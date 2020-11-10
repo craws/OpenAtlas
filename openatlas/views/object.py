@@ -1,30 +1,18 @@
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form2
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, was_modified
-
-
-class InformationCarrierForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
 
 
 @app.route('/object')
@@ -43,7 +31,7 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
 @app.route('/object/insert', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_insert() -> Union[str, Response]:
-    form = build_form2(InformationCarrierForm, 'Information Carrier')
+    form = build_form('information_carrier')
     if form.validate_on_submit():
         return redirect(save(form))
     return render_template('object/insert.html', form=form)
@@ -53,7 +41,7 @@ def object_insert() -> Union[str, Response]:
 @required_group('contributor')
 def object_update(id_: int) -> Union[str, Response]:
     object_ = Entity.get_by_id(id_, nodes=True, view_name='object')
-    form = build_form2(InformationCarrierForm, object_.system_type.title(), object_, request)
+    form = build_form('information_carrier', object_)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -94,7 +82,8 @@ def save(form: Any, object_: Optional[Entity] = None) -> str:
             object_ = Entity.insert('E84', form.name.data, 'information carrier')
         object_.update(form)
         url = url_for('entity_view', id_=object_.id)
-        url = url_for('object_insert') if form.continue_.data == 'yes' else url
+        if hasattr(form, 'continue') and form.continue_.data == 'yes':
+            url = url_for('object_insert')
         g.cursor.execute('COMMIT')
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

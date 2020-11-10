@@ -30,6 +30,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'information_carrier': ['name', 'description', 'continue'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
