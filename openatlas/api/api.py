@@ -1,6 +1,5 @@
 import ast
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from flask import g, session, url_for
 

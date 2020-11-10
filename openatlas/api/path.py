@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g
 
@@ -17,7 +17,7 @@ class Path:
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
             raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
-        for entity in Query.get_by_menu_item(code_, validation):
+        for entity in Query.get_by_menu_item_api(code_, validation):
             entities.append(entity)
         return entities
 
@@ -27,7 +27,7 @@ class Path:
         if class_code not in g.classes:
             raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
                            payload="404d")
-        for entity in Query.get_by_class_code(class_code, validation):
+        for entity in Query.get_by_class_code_api(class_code, validation):
             entities.append(entity)
         return entities
 
