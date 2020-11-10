@@ -122,7 +122,7 @@ class Validation:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
-    def validate_show(show: List[str]) -> List[Any]:
+    def validate_show(show: List[Any]) -> List[Any]:
         data = [True] if 'none' in show else [valid for valid in show if
                                               valid in Default.show_validation]
         return Default.show_validation if not data else data
@@ -136,5 +136,5 @@ class Validation:
         return Default.download if not download or download is True else True
 
     @staticmethod
-    def validate_lang(lang: Optional[str] = None) -> str:
+    def validate_lang(lang: Optional[str] = None) -> Optional[str]:
         return Default.lang if not lang or lang.lower() not in Default.lang_validation else lang
