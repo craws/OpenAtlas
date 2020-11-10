@@ -11,6 +11,6 @@ class GetEntity(Resource):
     def get(self, id_):
         args = entity_parser.parse_args()
         validation = Validation.validate_url_query(request.args)
-        entity = GeoJsonEntity.get_entity(id_, validation)
+        entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), validation)
         print(entity)
         return marshal(entity, template.entity_json), 200

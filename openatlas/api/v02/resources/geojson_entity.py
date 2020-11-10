@@ -169,7 +169,6 @@ class GeoJsonEntity:
         except Exception:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
-
         return entity
 
     @staticmethod
