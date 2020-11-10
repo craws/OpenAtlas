@@ -1,4 +1,6 @@
-from flask import request
+import json
+
+from flask import Response, request
 from flask_restful import Resource, marshal
 
 import openatlas.api.v02.templates.geojson as template
@@ -9,8 +11,13 @@ from openatlas.api.v02.resources.parser import entity_parser
 
 class GetEntity(Resource):
     def get(self, id_):
-        args = entity_parser.parse_args()
         validation = Validation.validate_url_query(request.args)
+
+        parser = entity_parser.parse_args()
         entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), validation)
-        print(entity)
+        if parser['download']:
+            return Response(json.dumps(marshal(entity, template.entity_json)),
+                            mimetype='application/json',
+                            headers={
+                                'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
         return marshal(entity, template.entity_json), 200

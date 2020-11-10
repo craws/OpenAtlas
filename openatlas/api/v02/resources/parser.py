@@ -9,9 +9,10 @@ default_parser = reqparse.RequestParser()
 default_parser.add_argument('download', type=bool, help='{error_msg}', default=False)
 default_parser.add_argument('count', type=bool, help='{error_msg}', default=False)
 
-language_parser = reqparse.RequestParser()
+language_parser = default_parser.copy()
 language_parser.add_argument('lang', type=str,
                              help='{error_msg}',
+                             case_sensitive=False,
                              choices=app.config['LANGUAGES'].keys())
 
 entity_parser = default_parser.copy()  # inherit the default parser
