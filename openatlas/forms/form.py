@@ -36,6 +36,17 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
 
 
+def build_add_reference_form(class_name: str) -> FlaskForm:
+
+    class Form(FlaskForm):  # type: ignore
+        pass
+
+    setattr(Form, class_name, TableField(_(class_name), [InputRequired()]))
+    setattr(Form, 'page', StringField(_('page')))
+    setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
+    return Form()
+
+
 def build_form(name: str,
                entity: Optional[Entity] = None,
                code: Optional[str] = None,

@@ -9,10 +9,9 @@ from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired
 
-import openatlas
 from openatlas import app, logger
 from openatlas.forms.field import TableField
-from openatlas.forms.form import build_form
+from openatlas.forms.form import build_add_reference_form, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.user import User
@@ -29,41 +28,11 @@ class AddReferenceForm(FlaskForm):  # type: ignore
     save = SubmitField(_('insert'))
 
 
-class AddSourceForm(FlaskForm):  # type: ignore
-    source = TableField(_('source'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddEventForm(FlaskForm):  # type: ignore
-    event = TableField(_('event'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddActorForm(FlaskForm):  # type: ignore
-    actor = TableField(_('actor'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddPlaceForm(FlaskForm):  # type: ignore
-    place = TableField(_('place'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddFileForm(FlaskForm):  # type: ignore
-    file = TableField(_('file'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
 @app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_, view_name='reference')
-    form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
+    form = build_add_reference_form(class_name)
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
         entity = Entity.get_by_id(getattr(form, class_name).data)
