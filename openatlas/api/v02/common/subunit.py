@@ -1,11 +1,11 @@
-import json
 from typing import Any, Dict, List, Tuple
 
-from flask import Response, jsonify, url_for
+from flask import jsonify, url_for
 from flask_restful import Resource, marshal
 
 from openatlas.api.v01.error import APIError
-from openatlas.api.v02.resources.parser import entity_parser
+from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
@@ -13,17 +13,15 @@ from openatlas.models.place import get_structure
 
 class GetSubunit(Resource):
     def get(self, id_: int) -> Tuple[Any, int]:
-        parser = entity_parser.parse_args()
+        parser = default_parser.parse_args()
         node = GetSubunit.get_subunits(id_)
+        template = NodeTemplate.node_template()
         if parser['count']:
             # Todo: very static, make it dynamic
-            return jsonify(len(GetSubunit.get_subunits(id_)))
+            return jsonify(len(node))
         if parser['download']:
-            return Response(json.dumps(marshal(node, NodeTemplate.node_template())),
-                            mimetype='application/json',
-                            headers={
-                                'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
-        return marshal(node, NodeTemplate.node_template()), 200
+            return Download.download(data=node, template=template, name=id_)
+        return marshal(node, template), 200
 
     @staticmethod
     def get_subunits(id_: int) -> List[Dict[str, Any]]:

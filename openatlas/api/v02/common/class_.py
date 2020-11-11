@@ -1,11 +1,11 @@
-import json
 from typing import Any, Dict, List, Tuple
 
-from flask import Response, g, jsonify, request
+from flask import g, jsonify, request
 from flask_restful import Resource, marshal
 
 from openatlas.api.v01.error import APIError
 from openatlas.api.v01.parameter import Validation
+from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.sql import Query
@@ -21,16 +21,13 @@ class GetByClass(Resource):
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, validation=validation),
             validation=validation)
+        template = GeoJson.geojson_template(parser['show'])
         if validation['count']:
             # Todo: very static, make it dynamic
             return jsonify(class_[1][0]['entities'])
         if parser['download']:
-            return Response(json.dumps(marshal(class_, GeoJson.geojson_template(parser['show']))),
-                            mimetype='application/json',
-                            headers={
-                                'Content-Disposition': 'attachment;filename=' + str(
-                                    class_code) + '.json'})
-        return marshal(class_, GeoJson.geojson_template(parser['show'])), 200
+            return Download.download(data=class_, template=template, name=class_code)
+        return marshal(class_, template), 200
 
     @staticmethod
     def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Entity]:
