@@ -9,8 +9,8 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm, widgets
 from flask_wtf.csrf import generate_csrf
-from wtforms import (FieldList, HiddenField, IntegerField, SelectField, SelectMultipleField,
-                     StringField, SubmitField, TextAreaField, widgets)
+from wtforms import (FieldList, FileField, HiddenField, IntegerField, SelectField,
+                     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
 from openatlas import app
@@ -32,6 +32,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'external_reference': ['name', 'description', 'continue'],
          'event': ['name', 'date', 'wikidata', 'description', 'continue'],
          'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'file': ['name', 'description'],
          'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
@@ -64,7 +65,7 @@ def build_form(name: str,
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     code = entity.class_.code if entity else code
     add_types(Form, name, code)
-    add_fields(Form, name, code)
+    add_fields(Form, name, code, entity)
     add_external_references(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
@@ -183,7 +184,10 @@ def add_types(form: any, name: str, code: Union[str, None]):
             add_value_type_fields(form, node.subs)
 
 
-def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
+def add_fields(form: Any,
+               name: str,
+               code: Optional[str, None],
+               entity: Optional[Entity, None]) -> None:
     if name == 'actor':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
@@ -201,6 +205,8 @@ def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'object', TableMultiField())
             setattr(form, 'person', TableMultiField())
+    elif name == 'file' and not entity:
+        setattr(form, 'file', FileField(_('file'), [InputRequired()]))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 

@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
@@ -51,6 +51,17 @@ def validate(self) -> bool:
                 if first > second:
                     field.errors.append(_('Begin dates cannot start after end dates.'))
                     valid = False
+
+    # File
+    if request.files:
+        file_ = request.files['file']
+        ext = session['settings']['file_upload_allowed_extension']
+        if not file_:  # pragma: no cover
+            self.file.errors.append(_('no file to upload'))
+            valid = False
+        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in ext):
+            self.file.errors.append(_('file type not allowed'))
+            valid = False
 
     # Super event
     if hasattr(self, 'event'):

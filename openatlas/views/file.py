@@ -2,45 +2,21 @@ import datetime
 import os
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, send_from_directory, session, url_for
+from flask import flash, g, render_template, request, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
-from wtforms import FileField, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.util import build_form2
-from openatlas.forms.form import build_table_form
+from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.display import (add_edit_link, add_remove_link, convert_size, format_date,
                                     get_base_table_data, get_entity_data, get_file_path, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, required_group, was_modified
-
-
-class FileForm(FlaskForm):  # type: ignore
-    file = FileField(_('file'), [InputRequired()])
-    name = StringField(_('name'), [InputRequired()])
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    opened = HiddenField()
-
-    def validate(self) -> bool:
-        valid = FlaskForm.validate(self)
-        if request.files:
-            file_ = request.files['file']
-            ext = session['settings']['file_upload_allowed_extension']
-            if not file_:  # pragma: no cover
-                self.file.errors.append(_('no file to upload'))
-                valid = False
-            elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in ext):
-                self.file.errors.append(_('file type not allowed'))
-                valid = False
-        return valid
 
 
 @app.route('/download/<path:filename>')
@@ -124,8 +100,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
 @required_group('contributor')
 def file_update(id_: int) -> Union[str, Response]:
     file_ = Entity.get_by_id(id_, nodes=True)
-    form = build_form2(FileForm, 'File', file_, request)
-    del form.file
+    form = build_form('file', file_)
     if form.validate_on_submit():
         if was_modified(form, file_):  # pragma: no cover
             del form.save
@@ -142,7 +117,7 @@ def file_update(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form2(FileForm, 'File')
+    form = build_form('file')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False
@@ -178,7 +153,7 @@ def file_view(file: Entity) -> str:
                            filename=path.name if path else False)
 
 
-def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
+def save(form: FlaskForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'
