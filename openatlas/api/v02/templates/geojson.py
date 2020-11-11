@@ -49,8 +49,7 @@ class GeoJson:
 
         geometry = {'type': fields.String,
                     'geometries': fields.Nested(geometries)}
-        nothing = ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                   'depictions']
+
         feature = {'@id': fields.String,
                    'type': fields.String,
                    'crmClass': fields.String,
