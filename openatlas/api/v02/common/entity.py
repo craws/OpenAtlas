@@ -1,5 +1,5 @@
 import json
-
+from typing import Any, Tuple
 from flask import Response, request
 from flask_restful import Resource, marshal
 
@@ -10,7 +10,7 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetEntity(Resource):
-    def get(self, id_):
+    def get(self, id_: int) -> Tuple[Any, int]:
         validation = Validation.validate_url_query(request.args)
 
         parser = entity_parser.parse_args()

@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Tuple
 
 from flask import Response, g, jsonify, request
 from flask_restful import Resource, marshal
@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByClass(Resource):
-    def get(self, class_code):
+    def get(self, class_code: str) -> Tuple[Any, int]:
         validation = Validation.validate_url_query(request.args)
 
         parser = entity_parser.parse_args()

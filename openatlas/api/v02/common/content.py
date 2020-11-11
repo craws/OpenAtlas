@@ -1,5 +1,5 @@
 import json
-
+from typing import Any, Tuple
 from flask import Response
 from flask_restful import Resource, marshal
 
@@ -9,7 +9,7 @@ from openatlas.models.content import Content
 
 
 class GetContent(Resource):
-    def get(self):
+    def get(self) -> Tuple[Any, int]:
         parser = language_parser.parse_args()
         content = {'intro': Content.get_translation('intro_for_frontend', parser['lang']),
                    'contact': Content.get_translation('contact_for_frontend', parser['lang']),
