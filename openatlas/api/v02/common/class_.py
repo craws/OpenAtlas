@@ -1,13 +1,13 @@
 import json
+from typing import Any, Dict, List
 
 from flask import Response, g, jsonify, request
 from flask_restful import Resource, marshal
-from typing import Any, Dict, List
 
 from openatlas.api.v01.error import APIError
 from openatlas.api.v01.parameter import Validation
-from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.pagination import Pagination
+from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.sql import Query
 from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.models.entity import Entity

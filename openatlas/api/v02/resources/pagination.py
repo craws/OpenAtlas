@@ -1,8 +1,8 @@
 import itertools
 from typing import Any, Dict, List
 
-from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 
 

@@ -4,8 +4,8 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.parser import language_parser
-from openatlas.models.content import Content
 from openatlas.api.v02.templates.content import ContentTemplate
+from openatlas.models.content import Content
 
 
 class GetContent(Resource):

@@ -2,11 +2,10 @@ from flask_restful import Api
 
 from openatlas import app
 from openatlas.api.v02.common.class_ import GetByClass
+from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.common.content import GetContent
 from openatlas.api.v02.common.entity import GetEntity
-from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.common.latest import GetLatest
-
 
 api = Api(app)  # Establish connection between API and APP
 

@@ -1,6 +1,6 @@
-from flask_restful import fields
-from typing import Any, Dict, Type
+from typing import Dict, Type
 
+from flask_restful import fields
 from flask_restful.fields import String
 
 
@@ -62,8 +62,10 @@ class GeoJson:
 
         if 'types' in show:
             feature['types'] = fields.List(fields.Nested(types))
+
         if 'relations' in show:
             feature['relations'] = fields.List(fields.Nested(relations))
+
         if 'names' in show:
             feature['names'] = fields.List(fields.Nested(names))
 

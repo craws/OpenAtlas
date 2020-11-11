@@ -3,10 +3,10 @@ import json
 from flask import Response, request
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.templates.geojson import GeoJson
-from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v01.parameter import Validation
+from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.parser import entity_parser
+from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetEntity(Resource):
