@@ -209,7 +209,7 @@ class GeoJsonEntity:
                 features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]}
 
         # Geonames
-        if GeoJsonEntity.get_geonames(entity) and 'geonames' in meta['show']:
+        if GeoJsonEntity.get_geonames(entity) and 'links' in meta['show']:
             features['links'] = [GeoJsonEntity.get_geonames(entity)]
 
         # Geometry

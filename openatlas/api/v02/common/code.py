@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from flask import Response, jsonify, request
 from flask_restful import Resource, marshal
 
-import openatlas.api.v02.templates.geojson as template
+from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.api.v01.error import APIError
 from openatlas.api.v01.parameter import Validation
 from openatlas.api.v02.resources.pagination import Pagination
@@ -25,12 +25,12 @@ class GetByCode(Resource):
             # Todo: very static, make it dynamic
             return jsonify(code[1][0]['entities'])
         if parser['download']:
-            return Response(json.dumps(marshal(code, template.entity_json)),
+            return Response(json.dumps(marshal(code, GeoJson.geojson_template(parser['show']))),
                             mimetype='application/json',
                             headers={
                                 'Content-Disposition': 'attachment;filename=' + str(
                                     item) + '.json'})
-        return code
+        return marshal(code, GeoJson.geojson_template(parser['show'])), 200
 
     @staticmethod
     def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[Entity]:

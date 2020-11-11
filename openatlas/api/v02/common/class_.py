@@ -6,10 +6,10 @@ from typing import Any, Dict, List
 
 from openatlas.api.v01.error import APIError
 from openatlas.api.v01.parameter import Validation
-import openatlas.api.v02.templates.geojson as template
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.sql import Query
+from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.models.entity import Entity
 
 
@@ -25,12 +25,12 @@ class GetByClass(Resource):
             # Todo: very static, make it dynamic
             return jsonify(class_[1][0]['entities'])
         if parser['download']:
-            return Response(json.dumps(marshal(class_, template.entity_json)),
+            return Response(json.dumps(marshal(class_, GeoJson.geojson_template(parser['show']))),
                             mimetype='application/json',
                             headers={
                                 'Content-Disposition': 'attachment;filename=' + str(
                                     class_code) + '.json'})
-        return class_
+        return marshal(class_, GeoJson.geojson_template(parser['show'])), 200
 
     @staticmethod
     def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Entity]:

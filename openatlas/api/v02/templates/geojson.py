@@ -1,65 +1,88 @@
 from flask_restful import fields
+from typing import Any, Dict, Type
 
-title = {'title': fields.String}
+from flask_restful.fields import String
 
-relations = {'label': fields.String,
-             'relationTo': fields.String,
-             'relationType': fields.String}
 
-depictions = {'@id': fields.String,
-              'title': fields.String,
-              'license': fields.String,
-              'url': fields.String}
+class GeoJson:
 
-links = {'type': fields.String,
-         'identifier': fields.String}
+    @staticmethod
+    def geojson_template(show: Dict[str, str]) -> Dict[str, Type[String]]:
+        title = {'title': fields.String}
 
-types = {'identifier': fields.String,
-         'label': fields.String,
-         'description': fields.String,
-         'hierarchy': fields.String}
+        relations = {'label': fields.String,
+                     'relationTo': fields.String,
+                     'relationType': fields.String}
 
-names = {'alias': fields.String}
+        depictions = {'@id': fields.String,
+                      'title': fields.String,
+                      'license': fields.String,
+                      'url': fields.String}
 
-start = {'earliest': fields.String,
-         'latest': fields.String}
+        links = {'type': fields.String,
+                 'identifier': fields.String}
 
-end = {'earliest': fields.String,
-       'latest': fields.String}
+        types = {'identifier': fields.String,
+                 'label': fields.String,
+                 'description': fields.String,
+                 'hierarchy': fields.String}
 
-description = {'value': fields.String}
+        names = {'alias': fields.String}
 
-timespans = {'start': fields.Nested(start),
-             'end': fields.Nested(end)}
+        start = {'earliest': fields.String,
+                 'latest': fields.String}
 
-when = {'timespans': fields.List(fields.Nested(timespans))}
+        end = {'earliest': fields.String,
+               'latest': fields.String}
 
-geometries = {'type': fields.String,
-              'coordinates': fields.List(fields.Float),
-              'title': fields.String,
-              'description': fields.String}
+        description = {'value': fields.String}
 
-geometry = {'type': fields.String,
-            'geometries': fields.Nested(geometries)}
+        timespans = {'start': fields.Nested(start),
+                     'end': fields.Nested(end)}
 
-feature = {'@id': fields.String,
-           'type': fields.String,
-           'crmClass': fields.String,
-           'properties': fields.Nested(title),
-           'description': fields.List(fields.Nested(description)),
-           'types': fields.List(fields.Nested(types)),
-           'names': fields.List(fields.Nested(names)),
-           'when': fields.Nested(when),
-           'relations': fields.List(fields.Nested(relations)),
-           'depictions': fields.List(fields.Nested(depictions)),
-           'links': fields.List(fields.Nested(links)),
-           # ToDo: geometry has to be dynamic, if it is only one geometry than geometries will never be returned. If it is a Point, the coordinates are list of two floats, else it is a list of lists, or maybe a lists of lists of lists...
-           # Look into that: https://blog.fossasia.org/dynamically-marshaling-output-in-flask-restplus/
-           # https://github.com/flask-restful/flask-restful/issues/212
-           # --> Maybe return the geometric with flask_restful.marshal_with_field
-           # 'geometry': fields.Nested(geometries)
-           }
+        when = {'timespans': fields.List(fields.Nested(timespans))}
 
-entity_json = {'@context': fields.String,
-               'type': fields.String,
-               'features': fields.List(fields.Nested(feature))}
+        geometries = {'type': fields.String,
+                      'coordinates': fields.List(fields.Float),
+                      'title': fields.String,
+                      'description': fields.String}
+
+        geometry = {'type': fields.String,
+                    'geometries': fields.Nested(geometries)}
+        nothing = ['when', 'types', 'relations', 'names', 'links', 'geometry',
+                   'depictions']
+        feature = {'@id': fields.String,
+                   'type': fields.String,
+                   'crmClass': fields.String,
+                   'properties': fields.Nested(title),
+                   'description': fields.List(fields.Nested(description))
+                   }
+
+        if 'when' in show:
+            feature['when'] = fields.Nested(when)
+
+        if 'types' in show:
+            feature['types'] = fields.List(fields.Nested(types))
+        if 'relations' in show:
+            feature['relations'] = fields.List(fields.Nested(relations))
+        if 'names' in show:
+            feature['names'] = fields.List(fields.Nested(names))
+
+        if 'links' in show:
+            feature['links'] = fields.List(fields.Nested(links))
+
+        # ToDo: geometry has to be dynamic, if it is only one geometry than geometries will never be returned. If it is a Point, the coordinates are list of two floats, else it is a list of lists, or maybe a lists of lists of lists...
+        # Look into that: https://blog.fossasia.org/dynamically-marshaling-output-in-flask-restplus/
+        # https://github.com/flask-restful/flask-restful/issues/212
+        # --> Maybe return the geometric with flask_restful.marshal_with_field
+        # if 'geometry' in show:
+        #    feature['geometry'] = fields.Nested(geometries)
+
+        if 'depictions' in show:
+            feature['depictions'] = fields.List(fields.Nested(depictions))
+
+        entity_json = {'@context': fields.String,
+                       'type': fields.String,
+                       'features': fields.List(fields.Nested(feature))}
+
+        return entity_json
