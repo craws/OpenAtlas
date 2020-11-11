@@ -5,12 +5,9 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
-                     widgets)
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form2
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import link, sanitize
@@ -18,28 +15,13 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
-class HierarchyForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
-    forms = SelectMultipleField(_('forms'),
-                                render_kw={'disabled': True},
-                                description=_('tooltip hierarchy forms'),
-                                choices=[],
-                                option_widget=widgets.CheckboxInput(),
-                                widget=widgets.ListWidget(prefix_label=False),
-                                coerce=int)
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-
-
 @app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(param: str) -> Union[str, Response]:
-    form = build_form2(HierarchyForm, 'hierarchy')
+    form = build_form('hierarchy', code=param)
     form.forms.choices = Node.get_form_choices()
-    if param == 'value':
-        del form.multiple
     if form.validate_on_submit():
+        # Todo: duplicate check doesn't seem to work for empty hierarchies
         if Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('hierarchy/insert.html', form=form)
@@ -52,34 +34,33 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_update(id_: int) -> Union[str, Response]:
-    root = g.nodes[id_]
+    hierarchy = g.nodes[id_]
     if g.nodes[id_].value_type:
         tab_hash = '#menu-tab-value_collapse-'
     else:
         tab_hash = '#menu-tab-custom_collapse-'
-    if root.standard:
+    if hierarchy.standard:
         abort(403)
-    form = build_form2(HierarchyForm, 'hierarchy', root)
-    form.forms.choices = Node.get_form_choices(root)
-    if root.value_type:
-        del form.multiple
-    elif root.multiple:
+    form = build_form('hierarchy', hierarchy)
+    form.forms.choices = Node.get_form_choices(hierarchy)
+    if hasattr(form, 'multiple'):
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
-        if form.name.data != root.name and Node.get_nodes(form.name.data):
+        if form.name.data != hierarchy.name and Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return redirect(url_for('node_index') + tab_hash + str(root.id))
-        save(form, root)
+            return redirect(url_for('node_index') + tab_hash + str(hierarchy.id))
+        save(form, hierarchy)
         flash(_('info update'), 'info')
-        return redirect(url_for('node_index') + tab_hash + str(root.id))
-    form.multiple = root.multiple
+        return redirect(url_for('node_index') + tab_hash + str(hierarchy.id))
+    form.multiple = hierarchy.multiple
     table = Table(paging=False)
-    for form_id, form_ in root.forms.items():
-        link_ = link(_('remove'), url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id))
-        count = Node.get_form_count(root, form_id)
+    for form_id, form_ in hierarchy.forms.items():
+        link_ = link(_('remove'),
+                     url_for('hierarchy_remove_form', id_=hierarchy.id, remove_id=form_id))
+        count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
     return render_template('hierarchy/update.html',
-                           node=root,
+                           node=hierarchy,
                            form=form,
                            table=table,
                            forms=[form.id for form in form.forms])

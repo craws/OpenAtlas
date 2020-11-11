@@ -9,7 +9,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm, widgets
 from flask_wtf.csrf import generate_csrf
-from wtforms import (FieldList, FileField, HiddenField, IntegerField, SelectField,
+from wtforms import (BooleanField, FieldList, FileField, HiddenField, IntegerField, SelectField,
                      SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -34,6 +34,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'file': ['name', 'description'],
          'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'hierarchy': ['name', 'description'],
          'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
@@ -47,7 +48,6 @@ def build_form(name: str,
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
-
     # Builds a form for CIDOC CRM entities which has to be dynamic because of types, module
     # settings and class specific fields
 
@@ -207,12 +207,22 @@ def add_fields(form: Any,
             setattr(form, 'person', TableMultiField())
     elif name == 'file' and not entity:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
+    elif name == 'hierarchy':
+        if (code and code == 'custom') or (entity and not entity.value_type):
+            setattr(form, 'multiple', BooleanField(_('multiple'),
+                                                   description=_('tooltip hierarchy multiple')))
+        setattr(form, 'forms', SelectMultipleField(_('forms'),
+                                                   render_kw={'disabled': True},
+                                                   description=_('tooltip hierarchy forms'),
+                                                   choices=[],
+                                                   option_widget=widgets.CheckboxInput(),
+                                                   widget=widgets.ListWidget(prefix_label=False),
+                                                   coerce=int))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 
 
 def build_add_reference_form(class_name: str) -> FlaskForm:
-
     class Form(FlaskForm):  # type: ignore
         pass
 
@@ -223,7 +233,6 @@ def build_add_reference_form(class_name: str) -> FlaskForm:
 
 
 def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) -> FlaskForm:
-
     class Form(FlaskForm):  # type: ignore
         name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
         is_node_form = HiddenField()
@@ -289,7 +298,6 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
 
 
 def build_move_form(node: Node) -> FlaskForm:
-
     class Form(FlaskForm):  # type: ignore
         is_node_form = HiddenField()
         checkbox_values = HiddenField()
