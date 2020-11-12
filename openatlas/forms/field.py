@@ -146,8 +146,8 @@ class TableSelect(HiddenInput):  # type: ignore
             data.insert(0, """
                 <div style="position: relative; top: 10px;" >
                     <div
-                        class="btn btn-outline-primary btn-sm"
-                        style="position: absolute; top: -30px; height: 27px"
+                        class="btn btn-outline-primary btn-xsm"
+                        style="position: absolute; top: -22px;"
                         onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')">
                             {label}
                     </div>
