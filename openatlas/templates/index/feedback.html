@@ -29,7 +29,7 @@
         {% if session.settings.mail and session.settings.mail_recipients_feedback %}
             <li>
                 <p>{{ _('feedback_form') }}:</p>
-                {{ form|display_form('feedback-form') }}
+                {{ form|display_new_form('feedback-form') }}
             </li>
         {% endif %}
     </ul>

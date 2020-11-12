@@ -37,6 +37,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'hierarchy': ['name', 'description'],
          'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
+         'involvement': ['date', 'description', 'continue'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
@@ -65,7 +66,7 @@ def build_form(name: str,
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     code = entity.class_.code if entity else code
     add_types(Form, name, code)
-    add_fields(Form, name, code, entity)
+    add_fields(Form, name, code, entity, origin)
     add_external_references(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
@@ -122,7 +123,7 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
     setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
     if entity:
         return form
-    if not origin and 'continue' in forms[name]:
+    if 'continue' in forms[name] and (name in ['involvement'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -187,7 +188,8 @@ def add_types(form: any, name: str, code: Union[str, None]):
 def add_fields(form: Any,
                name: str,
                code: Optional[str, None],
-               entity: Optional[Entity, None]) -> None:
+               entity: Optional[Entity, None],
+               origin: Optional[Entity, None]) -> None:
     if name == 'actor':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
@@ -218,6 +220,12 @@ def add_fields(form: Any,
                                                    option_widget=widgets.CheckboxInput(),
                                                    widget=widgets.ListWidget(prefix_label=False),
                                                    coerce=int))
+    elif name == 'involvement':
+        if entity:
+            return
+        involved_with = 'actor' if origin.view_name == 'event' else 'event'
+        setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
+        setattr(form, 'activity', SelectField(_('activity')))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 

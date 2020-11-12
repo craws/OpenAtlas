@@ -10,6 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
+from openatlas.forms.form import build_form
 from openatlas.forms.util import build_form2, get_link_type
 from openatlas.forms.field import TableMultiField
 from openatlas.models.entity import Entity
@@ -31,11 +32,7 @@ class ActorForm(DateForm):
 @required_group('contributor')
 def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form2(ActorForm, 'Involvement')
-    if origin.view_name == 'event':
-        del form.event
-    else:
-        del form.actor
+    form = build_form('involvement', origin=origin)
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
     if origin.class_.code in ['E7', 'E8']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
@@ -77,8 +74,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
-    form = build_form2(ActorForm, 'Involvement', link_, request)
-    del form.actor, form.event, form.insert_and_continue
+    form = build_form('involvement', link_)
     form.activity.choices = [('P11', g.properties['P11'].name)]
     event = Entity.get_by_id(link_.domain.id, view_name='event')
     actor = Entity.get_by_id(link_.range.id, view_name='actor')
