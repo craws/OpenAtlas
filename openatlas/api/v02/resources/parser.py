@@ -1,3 +1,4 @@
+from flask import g
 from flask_restful import reqparse
 
 from openatlas import app
@@ -37,3 +38,12 @@ entity_parser.add_argument('show', type=str, help='{error_msg}.', action='append
                                     'depictions', 'geonames', 'none'))
 entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append',
                            default='and|id|gt|1')
+
+query_parser = entity_parser.copy()
+query_parser.add_argument('entities', type=int, action='append',
+                          help="{error_msg}")
+query_parser.add_argument('classes', type=str, action='append',
+                          help="{error_msg}", case_sensitive=False)
+query_parser.add_argument('codes', type=str, action='append', help="{error_msg}",
+                          case_sensitive=False,
+                          choices=('actor', 'event', 'place', 'reference', 'source', 'object'))

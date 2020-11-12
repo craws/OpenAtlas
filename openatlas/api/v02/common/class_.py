@@ -16,7 +16,6 @@ from openatlas.models.entity import Entity
 class GetByClass(Resource):
     def get(self, class_code: str) -> Tuple[Any, int]:
         validation = Validation.validate_url_query(request.args)
-
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, validation=validation),
