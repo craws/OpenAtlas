@@ -642,11 +642,12 @@ tr:hover {
 }
 
 .btn-xsm {
-    padding-top: 0.25rem;
+    padding-top: 0.3rem;
     padding-right: 0.5rem;
-    padding-bottom: 0.25rem;
+    padding-bottom: 0.3rem;
     padding-left: 0.5rem;
     font-size: .875rem;
     line-height: 1.0;
     border-radius: .2rem;
+    margin-bottom: 0.15em;
 }
