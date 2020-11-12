@@ -1,6 +1,4 @@
-from typing import Any
-
-from flask import json, jsonify, render_template, request, send_file, send_from_directory
+from flask import json, jsonify, render_template, request
 from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
@@ -10,8 +8,6 @@ from openatlas.api.v01.error import APIError
 from openatlas.api.v01.node import APINode
 from openatlas.api.v01.parameter import Validation
 from openatlas.api.v01.path import Path
-from openatlas.models.entity import Entity
-from openatlas.models.node import Node
 from openatlas.util.util import api_access
 
 
@@ -118,7 +114,8 @@ def api_get_query() -> Response:
                     count += len(
                         Path.get_entities_by_class(class_code=class_code, validation=validation))
                 else:
-                    out.extend(Path.get_entities_by_class(class_code=class_code, validation=validation))
+                    out.extend(
+                        Path.get_entities_by_class(class_code=class_code, validation=validation))
         if validation['count']:
             return jsonify(count)
         if validation['download']:
@@ -191,25 +188,6 @@ def api_subunit_hierarchy(id_: int) -> Response:
                             'Content-Disposition': 'attachment;filename=subunit_hierarchy_' + str(
                                 id_) + '.json'})
     return jsonify(APINode.get_subunit_hierarchy(id_))
-
-
-@app.route('/api/display/<path:filename>', strict_slashes=False)
-@api_access()  # type: ignore
-@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def display_file_api(filename: str) -> Any:  # pragma: no cover
-    validation = Validation.validate_url_query(request.args)
-    from pathlib import Path as Pathlib_path
-    entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
-    license_ = None
-    # If img has no license, it will not displayed
-    for node in entity.nodes:
-        if node.root and node.root[-1] == Node.get_hierarchy('License').id:
-            license_ = node.name
-    if license_:
-        if validation['download']:
-            return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
-        return send_from_directory(app.config['UPLOAD_DIR'], filename)
-    raise APIError('Access denied.', status_code=403, payload="403")
 
 
 @app.route('/api/0.1/content/', strict_slashes=False)

@@ -36,6 +36,7 @@ from openatlas.views import (actor, admin, ajax, api_, entity, event, export, fi
                              overlay, place, profile, reference, relation, search, source, sql,
                              translation, types, user)
 #  Restful API import
+from openatlas.api import util
 from openatlas.api.v02 import routes
 
 
