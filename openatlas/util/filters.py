@@ -297,7 +297,7 @@ def add_row(field,
         </div>""".format(
         label=label if isinstance(label, str) else field.label,
         tooltip=display.tooltip(field.description),
-        value=value if value else field(class_=css_class),
+        value=value if value else field(class_=css_class).replace('> ', '>'),
         css_row='external-reference' if field.id in [name + '_id' for name in g.external] else '',
         errors=errors)
 
