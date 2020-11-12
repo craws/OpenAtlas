@@ -640,3 +640,13 @@ div.data-table div.display-none {
 tr:hover {
     background-color: rgba(0,0,0,0.1) !important;
 }
+
+.btn-xsm {
+    padding-top: 0.25rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.25rem;
+    padding-left: 0.5rem;
+    font-size: .875rem;
+    line-height: 1.0;
+    border-radius: .2rem;
+}

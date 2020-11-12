@@ -1,7 +1,8 @@
 
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_types() {
-    $(".value-type-switch").toggleClass('display-none');
+
+    /*$(".value-type-switch").toggleClass('display-none');*/
     $(this).text(function (i, text) {
         return text === show ? hide : show;
     })
