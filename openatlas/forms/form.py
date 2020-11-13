@@ -45,7 +45,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
 
 
 def build_form(name: str,
-               entity: Optional[Entity] = None,
+               item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -64,9 +64,9 @@ def build_form(name: str,
 
     if 'alias' in forms[name]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
-    code = entity.class_.code if entity else code
+    code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name, code)
-    add_fields(Form, name, code, entity, origin)
+    add_fields(Form, name, code, item, origin)
     add_external_references(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
@@ -77,21 +77,23 @@ def build_form(name: str,
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
-    add_buttons(Form, name, entity, origin)
+    add_buttons(Form, name, item, origin)
     setattr(Form, 'validate', validate)
-    return populate_form(Form(obj=entity), entity, location) if entity else Form()
+    if not item or (request and request.method != 'GET'):
+        return Form()
+    return populate_form(Form(obj=item), item, location)
 
 
-def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -> FlaskForm:
-    if not entity or not request or request.method != 'GET':
-        return form
+def populate_form(form: FlaskForm,
+                  item: Union[Entity, Link],
+                  location: Optional[Entity]) -> FlaskForm:
 
     # Dates
     if hasattr(form, 'begin_year_from'):
-        date.populate_dates(form, entity)
+        date.populate_dates(form, item)
 
     # Nodes
-    nodes = entity.nodes
+    nodes = item.nodes
     if location:  # Needed for administrative unit and historical place nodes
         nodes.update(location.nodes)
     form.opened.data = time.time()
@@ -110,7 +112,7 @@ def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -
     # External references
     for name in g.external:
         if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
-            link_ = Reference.get_link(entity, name)
+            link_ = Reference.get_link(item, name)
             if link_ and not getattr(form, name + '_id').data:
                 reference = link_.domain
                 getattr(form, name + '_id').data = reference.name if reference else ''
@@ -187,9 +189,9 @@ def add_types(form: any, name: str, code: Union[str, None]):
 
 def add_fields(form: Any,
                name: str,
-               code: Optional[str, None],
-               entity: Optional[Entity, None],
-               origin: Optional[Entity, None]) -> None:
+               code: Union[str, None],
+               item: Union[Entity, Link, None],
+               origin: Union[Entity, None]) -> None:
     if name == 'actor':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
@@ -207,10 +209,10 @@ def add_fields(form: Any,
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'object', TableMultiField())
             setattr(form, 'person', TableMultiField())
-    elif name == 'file' and not entity:
+    elif name == 'file' and not item:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
     elif name == 'hierarchy':
-        if (code and code == 'custom') or (entity and not entity.value_type):
+        if (code and code == 'custom') or (item and not item.value_type):
             setattr(form, 'multiple', BooleanField(_('multiple'),
                                                    description=_('tooltip hierarchy multiple')))
         setattr(form, 'forms', SelectMultipleField(_('forms'),
@@ -221,10 +223,9 @@ def add_fields(form: Any,
                                                    widget=widgets.ListWidget(prefix_label=False),
                                                    coerce=int))
     elif name == 'involvement':
-        if entity:
-            return
-        involved_with = 'actor' if origin.view_name == 'event' else 'event'
-        setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
+        if not item:
+            involved_with = 'actor' if origin.view_name == 'event' else 'event'
+            setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())

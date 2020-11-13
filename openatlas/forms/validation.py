@@ -64,7 +64,7 @@ def validate(self) -> bool:
             valid = False
 
     # Super event
-    if hasattr(self, 'event'):
+    if hasattr(self, 'event') and hasattr(self, 'event_id'):
         """ Check if selected super event is allowed."""
         # Todo: also check if super is not a sub event of itself (recursively)
         if self.event.data:

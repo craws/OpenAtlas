@@ -1,31 +1,17 @@
 import ast
 from typing import Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
 from openatlas.forms.form import build_form
-from openatlas.forms.util import build_form2, get_link_type
-from openatlas.forms.field import TableMultiField
+from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group
-
-
-class ActorForm(DateForm):
-    actor = TableMultiField(_('actor'), [InputRequired()])
-    event = TableMultiField(_('event'), [InputRequired()])
-    activity = SelectField(_('activity'))
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
 
 
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
@@ -102,7 +88,6 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description
-    form.populate_dates(link_)
     return render_template('involvement/update.html',
                            origin=origin,
                            form=form,
