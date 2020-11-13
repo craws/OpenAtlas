@@ -278,9 +278,10 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
 
 def add_row(field,
             label: Optional[str] = None,
-            value: Optional[str] = None) -> str:
+            value: Optional[str] = None,
+            form_id: Optional[str] = None) -> str:
     field.label.text = display.uc_first(field.label.text)
-    field.label.text += ' *' if field.flags.required else ''
+    field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
 
     # CSS
     css_class = 'required' if field.flags.required else ''
@@ -387,7 +388,7 @@ def display_new_form(self: Any,
                                                           str(precision_field)]))
             continue
 
-        html += add_row(field)
+        html += add_row(field, form_id=form_id)
 
     return Markup("""
         <form method="post" {id} {multi}>
