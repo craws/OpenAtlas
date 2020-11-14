@@ -13,7 +13,7 @@ class NoteTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', 'Ripley')
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
-            assert b'Note *' in rv.data
+            assert b'Description' in rv.data
             rv = self.app.post(url_for('note_insert', entity_id=actor.id),
                                data={'description': 'A nice description'},
                                follow_redirects=True)
@@ -25,6 +25,6 @@ class NoteTest(TestBaseCase):
             rv = self.app.post(url_for('note_update', entity_id=actor.id),
                                data={'description': 'A very nice description'},
                                follow_redirects=True)
-            assert b'Note updated' in rv.data
+            assert b'Note updated' in rv.data and b'A very nice description' in rv.data
             rv = self.app.get(url_for('note_delete', entity_id=actor.id), follow_redirects=True)
             assert b'Note deleted' in rv.data

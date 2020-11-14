@@ -99,16 +99,22 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
 def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
-    if not entity.note:
-        html = '<p><a href="{url}">{label}</a></p>'.format(
+    if not isinstance(entity.note, str):
+        html = '<div class="toolbar"><a class="{class_}" href="{url}">{label}</a></div>'.format(
             url=url_for('note_insert', entity_id=entity.id),
-            label=display.uc_first(_('note')))
+            class_=app.config['CSS']['button']['primary'],
+            label=display.uc_first(_('add note')))
     else:
-        html = '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
+        html = '''
+            <h2>{label}</h2>
+            <p>{note}</p>
+            <div class="toolbar">{edit} {delete}</div>'''.format(
             label=display.uc_first(_('note')),
             note=entity.note,
-            url=url_for('note_update', entity_id=entity.id),
-            edit=display.uc_first(_('edit note')))
+            edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
+            delete=display.button(_('delete'),
+                                  url_for('note_delete', entity_id=entity.id),
+                                  onclick="return confirm('" + _('Delete note?') + "');"))
     return Markup(html)
 
 

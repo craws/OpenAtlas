@@ -4,8 +4,5 @@
     {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('edit note')]|crumb }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ _('delete')|button(url_for('note_delete', entity_id=entity.id), onclick="return confirm('" + _('Delete note?') + "');") }}
-    </div>
-    {{ form|display_form }}
+    {{ form|display_new_form }}
 {% endblock %}
