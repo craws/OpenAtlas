@@ -100,10 +100,8 @@ def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
     if not isinstance(entity.note, str):
-        html = '<div class="toolbar"><a class="{class_}" href="{url}">{label}</a></div>'.format(
-            url=url_for('note_insert', entity_id=entity.id),
-            class_=app.config['CSS']['button']['primary'],
-            label=display.uc_first(_('add note')))
+        html = '<div class="toolbar">{insert}</div>'.format(
+            insert=display.button(_('add note'), url_for('note_insert', entity_id=entity.id)))
     else:
         html = '''
             <h2>{label}</h2>
