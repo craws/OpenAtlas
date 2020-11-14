@@ -38,6 +38,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
+         'member': ['date', 'description', 'continue'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
@@ -227,6 +228,11 @@ def add_fields(form: Any,
             involved_with = 'actor' if origin.view_name == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
+    elif name == 'member' and not item:
+        setattr(form, 'member_origin_id', HiddenField())
+        setattr(form,
+                'actor' if code == 'member' else 'group',
+                TableMultiField(_('actor'), [InputRequired()]))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 

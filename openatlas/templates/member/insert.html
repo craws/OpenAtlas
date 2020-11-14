@@ -1,8 +1,8 @@
 {% extends 'layout.html' %}
 {% block title_name %} - {{ _('member')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], origin, '+' + _('member')|uc_first]|crumb }}
+    {{ [[_('actor'), 'actor_index'], origin, '+ ' + _('member')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form }}
+    {{ form|display_new_form }}
 {% endblock %}

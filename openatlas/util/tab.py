@@ -42,11 +42,11 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
                 aria-selected="{selected}" 
                 href="#tab-{id}">{label}
             </a>
-        </li>'''.format(active=' active' if active else '',
-                        selected='true' if active else 'false',
-                        label=uc_first(_(id_.replace('_', ' '))) +
-                              (format_tab_number(table) if table else ''),
-                        id=id_.replace('_', '-').replace(' ', '-'))
+        </li>'''.format(
+        active=' active' if active else '',
+        selected='true' if active else 'false',
+        label=uc_first(_(id_.replace('_', ' '))) + (format_tab_number(table) if table else ''),
+        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
@@ -131,7 +131,8 @@ class Tab:
             buttons = [button(_('link'), url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
             table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
-            buttons = [button(_('link'), url_for('membership_insert', origin_id=id_))]
+            buttons = [button(_('link'),
+                              url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
             if system_type == 'file':
                 buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='place'))]

@@ -1,3 +1,5 @@
+import ast
+
 from flask import g, request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -84,4 +86,11 @@ def validate(self) -> bool:
             if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
                 valid = False
                 getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
+
+    # Membership
+    if hasattr(self, 'member_origin_id'):
+        member = getattr(self, 'actor') if hasattr(self, 'actor') else getattr(self, 'group')
+        if self.member_origin_id.data in ast.literal_eval(member.data):
+            member.errors.append(_("Can't link to itself."))
+            valid = False
     return valid
