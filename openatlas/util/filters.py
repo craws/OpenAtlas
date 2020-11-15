@@ -285,7 +285,8 @@ def add_row(field,
             value: Optional[str] = None,
             form_id: Optional[str] = None) -> str:
     field.label.text = display.uc_first(field.label.text)
-    field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
+    if field.flags.required and form_id != 'login-form' and field.label.text:
+        field.label.text += ' *'
 
     # CSS
     css_class = 'required' if field.flags.required else ''
@@ -297,7 +298,7 @@ def add_row(field,
         errors=' '.join(display.uc_first(error) for error in field.errors)) if field.errors else ''
     return """
         <div class="table-row {css_row}">
-            <div><label>{label}</label> {tooltip}</div>
+            <div>{label} {tooltip}</div>
             <div class="table-cell">{value} {errors}</div>
         </div>""".format(
         label=label if isinstance(label, str) else field.label,
@@ -322,7 +323,7 @@ def display_new_form(self: Any,
             field_ = getattr(form, str(sub_id))
             html_ += """
                 <div class="table-row  value-type-switch">
-                    <div><label>{label}</label></div>
+                    <div>{label}</div>
                     <div class="table-cell">{field} {unit}</div>
                 </div>
                 {value_fields}""".format(label=sub.name,
