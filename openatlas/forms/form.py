@@ -44,6 +44,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
+         'source_translation': ['name', 'description', 'continue'],
          'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
 
 
