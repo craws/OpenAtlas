@@ -22,10 +22,25 @@ h1, h2, h3 {
     padding: 0.4em;
 }
 
+a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a, a:hover {
+    text-decoration: none;
+}
+
 a,
 .info,
 .jstree-default .jstree-search {
     color: #007bff;
+}
+
+a.manual {
+    font-size: 1.6em;
+    vertical-align: top;
+    margin-right: 0.2em;
 }
 
 .overlay {
@@ -62,12 +77,6 @@ select {
     padding-top: 3px;
     font-size: 26px;
     display: inline-flex;
-}
-
-a.manual {
-    font-size: 1.6em;
-    vertical-align: top;
-    margin-right: 0.2em;
 }
 
 
@@ -198,11 +207,6 @@ div.pager {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-a {
-    font-weight: bold;
-    text-decoration: none;
 }
 
 p {
