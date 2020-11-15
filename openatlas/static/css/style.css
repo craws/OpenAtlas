@@ -17,6 +17,11 @@ h1, h2, h3 {
     color: #666666;
 }
 
+.note {
+    background-color: #dddddd;
+    padding: 0.4em;
+}
+
 a,
 .info,
 .jstree-default .jstree-search {

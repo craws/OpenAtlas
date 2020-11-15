@@ -105,10 +105,10 @@ def note(self: Any, entity: Entity) -> str:
     else:
         html = '''
             <h2>{label}</h2>
-            <p>{note}</p>
+            <div class="note">{note}</div>
             <div class="toolbar">{edit} {delete}</div>'''.format(
             label=display.uc_first(_('note')),
-            note=entity.note,
+            note=entity.note.replace('\r\n', '<br>'),
             edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
             delete=display.button(_('delete'),
                                   url_for('note_delete', entity_id=entity.id),
