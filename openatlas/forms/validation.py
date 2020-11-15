@@ -93,4 +93,11 @@ def validate(self) -> bool:
         if self.member_origin_id.data in ast.literal_eval(member.data):
             member.errors.append(_("Can't link to itself."))
             valid = False
+
+    # Actor actor relation
+    if hasattr(self, 'relation_origin_id'):
+        if self.relation_origin_id.data in ast.literal_eval(self.actor.data):
+            self.actor.errors.append(_("Can't link to itself."))
+            valid = False
+
     return valid

@@ -1,46 +1,25 @@
 import ast
 from typing import Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, HiddenField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form2, get_link_type
-from openatlas.forms.field import TableMultiField
+from openatlas.forms.form import build_form
+from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group
-
-
-class RelationForm(DateForm):
-    inverse = BooleanField(_('inverse'))
-    actor = TableMultiField(_('actor'), [InputRequired()])
-    origin_id = HiddenField()
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-
-    def validate(self) -> bool:
-        valid = DateForm.validate(self)
-        if hasattr(self, 'origin_id') and self.origin_id is not None:
-            if self.origin_id.data in ast.literal_eval(self.actor.data):
-                self.actor.errors.append(_("Can't link to itself."))
-                valid = False
-        return valid
 
 
 @app.route('/relation/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form2(RelationForm, 'Actor Actor Relation')
-    form.origin_id.data = origin.id
+    form = build_form('actor_actor_relation')
+    form.relation_origin_id.data = origin.id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
@@ -72,8 +51,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
     related = range_ if origin_id == domain.id else domain
-    form = build_form2(RelationForm, 'Actor Actor Relation', link_, request)
-    del form.actor, form.insert_and_continue, form.origin_id
+    form = build_form('actor_actor_relation', link_)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
@@ -94,6 +72,4 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     if origin.id == range_.id:
         form.inverse.data = True
-    form.save.label.text = _('save')
-    form.populate_dates(link_)
     return render_template('relation/update.html', origin=origin, form=form, related=related)

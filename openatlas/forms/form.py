@@ -27,6 +27,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
+         'actor_actor_relation': ['date', 'description', 'continue'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
@@ -198,6 +199,11 @@ def add_fields(form: Any,
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
         setattr(form, 'ends_in', TableField(_('died in') if code == 'E21' else _('ends in')))
+    elif name == 'actor_actor_relation':
+        setattr(form, 'inverse', BooleanField(_('inverse')))
+        if not item:
+            setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
+            setattr(form, 'relation_origin_id', HiddenField())
     elif name == 'event':
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
