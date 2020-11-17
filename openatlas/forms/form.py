@@ -53,8 +53,8 @@ def build_form(name: str,
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
-    # Builds a form for CIDOC CRM entities which has to be dynamic because of types, module
-    # settings and class specific fields
+    # Builds a form for CIDOC CRM entities which has to be dynamic because of types,
+    # module settings and class specific fields
 
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
@@ -84,8 +84,11 @@ def build_form(name: str,
     add_buttons(Form, name, item, origin)
     setattr(Form, 'validate', validate)
     if not item or (request and request.method != 'GET'):
-        return Form()
-    return populate_form(Form(obj=item), item, location)
+        form = Form()
+    else:
+        form = populate_form(Form(obj=item), item, location)
+    customize_labels(name, form)
+    return form
 
 
 def populate_form(form: FlaskForm,
@@ -123,6 +126,11 @@ def populate_form(form: FlaskForm,
                 getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
 
     return form
+
+
+def customize_labels(name: str, form: FlaskForm) -> None:
+    if name == 'source_translation':
+        form.description.label.text = _('content')
 
 
 def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:

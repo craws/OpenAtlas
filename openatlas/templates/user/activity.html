@@ -4,6 +4,6 @@
     {{ [[_('admin'), 'admin_index'], _('activity')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form }}
+    {{ form|display_new_form }}
     {{ table.display()|safe }}
 {% endblock %}

@@ -68,7 +68,7 @@ class ActivityForm(FlaskForm):  # type: ignore
                         coerce=int)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0, coerce=int)
     action = SelectField(_('action'), choices=action_choices, default='all')
-    apply = SubmitField(_('apply'))
+    save = SubmitField(_('apply'))
 
 
 @app.route('/admin/user/activity', methods=['POST', 'GET'])

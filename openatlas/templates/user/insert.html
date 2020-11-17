@@ -4,7 +4,7 @@
     <a href="{{ url_for('admin_index') }}#tab-user">{{ _('admin')|uc_first }}</a>&nbsp;> + {{ ('user')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('user-form', manual_page='admin/user') }}
+    {{ form|display_new_form(manual_page='admin/user') }}
     <script>
         $(document).ready(function () {
             $("#show_passwords").after(function() {
