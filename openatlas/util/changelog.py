@@ -2,6 +2,7 @@ class Changelog:
     versions = {
         '5.6.0': ['TBA', {
             'feature': {
+                '930': 'Wikidata API',
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
                 '1350': 'API: Pagination in an extra array',
