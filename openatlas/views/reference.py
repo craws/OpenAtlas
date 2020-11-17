@@ -88,7 +88,7 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
 @required_group('contributor')
 def reference_insert(category: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(category, origin=origin)
+    form = build_form(category.replace(' ', '_'), origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, category=category, origin=origin))
     return render_template('reference/insert.html', form=form, category=category, origin=origin)
