@@ -8,7 +8,7 @@
 {% block content %}
     {% if writeable %}
         <div style="float:left;margin-right: 1em;">
-            {{ form|display_new_form(manual_page='admin/export') }}
+            {{ form|display_form(manual_page='admin/export') }}
         </div>
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>

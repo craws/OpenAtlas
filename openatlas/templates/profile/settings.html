@@ -5,5 +5,5 @@
     &nbsp;> {{ _(category)|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_new_form(manual_page='admin/' + category) }}
+    {{ form|display_form(manual_page='admin/' + category) }}
 {% endblock %}

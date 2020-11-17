@@ -3,11 +3,11 @@ from typing import Optional, Union
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -220,7 +220,7 @@ def place_view(obj: Entity) -> str:
                            profile_image_id=profile_image_id)
 
 
-def save(form: DateForm,
+def save(form: FlaskForm,
          object__: Optional[Entity] = None,
          location_: Optional[Entity] = None,
          origin: Optional[Entity] = None,

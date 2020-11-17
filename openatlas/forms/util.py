@@ -1,18 +1,14 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import time
-from typing import Any, Dict, List, Optional as Optional_Type, Union
+from typing import Any, Dict, Optional as Optional_Type
 
-from flask import Request, g, session
+from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from wtforms.validators import Optional
 
-from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
-from openatlas.models.node import Node
 from openatlas.util.display import uc_first
 
 
@@ -22,65 +18,6 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
     return None
-
-
-def build_form2(form: Any,
-                form_name: str,
-                selected_object: Union[Entity, Link, None] = None,
-                request_origin: Optional_Type[Request] = None,
-                entity2: Optional_Type[Entity] = None) -> Any:
-    def add_value_type_fields(subs: List[int]) -> None:
-        for sub_id in subs:
-            sub = g.nodes[sub_id]
-            setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
-            add_value_type_fields(sub.subs)
-
-    # Add custom fields
-    custom_list = []
-    for id_, node in Node.get_nodes_for_form(form_name).items():
-        custom_list.append(id_)
-        setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
-        if node.value_type:
-            add_value_type_fields(node.subs)
-    form_instance = form(obj=selected_object)
-
-    # Delete custom fields except the ones specified for the form
-    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
-    for field in form_instance:
-        if type(field) in (TreeField, TreeMultiField) and int(field.id) not in custom_list:
-            delete_list.append(field.id)
-    for item in delete_list:
-        delattr(form_instance, item)
-
-    # External references
-    # Todo: remove no cover after form refactor
-    for name in g.external:  # pragma: no cover
-        if name + '_id' in form_instance and not current_user.settings['module_' + name]:
-            del form_instance[name + '_id'], form_instance[name + '_precision']
-
-    # Set field data if available and only if it's a GET request
-    if selected_object and request_origin and request_origin.method == 'GET':
-        from openatlas.forms.date import DateForm
-        # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
-        if isinstance(form_instance, DateForm):
-            form_instance.populate_dates(selected_object)
-        nodes = selected_object.nodes
-        if isinstance(entity2, Entity):
-            nodes.update(entity2.nodes)  # type: ignore
-        if hasattr(form, 'opened'):
-            form_instance.opened.data = time.time()
-        node_data: Dict[int, List[int]] = {}
-        for node, node_value in nodes.items():  # type: ignore
-            root = g.nodes[node.root[-1]] if node.root else node
-            if root.id not in node_data:
-                node_data[root.id] = []
-            node_data[root.id].append(node.id)
-            if root.value_type:
-                getattr(form_instance, str(node.id)).data = node_value
-        for root_id, nodes_ in node_data.items():
-            if hasattr(form_instance, str(root_id)):
-                getattr(form_instance, str(root_id)).data = nodes_
-    return form_instance
 
 
 def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:

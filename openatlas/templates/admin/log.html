@@ -7,6 +7,6 @@
     <div class="toolbar">
         {{ _('delete all logs')|button(url_for('admin_log_delete'), onclick="return confirm('" + _('delete all logs')|uc_first + "?')") }}
     </div>
-    {{ form|display_new_form }}
+    {{ form|display_form }}
     {{ table.display()|safe }}
 {% endblock %}

@@ -12,5 +12,5 @@
             {{ _('reload')|button(url_for('event_update', id_=event.id)) }}
         </div>
     {% endif %}
-    {{ form|display_new_form(manual_page='menu/event') }}
+    {{ form|display_form(manual_page='menu/event') }}
 {% endblock %}

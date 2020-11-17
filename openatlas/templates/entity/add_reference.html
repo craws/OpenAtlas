@@ -4,5 +4,5 @@
     {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('link') + ' ' + _('reference')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
-    *{{ form|display_new_form }}
+    *{{ form|display_form }}
 {% endblock %}

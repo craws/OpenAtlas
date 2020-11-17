@@ -7,6 +7,7 @@ from flask_login import current_user
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
+from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
 
@@ -17,7 +18,6 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 class Query:
 
     def __init__(self, row: NamedTupleCursor.Record) -> None:  # pragma: no cover
-        from openatlas.forms.date import DateForm
 
         self.id = row.id
         self.nodes: Dict['Node', str] = {}
@@ -50,9 +50,9 @@ class Query:
             self.end_from = Date.timestamp_to_datetime64(row.end_from)
             self.end_to = Date.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
-            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
-            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
-            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
+            self.first = format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = format_date(self.end_from, 'year') if self.end_from else None
+            self.last = format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = ''  # Used to build URLs
         self.external_references: List[Link] = []
