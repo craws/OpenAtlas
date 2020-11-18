@@ -43,7 +43,7 @@ query_parser = entity_parser.copy()
 query_parser.add_argument('entities', type=int, action='append',
                           help="{error_msg}")
 query_parser.add_argument('classes', type=str, action='append',
-                          help="{error_msg}", case_sensitive=False)
-query_parser.add_argument('codes', type=str, action='append', help="{error_msg}",
+                          help="{error_msg}")
+query_parser.add_argument('items', type=str, action='append', help="{error_msg}",
                           case_sensitive=False,
                           choices=('actor', 'event', 'place', 'reference', 'source', 'object'))

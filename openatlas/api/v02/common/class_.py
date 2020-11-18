@@ -31,6 +31,7 @@ class GetByClass(Resource):
     @staticmethod
     def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Entity]:
         entities = []
+        print(class_code)
         if class_code not in g.classes:
             raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
                            payload="404d")
