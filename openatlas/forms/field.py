@@ -129,13 +129,13 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')"
+                        <a onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
                             href="#">{entity_name}</a>
                     </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """
                     <a
-                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')"
+                        onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
                         href="#">{entity_name}</a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):

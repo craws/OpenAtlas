@@ -190,12 +190,23 @@ def table_select_model(self: Any,
         entities = g.properties
     table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                           {'sType': 'numeric', 'targets': [0]}])
+
     for id_ in entities:
         table.rows.append([
-            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
-            entities[id_].code + '</a>',
-            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
-            entities[id_].name + '</a>'])
+            """<a
+                    onclick="selectFromTable(this, '{name}', '{entity_id}', '{value}')"
+                    href="#">{label}</a>""".format(
+                name=name,
+                entity_id=id_,
+                value=entities[id_].code + ' ' + entities[id_].name,
+                label=entities[id_].code),
+            """<a
+                    onclick="selectFromTable(this, '{name}', '{entity_id}', '{value}')"
+                    href="#">{label}</a>""".format(
+                name=name,
+                entity_id=id_,
+                value=entities[id_].code + ' ' + entities[id_].name,
+                label=entities[id_].name)])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" name="{name}-button" class="table-select" type="text"
