@@ -181,8 +181,6 @@ def event_view(event: Entity) -> str:
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
-            if domain.system_type == 'external reference':
-                event.external_references.append(link_)
             data.append(link_.description)
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,

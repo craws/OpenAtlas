@@ -139,8 +139,6 @@ def actor_view(actor: Entity) -> str:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             data.append(link_.description)
-            if domain.system_type == 'external reference':
-                actor.external_references.append(link_)
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,
                                                origin_id=actor.id))
