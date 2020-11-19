@@ -2,12 +2,14 @@ class Changelog:
     versions = {
         '5.6.0': ['TBA', {
             'feature': {
+                '930': 'Wikidata API',
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
                 '1350': 'API: Pagination in an extra array',
                 '1375': 'API: Download result of request path',
-                '1377': 'API: IP restrictions'
-            }}],
+                '1377': 'API: IP restrictions'},
+            'fix': {
+                '1408': 'Link checker broken'}}],
         '5.5.1': ['2020-10-09', {
             'fix': {'1380': "Empty date comment is saved as 'None'"}}],
         '5.5.0': ['2020-09-26', {

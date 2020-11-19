@@ -1,12 +1,12 @@
 # sensitive data (except example files)
-instance/*
+instance/
 !instance/example_*
 
 # cache, system logs
-__pycache__/*
-.mypy_cache/*
+__pycache__/
+.mypy_cache/
 .bash_history
-.cache/*
+.cache/
 
 # compiled files
 *.pyc
@@ -18,9 +18,9 @@ openatlas/tests/cover
 cover
 
 # created files
-openatlas/uploads/*
-openatlas/export/csv/*
-openatlas/export/sql/*
+openatlas/uploads/
+openatlas/export/csv/
+openatlas/export/sql/
 
 # ide
 .idea
@@ -34,5 +34,5 @@ openatlas/static/package.json
 openatlas/static/package-lock.json
 
 # Docker files
-.npm/*
-.local/*
+.npm/
+.local/

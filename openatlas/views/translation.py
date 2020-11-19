@@ -1,38 +1,28 @@
 from typing import Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.util.display import get_entity_data
 from openatlas.util.util import required_group
-
-
-class TranslationForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    description = TextAreaField(_('content'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
 
 
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
     source = Entity.get_by_id(source_id, view_name='source')
-    form = build_form(TranslationForm, 'Source translation')
+    form = build_form('source_translation')
     if form.validate_on_submit():
         translation = save(form, source=source)
         flash(_('entity created'), 'info')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))
         return redirect(url_for('entity_view', id_=translation.id))
     return render_template('translation/insert.html', source=source, form=form)
@@ -51,7 +41,7 @@ def translation_delete(id_: int, source_id: int) -> Response:
 def translation_update(id_: int) -> Union[str, Response]:
     translation = Entity.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
-    form = build_form(TranslationForm, 'Source translation', translation, request)
+    form = build_form('source_translation', translation)
     if form.validate_on_submit():
         save(form, translation)
         flash(_('info update'), 'info')

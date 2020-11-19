@@ -22,8 +22,8 @@ class Link:
                  row: NamedTupleCursor.Record,
                  domain: Optional['Entity'] = None,
                  range_: Optional['Entity'] = None) -> None:
-        from openatlas.forms.date import DateForm
         from openatlas.models.entity import Entity
+        from openatlas.forms.date import format_date
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
@@ -40,9 +40,9 @@ class Link:
             self.end_from = Date.timestamp_to_datetime64(row.end_from)
             self.end_to = Date.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
-            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
-            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
-            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
+            self.first = format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = format_date(self.end_from, 'year') if self.end_from else None
+            self.last = format_date(self.end_to, 'year') if self.end_to else self.last
 
     def update(self) -> None:
         sql = """

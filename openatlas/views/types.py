@@ -5,31 +5,17 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
-                     widgets)
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_move_form, build_node_form
+from openatlas.forms.form import build_move_form, build_node_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.display import (add_remove_link, get_base_table_data, get_entity_data,
-                                    get_profile_image_table_link, link, tree_select, uc_first)
+                                    get_profile_image_table_link, link, tree_select)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
-
-
-class NodeForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    name_inverse = StringField(_('inverse'))
-    is_node_form = HiddenField()
-    unit = StringField(_('unit'))
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
 
 
 @app.route('/types')
@@ -55,11 +41,10 @@ def node_index() -> str:
 @required_group('editor')
 def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
     root = g.nodes[root_id]
-    form = build_node_form(NodeForm, root)
+    form = build_node_form(root=root)
     # Check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
         return redirect(save(form, root=root))
-    getattr(form, str(root.id)).label.text = 'super'
     if super_id:
         getattr(form, str(root.id)).data = super_id if super_id != root.id else None
     if 'name_search' in request.form:
@@ -74,11 +59,10 @@ def node_update(id_: int) -> Union[str, Response]:
     root = g.nodes[node.root[-1]] if node.root else None
     if node.standard or (root and root.locked):
         abort(403)
-    form = build_node_form(NodeForm, node, request)
+    form = build_node_form(node=node)
     if form.validate_on_submit():
         save(form, node)
         return redirect(url_for('entity_view', id_=id_))
-    getattr(form, str(root.id)).label.text = 'super'
     return render_template('types/update.html', node=node, root=root, form=form)
 
 
@@ -92,17 +76,6 @@ def node_delete(id_: int) -> Response:
     node.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('entity_view', id_=root.id) if root else url_for('node_index'))
-
-
-class MoveForm(FlaskForm):  # type: ignore
-    is_node_form = HiddenField()
-    checkbox_values = HiddenField()
-    selection = SelectMultipleField('',
-                                    [InputRequired()],
-                                    coerce=int,
-                                    option_widget=widgets.CheckboxInput(),
-                                    widget=widgets.ListWidget(prefix_label=False))
-    save = SubmitField()
 
 
 @app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
@@ -120,14 +93,13 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         tab_hash = '#menu-tab-custom_collapse-'
     if root.value_type:  # pragma: no cover
         abort(403)
-    form = build_move_form(MoveForm, node)
+    form = build_move_form(node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
         flash(_('Entities were updated'), 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
-    form.save.label.text = uc_first(_('move'))
     getattr(form, str(root.id)).data = node.id
     return render_template('types/move.html', node=node, root=root, form=form)
 
@@ -200,12 +172,12 @@ def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[st
         if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
             return None
+        node.description = form.description.data
         node.name = form.name.data
         if root and root.directional and form.name_inverse.data.strip():
             node.name += ' (' + form.name_inverse.data.strip() + ')'
         if root and not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
-        node.description = form.description.data if form.description else form.unit.data
         node.update()
 
         # Update super if changed and node is not a root node
@@ -215,7 +187,7 @@ def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[st
             node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
         url = url_for('entity_view', id_=node.id)
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('node_insert', root_id=root.id,  # type: ignore
                           super_id=new_super_id if new_super_id else None)
         logger.log_user(node.id, log_action)

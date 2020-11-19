@@ -4,6 +4,7 @@ from typing import Any, Dict, List, TYPE_CHECKING, Union
 
 from flask import g
 from flask_login import current_user
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.entity import Entity

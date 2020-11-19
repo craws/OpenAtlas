@@ -58,7 +58,7 @@ class UserTests(TestBaseCase):
 
             # Test activity log
             data = {'name': 'test', 'description': 'test'}  # insert a reference to show something
-            self.app.post(url_for('reference_insert', code='bibliography'), data=data)
+            self.app.post(url_for('reference_insert', category='bibliography'), data=data)
             rv = self.app.get(url_for('user_activity'))
             assert b'Activity' in rv.data
             rv = self.app.get(url_for('user_activity', user_id=user_id))

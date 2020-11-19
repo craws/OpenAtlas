@@ -1,53 +1,24 @@
 from typing import Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
-from openatlas.forms.forms import TableField, TableMultiField, build_form
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.reference import Reference
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-class EventForm(DateForm):
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    event = TableField(_('sub event of'))
-    place = TableField(_('location'))
-    place_from = TableField(_('from'))
-    place_to = TableField(_('to'))
-    object = TableMultiField()
-    person = TableMultiField()
-    event_id = HiddenField()
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
-    given_place = TableMultiField(_('given place'))
-
-    def validate(self) -> bool:
-        """ Check if selected super event is allowed."""
-        # Todo: also check if super is not a sub event of itself (recursively)
-        valid = DateForm.validate(self)
-        if self.event.data:
-            if str(self.event.data) == str(self.event_id.data):
-                self.event.errors.append(_('error node self as super'))
-                valid = False
-        return valid
 
 
 @app.route('/event')
@@ -63,27 +34,12 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     return render_template('event/index.html', table=table)
 
 
-def prepare_form(form: EventForm, code: str) -> FlaskForm:
-    if code != 'E8':
-        del form.given_place
-    if code == 'E9':
-        del form.place
-    else:
-        del form.place_from
-        del form.place_to
-        del form.object
-        del form.person
-    return form
-
-
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = prepare_form(build_form(EventForm, 'Event'), code)
-    if origin:
-        del form.insert_and_continue
+    form = build_form('event', code=code, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     if origin:
@@ -101,7 +57,7 @@ def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def event_update(id_: int) -> Union[str, Response]:
     event = Entity.get_by_id(id_, nodes=True, view_name='event')
-    form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
+    form = build_form('event', event)
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -151,9 +107,10 @@ def save(form: FlaskForm,
         else:
             abort(400)  # pragma: no cover, either event or code has to be provided
         event.update(form)
+        Reference.update(form, event)
         if form.event.data:
             event.link_string('P117', form.event.data)
-        if form.place and form.place.data:
+        if hasattr(form, 'place') and form.place.data:
             event.link('P7', Link.get_linked_entity_safe(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link_string('P24', form.given_place.data)
@@ -178,7 +135,7 @@ def save(form: FlaskForm,
             elif origin.view_name == 'actor':
                 link_id = event.link('P11', origin)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')
         logger.log_user(event.id, log_action)
@@ -224,12 +181,12 @@ def event_view(event: Entity) -> str:
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
-            if domain.system_type == 'external reference':
-                event.external_references.append(link_)
             data.append(link_.description)
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,
                                                origin_id=event.id))
+            if domain.system_type.startswith('external reference'):
+                event.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, event, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True) for location

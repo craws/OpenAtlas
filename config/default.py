@@ -36,6 +36,15 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 # Key for Thunderforest map layer
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
+# External References
+# Will moved to db and be configurable in admin when more options (GeoNames URL already is in db)
+EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': ''},
+                       'wikidata': {'name': 'Wikidata', 'url': 'https://www.wikidata.org/entity/'}}
+REFERENCE_PRECISION = [('',''), ('close match', 'close match'), ('exact match', 'exact match')]
+
+# Modules
+MODULES = ['geonames', 'wikidata', 'map_overlay', 'notes', 'sub_units']
+
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS), declared here because used in decorators
@@ -89,4 +98,4 @@ CLASS_CODES = {
     'source': ['E33']}
 
 CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
-                  'secondary': 'btn btn-secondary btn-sm'}}
+                  'secondary': 'btn btn-secondary btn-xsm'}}

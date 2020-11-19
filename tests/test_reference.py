@@ -10,17 +10,17 @@ class ReferenceTest(TestBaseCase):
     def test_reference(self) -> None:
         with app.app_context():  # type: ignore
             # Reference insert
-            rv = self.app.get(url_for('reference_insert', code='bibliography'))
+            rv = self.app.get(url_for('reference_insert', category='bibliography'))
             assert b'+ Bibliography' in rv.data
-            rv = self.app.get(url_for('reference_insert', code='edition'))
+            rv = self.app.get(url_for('reference_insert', category='edition'))
             assert b'+ Edition' in rv.data
             data = {'name': 'https://openatlas.eu', 'description': 'Reference description'}
-            rv = self.app.post(url_for('reference_insert', code='external_reference'), data=data)
+            rv = self.app.post(url_for('reference_insert', category='external_reference'), data=data)
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 reference = Entity.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('reference_insert', code='external_reference'),
+            rv = self.app.post(url_for('reference_insert', category='external_reference'),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data

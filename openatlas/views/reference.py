@@ -1,17 +1,17 @@
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired, URL
+from wtforms import StringField, SubmitField
+from wtforms.validators import InputRequired
 
-import openatlas
 from openatlas import app, logger
-from openatlas.forms.forms import TableField, build_form
+from openatlas.forms.field import TableField
+from openatlas.forms.form import build_add_reference_form, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.user import User
@@ -22,47 +22,8 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group, was_modified
 
 
-class ReferenceForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
-
-
 class AddReferenceForm(FlaskForm):  # type: ignore
     reference = TableField(_('reference'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddSourceForm(FlaskForm):  # type: ignore
-    source = TableField(_('source'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddEventForm(FlaskForm):  # type: ignore
-    event = TableField(_('event'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddActorForm(FlaskForm):  # type: ignore
-    actor = TableField(_('actor'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddPlaceForm(FlaskForm):  # type: ignore
-    place = TableField(_('place'), [InputRequired()])
-    page = StringField(_('page'))
-    save = SubmitField(_('insert'))
-
-
-class AddFileForm(FlaskForm):  # type: ignore
-    file = TableField(_('file'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
@@ -71,7 +32,7 @@ class AddFileForm(FlaskForm):  # type: ignore
 @required_group('contributor')
 def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_, view_name='reference')
-    form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
+    form = build_add_reference_form(class_name)
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
         entity = Entity.get_by_id(getattr(form, class_name).data)
@@ -122,30 +83,22 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
     return render_template('reference/index.html', table=table)
 
 
-@app.route('/reference/insert/<code>', methods=['POST', 'GET'])
-@app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/reference/insert/<category>', methods=['POST', 'GET'])
+@app.route('/reference/insert/<category>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
+def reference_insert(category: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
-    if code == 'external_reference':
-        form.name.validators = [InputRequired(), URL()]
-        form.name.label.text = 'URL'
-    if origin:
-        del form.insert_and_continue
+    form = build_form(category.replace(' ', '_'), origin=origin)
     if form.validate_on_submit():
-        return redirect(save(form, code=code, origin=origin))
-    return render_template('reference/insert.html', form=form, code=code, origin=origin)
+        return redirect(save(form, category=category, origin=origin))
+    return render_template('reference/insert.html', form=form, category=category, origin=origin)
 
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_update(id_: int) -> Union[str, Response]:
     reference = Entity.get_by_id(id_, nodes=True, view_name='reference')
-    form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
-    if reference.system_type == 'external reference':
-        form.name.validators = [InputRequired(), URL()]
-        form.name.label.text = 'URL'
+    form = build_form(reference.system_type.replace(' ', '_'), reference)
     if form.validate_on_submit():
         if was_modified(form, reference):  # pragma: no cover
             del form.save
@@ -191,25 +144,24 @@ def reference_view(reference: Entity) -> str:
 
 def save(form: Any,
          reference: Optional[Entity] = None,
-         code: Optional[str] = None,
+         category: Optional[str] = None,
          origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
-
     try:
-        if not code and not reference:
-            abort(400)  # pragma: no cover, either reference or code has to be provided
+        if not category and not reference:
+            abort(400)  # pragma: no cover, either reference or category has to be provided
         elif not reference:
             log_action = 'insert'
-            system_type = code.replace('_', ' ')  # type: ignore
+            system_type = category.replace('_', ' ')  # type: ignore
             reference = Entity.insert('E31', form.name.data, system_type)
         reference.update(form)
         url = url_for('entity_view', id_=reference.id)
         if origin:
             link_id = reference.link('P67', origin)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        if form.continue_.data == 'yes' and code:
-            url = url_for('reference_insert', code=code)
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes' and category:
+            url = url_for('reference_insert', category=category)
         g.cursor.execute('COMMIT')
         logger.log_user(reference.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

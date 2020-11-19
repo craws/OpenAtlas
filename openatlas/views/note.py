@@ -5,26 +5,19 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (SubmitField, TextAreaField)
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.util import (required_group)
-
-
-class NoteForm(FlaskForm):  # type: ignore
-    description = TextAreaField(_('note'), [InputRequired()])
-    save = SubmitField(_('insert'))
 
 
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
-    form = build_form(NoteForm, 'note-form')
+    form = build_form('note')
     if form.validate_on_submit():
         save(form, entity=entity)
         return redirect(url_for('entity_view', id_=entity.id))
@@ -35,10 +28,11 @@ def note_insert(entity_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def note_update(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
-    form = build_form(NoteForm, 'note-form')
+    form = build_form('note')
     if form.validate_on_submit():
         save(form, entity=entity, insert=False)
         return redirect(url_for('entity_view', id_=entity.id))
+    form.save.label.text = _('update')
     form.description.data = User.get_note(entity)
     return render_template('note/update.html', form=form, entity=entity)
 
