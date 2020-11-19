@@ -1,4 +1,6 @@
-from typing import Any, Dict, List
+import ast
+import json
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
@@ -102,7 +104,7 @@ class Api:
         return time
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]:
+    def get_geometry(entity: Entity) -> Dict[str, Any]: # pragma: nocover
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         for geometry in Gis.get_by_id(entity.location.id):
@@ -119,6 +121,33 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
+    def get_geom_by_entity(entity: Entity):
+        if entity.class_.code != 'E53': # pragma: nocover
+            return 'Wrong class'
+        geom = []
+        for shape in ['point', 'polygon', 'linestring']:
+            sql = """
+                    SELECT
+                        {shape}.id,
+                        {shape}.name,
+                        {shape}.description,
+                        public.ST_AsGeoJSON({shape}.geom) AS geojson
+                    FROM model.entity e
+                    JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
+                    WHERE e.id = %(entity_id)s;""".format(shape=shape)
+            g.execute(sql, {'entity_id': entity.id})
+            for row in g.cursor.fetchall():
+                test = ast.literal_eval(row.geojson)
+                test['title'] = row.name.replace('"', '\"') if row.name else ''
+                test['description'] = row.description.replace('"',
+                                                              '\"') if row.description else ''
+                geom.append(test)
+        if len(geom) == 1:
+            return geom[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geom}
+
+    @staticmethod
     def get_geonames(entity: Entity) -> Dict[str, Any]:
         geonames_link = Reference.get_link(entity, 'geonames')
         if geonames_link and geonames_link.range.class_.code == 'E18':
@@ -130,7 +159,7 @@ class Api:
             return geo_name
 
     @staticmethod
-    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity_by_id(id_: int) -> Entity:
         try:
             int(id_)
         except Exception:
@@ -141,6 +170,10 @@ class Api:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
+        return entity
+
+    @staticmethod
+    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -162,7 +195,7 @@ class Api:
             features['types'] = Api.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']:
+        if entity.aliases and 'names' in meta['show']: # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
@@ -181,9 +214,10 @@ class Api:
             features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        if 'geometry' in meta['show'] and entity.location:
-            features['geometry'] = {'type': 'GeometryCollection',
-                                    'geometries': [Api.get_geometry(entity)]}
+        if 'geometry' in meta['show'] and entity.class_.code == 'E53':
+            features['geometry'] = Api.get_geom_by_entity(entity)
+        elif 'geometry' in meta['show'] and entity.location:
+            features['geometry'] = Api.get_geom_by_entity(entity.location)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],

@@ -164,9 +164,13 @@ def add_external_references(form: any, form_name: str) -> None:
         if name not in forms[form_name] or not current_user.settings['module_' + name]:
             continue
         if name == 'geonames':
-            field = IntegerField(ref['name'] + ' Id', [OptionalValidator()])
+            field = IntegerField(ref['name'] + ' Id',
+                                 [OptionalValidator()],
+                                 render_kw={'autocomplete': 'off'})
         else:
-            field = StringField(ref['name'] + ' Id', [OptionalValidator()])
+            field = StringField(ref['name'] + ' Id test',
+                                [OptionalValidator()],
+                                render_kw={'autocomplete': 'off'})
         setattr(form, name + '_id', field)
         setattr(form,
                 name + '_precision',
