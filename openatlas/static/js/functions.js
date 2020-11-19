@@ -101,6 +101,28 @@ $(document).ready(function () {
     newUrl = url.split("#")[0] + hash;
     history.replaceState(null, null, newUrl);
   });
+
+  //wikidata autocomplete
+  $('#wikidata_id').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+        return {
+            value: item.id,
+            text: item.id
+        };
+    },
+    events: {
+        search: function (qry, callback) {
+            $.ajax(
+                `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
+            ).done(function (res) {
+                console.log(res);
+                callback(res.search)
+            });
+        }
+    }
+  });
 });
 
 $.jstree.defaults.core.themes.dots = false;
