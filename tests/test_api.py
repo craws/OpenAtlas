@@ -98,8 +98,9 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('api_node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
+            # Todo: Expected Nostormos to, only get Asgard
             rv = self.app.get(
-                url_for('api_get_query', entities=place, classes='E18', items='place'))
+                url_for('api_get_query', entities=place.id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_content', lang='de'))
             assert b'intro' in rv.data
@@ -192,7 +193,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference', count=True))
             assert b'2' in rv.data  # Assert can vary, to get around use \n
             rv = self.app.get(
-                url_for('api_get_query', ntities=place_id, classes='E18', items='place',
+                url_for('api_get_query', entities=place_id, classes='E18', items='place',
                         count=True))
             assert b'1' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_=unit_node.id, count=True))
