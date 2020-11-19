@@ -97,7 +97,7 @@ def api_get_query() -> Response:
         if request.args.getlist('entities'):
             entities = request.args.getlist('entities')
             for e in entities:
-                out.append(e)
+                out.append(Api.get_entity_by_id(e))
             count += len(out)
         if request.args.getlist('items'):
             items = request.args.getlist('items')
@@ -116,7 +116,6 @@ def api_get_query() -> Response:
                 else:
                     out.extend(
                         Path.get_entities_by_class(class_code=class_code, validation=validation))
-
         if validation['count']:
             return jsonify(count)
         if validation['download']:
