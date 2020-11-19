@@ -16,7 +16,9 @@ def sql_index() -> str:
 
 
 class SqlForm(FlaskForm):  # type: ignore
-    statement = TextAreaField(_('statement'), [InputRequired()])
+    statement = TextAreaField('',
+                              [InputRequired()],
+                              render_kw={'placeholder': 'SELECT code FROM model.class;'})
     save = SubmitField(_('execute'))
 
 

@@ -44,6 +44,7 @@ INSERT INTO settings (name, value) VALUES
     ('module_map_overlay', 'True'),
     ('module_notes', 'True'),
     ('module_sub_units', 'True'),
+    ('module_wikidata', 'True'),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),
     ('reset_confirm_hours', '24'),

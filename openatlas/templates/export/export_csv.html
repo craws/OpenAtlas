@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('export CSV')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('export CSV')|uc_first }}
+    <div class="toolbar">
+        <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('export CSV')|uc_first }}
+    </div>
 {% endblock %}
 {% block content %}
     {% if writeable %}

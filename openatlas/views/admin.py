@@ -12,10 +12,10 @@ from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
-                                         MailForm, MapForm, ModulesForm, NewsLetterForm,
-                                         SimilarForm, TestMailForm)
-from openatlas.forms.forms import get_form_settings, set_form_settings
+from openatlas.forms.setting import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
+                                     MailForm, MapForm, ModulesForm, NewsLetterForm,
+                                     SimilarForm, TestMailForm)
+from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
@@ -164,7 +164,7 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
         abort(403)  # pragma: no cover
-    form = getattr(importlib.import_module('openatlas.forms.admin_forms'),
+    form = getattr(importlib.import_module('openatlas.forms.setting'),
                    uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -178,6 +178,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'data' if category == 'api' else category
+        tab = 'email' if category == 'mail' else tab
         return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
     return render_template('admin/settings.html', form=form, category=category)

@@ -47,7 +47,8 @@ class SourceTest(TestBaseCase):
             assert b'Test source' in rv.data
 
             # Link source
-            rv = self.app.post(url_for('reference_insert', code='external reference',
+            rv = self.app.post(url_for('reference_insert',
+                                       category='external_reference',
                                        origin_id=source.id),
                                data={'name': 'https://openatlas.eu'},
                                follow_redirects=True)

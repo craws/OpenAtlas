@@ -42,11 +42,11 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
                 aria-selected="{selected}" 
                 href="#tab-{id}">{label}
             </a>
-        </li>'''.format(active=' active' if active else '',
-                        selected='true' if active else 'false',
-                        label=uc_first(_(id_.replace('_', ' '))) +
-                              (format_tab_number(table) if table else ''),
-                        id=id_.replace('_', '-').replace(' ', '-'))
+        </li>'''.format(
+        active=' active' if active else '',
+        selected='true' if active else 'false',
+        label=uc_first(_(id_.replace('_', ' '))) + (format_tab_number(table) if table else ''),
+        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
@@ -131,7 +131,8 @@ class Tab:
             buttons = [button(_('link'), url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
             table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
-            buttons = [button(_('link'), url_for('membership_insert', origin_id=id_))]
+            buttons = [button(_('link'),
+                              url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
             if system_type == 'file':
                 buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='place'))]
@@ -141,16 +142,11 @@ class Tab:
                 buttons = [button(_('link'), url_for('source_add', id_=id_, class_name='place'))]
             buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
         elif name == 'reference':
-            buttons = [button(_('link'), url_for('entity_add_reference', id_=id_)),
-                       button(_('bibliography'), url_for('reference_insert',
-                                                         code='bibliography',
-                                                         origin_id=id_)),
-                       button(_('edition'), url_for('reference_insert',
-                                                    code='edition',
-                                                    origin_id=id_)),
-                       button(_('external reference'), url_for('reference_insert',
-                                                               code='external_reference',
-                                                               origin_id=id_))]
+            buttons = [button(_('link'), url_for('entity_add_reference', id_=id_))]
+            for category in ['bibliography', 'edition', 'external reference']:
+                buttons.append(button(_(category), url_for('reference_insert',
+                                                           category=category,
+                                                           origin_id=id_)))
         elif name == 'relation':
             table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]

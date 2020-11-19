@@ -27,7 +27,7 @@ class FeedbackForm(FlaskForm):  # type: ignore
                                    ('question', _('question')),
                                    ('problem', _('problem'))))
     description = TextAreaField(_('description'), [InputRequired()])
-    send = SubmitField(_('send'))
+    save = SubmitField(_('send'))
 
 
 @app.route('/')

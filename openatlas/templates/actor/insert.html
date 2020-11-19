@@ -8,5 +8,5 @@
     {% endif %}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('Person', True if code=='E21' else False, manual_page='menu/actor')|safe }}
+    {{ form|display_form(manual_page='menu/actor') }}
 {% endblock %}

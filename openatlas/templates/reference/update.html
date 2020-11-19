@@ -12,6 +12,6 @@
             {{ _('reload')|button(url_for('reference_update', id_=reference.id)) }}
         </div>
     {% endif %}
-    {{ form|display_form(reference.system_type|replace(' ', '_'), manual_page='menu/reference') }}
+    {{ form|display_form(manual_page='menu/reference') }}
     {{ code|display_citation_example }}
 {% endblock %}

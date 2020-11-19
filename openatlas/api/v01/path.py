@@ -51,6 +51,9 @@ class Path:
         index = []
         total = []
         for e in entities:
+            print(e)
+            print(type(e))
+            print("eetete")
             total.append(e.id)
         for num, i in enumerate(
                 list(itertools.islice(total, 0, None, int(validation['limit'])))):

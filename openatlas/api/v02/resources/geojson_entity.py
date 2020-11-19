@@ -6,7 +6,7 @@ from flask import g, session, url_for
 from openatlas import app
 from openatlas.api.v01.error import APIError
 from openatlas.models.entity import Entity
-from openatlas.models.geonames import Geonames
+from openatlas.models.reference import Reference
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.display import format_date, get_file_path
@@ -148,7 +148,7 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_geonames(entity: Entity) -> Dict[str, Any]:
-        geonames_link = Geonames.get_geonames_link(entity)
+        geonames_link = Reference.get_link(entity, 'geonames')
         if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:

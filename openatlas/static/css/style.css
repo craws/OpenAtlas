@@ -4,11 +4,6 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
-.inactive,
-.inactive a {
-    color: #666666;
-}
-
 body {
     color: #000000;
 }
@@ -22,10 +17,30 @@ h1, h2, h3 {
     color: #666666;
 }
 
+.note {
+    background-color: #dddddd;
+    padding: 0.4em;
+}
+
+a {
+    font-weight: bold;
+    text-decoration: none;
+}
+
+a, a:hover {
+    text-decoration: none;
+}
+
 a,
 .info,
 .jstree-default .jstree-search {
     color: #007bff;
+}
+
+a.manual {
+    font-size: 1.6em;
+    vertical-align: top;
+    margin-right: 0.2em;
 }
 
 .overlay {
@@ -64,20 +79,7 @@ select {
     display: inline-flex;
 }
 
-a.manual {
-    font-size: 1.6em;
-    vertical-align: top;
-    margin-right: 0.2em;
-}
 
-form ul, form ol, form li {
-    list-style: none;
-    padding: 0;
-}
-
-#global-term {
-    width: 120px;
-}
 
 table.dataTable th {
     white-space:nowrap;
@@ -133,8 +135,12 @@ span.tab-counter {
     width: 36em;
 }
 
-#geonames_id {
-    width: 5em;
+.external-reference input[type="text"] {
+    width: 4em;
+}
+
+.external-reference select {
+    width: auto;
 }
 
 .date-switch label.error {
@@ -155,30 +161,6 @@ span.tab-counter {
 p.manual {
     margin: 0;
     margin-bottom: 0.5em;
-}
-
-input[type="text"].value-type, input[type="text"].integer {
-    width: 4em;
-    text-align: right;
-}
-
-input[type="text"].data-huebee {
-    width: 6em;
-    height: 1.2em;
-    font-size: 0.8em;
-    margin-top: 0.2em;
-}
-
-#network-form input[type="text"] {
-    width: 5em;
-}
-
-#global-search, #search {
-    text-transform: capitalize;
-}
-
-#show_passwords, form div.table-row div label[for='show_passwords'] {
-    display: none;
 }
 
 #disk-size {
@@ -227,28 +209,8 @@ div.pager {
     text-overflow: ellipsis;
 }
 
-a {
-    font-weight: bold;
-    text-decoration: none;
-}
-
 p {
     margin: 0.5em 0 1em;
-}
-
-#geonames_precision {
-    margin: 0 0.4em;
-}
-
-form input[type="text"].year {
-    text-align: right;
-    width: 4em;
-}
-
-input[type="text"].value_input {
-    width: 8em;
-    margin-top: 0.5em;
-    text-align: right;
 }
 
 .faded {
@@ -287,23 +249,7 @@ input[type="text"].value_input {
     margin-right: 0;
 }
 
-#newsletter-form textarea {
-    font-size: 1em;
-    width: 30em;
-    height: 10em;
-}
-
-#newsletter-form input[type='text'] {
-    font-size: 1em;
-    width: 30em;
-}
-
-form input[type="text"].month, form input[type="text"].day {
-    text-align: right;
-    width: 2em;
-}
-
-#description {
+textarea#description {
     height: 8em;
     width: 65%;
 }
@@ -400,7 +346,7 @@ h2 {
     margin: 1em 0;
 }
 
-/* tables */
+/* Tables */
 table {
     border-collapse: inherit;
     border-spacing: 0.2em;
@@ -424,24 +370,6 @@ div.data-table > div > div {
     text-align: right;
 }
 
-form div.table-row > div {
-    text-align: right;
-    vertical-align: top;
-}
-
-form div.table-row div label {
-    display: inline-block;
-    margin-top: 0.3em;
-}
-
-form div.table-row div.table-cell {
-    text-align: left;
-}
-
-form div.table-row div.table-cell div {
-    margin-top: 0.3em;
-}
-
 table td {
     white-space: nowrap;
     overflow: hidden;
@@ -454,7 +382,76 @@ select[name="table_table_length"] {
     padding-bottom: initial;
 }
 
-/* forms */
+/* Forms */
+
+form ul, form ol, form li {
+    list-style: none;
+    padding: 0;
+}
+
+#global-term {
+    width: 120px;
+}
+
+input[type="text"].value-type, input[type="text"].integer {
+    width: 4em;
+    text-align: right;
+}
+
+input[type="text"].data-huebee {
+    width: 6em;
+    height: 1.2em;
+    font-size: 0.8em;
+    margin-top: 0.2em;
+}
+
+#network-form input[type="text"] {
+    width: 5em;
+}
+
+#global-search, #search {
+    text-transform: capitalize;
+}
+
+#show_passwords, form div.table-row div label[for='show_passwords'] {
+    display: none;
+}
+
+form input[type="text"].year {
+    text-align: right;
+    width: 4em;
+}
+
+input[type="text"].value_input {
+    width: 8em;
+    margin-top: 0.5em;
+    text-align: right;
+}
+
+#newsletter-form textarea {
+    font-size: 1em;
+    width: 30em;
+    height: 10em;
+}
+
+#newsletter-form input[type='text'] {
+    font-size: 1em;
+    width: 30em;
+}
+
+form input[type="text"].month, form input[type="text"].day {
+    text-align: right;
+    width: 2em;
+}
+
+form div.table-row > div {
+    text-align: right;
+}
+
+form div.table-row div.table-cell {
+    text-align: left;
+}
+
 label.error {
     padding-left: 0.5em;
 }
@@ -651,4 +648,15 @@ div.data-table div.display-none {
 
 tr:hover {
     background-color: rgba(0,0,0,0.1) !important;
+}
+
+.btn-xsm {
+    padding-top: 0.3rem;
+    padding-right: 0.5rem;
+    padding-bottom: 0.3rem;
+    padding-left: 0.5rem;
+    font-size: .875rem;
+    line-height: 1.0;
+    border-radius: .2rem;
+    margin-bottom: 0.15em;
 }

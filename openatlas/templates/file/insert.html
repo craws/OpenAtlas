@@ -16,7 +16,7 @@
         <span style="font-weight: bold;">{{ ', '.join(session['settings']['file_upload_allowed_extension']) }}</span>
     </p>
     {% if writeable %}
-        {{ form|display_form('file-form', manual_page='tools/file') }}
+        {{ form|display_form(manual_page='tools/file') }}
     {% else %}
         <span class="error">{{ _('directory not writable')|uc_first }}</span>
     {% endif %}

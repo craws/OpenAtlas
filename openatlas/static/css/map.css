@@ -50,7 +50,7 @@ a.manual svg.svg-inline--fa {
     font-style: normal;
 }
 
-#nameField, select {
+#nameField {
     width: 96%;
     display: block;
 }

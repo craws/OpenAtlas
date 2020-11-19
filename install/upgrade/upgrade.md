@@ -10,6 +10,13 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
     
+### 5.5.1 to 5.6.0
+
+Execute install/upgrade/5.6.0.sql after making backups (can also be done in Admin/Execute SQL)
+
+A new module for Wikidata was added and is activated by default
+which can be changed in Admin/Modules.
+
 ### 5.5.0 to 5.5.1
 
 Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admin/Execute SQL)
@@ -17,6 +24,9 @@ Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admi
 ### 5.5.0 to 5.6.0
 
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+
+The new Wikidata module will be inactive by default but you can activate it as default at 
+admin/modules after the upgrade.
 
 ### 5.4.0 to 5.5.0
 

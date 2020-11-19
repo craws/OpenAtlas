@@ -148,7 +148,9 @@ class Node(Entity):
 
     @staticmethod
     def save_entity_nodes(entity: Entity, form: Any) -> None:
-        from openatlas.forms.forms import TreeField, TreeMultiField, ValueFloatField
+        from openatlas.forms.field import TreeField
+        from openatlas.forms.field import TreeMultiField
+        from openatlas.forms.field import ValueFloatField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:

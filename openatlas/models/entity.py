@@ -16,6 +16,7 @@ from openatlas.models.date import Date
 from openatlas.models.link import Link
 from openatlas.util.display import get_file_extension, link
 from openatlas.util.util import is_authorized
+from openatlas.forms.date import format_date
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -24,7 +25,6 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 class Entity:
 
     def __init__(self, row: NamedTupleCursor.Record) -> None:
-        from openatlas.forms.date import DateForm
 
         self.id = row.id
         self.nodes: Dict['Node', str] = {}
@@ -58,9 +58,9 @@ class Entity:
             self.end_from = Date.timestamp_to_datetime64(row.end_from)
             self.end_to = Date.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
-            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
-            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
-            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
+            self.first = format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = format_date(self.end_from, 'year') if self.end_from else None
+            self.last = format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = ''  # Used to build URLs
         self.external_references: List[Link] = []
@@ -126,19 +126,18 @@ class Entity:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
-        from openatlas.forms.date import DateForm
         from openatlas.util.display import sanitize
         if form:
             self.save_nodes(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
                     setattr(self, field, getattr(form, field).data)
-            if isinstance(form, DateForm):
+            if hasattr(form, 'begin_year_from'):
                 self.set_dates(form)
-            if hasattr(form, 'alias') and (
-                    self.system_type == 'place' or
-                    self.class_.code in app.config['CLASS_CODES']['actor']):
+            if hasattr(form, 'alias') and (self.system_type == 'place' or
+                                           self.class_.code in app.config['CLASS_CODES']['actor']):
                 self.update_aliases(form)
+
         if self.class_.code == 'E53':
             self.name = sanitize(self.name, 'node')
         if self.system_type == 'place location':
@@ -219,17 +218,15 @@ class Entity:
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_name or self.view_name == 'actor':  # actors have no base type
+        if not self.view_name or self.view_name == 'actor':  # Actors have no base type
             return ''
+        if self.system_type and self.system_type.startswith('external reference '):
+            return ''   # e.g. "External Reference GeoNames"
         root_name = self.view_name.title()
-        if self.view_name == 'reference':
+        if self.view_name in ['reference', 'place']:
             root_name = self.system_type.title()
-            if root_name == 'External Reference Geonames':
-                root_name = 'External Reference'
         elif self.view_name == 'file':
             root_name = 'License'
-        elif self.view_name == 'place':
-            root_name = self.system_type.title()
         elif self.class_.code == 'E84':
             root_name = 'Information Carrier'
         root_id = Node.get_hierarchy(root_name).id

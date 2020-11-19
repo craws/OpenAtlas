@@ -39,8 +39,9 @@ class ApiTests(TestBaseCase):
                 # stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
 
             # Data for geometric results
-            data = {'name': 'Asgard', 'geonames_id': '123', 'geonames_precision': True,
-                    'geonames_description': "Alexander",
+            data = {'name': 'Asgard',
+                    'geonames_id': '123',
+                    'geonames_precision': 'close match',
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
                     'gis_points': """[{
                             "type":"Feature",
@@ -76,7 +77,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.post(url_for('place_insert', origin_id=source.id),
                                data=data,
                                follow_redirects=True)
-            assert b'Necronomicon' in rv.data
+            assert b'Asgard' in rv.data
 
             # Path Tests
             rv = self.app.get(url_for('api_index'))
@@ -98,7 +99,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
             rv = self.app.get(
-                url_for('api_get_query', entities=place_id, classes='E18', items='place'))
+                url_for('api_get_query', entities=place, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_content', lang='de'))
             assert b'intro' in rv.data
