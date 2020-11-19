@@ -19,13 +19,12 @@ instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testin
 # Load config/default.py and instance/INSTANCE_NAME.py
 app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
 
 if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
-
 babel = Babel(app)
 debug_model: Dict[str, float] = {}
-
 
 from openatlas.models.logger import Logger
 
