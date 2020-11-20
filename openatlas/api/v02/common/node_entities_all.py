@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from flask import g, jsonify, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
@@ -24,7 +24,7 @@ class GetNodeEntitiesAll(Resource):
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
             # Todo: Eliminate Error
-            raise APIError('Node ID ' + str(id_) + ' doesn\'t exist', status_code=404,
+            raise Error('Node ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404g")
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])
 

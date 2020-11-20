@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from flask import jsonify, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
@@ -29,7 +29,7 @@ class GetSubunit(Resource):
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
             # Todo: Eliminate Error
-            raise APIError('ID ' + str(id_) + ' doesn\'t exist', status_code=404,
+            raise Error('ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
         structure = get_structure(entity)
         data = []
@@ -38,6 +38,6 @@ class GetSubunit(Resource):
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('api_entity', id_=n.id, _external=True)})
         else:  # pragma: no cover
-            raise APIError('There is no subunit with the ID: ' + str(id_), status_code=404,
+            raise Error('There is no subunit with the ID: ' + str(id_), status_code=404,
                            payload="404g")
         return data

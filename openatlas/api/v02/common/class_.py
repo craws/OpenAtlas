@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from flask import g, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
@@ -30,7 +30,7 @@ class GetByClass(Resource):
         entities = []
         if class_code not in g.classes:
             # Todo: Eliminate Error
-            raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
+            raise Error('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
                            payload="404d")
         for entity in Query.get_by_class_code_api(class_code, parser):
             entities.append(entity)

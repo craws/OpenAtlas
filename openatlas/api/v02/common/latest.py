@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from flask import jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.parser import entity_parser
@@ -32,4 +32,4 @@ class GetLatest(Resource):
             return entities
         else:
             # Todo: Eliminate Error
-            raise APIError('Invalid limit.', status_code=404, payload="404e")
+            raise Error('Invalid limit.', status_code=404, payload="404e")

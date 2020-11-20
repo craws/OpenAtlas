@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -145,7 +145,7 @@ class GeoJsonEntity:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
             # Todo: Eliminate Error
-            raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
+            raise Error('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
         return entity
 

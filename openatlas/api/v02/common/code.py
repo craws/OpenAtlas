@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple
 from flask import jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
@@ -29,8 +29,7 @@ class GetByCode(Resource):
     def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
-            # Todo: Eliminate Error
-            raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
+            raise Error('Invalid code: ' + code_, status_code=404, payload="404c")
         for entity in Query.get_by_menu_item_api(code_, parser):
             entities.append(entity)
         return entities

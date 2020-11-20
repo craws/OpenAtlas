@@ -1,7 +1,7 @@
 import itertools
 from typing import Any, Dict, List
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 
@@ -28,7 +28,7 @@ class Pagination:
                     itertools.islice(total, total.index(int(parser['first'])), None))
             else:
                 # Todo: Eliminate Error
-                raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+                raise Error('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass
         # Finding the entity with the wanted id

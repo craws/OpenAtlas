@@ -4,7 +4,7 @@ from typing import Dict
 from flask import request
 
 
-class APIError(Exception):
+class Error(Exception):
     status_code = 400
 
     error_detail = {

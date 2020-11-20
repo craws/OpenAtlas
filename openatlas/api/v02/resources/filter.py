@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, List, Union
 
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import Error
 
 
 class Filter:
@@ -47,12 +47,12 @@ class Filter:
         for i in data:
             if not i:
                 # Todo: Eliminate Error
-                raise APIError('Filter operators is not implemented or wrong.', status_code=404,
+                raise Error('Filter operators is not implemented or wrong.', status_code=404,
                                payload="404j")
 
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
-                raise APIError('No search term.', status_code=404, payload="404i")
+                raise Error('No search term.', status_code=404, payload="404i")
             column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')' if \
                 Filter.compare_operators[filter_[2]] == 'LIKE' else Filter.valid_columns[
                 filter_[1]]
@@ -71,7 +71,7 @@ class Filter:
                 datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
             except:
                 # Todo: Eliminate Error
-                raise APIError('Invalid search term: ' + filter_[3], status_code=404,
+                raise Error('Invalid search term: ' + filter_[3], status_code=404,
                                payload="404k")
         # Check if search term is an integer if column is id
         if Filter.valid_columns[filter_[1]] == 'e.id':
@@ -79,7 +79,7 @@ class Filter:
                 int(filter_[3])
             except:
                 # Todo: Eliminate Error
-                raise APIError('Invalid search term: ' + filter_[3], status_code=404,
+                raise Error('Invalid search term: ' + filter_[3], status_code=404,
                                payload="404l")
         # If operator is LIKE then % are needed
         term = '%' + filter_[3] + '%' if Filter.compare_operators[filter_[2]] == 'LIKE' else \
