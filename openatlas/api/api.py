@@ -1,6 +1,6 @@
 import ast
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, session, url_for
 
@@ -148,15 +148,14 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_geonames(entity: Entity) -> Dict[str, Any]:
-        geonames_link = Reference.get_link(entity, 'geonames')
-        if geonames_link and geonames_link.range.class_.code == 'E18':
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = g.external['geonames']['url'] + geonames_link.domain.name
-            return geo_name
+    def get_external(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+        ref = []
+        for external in g.external:
+            reference = Reference.get_link(entity, external)
+            if reference:
+                ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
+                            'type': Api.to_camelcase(reference.type.name)})
+        return ref
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
@@ -210,8 +209,8 @@ class Api:
                 features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if Api.get_geonames(entity) and 'geonames' in meta['show']:
-            features['links'] = [Api.get_geonames(entity)]
+        if Api.get_external(entity) and 'geonames' in meta['show']:
+            features['links'] = [Api.get_external(entity)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
