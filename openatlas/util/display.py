@@ -208,7 +208,7 @@ def add_system_data(entity: 'Entity',
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
-            </a>'''.format(url=url_for('api_download_entity', id_=entity.id),
+            </a>'''.format(url=url_for('api_entity', id_=entity.id, download=True),
                            label=uc_first('download'))
         data['API'] = data_api
     return data
