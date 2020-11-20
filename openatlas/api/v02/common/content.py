@@ -1,5 +1,6 @@
 from typing import Any, Tuple
 
+from flasgger import swag_from
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.download import Download
@@ -9,7 +10,9 @@ from openatlas.models.content import Content
 
 
 class GetContent(Resource):
+    @swag_from("content.yml")
     def get(self) -> Tuple[Any, int]:
+
         parser = language_parser.parse_args()
         content = {'intro': Content.get_translation('intro_for_frontend', parser['lang']),
                    'contact': Content.get_translation('contact_for_frontend', parser['lang']),

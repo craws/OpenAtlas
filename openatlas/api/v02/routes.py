@@ -1,3 +1,4 @@
+from flasgger import Swagger
 from flask_restful import Api
 
 from openatlas import app
@@ -12,7 +13,11 @@ from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 
+
+
+
 api = Api(app)  # Establish connection between API and APP
+swagger = Swagger(app)
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")
