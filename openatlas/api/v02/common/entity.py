@@ -1,9 +1,7 @@
 from typing import Any, Tuple
 
-from flask import request
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.parameter import Validation
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.parser import entity_parser

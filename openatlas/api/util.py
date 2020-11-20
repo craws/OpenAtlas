@@ -1,11 +1,10 @@
 from typing import Any
 
-from flask import request, send_file, send_from_directory
+from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
 from openatlas.api.v01.error import APIError
-from openatlas.api.v01.parameter import Validation
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node

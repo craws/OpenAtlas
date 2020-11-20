@@ -1,9 +1,8 @@
 from typing import Any, Tuple
 
-from flask import jsonify, request
+from flask import jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v01.parameter import Validation
 from openatlas.api.v02.common.class_ import GetByClass
 from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.resources.download import Download

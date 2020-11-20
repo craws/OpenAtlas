@@ -1,6 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
-
-from typing import Any, Dict, List, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Union
 
 from flask import g
 from flask_login import current_user
@@ -9,23 +7,13 @@ from openatlas import app
 from openatlas.api.v02.resources.filter import Filter
 from openatlas.models.entity import Entity
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
-    pass
-
 
 class Query(Entity):
 
     @staticmethod
     def get_by_class_code_api(code: Union[str, List[str]], parser: Dict[str, Any]) -> List[Entity]:
-        filters = Filter.validate_filter(parser['filter'])
-        clause = ""
         parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
-        for filter_ in filters:
-            if 'LIKE' in filter_['clause']:
-                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
-            else:
-                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
-            parameters[str(filter_['idx'])] = filter_['term']
+        clause = Filter.get_filter(parameters=parameters, parser=parser)
         sql = Query.build_sql() + """
             WHERE class_code IN %(codes)s {clause} 
             ORDER BY {order} {sort};""".format(clause=clause,
@@ -38,15 +26,8 @@ class Query(Entity):
     def get_by_menu_item_api(menu_item: str,
                              parser: Dict[str, Any]) -> List[Entity]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
-        filters = Filter.validate_filter(parser['filter'])
-        clause = ""
         parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
-        for filter_ in filters:
-            if 'LIKE' in filter_['clause']:
-                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
-            else:
-                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
-            parameters[str(filter_['idx'])] = filter_['term']
+        clause = Filter.get_filter(parameters=parameters, parser=parser)
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {clause}

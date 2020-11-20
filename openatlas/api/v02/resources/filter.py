@@ -1,5 +1,3 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
-
 import datetime
 from typing import Any, Dict, List, Union
 
@@ -22,6 +20,17 @@ class Filter:
                                               'begin_to': 'e.begin_to',
                                               'created': 'e.created', 'modified': 'e.modified',
                                               'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+    @staticmethod
+    def get_filter(parameters, parser):
+        clause = ""
+        filters = Filter.validate_filter(parser['filter'])
+        for filter_ in filters:
+            if 'LIKE' in filter_['clause']:
+                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
+            else:
+                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            parameters[str(filter_['idx'])] = filter_['term']
+        return clause
 
     @staticmethod
     def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:

@@ -1,10 +1,9 @@
 from typing import Any, Dict, List, Tuple
 
-from flask import g, jsonify, request
+from flask import g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.v01.error import APIError
-from openatlas.api.v01.parameter import Validation
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser

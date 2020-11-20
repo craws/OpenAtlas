@@ -1,4 +1,3 @@
-from flask import g
 from flask_restful import Api
 
 from openatlas import app
@@ -9,9 +8,9 @@ from openatlas.api.v02.common.entity import GetEntity
 from openatlas.api.v02.common.latest import GetLatest
 from openatlas.api.v02.common.node_entities import GetNodeEntities
 from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
+from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
-from openatlas.api.v02.common.query import GetQuery
 
 api = Api(app)  # Establish connection between API and APP
 
