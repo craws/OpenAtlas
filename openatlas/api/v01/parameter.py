@@ -25,10 +25,7 @@ class Default:
                                          'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
                                          'created': 'e.created', 'modified': 'e.modified',
                                          'end_to': 'e.end_to', 'end_from': 'e.end_from'}
-    date_column_validation: Dict[str, str] = {'begin_from': 'e.begin_from',
-                                              'begin_to': 'e.begin_to',
-                                              'created': 'e.created', 'modified': 'e.modified',
-                                              'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
                                   'depictions', 'geonames']
 

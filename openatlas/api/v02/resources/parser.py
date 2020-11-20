@@ -25,6 +25,7 @@ entity_parser.add_argument('column', type=str, default=['name'], action='append'
                            help='{error_msg}', choices=(
         'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
         'begin_from', 'begin_to', 'end_from', 'end_to'))
+entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append')
 # Todo: Dismiss negative value
 entity_parser.add_argument('limit', type=int, default=20, help="Invalid number for limit")
 # Todo: Either first or last
@@ -36,8 +37,7 @@ entity_parser.add_argument('show', type=str, help='{error_msg}.', action='append
                                     'depictions', 'geonames'],
                            choices=('when', 'types', 'relations', 'names', 'links', 'geometry',
                                     'depictions', 'geonames', 'none'))
-entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append',
-                           default='and|id|gt|1')
+
 
 query_parser = entity_parser.copy()
 query_parser.add_argument('entities', type=int, action='append',

@@ -12,10 +12,8 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 class GetEntity(Resource):
     def get(self, id_: int) -> Tuple[Any, int]:
-        validation = Validation.validate_url_query(request.args)
-
         parser = entity_parser.parse_args()
-        entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), validation)
+        entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['download']:
             return Download.download(data=entity, template=template, name=id_)

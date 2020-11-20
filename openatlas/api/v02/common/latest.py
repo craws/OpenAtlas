@@ -14,11 +14,9 @@ from openatlas.models.entity import Entity
 
 class GetLatest(Resource):
     def get(self, latest: int) -> Tuple[Any, int]:
-        validation = Validation.validate_url_query(request.args)
-
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination
-        entities = GetLatest.get_entities_get_latest(latest, validation)
+        entities = GetLatest.get_entities_get_latest(latest, parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['count']:
             return jsonify(len(entities))

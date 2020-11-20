@@ -15,14 +15,12 @@ from openatlas.models.entity import Entity
 
 class GetByCode(Resource):
     def get(self, item: str) -> Tuple[Any, int]:
-        validation = Validation.validate_url_query(request.args)
-
         parser = entity_parser.parse_args()
         code = Pagination.pagination(
-            GetByCode.get_entities_by_menu_item(code_=item, validation=validation),
-            validation=validation)
+            GetByCode.get_entities_by_menu_item(code_=item, validation=parser),
+            validation=parser)
         template = GeoJson.geojson_template(parser['show'])
-        if validation['count']:
+        if parser['count']:
             # Todo: very static, make it dynamic
             return jsonify(code[1][0]['entities'])
         if parser['download']:

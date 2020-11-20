@@ -15,8 +15,6 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 class GetQuery(Resource):
     def get(self, ) -> Tuple[Any, int]:
-        validation = Validation.validate_url_query(request.args)
-
         entities = []
         parser = query_parser.parse_args()
         template = GeoJson.geojson_template(parser['show'])
@@ -25,15 +23,15 @@ class GetQuery(Resource):
                 entities.append(GeoJsonEntity.get_entity_by_id(entity))
         if parser['items']:
             for item in parser['items']:
-                entities.extend(GetByCode.get_entities_by_menu_item(code_=item, validation=validation))
+                entities.extend(GetByCode.get_entities_by_menu_item(code_=item, validation=parser))
         if parser['classes']:
             for class_ in parser['classes']:
-                entities.extend(GetByClass.get_entities_by_class(class_code=class_, validation=validation))
-        if validation['count']:
+                entities.extend(GetByClass.get_entities_by_class(class_code=class_, validation=parser))
+        if parser['count']:
             return jsonify(len(entities))
         if parser['download']:
             return Download.download(data=entities, template=template, name='query')
 
-        output = Pagination.pagination(entities=entities, validation=validation)
+        output = Pagination.pagination(entities=entities, validation=parser)
 
         return marshal(output, template), 200
