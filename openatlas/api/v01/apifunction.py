@@ -148,15 +148,19 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_geonames(entity: Entity) -> Dict[str, Any]:
-        geonames_link = Reference.get_link(entity, 'geonames')
-        if geonames_link and geonames_link.range.class_.code == 'E18':
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = g.external['geonames']['url'] + geonames_link.domain.name
-            return geo_name
+    def get_external(entity: Entity) -> Dict[str, Any]:
+        for external in g.external:
+            print(external)
+            reference = Reference.get_link(entity, 'wikidata')
+            print(reference.type.name)
+            print(reference.domain.name)
+            if reference:
+                geo_name = {}
+                if reference.type.name:
+                    geo_name['type'] = Api.to_camelcase(reference.type.name)
+                if reference.domain.name:
+                    geo_name['identifier'] = g.external['geonames']['url'] + reference.domain.name
+                return geo_name
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
@@ -210,8 +214,8 @@ class Api:
                 features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if Api.get_geonames(entity) and 'geonames' in meta['show']:
-            features['links'] = [Api.get_geonames(entity)]
+        if Api.get_external(entity) and 'geonames' in meta['show']:
+            features['links'] = [Api.get_external(entity)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
