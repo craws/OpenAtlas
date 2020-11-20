@@ -27,6 +27,7 @@ class Pagination:
                 total = list(
                     itertools.islice(total, total.index(int(parser['first'])), None))
             else:
+                # Todo: Eliminate Error
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass

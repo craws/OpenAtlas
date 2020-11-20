@@ -22,11 +22,8 @@ class GetNodeEntitiesAll(Resource):
 
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
-        try:
-            id_ = int(id_)
-        except Exception:
-            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         if id_ not in g.nodes:
+            # Todo: Eliminate Error
             raise APIError('Node ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404g")
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])

@@ -17,7 +17,6 @@ class GetSubunitHierarchy(Resource):
         node = GetSubunitHierarchy.get_subunit_hierarchy(id_)
         template = NodeTemplate.node_template()
         if parser['count']:
-            # Todo: very static, make it dynamic
             return jsonify(len(node))
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
@@ -26,10 +25,7 @@ class GetSubunitHierarchy(Resource):
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
-            id_ = int(id_)
-        except Exception:
-            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
-        try:
+            # Todo: Eliminate Error
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
             raise APIError('ID ' + str(id_) + ' doesn\'t exist', status_code=404,
@@ -37,6 +33,7 @@ class GetSubunitHierarchy(Resource):
         if entity.class_.code in ['E18']:
             return GetSubunitHierarchy.get_subunits_recursive(entity, [])
         else:
+            # Todo: Eliminate Error
             raise APIError('There is no subunit with the ID: ' + str(id_), status_code=404,
                            payload="404g")
 

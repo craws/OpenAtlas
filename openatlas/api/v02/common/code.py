@@ -20,7 +20,6 @@ class GetByCode(Resource):
             parser=parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['count']:
-            # Todo: very static, make it dynamic
             return jsonify(code[1][0]['entities'])
         if parser['download']:
             return Download.download(data=code, template=template, name=item)
@@ -30,6 +29,7 @@ class GetByCode(Resource):
     def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
+            # Todo: Eliminate Error
             raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
         for entity in Query.get_by_menu_item_api(code_, parser):
             entities.append(entity)

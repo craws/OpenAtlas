@@ -20,7 +20,6 @@ class GetByClass(Resource):
             parser=parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['count']:
-            # Todo: very static, make it dynamic
             return jsonify(class_[1][0]['entities'])
         if parser['download']:
             return Download.download(data=class_, template=template, name=class_code)
@@ -29,8 +28,8 @@ class GetByClass(Resource):
     @staticmethod
     def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
-        print(class_code)
         if class_code not in g.classes:
+            # Todo: Eliminate Error
             raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
                            payload="404d")
         for entity in Query.get_by_class_code_api(class_code, parser):

@@ -15,7 +15,6 @@ class GetNodeEntities(Resource):
         node = GetNodeEntities.get_node(id_)
         template = NodeTemplate.node_template()
         if parser['count']:
-            # Todo: very static, make it dynamic
             return jsonify(len(node))
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
@@ -23,11 +22,8 @@ class GetNodeEntities(Resource):
 
     @staticmethod
     def get_node(id_: int) -> List[Dict[str, Any]]:
-        try:
-            id_ = int(id_)
-        except Exception:
-            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         if id_ not in g.nodes:
+            # Todo: Eliminate Error
             raise APIError('Node ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404g")
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)

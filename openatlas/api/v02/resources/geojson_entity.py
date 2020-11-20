@@ -103,37 +103,20 @@ class GeoJsonEntity:
         return time
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]:
-        geometries = []
-        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        for geometry in Gis.get_by_id(entity.location.id):
-            geo_dict = {'type': shape[geometry['shape']],
-                        'coordinates': geometry['geometry']['coordinates']}
-            if geometry['description']:
-                geo_dict['description'] = geometry['description']
-            if geometry['name']:
-                geo_dict['title'] = geometry['name']
-            geometries.append(geo_dict)
-        if len(geometries) == 1:
-            return geometries[0]
-        else:
-            return {'type': 'GeometryCollection', 'geometries': geometries}
-
-    @staticmethod
     def get_geom_by_entity(entity: Entity):
         if entity.class_.code != 'E53':
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
             sql = """
-                    SELECT
-                        {shape}.id,
-                        {shape}.name,
-                        {shape}.description,
-                        public.ST_AsGeoJSON({shape}.geom) AS geojson
-                    FROM model.entity e
-                    JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
-                    WHERE e.id = %(entity_id)s;""".format(shape=shape)
+                     SELECT
+                         {shape}.id,
+                         {shape}.name,
+                         {shape}.description,
+                         public.ST_AsGeoJSON({shape}.geom) AS geojson
+                     FROM model.entity e
+                     JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
+                     WHERE e.id = %(entity_id)s;""".format(shape=shape)
             g.execute(sql, {'entity_id': entity.id})
             for row in g.cursor.fetchall():
                 test = ast.literal_eval(row.geojson)
@@ -159,12 +142,9 @@ class GeoJsonEntity:
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
         try:
-            int(id_)
-        except Exception:
-            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
-        try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
+            # Todo: Eliminate Error
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
         return entity
@@ -211,7 +191,6 @@ class GeoJsonEntity:
             features['links'] = [GeoJsonEntity.get_external(entity)]
 
         # Geometry
-        # Todo: both functions are basically the same, compare and merge functions
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
         elif 'geometry' in parser['show'] and entity.location:

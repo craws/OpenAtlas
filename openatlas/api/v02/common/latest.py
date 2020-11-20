@@ -26,13 +26,10 @@ class GetLatest(Resource):
     @staticmethod
     def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
-        try:
-            limit_ = int(limit_)
-        except Exception:
-            raise APIError('Invalid limit.', status_code=404, payload="404e")
         if 1 < limit_ < 101:
             for entity in Entity.get_latest(limit_):
                 entities.append(GeoJsonEntity.get_entity(entity, parser=parser))
             return entities
         else:
+            # Todo: Eliminate Error
             raise APIError('Invalid limit.', status_code=404, payload="404e")

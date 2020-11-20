@@ -46,6 +46,7 @@ class Filter:
 
         for i in data:
             if not i:
+                # Todo: Eliminate Error
                 raise APIError('Filter operators is not implemented or wrong.', status_code=404,
                                payload="404j")
 
@@ -69,6 +70,7 @@ class Filter:
             try:
                 datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
             except:
+                # Todo: Eliminate Error
                 raise APIError('Invalid search term: ' + filter_[3], status_code=404,
                                payload="404k")
         # Check if search term is an integer if column is id
@@ -76,6 +78,7 @@ class Filter:
             try:
                 int(filter_[3])
             except:
+                # Todo: Eliminate Error
                 raise APIError('Invalid search term: ' + filter_[3], status_code=404,
                                payload="404l")
         # If operator is LIKE then % are needed

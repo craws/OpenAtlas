@@ -12,7 +12,14 @@ from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 
-api = Api(app)  # Establish connection between API and APP
+errors = {
+    'Conflict': {
+        'message': "A user with that username already exists.",
+        'status': 409,
+    },
+}
+
+api = Api(app, errors=errors)  # Establish connection between API and APP
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")
