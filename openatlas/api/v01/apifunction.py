@@ -1,20 +1,18 @@
 import ast
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Union
 
-from flask import g, session, url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.v01.error import APIError
 from openatlas.models.entity import Entity
-from openatlas.models.reference import Reference
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.reference import Reference
 from openatlas.util.display import format_date, get_file_path
 
 
 class Api:
-
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
@@ -105,7 +103,7 @@ class Api:
         return time
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]: # pragma: nocover
+    def get_geometry(entity: Entity) -> Dict[str, Any]:  # pragma: nocover
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         for geometry in Gis.get_by_id(entity.location.id):
@@ -123,7 +121,7 @@ class Api:
 
     @staticmethod
     def get_geom_by_entity(entity: Entity):
-        if entity.class_.code != 'E53': # pragma: nocover
+        if entity.class_.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -149,19 +147,14 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_external(entity: Entity) -> Dict[str, Any]:
+    def get_external(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+        ref = []
         for external in g.external:
-            print(external)
-            reference = Reference.get_link(entity, 'wikidata')
-            print(reference.type.name)
-            print(reference.domain.name)
+            reference = Reference.get_link(entity, external)
             if reference:
-                geo_name = {}
-                if reference.type.name:
-                    geo_name['type'] = Api.to_camelcase(reference.type.name)
-                if reference.domain.name:
-                    geo_name['identifier'] = g.external['geonames']['url'] + reference.domain.name
-                return geo_name
+                ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
+                            'type': Api.to_camelcase(reference.type.name)})
+        return ref
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
@@ -200,7 +193,7 @@ class Api:
             features['types'] = Api.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']: # pragma: nocover
+        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
@@ -216,7 +209,7 @@ class Api:
 
         # Geonames
         if Api.get_external(entity) and 'geonames' in meta['show']:
-            features['links'] = [Api.get_external(entity)]
+            features['links'] = Api.get_external(entity)
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
