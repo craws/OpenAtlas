@@ -9,7 +9,7 @@ from openatlas.models.entity import Entity
 class Pagination:
 
     @staticmethod
-    def pagination(entities: List[Entity], validation: Dict[str, Any]) -> List[
+    def pagination(entities: List[Entity], parser: Dict[str, Any]) -> List[
         List[Dict[str, Any]]]:
         result = []
         index = []
@@ -17,15 +17,15 @@ class Pagination:
         for e in entities:
             total.append(e.id)
         for num, i in enumerate(
-                list(itertools.islice(total, 0, None, int(validation['limit'])))):
+                list(itertools.islice(total, 0, None, int(parser['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
-        if validation['last'] or validation['first']:
-            if validation['last'] and int(validation['last']) in total:
+        if parser['last'] or parser['first']:
+            if parser['last'] and int(parser['last']) in total:
                 total = list(
-                    itertools.islice(total, total.index(int(validation['last'])) + 1, None))
-            elif validation['first'] and int(validation['first']) in total:
+                    itertools.islice(total, total.index(int(parser['last'])) + 1, None))
+            elif parser['first'] and int(parser['first']) in total:
                 total = list(
-                    itertools.islice(total, total.index(int(validation['first'])), None))
+                    itertools.islice(total, total.index(int(parser['first'])), None))
             else:
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
@@ -36,9 +36,9 @@ class Pagination:
         for idx, e in enumerate(entities[h[0]:]):
             entity_limit.append(e)
         entities_result = []
-        for r in entity_limit[:int(validation['limit'])]:
-            entities_result.append(GeoJsonEntity.get_entity(r, validation))
+        for r in entity_limit[:int(parser['limit'])]:
+            entities_result.append(GeoJsonEntity.get_entity(r, parser))
         result.append(entities_result)
-        result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
+        result.append([{'entity_per_page': int(parser['limit']), 'entities': len(total),
                         'index': index, 'total_pages': len(index)}])
         return result

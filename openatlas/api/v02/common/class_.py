@@ -16,8 +16,8 @@ class GetByClass(Resource):
     def get(self, class_code: str) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(
-            GetByClass.get_entities_by_class(class_code=class_code, validation=parser),
-            validation=parser)
+            GetByClass.get_entities_by_class(class_code=class_code, parser=parser),
+            parser=parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['count']:
             # Todo: very static, make it dynamic
@@ -27,12 +27,12 @@ class GetByClass(Resource):
         return marshal(class_, template), 200
 
     @staticmethod
-    def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Entity]:
+    def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         print(class_code)
         if class_code not in g.classes:
             raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
                            payload="404d")
-        for entity in Query.get_by_class_code_api(class_code, validation):
+        for entity in Query.get_by_class_code_api(class_code, parser):
             entities.append(entity)
         return entities

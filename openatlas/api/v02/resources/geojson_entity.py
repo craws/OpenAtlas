@@ -170,7 +170,7 @@ class GeoJsonEntity:
         return entity
 
     @staticmethod
-    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -180,7 +180,7 @@ class GeoJsonEntity:
                     'properties': {'title': entity.name}}
 
         # Relations
-        if GeoJsonEntity.get_links(entity) and 'relations' in meta['show']:
+        if GeoJsonEntity.get_links(entity) and 'relations' in parser['show']:
             features['relations'] = GeoJsonEntity.get_links(entity)
 
         # Descriptions
@@ -188,33 +188,33 @@ class GeoJsonEntity:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if GeoJsonEntity.get_node(entity) and 'types' in meta['show']:
+        if GeoJsonEntity.get_node(entity) and 'types' in parser['show']:
             features['types'] = GeoJsonEntity.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']:
+        if entity.aliases and 'names' in parser['show']:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
         # Depictions
-        if GeoJsonEntity.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
+        if GeoJsonEntity.get_file(entity) and 'depictions' in parser['show']:  # pragma: nocover
             features['depictions'] = GeoJsonEntity.get_file(entity)
 
         # Time spans
-        if GeoJsonEntity.get_time(entity) and 'when' in meta['show']:
+        if GeoJsonEntity.get_time(entity) and 'when' in parser['show']:
             if entity.begin_from or entity.end_from:
                 features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]}
 
         # Geonames
-        if GeoJsonEntity.get_external(entity) and 'links' in meta['show']:
+        if GeoJsonEntity.get_external(entity) and 'links' in parser['show']:
             features['links'] = [GeoJsonEntity.get_external(entity)]
 
         # Geometry
         # Todo: both functions are basically the same, compare and merge functions
-        if 'geometry' in meta['show'] and entity.class_.code == 'E53':
+        if 'geometry' in parser['show'] and entity.class_.code == 'E53':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
-        elif 'geometry' in meta['show'] and entity.location:
+        elif 'geometry' in parser['show'] and entity.location:
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity.location)
 
         data: Dict[str, Any] = {'type': type_,

@@ -22,15 +22,15 @@ class GetQuery(Resource):
                 entities.append(GeoJsonEntity.get_entity_by_id(entity))
         if parser['items']:
             for item in parser['items']:
-                entities.extend(GetByCode.get_entities_by_menu_item(code_=item, validation=parser))
+                entities.extend(GetByCode.get_entities_by_menu_item(code_=item, parser=parser))
         if parser['classes']:
             for class_ in parser['classes']:
-                entities.extend(GetByClass.get_entities_by_class(class_code=class_, validation=parser))
+                entities.extend(GetByClass.get_entities_by_class(class_code=class_, parser=parser))
         if parser['count']:
             return jsonify(len(entities))
         if parser['download']:
             return Download.download(data=entities, template=template, name='query')
 
-        output = Pagination.pagination(entities=entities, validation=parser)
+        output = Pagination.pagination(entities=entities, parser=parser)
 
         return marshal(output, template), 200

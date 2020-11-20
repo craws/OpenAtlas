@@ -16,8 +16,8 @@ class GetByCode(Resource):
     def get(self, item: str) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         code = Pagination.pagination(
-            GetByCode.get_entities_by_menu_item(code_=item, validation=parser),
-            validation=parser)
+            GetByCode.get_entities_by_menu_item(code_=item, parser=parser),
+            parser=parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['count']:
             # Todo: very static, make it dynamic
@@ -27,10 +27,10 @@ class GetByCode(Resource):
         return marshal(code, template), 200
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[Entity]:
+    def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
             raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
-        for entity in Query.get_by_menu_item_api(code_, validation):
+        for entity in Query.get_by_menu_item_api(code_, parser):
             entities.append(entity)
         return entities

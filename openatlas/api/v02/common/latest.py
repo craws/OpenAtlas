@@ -24,7 +24,7 @@ class GetLatest(Resource):
         return marshal(entities, template), 200
 
     @staticmethod
-    def get_entities_get_latest(limit_: int, validation: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
         try:
             limit_ = int(limit_)
@@ -32,7 +32,7 @@ class GetLatest(Resource):
             raise APIError('Invalid limit.', status_code=404, payload="404e")
         if 1 < limit_ < 101:
             for entity in Entity.get_latest(limit_):
-                entities.append(GeoJsonEntity.get_entity(entity, meta=validation))
+                entities.append(GeoJsonEntity.get_entity(entity, parser=parser))
             return entities
         else:
             raise APIError('Invalid limit.', status_code=404, payload="404e")
