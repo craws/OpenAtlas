@@ -1,4 +1,6 @@
-from flask import json, jsonify, render_template, request
+from typing import Any
+
+from flask import json, jsonify, render_template, request, send_file, send_from_directory
 from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
@@ -8,6 +10,8 @@ from openatlas.api.v01.error import APIError
 from openatlas.api.v01.node import APINode
 from openatlas.api.v01.parameter import Validation
 from openatlas.api.v01.path import Path
+from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 from openatlas.util.util import api_access
 
 
@@ -97,7 +101,7 @@ def api_get_query() -> Response:
         if request.args.getlist('entities'):
             entities = request.args.getlist('entities')
             for e in entities:
-                out.append(Api.get_entity_by_id(e))
+                out.append(e)
             count += len(out)
         if request.args.getlist('items'):
             items = request.args.getlist('items')
@@ -116,6 +120,7 @@ def api_get_query() -> Response:
                 else:
                     out.extend(
                         Path.get_entities_by_class(class_code=class_code, validation=validation))
+
         if validation['count']:
             return jsonify(count)
         if validation['download']:

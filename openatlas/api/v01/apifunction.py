@@ -15,6 +15,7 @@ from openatlas.util.display import format_date, get_file_path
 
 class Api:
 
+
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
         if not string:
