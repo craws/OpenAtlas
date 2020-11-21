@@ -1,0 +1,148 @@
+Classes endpoint
+---
+parameters:
+  - in: query
+    name: entities
+    description: get specific entities by id
+    schema:
+      type: number
+  - in: query
+    name: classes
+    description: get specific classes by cidoc class code e.g. E18
+    schema:
+      type: string
+  - in: query
+    name: items
+    description: get specific menu items e.g. actor, place
+    schema:
+      type: string
+  - in: query
+    name: limit
+    description: number of geojson representations to be returned
+    schema:
+      type: number
+  - in: query
+    name: column
+    description: the column wich should be sorted and filtered
+    schema:
+      type: string
+      enum:
+        -  id
+        -  class_code
+        -  name
+        -  description
+        -  created
+        -  modified
+        -  system_type
+        -  begin_from
+        -  begin_to
+        -  end_from
+        -  end_to
+  - in: query
+    name: sort
+    description: sort direction asc/desc
+    schema:
+      type: string
+      enum:
+        - asc
+        - desc
+  - in: query
+    name: filter
+    description: filter operator to be applied
+    schema:
+      type: string
+  - in: query
+    name: first
+    description: first id of a page
+    schema:
+      type: number
+  - in: query
+    name: last
+    description: last id of a page
+    schema:
+      type: number
+  - in: query
+    name: show
+    description: select which key should be shown e.g. when, types, relations, names, links, geometry, depictions, not
+    schema:
+      type: string
+      enum:
+        - when
+        - types
+        - relations
+        - names
+        - links
+        - geometry
+        - depictions
+        - not
+  - in: query
+    name: count
+    description: returns only how many results the API query gets
+    schema:
+      type: boolean
+  - in: query
+    name: download
+    description: triggers a file download of the result.
+    schema:
+      type: boolean
+responses:
+  '200':
+    description: a geojson representation of the specified entity
+    content:
+        application/ld+json:
+          schema:
+            properties:
+              type:
+                type: string
+                enum:
+                  - FeatureCollection
+              features:
+                type: array
+                items:
+                  type:
+                    type: string
+                    enum:
+                      - Feature
+                  geometry:
+                    type:
+                      type: string
+                      enum:
+                        - Point
+                        - MultiPoint
+                        - LineString
+                        - MultiLineString
+                        - Polygon
+                        - MultiPolygon
+                        - GeometryCollection
+                  properties:
+                    type: object
+                    nullable: true
+                  id:
+                    oneOf:
+                      - type: string
+                      - type: integer
+              links:
+                type: array
+                items:
+                  href:
+                    type: string
+                  rel:
+                    type: string
+                    example: prev
+                  type:
+                    type: string
+                    example: application/geo+json
+                  hreflang:
+                    type: string
+                    example: en
+              timeStamp:
+                type: string
+                format: dateTime
+              numberMatched:
+                type: integer
+                minimum: 0
+              numberReturned:
+                type: integer
+                minimum: 0
+  '404':
+    description: not found

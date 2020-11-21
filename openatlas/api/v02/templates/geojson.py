@@ -72,12 +72,8 @@ class GeoJson:
         if 'links' in show:
             feature['links'] = fields.List(fields.Nested(links))
 
-        # ToDo: geometry has to be dynamic, if it is only one geometry than geometries will never be returned. If it is a Point, the coordinates are list of two floats, else it is a list of lists, or maybe a lists of lists of lists...
-        # Look into that: https://blog.fossasia.org/dynamically-marshaling-output-in-flask-restplus/
-        # https://github.com/flask-restful/flask-restful/issues/212
-        # --> Maybe return the geometric with flask_restful.marshal_with_field
-        # if 'geometry' in show:
-        #    feature['geometry'] = fields.Nested(geometries)
+        if 'geometry' in show:
+            feature['geometry'] = fields.Raw
 
         if 'depictions' in show:
             feature['depictions'] = fields.List(fields.Nested(depictions))

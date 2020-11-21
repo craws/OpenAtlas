@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
+from flasgger import swag_from
 from flask import jsonify, url_for
 from flask_restful import Resource, marshal
 
@@ -12,6 +13,7 @@ from openatlas.models.place import get_structure
 
 
 class GetSubunit(Resource):
+    @swag_from("nodes.yml")
     def get(self, id_: int) -> Tuple[Any, int]:
         parser = default_parser.parse_args()
         node = GetSubunit.get_subunits(id_)

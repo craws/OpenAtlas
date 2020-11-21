@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
+from flasgger import swag_from
 from flask import g, jsonify
 from flask_restful import Resource, marshal
 
@@ -13,6 +14,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByClass(Resource):
+    @swag_from("code.yml")
     def get(self, class_code: str) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(

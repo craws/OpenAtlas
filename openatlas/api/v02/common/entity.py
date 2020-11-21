@@ -1,6 +1,6 @@
 from typing import Any, Tuple
 
-from flasgger import swag_from, Swagger
+from flasgger import swag_from
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.download import Download
@@ -12,7 +12,6 @@ from openatlas.api.v02.templates.geojson import GeoJson
 class GetEntity(Resource):
     @swag_from("entity.yml")
     def get(self, id_: int) -> Tuple[Any, int]:
-
         parser = entity_parser.parse_args()
         entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), parser)
         template = GeoJson.geojson_template(parser['show'])

@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
+from flasgger import swag_from
 from flask import jsonify
 from flask_restful import Resource, marshal
 
@@ -12,6 +13,7 @@ from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):
+    @swag_from("latest.yml")
     def get(self, latest: int) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination

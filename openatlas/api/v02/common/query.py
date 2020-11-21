@@ -1,5 +1,6 @@
 from typing import Any, Tuple
 
+from flasgger import swag_from
 from flask import jsonify
 from flask_restful import Resource, marshal
 
@@ -13,6 +14,7 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetQuery(Resource):
+    @swag_from("query.yml")
     def get(self, ) -> Tuple[Any, int]:
         entities = []
         parser = query_parser.parse_args()

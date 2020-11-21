@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple
 
+from flasgger import swag_from
 from flask import g, jsonify, url_for
 from flask_restful import Resource, marshal
 
@@ -10,6 +11,7 @@ from openatlas.api.v02.templates.nodes import NodeTemplate
 
 
 class GetNodeEntitiesAll(Resource):
+    @swag_from("nodes.yml")
     def get(self, id_: int) -> Tuple[Any, int]:
         parser = default_parser.parse_args()
         node = GetNodeEntitiesAll.get_node_all(id_)
