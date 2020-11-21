@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByCode(Resource):
-    @swag_from("code.yml")
+    @swag_from("../swagger/code.yml", endpoint="code")
     def get(self, item: str) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         code = Pagination.pagination(

@@ -4,8 +4,8 @@ from flasgger import swag_from
 from flask import jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.geojson import GeoJson
@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):
-    @swag_from("latest.yml")
+    @swag_from("../swagger/latest.yml", endpoint="latest")
     def get(self, latest: int) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination

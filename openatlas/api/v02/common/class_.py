@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByClass(Resource):
-    @swag_from("code.yml")
+    @swag_from("../swagger/class.yml", endpoint="class")
     def get(self, class_code: str) -> Tuple[Any, int]:
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(

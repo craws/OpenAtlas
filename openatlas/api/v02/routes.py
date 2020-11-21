@@ -13,11 +13,26 @@ from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 
-
+template = {
+    "swagger": "2.0",
+    "info": {
+        "title": "Openatlas API",
+        "verion": "0.2",
+        "description": "A documentation of the OpenAtlas API",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "contact": {
+            "name": "Bernhard Koschicek",
+            "email": "bernhard.koschicek@oeaw.ac.at"
+        }
+    }
+}
 
 
 api = Api(app)  # Establish connection between API and APP
-swagger = Swagger(app)
+swagger = Swagger(app, template=template)
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")
