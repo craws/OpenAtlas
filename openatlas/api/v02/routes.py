@@ -14,8 +14,7 @@ from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 
 template = {
-    "swagger": "2.0",
-    # "openapi": "3.0.0",
+    "openapi": "3.0.2",
     "info": {
         "title": "Openatlas API",
         "version": "0.2",
@@ -29,6 +28,7 @@ template = {
             "email": "bernhard.koschicek@oeaw.ac.at"
         }
     },
+    "servers": [],
     "tags": [
         {
             "name": "Entities",
@@ -130,14 +130,14 @@ template = {
                 "schema": {
                     "type": "string",
                     "enum": [
-                         "when",
-                         "types",
-                         "relations",
-                         "names",
-                         "links",
-                         "geometry",
-                         "depictions",
-                         "not"
+                        "when",
+                        "types",
+                        "relations",
+                        "names",
+                        "links",
+                        "geometry",
+                        "depictions",
+                        "not"
                     ]
                 }
             },
@@ -154,7 +154,10 @@ template = {
     }
 }
 
-
+app.config['SWAGGER'] = {
+    'openapi': '3.0.2',
+    'uiversion': 3
+}
 api = Api(app)  # Establish connection between API and APP
 swagger = Swagger(app, template=template)
 
