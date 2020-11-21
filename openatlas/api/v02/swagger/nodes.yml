@@ -1,35 +1,29 @@
 Node endpoint
 ---
-summary: retrieves a list of entities linked to that node
+tags:
+  - Nodes
+summary: Retrieves a list of entities linked to that node
 parameters:
-  - in: path
-    name: id
-    description: the entity ID
+  - name: id
+    in: path
+    description: The ID of an entity, which has to be a Node
     required: true
     schema:
       type: number
-  - in: query
-    name: count
-    description: returns only how many results the API query gets
-    schema:
-      type: boolean
-  - in: query
-    name: download
-    description: triggers a file download of the result.
-    schema:
-      type: boolean
+  - $ref: '#/components/parameters/countParam'
+  - $ref: '#/components/parameters/downloadParam'
 responses:
   '200':
     description: a geojson representation of the specified entity
     content:
-        application/ld+json:
-          schema:
-            properties:
-              id:
-                type: number
-              label:
-                type: string
-              url:
-                type: string
+      application/ld+json:
+        schema:
+          properties:
+            id:
+              type: number
+            label:
+              type: string
+            url:
+              type: string
   '404':
     description: not found
