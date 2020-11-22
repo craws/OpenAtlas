@@ -80,7 +80,10 @@ template = {
                 "description": "Result will be sorted asc/desc (by default by the name column)",
                 "schema": {
                     "type": "string",
-                    "enum": ["asc", "desc"]
+                    "enum": [
+                        "asc",
+                        "desc"
+                    ]
                 }
             },
             "filterParam": {
@@ -147,9 +150,234 @@ template = {
                 "description": "Select output language",
                 "schema": {
                     "type": "string",
-                    "enum": ["en", "de"]
+                    "enum": [
+                        "en",
+                        "de"
+                    ]
+                }
+            }
+        },
+        "schemas": {
+            "ContentModel": {
+                "type": "object",
+                "properties": {
+                    "contact": {
+                        "type": "string"
+                    },
+                    "intro": {
+                        "type": "string"
+                    },
+                    "legal-notice": {
+                        "type": "string"
+                    }
                 }
             },
+            "NodeModel": {
+                "type": "object",
+                "properties": {
+                    "id": {
+                        "type": "number"
+                    },
+                    "label": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "GeoJsonModel": {
+                "type": "object",
+                "required": [
+                    "type",
+                    "features"
+                ],
+                "properties": {
+                    "features": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/FeatureGeoJSON"
+                        }
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "FeatureGeoJSON": {
+                "type": "object",
+                "required": [
+                    "@id",
+                    "geometry",
+                    "type"
+                ],
+                "properties": {
+                    "@id": {
+                        "type": "string"
+                    },
+                    "crmClass:": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    },
+                    "depictions": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DepictionModel"
+                        }
+                    },
+                    "description": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/DescriptionModel"
+                        }
+                    },
+                    "links": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/LinkModel"
+                        }
+                    },
+                    "names": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/NamesModel"
+                        }
+                    },
+                    "properties": {
+                        "type": "object",
+                        "properties": {
+                            "title": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/RelationModel"
+                        }
+                    },
+                    "types": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TypeModel"
+                        }
+                    },
+                    "when": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/WhenModel"
+                        }
+                    }
+                }
+            },
+            "DepictionModel": {
+                "type": "object",
+                "properties": {
+                    "@id": {
+                        "type": "string"
+                    },
+                    "license": {
+                        "type": "string"
+                    },
+                    "title": {
+                        "type": "string"
+                    },
+                    "url": {
+                        "type": "string"
+                    }
+                }
+            },
+            "DescriptionModel": {
+                "type": "object",
+                "properties": {
+                    "value": {
+                        "type": "string"
+                    }
+                }
+            },
+            "LinkModel": {
+                "type": "object",
+                "properties": {
+                    "identifier": {
+                        "type": "string"
+                    },
+                    "type": {
+                        "type": "string"
+                    }
+                }
+            },
+            "NamesModel": {
+                "type": "object",
+                "properties": {
+                    "alias": {
+                        "type": "string"
+                    }
+                }
+            },
+            "RelationModel": {
+                "type": "object",
+                "properties": {
+                    "label": {
+                        "type": "string"
+                    },
+                    "relationTo": {
+                        "type": "string"
+                    },
+                    "relationType": {
+                        "type": "string"
+                    }
+                }
+            },
+            "TypeModel": {
+                "type": "object",
+                "properties": {
+                    "hierarchy": {
+                        "type": "string"
+                    },
+                    "identifier": {
+                        "type": "string"
+                    },
+                    "label": {
+                        "type": "string"
+                    }
+                }
+            },
+            "TimespansModel": {
+                "type": "object",
+                "properties": {
+                    "earliest": {
+                        "type": "string"
+                    },
+                    "latest": {
+                        "type": "string"
+                    }
+                }
+            },
+            "WhenModel": {
+                "type": "object",
+                "properties": {
+                    "timespans": {
+                        "type": "array",
+                        "items": {
+                            "end": {
+                                "type": "object",
+                                "properties": {
+                                    "$ref": "#/components/schemas/TimespansModel"
+                                }
+                            },
+                            "first": {
+                                "type": "object",
+                                "properties": {
+                                    "$ref": "#/components/schemas/TimespansModel"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -159,7 +387,7 @@ app.config['SWAGGER'] = {
     'uiversion': 3
 }
 api = Api(app)  # Establish connection between API and APP
-swagger = Swagger(app, template=template)
+swagger = Swagger(app, template=template, parse=False)
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")

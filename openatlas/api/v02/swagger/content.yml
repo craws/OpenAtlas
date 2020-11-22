@@ -8,15 +8,10 @@ parameters:
   - $ref: '#/components/parameters/downloadParam'
 responses:
   '200':
-    description: list of OA content
+    description: List of OA content
     content:
       application/ld+json:
         schema:
-          contact:
-            type: string
-          intro:
-            type: string
-          legal:
-            type: string
+          $ref: '#/components/schemas/ContentModel'
   '404':
     description: not found

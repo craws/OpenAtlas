@@ -17,59 +17,7 @@ responses:
     content:
       application/ld+json:
         schema:
-          properties:
-            type:
-              type: string
-              enum:
-                - FeatureCollection
-            features:
-              type: array
-              items:
-                type:
-                  type: string
-                  enum:
-                    - Feature
-                geometry:
-                  type:
-                    type: string
-                    enum:
-                      - Point
-                      - MultiPoint
-                      - LineString
-                      - MultiLineString
-                      - Polygon
-                      - MultiPolygon
-                      - GeometryCollection
-                properties:
-                  type: object
-                  nullable: true
-                id:
-                  oneOf:
-                    - type: string
-                    - type: integer
-            links:
-              type: array
-              items:
-                href:
-                  type: string
-                rel:
-                  type: string
-                  example: prev
-                type:
-                  type: string
-                  example: application/geo+json
-                hreflang:
-                  type: string
-                  example: en
-            timeStamp:
-              type: string
-              format: dateTime
-            numberMatched:
-              type: integer
-              minimum: 0
-            numberReturned:
-              type: integer
-              minimum: 0
+          $ref: '#/components/parameters/GeoJsonModel'
   '404':
     description: not found
 

@@ -18,12 +18,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          properties:
-            id:
-              type: number
-            label:
-              type: string
-            url:
-              type: string
+          $ref: '#/components/schemas/NodeModel'
   '404':
     description: not found
