@@ -49,7 +49,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
 
 
 def build_form(name: str,
-               item: Optional[Union[Entity, Link]] = None,  # The entity or link which is to be updated
+               item: Optional[Union[Entity, Link]] = None,
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -137,7 +137,7 @@ def add_buttons(form: Any,
                 name: str,
                 entity: Optional[Entity],
                 origin: Optional[Entity]) -> None:
-    setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
+    setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
     if 'continue' in forms[name] and (name in ['involvement'] or not origin):
@@ -283,7 +283,7 @@ def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) ->
         setattr(Form, 'description', StringField(_('unit')))
     else:
         setattr(Form, 'description', TextAreaField(_('description')))
-    setattr(Form, 'save', SubmitField(uc_first(_('save' if node else 'insert'))))
+    setattr(Form, 'save', SubmitField(uc_first(_('save') if node else _('insert'))))
     if not node:
         setattr(Form, 'continue_', HiddenField())
         setattr(Form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
