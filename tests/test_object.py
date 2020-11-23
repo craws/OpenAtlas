@@ -15,7 +15,8 @@ class ObjectTest(TestBaseCase):
 
             rv = self.app.get(url_for('object_insert'))
             assert b'+ Information Carrier' in rv.data
-            rv = self.app.post(url_for('object_insert'), data={'name': 'Love-letter'},
+            rv = self.app.post(url_for('object_insert'),
+                               data={'name': 'Love-letter'},
                                follow_redirects=True)
             assert b'Love-letter' in rv.data
             rv = self.app.get(url_for('object_index'))
@@ -25,7 +26,8 @@ class ObjectTest(TestBaseCase):
                 object_ = Entity.get_by_menu_item('object')[0]
             rv = self.app.get(url_for('object_update', id_=object_.id))
             assert b'Love-letter' in rv.data
-            rv = self.app.post(url_for('object_update', id_=object_.id), follow_redirects=True,
+            rv = self.app.post(url_for('object_update', id_=object_.id),
+                               follow_redirects=True,
                                data={'name': 'A little hate',
                                      'description': 'makes nothing better'})
             assert b'Changes have been saved' in rv.data
@@ -34,7 +36,8 @@ class ObjectTest(TestBaseCase):
             rv = self.app.get(url_for('entity_add_source', id_=object_.id))
             assert b'Link Source' in rv.data
             rv = self.app.post(url_for('entity_add_source', id_=object_.id),
-                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+                               data={'checkbox_values': str([source.id])},
+                               follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
             # Add to event
@@ -47,3 +50,9 @@ class ObjectTest(TestBaseCase):
 
             rv = self.app.get(url_for('object_index', action='delete', id_=object_.id))
             assert b'has been deleted' in rv.data
+
+            # Insert and continue
+            rv = self.app.post(url_for('object_insert'),
+                               data={'name': 'This will be continued', 'continue_': 'yes'},
+                               follow_redirects=True)
+            assert b'An entry has been created' in rv.data

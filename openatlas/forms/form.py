@@ -162,13 +162,13 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
 def add_external_references(form: any, form_name: str) -> None:
     for name, ref in g.external.items():
         if name not in forms[form_name] or not current_user.settings['module_' + name]:
-            continue
+            continue  # pragma: no cover, in tests all modules are activated
         if name == 'geonames':
             field = IntegerField(ref['name'] + ' Id',
                                  [OptionalValidator()],
                                  render_kw={'autocomplete': 'off'})
         else:
-            field = StringField(ref['name'] + ' Id test',
+            field = StringField(ref['name'] + ' Id',
                                 [OptionalValidator()],
                                 render_kw={'autocomplete': 'off'})
         setattr(form, name + '_id', field)

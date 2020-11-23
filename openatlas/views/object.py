@@ -82,7 +82,7 @@ def save(form: Any, object_: Optional[Entity] = None) -> str:
             object_ = Entity.insert('E84', form.name.data, 'information carrier')
         object_.update(form)
         url = url_for('entity_view', id_=object_.id)
-        if hasattr(form, 'continue') and form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('object_insert')
         g.cursor.execute('COMMIT')
         logger.log_user(object_.id, log_action)
