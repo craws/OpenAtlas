@@ -4,11 +4,12 @@ tags:
   - Entities
 summary: Retrieves a Geojson representations of an entity
 parameters:
-  - name: id
-    in: path
+  - in: path
+    name: id_
     description: Specific entity ID
     required: true
-    type: number
+    schema:
+      type: number
   - $ref: '#/components/parameters/showParam'
   - $ref: '#/components/parameters/downloadParam'
 responses:
@@ -17,7 +18,7 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/parameters/GeoJsonModel'
+          $ref: '#/components/schemas/GeoJsonModel'
   '404':
     description: not found
 

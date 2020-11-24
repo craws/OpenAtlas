@@ -4,8 +4,8 @@ tags:
   - Nodes
 summary: Retrieves a list of entities linked to that node
 parameters:
-  - name: id
-    in: path
+  - in: path
+    name: id_
     description: The ID of an entity, which has to be a Node
     required: true
     schema:

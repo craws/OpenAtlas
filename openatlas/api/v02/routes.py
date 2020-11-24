@@ -12,7 +12,7 @@ from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
 from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
-
+"""
 template = {
     "openapi": "3.0.2",
     "info": {
@@ -186,6 +186,60 @@ template = {
                     }
                 }
             },
+            "OutputModel": {
+                "type": "object",
+                "properties": {
+                    "GeoJson": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GeoJsonModel"
+                        }
+                    },
+                    "pagination": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PaginationModel"
+                        }
+                    }
+                }
+            },
+            "PaginationModel": {
+                "type": "object",
+                "properties": {
+                    "entities": {
+                        "type": "number"
+                    },
+                    "entity_per_page": {
+                        "type": "number"
+                    },
+                    "total_pages": {
+                        "type": "number"
+                    },
+                    "index": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/PaginationIndexModel"
+                        }
+                    }
+                }
+            },
+            "PaginationIndexModel": {
+                "type": "object",
+                "properties": {
+                    "page": {
+                        "type": "number"
+                    },
+                    "start_id": {
+                        "type": "number"
+                    }
+                }
+            },
+            "LatestModel": {
+                "type": "array",
+                "items": {
+                    "$ref": "#/components/schemas/GeoJsonModel"
+                }
+            },
             "GeoJsonModel": {
                 "type": "object",
                 "required": [
@@ -200,6 +254,9 @@ template = {
                         }
                     },
                     "type": {
+                        "type": "string"
+                    },
+                    "@context": {
                         "type": "string"
                     }
                 }
@@ -345,7 +402,7 @@ template = {
                     }
                 }
             },
-            "TimespansModel": {
+            "TimeDetailModel": {
                 "type": "object",
                 "properties": {
                     "earliest": {
@@ -356,24 +413,24 @@ template = {
                     }
                 }
             },
+            "TimespansModel": {
+                "type": "object",
+                "properties": {
+                    "end": {
+                        "$ref": "#/components/schemas/TimeDetailModel"
+                    },
+                    "first": {
+                        "$ref": "#/components/schemas/TimeDetailModel"
+                    }
+                }
+            },
             "WhenModel": {
                 "type": "object",
                 "properties": {
                     "timespans": {
                         "type": "array",
                         "items": {
-                            "end": {
-                                "type": "object",
-                                "properties": {
-                                    "$ref": "#/components/schemas/TimespansModel"
-                                }
-                            },
-                            "first": {
-                                "type": "object",
-                                "properties": {
-                                    "$ref": "#/components/schemas/TimespansModel"
-                                }
-                            }
+                            "$ref": "#/components/schemas/TimespansModel"
                         }
                     }
                 }
@@ -381,13 +438,13 @@ template = {
         }
     }
 }
-
+"""
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
     'uiversion': 3
 }
 api = Api(app)  # Establish connection between API and APP
-swagger = Swagger(app, template=template, parse=False)
+swagger = Swagger(app, parse=False, template_file="static/swagger/Swagger.json")
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")

@@ -4,8 +4,8 @@ tags:
   - Entities
 summary: Retrieves a list of Geojson representations for a specific CIDOC CRM code
 parameters:
-  - name: class
-    in: path
+  - in: path
+    name: class_code
     description: Need to be a Entity class of the CIDOC CRM (e.g. E21, E18, E33)
     required: true
     schema:
@@ -25,58 +25,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          properties:
-            type:
-              type: string
-              enum:
-                - FeatureCollection
-            features:
-              type: array
-              items:
-                type:
-                  type: string
-                  enum:
-                    - Feature
-                geometry:
-                  type:
-                    type: string
-                    enum:
-                      - Point
-                      - MultiPoint
-                      - LineString
-                      - MultiLineString
-                      - Polygon
-                      - MultiPolygon
-                      - GeometryCollection
-                properties:
-                  type: object
-                  nullable: true
-                id:
-                  oneOf:
-                    - type: string
-                    - type: integer
-            links:
-              type: array
-              items:
-                href:
-                  type: string
-                rel:
-                  type: string
-                  example: prev
-                type:
-                  type: string
-                  example: application/geo+json
-                hreflang:
-                  type: string
-                  example: en
-            timeStamp:
-              type: string
-              format: dateTime
-            numberMatched:
-              type: integer
-              minimum: 0
-            numberReturned:
-              type: integer
-              minimum: 0
+          $ref: '#/components/schemas/OutputModel'
   '404':
     description: not found
