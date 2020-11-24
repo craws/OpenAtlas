@@ -8,7 +8,7 @@ from openatlas.models.date import Date
 from openatlas.util.display import uc_first
 
 
-def validate(self) -> bool:
+def validate(self: FlaskForm) -> bool:
     valid = FlaskForm.validate(self)
 
     # Check date format, if valid put dates into a list called "dates"

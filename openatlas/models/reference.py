@@ -14,7 +14,7 @@ class Reference:
     # Tools for external references like Wikidata or GeoNames
 
     @staticmethod
-    def get_link(entity: Entity, name) -> Optional[Link]:
+    def get_link(entity: Entity, name: str) -> Optional[Link]:
         for link_ in entity.get_links('P67', inverse=True):
             if link_.domain.system_type == 'external reference ' + name:
                 return link_

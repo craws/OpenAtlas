@@ -49,7 +49,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
 
 
 def build_form(name: str,
-               item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
+               item: Optional[Union[Entity, Link]] = None,
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -133,8 +133,11 @@ def customize_labels(name: str, form: FlaskForm) -> None:
         form.description.label.text = _('content')
 
 
-def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
-    setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
+def add_buttons(form: Any,
+                name: str,
+                entity: Optional[Entity],
+                origin: Optional[Entity]) -> None:
+    setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
     if 'continue' in forms[name] and (name in ['involvement'] or not origin):
@@ -159,16 +162,16 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
     return form
 
 
-def add_external_references(form: any, form_name: str) -> None:
+def add_external_references(form: Any, form_name: str) -> None:
     for name, ref in g.external.items():
         if name not in forms[form_name] or not current_user.settings['module_' + name]:
-            continue
+            continue  # pragma: no cover, in tests all modules are activated
         if name == 'geonames':
             field = IntegerField(ref['name'] + ' Id',
                                  [OptionalValidator()],
                                  render_kw={'autocomplete': 'off'})
         else:
-            field = StringField(ref['name'] + ' Id test',
+            field = StringField(ref['name'] + ' Id',
                                 [OptionalValidator()],
                                 render_kw={'autocomplete': 'off'})
         setattr(form, name + '_id', field)
@@ -179,14 +182,14 @@ def add_external_references(form: any, form_name: str) -> None:
                             default='close match' if name == 'geonames' else ''))
 
 
-def add_value_type_fields(form: any, subs: List[int]) -> None:
+def add_value_type_fields(form: Any, subs: List[int]) -> None:
     for sub_id in subs:
         sub = g.nodes[sub_id]
         setattr(form, str(sub.id), ValueFloatField(sub.name, [OptionalValidator()]))
         add_value_type_fields(form, sub.subs)
 
 
-def add_types(form: any, name: str, code: Union[str, None]):
+def add_types(form: Any, name: str, code: Union[str, None]) -> None:
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     type_name = name.replace('_', ' ').title()
     if code in code_class:
@@ -244,7 +247,7 @@ def add_fields(form: Any,
                                                    widget=widgets.ListWidget(prefix_label=False),
                                                    coerce=int))
     elif name == 'involvement':
-        if not item:
+        if not item and origin:
             involved_with = 'actor' if origin.view_name == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
@@ -272,7 +275,7 @@ def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) ->
         name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
         is_node_form = HiddenField()
 
-    root = g.nodes[node.root[-1]] if not root else root
+    root = g.nodes[node.root[-1]] if node else root
     setattr(Form, str(root.id), TreeField(str(root.id)))
     if root.directional:
         setattr(Form, 'name_inverse', StringField(_('inverse')))
@@ -280,7 +283,7 @@ def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) ->
         setattr(Form, 'description', StringField(_('unit')))
     else:
         setattr(Form, 'description', TextAreaField(_('description')))
-    setattr(Form, 'save', SubmitField(uc_first(_('save' if node else 'insert'))))
+    setattr(Form, 'save', SubmitField(uc_first(_('save') if node else _('insert'))))
     if not node:
         setattr(Form, 'continue_', HiddenField())
         setattr(Form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))

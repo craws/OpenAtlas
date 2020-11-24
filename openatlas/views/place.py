@@ -117,18 +117,10 @@ def place_update(id_: int) -> Union[str, Response]:
                                    modifier=modifier)
         save(form, object_, location)
         return redirect(url_for('entity_view', id_=id_))
-
     if object_.system_type == 'place':
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    for name in g.external:
-        if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
-            link_ = Reference.get_link(object_, name)
-            if link_ and not getattr(form, name + '_id').data:
-                reference = link_.domain
-                getattr(form, name + '_id').data = reference.name if reference else ''
-                getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
     structure = get_structure(object_)
     return render_template('place/update.html',
                            form=form,
