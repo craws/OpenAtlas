@@ -386,6 +386,7 @@ def admin_log_delete() -> Response:
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
     form = NewsLetterForm()
+    form.save.label.text = uc_first(_('send'))
     if form.validate_on_submit():  # pragma: no cover
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
