@@ -115,8 +115,10 @@ class DisplayForm(FlaskForm):  # type: ignore
                              choices=list(app.config['TABLE_ROWS'].items()),
                              coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
-    layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
-    layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
+    entity_show_dates = BooleanField(_('show created and modified information'))
+    entity_show_import = BooleanField(_('show import information'))
+    entity_show_class = BooleanField(_('show CIDOC class'))
+    entity_show_api = BooleanField(_('show API links'))
     map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     save = SubmitField(_('save'))
