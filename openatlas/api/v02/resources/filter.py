@@ -21,7 +21,7 @@ class Filter:
                                               'created': 'e.created', 'modified': 'e.modified',
                                               'end_to': 'e.end_to', 'end_from': 'e.end_from'}
     @staticmethod
-    def get_filter(parameters: Dict[str, Tuple], parser: Dict[str, Any]) -> str:
+    def get_filter(parameters: Dict[str, Tuple[Any]], parser: Dict[str, Any]) -> str:
         clause = ""
         filters = Filter.validate_filter(parser['filter'])
         for filter_ in filters:

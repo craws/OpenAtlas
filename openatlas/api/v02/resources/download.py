@@ -10,7 +10,7 @@ from flask_restful.fields import String
 class Download:
 
     @staticmethod
-    def download(data: List[List[Dict[str, Any]]], template: Dict[str, Type[String]], name: Union[str, int]):
+    def download(data: Union[List[List[Dict[str, Any]]], Dict[str, Any]], template: Dict[str, Type[String]], name: Union[str, int]):
         return Response(json.dumps(marshal(data, template)),
                         mimetype='application/json',
                         headers={
