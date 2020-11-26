@@ -6,7 +6,6 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.v02.resources.error import Error
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference import Reference
 from openatlas.util.display import format_date, get_file_path
@@ -103,7 +102,7 @@ class GeoJsonEntity:
         return time
 
     @staticmethod
-    def get_geom_by_entity(entity: Entity):
+    def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
         if entity.class_.code != 'E53':
             return 'Wrong class'
         geom = []
@@ -146,7 +145,7 @@ class GeoJsonEntity:
         except Exception:
             # Todo: Eliminate Error
             raise Error('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
-                           payload="404a")
+                        payload="404a")
         return entity
 
     @staticmethod

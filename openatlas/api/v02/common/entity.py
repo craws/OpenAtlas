@@ -11,7 +11,7 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 class GetEntity(Resource):
     @swag_from("../swagger/entity.yml", endpoint="entity")
-    def get(self, id_: int) -> Tuple[Any, int]:
+    def get(self, id_: int) -> Tuple[Resource, int]:
         parser = entity_parser.parse_args()
         entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), parser)
         template = GeoJson.geojson_template(parser['show'])

@@ -12,7 +12,7 @@ from openatlas.api.v02.templates.nodes import NodeTemplate
 
 class GetNodeEntities(Resource):
     @swag_from("../swagger/nodes.yml", endpoint="node_entities")
-    def get(self, id_: int) -> Tuple[Any, int]:
+    def get(self, id_: int) -> Tuple[Resource, int]:
         parser = default_parser.parse_args()
         node = GetNodeEntities.get_node(id_)
         template = NodeTemplate.node_template()

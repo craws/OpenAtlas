@@ -11,7 +11,7 @@ from openatlas.models.content import Content
 
 class GetContent(Resource):
     @swag_from("../swagger/content.yml", endpoint="content")
-    def get(self) -> Tuple[Any, int]:
+    def get(self) -> Tuple[Resource, int]:
 
         parser = language_parser.parse_args()
         content = {'intro': Content.get_translation('intro_for_frontend', parser['lang']),

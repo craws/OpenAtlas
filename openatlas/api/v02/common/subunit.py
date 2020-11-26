@@ -14,7 +14,7 @@ from openatlas.models.place import get_structure
 
 class GetSubunit(Resource):
     @swag_from("../swagger/nodes.yml", endpoint="subunit")
-    def get(self, id_: int) -> Tuple[Any, int]:
+    def get(self, id_: int) -> Tuple[Resource, int]:
         parser = default_parser.parse_args()
         node = GetSubunit.get_subunits(id_)
         template = NodeTemplate.node_template()

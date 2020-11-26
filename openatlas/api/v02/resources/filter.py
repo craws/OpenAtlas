@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from openatlas.api.v02.resources.error import Error
 
@@ -21,7 +21,7 @@ class Filter:
                                               'created': 'e.created', 'modified': 'e.modified',
                                               'end_to': 'e.end_to', 'end_from': 'e.end_from'}
     @staticmethod
-    def get_filter(parameters, parser):
+    def get_filter(parameters: Dict[str, Tuple], parser: Dict[str, Any]) -> str:
         clause = ""
         filters = Filter.validate_filter(parser['filter'])
         for filter_ in filters:

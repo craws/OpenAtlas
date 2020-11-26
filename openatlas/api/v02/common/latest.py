@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 
 class GetLatest(Resource):
     @swag_from("../swagger/latest.yml", endpoint="latest")
-    def get(self, latest: int) -> Tuple[Any, int]:
+    def get(self, latest: int) -> Tuple[Resource, int]:
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination
         entities = GetLatest.get_entities_get_latest(latest, parser)
