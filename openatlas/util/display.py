@@ -74,7 +74,6 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
          class_: Optional[str] = None,
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
-
     if type(object_) is str or type(object_) is LazyString:
         return '<a href="{url}" {class_} {js}>{label}</a>'.format(
             url=url,
@@ -189,20 +188,26 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
 
 def add_system_data(entity: 'Entity',
                     data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
-    # Additional info for advanced layout
-    if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
+    # Add additional information for entity views (if activated in profile)
+    if not hasattr(current_user, 'settings'):
+        return data  # pragma: no cover
+    info = openatlas.logger.get_log_for_advanced_view(entity.id)
+    if 'entity_show_class' in current_user.settings and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.class_)
-        info = openatlas.logger.get_log_for_advanced_view(entity.id)
+    if 'entity_show_dates' in current_user.settings and current_user.settings['entity_show_dates']:
         data[_('created')] = format_date(entity.created) + ' ' + link(info['creator'])
         if info['modified']:
             html = format_date(info['modified']) + ' ' + link(info['modifier'])
             data[_('modified')] = html
-        if info['import_project']:
-            data[_('imported from')] = link(info['import_project'])
-        if info['import_user']:
-            data[_('imported by')] = link(info['import_user'])
-        if info['import_origin_id']:
-            data['origin ID'] = info['import_origin_id']
+    if 'entity_show_import' in current_user.settings:
+        if current_user.settings['entity_show_import']:
+            if info['import_project']:
+                data[_('imported from')] = link(info['import_project'])
+            if info['import_user']:
+                data[_('imported by')] = link(info['import_user'])
+            if info['import_origin_id']:
+                data['origin ID'] = info['import_origin_id']
+    if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
         data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
             url=url_for('api_entity', id_=entity.id))
         data_api += '''

@@ -8,11 +8,13 @@ from openatlas.models.date import Date
 from openatlas.util.display import uc_first
 
 
-def validate(self) -> bool:
+def validate(self: FlaskForm) -> bool:
     valid = FlaskForm.validate(self)
 
-    # Check date format, if valid put dates into a list called "dates"
+    # Dates
     if hasattr(self, 'begin_year_from'):
+
+        # Check date format, if valid put dates into a list called "dates" for further validation
         dates = {}
         for prefix in ['begin_', 'end_']:
             if getattr(self, prefix + 'year_to').data and not getattr(self,
@@ -77,7 +79,7 @@ def validate(self) -> bool:
     # External references
     if hasattr(self, 'wikidata_id') and self.wikidata_id.data:  # pragma: no cover
         if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
-            self.wikidata_id.errors.append(uc_first(_('wrong format')))
+            self.wikidata_id.errors.append(uc_first(_('wrong Wikidata Id format') + '.'))
             valid = False
         else:
             self.wikidata_id.data = uc_first(self.wikidata_id.data)

@@ -33,11 +33,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             else:
                 tab_hash = '#menu-tab-custom_collapse-'
             return redirect(url_for('node_index') + tab_hash + str(id_))
-    try:
-        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-    except AttributeError:
-        abort(418)
-        return ''  # pragma: no cover
+    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)

@@ -330,7 +330,11 @@ class Entity:
             return g.nodes[entity_id]
         sql = Entity.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        entity = Entity(g.cursor.fetchone())
+        try:
+            entity = Entity(g.cursor.fetchone())
+        except AttributeError:
+            abort(418)
+            return Entity(g.cursor.fetchone())  # pragma: no cover, this line is just for type check
         if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
             logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
                        format(id=entity_id, view=entity.view_name, request=view_name))

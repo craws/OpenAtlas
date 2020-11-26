@@ -17,6 +17,7 @@ from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.models.node import Node
 from openatlas.models.user import User
 from openatlas.util import display, tab, util
 from openatlas.util.table import Table
@@ -322,25 +323,28 @@ def add_row(field,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self: Any,
-                     form: Any,
-                     form_id: Optional[str] = None,
-                     for_persons: bool = False,
-                     manual_page: Optional[str] = None) -> str:
+                 form: Any,
+                 form_id: Optional[str] = None,
+                 for_persons: bool = False,
+                 manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
-    def display_value_type_fields(subs: List[int], html_: str = '') -> str:
-        for sub_id in subs:
+    def display_value_type_fields(node_: Node, root: Optional[Node] = None) -> str:
+        root = root if root else node_
+        html_ = ''
+        for sub_id in node_.subs:
             sub = g.nodes[sub_id]
             field_ = getattr(form, str(sub_id))
             html_ += """
-                <div class="table-row  value-type-switch">
+                <div class="table-row value-type-switch{id}">
                     <div>{label}</div>
                     <div class="table-cell">{field} {unit}</div>
                 </div>
-                {value_fields}""".format(label=sub.name,
+                {value_fields}""".format(id=root.id,
+                                         label=sub.name,
                                          unit=sub.description,
                                          field=field_(class_='value-type'),
-                                         value_fields=display_value_type_fields(sub.subs))
+                                         value_fields=display_value_type_fields(sub, root))
         return html_
 
     html = ''
@@ -370,10 +374,11 @@ def display_form(self: Any,
                 label = display.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
+                onclick = 'switch_value_type({id})'.format(id=node.id)
                 html += add_row(field, label, display.button(_('show'),
-                                                             onclick='switch_value_types()',
+                                                             onclick=onclick,
                                                              css='secondary'))
-                html += display_value_type_fields(node.subs)
+                html += display_value_type_fields(node)
                 continue
             tooltip = '' if 'is_node_form' in form else ' ' + display.tooltip(node.description)
             html += add_row(field, label + tooltip)
