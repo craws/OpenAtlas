@@ -59,6 +59,8 @@ def build_form(name: str,
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
 
+    print(name)
+    print(forms)
     if 'name' in forms[name]:
         label = _('URL') if name == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
@@ -167,13 +169,15 @@ def add_external_references(form: Any, form_name: str) -> None:
         if name not in forms[form_name] or not current_user.settings['module_' + name]:
             continue  # pragma: no cover, in tests all modules are activated
         if name == 'geonames':
-            field = IntegerField(ref['name'] + ' Id',
-                                 [OptionalValidator()],
-                                 render_kw={'autocomplete': 'off'})
+            field = IntegerField(
+                ref['name'] + ' Id',
+                [OptionalValidator()],
+                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
         else:
-            field = StringField(ref['name'] + ' Id',
-                                [OptionalValidator()],
-                                render_kw={'autocomplete': 'off'})
+            field = StringField(
+                ref['name'] + ' Id',
+                [OptionalValidator()],
+                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
         setattr(form, name + '_id', field)
         setattr(form,
                 name + '_precision',

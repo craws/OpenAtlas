@@ -1,7 +1,7 @@
 
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
-function switch_value_types() {
-    $(".value-type-switch").toggleClass('display-none');
+function switch_value_type(id) {
+    $(".value-type-switch" + id).toggleClass('display-none');
     $(this).text(function (i, text) {
         return text === show ? hide : show;
     })
@@ -44,9 +44,10 @@ $(document).ready(function () {
         $('.date-switch').addClass('display-none');
     }
 
-    $('.value-type-switch').addClass('display-none');
-    $('label[for="show_passwords"]').css('display', 'block');
+    /* Hide value type fields with class* wildcard selector */
+    $('[class*="value-type-switch"]').addClass('display-none');
 
+    $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').show()
 
     .change(function () {

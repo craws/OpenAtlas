@@ -98,7 +98,10 @@ def reference_insert(category: str, origin_id: Optional[int] = None) -> Union[st
 @required_group('contributor')
 def reference_update(id_: int) -> Union[str, Response]:
     reference = Entity.get_by_id(id_, nodes=True, view_name='reference')
-    form = build_form(reference.system_type.replace(' ', '_'), reference)
+    form_name = reference.system_type.replace(' ', '_')
+    if form_name.startswith('external_reference'):
+        form_name = 'external_reference'
+    form = build_form(form_name, reference)
     if form.validate_on_submit():
         if was_modified(form, reference):  # pragma: no cover
             del form.save

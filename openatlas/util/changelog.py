@@ -4,6 +4,7 @@ class Changelog:
             'feature': {
                 '930': 'Wikidata API',
                 '1409': 'Redesign forms',
+                '1393': 'Split profile display options',
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
                 '1407': 'Extend session availability (prevent CSRF token timeout)',
