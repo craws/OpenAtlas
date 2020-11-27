@@ -1,7 +1,7 @@
 #map {
     z-index: 0;
     float: right;
-    height: calc(100vh - 145px);
+    height: calc(100vh - 205px);
     width: 100%;
 }
 

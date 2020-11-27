@@ -15,7 +15,9 @@
             {{ table.display()|safe }}
         </div>
         {% if gis_data %}
-            <div id="map" class="col"></div>
+            <div class="col">
+                <div id="map"></div>
+            </div>
         {% endif %}
     </div>
     <script src="/static/js/map/map.js"></script>
