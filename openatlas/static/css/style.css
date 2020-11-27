@@ -660,3 +660,7 @@ tr:hover {
     border-radius: .2rem;
     margin-bottom: 0.15em;
 }
+
+.dropdown-menu.show {
+    width: auto!important;
+}
