@@ -59,8 +59,6 @@ def build_form(name: str,
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
 
-    print(name)
-    print(forms)
     if 'name' in forms[name]:
         label = _('URL') if name == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
