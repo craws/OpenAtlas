@@ -36,7 +36,7 @@ class GeoJsonEntity:
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
-        return links
+        return links if links else None
 
     @staticmethod
     def get_file(entity: Entity) -> List[Dict[str, str]]:
@@ -50,7 +50,7 @@ class GeoJsonEntity:
                               'url': url_for('display_file_api',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
-        return files
+        return files if files else None
 
     @staticmethod
     def get_license(entity_id: int) -> str:  # pragma: nocover
@@ -80,7 +80,7 @@ class GeoJsonEntity:
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
-        return nodes
+        return nodes if nodes else None
 
     @staticmethod
     def get_time(entity: Entity) -> Dict[str, Any]:
@@ -99,7 +99,7 @@ class GeoJsonEntity:
             if entity.end_comment:
                 end['comment'] = entity.end_comment
             time['end'] = end
-        return time
+        return time if time else None
 
     @staticmethod
     def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
@@ -136,7 +136,7 @@ class GeoJsonEntity:
             if reference:
                 ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
                             'type': GeoJsonEntity.to_camelcase(reference.type.name)})
-        return ref
+        return ref if ref else None
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
@@ -158,17 +158,9 @@ class GeoJsonEntity:
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
-        # Relations
-        if GeoJsonEntity.get_links(entity) and 'relations' in parser['show']:
-            features['relations'] = GeoJsonEntity.get_links(entity)
-
         # Descriptions
         if entity.description:
             features['description'] = [{'value': entity.description}]
-
-        # Types
-        if GeoJsonEntity.get_node(entity) and 'types' in parser['show']:
-            features['types'] = GeoJsonEntity.get_node(entity)
 
         # Alias
         if entity.aliases and 'names' in parser['show']:
@@ -176,18 +168,35 @@ class GeoJsonEntity:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
+        # Relations
+        # if GeoJsonEntity.get_links(entity) and 'relations' in parser['show']:
+        #     features['relations'] = GeoJsonEntity.get_links(entity)
+        features['relations'] = GeoJsonEntity.get_links(entity) if 'relations' in parser[
+            'show'] else None
+
+        # Types
+        # if GeoJsonEntity.get_node(entity) and 'types' in parser['show']:
+        #     features['types'] = GeoJsonEntity.get_node(entity)
+        features['types'] = GeoJsonEntity.get_node(entity) if 'types' in parser['show'] else None
+
+
         # Depictions
-        if GeoJsonEntity.get_file(entity) and 'depictions' in parser['show']:  # pragma: nocover
-            features['depictions'] = GeoJsonEntity.get_file(entity)
+        # if GeoJsonEntity.get_file(entity) and 'depictions' in parser['show']:  # pragma: nocover
+        #     features['depictions'] = GeoJsonEntity.get_file(entity)
+        features['depictions'] = GeoJsonEntity.get_file(entity) if 'depictions' in parser['show'] else None
 
         # Time spans
-        if GeoJsonEntity.get_time(entity) and 'when' in parser['show']:
-            if entity.begin_from or entity.end_from:
-                features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]}
+        # if GeoJsonEntity.get_time(entity) and 'when' in parser['show']:
+        #     if entity.begin_from or entity.end_from:
+        #         features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]}
+
+        if entity.begin_from or entity.end_from:
+            features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if'when' in parser['show'] else None
 
         # Geonames
-        if GeoJsonEntity.get_external(entity) and 'links' in parser['show']:
-            features['links'] = [GeoJsonEntity.get_external(entity)]
+        # if GeoJsonEntity.get_external(entity) and 'links' in parser['show']:
+        #     features['links'] = [GeoJsonEntity.get_external(entity)]
+        features['links'] = GeoJsonEntity.get_external(entity) if 'links' in parser['show'] else None
 
         # Geometry
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':

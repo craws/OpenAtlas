@@ -72,8 +72,8 @@ class GeoJson:
         if 'links' in show:
             feature['links'] = fields.List(fields.Nested(links))
 
-        if 'geometry' in show:
-            feature['geometry'] = fields.Raw
+        #if 'geometry' in show:
+        feature['geometry'] = fields.Raw
 
         if 'depictions' in show:
             feature['depictions'] = fields.List(fields.Nested(depictions))

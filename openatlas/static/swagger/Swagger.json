@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.2",
     "info": {
-        "title": "Openatlas API",
+        "title": "OpenAtlas API",
         "version": "0.2",
         "description": "A documentation of the OpenAtlas API",
         "license": {
