@@ -101,6 +101,33 @@ $(document).ready(function () {
     newUrl = url.split("#")[0] + hash;
     history.replaceState(null, null, newUrl);
   });
+
+  /**
+   * wikidata autocomplete
+   * documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * bootstrap version needs to be manually set d/t
+   */
+  $('#wikidata_id').autoComplete({
+    bootstrapVersion: '4',
+    resolver: 'custom',
+    formatResult: function (item) {
+        return {
+            value: item.id,
+            text: `${item.id} - ${item.label} - ${item.description}`
+        };
+    },
+    events: {
+        search: function (qry, callback) {
+            $.ajax(
+                `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
+            ).done(function (res) {
+                callback(res.search)
+            });
+        }
+    }
+  }).on('autocomplete.select', function(evt,item) {
+      $('#wikidata_id').val(item.id);
+  });
 });
 
 $.jstree.defaults.core.themes.dots = false;

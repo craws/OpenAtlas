@@ -308,7 +308,6 @@ noscript div {
 }
 
 #content {
-    margin: 1em;
     text-align: left;
     font-size: 0.9em;
 }
@@ -659,4 +658,8 @@ tr:hover {
     line-height: 1.0;
     border-radius: .2rem;
     margin-bottom: 0.15em;
+}
+
+.dropdown-menu.show {
+    width: auto!important;
 }

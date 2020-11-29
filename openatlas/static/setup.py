@@ -18,7 +18,8 @@ package_json = {
         "save-svg-as-png": "^1.4.14",
         "tinymce": "^5.1.1",
         "bootstrap": "^4.3.1",
-        "popper.js": "^1.16.0"
+        "popper.js": "^1.16.0",
+        "bootstrap-autocomplete": "2.3.7"
     }
 }
 

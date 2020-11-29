@@ -4,7 +4,7 @@ import ast
 import itertools
 from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
 
-from flask import g
+from flask import g, request
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from fuzzywuzzy import fuzz
@@ -333,6 +333,8 @@ class Entity:
         try:
             entity = Entity(g.cursor.fetchone())
         except AttributeError:
+            if 'activity' in request.path:
+                raise AttributeError  # pragma: no cover, re-raise if user activity view
             abort(418)
             return Entity(g.cursor.fetchone())  # pragma: no cover, this line is just for type check
         if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
