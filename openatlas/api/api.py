@@ -1,15 +1,13 @@
 import ast
-import json
 from typing import Any, Dict, List, Optional, Union
 
-from flask import g, session, url_for
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.error import APIError
 from openatlas.models.entity import Entity
-from openatlas.models.reference import Reference
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.reference import Reference
 from openatlas.util.display import format_date, get_file_path
 
 
@@ -30,8 +28,6 @@ class Api:
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
                                           + link.property.i18n['en'].replace(' ', '_')})
-            if link.property.code == 'P53':
-                entity.location = link.range
 
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
@@ -41,7 +37,7 @@ class Api:
         return links
 
     @staticmethod
-    def get_file(entity: Entity) -> List[Dict[str, str]]:
+    def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
         files = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
@@ -52,7 +48,7 @@ class Api:
                               'url': url_for('display_file_api',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
-        return files
+        return files if files else None
 
     @staticmethod
     def get_license(entity_id: int) -> str:  # pragma: nocover
@@ -63,7 +59,7 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_node(entity: Entity) -> List[Dict[str, Any]]:
+    def get_node(entity: Entity) -> Optional[List[Dict[str, str]]]:
         nodes = []
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
@@ -82,7 +78,8 @@ class Api:
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
-        return nodes
+
+        return nodes if nodes else None
 
     @staticmethod
     def get_time(entity: Entity) -> Dict[str, Any]:
@@ -104,25 +101,8 @@ class Api:
         return time
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]: # pragma: nocover
-        geometries = []
-        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        for geometry in Gis.get_by_id(entity.location.id):
-            geo_dict = {'type': shape[geometry['shape']],
-                        'coordinates': geometry['geometry']['coordinates']}
-            if geometry['description']:
-                geo_dict['description'] = geometry['description']
-            if geometry['name']:
-                geo_dict['title'] = geometry['name']
-            geometries.append(geo_dict)
-        if len(geometries) == 1:
-            return geometries[0]
-        else:
-            return {'type': 'GeometryCollection', 'geometries': geometries}
-
-    @staticmethod
-    def get_geom_by_entity(entity: Entity):
-        if entity.class_.code != 'E53': # pragma: nocover
+    def get_geom_by_entity(entity: Entity) -> Union[Dict[str, Any], str]:
+        if entity.class_.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -148,14 +128,14 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_external(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+    def get_external(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
         ref = []
         for external in g.external:
             reference = Reference.get_link(entity, external)
             if reference:
                 ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
                             'type': Api.to_camelcase(reference.type.name)})
-        return ref
+        return ref if ref else None
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
@@ -168,7 +148,6 @@ class Api:
         except Exception:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
-
         return entity
 
     @staticmethod
@@ -179,44 +158,42 @@ class Api:
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
                     'crmClass': "crm:" + class_code,
-                    'properties': {'title': entity.name}}
+                    'properties': {'title': entity.name},
+                    'description': [{'value': entity.description}]
+                    }
 
         # Relations
-        if Api.get_links(entity) and 'relations' in meta['show']:
+        if 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)
 
-        # Descriptions
-        if entity.description:
-            features['description'] = [{'value': entity.description}]
-
         # Types
-        if Api.get_node(entity) and 'types' in meta['show']:
+        if 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']: # pragma: nocover
+        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
         # Depictions
-        if Api.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
+        if 'depictions' in meta['show']:  # pragma: nocover
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if Api.get_time(entity) and 'when' in meta['show']:
+        if 'when' in meta['show']:
             if entity.begin_from or entity.end_from:
                 features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if Api.get_external(entity) and 'geonames' in meta['show']:
-            features['links'] = [Api.get_external(entity)]
+        if 'geonames' in meta['show']:
+            features['links'] = Api.get_external(entity)
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
             features['geometry'] = Api.get_geom_by_entity(entity)
-        elif 'geometry' in meta['show'] and entity.location:
-            features['geometry'] = Api.get_geom_by_entity(entity.location)
+        elif 'geometry' in meta['show'] and entity.class_.code == 'E18':
+            features['geometry'] = Api.get_geom_by_entity(Link.get_linked_entity(entity.id, 'P53'))
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
