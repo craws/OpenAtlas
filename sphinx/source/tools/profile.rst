@@ -22,7 +22,10 @@ Display
 * **Language** - select your language for the user interface.
 * **Table rows** - amount of rows that are shown on one table page.
 * **Show aliases in tables** - show aliases of actors and places in tables and make them searchable.
-* **Layout** - in advanced you see more information about entities, e.g. the CIDOC class, creation/modification date and author and a link to the API.
+* **Show created and modified information** - in entity view: show when and by whom an entry was created and last updated
+* **Show import information** - in entity view: show the project name and original identifier in case the entity was imported from another project
+* **Show CIDOC class** - in entity view: show the CIDOC CRM class with a link to the :doc:`/tools/model`
+* **Show API links** - in entity view: show a button for the :doc:`/tools/api` view
 * **Default map zoom** - define the lowest zoom level to include all features on a :doc:`/tools/map` view.
 * **Max map zoom** - adjust how far you can zoom into a :doc:`/tools/map`.
 
@@ -31,7 +34,8 @@ Modules
 Here you can adjust shown interface elements to your preferences. You still see e.g. existing sub
 units even when you deactivate them but the interface elements to add them will disappear.
 
-* **GeoNames** - to use the GeoNames feature at :doc:`/menu/place` insert or update.
+* **Wikidata** - to link to `Wikidata <https://www.wikidata.org>`_ at insert or update of an entity.
+* **GeoNames** - to link to `GeoNames <https://www.geonames.org>`_ at insert or update of a :doc:`/menu/place`.
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones (editor or above).
 * **Sub units** - to insert archeological sub units at places, see: :doc:`/menu/place`
 * **Notes** - an additional tool for your workflow, e.g. to add a personal reminder to an entity.

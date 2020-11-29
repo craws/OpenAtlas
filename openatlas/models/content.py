@@ -27,7 +27,7 @@ class Content:
             return ''  # May was added with an software update and isn't available yet
         translations = items[name]
         if lang and lang in translations and translations[lang]:
-            return translations[lang]  # can be used by API
+            return translations[lang]  # pragma: no cover, can be used by API
         if translations[session['language']]:
             return translations[session['language']]
         return translations[session['settings']['default_language']]

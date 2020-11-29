@@ -153,6 +153,7 @@ def event_view(event: Entity) -> str:
                                                        'reference', 'file']}
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
+    tabs['actor'].table.header.insert(5, _('activity'))  # Add a table column for activity
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
@@ -163,7 +164,9 @@ def event_view(event: Entity) -> str:
         data = [link(link_.range),
                 g.classes[link_.range.class_.code].name,
                 link_.type.name if link_.type else '',
-                first, last,
+                first,
+                last,
+                g.properties[link_.property.code].name_inverse,
                 link_.description]
         if is_authorized('contributor'):
             data.append(
