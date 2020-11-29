@@ -161,7 +161,8 @@ def add_buttons(form: Any,
                 SubmitField(insert_and_add + _('human remains')))
     return form
 
-#TODO: this should probably go to a custom field in field.py
+
+# TODO: this should probably go to a custom field in field.py
 def add_external_references(form: Any, form_name: str) -> None:
     for name, ref in g.external.items():
         if name not in forms[form_name] or not current_user.settings['module_' + name]:
