@@ -20,7 +20,7 @@ class GetByClass(Resource):
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, parser=parser),
             parser=parser)
-        template = GeoJson.geojson_template(parser['show'])
+        template = GeoJson.pagination(parser['show'])
         if parser['count']:
             return jsonify(class_[1][0]['entities'])
         if parser['download']:

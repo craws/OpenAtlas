@@ -18,7 +18,7 @@ class GetQuery(Resource):
     def get(self, ) -> Tuple[Resource, int]:
         entities = []
         parser = query_parser.parse_args()
-        template = GeoJson.geojson_template(parser['show'])
+        template = GeoJson.pagination(parser['show'])
         if parser['entities']:
             for entity in parser['entities']:
                 entities.append(GeoJsonEntity.get_entity_by_id(entity))

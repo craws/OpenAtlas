@@ -1,7 +1,7 @@
 from typing import Dict, Type
 
 from flask_restful import fields
-from flask_restful.fields import String
+from flask_restful.fields import List, String
 
 
 class GeoJson:
@@ -72,7 +72,7 @@ class GeoJson:
         if 'links' in show:
             feature['links'] = fields.List(fields.Nested(links))
 
-        #if 'geometry' in show:
+        # if 'geometry' in show:
         feature['geometry'] = fields.Raw
 
         if 'depictions' in show:
@@ -81,5 +81,22 @@ class GeoJson:
         entity_json = {'@context': fields.String,
                        'type': fields.String,
                        'features': fields.List(fields.Nested(feature))}
-
+        print(entity_json)
         return entity_json
+
+    @staticmethod
+    def pagination(show: Dict[str, str]) -> Dict[str, List]:
+        page_index = {"page": fields.Integer,
+                      "start_id": fields.Integer
+                      }
+        pagination_model = {"entities": fields.Integer,
+                            "entity_per_page": fields.Integer,
+                            "index": fields.List(fields.Nested(page_index)),
+                            "total_pages": fields.Integer
+                            }
+
+        pagination = {"geojson": fields.List(fields.Nested(GeoJson.geojson_template(show))),
+                      "pagination": fields.List(fields.Nested(pagination_model))
+                      }
+
+        return pagination

@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
@@ -9,8 +9,7 @@ from openatlas.models.entity import Entity
 class Pagination:
 
     @staticmethod
-    def pagination(entities: List[Entity], parser: Dict[str, Any]) -> List[List[Dict[str, Any]]]:
-        result = []
+    def pagination(entities: List[Entity], parser: Dict[str, Any]):
         index = []
         total = []
         for e in entities:
@@ -38,7 +37,7 @@ class Pagination:
         entities_result = []
         for r in entity_limit[:int(parser['limit'])]:
             entities_result.append(GeoJsonEntity.get_entity(r, parser))
-        result.append(entities_result)
-        result.append([{'entity_per_page': int(parser['limit']), 'entities': len(total),
-                        'index': index, 'total_pages': len(index)}])
+        result = {"geojson": entities_result,
+                  "pagination": [{'entity_per_page': int(parser['limit']), 'entities': len(total),
+                                  'index': index, 'total_pages': len(index)}]}
         return result

@@ -20,7 +20,7 @@ class GetByCode(Resource):
         code = Pagination.pagination(
             GetByCode.get_entities_by_menu_item(code_=item, parser=parser),
             parser=parser)
-        template = GeoJson.geojson_template(parser['show'])
+        template = GeoJson.pagination(parser['show'])
         if parser['count']:
             return jsonify(code[1][0]['entities'])
         if parser['download']:
