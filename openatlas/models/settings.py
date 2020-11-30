@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
 from flask import g
 
@@ -10,7 +10,7 @@ class Settings:
     @staticmethod
     def get_settings() -> Dict[str, Any]:
         g.execute("SELECT name, value FROM web.settings;")
-        settings = {}
+        settings: Dict[str, Union[str, bool, int]] = {}
         for name in app.config['MODULES']:  # Set default if doesn't exist (e.g. after an upgrade)
             settings['module_' + name] = False
         for row in g.cursor.fetchall():
