@@ -373,11 +373,14 @@ def display_form(self: Any,
             if field.label.text == 'super':
                 label = display.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
+                # Todo: maybe refactor filter button to make a span for buttons without URL
                 field.description = node.description
-                onclick = 'switch_value_type({id})'.format(id=node.id)
-                html += add_row(field, label, display.button(_('show'),
-                                                             onclick=onclick,
-                                                             css='secondary'))
+                span = '<span class="{class_}" {id} onclick="{onclick}">{label}</span>'.format(
+                    class_=app.config['CSS']['button']['secondary'],
+                    label=_('show'),
+                    id=node.id,
+                    onclick='switch_value_type({id})'.format(id=node.id))
+                html += add_row(field, label, span)
                 html += display_value_type_fields(node)
                 continue
             tooltip = '' if 'is_node_form' in form else ' ' + display.tooltip(node.description)
