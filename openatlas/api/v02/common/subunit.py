@@ -2,17 +2,22 @@ from typing import Any, Dict, List, Tuple
 
 from flasgger import swag_from
 from flask import jsonify, url_for
+from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
+from openatlas import app
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import Error
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
+from openatlas.util.util import api_access
 
 
 class GetSubunit(Resource):
+    @api_access()  # type: ignore
+    @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/nodes.yml", endpoint="subunit")
     def get(self, id_: int) -> Tuple[Resource, int]:
         parser = default_parser.parse_args()

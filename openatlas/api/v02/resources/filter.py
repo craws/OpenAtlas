@@ -9,17 +9,18 @@ class Filter:
                                          'anot': 'AND NOT'}
 
     valid_columns: Dict[str, str] = {'id': 'e.id', 'class_code': 'e.class_code',
-                                         'name': 'e.name', 'description': 'e.description',
-                                         'system_type': 'e.system_type',
-                                         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
-                                         'created': 'e.created', 'modified': 'e.modified',
-                                         'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+                                     'name': 'e.name', 'description': 'e.description',
+                                     'system_type': 'e.system_type',
+                                     'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
+                                     'created': 'e.created', 'modified': 'e.modified',
+                                     'end_to': 'e.end_to', 'end_from': 'e.end_from'}
     compare_operators: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                          'ge': '>=', 'like': 'LIKE'}
     valid_date_column: Dict[str, str] = {'begin_from': 'e.begin_from',
-                                              'begin_to': 'e.begin_to',
-                                              'created': 'e.created', 'modified': 'e.modified',
-                                              'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+                                         'begin_to': 'e.begin_to',
+                                         'created': 'e.created', 'modified': 'e.modified',
+                                         'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+
     @staticmethod
     def get_filter(parameters: Dict[str, Tuple[Any]], parser: Dict[str, Any]) -> str:
         clause = ""
@@ -48,7 +49,7 @@ class Filter:
             if not i:
                 # Todo: Eliminate Error
                 raise Error('Filter operators is not implemented or wrong.', status_code=404,
-                               payload="404j")
+                            payload="404j")
 
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
@@ -72,7 +73,7 @@ class Filter:
             except:
                 # Todo: Eliminate Error
                 raise Error('Invalid search term: ' + filter_[3], status_code=404,
-                               payload="404k")
+                            payload="404k")
         # Check if search term is an integer if column is id
         if Filter.valid_columns[filter_[1]] == 'e.id':
             try:
@@ -80,7 +81,7 @@ class Filter:
             except:
                 # Todo: Eliminate Error
                 raise Error('Invalid search term: ' + filter_[3], status_code=404,
-                               payload="404l")
+                            payload="404l")
         # If operator is LIKE then % are needed
         term = '%' + filter_[3] + '%' if Filter.compare_operators[filter_[2]] == 'LIKE' else \
             filter_[3]

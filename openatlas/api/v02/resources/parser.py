@@ -37,7 +37,6 @@ entity_parser.add_argument('show', type=str, help='{error_msg}.', action='append
                            choices=('when', 'types', 'relations', 'names', 'links', 'geometry',
                                     'depictions', 'geonames', 'none'))
 
-
 query_parser = entity_parser.copy()
 query_parser.add_argument('entities', type=int, action='append',
                           help="{error_msg}")
