@@ -11,3 +11,9 @@ Displayed texts in available languages can be customized here:
 * **Citation example** - displayed under the form at insert/update of an edition or a bibliography
 
 Links to **Contact** and **Legal notice** are available in the menu if they contain text.
+
+For frontends (presentation sites, if available) shown text can be set with:
+
+* **Intro for frontend**
+* **Contact for frontend**
+* **Legal notice for frontend**
