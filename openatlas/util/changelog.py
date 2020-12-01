@@ -1,5 +1,7 @@
 class Changelog:
     versions = {
+        '5.7.0': ['TBA', {
+            'feature': {}}],
         '5.6.0': ['2020-11-30', {
             'feature': {
                 '930': 'Wikidata API',
