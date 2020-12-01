@@ -22,6 +22,11 @@ To install extra JavaScript (example commands for Linux/Debian in root of projec
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
 
+In case you get an error like "calmjs.cli not overwriting existing 'openatlas/static/package.json':
+Delete it and try again.
+
+    $ rm openatlas/static/package.json
+
 ### 5.5.0 to 5.5.1
 Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admin/Execute SQL)
 
