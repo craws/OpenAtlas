@@ -14,6 +14,7 @@ class Pagination:
         total = []
         for e in entities:
             total.append(e.id)
+        entities_count = len(total)
         for num, i in enumerate(
                 list(itertools.islice(total, 0, None, int(parser['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
@@ -38,6 +39,6 @@ class Pagination:
         for r in entity_limit[:int(parser['limit'])]:
             entities_result.append(GeoJsonEntity.get_entity(r, parser))
         result = {"geojson": entities_result,
-                  "pagination": [{'entity_per_page': int(parser['limit']), 'entities': len(total),
+                  "pagination": [{'entity_per_page': int(parser['limit']), 'entities': entities_count,
                                   'index': index, 'total_pages': len(index)}]}
         return result
