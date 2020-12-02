@@ -2,6 +2,7 @@ from typing import Any, TYPE_CHECKING, Union
 
 import numpy
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField
 from wtforms.validators import NoneOf, NumberRange, Optional
 
@@ -46,7 +47,7 @@ def add_date_fields(form: Any) -> None:
             StringField(render_kw={'placeholder': _('comment')}))
 
 
-def populate_dates(form, item: Union['Entity', Link]) -> None:
+def populate_dates(form: FlaskForm, item: Union['Entity', Link]) -> None:
     """ Populates date form fields with date values of an entity or link."""
     if item.begin_from:
         form.begin_year_from.data = format_date(item.begin_from, 'year')

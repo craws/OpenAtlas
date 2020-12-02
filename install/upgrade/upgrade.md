@@ -1,8 +1,8 @@
 ## INFO
-
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
-If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+If you are using git and want to update to the latest stable release you can fetch the master branch
+e.g.
 
     git pull origin master
 
@@ -11,32 +11,38 @@ After following the instructions restart Apache and test if the application is w
     service apache2 restart
     
 ### 5.5.1 to 5.6.0
-
 Execute install/upgrade/5.6.0.sql after making backups (can also be done in Admin/Execute SQL)
 
-A new module for Wikidata was added and is activated by default
-which can be changed in Admin/Modules.
+#### Wikidata
+A Wikidata module was added and is activated by default which can be changed in Admin/Modules.
+To install extra JavaScript (example commands for Linux/Debian in root of project):
+
+    $ pip3 install calmjs
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
+In case you get an error like "calmjs.cli not overwriting existing 'openatlas/static/package.json':
+Delete it and try again.
+
+    $ rm openatlas/static/package.json
 
 ### 5.5.0 to 5.5.1
-
 Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admin/Execute SQL)
 
 ### 5.5.0 to 5.6.0
-
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 The new Wikidata module will be inactive by default but you can activate it as default at 
 admin/modules after the upgrade.
 
 ### 5.4.0 to 5.5.0
-
 Execute install/upgrade/5.5.0.sql after making backups
 
 Default modules for new user can now be set at admin/modules which can be overridden in user
 profiles. You might want to check the default settings and your own profile after the upgrade.
 
 ### 5.3.0 to 5.4.0
-
 **Important**: we renamed our main branch which is also used for productive systems from **master**
 to **main**. For this upgrade you have to fetch and checkout the **main** branch. You can delete
 the master branch afterwards.
@@ -44,13 +50,11 @@ the master branch afterwards.
 Otherwise it's a normal code update without database changes.
 
 ### 5.2.0 to 5.3.0
-
 Install flask-cors packages e.g. on Debian: 
 
     # apt-get install python3-flask-cors
 
 ### 5.1.x to 5.2.0
-
 Execute install/upgrade/5.2.0.sql after making backups
 
 Some map configurations were moved from default/config.py to the database and can now be adjusted in 
@@ -63,23 +67,19 @@ Moved values:
 * GEONAMES_VIEW_URL
 
 ### 5.1.0 to 5.1.1
-
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 ### 5.0.0 to 5.1.0
-
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 ### 4.1.0 to 5.0.0
-
-WARNING - this is a major release and requires new software. JavaScript libraries are now installed in a separate step.
+WARNING - this is a major release and requires new software. JavaScript libraries are now installed
+in a separate step.
 
 #### Software
-
 Make a code base update (e.g. with git pull).
 
 #### New frontend libraries
-
 Install pip and npm packages, e.g. on Debian:
 
     # apt-get install python3-pip npm
@@ -92,233 +92,7 @@ Install frontend libraries with npm:
     $ ~/.local/bin/calmjs npm --install openatlas
 
 #### Database
-
 Execute install/upgrade/5.0.0.sql after making backups
 
 #### Logo
 In the new layout a much smaller logo is needed (40px height). To save bandwidth you could exchange an existing logo with a 40px height one.
-
-### 4.0.0 to 4.1.0
-
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
-
-If you're using tests make sure that this line is in instance/testing.py
-
-    IS_UNIT_TEST = True
-
-### 3.20.x to 4.0.0
-
-WARNING - this is a major release and requires software upgrades. If you are using Debian upgrade it to 10 (buster).
-
-See install.md which versions of software are needed after the upgrade.
-
-If you upgrade a Debian system to buster be sure to have the new postgis packages installed (see install.md) before you upgrade database clusters.
-
-#### Database
-
-Execute install/upgrade/4.0.0.sql after making backups
-
-#### Paths
-
-The new version uses operating system independent paths with pathlib.
-In case you want to override the ones in default.py take a look there, how to do it.
-
-#### Tests
-
-If you're using tests add this to line to instance/testing.py
-
-    IS_UNIT_TEST = True
-
-### 3.20.0 to 3.20.1
-
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
-
-### 3.19.x to 3.20.0
-
-Execute install/upgrade/3.20.0.sql after making backups
-
-### 3.18.0 to 3.19.0
-
-In preparation of other new features the color themes were removed and
-the classes Production (E12) and Destruction (E6) were remapped to Activity (E7) - check issue #1054 if your project was tested and is affected.
-
-Execute install/upgrade/3.19.0.sql after making backups
-
-### 3.17.x to 3.18.0
-
-For the function to check similar names the library fuzzywuzzy is needed. On Debian it can be installed with:
-
-    # apt-get install python3-fuzzywuzzy
-
-### 3.16.0 to 3.17.0
-
-Execute install/upgrade/3.17.0.sql after making backups
-
-### 3.15.0 to 3.16.0
-
-If you are running a productive online system take a look at install.md section "Additional security" for instructions to improve server side security.
-
-The package python3-geopandas is no longer required.
-
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
-
-### 3.14.0 to 3.15.0
-
-Execute install/upgrade/3.15.0.sql after making backups
-
-### 3.13.0 to 3.14.0
-
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
-
-### 3.12.0 to 3.13.0
-
-Execute install/upgrade/3.13.0.sql after making backups
-
-The database structure changed significantly regarding how dates are mapped.
-
-Also some inconsistency in the actor forms were resolved. In the former version there were form fields for appears first/last at a place and begin/end dates.
-Since these date and place information weren't connected we changed it to begin and end fields for places and dates to e.g. enter a birthplace.
-
-Since we couldn't assume that the information entered before was related this update creates events for first/last appearances which are named "First/Last Appearance of actor_name".
-
-After the update you can check the new created entries going to the event overview and filter for "appearance of".
-
-#### Value type label (description)
-
-After this update the descriptions of value types is shown at entity views.
-e.g. if the value type "height" has "centimeter" in its description and a find has it with the value 5 it will displayed as:
-Height: 5 centimeter
-So you might want to check the value type descriptions and e.g. change "In centimeter" to "centimeter"
-
-### 3.11.0 to 3.12.0
-
-Execute install/upgrade/3.12.0.sql after making backups
-
-After the update minimum character search for tables and jstree can be configured in general settings (instead of the config file). The default value is 1 and has to be adjusted if needed. Former entries (MIN_CHARS_TABLESORTER_SEARCH and MIN_CHARS_JSTREE_SEARCH) in your instance config (e.g. production.py) can be removed.
-
-### 3.10.0 to 3.11.0
-
-Execute install/upgrade/3.11.0.sql after making backups
-
-If you are using multiple OpenAtlas versions on the same server it is import to add something like
-
-    WSGIDaemonProcess openatlas processes=2 threads=15 display-name=%{GROUP}
-    WSGIProcessGroup openatlas
-
-And replace openatlas for every instance with a unique name.
-
-If you are using additional https configuration add there only
-
-    WSGIProcessGroup openatlas
-
-### 3.9.0 to 3.10.0
-
-Install pandas libraries (needed for export and import)
-
-    # apt-get install python3-pandas python3-geopandas python3-xlrd
-
-Add this line to your apache config right after the WSGIScriptAlias line.
-If you have an additional HTTPS config file it has to be added there too.
-
-    WSGIApplicationGroup %{GLOBAL}
-
-Execute install/upgrade/3.10.0.sql after making backups
-
-### 3.8.0 to 3.9.0
-
-Execute install/upgrade/3.9.0.sql after making backups
-
-### 3.7.0 to 3.8.0
-
-For the export functions you need to make these directories writeable for the Apache user:
-
-openatlas/export/csv
-
-openatlas/export/sql
-
-e.g.
-
-    # chown www-data openatlas/uploads
-
-You can check at /admin if there are warnings about non-writeable directories.
-
-### 3.6.x to 3.7.0
-
-One major change is that it isn't needed anymore to have different branches for different projects.
-The master branch should be sufficient for all projects.
-
-Execute install/upgrade/3.7.0.sql after making backups
-
-Changes to look out for:
-
-- Change logo function to customize the logo if you like to replace the default OpenAtlas logo
-- The site header text is now a setting on its own and can be configured at admin/settings/general
-- Configuration should be done in instance/production.py (not in config/default.py)
-
-### 3.5.0 to 3.6.0
-
-Due to a bug it was possible to link information carriers to event, actor and place. These links are
-invalid and will be removed with the 3.6.0.sql update. You should check the information carriers for
-those invalid links which will be deleted before executing the SQL.
-
-Execute install/upgrade/3.6.0.sql after making backups
-
-### 3.4.x to 3.5.0
-
-Execute install/upgrade/3.5.0.sql after making backups
-
-After the upgrade you can add a legal notice text if you like at admin > content > legal notice
-
-### 3.3.x to 3.4.0
-
-Execute install/upgrade/3.4.0.sql after making backups
-
-### 3.2.x to 3.3.0
-
-Execute install/upgrade/3.3.0.sql after making backups
-
-Make the openatlas/uploads directory writable for apache e.g.
-
-    chown www-data /var/www/net/openatlas/openatlas/uploads/
-
-### 3.1.0 to 3.2.0
-
-#### Database
-
-Execute install/upgrade/3.2.0.sql after making backups
-
-#### Apache
-
-Update Apache config for serving static files - see install/example_apache.conf
-
-### 3.0.0 to 3.1.0
-
-apt-get install python3-numpy
-
-### 2.4.1 to 3.0.0 Upgrade (PHP to Python upgrade)
-
-Be sure to have upgraded the database to the PHP Version 2.3.2 and have read the information below.
-
-#### Passwords
-
-The password hash function changed to Bcrypt so all user passwords from the PHP version will be
-invalid.
-
-The mail password is not being stored in the database anymore and has to be set in
-/instance/config.py (MAIL_TRANSPORT_PASSWORD). See /install/example_config.py
-
-#### Content
-
-Website text translations where completely rewritten.
-
-Please backup your text translations at "Content" in the web interface and
-enter them in "Settings" (intro and contact; faq was removed) again after upgrading.
-
-#### Edition and Bibliography
-
-Edition and bibliography types are only checked one level deep. Meaning if your
-edition/bibliography subtypes have also subtypes you have to remove them or adapt the SQL.
-
-#### Database update
-
-Execute install/upgrade/3.0.0.sql after making backups.

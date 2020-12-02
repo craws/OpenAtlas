@@ -273,14 +273,14 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P89', (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Kingdom of Serbia'));
 
 ------------------------
--- Source translation --
+-- Source Translation --
 ------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Source translation', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Source Translation', '');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Original Text'), ('E55', 'Translation'), ('E55', 'Transliteration');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Original Text')),
-('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Translation')),
-('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Transliteration'));
+('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Original Text')),
+('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Translation')),
+('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Transliteration'));
 
 ------------------------
 -- Value types --
@@ -310,7 +310,7 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False, False),
+((SELECT id FROM entity WHERE name='Source Translation'), 'Source Translation', False, False, False, False, False),
 ((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', True, False, False, True, False),
@@ -334,7 +334,7 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Actor Actor Relation', False),
 ('Involvement', False),
 ('Member', False),
-('Source translation', False),
+('Source Translation', False),
 ('External Reference', True);
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
@@ -354,7 +354,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Actor Actor Relation'),(SELECT id FROM web.form WHERE name='Actor Actor Relation')),
 ((SELECT id FROM web.hierarchy WHERE name='Involvement'),(SELECT id FROM web.form WHERE name='Involvement')),
 ((SELECT id FROM web.hierarchy WHERE name='Actor Function'),(SELECT id FROM web.form WHERE name='Member')),
-((SELECT id FROM web.hierarchy WHERE name='Source translation'),(SELECT id FROM web.form WHERE name='Source translation')),
+((SELECT id FROM web.hierarchy WHERE name='Source Translation'),(SELECT id FROM web.form WHERE name='Source Translation')),
 ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='Find')),
 ((SELECT id FROM web.hierarchy WHERE name='External Reference'),(SELECT id FROM web.form WHERE name='External Reference'));
 

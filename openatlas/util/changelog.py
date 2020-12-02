@@ -1,18 +1,23 @@
 class Changelog:
     versions = {
-        '5.6.0': ['TBA', {
+        '5.7.0': ['TBA', {
+            'feature': {}}],
+        '5.6.0': ['2020-11-30', {
             'feature': {
                 '930': 'Wikidata API',
                 '1409': 'Redesign forms',
                 '1393': 'Split profile display options',
+                '1395': 'Content for frontends',
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
                 '1407': 'Extend session availability (prevent CSRF token timeout)',
+                '1412': 'API: Include Wikidata',
                 '1350': 'API: Pagination in an extra array',
                 '1375': 'API: Download result of request path',
                 '1401': 'API: file access',
                 '1377': 'API: IP restrictions'},
             'fix': {
+                '1383': 'Map in tab views too big',
                 '1408': 'Link checker broken'}}],
         '5.5.1': ['2020-10-09', {
             'fix': {'1380': "Empty date comment is saved as 'None'"}}],

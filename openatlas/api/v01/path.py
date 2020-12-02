@@ -52,9 +52,11 @@ class Path:
         total = []
         for e in entities:
             total.append(e.id)
+        entities_count = len(total)
         for num, i in enumerate(
                 list(itertools.islice(total, 0, None, int(validation['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
+
         if validation['last'] or validation['first']:
             if validation['last'] and int(validation['last']) in total:
                 total = list(
@@ -75,7 +77,7 @@ class Path:
         for r in entity_limit[:int(validation['limit'])]:
             entities_result.append(Api.get_entity(r, validation))
         result.append(entities_result)
-        result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
+        result.append([{'entity_per_page': int(validation['limit']), 'entities': entities_count,
                         'index': index, 'total_pages': len(index)}])
         return result
 

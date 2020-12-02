@@ -262,16 +262,17 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 
 def button(label: str,
-           url: Optional[str] = '#',
+           url: Optional[str] = None,
            css: Optional[str] = 'primary',
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
+    html = '<{tag} class="{class_}" {url} {id} {onclick}>{label}</{tag}>'.format(
+        tag='a' if url else 'span',
         class_=app.config['CSS']['button'][css],
-        url=url,
+        url='href="{url}"'.format(url=url) if url else '',
         label=label,
         id='id="' + id_ + '"' if id_ else '',
         onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
