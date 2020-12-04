@@ -24,7 +24,7 @@ class GetSubunit(Resource):
         node = {"nodes": GetSubunit.get_subunits(id_)}
         template = NodeTemplate.node_template()
         if parser['count']:
-            return jsonify(len(node))
+            return jsonify(len(node['nodes']))
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
         return marshal(node, template), 200

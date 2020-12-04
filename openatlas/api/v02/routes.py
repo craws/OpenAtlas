@@ -18,7 +18,7 @@ app.config['SWAGGER'] = {
     'openapi': '3.0.2',
     'uiversion': 3
 }
-template= {
+template = {
   "openapi": "3.0.2",
   "info": {
     "title": "OpenAtlas API",

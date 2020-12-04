@@ -24,7 +24,7 @@ class GetSubunitHierarchy(Resource):
         node = {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)}
         template = NodeTemplate.node_template()
         if parser['count']:
-            return jsonify(len(node))
+            return jsonify(len(node['nodes']))
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
         return marshal(node, template), 200
