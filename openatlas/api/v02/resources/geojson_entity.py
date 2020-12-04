@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference import Reference
@@ -139,10 +139,9 @@ class GeoJsonEntity:
     def get_entity_by_id(id_: int) -> Entity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            # Todo: Eliminate Error
-            raise Error('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
-                        payload="404a")
+        # Todo: get_by_id return an abort if id does not exist... I don't get to the exception
+        except EntityDoesNotExistError:
+            raise EntityDoesNotExistError
         return entity
 
     @staticmethod

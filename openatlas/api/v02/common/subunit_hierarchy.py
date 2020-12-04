@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.v02.resources.download import Download
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import EntityDoesNotExistError, InvalidSubunitError
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.models.entity import Entity
@@ -32,17 +32,13 @@ class GetSubunitHierarchy(Resource):
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
-            # Todo: Eliminate Error
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            raise Error('ID ' + str(id_) + ' doesn\'t exist', status_code=404,
-                        payload="404a")
+        except EntityDoesNotExistError:
+            raise EntityDoesNotExistError
         if entity.class_.code in ['E18']:
             return GetSubunitHierarchy.get_subunits_recursive(entity, [])
         else:
-            # Todo: Eliminate Error
-            raise Error('There is no subunit with the ID: ' + str(id_), status_code=404,
-                        payload="404g")
+            raise InvalidSubunitError
 
     @staticmethod
     def get_subunits_recursive(entity: Optional[Entity], data: List[Dict[str, Any]]) \

@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.v02.resources.download import Download
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import InvalidCidocClassCode
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.sql import Query
@@ -36,9 +36,7 @@ class GetByClass(Resource):
     def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if class_code not in g.classes:
-            # Todo: Eliminate Error
-            raise Error('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
-                        payload="404d")
+            raise InvalidCidocClassCode
         for entity in Query.get_by_class_code_api(class_code, parser):
             entities.append(entity)
         return entities

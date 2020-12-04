@@ -1,7 +1,8 @@
 import datetime
 from typing import Any, Dict, List, Tuple, Union
 
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import FilterOperatorError, InvalidSearchDateError, \
+    InvalidSearchNumberError, NoSearchStringError
 
 
 class Filter:
@@ -47,13 +48,11 @@ class Filter:
 
         for i in data:
             if not i:
-                # Todo: Eliminate Error
-                raise Error('Filter operators is not implemented or wrong.', status_code=404,
-                            payload="404j")
+                raise FilterOperatorError
 
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
-                raise Error('No search term.', status_code=404, payload="404i")
+                raise NoSearchStringError
             column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')' if \
                 Filter.compare_operators[filter_[2]] == 'LIKE' else Filter.valid_columns[
                 filter_[1]]
@@ -70,18 +69,14 @@ class Filter:
         if Filter.valid_columns[filter_[1]] in Filter.valid_date_column.values():
             try:
                 datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
-            except:
-                # Todo: Eliminate Error
-                raise Error('Invalid search term: ' + filter_[3], status_code=404,
-                            payload="404k")
+            except InvalidSearchDateError:
+                raise InvalidSearchDateError
         # Check if search term is an integer if column is id
         if Filter.valid_columns[filter_[1]] == 'e.id':
             try:
                 int(filter_[3])
-            except:
-                # Todo: Eliminate Error
-                raise Error('Invalid search term: ' + filter_[3], status_code=404,
-                            payload="404l")
+            except InvalidSearchNumberError:
+                raise InvalidSearchNumberError
         # If operator is LIKE then % are needed
         term = '%' + filter_[3] + '%' if Filter.compare_operators[filter_[2]] == 'LIKE' else \
             filter_[3]

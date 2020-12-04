@@ -1,7 +1,7 @@
 import itertools
 from typing import Any, Dict, List
 
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 
@@ -26,8 +26,7 @@ class Pagination:
                 total = list(
                     itertools.islice(total, total.index(int(parser['first'])), None))
             else:
-                # Todo: Eliminate Error
-                raise Error('Entity ID doesn\'t exist', status_code=404, payload="404a")
+                raise EntityDoesNotExistError
         else:
             pass
         # Finding the entity with the wanted id
@@ -39,6 +38,7 @@ class Pagination:
         for r in entity_limit[:int(parser['limit'])]:
             entities_result.append(GeoJsonEntity.get_entity(r, parser))
         result = {"geojson": entities_result,
-                  "pagination": [{'entity_per_page': int(parser['limit']), 'entities': entities_count,
-                                  'index': index, 'total_pages': len(index)}]}
+                  "pagination": [
+                      {'entity_per_page': int(parser['limit']), 'entities': entities_count,
+                       'index': index, 'total_pages': len(index)}]}
         return result

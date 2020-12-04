@@ -12,12 +12,14 @@ from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
 from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
+from openatlas.api.v02.resources.error import errors
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
     'uiversion': 3
 }
-api = Api(app)  # Establish connection between API and APP
+
+api = Api(app, catch_all_404s=False, errors=errors)  # Establish connection between API and APP
 swagger = Swagger(app, parse=False, template_file="static/swagger/Swagger.json")
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')

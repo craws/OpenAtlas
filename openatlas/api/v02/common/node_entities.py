@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 
 from openatlas import app
 from openatlas.api.v02.resources.download import Download
-from openatlas.api.v02.resources.error import Error
+from openatlas.api.v02.resources.error import InvalidSubunitError
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.util.util import api_access
@@ -30,9 +30,7 @@ class GetNodeEntities(Resource):
     @staticmethod
     def get_node(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
-            # Todo: Eliminate Error
-            raise Error('Node ID ' + str(id_) + ' doesn\'t exist', status_code=404,
-                        payload="404g")
+            raise InvalidSubunitError
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
         data = []
         for e in entities:
