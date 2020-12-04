@@ -18,6 +18,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/NodeModel'
+          $ref: '#/components/schemas/NodeOverviewModel'
   '404':
     description: not found

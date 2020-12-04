@@ -11,4 +11,5 @@ class NodeTemplate:
         node_json = {'id': fields.Integer,
                      'label': fields.String,
                      'url': fields.String}
-        return node_json
+        node = {"nodes": fields.List(fields.Nested(node_json))}
+        return node

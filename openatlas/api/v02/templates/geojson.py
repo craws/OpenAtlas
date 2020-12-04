@@ -81,7 +81,6 @@ class GeoJson:
         entity_json = {'@context': fields.String,
                        'type': fields.String,
                        'features': fields.List(fields.Nested(feature))}
-        print(entity_json)
         return entity_json
 
     @staticmethod
