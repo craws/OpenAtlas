@@ -9,7 +9,10 @@ e.g.
 After following the instructions restart Apache and test if the application is working.
 
     service apache2 restart
-    
+
+### 5.6.0 to 5.7.0
+Execute install/upgrade/5.7.0.sql after making backups
+
 ### 5.5.1 to 5.6.0
 Execute install/upgrade/5.6.0.sql after making backups (can also be done in Admin/Execute SQL)
 

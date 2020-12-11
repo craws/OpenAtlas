@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.7 (Debian 11.7-0+deb10u1)
--- Dumped by pg_dump version 11.7 (Debian 11.7-0+deb10u1)
+-- Dumped from database version 11.9 (Debian 11.9-0+deb10u1)
+-- Dumped by pg_dump version 11.9 (Debian 11.9-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,6 +22,9 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
@@ -53,6 +56,7 @@ DROP TRIGGER IF EXISTS update_modified ON web.user_settings;
 DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
 DROP TRIGGER IF EXISTS update_modified ON web.user_bookmarks;
 DROP TRIGGER IF EXISTS update_modified ON web."user";
+DROP TRIGGER IF EXISTS update_modified ON web.reference_system;
 DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
@@ -85,6 +89,10 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
+ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
+ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_form_id_key;
+ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_place_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
@@ -126,6 +134,7 @@ ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.reference_system_form ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.map_overlay ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
@@ -158,6 +167,9 @@ DROP TABLE IF EXISTS web.user_bookmarks;
 DROP TABLE IF EXISTS web."user";
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
+DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
+DROP TABLE IF EXISTS web.reference_system_form;
+DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
 DROP TABLE IF EXISTS web.map_overlay;
 DROP SEQUENCE IF EXISTS web.log_id_seq;
@@ -1176,6 +1188,65 @@ ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
 
 
 --
+-- Name: reference_system; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.reference_system (
+    entity_id integer NOT NULL,
+    resolver_url text,
+    website_url text,
+    created timestamp without time zone,
+    modified timestamp without time zone DEFAULT now() NOT NULL,
+    locked boolean DEFAULT false NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE web.reference_system OWNER TO openatlas;
+
+--
+-- Name: COLUMN reference_system.locked; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON COLUMN web.reference_system.locked IS 'If true because integrated in system only URLs are editable';
+
+
+--
+-- Name: reference_system_form; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.reference_system_form (
+    id integer NOT NULL,
+    reference_system_id integer NOT NULL,
+    form_id integer NOT NULL
+);
+
+
+ALTER TABLE web.reference_system_form OWNER TO openatlas;
+
+--
+-- Name: reference_system_form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.reference_system_form_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.reference_system_form_id_seq OWNER TO openatlas;
+
+--
+-- Name: reference_system_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.reference_system_form_id_seq OWNED BY web.reference_system_form.id;
+
+
+--
 -- Name: settings; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1543,6 +1614,13 @@ ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_ov
 
 
 --
+-- Name: reference_system_form id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_form ALTER COLUMN id SET DEFAULT nextval('web.reference_system_form_id_seq'::regclass);
+
+
+--
 -- Name: settings id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1864,6 +1942,38 @@ ALTER TABLE ONLY web.map_overlay
 
 
 --
+-- Name: reference_system_form reference_system_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_form
+    ADD CONSTRAINT reference_system_form_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: reference_system_form reference_system_form_reference_system_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_form
+    ADD CONSTRAINT reference_system_form_reference_system_id_form_id_key UNIQUE (reference_system_id, form_id);
+
+
+--
+-- Name: reference_system reference_system_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system
+    ADD CONSTRAINT reference_system_name_key UNIQUE (name);
+
+
+--
+-- Name: reference_system reference_system_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system
+    ADD CONSTRAINT reference_system_pkey PRIMARY KEY (entity_id);
+
+
+--
 -- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -2098,6 +2208,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.i18n FOR EACH ROW EXECUTE PR
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: reference_system update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.reference_system FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2342,6 +2459,30 @@ ALTER TABLE ONLY web.map_overlay
 
 ALTER TABLE ONLY web.map_overlay
     ADD CONSTRAINT map_overlay_place_id_fkey FOREIGN KEY (place_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system reference_system_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system
+    ADD CONSTRAINT reference_system_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES import.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system_form reference_system_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_form
+    ADD CONSTRAINT reference_system_form_form_id_fkey FOREIGN KEY (form_id) REFERENCES web.form(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system_form reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_form
+    ADD CONSTRAINT reference_system_form_reference_system_id_fkey FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
