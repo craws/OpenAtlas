@@ -22,6 +22,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
 from openatlas.models.node import Node
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.display import (convert_size, delete_link, format_date, format_datetime,
@@ -48,7 +49,10 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     tables = {'user': Table(['username', 'name', 'group', 'email', 'newsletter', 'created',
                              'last login', 'entities']),
               'content':
-                  Table(['name'] + [language for language in app.config['LANGUAGES'].keys()])}
+                  Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]),
+              'reference_system': Table(['name'])}
+    for reference_system in ReferenceSystem.get_all():
+        tables['reference_system'].rows.append(reference_system.name)
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
