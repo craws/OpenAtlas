@@ -133,6 +133,7 @@
                     <div class="tab-pane fade" role="tabpanel" id="tab-reference-system">
                         <div class="toolbar">
                             {{ 'admin/reference_system'|manual }}
+                            {{ _('reference system')|button(url_for('reference_system_insert')) }}
                         </div>
                         <div>
                             {{ tables.reference_system.display('reference_system')|safe }}

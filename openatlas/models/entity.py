@@ -311,8 +311,7 @@ class Entity:
             abort(422)
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
-            RETURNING id;"""
+            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s) RETURNING id;"""
         params = {'name': str(name).strip(),
                   'code': code,
                   'system_type': system_type.strip() if system_type else None,

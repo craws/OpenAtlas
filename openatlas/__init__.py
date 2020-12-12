@@ -33,8 +33,8 @@ logger = Logger()
 from openatlas.util import filters, processor
 from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
                              involvement, imports, link, login, member, model, note, object,
-                             overlay, place, profile, reference, relation, search, source, sql,
-                             translation, types, user)
+                             overlay, place, profile, reference, reference_system, relation,
+                             search, source, sql, translation, types, user)
 
 
 @babel.localeselector

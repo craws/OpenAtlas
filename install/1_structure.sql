@@ -1192,13 +1192,13 @@ ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
 --
 
 CREATE TABLE web.reference_system (
+    name text NOT NULL,
     entity_id integer NOT NULL,
     resolver_url text,
     website_url text,
     created timestamp without time zone,
     modified timestamp without time zone DEFAULT now() NOT NULL,
-    locked boolean DEFAULT false NOT NULL,
-    name text NOT NULL
+    locked boolean DEFAULT false NOT NULL
 );
 
 
@@ -2466,7 +2466,7 @@ ALTER TABLE ONLY web.map_overlay
 --
 
 ALTER TABLE ONLY web.reference_system
-    ADD CONSTRAINT reference_system_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES import.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT reference_system_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

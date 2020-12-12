@@ -50,9 +50,12 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                              'last login', 'entities']),
               'content':
                   Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]),
-              'reference_system': Table(['name'])}
-    for reference_system in ReferenceSystem.get_all():
-        tables['reference_system'].rows.append(reference_system.name)
+              'reference_system': Table(['name', 'website URL', 'resolver URL', 'description'])}
+    for system in ReferenceSystem.get_all():
+        tables['reference_system'].rows.append(system.name,
+                                               system.website_url,
+                                               system.resolver_url,
+                                               system.description)
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
