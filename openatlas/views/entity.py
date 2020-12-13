@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 from openatlas.views.reference import AddReferenceForm
@@ -34,6 +35,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                 tab_hash = '#menu-tab-custom_collapse-'
             return redirect(url_for('node_index') + tab_hash + str(id_))
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    if entity.class_.code == 'E32':
+        entity = ReferenceSystem.get_by_id(entity.id)
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)

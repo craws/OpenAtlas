@@ -25,9 +25,9 @@ from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
-from openatlas.util.display import (convert_size, delete_link, format_date, format_datetime,
-                                    get_disk_space_info, get_file_path, link, sanitize, truncate,
-                                    uc_first)
+from openatlas.util.display import (convert_size, delete_link, external_url, format_date,
+                                    format_datetime, get_disk_space_info, get_file_path, link,
+                                    sanitize, truncate, uc_first)
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group, send_mail
 
@@ -52,10 +52,10 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                   Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]),
               'reference_system': Table(['name', 'website URL', 'resolver URL', 'description'])}
     for system in ReferenceSystem.get_all():
-        tables['reference_system'].rows.append(system.name,
-                                               system.website_url,
-                                               system.resolver_url,
-                                               system.description)
+        tables['reference_system'].rows.append([link(system),
+                                                external_url(system.website_url),
+                                                external_url(system.resolver_url),
+                                                system.description])
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''

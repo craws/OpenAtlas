@@ -72,6 +72,8 @@ class Entity:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
         elif self.class_.code == 'E55':
             self.view_name = 'node'
+        elif self.class_.code == 'E32':
+            self.view_name = 'reference_system'
         self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '_')
