@@ -40,6 +40,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         if id_ and action == 'delete_user':
             User.delete(id_)
             flash(_('user deleted'), 'info')
+        elif id_ and action == 'delete_reference_system':
+            Entity.get_by_id(id_).delete()
+            flash(_('entity deleted'), 'info')
         elif action == 'remove_logo':
             Settings.set_logo()
             return redirect(url_for('admin_index') + '#tab-file')

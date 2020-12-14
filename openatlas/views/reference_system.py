@@ -32,10 +32,10 @@ def reference_system_insert() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            id_ = ReferenceSystem.insert(form)
+            entity = ReferenceSystem.insert(form)
             flash(_('entity created'), 'info')
             g.cursor.execute('COMMIT')
-            return redirect(url_for('reference_system_view', id_=id_))
+            return redirect(url_for('entity_view', id_=entity.id))
         except IntegrityError as e:
             g.cursor.execute('ROLLBACK')
             flash(_('error name exists'), 'error')
@@ -71,7 +71,6 @@ def reference_system_update(id_: int) -> Union[str, Response]:
     return render_template('reference_system/update.html', form=form, entity=entity)
 
 
-@app.route('/reference_system/view', methods=['POST', 'GET'])
 def reference_system_view(entity: Entity) -> Union[str, Response]:
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
     info: Dict[str, Union[str, List[str]]] = {

@@ -436,8 +436,13 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
+    if entity.view_name == 'reference_system':
+        url = url_for('admin_index', id_=entity.id, action='delete_reference_system')
+        url += '#tab-reference-system'
+    else:
+        url = url_for(entity.view_name + '_index', action='delete', id_=entity.id)
     return display.button(_('delete'),
-                          url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                          url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
