@@ -8,9 +8,8 @@ class ReferenceSystem:
     # Tools for reference systems like Wikidata or GeoNames
 
     @staticmethod
-    def insert(form: FlaskForm) -> None:
+    def insert(form: FlaskForm) -> Entity:
         entity = Entity.insert('E32', form.name.data, description=form.description.data)
-        print(entity.id)
         sql = '''
             INSERT INTO web.reference_system (entity_id, name, website_url, resolver_url)
             VALUES (%(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);'''
@@ -18,7 +17,18 @@ class ReferenceSystem:
                         'name': entity.name,
                         'website_url': form.website_url.data if form.website_url.data else None,
                         'resolver_url': form.resolver_url.data if form.resolver_url.data else None})
-        ReferenceSystem.get_by_id(entity.id)
+        return ReferenceSystem.get_by_id(entity.id)
+
+    @staticmethod
+    def update(entity: Entity, form: FlaskForm):
+        entity.update()
+        sql = '''
+            UPDATE web.reference_system SET (name, website_url, resolver_url) =
+            (%(name)s, %(website_url)s, %(resolver_url)s) WHERE entity_id = %(entity_id)s;'''
+        g.execute(sql, {'entity_id': entity.id,
+                        'name': entity.name,
+                        'website_url': form.website_url.data if form.website_url.data else None,
+                        'resolver_url': form.resolver_url.data if form.resolver_url.data else None})
 
     @staticmethod
     def get_by_id(id_: int) -> Entity:

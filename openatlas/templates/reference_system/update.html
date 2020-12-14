@@ -1,5 +1,5 @@
 {% extends 'layout.html' %}
-{% block title_name %} - {{ actor.name }}{% endblock %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}#reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;
     > {{ entity.name }}
@@ -11,7 +11,7 @@
             {{ _('error modified by %(username)s', username=modifier|safe) }}
         </p>
         <p>
-            {{ _('reload')|button(url_for('actor_update', id_=actor.id)) }}
+            {{ _('reload')|button(url_for('reference_system_update', id_=entity.id)) }}
         </p>
     {% endif %}
     {{ form|display_form(manual_page='menu/reference_system') }}

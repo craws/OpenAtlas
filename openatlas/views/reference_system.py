@@ -32,10 +32,10 @@ def reference_system_insert() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            ReferenceSystem.insert(form)
+            id_ = ReferenceSystem.insert(form)
             flash(_('entity created'), 'info')
             g.cursor.execute('COMMIT')
-            return redirect(url_for('admin_index') + '#tab-reference-system')
+            return redirect(url_for('reference_system_view', id_=id_))
         except IntegrityError as e:
             g.cursor.execute('ROLLBACK')
             flash(_('error name exists'), 'error')
@@ -50,9 +50,24 @@ def reference_system_insert() -> Union[str, Response]:
 @required_group('manager')
 def reference_system_update(id_: int) -> Union[str, Response]:
     entity = ReferenceSystem.get_by_id(id_)
-    form = ReferenceSystemForm(entity)
+    form = ReferenceSystemForm(obj=entity)
     if form.validate_on_submit():
-        pass
+        entity.name = form.name.data
+        entity.description = form.description.data
+        entity.website_url = form.website_url.data
+        entity.resolver_url = form.resolver_url.data
+        try:
+            ReferenceSystem.update(entity, form)
+            flash(_('info update'), 'info')
+            g.cursor.execute('COMMIT')
+            return redirect(url_for('admin_index') + '#tab-reference-system')
+        except IntegrityError as e:
+            g.cursor.execute('ROLLBACK')
+            flash(_('error name exists'), 'error')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
     return render_template('reference_system/update.html', form=form, entity=entity)
 
 
