@@ -311,7 +311,7 @@ class Link:
         from openatlas.models.node import Node
         from openatlas.models.entity import Entity
         data = []
-        for id_, node in g.nodes.items():
+        for node in g.nodes.values():
             if node.root or node.multiple or node.value_type:
                 continue  # pragma: no cover
             node_ids = Node.get_all_sub_ids(node)
@@ -336,6 +336,6 @@ class Link:
                                     node_id=entity_node.id)))
                 data.append([link(entity),
                              entity.class_.name,
-                             link(g.nodes[id_]),
+                             link(g.nodes[node.id]),
                              '<br><br><br><br><br>'.join(offending_nodes)])
         return data

@@ -78,10 +78,10 @@ class Node(Entity):
             FROM web.hierarchy h;"""
         g.execute(sql)
         hierarchies = {row.id: row for row in g.cursor.fetchall()}
-        for id_, node in nodes.items():
+        for node in nodes.values():
             if node.root:
                 super_ = nodes[node.root[0]]
-                super_.subs.append(id_)
+                super_.subs.append(node.id)
                 node.root = Node.get_root_path(nodes, node, node.root[0], node.root)
                 node.standard = False
                 node.locked = nodes[node.root[0]].locked
@@ -107,14 +107,14 @@ class Node(Entity):
 
     @staticmethod
     def get_nodes(name: str) -> List[int]:
-        for id_, node in g.nodes.items():
+        for node in g.nodes.values():
             if node.name == name and not node.root:
                 return node.subs
         return []
 
     @staticmethod
     def get_hierarchy(name: str) -> Node:
-        return [root for id_, root in g.nodes.items() if root.name == name.replace('_', ' ')][0]
+        return [root for root in g.nodes.values() if root.name == name.replace('_', ' ')][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> List[Dict[str, Any]]:
