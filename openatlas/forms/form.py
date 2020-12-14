@@ -198,13 +198,16 @@ def add_types(form: Any, name: str, code: Union[str, None]) -> None:
     if code in code_class:
         type_name = code_class[code]
     types = OrderedDict(Node.get_nodes_for_form(type_name))
-    for id_, node in types.items():
+    for node in types.values():
         if node.name in app.config['BASE_TYPES']:
             types.move_to_end(node.id, last=False)  # Move standard type to top
             break
 
-    for id_, node in types.items():
-        setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
+    for node in types.values():
+        if node.multiple:
+            setattr(form, str(node.id), TreeMultiField(str(node.id)))
+        else:
+            setattr(form, str(node.id), TreeField(str(node.id)))
         if node.value_type:
             add_value_type_fields(form, node.subs)
 

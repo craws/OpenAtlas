@@ -85,7 +85,7 @@
                                                 {% if node.forms %}
                                                     <p style="margin-top:0;">
                                                         <strong>{{ _('forms')|uc_first }}</strong>:
-                                                        {% for id, form in node.forms.items() %}
+                                                        {% for form in node.forms.values() %}
                                                             {{ form.name }}{{ "," if not loop.last }}
                                                         {% endfor %}
                                                     </p>
