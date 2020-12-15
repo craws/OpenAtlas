@@ -22,6 +22,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
@@ -43,6 +44,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'note': ['description'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
+         'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
          'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
@@ -262,6 +264,17 @@ def add_fields(form: Any,
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
+    elif name == 'reference_system':
+        setattr(form, 'website_url', StringField(_('website URL'),
+                                                 validators=[OptionalValidator(), URL()]))
+        setattr(form, 'resolver_url', StringField(_('resolver URL'),
+                                                  validators=[OptionalValidator(), URL()]))
+        setattr(form, 'forms', SelectMultipleField(_('forms'),
+                                                   render_kw={'disabled': True},
+                                                   choices=ReferenceSystem.get_form_choices(origin),
+                                                   option_widget=widgets.CheckboxInput(),
+                                                   widget=widgets.ListWidget(prefix_label=False),
+                                                   coerce=int))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 

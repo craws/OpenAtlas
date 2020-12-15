@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %} - {{ _('reference system')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;> +
+    <a href="{{ url_for('admin_index') }}#tab-reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;> +
 {% endblock %}
 {% block content %}
     {{ form|display_form(manual_page='menu/reference_system') }}

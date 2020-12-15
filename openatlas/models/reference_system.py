@@ -1,3 +1,5 @@
+from typing import List, Tuple, Union
+
 from flask import g
 from flask_wtf import FlaskForm
 
@@ -6,6 +8,22 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem:
     # Tools for reference systems like Wikidata or GeoNames
+
+    @staticmethod
+    def add_forms_to_system(entity: Entity, form: FlaskForm) -> None:
+        for form_id in form.forms.data:
+            sql = """
+                INSERT INTO web.reference_system_form (reference_system_id, form_id)
+                VALUES (%(entity_id)s, %(form_id)s);"""
+            g.execute(sql, {'entity_id': entity.id, 'form_id': form_id})
+
+    @staticmethod
+    def get_form_choices(origin: Union[Entity, None]) -> List[Tuple[int, str]]:
+        g.execute("SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
+                  {'forms': tuple(['Event', 'Feature', 'Find', 'Group', 'Human_Remains',
+                                   'Legal Body', 'Person', 'Place', 'Stratigraphic Unit'])})
+        return [
+            (r.id, r.name) for r in g.cursor.fetchall() if not origin or r.id not in origin.forms]
 
     @staticmethod
     def insert(form: FlaskForm) -> Entity:
@@ -34,13 +52,17 @@ class ReferenceSystem:
     def get_by_id(id_: int) -> Entity:
         entity = Entity.get_by_id(id_)
         sql = '''
-            SELECT name, website_url, resolver_url, locked
-            FROM web.reference_system
-            WHERE entity_id = %(entity_id)s;'''
+            SELECT rs.name, rs.website_url, rs.resolver_url, rs.locked,
+            (SELECT ARRAY(
+                SELECT f.id FROM web.form f JOIN web.reference_system_form rfs ON f.id = rfs.form_id
+                AND rfs.reference_system_id = rs.entity_id)) AS form_ids
+            FROM web.reference_system AS rs
+            WHERE rs.entity_id = %(entity_id)s;'''
         g.execute(sql, {'entity_id': id_})
         row = g.cursor.fetchone()
         entity.website_url = row.website_url
         entity.resolver_url = row.resolver_url
+        entity.forms = row.form_ids
         return entity
 
     @staticmethod

@@ -2,14 +2,12 @@ from typing import Dict, List, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas import app, logger
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import external_url
@@ -17,22 +15,15 @@ from openatlas.util.tab import Tab
 from openatlas.util.util import required_group
 
 
-class ReferenceSystemForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    website_url = StringField(_('website URL'), validators=[Optional(), URL()])
-    resolver_url = StringField(_('resolver URL'), validators=[Optional(), URL()])
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('save'))
-
-
 @app.route('/reference_system/insert', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_insert() -> Union[str, Response]:
-    form = ReferenceSystemForm()
+    form = build_form('reference_system')
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
             entity = ReferenceSystem.insert(form)
+            ReferenceSystem.add_forms_to_system(entity, form)
             flash(_('entity created'), 'info')
             g.cursor.execute('COMMIT')
             return redirect(url_for('entity_view', id_=entity.id))
@@ -50,7 +41,7 @@ def reference_system_insert() -> Union[str, Response]:
 @required_group('manager')
 def reference_system_update(id_: int) -> Union[str, Response]:
     entity = ReferenceSystem.get_by_id(id_)
-    form = ReferenceSystemForm(obj=entity)
+    form = build_form('reference_system', entity)
     if form.validate_on_submit():
         entity.name = form.name.data
         entity.description = form.description.data
@@ -58,6 +49,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
         entity.resolver_url = form.resolver_url.data
         try:
             ReferenceSystem.update(entity, form)
+            ReferenceSystem.add_forms_to_system(entity, form)
             flash(_('info update'), 'info')
             g.cursor.execute('COMMIT')
             return redirect(url_for('admin_index') + '#tab-reference-system')
