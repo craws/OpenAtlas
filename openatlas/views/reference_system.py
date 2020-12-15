@@ -3,7 +3,7 @@ from typing import Dict, List, Union
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from psycopg2._psycopg import IntegrityError
+from psycopg2 import IntegrityError
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField, TextAreaField
