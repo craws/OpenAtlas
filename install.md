@@ -35,6 +35,7 @@ more knowledge about server administration.
 Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
     $ git clone https://github.com/craws/OpenAtlas.git
+    $ mv OpenAtlas openatlas
 
 ### Frontend libraries
 
