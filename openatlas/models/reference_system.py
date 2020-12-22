@@ -3,6 +3,7 @@ from typing import List, Tuple, Union
 from flask import g
 from flask_wtf import FlaskForm
 
+from openatlas import app
 from openatlas.models.entity import Entity
 
 
@@ -18,12 +19,11 @@ class ReferenceSystem:
             g.execute(sql, {'entity_id': entity.id, 'form_id': form_id})
 
     @staticmethod
-    def get_form_choices(origin: Union[Entity, None]) -> List[Tuple[int, str]]:
+    def get_form_choices(entity: Union[Entity, None]) -> List[Tuple[int, str]]:
         g.execute("SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
-                  {'forms': tuple(['Event', 'Feature', 'Find', 'Group', 'Human_Remains',
-                                   'Legal Body', 'Person', 'Place', 'Stratigraphic Unit'])})
+                  {'forms': tuple(app.config['EXTERNAL_REFERENCES_FORMS'])})
         return [
-            (r.id, r.name) for r in g.cursor.fetchall() if not origin or r.id not in origin.forms]
+            (r.id, r.name) for r in g.cursor.fetchall() if not entity or r.id not in entity.forms]
 
     @staticmethod
     def insert(form: FlaskForm) -> Entity:

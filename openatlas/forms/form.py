@@ -271,7 +271,7 @@ def add_fields(form: Any,
                                                   validators=[OptionalValidator(), URL()]))
         setattr(form, 'forms', SelectMultipleField(_('forms'),
                                                    render_kw={'disabled': True},
-                                                   choices=ReferenceSystem.get_form_choices(origin),
+                                                   choices=ReferenceSystem.get_form_choices(item),
                                                    option_widget=widgets.CheckboxInput(),
                                                    widget=widgets.ListWidget(prefix_label=False),
                                                    coerce=int))

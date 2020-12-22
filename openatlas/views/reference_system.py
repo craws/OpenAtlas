@@ -52,7 +52,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
             ReferenceSystem.add_forms_to_system(entity, form)
             flash(_('info update'), 'info')
             g.cursor.execute('COMMIT')
-            return redirect(url_for('admin_index') + '#tab-reference-system')
+            return redirect(url_for('entity_view', id_=id_))
         except IntegrityError as e:
             g.cursor.execute('ROLLBACK')
             flash(_('error name exists'), 'error')
@@ -64,6 +64,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
 
 
 def reference_system_view(entity: Entity) -> Union[str, Response]:
+    # print(entity.forms)
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
     info: Dict[str, Union[str, List[str]]] = {
         _('website URL'): external_url(entity.website_url),
