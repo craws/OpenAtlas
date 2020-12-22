@@ -1,7 +1,7 @@
 from typing import Dict, List, Union
 
 from flask import flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from psycopg2 import IntegrityError
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -10,9 +10,10 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import external_url
+from openatlas.util.display import external_url, link
 from openatlas.util.tab import Tab
-from openatlas.util.util import required_group
+from openatlas.util.table import Table
+from openatlas.util.util import is_authorized, required_group
 
 
 @app.route('/reference_system/insert', methods=['POST', 'GET'])
@@ -23,7 +24,7 @@ def reference_system_insert() -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             entity = ReferenceSystem.insert(form)
-            ReferenceSystem.add_forms_to_system(entity, form)
+            ReferenceSystem.add_forms(entity, form)
             flash(_('entity created'), 'info')
             g.cursor.execute('COMMIT')
             return redirect(url_for('entity_view', id_=entity.id))
@@ -49,7 +50,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
         entity.resolver_url = form.resolver_url.data
         try:
             ReferenceSystem.update(entity, form)
-            ReferenceSystem.add_forms_to_system(entity, form)
+            ReferenceSystem.add_forms(entity, form)
             flash(_('info update'), 'info')
             g.cursor.execute('COMMIT')
             return redirect(url_for('entity_view', id_=id_))
@@ -63,10 +64,28 @@ def reference_system_update(id_: int) -> Union[str, Response]:
     return render_template('reference_system/update.html', form=form, entity=entity)
 
 
+@app.route('/reference_system/update/<int:entity_id>/<int:form_id>', methods=['POST', 'GET'])
+@required_group('manager')
+def reference_system_remove_form(entity_id: int, form_id: int):
+    return
+
+
 def reference_system_view(entity: Entity) -> Union[str, Response]:
-    # print(entity.forms)
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
     info: Dict[str, Union[str, List[str]]] = {
         _('website URL'): external_url(entity.website_url),
         _('resolver URL'): external_url(entity.resolver_url)}
-    return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
+    table = Table(paging=False)
+    for form_id, form_ in ReferenceSystem.get_forms(entity).items():
+        if not form_['count'] and is_authorized('manager'):
+            html = link(_('remove'), url_for('reference_system_remove_form',
+                                             entity_id=entity.id,
+                                             form_id=form_id))
+        else:
+            html = format_number(form_['count'])
+        table.rows.append([form_['name'], html])
+    return render_template('reference_system/view.html',
+                           entity=entity,
+                           tabs=tabs,
+                           info=info,
+                           table=table)

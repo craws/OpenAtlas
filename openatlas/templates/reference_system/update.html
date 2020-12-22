@@ -2,8 +2,8 @@
 {% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}#tab-reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;
-    > {{ entity.name }}
-    > {{ _('edit')|uc_first }}
+    >&nbsp; {{ entity|link|safe }}&nbsp;
+    >&nbsp; {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
     {% if modifier %}

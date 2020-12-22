@@ -5,21 +5,17 @@
     > {{ entity.name }}
 {% endblock %}
 {% block tab_info %}
-    <div class="row">
-        <div class="col-6">
-            <div class="toolbar">
-                {{ 'menu/reference_system'|manual }}
-                {% if 'manager'|is_authorized %}
-                    {{ _('edit')|button(url_for('reference_system_update', id_=entity.id)) }}
-                    {{ entity|display_delete_link }}
-                {% endif %}
-                {{ entity.id|bookmark_toggle }}
-            </div>
-            <h1>{{ entity.name }}</h1>
-            <div style="float:left;">
-                {{ info|display_info }}
-                {{ entity|description }}
-            </div>
-        </div>
+    <div class="toolbar">
+        {{ 'menu/reference_system'|manual }}
+        {% if 'manager'|is_authorized %}
+            {{ _('edit')|button(url_for('reference_system_update', id_=entity.id)) }}
+            {{ entity|display_delete_link }}
+        {% endif %}
+        {{ entity.id|bookmark_toggle }}
     </div>
+    <h1>{{ entity.name }}</h1>
+    {{ info|display_info }}
+    {{ entity|description }}
+    <h2>{{ _('forms')|uc_first }}</h2>
+    {{ table.display()|safe }}
 {% endblock %}

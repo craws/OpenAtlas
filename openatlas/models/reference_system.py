@@ -11,12 +11,23 @@ class ReferenceSystem:
     # Tools for reference systems like Wikidata or GeoNames
 
     @staticmethod
-    def add_forms_to_system(entity: Entity, form: FlaskForm) -> None:
+    def add_forms(entity: Entity, form: FlaskForm) -> None:
         for form_id in form.forms.data:
             sql = """
                 INSERT INTO web.reference_system_form (reference_system_id, form_id)
                 VALUES (%(entity_id)s, %(form_id)s);"""
             g.execute(sql, {'entity_id': entity.id, 'form_id': form_id})
+
+    @staticmethod
+    def get_forms(entity):
+        sql = """
+            SELECT f.id, f.name, COUNT(l.id) AS count FROM web.form f
+            JOIN web.reference_system_form rsf ON f.id = rsf.form_id
+                AND rsf.reference_system_id = %(id)s
+            LEFT JOIN model.link l ON rsf.reference_system_id = l.domain_id
+            GROUP BY f.id, f.name;"""
+        g.execute(sql, {'id': entity.id})
+        return {row.id: {'name': row.name, 'count': row.count} for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_form_choices(entity: Union[Entity, None]) -> List[Tuple[int, str]]:
