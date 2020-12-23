@@ -1,7 +1,8 @@
-from typing import Dict, List, Union
+from typing import Dict, List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
+from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -22,20 +23,9 @@ from openatlas.util.util import is_authorized, required_group
 def reference_system_insert() -> Union[str, Response]:
     form = build_form('reference_system')
     if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
-        try:
-            entity = ReferenceSystem.insert(form)
-            ReferenceSystem.add_forms(entity, form)
-            flash(_('entity created'), 'info')
-            g.cursor.execute('COMMIT')
-            return redirect(url_for('entity_view', id_=entity.id))
-        except IntegrityError as e:
-            g.cursor.execute('ROLLBACK')
-            flash(_('error name exists'), 'error')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        url = save(form)
+        if url:
+            return redirect(url)
     return render_template('reference_system/insert.html', form=form)
 
 
@@ -45,23 +35,9 @@ def reference_system_update(id_: int) -> Union[str, Response]:
     entity = ReferenceSystem.get_by_id(id_)
     form = build_form('reference_system', entity)
     if form.validate_on_submit():
-        entity.name = form.name.data
-        entity.description = form.description.data
-        entity.website_url = form.website_url.data
-        entity.resolver_url = form.resolver_url.data
-        try:
-            ReferenceSystem.update(entity, form)
-            ReferenceSystem.add_forms(entity, form)
-            flash(_('info update'), 'info')
-            g.cursor.execute('COMMIT')
-            return redirect(url_for('entity_view', id_=id_))
-        except IntegrityError as e:
-            g.cursor.execute('ROLLBACK')
-            flash(_('error name exists'), 'error')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        url = save(form, entity)
+        if url:
+            return redirect(url)
     return render_template('reference_system/update.html', form=form, entity=entity)
 
 
@@ -99,3 +75,31 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
                            tabs=tabs,
                            info=info,
                            table=table)
+
+
+def save(form: FlaskForm, entity: Optional[Entity] = None,) -> str:
+    g.cursor.execute('BEGIN')
+    try:
+        if not entity:
+            log_action = 'insert'
+            entity = ReferenceSystem.insert(form)
+        else:
+            log_action = 'update'
+            entity.name = form.name.data
+            entity.description = form.description.data
+            entity.website_url = form.website_url.data if form.website_url.data else None
+            entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
+            ReferenceSystem.update(entity)
+        ReferenceSystem.add_forms(entity, form)
+        g.cursor.execute('COMMIT')
+        logger.log_user(entity.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+        return url_for('entity_view', id_=entity.id)
+    except IntegrityError as e:
+        g.cursor.execute('ROLLBACK')
+        flash(_('error name exists'), 'error')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+    return ''
