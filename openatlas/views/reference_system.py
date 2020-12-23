@@ -3,6 +3,7 @@ from typing import Dict, List, Union
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from psycopg2 import IntegrityError
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -64,10 +65,19 @@ def reference_system_update(id_: int) -> Union[str, Response]:
     return render_template('reference_system/update.html', form=form, entity=entity)
 
 
-@app.route('/reference_system/update/<int:entity_id>/<int:form_id>', methods=['POST', 'GET'])
+@app.route('/reference_system/remove_form/<int:entity_id>/<int:form_id>', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_remove_form(entity_id: int, form_id: int):
-    return
+    forms = ReferenceSystem.get_forms(entity_id)
+    if forms[form_id]['count']:
+        abort(403)  # pragma: no cover
+    try:
+        ReferenceSystem.remove_form(entity_id, form_id)
+        flash(_('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        logger.log('error', 'database', 'remove form failed', e)
+        flash(_('error database'), 'error')
+    return redirect(url_for('entity_view', id_=entity_id))
 
 
 def reference_system_view(entity: Entity) -> Union[str, Response]:
@@ -76,7 +86,7 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
         _('website URL'): external_url(entity.website_url),
         _('resolver URL'): external_url(entity.resolver_url)}
     table = Table(paging=False)
-    for form_id, form_ in ReferenceSystem.get_forms(entity).items():
+    for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         if not form_['count'] and is_authorized('manager'):
             html = link(_('remove'), url_for('reference_system_remove_form',
                                              entity_id=entity.id,

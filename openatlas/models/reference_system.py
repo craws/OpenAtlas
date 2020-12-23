@@ -19,14 +19,21 @@ class ReferenceSystem:
             g.execute(sql, {'entity_id': entity.id, 'form_id': form_id})
 
     @staticmethod
-    def get_forms(entity):
+    def remove_form(entity_id: int, form_id: int) -> None:
+        sql = """
+            DELETE FROM web.reference_system_form
+            WHERE reference_system_id = %(reference_system_id)s AND form_id = %(form_id)s;"""
+        g.execute(sql, {'reference_system_id': entity_id, 'form_id': form_id})
+
+    @staticmethod
+    def get_forms(entity_id: int):
         sql = """
             SELECT f.id, f.name, COUNT(l.id) AS count FROM web.form f
             JOIN web.reference_system_form rsf ON f.id = rsf.form_id
                 AND rsf.reference_system_id = %(id)s
             LEFT JOIN model.link l ON rsf.reference_system_id = l.domain_id
             GROUP BY f.id, f.name;"""
-        g.execute(sql, {'id': entity.id})
+        g.execute(sql, {'id': entity_id})
         return {row.id: {'name': row.name, 'count': row.count} for row in g.cursor.fetchall()}
 
     @staticmethod
