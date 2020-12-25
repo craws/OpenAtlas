@@ -27,27 +27,32 @@ from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
-forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
+forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                   'continue'],
          'actor_actor_relation': ['date', 'description', 'continue'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'wikidata', 'description', 'continue'],
-         'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'event': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue'],
+         'feature': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
+                     'map'],
          'file': ['name', 'description'],
-         'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'find': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
+                  'map'],
          'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'wikidata', 'reference_systems', 'description',
+                           'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
          'note': ['description'],
-         'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
-                   'map'],
+         'place': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'geonames',
+                   'description', 'continue', 'map'],
          'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
+         'stratigraphic_unit': ['name', 'date', 'wikidata', 'reference_systems', 'description',
+                                'continue', 'map']}
 
 
 def build_form(name: str,
@@ -74,6 +79,8 @@ def build_form(name: str,
     add_types(Form, name, code)
     add_fields(Form, name, code, item, origin)
     add_external_references(Form, name)
+    if 'reference_systems' in forms[name]:
+        add_reference_systems(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
     if 'description' in forms[name]:
@@ -185,6 +192,22 @@ def add_external_references(form: Any, form_name: str) -> None:
                 SelectField(uc_first(_('precision')),
                             choices=app.config['REFERENCE_PRECISION'],
                             default='close match' if name == 'geonames' else ''))
+
+
+def add_reference_systems(form: Any, form_name: str) -> None:
+    for system in ReferenceSystem.get_all():
+        forms_ = [form_['name'] for form_ in ReferenceSystem.get_forms(system.id).values()]
+        if form_name.capitalize() not in forms_:
+            continue
+        setattr(form,
+                'reference_system_' + str(system.id),
+                StringField(system.name,
+                            validators=[OptionalValidator()],
+                            render_kw={'autocomplete': 'off', 'placeholder': 'to do'}))
+        setattr(form,
+                'reference_system_' + str(system.id) + '_precision',
+                SelectField(uc_first(_('precision')),
+                            choices=app.config['REFERENCE_PRECISION']))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:

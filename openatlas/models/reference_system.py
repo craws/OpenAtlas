@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 
 
 class ReferenceSystem:
-    # Tools for reference systems like Wikidata or GeoNames
+    # Functions for external reference systems like Wikidata or GeoNames
 
     @staticmethod
     def add_forms(entity: Entity, form: FlaskForm) -> None:
