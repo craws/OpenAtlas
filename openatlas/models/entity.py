@@ -521,7 +521,7 @@ class Entity:
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
         g.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
 
-        # Prepare date filter
+        # Repopulate date fields with autocompleted values
         from_date = Date.form_to_datetime64(form.begin_year.data,
                                             form.begin_month.data,
                                             form.begin_day.data)
@@ -529,8 +529,6 @@ class Entity:
                                           form.end_month.data,
                                           form.end_day.data,
                                           to_date=True)
-
-        # Refill form in case dates were completed
         if from_date:
             string = str(from_date)
             if string.startswith('-') or string.startswith('0000'):
@@ -540,7 +538,6 @@ class Entity:
             form.begin_day.raw_data = None
             form.begin_month.data = int(parts[1])
             form.begin_day.data = int(parts[2])
-
         if to_date:
             string = str(to_date)
             if string.startswith('-') or string.startswith('0000'):
@@ -551,6 +548,7 @@ class Entity:
             form.end_month.data = int(parts[1])
             form.end_day.data = int(parts[2])
 
+        # Get search results
         entities = []
         for row in g.cursor.fetchall():
             entity = None

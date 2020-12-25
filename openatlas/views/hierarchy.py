@@ -56,7 +56,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     table = Table(paging=False)
     for form_id, form_ in hierarchy.forms.items():
         link_ = link(_('remove'),
-                     url_for('hierarchy_remove_form', id_=hierarchy.id, remove_id=form_id))
+                     url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
         count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
     return render_template('hierarchy/update.html',
