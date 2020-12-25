@@ -156,8 +156,8 @@
                             <div class="toolbar">
                                 {{ _('import')|button(url_for('import_index')) }}
                                 {% if 'manager'|is_authorized %}
-                                    {{ (_('export') + ' CSV')|button(url_for('export_csv')) }}
-                                    {{ (_('export') + ' SQL')|button(url_for('export_sql')) }}
+                                    {{ ('CSV ' + _('export'))|button(url_for('export_csv')) }}
+                                    {{ ('SQL ' + _('export'))|button(url_for('export_sql')) }}
                                 {% endif %}
                                 {% if 'admin'|is_authorized %}
                                     {{ _('execute SQL')|button(url_for('sql_index')) }}
