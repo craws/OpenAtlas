@@ -511,6 +511,8 @@ class Entity:
                 sql_where.append("e.system_type = 'stratigraphic unit'")
             elif name == 'find':
                 sql_where.append("e.class_code = 'E22'")
+            elif name == 'human remains':
+                sql_where.append("e.class_code = 'E20'")
             elif name == 'reference':
                 sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
                     codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))
