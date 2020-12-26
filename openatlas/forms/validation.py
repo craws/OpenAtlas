@@ -89,6 +89,14 @@ def validate(self: FlaskForm) -> bool:
                 valid = False
                 getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
 
+    # External reference systems
+    for field_id, field in self.__dict__.items():
+        if field_id.startswith('reference_system_') and 'precision' not in field_id and field.data:
+            precision_field = getattr(self, field_id.replace('system_', 'system_precision_'))
+            if not precision_field.data:
+                valid = False
+                field.errors.append(uc_first(_('precision required')))
+
     # Membership
     if hasattr(self, 'member_origin_id'):
         member = getattr(self, 'actor') if hasattr(self, 'actor') else getattr(self, 'group')

@@ -203,9 +203,10 @@ def add_reference_systems(form: Any, form_name: str) -> None:
                 'reference_system_' + str(system.id),
                 StringField(system.name,
                             validators=[OptionalValidator()],
+                            description=system.description,
                             render_kw={'autocomplete': 'off', 'placeholder': 'to do'}))
         setattr(form,
-                'reference_system_' + str(system.id) + '_precision',
+                'reference_system_precision_' + str(system.id),
                 SelectField(uc_first(_('precision')),
                             choices=app.config['REFERENCE_PRECISION']))
 
