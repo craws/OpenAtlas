@@ -91,9 +91,8 @@ def validate(self: FlaskForm) -> bool:
 
     # External reference systems
     for field_id, field in self.__dict__.items():
-        if field_id.startswith('reference_system_') and 'precision' not in field_id and field.data:
-            precision_field = getattr(self, field_id.replace('system_', 'system_precision_'))
-            if not precision_field.data:
+        if field_id.startswith('reference_system_id_') and field.data:
+            if not getattr(self, field_id.replace('id_', 'precision_')).data:
                 valid = False
                 field.errors.append(uc_first(_('precision required')))
 
@@ -109,5 +108,4 @@ def validate(self: FlaskForm) -> bool:
         if self.relation_origin_id.data in ast.literal_eval(self.actor.data):
             self.actor.errors.append(_("Can't link to itself."))
             valid = False
-
     return valid

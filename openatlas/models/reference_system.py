@@ -67,6 +67,19 @@ class ReferenceSystem:
                         'resolver_url': entity.resolver_url})
 
     @staticmethod
+    def update_links(form: FlaskForm, entity: Entity) -> None:
+        for field in form:
+            if field.id.startswith('reference_system_id_'):  # Delete and recreate link
+                system = Entity.get_by_id(int(field.id.replace('reference_system_id_', '')))
+                precision_field = getattr(form, field.id.replace('id_', 'precision_'))
+                sql = """
+                    DELETE FROM model.link WHERE property_code = 'P67'
+                    AND domain_id = %(system_id)s AND range_id = %(entity_id)s;"""
+                g.execute(sql, {'system_id': system.id, 'entity_id': entity.id})
+                if field.data:
+                    system.link('P67', entity, field.data, type_id=precision_field.data)
+
+    @staticmethod
     def get_by_id(id_: int) -> Entity:
         entity = Entity.get_by_id(id_)
         sql = '''

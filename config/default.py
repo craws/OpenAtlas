@@ -45,7 +45,7 @@ EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': '', 'placeholder'
                        'wikidata': {'name': 'Wikidata',
                                     'url': 'https://www.wikidata.org/entity/',
                                     'placeholder': 'Q123'}}
-REFERENCE_PRECISION = [('',''), ('close match', 'close match'), ('exact match', 'exact match')]
+REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
 
 # Modules
 MODULES = ['geonames', 'wikidata', 'map_overlay', 'notes', 'sub_units']

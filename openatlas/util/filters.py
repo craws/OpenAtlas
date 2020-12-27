@@ -407,8 +407,8 @@ def display_form(self: Any,
             continue
 
         # External reference system
-        if field.id.startswith('reference_system_'):
-            precision_field = getattr(form, field.id.replace('system_', 'system_precision_'))
+        if field.id.startswith('reference_system_id_'):
+            precision_field = getattr(form, field.id.replace('id_', 'precision_'))
             html += add_row(field, field.label, ' '.join([str(field),
                                                           str(precision_field.label),
                                                           str(precision_field)]))

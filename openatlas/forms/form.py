@@ -195,20 +195,22 @@ def add_external_references(form: Any, form_name: str) -> None:
 
 
 def add_reference_systems(form: Any, form_name: str) -> None:
+    precisions = [('', '')]
+    for id_ in Node.get_hierarchy('External Reference Match').subs:
+        precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in ReferenceSystem.get_all():
         forms_ = [form_['name'] for form_ in ReferenceSystem.get_forms(system.id).values()]
         if form_name.capitalize() not in forms_:
             continue
         setattr(form,
-                'reference_system_' + str(system.id),
+                'reference_system_id_{id}'.format(id=system.id),
                 StringField(system.name,
                             validators=[OptionalValidator()],
                             description=system.description,
                             render_kw={'autocomplete': 'off', 'placeholder': 'to do'}))
         setattr(form,
-                'reference_system_precision_' + str(system.id),
-                SelectField(uc_first(_('precision')),
-                            choices=app.config['REFERENCE_PRECISION']))
+                'reference_system_precision_{id}'.format(id=system.id),
+                SelectField(uc_first(_('precision')), choices=precisions))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
