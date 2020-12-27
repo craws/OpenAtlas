@@ -58,6 +58,7 @@ def build_form(name: str,
 
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
+        validate = validate
 
     if 'name' in forms[name]:
         label = _('URL') if name == 'external_reference' else _('name')
@@ -82,7 +83,6 @@ def build_form(name: str,
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
     add_buttons(Form, name, item, origin)
-    setattr(Form, 'validate', validate)
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
