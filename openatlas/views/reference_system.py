@@ -1,7 +1,7 @@
 from typing import Dict, List, Optional, Union
 
 from flask import flash, g, render_template, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
 from werkzeug.exceptions import abort
@@ -11,10 +11,11 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.util import display
 from openatlas.util.display import external_url, link
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
 
 
@@ -44,9 +45,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
 @app.route('/reference_system/remove_form/<int:entity_id>/<int:form_id>', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_remove_form(entity_id: int, form_id: int):
-    forms = ReferenceSystem.get_forms(entity_id)
-    if forms[form_id]['count']:
-        abort(403)  # pragma: no cover
+    # Todo: check if there are no form connections anymore
     try:
         ReferenceSystem.remove_form(entity_id, form_id)
         flash(_('info update'), 'info')
@@ -61,20 +60,24 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
     info: Dict[str, Union[str, List[str]]] = {
         _('website URL'): external_url(entity.website_url),
         _('resolver URL'): external_url(entity.resolver_url)}
-    table = Table(paging=False)
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
-        if not form_['count'] and is_authorized('manager'):
-            html = link(_('remove'), url_for('reference_system_remove_form',
-                                             entity_id=entity.id,
-                                             form_id=form_id))
-        else:
-            html = format_number(form_['count'])
-        table.rows.append([form_['name'], html])
-    return render_template('reference_system/view.html',
-                           entity=entity,
-                           tabs=tabs,
-                           info=info,
-                           table=table)
+        tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'), origin=entity)
+        tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id']
+    for link_ in entity.get_links('P67'):
+        name = link_.description
+        if entity.resolver_url:
+            name = '<a href="{url}" target="_blank">{name}</a>'.format(
+                url=entity.resolver_url + name,
+                name=name)
+        tabs[link_.range.view_name.capitalize().replace(' ', '-')].table.rows.append([
+            link(link_.range),
+            name])
+    for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
+        if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
+            tabs[form_['name'].replace(' ', '-')].buttons = [
+                link(_('remove'),
+                     url_for('reference_system_remove_form', entity_id=entity.id, form_id=form_id))]
+    return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
 def save(form: FlaskForm, entity: Optional[Entity] = None,) -> str:

@@ -191,7 +191,7 @@ def event_view(event: Entity) -> str:
                                                link_id=link_.id,
                                                origin_id=event.id))
             if domain.view_name == 'reference_system':
-                # Todo
+                event.reference_systems.append(link_)
                 continue
             if domain.system_type and domain.system_type.startswith('external reference'):
                 event.external_references.append(link_)

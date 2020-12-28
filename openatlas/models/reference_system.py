@@ -28,13 +28,11 @@ class ReferenceSystem:
     @staticmethod
     def get_forms(entity_id: int):
         sql = """
-            SELECT f.id, f.name, COUNT(l.id) AS count FROM web.form f
+            SELECT f.id, f.name FROM web.form f
             JOIN web.reference_system_form rsf ON f.id = rsf.form_id
-                AND rsf.reference_system_id = %(id)s
-            LEFT JOIN model.link l ON rsf.reference_system_id = l.domain_id
-            GROUP BY f.id, f.name;"""
+                AND rsf.reference_system_id = %(id)s;"""
         g.execute(sql, {'id': entity_id})
-        return {row.id: {'name': row.name, 'count': row.count} for row in g.cursor.fetchall()}
+        return {row.id: {'name': row.name} for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_form_choices(entity: Union[Entity, None]) -> List[Tuple[int, str]]:
