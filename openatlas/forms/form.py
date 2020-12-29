@@ -95,12 +95,13 @@ def build_form(name: str,
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(Form(obj=item), item, location)
+        form = populate_form(name, Form(obj=item), item, location)
     customize_labels(name, form)
     return form
 
 
-def populate_form(form: FlaskForm,
+def populate_form(name: str,
+                  form: FlaskForm,
                   item: Union[Entity, Link],
                   location: Optional[Entity]) -> FlaskForm:
 
@@ -126,13 +127,25 @@ def populate_form(form: FlaskForm,
             getattr(form, str(root_id)).data = nodes_
 
     # External references
-    for name in g.external:
-        if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
-            link_ = Reference.get_link(item, name)
-            if link_ and not getattr(form, name + '_id').data:
+    for name_ in g.external:
+        if hasattr(form, name_ + '_id') and current_user.settings['module_' + name_]:
+            link_ = Reference.get_link(item, name_)
+            if link_ and not getattr(form, name_ + '_id').data:
                 reference = link_.domain
-                getattr(form, name + '_id').data = reference.name if reference else ''
-                getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
+                getattr(form, name_ + '_id').data = reference.name if reference else ''
+                getattr(form, name_ + '_precision').data = g.nodes[link_.type.id].name
+
+    # Reference systems
+    if 'reference_systems' in forms[name]:
+        system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
+                        if link_.domain.view_name == 'reference_system'}
+        for field in form:
+            if field.id.startswith('reference_system_id_'):
+                system_id = int(field.id.replace('reference_system_id_', ''))
+                if system_id in system_links:
+                    field.data = system_links[system_id].description
+                    getattr(form, 'reference_system_precision_{id}'.format(
+                        id=system_id)).data = str(system_links[system_id].type.id)
 
     return form
 

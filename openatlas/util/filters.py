@@ -509,7 +509,7 @@ def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str
 @blueprint.app_template_filter()
 def display_external_references(self: Any, entity: Entity) -> str:
     """ Formats external references for display."""
-    html = ''
+    system_links = []
     for link_ in entity.reference_systems:
         system = ReferenceSystem.get_by_id(link_.domain.id)
         name = link_.description
@@ -517,8 +517,12 @@ def display_external_references(self: Any, entity: Entity) -> str:
             name = '<a href="{url}" target="_blank">{name}</a>'.format(
                 url=system.resolver_url + name,
                 name=name)
-        html += '''{name} ({system_name})'''.format(name=name,
-                                                    system_name=display.link(link_.domain))
+        system_links.append('''{name} ({match} {at} {system_name})'''.format(
+            name=name,
+            match= g.nodes[link_.type.id].name,
+            at=_('at'),
+            system_name= display.link(link_.domain)))
+    html = '<br>'.join(system_links)
     for link_ in entity.external_references:
         url = link_.domain.name
         name = display.truncate(url.replace('http://', '').replace('https://', ''), span=False)
