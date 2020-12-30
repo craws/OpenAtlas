@@ -1,7 +1,7 @@
 {% extends "tabs.html" %}
 {% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;
+    <a href="{{ url_for('reference_system_index') }}">{{ _('reference system')|uc_first }}</a>&nbsp;
     > {{ entity.name }}
 {% endblock %}
 {% block tab_info %}
@@ -9,7 +9,9 @@
         {{ 'menu/reference_system'|manual }}
         {% if 'manager'|is_authorized %}
             {{ _('edit')|button(url_for('reference_system_update', id_=entity.id)) }}
-            {{ entity|display_delete_link }}
+            {% if not entity.forms %}
+                {{ entity|display_delete_link }}
+            {% endif %}
         {% endif %}
         {{ entity.id|bookmark_toggle }}
     </div>

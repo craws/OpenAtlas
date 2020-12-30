@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-reference-system">{{ _('reference system')|uc_first }}</a>&nbsp;
+    <a href="{{ url_for('reference_system_index') }}">{{ _('reference system')|uc_first }}</a>&nbsp;
     >&nbsp; {{ entity|link|safe }}&nbsp;
     >&nbsp; {{ _('edit')|uc_first }}
 {% endblock %}

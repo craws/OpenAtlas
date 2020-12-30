@@ -4,19 +4,37 @@ from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util import display
 from openatlas.util.display import external_url, link
 from openatlas.util.tab import Tab
+from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
+
+
+@app.route('/reference_system')
+@app.route('/reference_system/<action>/<int:id_>')
+def reference_system_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
+    if id_ and action == 'delete':
+        system = ReferenceSystem.get_by_id(id_)
+        if system.forms:
+            flash(_('Deletion not possible because forms are attached'), 'error')
+        else:
+            system.delete()
+            logger.log_user(id_, 'delete')
+            flash(_('entity deleted'), 'info')
+    table = Table(['name', 'website URL', 'resolver URL', 'description'])
+    for system in ReferenceSystem.get_all():
+        table.rows.append([link(system),
+                           external_url(system.website_url),
+                           external_url(system.resolver_url),
+                           system.description])
+    return render_template('reference_system/index.html', table=table)
 
 
 @app.route('/reference_system/insert', methods=['POST', 'GET'])
@@ -80,7 +98,7 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
     return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
-def save(form: FlaskForm, entity: Optional[Entity] = None,) -> str:
+def save(form: FlaskForm, entity: Optional[Entity] = None, ) -> str:
     g.cursor.execute('BEGIN')
     try:
         if not entity:
