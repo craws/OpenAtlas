@@ -80,7 +80,7 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
         _('resolver URL'): external_url(entity.resolver_url)}
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'), origin=entity)
-        tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id']
+        tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
     for link_ in entity.get_links('P67'):
         name = link_.description
         if entity.resolver_url:
@@ -89,7 +89,8 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
                 name=name)
         tabs[link_.range.view_name.capitalize().replace(' ', '-')].table.rows.append([
             link(link_.range),
-            name])
+            name,
+            link_.type.name,])
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
             tabs[form_['name'].replace(' ', '-')].buttons = [
