@@ -38,7 +38,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @required_group('contributor')
 def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form('actor', code=code, origin=origin)
+    form = build_form(g.classes[code].name.lower().replace(' ', '_'), code=code, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     form.alias.append_entry('')
@@ -51,7 +51,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def actor_update(id_: int) -> Union[str, Response]:
     actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
-    form = build_form('actor', actor)
+    form = build_form(g.classes[actor.class_.code].name.lower().replace(' ', '_'), actor)
     if form.validate_on_submit():
         if was_modified(form, actor):  # pragma: no cover
             del form.save

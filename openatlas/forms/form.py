@@ -27,9 +27,7 @@ from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
-forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
-                   'continue'],
-         'actor_actor_relation': ['date', 'description', 'continue'],
+forms = {'actor_actor_relation': ['date', 'description', 'continue'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
@@ -39,13 +37,19 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'de
          'file': ['name', 'description'],
          'find': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
                   'map'],
+         'group': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                   'continue'],
          'hierarchy': ['name', 'description'],
          'human_remains': ['name', 'date', 'wikidata', 'reference_systems', 'description',
                            'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
+         'legal_body': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                        'continue'],
          'note': ['description'],
+         'person': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                    'continue'],
          'place': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'geonames',
                    'description', 'continue', 'map'],
          'reference_system': ['name', 'description'],
@@ -258,11 +262,7 @@ def add_fields(form: Any,
                code: Union[str, None],
                item: Union[Entity, Link, None],
                origin: Union[Entity, None]) -> None:
-    if name == 'actor':
-        setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
-        setattr(form, 'ends_in', TableField(_('died in') if code == 'E21' else _('ends in')))
-    elif name == 'actor_actor_relation':
+    if name == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
             setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
@@ -282,6 +282,10 @@ def add_fields(form: Any,
             setattr(form, 'person', TableMultiField())
     elif name == 'file' and not item:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
+    elif name == 'group':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField( _('begins in')))
+        setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'hierarchy':
         if (code and code == 'custom') or (item and not item.value_type):
             setattr(form, 'multiple', BooleanField(_('multiple'),
@@ -298,11 +302,19 @@ def add_fields(form: Any,
             involved_with = 'actor' if origin.view_name == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
+    elif name == 'legal_body':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField( _('begins in')))
+        setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
+    elif name == 'person':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField(_('born in')))
+        setattr(form, 'ends_in', TableField(_('died in')))
     elif name == 'reference_system':
         setattr(form, 'website_url', StringField(_('website URL'),
                                                  validators=[OptionalValidator(), URL()]))
