@@ -14,6 +14,7 @@ from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link, uc_first)
@@ -172,6 +173,9 @@ def place_view(obj: Entity) -> str:
             data = add_edit_link(
                 data,
                 url_for('reference_link_update', link_id=link_.id, origin_id=obj.id))
+            if domain.view_name == 'reference_system':
+                obj.reference_systems.append(link_)
+                continue
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
@@ -242,6 +246,7 @@ def save(form: FlaskForm,
         object_.update(form)
         location.update(form)
         Reference.update(form, object_)
+        ReferenceSystem.update_links(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'

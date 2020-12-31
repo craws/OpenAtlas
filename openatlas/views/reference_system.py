@@ -87,10 +87,10 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
             name = '<a href="{url}" target="_blank">{name}</a>'.format(
                 url=entity.resolver_url + name,
                 name=name)
-        tabs[link_.range.view_name.capitalize().replace(' ', '-')].table.rows.append([
-            link(link_.range),
-            name,
-            link_.type.name,])
+        tab_name = link_.range.view_name.capitalize().replace(' ', '-')
+        if tab_name == 'Actor':
+            tab_name = g.classes[link_.range.class_.code].name.replace(' ', '_')
+        tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
             tabs[form_['name'].replace(' ', '-')].buttons = [

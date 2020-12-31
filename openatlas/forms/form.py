@@ -217,7 +217,7 @@ def add_reference_systems(form: Any, form_name: str) -> None:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in ReferenceSystem.get_all():
         forms_ = [form_['name'] for form_ in ReferenceSystem.get_forms(system.id).values()]
-        if form_name.capitalize() not in forms_:
+        if form_name.replace('_', ' ').title() not in forms_:
             continue
         setattr(form,
                 'reference_system_id_{id}'.format(id=system.id),
@@ -284,7 +284,7 @@ def add_fields(form: Any,
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
     elif name == 'group':
         setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField( _('begins in')))
+        setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'hierarchy':
         if (code and code == 'custom') or (item and not item.value_type):
@@ -304,7 +304,7 @@ def add_fields(form: Any,
         setattr(form, 'activity', SelectField(_('activity')))
     elif name == 'legal_body':
         setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField( _('begins in')))
+        setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
