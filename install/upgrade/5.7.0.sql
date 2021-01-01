@@ -5,20 +5,37 @@ BEGIN;
 
 -- #1292: Reference systems
 CREATE TABLE web.reference_system (
-    name text NOT NULL,
     entity_id integer NOT NULL,
     resolver_url text,
     website_url text,
     created timestamp without time zone,
     modified timestamp without time zone DEFAULT now() NOT NULL,
-    locked boolean DEFAULT false NOT NULL
+    locked boolean DEFAULT false NOT NULL,
+    name text NOT NULL,
+    precision_default_id integer,
+    placeholder_text text
 );
+
+CREATE TABLE web.reference_system (
+    entity_id integer NOT NULL,
+    name text NOT NULL,
+    resolver_url text,
+    website_url text,
+    precision_default_id integer,
+    placeholder_text text,
+    locked boolean DEFAULT false NOT NULL,
+    created timestamp without time zone,
+    modified timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
 ALTER TABLE web.reference_system OWNER TO openatlas;
 COMMENT ON COLUMN web.reference_system.locked IS 'If true because integrated in system only URLs are editable';
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_name_key UNIQUE (name);
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_pkey PRIMARY KEY (entity_id);
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.reference_system FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_precision_default_id_fkey FOREIGN KEY (precision_default_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 CREATE TABLE web.reference_system_form (
     id integer NOT NULL,
