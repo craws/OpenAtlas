@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 
 
 class ReferenceSystem:
@@ -54,15 +55,24 @@ class ReferenceSystem:
         return ReferenceSystem.get_by_id(entity.id)
 
     @staticmethod
-    def update(entity: Entity) -> None:
-        entity.update()
+    def update(entity: Entity, form: FlaskForm) -> None:
+        entity.update(form)
+        precision_default_id = None
+        entity_with_updated_nodes = Entity.get_by_id(entity.id, nodes=True)
+        if entity_with_updated_nodes.nodes:
+            precision_default_id = list(entity_with_updated_nodes.nodes.keys())[0].id
         sql = '''
-            UPDATE web.reference_system SET (name, website_url, resolver_url) =
-            (%(name)s, %(website_url)s, %(resolver_url)s) WHERE entity_id = %(entity_id)s;'''
+            UPDATE web.reference_system SET (name, website_url, resolver_url, identifier_example,
+                precision_default_id)
+            = (%(name)s, %(website_url)s, %(resolver_url)s, %(identifier_example)s,
+                %(precision_default_id)s)
+            WHERE entity_id = %(entity_id)s;'''
         g.execute(sql, {'entity_id': entity.id,
                         'name': entity.name,
                         'website_url': entity.website_url,
-                        'resolver_url': entity.resolver_url})
+                        'resolver_url': entity.resolver_url,
+                        'identifier_example': entity.placeholder,
+                        'precision_default_id': precision_default_id})
 
     @staticmethod
     def update_links(form: FlaskForm, entity: Entity) -> None:
@@ -79,9 +89,10 @@ class ReferenceSystem:
 
     @staticmethod
     def get_by_id(id_: int) -> Entity:
-        entity = Entity.get_by_id(id_)
+        entity = Entity.get_by_id(id_, nodes=True)
         sql = '''
-            SELECT rs.name, rs.website_url, rs.resolver_url, rs.locked,
+            SELECT rs.name, rs.website_url, rs.resolver_url, rs.identifier_example, rs.locked,
+                rs.precision_default_id,
             (SELECT ARRAY(
                 SELECT f.id FROM web.form f JOIN web.reference_system_form rfs ON f.id = rfs.form_id
                 AND rfs.reference_system_id = rs.entity_id)) AS form_ids
@@ -92,6 +103,8 @@ class ReferenceSystem:
         entity.website_url = row.website_url
         entity.resolver_url = row.resolver_url
         entity.forms = row.form_ids
+        entity.placeholder = row.identifier_example
+        entity.precision_default_id = row.precision_default_id
         return entity
 
     @staticmethod

@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import external_url, link
+from openatlas.util.display import add_system_data, add_type_data, external_url, link
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
@@ -28,12 +28,16 @@ def reference_system_index(action: Optional[str] = None, id_: Optional[int] = No
             system.delete()
             logger.log_user(id_, 'delete')
             flash(_('entity deleted'), 'info')
-    table = Table(['name', 'website URL', 'resolver URL', 'description'])
+    table = Table([_('name'), _('website URL'), _('resolver URL'), _('example identifier'),
+                   _('default match'), _('description')])
     for system in ReferenceSystem.get_all():
-        table.rows.append([link(system),
-                           external_url(system.website_url),
-                           external_url(system.resolver_url),
-                           system.description])
+        table.rows.append([
+            link(system),
+            external_url(system.website_url),
+            external_url(system.resolver_url),
+            system.placeholder,
+            link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
+            system.description])
     return render_template('reference_system/index.html', table=table)
 
 
@@ -75,9 +79,11 @@ def reference_system_remove_form(entity_id: int, form_id: int):
 
 def reference_system_view(entity: Entity) -> Union[str, Response]:
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
-    info: Dict[str, Union[str, List[str]]] = {
-        _('website URL'): external_url(entity.website_url),
-        _('resolver URL'): external_url(entity.resolver_url)}
+    info: Dict[str, Union[str, List[str]]] = {_('website URL'): external_url(entity.website_url),
+                                              _('resolver URL'): external_url(entity.resolver_url),
+                                              _('placeholder'): entity.placeholder}
+    add_type_data(entity, info)
+    add_system_data(entity, info)
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'), origin=entity)
         tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
@@ -111,7 +117,9 @@ def save(form: FlaskForm, entity: Optional[Entity] = None, ) -> str:
             entity.description = form.description.data
             entity.website_url = form.website_url.data if form.website_url.data else None
             entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
-            ReferenceSystem.update(entity)
+            entity.placeholder = form.placeholder.data if form.placeholder.data else None
+            entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
+            ReferenceSystem.update(entity, form)
         ReferenceSystem.add_forms(entity, form)
         g.cursor.execute('COMMIT')
         logger.log_user(entity.id, log_action)

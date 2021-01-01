@@ -6,23 +6,11 @@ BEGIN;
 -- #1292: Reference systems
 CREATE TABLE web.reference_system (
     entity_id integer NOT NULL,
-    resolver_url text,
-    website_url text,
-    created timestamp without time zone,
-    modified timestamp without time zone DEFAULT now() NOT NULL,
-    locked boolean DEFAULT false NOT NULL,
-    name text NOT NULL,
-    precision_default_id integer,
-    placeholder_text text
-);
-
-CREATE TABLE web.reference_system (
-    entity_id integer NOT NULL,
     name text NOT NULL,
     resolver_url text,
     website_url text,
     precision_default_id integer,
-    placeholder_text text,
+    identifier_example text,
     locked boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
     modified timestamp without time zone DEFAULT now() NOT NULL

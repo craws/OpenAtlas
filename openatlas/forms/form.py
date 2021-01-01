@@ -224,10 +224,13 @@ def add_reference_systems(form: Any, form_name: str) -> None:
                 StringField(system.name,
                             validators=[OptionalValidator()],
                             description=system.description,
-                            render_kw={'autocomplete': 'off', 'placeholder': 'to do'}))
+                            render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
+
         setattr(form,
                 'reference_system_precision_{id}'.format(id=system.id),
-                SelectField(uc_first(_('precision')), choices=precisions))
+                SelectField(uc_first(_('precision')),
+                            choices=precisions,
+                            default=system.precision_default_id))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
@@ -320,6 +323,9 @@ def add_fields(form: Any,
                                                  validators=[OptionalValidator(), URL()]))
         setattr(form, 'resolver_url', StringField(_('resolver URL'),
                                                   validators=[OptionalValidator(), URL()]))
+        setattr(form, 'placeholder', StringField(_('placeholder')))
+        precision_node_id = str(Node.get_hierarchy('External Reference Match').id)
+        setattr(form, precision_node_id, TreeField(precision_node_id))
         setattr(form, 'forms', SelectMultipleField(_('forms'),
                                                    render_kw={'disabled': True},
                                                    choices=ReferenceSystem.get_form_choices(item),

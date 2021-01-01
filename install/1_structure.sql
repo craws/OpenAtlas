@@ -1198,7 +1198,7 @@ CREATE TABLE web.reference_system (
     resolver_url text,
     website_url text,
     precision_default_id integer,
-    placeholder_text text,
+    identifier_example text,
     locked boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
     modified timestamp without time zone DEFAULT now() NOT NULL
