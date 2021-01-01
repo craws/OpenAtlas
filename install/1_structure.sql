@@ -22,6 +22,7 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_precision_default_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_form_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
@@ -1192,13 +1193,15 @@ ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
 --
 
 CREATE TABLE web.reference_system (
-    name text NOT NULL,
     entity_id integer NOT NULL,
+    name text NOT NULL,
     resolver_url text,
     website_url text,
+    precision_default_id integer,
+    placeholder_text text,
+    locked boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
-    modified timestamp without time zone DEFAULT now() NOT NULL,
-    locked boolean DEFAULT false NOT NULL
+    modified timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -2483,6 +2486,14 @@ ALTER TABLE ONLY web.reference_system_form
 
 ALTER TABLE ONLY web.reference_system_form
     ADD CONSTRAINT reference_system_form_reference_system_id_fkey FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system reference_system_precision_default_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system
+    ADD CONSTRAINT reference_system_precision_default_id_fkey FOREIGN KEY (precision_default_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
