@@ -323,7 +323,7 @@ def add_fields(form: Any,
                                                  validators=[OptionalValidator(), URL()]))
         setattr(form, 'resolver_url', StringField(_('resolver URL'),
                                                   validators=[OptionalValidator(), URL()]))
-        setattr(form, 'placeholder', StringField(_('placeholder')))
+        setattr(form, 'placeholder', StringField(_('example ID')))
         precision_node_id = str(Node.get_hierarchy('External Reference Match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
         setattr(form, 'forms', SelectMultipleField(_('forms'),

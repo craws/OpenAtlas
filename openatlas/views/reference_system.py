@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import add_system_data, add_type_data, external_url, link
+from openatlas.util.display import add_system_data, add_type_data, button, external_url, link
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
@@ -81,7 +81,7 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
     info: Dict[str, Union[str, List[str]]] = {_('website URL'): external_url(entity.website_url),
                                               _('resolver URL'): external_url(entity.resolver_url),
-                                              _('placeholder'): entity.placeholder}
+                                              _('example ID'): entity.placeholder}
     add_type_data(entity, info)
     add_system_data(entity, info)
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
@@ -100,8 +100,9 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
     for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
         if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
             tabs[form_['name'].replace(' ', '-')].buttons = [
-                link(_('remove'),
-                     url_for('reference_system_remove_form', entity_id=entity.id, form_id=form_id))]
+                button(_('remove'), url_for('reference_system_remove_form',
+                                            entity_id=entity.id,
+                                            form_id=form_id))]
     return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
