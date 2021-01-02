@@ -9,7 +9,6 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 
-
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
@@ -70,6 +69,7 @@ def before_request() -> None:
     from openatlas.models.model import CidocClass, CidocProperty
     from openatlas.models.node import Node
     from openatlas.models.settings import Settings
+    from openatlas.models.reference_system import ReferenceSystem
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Only needed if not running with Apache and static alias
     debug_model['sql'] = 0
@@ -80,6 +80,7 @@ def before_request() -> None:
     g.classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
     g.nodes = Node.get_all_nodes()
+    g.reference_systems = ReferenceSystem.get_all()
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
     g.external = app.config['EXTERNAL_REFERENCES']

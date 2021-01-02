@@ -215,8 +215,8 @@ def add_reference_systems(form: Any, form_name: str) -> None:
     precisions = [('', '')]
     for id_ in Node.get_hierarchy('External Reference Match').subs:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
-    for system in ReferenceSystem.get_all():
-        forms_ = [form_['name'] for form_ in ReferenceSystem.get_forms(system.id).values()]
+    for system in g.reference_systems.values():
+        forms_ = [form_['name'] for form_ in system.get_forms().values()]
         if form_name.replace('_', ' ').title() not in forms_:
             continue
         setattr(form,
@@ -263,7 +263,7 @@ def add_types(form: Any, name: str, code: Union[str, None]) -> None:
 def add_fields(form: Any,
                name: str,
                code: Union[str, None],
-               item: Union[Entity, Link, None],
+               item: Union[Entity, Node, Link, None],
                origin: Union[Entity, None]) -> None:
     if name == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))

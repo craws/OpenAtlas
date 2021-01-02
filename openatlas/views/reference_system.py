@@ -9,7 +9,6 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.forms.form import build_form
-from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import add_system_data, add_type_data, button, external_url, link
 from openatlas.util.tab import Tab
@@ -21,7 +20,7 @@ from openatlas.util.util import is_authorized, required_group
 @app.route('/reference_system/<action>/<int:id_>')
 def reference_system_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        system = ReferenceSystem.get_by_id(id_)
+        system = g.reference_systems[id]
         if system.forms:
             flash(_('Deletion not possible because forms are attached'), 'error')
         else:
@@ -30,7 +29,7 @@ def reference_system_index(action: Optional[str] = None, id_: Optional[int] = No
             flash(_('entity deleted'), 'info')
     table = Table([_('name'), _('website URL'), _('resolver URL'), _('example identifier'),
                    _('default match'), _('description')])
-    for system in ReferenceSystem.get_all():
+    for system in g.reference_systems.values():
         table.rows.append([
             link(system),
             external_url(system.website_url),
@@ -55,36 +54,36 @@ def reference_system_insert() -> Union[str, Response]:
 @app.route('/reference_system/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_update(id_: int) -> Union[str, Response]:
-    entity = ReferenceSystem.get_by_id(id_)
-    form = build_form('reference_system', entity)
+    system = g.reference_systems[id_]
+    form = build_form('reference_system', system)
     if form.validate_on_submit():
-        url = save(form, entity)
+        url = save(form, system)
         if url:
             return redirect(url)
-    return render_template('reference_system/update.html', form=form, entity=entity)
+    return render_template('reference_system/update.html', form=form, entity=system)
 
 
-@app.route('/reference_system/remove_form/<int:entity_id>/<int:form_id>', methods=['POST', 'GET'])
+@app.route('/reference_system/remove_form/<int:system_id>/<int:form_id>', methods=['POST', 'GET'])
 @required_group('manager')
-def reference_system_remove_form(entity_id: int, form_id: int):
+def reference_system_remove_form(system_id: int, form_id: int):
     # Todo: check if there are no form connections anymore
     try:
-        ReferenceSystem.remove_form(entity_id, form_id)
+        g.reference_systems[system_id].remove_form(form_id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         logger.log('error', 'database', 'remove form failed', e)
         flash(_('error database'), 'error')
-    return redirect(url_for('entity_view', id_=entity_id))
+    return redirect(url_for('entity_view', id_=system_id))
 
 
-def reference_system_view(entity: Entity) -> Union[str, Response]:
+def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
     info: Dict[str, Union[str, List[str]]] = {_('website URL'): external_url(entity.website_url),
                                               _('resolver URL'): external_url(entity.resolver_url),
                                               _('example ID'): entity.placeholder}
     add_type_data(entity, info)
     add_system_data(entity, info)
-    for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
+    for form_id, form_ in entity.get_forms().items():
         tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'), origin=entity)
         tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
     for link_ in entity.get_links('P67'):
@@ -97,21 +96,21 @@ def reference_system_view(entity: Entity) -> Union[str, Response]:
         if tab_name == 'Actor':
             tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
         tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
-    for form_id, form_ in ReferenceSystem.get_forms(entity.id).items():
+    for form_id, form_ in entity.get_forms().items():
         if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
             tabs[form_['name'].replace(' ', '-')].buttons = [
                 button(_('remove'), url_for('reference_system_remove_form',
-                                            entity_id=entity.id,
+                                            system_id=entity.id,
                                             form_id=form_id))]
     return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
-def save(form: FlaskForm, entity: Optional[Entity] = None, ) -> str:
+def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         if not entity:
             log_action = 'insert'
-            entity = ReferenceSystem.insert(form)
+            entity = ReferenceSystem.insert_system(form)
         else:
             log_action = 'update'
             entity.name = form.name.data
@@ -120,8 +119,8 @@ def save(form: FlaskForm, entity: Optional[Entity] = None, ) -> str:
             entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
             entity.placeholder = form.placeholder.data if form.placeholder.data else None
             entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
-            ReferenceSystem.update(entity, form)
-        ReferenceSystem.add_forms(entity, form)
+            entity.update_system(form)
+        entity.add_forms(form)
         g.cursor.execute('COMMIT')
         logger.log_user(entity.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

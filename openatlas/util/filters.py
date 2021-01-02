@@ -18,7 +18,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.models.node import Node
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util import display, tab, util
 from openatlas.util.table import Table
@@ -507,7 +506,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
     """ Formats external references for display."""
     system_links = []
     for link_ in entity.reference_systems:
-        system = ReferenceSystem.get_by_id(link_.domain.id)
+        system = g.reference_systems[link_.domain.id]
         name = link_.description
         if system.resolver_url:
             name = '<a href="{url}" target="_blank">{name}</a>'.format(
