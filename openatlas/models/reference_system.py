@@ -24,18 +24,23 @@ class ReferenceSystem(Entity):
         self.forms = row.form_ids
         self.placeholder = row.identifier_example
         self.precision_default_id = row.precision_default_id
+        self.count = row.count
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
         sql = """
             SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
                 rs.website_url, rs.resolver_url, rs.identifier_example, rs.locked,
-                rs.precision_default_id,
+                rs.precision_default_id, COUNT(l.id) AS count,
                 (SELECT ARRAY(
                 SELECT f.id FROM web.form f JOIN web.reference_system_form rfs ON f.id = rfs.form_id
                 AND rfs.reference_system_id = rs.entity_id)) AS form_ids
             FROM model.entity e
-            JOIN web.reference_system rs ON e.id = rs.entity_id;"""
+            JOIN web.reference_system rs ON e.id = rs.entity_id
+            LEFT JOIN model.link l ON e.id = l.domain_id
+            GROUP BY e.id, e.name, e.class_code, e.description, e.system_type, e.created,
+                e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.locked,
+                rs.precision_default_id, rs.entity_id;"""
         g.execute(sql)
         return {row.id: ReferenceSystem(row) for row in g.cursor.fetchall()}
 

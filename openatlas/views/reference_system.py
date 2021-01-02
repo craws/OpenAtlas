@@ -18,20 +18,22 @@ from openatlas.util.util import is_authorized, required_group
 
 @app.route('/reference_system')
 @app.route('/reference_system/<action>/<int:id_>')
+@required_group('readonly')
 def reference_system_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        system = g.reference_systems[id]
+        system = g.reference_systems[id_]
         if system.forms:
             flash(_('Deletion not possible because forms are attached'), 'error')
         else:
             system.delete()
             logger.log_user(id_, 'delete')
             flash(_('entity deleted'), 'info')
-    table = Table([_('name'), _('website URL'), _('resolver URL'), _('example identifier'),
-                   _('default match'), _('description')])
+    table = Table([_('name'), _('count'), _('website URL'), _('resolver URL'),
+                   _('example identifier'), _('default match'), _('description')])
     for system in g.reference_systems.values():
         table.rows.append([
             link(system),
+            system.count if system.count else '',
             external_url(system.website_url),
             external_url(system.resolver_url),
             system.placeholder,
