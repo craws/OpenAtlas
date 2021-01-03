@@ -221,7 +221,7 @@ class Entity:
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_name or self.view_name == 'actor':  # Actors have no base type
+        if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
             return ''
         if self.system_type and self.system_type.startswith('external reference '):
             return ''   # e.g. "External Reference GeoNames"

@@ -36,10 +36,14 @@ class ReferenceSystem(Entity):
                 rs.precision_default_id, COUNT(l.id) AS count,
                 (SELECT ARRAY(
                 SELECT f.id FROM web.form f JOIN web.reference_system_form rfs ON f.id = rfs.form_id
-                AND rfs.reference_system_id = rs.entity_id)) AS form_ids
+                AND rfs.reference_system_id = rs.entity_id)) AS form_ids,
+                array_to_json(
+                    array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
+                ) AS nodes
             FROM model.entity e
             JOIN web.reference_system rs ON e.id = rs.entity_id
             LEFT JOIN model.link l ON e.id = l.domain_id
+            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2')
             GROUP BY e.id, e.name, e.class_code, e.description, e.system_type, e.created,
                 e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, rs.entity_id;"""

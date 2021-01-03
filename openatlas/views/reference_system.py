@@ -4,6 +4,7 @@ from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -21,24 +22,26 @@ from openatlas.util.util import is_authorized, required_group
 @required_group('readonly')
 def reference_system_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        system = g.reference_systems[id_]
-        if system.forms:
+        entity = g.reference_systems[id_]
+        if entity.forms:
             flash(_('Deletion not possible because forms are attached'), 'error')
+        elif entity.system:
+            abort(403)
         else:
-            system.delete()
+            entity.delete()
             logger.log_user(id_, 'delete')
             flash(_('entity deleted'), 'info')
     table = Table([_('name'), _('count'), _('website URL'), _('resolver URL'),
                    _('example identifier'), _('default match'), _('description')])
-    for system in g.reference_systems.values():
+    for entity in g.reference_systems.values():
         table.rows.append([
-            link(system),
-            system.count if system.count else '',
-            external_url(system.website_url),
-            external_url(system.resolver_url),
-            system.placeholder,
-            link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
-            system.description])
+            link(entity),
+            entity.count if entity.count else '',
+            external_url(entity.website_url),
+            external_url(entity.resolver_url),
+            entity.placeholder,
+            link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
+            entity.description])
     return render_template('reference_system/index.html', table=table)
 
 
@@ -56,13 +59,15 @@ def reference_system_insert() -> Union[str, Response]:
 @app.route('/reference_system/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_update(id_: int) -> Union[str, Response]:
-    system = g.reference_systems[id_]
-    form = build_form('reference_system', system)
+    entity = g.reference_systems[id_]
+    form = build_form('reference_system', entity)
+    if entity.system:
+        form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
-        url = save(form, system)
+        url = save(form, entity)
         if url:
             return redirect(url)
-    return render_template('reference_system/update.html', form=form, entity=system)
+    return render_template('reference_system/update.html', form=form, entity=entity)
 
 
 @app.route('/reference_system/remove_form/<int:system_id>/<int:form_id>', methods=['POST', 'GET'])
@@ -95,7 +100,7 @@ def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
                 url=entity.resolver_url + name,
                 name=name)
         tab_name = link_.range.view_name.capitalize().replace(' ', '-')
-        if tab_name == 'Actor':
+        if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
             tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
         tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
     for form_id, form_ in entity.get_forms().items():
@@ -115,7 +120,7 @@ def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
             entity = ReferenceSystem.insert_system(form)
         else:
             log_action = 'update'
-            entity.name = form.name.data
+            entity.name = entity.name if entity.system else form.name.data
             entity.description = form.description.data
             entity.website_url = form.website_url.data if form.website_url.data else None
             entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None

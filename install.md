@@ -62,7 +62,7 @@ Add the postgis extension to the database
 Import the scripts: 1_structure.sql,  2_data_web.sql,  3_data_model.sql, 4_data_node.sql
 
     $ cd install
-    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_node.sql | psql -d openatlas -f -
 
 **Important!** A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
 
@@ -130,7 +130,7 @@ As postgres
     $ createdb openatlas_test -O openatlas
     $ psql openatlas_test -c "CREATE EXTENSION postgis;"
     $ cd install
-    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas_test -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql  4_data_node.sql | psql -d openatlas_test -f -
 
 Copy instance/example_testing.py to instance/testing.py and add/change values as appropriate.
 

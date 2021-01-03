@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 
 class ContentTests(TestBaseCase):
 
-    def test_content_and_newsletter(self) -> None:
+    def test_orphans_and_newsletter(self) -> None:
         with app.app_context():  # type: ignore
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():

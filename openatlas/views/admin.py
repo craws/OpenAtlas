@@ -266,6 +266,8 @@ def admin_orphans() -> str:
               'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
     tables['circular'].rows = [[link(entity)] for entity in Entity.get_circular()]
     for entity in Entity.get_orphans():
+        if entity.class_.code == 'E32':  # Skip external reference systems
+            continue
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name].rows.append([link(entity),
                                   link(entity.class_),

@@ -47,18 +47,16 @@ ALTER TABLE ONLY web.reference_system_form ADD CONSTRAINT reference_system_form_
     FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 INSERT INTO model.entity (name, class_code) VALUES ('GeoNames', 'E32'), ('Wikidata', 'E32');
-INSERT INTO web.reference_system (system, name, entity_id, precision_default_id, resolver_url, website_url, identifier_example);
+INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES (true,
         'GeoNames',
         (SELECT id FROM model.entity WHERE name = 'GeoNames' AND class_code = 'E32'),
-        (SELECT id FROM model.entity WHERE name = 'exact match' AND class_code = 'E55'),
         'https://www.geonames.org/',
         'https://www.geonames.org/',
         '1234567'),
        (true,
         'Wikidata',
         (SELECT id FROM model.entity WHERE name = 'Wikidata' AND class_code = 'E32'),
-        NULL,
         'https://www.wikidata.org/entity/',
         'https://www.wikidata.org',
         'Q123');
