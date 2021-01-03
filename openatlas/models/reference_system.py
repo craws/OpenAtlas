@@ -15,6 +15,7 @@ class ReferenceSystem(Entity):
     website_url = None
     resolver_url = None
     placeholder = None
+    system = False
 
     def __init__(self, row: NamedTupleCursor.Record) -> None:
 
@@ -25,12 +26,13 @@ class ReferenceSystem(Entity):
         self.placeholder = row.identifier_example
         self.precision_default_id = row.precision_default_id
         self.count = row.count
+        self.system = row.system
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
         sql = """
             SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
-                rs.website_url, rs.resolver_url, rs.identifier_example, rs.locked,
+                rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, COUNT(l.id) AS count,
                 (SELECT ARRAY(
                 SELECT f.id FROM web.form f JOIN web.reference_system_form rfs ON f.id = rfs.form_id
@@ -39,7 +41,7 @@ class ReferenceSystem(Entity):
             JOIN web.reference_system rs ON e.id = rs.entity_id
             LEFT JOIN model.link l ON e.id = l.domain_id
             GROUP BY e.id, e.name, e.class_code, e.description, e.system_type, e.created,
-                e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.locked,
+                e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, rs.entity_id;"""
         g.execute(sql)
         return {row.id: ReferenceSystem(row) for row in g.cursor.fetchall()}

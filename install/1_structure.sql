@@ -1199,7 +1199,7 @@ CREATE TABLE web.reference_system (
     website_url text,
     precision_default_id integer,
     identifier_example text,
-    locked boolean DEFAULT false NOT NULL,
+    system boolean DEFAULT false NOT NULL,
     created timestamp without time zone,
     modified timestamp without time zone DEFAULT now() NOT NULL
 );
@@ -1208,10 +1208,10 @@ CREATE TABLE web.reference_system (
 ALTER TABLE web.reference_system OWNER TO openatlas;
 
 --
--- Name: COLUMN reference_system.locked; Type: COMMENT; Schema: web; Owner: openatlas
+-- Name: COLUMN reference_system.system; Type: COMMENT; Schema: web; Owner: openatlas
 --
 
-COMMENT ON COLUMN web.reference_system.locked IS 'If true because integrated in system only URLs are editable';
+COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.';
 
 
 --
