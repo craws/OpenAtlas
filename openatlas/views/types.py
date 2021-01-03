@@ -136,7 +136,7 @@ def node_view(node: Node) -> str:
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
         tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
-    if not tabs['entities'].table.rows:
+    if not tabs['entities'].table.rows:  # If no entities available get links with this type_id
         tabs['entities'].table = Table([_('domain'), _('range')])
         for row in Link.get_entities_by_node(node):
             tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
