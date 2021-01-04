@@ -41,7 +41,12 @@ class NoSearchStringError(Exception):
 class AccessDeniedError(Exception):
     pass
 
+
 class MethodNotAllowedError(Exception):
+    pass
+
+
+class QueryEmptyError(Exception):
     pass
 
 
@@ -76,7 +81,7 @@ errors = {
         "status": 404
     },
     "InvalidSubunitError": {
-        "message": "The requested node or subunit doesn't exist. Try another node ID",
+        "message": "The requested ID is not a node/subunit or doesn't exist. Try another node ID",
         "status": 404
     },
     "InvalidCodeError": {
@@ -95,5 +100,9 @@ errors = {
     "MethodNotAllowedError": {
         "message": "This method is not allowed for this path. Please confer the manual.",
         "status": 405
+    },
+    "QueryEmptyError": {
+        "message": "Query path needs one or more parameter: classes, items or entities.",
+        "status": 404
     },
 }

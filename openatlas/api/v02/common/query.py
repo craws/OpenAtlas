@@ -9,6 +9,7 @@ from openatlas import app
 from openatlas.api.v02.common.class_ import GetByClass
 from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import query_parser
@@ -23,6 +24,8 @@ class GetQuery(Resource):
     def get(self, ) -> Tuple[Resource, int]:
         entities = []
         parser = query_parser.parse_args()
+        if not parser['entities'] and not parser['items'] and not parser['classes']:
+            raise QueryEmptyError
         template = GeoJson.pagination(parser['show'])
         if parser['entities']:
             for entity in parser['entities']:
