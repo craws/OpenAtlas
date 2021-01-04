@@ -107,8 +107,12 @@ class ReferenceSystem(Entity):
     def get_form_choices(entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
         g.execute("SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
                   {'forms': tuple(app.config['EXTERNAL_REFERENCES_FORMS'])})
-        return [
-            (r.id, r.name) for r in g.cursor.fetchall() if not entity or r.id not in entity.forms]
+        choices = []
+        for row in g.cursor.fetchall():
+            if not entity or row.id not in entity.forms:
+                if entity and entity.name != 'GeoNames' or row.name == 'Place':
+                    choices.append((row.id, row.name))
+        return choices
 
     @staticmethod
     def insert_system(form: FlaskForm) -> Entity:

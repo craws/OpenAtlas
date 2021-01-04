@@ -127,7 +127,8 @@ def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
             entity.placeholder = form.placeholder.data if form.placeholder.data else None
             entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
             entity.update_system(form)
-        entity.add_forms(form)
+        if hasattr(form, 'forms'):
+            entity.add_forms(form)
         g.cursor.execute('COMMIT')
         logger.log_user(entity.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

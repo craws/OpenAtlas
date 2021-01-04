@@ -108,7 +108,6 @@ def populate_form(name: str,
                   form: FlaskForm,
                   item: Union[Entity, Link],
                   location: Optional[Entity]) -> FlaskForm:
-
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -326,12 +325,15 @@ def add_fields(form: Any,
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_node_id = str(Node.get_hierarchy('External Reference Match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
-        setattr(form, 'forms', SelectMultipleField(_('forms'),
-                                                   render_kw={'disabled': True},
-                                                   choices=ReferenceSystem.get_form_choices(item),
-                                                   option_widget=widgets.CheckboxInput(),
-                                                   widget=widgets.ListWidget(prefix_label=False),
-                                                   coerce=int))
+        choices = ReferenceSystem.get_form_choices(item)
+        if choices:
+            setattr(form, 'forms', SelectMultipleField(
+                _('forms'),
+                render_kw={'disabled': True},
+                choices=choices,
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False),
+                coerce=int))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 
