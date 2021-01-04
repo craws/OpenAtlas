@@ -49,6 +49,7 @@ INSERT INTO web.settings (name, value) VALUES
     ('reset_confirm_hours', '24'),
     ('site_name', 'OpenAtlas');
 
+-- External Reference Systems
 INSERT INTO model.entity (name, class_code) VALUES ('GeoNames', 'E32'), ('Wikidata', 'E32');
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES (true,

@@ -60,5 +60,12 @@ VALUES (true,
         'https://www.wikidata.org/entity/',
         'https://www.wikidata.org',
         'Q123');
+INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
+((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='Place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Person')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Group')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Legal Body')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));
 
 COMMIT;
