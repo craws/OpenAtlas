@@ -20,3 +20,6 @@ INSERT INTO web.i18n (name, language, text) VALUES ('citation_example', 'en', 'c
 -- Insert invalid link
 INSERT INTO model.entity (class_code, name) VALUES ('E13', 'Invalid linked entity');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P86', (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'), (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'));
+
+-- Remove after finishing external reference systems
+TRUNCATE web.reference_system_form;
