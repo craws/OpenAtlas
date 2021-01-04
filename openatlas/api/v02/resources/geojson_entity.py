@@ -25,12 +25,12 @@ class GeoJsonEntity:
         links = []
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
-                          'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
+                          'relationTo': url_for('entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
                                           + link.property.i18n['en'].replace(' ', '_')})
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
-                          'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
+                          'relationTo': url_for('entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
         return links if links else None
@@ -41,7 +41,7 @@ class GeoJsonEntity:
         for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
-                files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
+                files.append({'@id': url_for('entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
                               'license': GeoJsonEntity.get_license(link.domain.id),
                               'url': url_for('display_file_api',
@@ -61,7 +61,7 @@ class GeoJsonEntity:
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
         for node in entity.nodes:
-            nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
+            nodes_dict = {'identifier': url_for('entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:  # pragma: nocover

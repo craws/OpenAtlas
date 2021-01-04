@@ -4,7 +4,7 @@ from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
-from openatlas.api.v01.error import APIError
+from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -27,4 +27,4 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
         if parser['download']:
             return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
-    raise APIError('Access denied.', status_code=403, payload="403")
+    raise AccessDeniedError

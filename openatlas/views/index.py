@@ -11,6 +11,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.api.v01.error import APIError
+
+from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -122,7 +124,7 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(405)  # pragma: no cover
 def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return str(APIError('Method Not Allowed', status_code=405, payload="405").to_dict()), 405
+    raise MethodNotAllowedError
 
 
 @app.errorhandler(418)

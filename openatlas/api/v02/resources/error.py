@@ -38,6 +38,13 @@ class NoSearchStringError(Exception):
     pass
 
 
+class AccessDeniedError(Exception):
+    pass
+
+class MethodNotAllowedError(Exception):
+    pass
+
+
 errors = {
     "InternalServerError": {
         "message": "Something went wrong",
@@ -80,5 +87,13 @@ errors = {
     "NoSearchStringError": {
         "message": "The filter parameter has no search string.",
         "status": 404
+    },
+    "AccessDeniedError": {
+        "message": "You don't have access to the API. Please ask the owner for access.",
+        "status": 403
+    },
+    "MethodNotAllowedError": {
+        "message": "This method is not allowed for this path. Please confer the manual.",
+        "status": 405
     },
 }
