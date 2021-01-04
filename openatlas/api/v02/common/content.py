@@ -12,7 +12,7 @@ from openatlas.models.content import Content
 from openatlas.util.util import api_access
 
 
-class GetContent(Resource):
+class GetContent(Resource): # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/content.yml", endpoint="content")

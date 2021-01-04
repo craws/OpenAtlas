@@ -12,7 +12,7 @@ from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.util.util import api_access
 
 
-class GetEntity(Resource):
+class GetEntity(Resource): # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/entity.yml", endpoint="entity")

@@ -15,7 +15,7 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import api_access
 
 
-class GetLatest(Resource):
+class GetLatest(Resource): # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/latest.yml", endpoint="latest")
@@ -31,7 +31,7 @@ class GetLatest(Resource):
         return marshal(entities, template), 200
 
     @staticmethod
-    def get_entities_get_latest(limit_: int, parser) -> List[Dict[str, Any]]:
+    def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
         if 1 < limit_ < 101:
             for entity in Entity.get_latest(limit_):

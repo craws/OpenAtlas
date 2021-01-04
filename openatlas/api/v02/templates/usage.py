@@ -7,7 +7,7 @@ from flask_restful.fields import List as RestList
 class UsageTemplate:
 
     @staticmethod
-    def usage_templage() -> Dict[str, RestList]:
+    def usage_template() -> Dict[str, RestList]:
         examples = {'entity': fields.String,
                     'code': fields.String,
                     'class': fields.String,

@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, url_for
 
@@ -21,7 +21,7 @@ class GeoJsonEntity:
         return words[0] + ''.join(x.title() for x in words[1:])
 
     @staticmethod
-    def get_links(entity: Entity) -> List[Dict[str, str]]:
+    def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
@@ -36,7 +36,7 @@ class GeoJsonEntity:
         return links if links else None
 
     @staticmethod
-    def get_file(entity: Entity) -> List[Dict[str, str]]:
+    def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
         files = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
@@ -58,7 +58,7 @@ class GeoJsonEntity:
         return file_license
 
     @staticmethod
-    def get_node(entity: Entity) -> List[Dict[str, Any]]:
+    def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         nodes = []
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('entity', id_=node.id, _external=True),
@@ -80,7 +80,7 @@ class GeoJsonEntity:
         return nodes if nodes else None
 
     @staticmethod
-    def get_time(entity: Entity) -> Dict[str, Any]:
+    def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
         time = {}
         if entity.begin_from:
             start = {'earliest': format_date(entity.begin_from)}
@@ -126,7 +126,7 @@ class GeoJsonEntity:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_external(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+    def get_external(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
         ref = []
         for external in g.external:
             reference = Reference.get_link(entity, external)

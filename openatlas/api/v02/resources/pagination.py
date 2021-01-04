@@ -9,7 +9,8 @@ from openatlas.models.entity import Entity
 class Pagination:
 
     @staticmethod
-    def pagination(entities: List[Entity], parser: Dict[str, Any]):
+    def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[
+        str, List[Dict[str, Any]]]:
         index = []
         total = []
         for e in entities:
