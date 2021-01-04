@@ -52,7 +52,8 @@ errors = {
         "status": 404
     },
     "InvalidSearchDateError": {
-        "message": "The search term must be a valid date e.g. 2020-01-01. A valid date contains yyyy-mm-dd.",
+        "message": "The search term must be a valid date e.g. 2020-01-01."
+                   " A valid date contains yyyy-mm-dd.",
         "status": 404
     },
     "InvalidSearchNumberError": {
@@ -72,7 +73,8 @@ errors = {
         "status": 404
     },
     "InvalidCodeError": {
-        "message": "The code is not valid. Valid codes are: actor, event, place, source, reference and object. For further usage, please confer the help page.",
+        "message": "The code is not valid. Valid codes are: actor, event, place, source, reference"
+                   " and object. For further usage, please confer the help page.",
         "status": 404
     },
     "NoSearchStringError": {

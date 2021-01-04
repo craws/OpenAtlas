@@ -134,7 +134,8 @@ template = {
       "showParam": {
         "name": "show",
         "in": "query",
-        "description": "Select which key should be shown e.g. when, types, relations, names, links, geometry, depictions, not",
+        "description": "Select which key should be shown e.g. when, types, relations, names, links,"
+                       " geometry, depictions, not",
         "schema": {
           "type": "string",
           "enum": [
@@ -456,7 +457,7 @@ template = {
 }
 
 api = Api(app, catch_all_404s=False, errors=errors)  # Establish connection between API and APP
-#swagger = Swagger(app, parse=False, template_file="static/swagger/Swagger.json")
+# swagger = Swagger(app, parse=False, template_file="static/swagger/Swagger.json")
 swagger = Swagger(app, parse=False, template=template)
 
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')

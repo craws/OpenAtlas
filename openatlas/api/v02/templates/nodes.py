@@ -1,13 +1,13 @@
-from typing import Dict, Type
+from typing import Dict
 
 from flask_restful import fields
-from flask_restful.fields import String
+from flask_restful.fields import List as RestList
 
 
 class NodeTemplate:
 
     @staticmethod
-    def node_template() -> Dict[str, Type[String]]:
+    def node_template() -> Dict[str, RestList]:
         node_json = {'id': fields.Integer,
                      'label': fields.String,
                      'url': fields.String}

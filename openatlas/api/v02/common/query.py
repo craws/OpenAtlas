@@ -38,7 +38,4 @@ class GetQuery(Resource):
             return jsonify(output['pagination'][0]['entities'])
         if parser['download']:
             return Download.download(data=entities, template=template, name='query')
-
-
-
         return marshal(output, template), 200
