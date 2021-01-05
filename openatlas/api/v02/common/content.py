@@ -1,6 +1,7 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 from flasgger import swag_from
+from flask import Response
 from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
@@ -12,11 +13,11 @@ from openatlas.models.content import Content
 from openatlas.util.util import api_access
 
 
-class GetContent(Resource): # type: ignore
+class GetContent(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/content.yml", endpoint="content")
-    def get(self) -> Tuple[Resource, int]:
+    def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = language_parser.parse_args()
         content = {'intro': Content.get_translation('intro_for_frontend', parser['lang']),
                    'contact': Content.get_translation('contact_for_frontend', parser['lang']),

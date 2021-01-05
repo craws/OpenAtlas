@@ -14,7 +14,7 @@ class Download:
     def download(data: Union[List[Dict[str, Any]], Dict[str, Any], List[Entity]],
                  template: Union[
                      Dict[str, Type[String]], Dict[str, RestList], Dict[str, List[str]]],
-                 name: Union[str, int]) -> Union[Tuple[Any, int], Response]:
+                 name: Union[str, int]) -> Response:
         return Response(json.dumps(marshal(data, template)),
                         mimetype='application/json',
                         headers={

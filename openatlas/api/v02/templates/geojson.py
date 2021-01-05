@@ -42,14 +42,6 @@ class GeoJson:
 
         when = {'timespans': fields.List(fields.Nested(timespans))}
 
-        # geometries = {'type': fields.String,
-        #               'coordinates': fields.List(fields.Float),
-        #               'title': fields.String,
-        #               'description': fields.String}
-        #
-        # geometry = {'type': fields.String,
-        #             'geometries': fields.Nested(geometries)}
-
         feature = {'@id': fields.String,
                    'type': fields.String,
                    'crmClass': fields.String,

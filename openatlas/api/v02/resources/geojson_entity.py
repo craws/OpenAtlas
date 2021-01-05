@@ -189,7 +189,7 @@ class GeoJsonEntity:
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
         elif 'geometry' in parser['show'] and entity.class_.code == 'E18':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(
-                Link.get_linked_entity(entity.id, 'P53'))
+                Link.get_linked_entity(entity.id, 'P53'))  # type: ignore
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],

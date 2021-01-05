@@ -23,7 +23,8 @@ class Filter:
                                          'end_to': 'e.end_to', 'end_from': 'e.end_from'}
 
     @staticmethod
-    def get_filter(parameters: Dict[str, Tuple[Union[str, Any]]], parser: Dict[str, Any]) -> str:
+    def get_filter(parameters: Dict[str, Tuple[Union[str, Any], ...]],
+                   parser: Dict[str, Any]) -> str:
         clause = ""
         filters = Filter.validate_filter(parser['filter'])
         for filter_ in filters:

@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
-from flask import g, jsonify, url_for
+from flask import Response, g, jsonify, url_for
 from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
@@ -13,11 +13,11 @@ from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.util.util import api_access
 
 
-class GetNodeEntitiesAll(Resource): # type: ignore
+class GetNodeEntitiesAll(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/nodes.yml", endpoint="node_entities_all")
-    def get(self, id_: int) -> Tuple[Resource, int]:
+    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetNodeEntitiesAll.get_node_all(id_)}
         template = NodeTemplate.node_template()

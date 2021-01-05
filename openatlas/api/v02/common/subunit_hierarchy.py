@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from flasgger import swag_from
-from flask import jsonify, url_for
+from flask import Response, jsonify, url_for
 from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
@@ -15,11 +15,11 @@ from openatlas.models.place import get_structure
 from openatlas.util.util import api_access
 
 
-class GetSubunitHierarchy(Resource): # type: ignore
+class GetSubunitHierarchy(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/nodes.yml", endpoint="subunit_hierarchy")
-    def get(self, id_: int) -> Tuple[Resource, int]:
+    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)}
         template = NodeTemplate.node_template()

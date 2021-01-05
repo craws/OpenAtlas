@@ -1,7 +1,7 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 from flasgger import swag_from
-from flask import jsonify
+from flask import Response, jsonify
 from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
@@ -17,11 +17,11 @@ from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.util.util import api_access
 
 
-class GetQuery(Resource): # type: ignore
+class GetQuery(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/query.yml", endpoint="query")
-    def get(self, ) -> Tuple[Resource, int]:
+    def get(self) -> Union[Tuple[Resource, int], Response]:
         entities = []
         parser = query_parser.parse_args()
         if not parser['entities'] and not parser['items'] and not parser['classes']:

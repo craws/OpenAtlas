@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
-from flask import g, jsonify
+from flask import Response, g, jsonify
 from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
@@ -16,11 +16,11 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import api_access
 
 
-class GetByClass(Resource): # type: ignore
+class GetByClass(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/class.yml", endpoint="class")
-    def get(self, class_code: str) -> Tuple[Resource, int]:
+    def get(self, class_code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, parser=parser),
