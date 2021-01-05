@@ -1,6 +1,6 @@
 from typing import Dict, Tuple, Union
 
-from flask import flash, g, jsonify, render_template, request, session, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -10,8 +10,6 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.api.v01.error import APIError
-
 from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
@@ -135,13 +133,6 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
-
-
-@app.errorhandler(APIError)
-def handle_api_error(error: APIError) -> Tuple[Dict[str, str], int]:
-    response = jsonify(error.to_dict())
-    response.status_code = response.status_code
-    return response
 
 
 @app.route('/changelog')

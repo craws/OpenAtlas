@@ -47,7 +47,7 @@ class GetSubunitHierarchy(Resource):  # type: ignore
         if structure and structure['subunits']:
             for n in structure['subunits']:
                 data.append({'id': n.id, 'label': n.name,
-                             'url': url_for('api_entity', id_=n.id, _external=True)})
+                             'url': url_for('entity', id_=n.id, _external=True)})
         node = get_structure(entity)
         if node:
             for sub_id in node['subunits']:
