@@ -32,7 +32,7 @@ more knowledge about server administration.
 
 ### Files
 
-Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
+Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub and adapt accordingly e.g.
 
     $ git clone https://github.com/craws/OpenAtlas.git
 
@@ -135,8 +135,6 @@ As postgres
 Copy instance/example_testing.py to instance/testing.py and add/change values as appropriate.
 
     $ cp instance/example_testing.py instance/testing.py
-
-
 
 If using PyCharm, create a Nosetest and use these parameters for tests with coverage and HTML report:
 

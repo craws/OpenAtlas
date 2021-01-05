@@ -12,7 +12,6 @@ from openatlas.models.entity import Entity
 
 
 class Node(Entity):
-
     count = 0
     count_subs = 0
     locked = False
@@ -78,10 +77,10 @@ class Node(Entity):
             FROM web.hierarchy h;"""
         g.execute(sql)
         hierarchies = {row.id: row for row in g.cursor.fetchall()}
-        for id_, node in nodes.items():
+        for node in nodes.values():
             if node.root:
                 super_ = nodes[node.root[0]]
-                super_.subs.append(id_)
+                super_.subs.append(node.id)
                 node.root = Node.get_root_path(nodes, node, node.root[0], node.root)
                 node.standard = False
                 node.locked = nodes[node.root[0]].locked
@@ -107,14 +106,15 @@ class Node(Entity):
 
     @staticmethod
     def get_nodes(name: str) -> List[int]:
-        for id_, node in g.nodes.items():
+        for node in g.nodes.values():
             if node.name == name and not node.root:
                 return node.subs
         return []
 
     @staticmethod
     def get_hierarchy(name: str) -> Node:
-        return [root for id_, root in g.nodes.items() if root.name == name.replace('_', ' ')][0]
+        return [root for root in g.nodes.values() if
+                root.name == name.replace('_', ' ') and not root.root][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> List[Dict[str, Any]]:
@@ -202,7 +202,7 @@ class Node(Entity):
 
     @staticmethod
     def get_node_orphans() -> List[Node]:
-        return[n for key, n in g.nodes.items() if n.root and n.count < 1 and not n.subs]
+        return [n for key, n in g.nodes.items() if n.root and n.count < 1 and not n.subs]
 
     @staticmethod
     def move_entities(old_node: Node, new_type_id: int, checkbox_values: str) -> None:
@@ -279,7 +279,7 @@ class Node(Entity):
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
-                sql_where='e.system_type =' if system_type else 'e.class_code IN')
+            sql_where='e.system_type =' if system_type else 'e.class_code IN')
         g.execute(sql, {'node_ids': tuple(node_ids),
                         'params': system_type if system_type else tuple(class_code)})
         return g.cursor.fetchone()[0]
