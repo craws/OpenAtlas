@@ -18,7 +18,6 @@ class GetEntity(Resource):  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/entity.yml", endpoint="entity")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
-        print("here")
         parser = entity_parser.parse_args()
         entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), parser)
         template = GeoJson.geojson_template(parser['show'])

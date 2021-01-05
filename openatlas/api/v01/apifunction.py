@@ -29,7 +29,6 @@ class Api:
                           'relationType': 'crm:' + link.property.code + '_'
                                           + link.property.i18n['en'].replace(' ', '_')})
 
-
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
@@ -167,7 +166,6 @@ class Api:
         if 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)
 
-
         # Types
         if 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
@@ -195,7 +193,8 @@ class Api:
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
             features['geometry'] = Api.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.class_.code == 'E18':
-            features['geometry'] = Api.get_geom_by_entity(Link.get_linked_entity(entity.id, 'P53'))
+            features['geometry'] = Api.get_geom_by_entity(
+                Link.get_linked_entity(entity.id, 'P53'))  # type: ignore
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],

@@ -24,14 +24,14 @@ class GetQuery(Resource):  # type: ignore
     def get(self) -> Union[Tuple[Resource, int], Response]:
         entities = []
         parser = query_parser.parse_args()
-        if not parser['entities'] and not parser['items'] and not parser['classes']:
+        if not parser['entities'] and not parser['codes'] and not parser['classes']:
             raise QueryEmptyError
         template = GeoJson.pagination(parser['show'])
         if parser['entities']:
             for entity in parser['entities']:
                 entities.append(GeoJsonEntity.get_entity_by_id(entity))
-        if parser['items']:
-            for item in parser['items']:
+        if parser['codes']:
+            for item in parser['codes']:
                 entities.extend(GetByCode.get_entities_by_menu_item(code_=item, parser=parser))
         if parser['classes']:
             for class_ in parser['classes']:
@@ -40,5 +40,5 @@ class GetQuery(Resource):  # type: ignore
         if parser['count']:
             return jsonify(output['pagination'][0]['entities'])
         if parser['download']:
-            return Download.download(data=entities, template=template, name='query')
+            return Download.download(data=output, template=template, name='query')
         return marshal(output, template), 200

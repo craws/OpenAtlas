@@ -20,17 +20,17 @@ class GetByCode(Resource):  # type: ignore
     @api_access()  # type: ignore
     @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/code.yml", endpoint="code")
-    def get(self, item: str) -> Union[Tuple[Resource, int], Response]:
+    def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
-        code = Pagination.pagination(
-            GetByCode.get_entities_by_menu_item(code_=item, parser=parser),
+        code_ = Pagination.pagination(
+            GetByCode.get_entities_by_menu_item(code_=code, parser=parser),
             parser=parser)
         template = GeoJson.pagination(parser['show'])
         if parser['count']:
-            return jsonify(code['pagination'][0]['entities'])
+            return jsonify(code_['pagination'][0]['entities'])
         if parser['download']:
-            return Download.download(data=code, template=template, name=item)
-        return marshal(code, template), 200
+            return Download.download(data=code_, template=template, name=code)
+        return marshal(code_, template), 200
 
     @staticmethod
     def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:

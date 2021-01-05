@@ -466,7 +466,7 @@ api.add_resource(ShowUsage, '/api/0.2/', '/api/0.2/entity/', '/api/0.2/class/', 
                  '/api/0.2/subunit/', '/api/0.2/subunit_hierarchy/', endpoint='usage')
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")
-api.add_resource(GetByCode, '/api/0.2/code/<string:item>', endpoint="code")
+api.add_resource(GetByCode, '/api/0.2/code/<string:code>', endpoint="code")
 api.add_resource(GetContent, '/api/0.2/content/', endpoint="content")
 api.add_resource(GetLatest, '/api/0.2/latest/<int:latest>', endpoint="latest")
 api.add_resource(GetNodeEntities, '/api/0.2/node_entities/<int:id_>', endpoint="node_entities")

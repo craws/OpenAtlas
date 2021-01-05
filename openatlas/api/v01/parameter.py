@@ -79,12 +79,11 @@ class Validation:
     @staticmethod
     def validate_term(filter_: List[str]) -> Union[int, str]:
         # Check if search term is a valid date if needed
-        if Default.column_validation[filter_[1]] in Default.date_column_validation.values():
-            try:
-                datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
-            except:
-                raise APIError('Invalid search term: ' + filter_[3], status_code=404,
-                               payload="404k")
+        try:
+            datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
+        except:
+            raise APIError('Invalid search term: ' + filter_[3], status_code=404,
+                           payload="404k")
         # Check if search term is an integer if column is id
         if Default.column_validation[filter_[1]] == 'e.id':
             try:
