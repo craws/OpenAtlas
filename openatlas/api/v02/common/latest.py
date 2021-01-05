@@ -33,7 +33,7 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
-        if 1 < limit_ < 101:
+        if 0 < limit_ < 101:
             for entity in Entity.get_latest(limit_):
                 entities.append(GeoJsonEntity.get_entity(entity, parser))
             return entities

@@ -80,10 +80,12 @@ class ApiTests(TestBaseCase):
             assert b'Asgard' in rv.data
 
             # Path Tests
-            rv = self.app.get(url_for('api_index'))
-            assert b'Test API' in rv.data
+            rv = self.app.get(url_for('usage'))
+            assert b'message' in rv.data
             rv = self.app.get(url_for('latest', latest=10))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('latest', count=True, latest=1))
+            assert b'1' in rv.data
             rv = self.app.get(url_for('entity', id_=place_id))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference'))

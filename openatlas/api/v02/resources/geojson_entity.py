@@ -100,7 +100,7 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
-        if entity.class_.code != 'E53':
+        if entity.class_.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -159,7 +159,7 @@ class GeoJsonEntity:
             features['description'] = [{'value': entity.description}]
 
         # Alias
-        if entity.aliases and 'names' in parser['show']:
+        if entity.aliases and 'names' in parser['show']:  # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})

@@ -19,7 +19,7 @@ class ShowUsage(Resource):  # type: ignore
             'message': 'The path you entered is not correct.',
             'examples':
                 {'entity': url_for('entity', id_=23, _external=True),
-                 'code': url_for('code', item='actor', _external=True),
+                 'code': url_for('code', code='actor', _external=True),
                  'class': url_for('class', class_code='E18', _external=True),
                  'query': url_for('query', classes='E18', items='actor', entities=23,
                                   _external=True),
