@@ -11,4 +11,4 @@ responses:
         schema:
           $ref: '#/components/schemas/ContentModel'
   '404':
-    description: not found
+    description: Something went wrong. Please consult the error message.

@@ -33,7 +33,7 @@
       "limitParam": {
         "name": "limit",
         "in": "query",
-        "description": "Number of geojson representation to be returned",
+        "description": "Number of entities to be returned",
         "schema": {
           "type": "number"
         }
@@ -41,7 +41,7 @@
       "columnParam": {
         "name": "column",
         "in": "query",
-        "description": "The result will sorted by the given column",
+        "description": "The result will be sorted by the given column",
         "schema": {
           "type": "string",
           "enum": [
@@ -62,7 +62,7 @@
       "sortParam": {
         "name": "sort",
         "in": "query",
-        "description": "Result will be sorted asc/desc (by default by the name column)",
+        "description": "Result will be sorted asc/desc (default column is name)",
         "schema": {
           "type": "string",
           "enum": [
@@ -74,7 +74,7 @@
       "filterParam": {
         "name": "filter",
         "in": "query",
-        "description": "Specify request with custom SQL filter method",
+        "description": "Specify request with custom SQL filter method. ",
         "schema": {
           "type": "string"
         }
@@ -114,7 +114,7 @@
       "showParam": {
         "name": "show",
         "in": "query",
-        "description": "Select which key should be shown e.g. when, types, relations, names, links, geometry, depictions, not",
+        "description": "Select which key should be shown. If 'not' is used, no other keys will be shown",
         "schema": {
           "type": "string",
           "enum": [
