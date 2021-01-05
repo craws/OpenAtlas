@@ -33,7 +33,7 @@
       "limitParam": {
         "name": "limit",
         "in": "query",
-        "description": "Number of entities to be returned",
+        "description": "Number of entities returned per page",
         "schema": {
           "type": "number"
         }
