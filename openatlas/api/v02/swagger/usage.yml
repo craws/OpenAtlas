@@ -1,0 +1,14 @@
+Usage endpoint
+---
+tags:
+  - Usage
+summary: Shows a summary of API options
+responses:
+  '200':
+    description: List of API Options
+    content:
+      application/ld+json:
+        schema:
+          $ref: '#/components/schemas/ContentModel'
+  '404':
+    description: not found

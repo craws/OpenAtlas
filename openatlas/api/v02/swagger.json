@@ -157,6 +157,17 @@
           }
         }
       },
+      "UsageModel": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "examples": {
+            "type": "string"
+          }
+        }
+      },
       "NodeModel": {
         "type": "object",
         "properties": {
