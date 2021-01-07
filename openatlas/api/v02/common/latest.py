@@ -19,7 +19,7 @@ class GetLatest(Resource):  # type: ignore
     def get(self, latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination
-        entities = {"geojson": GetLatest.get_entities_get_latest(latest, parser)}
+        entities = {"result": GetLatest.get_entities_get_latest(latest, parser)}
         template = GeoJson.pagination(parser['show'])
         if parser['count']:
             return jsonify(len(entities))

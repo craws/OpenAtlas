@@ -13,4 +13,12 @@ was used as standard.
 The API links in the user interface are only visible for user with activated **advanced layout** in
 their :doc:`profile` but any logged in user has access to the API.
 
+The base url of the current OpenAtlas API is :doc:`/api/0.2/`
+
 Settings: :doc:`/admin/api`
+
+Documentation: :doc:`/apidocs`
+
+
+
+

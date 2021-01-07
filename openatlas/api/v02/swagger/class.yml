@@ -2,11 +2,11 @@ Classes endpoint
 ---
 tags:
   - Entities
-summary: Retrieves a list of Geojson representations for a specific CIDOC CRM class code
+description: Retrieves a json with a list of entities based on their CIDOC CRM class code. The json contains a **result** and **pagination** key. All in OpenAtlas available codes can be found under `https://redmine.craws.net/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping`. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
     name: class_code
-    description: Need to be a entity class code of the CIDOC CRM (e.g. E21, E18, E33). For further information visit https://redmine.craws.net/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping
+    description: Need to be a valid CIDOC CRM class code (e.g. E21, E18, E33)
     required: true
     schema:
       type: string
@@ -21,7 +21,7 @@ parameters:
   - $ref: '#/components/parameters/downloadParam'
 responses:
   '200':
-    description: A dictionary with a result dictionary and pagination information
+    description: A json with a list of results and pagination information
     content:
       application/ld+json:
         schema:

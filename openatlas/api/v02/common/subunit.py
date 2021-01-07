@@ -15,7 +15,7 @@ from openatlas.util.util import api_access
 
 class GetSubunit(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @swag_from("../swagger/nodes.yml", endpoint="subunit")
+    @swag_from("../swagger/subunit.yml", endpoint="subunit")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetSubunit.get_subunits(id_)}

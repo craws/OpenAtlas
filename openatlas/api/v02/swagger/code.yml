@@ -2,11 +2,11 @@ Code endpoint
 ---
 tags:
   - Entities
-summary: Retrieves a list of Geojson representations covert by a menu item
+description: Retrieves a json with a list of entities based on their OpenAtlas categorie. Available categories are **actor**, **event**, **place**, **source**, **reference**, **object**. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
     name: code
-    description: Need to be an OpenAtlas menu items
+    description: Need to be an OpenAtlas menu item
     required: true
     schema:
       type: string

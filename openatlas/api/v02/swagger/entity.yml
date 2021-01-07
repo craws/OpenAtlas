@@ -2,7 +2,7 @@ Entity endpoint
 ---
 tags:
   - Entities
-summary: Retrieves a geojson representations of an entity
+description: Retrieves a geojson representations of an entity through the **id**.
 parameters:
   - in: path
     name: id_
