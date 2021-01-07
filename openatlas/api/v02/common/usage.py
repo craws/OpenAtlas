@@ -2,17 +2,14 @@ from typing import Tuple, Union
 
 from flasgger import swag_from
 from flask import Response, url_for
-from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
-from openatlas import app
 from openatlas.api.v02.templates.usage import UsageTemplate
 from openatlas.util.util import api_access
 
 
 class ShowUsage(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/usage.yml", endpoint="usage")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         usage = {

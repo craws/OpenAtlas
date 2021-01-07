@@ -7,6 +7,7 @@ from typing import Any, Dict, Optional
 import psycopg2.extras
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
+from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect
 
 app: Flask = Flask(__name__, instance_relative_config=True)

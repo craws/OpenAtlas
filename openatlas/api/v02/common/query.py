@@ -2,10 +2,8 @@ from typing import Tuple, Union
 
 from flasgger import swag_from
 from flask import Response, jsonify
-from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
-from openatlas import app
 from openatlas.api.v02.common.class_ import GetByClass
 from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.resources.download import Download
@@ -19,7 +17,6 @@ from openatlas.util.util import api_access
 
 class GetQuery(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/query.yml", endpoint="query")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         entities = []

@@ -2,10 +2,8 @@ from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
 from flask import Response, g, jsonify, url_for
-from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
-from openatlas import app
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidSubunitError
 from openatlas.api.v02.resources.parser import default_parser
@@ -15,7 +13,6 @@ from openatlas.util.util import api_access
 
 class GetNodeEntitiesAll(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/nodes.yml", endpoint="node_entities_all")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()

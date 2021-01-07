@@ -2,10 +2,8 @@ from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
 from flask import Response, jsonify
-from flask_cors import cross_origin
 from flask_restful import Resource, marshal
 
-from openatlas import app
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCodeError
 from openatlas.api.v02.resources.pagination import Pagination
@@ -18,7 +16,6 @@ from openatlas.util.util import api_access
 
 class GetByCode(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
     @swag_from("../swagger/code.yml", endpoint="code")
     def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
