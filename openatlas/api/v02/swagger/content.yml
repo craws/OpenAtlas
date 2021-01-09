@@ -1,0 +1,17 @@
+Content endpoint
+---
+tags:
+  - Content
+summary: Retrieves the content (Intro, Legal Notice and Contact) of an OpenAtlas instance
+parameters:
+  - $ref: '#/components/parameters/langParam'
+  - $ref: '#/components/parameters/downloadParam'
+responses:
+  '200':
+    description: List of OpenAtlas content (Intro, Legal Notice and Contact)
+    content:
+      application/ld+json:
+        schema:
+          $ref: '#/components/schemas/ContentModel'
+  '404':
+    description: Something went wrong. Please consult the error message.

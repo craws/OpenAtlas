@@ -213,11 +213,11 @@ def add_system_data(entity: 'Entity',
                 data['origin ID'] = info['import_origin_id']
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
         data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('api_entity', id_=entity.id))
+            url=url_for('entity', id_=entity.id))
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
-            </a>'''.format(url=url_for('api_download_entity', id_=entity.id),
+            </a>'''.format(url=url_for('entity', id_=entity.id, download=True),
                            label=uc_first('download'))
         data['API'] = data_api
     return data

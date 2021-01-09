@@ -16,7 +16,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.api.error import APIError
+from openatlas.api.v02.resources.error import AccessDeniedError
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -94,7 +94,7 @@ def api_access():  # type: ignore
             # Raise error if 1. User not logged in 2. API is NOT public 3. IP is not in whitelist
             if not current_user.is_authenticated and not session['settings']['api_public'] \
                     and ip not in app.config['ALLOWED_IPS']:
-                raise APIError('Access denied.', status_code=403, payload="403")  # pragma: no cover
+                raise AccessDeniedError
             return f(*args, **kwargs)
 
         return wrapped

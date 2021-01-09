@@ -30,10 +30,15 @@ from openatlas.models.logger import Logger
 logger = Logger()
 
 from openatlas.util import filters, processor
-from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
+from openatlas.views import (actor, admin, ajax, entity, event, export, file, hierarchy, index,
                              involvement, imports, link, login, member, model, note, object,
-                             overlay, place, profile, reference, reference_system, relation,
+                             overlay, place, profile, reference, relation, reference_system,
                              search, source, sql, translation, types, user)
+
+#  Restful API import
+from openatlas.api import util  # contains routes for each version
+from openatlas.api.v02 import routes  # New routes
+from openatlas.api.v02.resources import parser
 
 
 @babel.localeselector
@@ -112,7 +117,6 @@ def teardown_request(exception: Any) -> None:
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()

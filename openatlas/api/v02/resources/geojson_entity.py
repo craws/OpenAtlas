@@ -4,14 +4,14 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.error import APIError
+from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference import Reference
 from openatlas.util.display import format_date, get_file_path
 
 
-class Api:
+class GeoJsonEntity:
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
@@ -21,20 +21,19 @@ class Api:
         return words[0] + ''.join(x.title() for x in words[1:])
 
     @staticmethod
-    def get_links(entity: Entity) -> List[Dict[str, str]]:
+    def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
-                          'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
+                          'relationTo': url_for('entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
                                           + link.property.i18n['en'].replace(' ', '_')})
-
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
-                          'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
+                          'relationTo': url_for('entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
-        return links
+        return links if links else None
 
     @staticmethod
     def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
@@ -42,9 +41,9 @@ class Api:
         for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
-                files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
+                files.append({'@id': url_for('entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id),
+                              'license': GeoJsonEntity.get_license(link.domain.id),
                               'url': url_for('display_file_api',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
@@ -59,10 +58,10 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_node(entity: Entity) -> Optional[List[Dict[str, str]]]:
+    def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         nodes = []
         for node in entity.nodes:
-            nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
+            nodes_dict = {'identifier': url_for('entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:  # pragma: nocover
@@ -78,11 +77,10 @@ class Api:
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
-
         return nodes if nodes else None
 
     @staticmethod
-    def get_time(entity: Entity) -> Dict[str, Any]:
+    def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
         time = {}
         if entity.begin_from:
             start = {'earliest': format_date(entity.begin_from)}
@@ -98,23 +96,23 @@ class Api:
             if entity.end_comment:
                 end['comment'] = entity.end_comment
             time['end'] = end
-        return time
+        return time if time else None
 
     @staticmethod
-    def get_geom_by_entity(entity: Entity) -> Union[Dict[str, Any], str]:
+    def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
         if entity.class_.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
             sql = """
-                    SELECT
-                        {shape}.id,
-                        {shape}.name,
-                        {shape}.description,
-                        public.ST_AsGeoJSON({shape}.geom) AS geojson
-                    FROM model.entity e
-                    JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
-                    WHERE e.id = %(entity_id)s;""".format(shape=shape)
+                     SELECT
+                         {shape}.id,
+                         {shape}.name,
+                         {shape}.description,
+                         public.ST_AsGeoJSON({shape}.geom) AS geojson
+                     FROM model.entity e
+                     JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
+                     WHERE e.id = %(entity_id)s;""".format(shape=shape)
             g.execute(sql, {'entity_id': entity.id})
             for row in g.cursor.fetchall():
                 test = ast.literal_eval(row.geojson)
@@ -134,66 +132,64 @@ class Api:
             reference = Reference.get_link(entity, external)
             if reference:
                 ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
-                            'type': Api.to_camelcase(reference.type.name)})
+                            'type': GeoJsonEntity.to_camelcase(reference.type.name)})
         return ref if ref else None
 
     @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
         try:
-            int(id_)
-        except Exception:
-            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
-        try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
-                           payload="404a")
+        # Todo: get_by_id return an abort if id does not exist... I don't get to the exception
+        except EntityDoesNotExistError:
+            raise EntityDoesNotExistError
         return entity
 
     @staticmethod
-    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
                     'crmClass': "crm:" + class_code,
-                    'properties': {'title': entity.name},
-                    'description': [{'value': entity.description}]
-                    }
+                    'properties': {'title': entity.name}}
 
-        # Relations
-        if 'relations' in meta['show']:
-            features['relations'] = Api.get_links(entity)
-
-        # Types
-        if 'types' in meta['show']:
-            features['types'] = Api.get_node(entity)
+        # Descriptions
+        if entity.description:
+            features['description'] = [{'value': entity.description}]
 
         # Alias
-        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
+        if entity.aliases and 'names' in parser['show']:  # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
+        # Relations
+        features['relations'] = GeoJsonEntity.get_links(entity) if 'relations' in parser[
+            'show'] else None
+
+        # Types
+        features['types'] = GeoJsonEntity.get_node(entity) if 'types' in parser['show'] else None
+
         # Depictions
-        if 'depictions' in meta['show']:  # pragma: nocover
-            features['depictions'] = Api.get_file(entity)
+        features['depictions'] = GeoJsonEntity.get_file(entity) if 'depictions' in parser[
+            'show'] else None
 
         # Time spans
-        if 'when' in meta['show']:
-            if entity.begin_from or entity.end_from:
-                features['when'] = {'timespans': [Api.get_time(entity)]}
+        if entity.begin_from or entity.end_from:
+            features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
+                'show'] else None
 
         # Geonames
-        if 'geonames' in meta['show']:
-            features['links'] = Api.get_external(entity)
+        features['links'] = GeoJsonEntity.get_external(entity) if 'links' in parser[
+            'show'] else None
 
         # Geometry
-        if 'geometry' in meta['show'] and entity.class_.code == 'E53':
-            features['geometry'] = Api.get_geom_by_entity(entity)
-        elif 'geometry' in meta['show'] and entity.class_.code == 'E18':
-            features['geometry'] = Api.get_geom_by_entity(Link.get_linked_entity(entity.id, 'P53'))
+        if 'geometry' in parser['show'] and entity.class_.code == 'E53':
+            features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
+        elif 'geometry' in parser['show'] and entity.class_.code == 'E18':
+            features['geometry'] = GeoJsonEntity.get_geom_by_entity(
+                Link.get_linked_entity(entity.id, 'P53'))  # type: ignore
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],

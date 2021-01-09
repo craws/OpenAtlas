@@ -60,7 +60,7 @@ forms = {'actor_actor_relation': ['date', 'description', 'continue'],
 
 
 def build_form(name: str,
-               item: Optional[Union[Entity, Link]] = None,
+               item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
                code: Optional[str] = None,
                origin: Optional[Entity] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -158,11 +158,8 @@ def customize_labels(name: str, form: FlaskForm) -> None:
         form.description.label.text = _('content')
 
 
-def add_buttons(form: Any,
-                name: str,
-                entity: Optional[Entity],
-                origin: Optional[Entity]) -> None:
-    setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
+def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
+    setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
     if entity:
         return form
     if 'continue' in forms[name] and (name in ['involvement'] or not origin):
