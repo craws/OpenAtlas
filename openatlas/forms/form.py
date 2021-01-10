@@ -6,10 +6,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm, widgets
 from flask_wtf.csrf import generate_csrf
-from wtforms import (BooleanField, FieldList, FileField, HiddenField, IntegerField, SelectField,
+from wtforms import (BooleanField, FieldList, FileField, HiddenField, SelectField,
                      SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -21,7 +20,6 @@ from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.reference import Reference
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
@@ -83,7 +81,6 @@ def build_form(name: str,
     code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name, code)
     add_fields(Form, name, code, item, origin)
-    add_external_references(Form, name)
     if 'reference_systems' in forms[name]:
         add_reference_systems(Form, name)
     if 'date' in forms[name]:
@@ -128,15 +125,6 @@ def populate_form(name: str,
     for root_id, nodes_ in node_data.items():
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = nodes_
-
-    # External references
-    for name_ in g.external:
-        if hasattr(form, name_ + '_id') and current_user.settings['module_' + name_]:
-            link_ = Reference.get_link(item, name_)
-            if link_ and not getattr(form, name_ + '_id').data:
-                reference = link_.domain
-                getattr(form, name_ + '_id').data = reference.name if reference else ''
-                getattr(form, name_ + '_precision').data = g.nodes[link_.type.id].name
 
     # Reference systems
     if 'reference_systems' in forms[name]:
@@ -185,28 +173,6 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
 
 
 # TODO: this should probably go to a custom field in field.py
-def add_external_references(form: Any, form_name: str) -> None:
-    for name, ref in g.external.items():
-        if name not in forms[form_name] or not current_user.settings['module_' + name]:
-            continue  # pragma: no cover, in tests all modules are activated
-        if name == 'geonames':
-            field = IntegerField(
-                ref['name'] + ' Id',
-                [OptionalValidator()],
-                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
-        else:
-            field = StringField(
-                ref['name'] + ' Id',
-                [OptionalValidator()],
-                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
-        setattr(form, name + '_id', field)
-        setattr(form,
-                name + '_precision',
-                SelectField(uc_first(_('precision')),
-                            choices=app.config['REFERENCE_PRECISION'],
-                            default='close match' if name == 'geonames' else ''))
-
-
 def add_reference_systems(form: Any, form_name: str) -> None:
     precisions = [('', '')]
     for id_ in Node.get_hierarchy('External Reference Match').subs:

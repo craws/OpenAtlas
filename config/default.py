@@ -37,18 +37,12 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # External References
+REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
 EXTERNAL_REFERENCES_FORMS = ['Event', 'Feature', 'Find', 'Group', 'Human_Remains', 'Legal Body',
                              'Person', 'Place', 'Stratigraphic Unit']
 
-# Will moved to db and be configurable in admin when more options (GeoNames URL already is in db)
-EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': '', 'placeholder': '1234567'},
-                       'wikidata': {'name': 'Wikidata',
-                                    'url': 'https://www.wikidata.org/entity/',
-                                    'placeholder': 'Q123'}}
-REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-
 # Modules
-MODULES = ['geonames', 'wikidata', 'map_overlay', 'notes', 'sub_units']
+MODULES = ['map_overlay', 'notes', 'sub_units']
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'

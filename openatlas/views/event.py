@@ -12,7 +12,6 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.reference import Reference
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
@@ -108,7 +107,6 @@ def save(form: FlaskForm,
         else:
             abort(400)  # pragma: no cover, either event or code has to be provided
         event.update(form)
-        Reference.update(form, event)
         ReferenceSystem.update_links(form, event)
         if form.event.data:
             event.link_string('P117', form.event.data)

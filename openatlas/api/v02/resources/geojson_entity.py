@@ -7,7 +7,6 @@ from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference import Reference
 from openatlas.util.display import format_date, get_file_path
 
 
@@ -126,16 +125,6 @@ class GeoJsonEntity:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_external(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
-        ref = []
-        for external in g.external:
-            reference = Reference.get_link(entity, external)
-            if reference:
-                ref.append({'identifier': g.external[external]['url'] + reference.domain.name,
-                            'type': GeoJsonEntity.to_camelcase(reference.type.name)})
-        return ref if ref else None
-
-    @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
@@ -180,9 +169,9 @@ class GeoJsonEntity:
             features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
                 'show'] else None
 
-        # Geonames
-        features['links'] = GeoJsonEntity.get_external(entity) if 'links' in parser[
-            'show'] else None
+        # Todo: adapt Geonames for new reference systems
+        # features['links'] = GeoJsonEntity.get_external(entity) if 'links' in parser[
+        #    'show'] else None
 
         # Geometry
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':

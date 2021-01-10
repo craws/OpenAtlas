@@ -13,7 +13,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
-from openatlas.models.reference import Reference
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
@@ -245,7 +244,6 @@ def save(form: FlaskForm,
             object_.link('P53', location)
         object_.update(form)
         location.update(form)
-        Reference.update(form, object_)
         ReferenceSystem.update_links(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
