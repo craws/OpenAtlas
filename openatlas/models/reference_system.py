@@ -50,6 +50,13 @@ class ReferenceSystem(Entity):
         g.execute(sql)
         return {row.id: ReferenceSystem(row) for row in g.cursor.fetchall()}
 
+    @staticmethod
+    def get_by_name(name: str) -> Union[ReferenceSystem, None]:
+        for system in g.reference_systems.values():
+            if system.name == name:
+                return system
+        return
+
     def add_forms(self, form: FlaskForm) -> None:
         for form_id in form.forms.data:
             sql = """

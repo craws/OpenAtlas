@@ -54,11 +54,11 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
 def place_insert(origin_id: Optional[int] = None,
                  system_type: Optional[str] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    geonames_buttons = False
+    geonames_module = False
     title = 'place'
     form = build_form('place', origin=origin)
     if not origin:
-        geonames_buttons = True if current_user.settings['module_geonames'] else False
+        geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
     elif origin.system_type == 'place':
         title = 'feature'
         form = build_form('feature', origin=origin)
@@ -85,7 +85,7 @@ def place_insert(origin_id: Optional[int] = None,
                            origin=origin,
                            structure=structure,
                            gis_data=gis_data,
-                           geonames_buttons=geonames_buttons,
+                           geonames_module=geonames_module,
                            overlays=overlays)
 
 
@@ -94,7 +94,7 @@ def place_insert(origin_id: Optional[int] = None,
 def place_update(id_: int) -> Union[str, Response]:
     object_ = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='place')
     location = object_.get_linked_entity_safe('P53', nodes=True)
-    geonames_buttons = False
+    geonames_module = False
     if object_.system_type == 'feature':
         form = build_form('feature', object_, location=location)
     elif object_.system_type == 'stratigraphic unit':
@@ -104,7 +104,7 @@ def place_update(id_: int) -> Union[str, Response]:
     elif object_.system_type == 'human remains':
         form = build_form('human_remains', object_, location=location)
     else:
-        geonames_buttons = True if current_user.settings['module_geonames'] else False
+        geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
         form = build_form('place', object_, location=location)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
@@ -129,7 +129,7 @@ def place_update(id_: int) -> Union[str, Response]:
                            structure=structure,
                            gis_data=Gis.get_all([object_], structure),
                            overlays=Overlay.get_by_object(object_),
-                           geonames_buttons=geonames_buttons)
+                           geonames_module=geonames_module)
 
 
 def place_view(obj: Entity) -> str:
