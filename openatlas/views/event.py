@@ -191,8 +191,6 @@ def event_view(event: Entity) -> str:
             if domain.view_name == 'reference_system':
                 event.reference_systems.append(link_)
                 continue
-            if domain.system_type and domain.system_type.startswith('external reference'):
-                event.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, event, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True) for location

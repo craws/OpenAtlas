@@ -63,7 +63,6 @@ class Entity:
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = ''  # Used to build URLs
-        self.external_references: List[Link] = []
         self.reference_systems: List[Link] = []
         if self.system_type == 'file':
             self.view_name = 'file'

@@ -489,7 +489,6 @@ def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_external_references(self: Any, entity: Entity) -> str:
-    """ Formats external references for display."""
     system_links = []
     for link_ in entity.reference_systems:
         system = g.reference_systems[link_.domain.id]
@@ -504,12 +503,6 @@ def display_external_references(self: Any, entity: Entity) -> str:
             at=_('at'),
             system_name= display.link(link_.domain)))
     html = '<br>'.join(system_links)
-    for link_ in entity.external_references:
-        url = link_.domain.name
-        name = display.truncate(url.replace('http://', '').replace('https://', ''), span=False)
-        if link_.description:
-            name = link_.description
-        html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     if not html:
         return ''
     return Markup('<h2>' + display.uc_first(_('external references')) + '</h2>' + html)

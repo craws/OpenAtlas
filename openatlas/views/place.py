@@ -175,8 +175,6 @@ def place_view(obj: Entity) -> str:
             if domain.view_name == 'reference_system':
                 obj.reference_systems.append(link_)
                 continue
-            if domain.system_type.startswith('external reference'):
-                obj.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles

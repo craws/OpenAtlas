@@ -145,8 +145,6 @@ def actor_view(actor: Entity) -> str:
             if domain.view_name == 'reference_system':
                 actor.reference_systems.append(link_)
                 continue
-            if domain.system_type.startswith('external reference'):
-                actor.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, actor, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
 

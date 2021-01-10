@@ -3,7 +3,7 @@
 
 BEGIN;
 
--- #1292: Reference systems
+-- #1292: Reference systems - add new structure and data
 CREATE TABLE web.reference_system (
     entity_id integer NOT NULL,
     name text NOT NULL,
@@ -70,5 +70,9 @@ INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Feature')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Stratigraphic Unit')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Find'));
+
+-- #1292: Reference systems - remove former reference systems entries
+DELETE FROM web.settings WHERE name in ('geonames_url', 'module_geonames', 'module_wikidata');
+DELETE FROM web.user_settings WHERE name in ('module_geonames', 'module_wikidata');
 
 COMMIT;
