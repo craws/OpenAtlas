@@ -29,7 +29,9 @@ class PlaceTest(TestBaseCase):
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
                     'geonames_precision': 'close match',
-                    unit_node.id: str([unit_sub1.id, unit_sub2.id])}
+                    unit_node.id: str([unit_sub1.id, unit_sub2.id]),
+                    self.precision_geonames: '',
+                    self.precision_wikidata: ''}
             rv = self.app.post(url_for('place_insert', origin_id=reference.id),
                                data=data,
                                follow_redirects=True)

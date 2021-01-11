@@ -11,7 +11,9 @@ class EventTest(TestBaseCase):
         with app.app_context():  # type: ignore
             # Create entities for event
             place_name = 'Lewis and Clark'
-            rv = self.app.post(url_for('place_insert'), data={'name': place_name})
+            rv = self.app.post(url_for('place_insert'), data={'name': place_name,
+                                                              self.precision_geonames: '',
+                                                              self.precision_wikidata: ''})
             residence_id = rv.location.split('/')[-1]
             actor_name = 'Captain Miller'
             event_name = 'Event Horizon'
@@ -27,7 +29,9 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
             data = {'name': event_name,
-                    'place': residence_id}
+                    'place': residence_id,
+                    self.precision_geonames: '',
+                    self.precision_wikidata: ''}
             rv = self.app.post(url_for('event_insert', code='E7', origin_id=reference.id),
                                data=data, follow_redirects=True)
             assert bytes(event_name, 'utf-8') in rv.data
@@ -52,7 +56,9 @@ class EventTest(TestBaseCase):
                                      'begin_year_from': '1949',
                                      'begin_month_from': '10',
                                      'begin_day_from': '8',
-                                     'end_year_from': '1951'})
+                                     'end_year_from': '1951',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             event_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=event_id))
             assert bytes(event_name, 'utf-8') in rv.data
@@ -63,7 +69,9 @@ class EventTest(TestBaseCase):
                                      'place_to': residence_id,
                                      'place_from': residence_id,
                                      'object': carrier.id,
-                                     'person': actor.id})
+                                     'person': actor.id,
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=move_id))
             assert b'Keep it moving' in rv.data
@@ -73,13 +81,19 @@ class EventTest(TestBaseCase):
             # Add another event and test if events are seen at place
             event_name3 = 'Third event'
             self.app.post(url_for('event_insert', code='E8'),
-                          data={'name': event_name3, 'given_place': [residence_id]})
+                          data={'name': event_name3,
+                                'given_place': [residence_id],
+                                self.precision_geonames: '',
+                                self.precision_wikidata: ''})
             rv = self.app.get(url_for('entity_view', id_=residence_id))
             assert bytes(place_name, 'utf-8') in rv.data
             rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert bytes(actor_name, 'utf-8') in rv.data
             rv = self.app.post(url_for('event_insert', code='E8'), follow_redirects=True,
-                               data={'name': event_name, 'continue_': 'yes'})
+                               data={'name': event_name,
+                                     'continue_': 'yes',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Event' in rv.data

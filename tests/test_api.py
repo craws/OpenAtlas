@@ -21,7 +21,8 @@ class ApiTests(TestBaseCase):
                                              "geometry":{"type":"Point","coordinates":[9,17]},
                                              "properties":{"name":"Valhalla","description":"",
                                              "shapeType":"centerpoint"}}]""",
-                                     })
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             place_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -43,6 +44,8 @@ class ApiTests(TestBaseCase):
                     'geonames_id': '123',
                     'geonames_precision': 'close match',
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
+                    self.precision_geonames: '',
+                    self.precision_wikidata: '',
                     'gis_points': """[{
                             "type":"Feature",
                             "geometry":{"type":"Point","coordinates":[9,17]},
