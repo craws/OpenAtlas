@@ -3,7 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from tests.base import TestBaseCase, random_string
+from tests.base import TestBaseCase
 
 
 class ActorTests(TestBaseCase):
@@ -13,7 +13,7 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
             # Create entities for actor
-            rv = self.app.post(url_for('place_insert'), data={'name': random_string()})
+            rv = self.app.post(url_for('place_insert'), data={'name': 'Captain Miller'})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

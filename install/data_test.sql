@@ -21,5 +21,5 @@ INSERT INTO web.i18n (name, language, text) VALUES ('citation_example', 'en', 'c
 INSERT INTO model.entity (class_code, name) VALUES ('E13', 'Invalid linked entity');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P86', (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'), (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'));
 
--- Remove after finishing external reference systems
+-- Remove external reference systems forms because they throw errors 'Not a valid choice' errors if not all of the precision field is set everytime
 TRUNCATE web.reference_system_form;

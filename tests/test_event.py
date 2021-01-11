@@ -2,7 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, random_string
+from tests.base import TestBaseCase
 
 
 class EventTest(TestBaseCase):
@@ -10,11 +10,11 @@ class EventTest(TestBaseCase):
     def test_event(self) -> None:
         with app.app_context():  # type: ignore
             # Create entities for event
-            place_name = random_string()
+            place_name = 'Lewis and Clark'
             rv = self.app.post(url_for('place_insert'), data={'name': place_name})
             residence_id = rv.location.split('/')[-1]
-            actor_name = random_string()
-            event_name = random_string()
+            actor_name = 'Captain Miller'
+            event_name = 'Event Horizon'
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', actor_name)
@@ -43,7 +43,7 @@ class EventTest(TestBaseCase):
             assert b'Location' not in rv.data
 
             # Acquisition
-            event_name2 = random_string(8)
+            event_name2 = 'Second event'
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': event_name2,
                                      'given_place': [residence_id],
@@ -71,7 +71,7 @@ class EventTest(TestBaseCase):
             assert b'Keep it moving' in rv.data
 
             # Add another event and test if events are seen at place
-            event_name3 = random_string()
+            event_name3 = 'Third event'
             self.app.post(url_for('event_insert', code='E8'),
                           data={'name': event_name3, 'given_place': [residence_id]})
             rv = self.app.get(url_for('entity_view', id_=residence_id))
