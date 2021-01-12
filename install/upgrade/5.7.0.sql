@@ -46,7 +46,9 @@ ALTER TABLE ONLY web.reference_system_form ADD CONSTRAINT reference_system_form_
 ALTER TABLE ONLY web.reference_system_form ADD CONSTRAINT reference_system_form_reference_system_id_fkey
     FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-INSERT INTO model.entity (name, class_code) VALUES ('GeoNames', 'E32'), ('Wikidata', 'E32');
+INSERT INTO model.entity (name, class_code, description) VALUES
+    ('GeoNames', 'E32', 'Geographical database covering all countries and many places.'),
+    ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.');
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES (true,
         'GeoNames',
@@ -68,7 +70,7 @@ INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Legal Body')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));
 
--- #1292: Reference systems - remove former reference systems entries
+-- #1292: Reference systems - remove former reference systems settings
 DELETE FROM web.settings WHERE name in ('geonames_url', 'module_geonames', 'module_wikidata');
 DELETE FROM web.user_settings WHERE name in ('module_geonames', 'module_wikidata');
 
