@@ -43,3 +43,6 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'The name is already in use.' in rv.data
             rv = self.app.get(url_for('reference_system_index', id_=geonames.id, action='delete'))
             assert b'Deletion not possible' in rv.data
+            rv = self.app.get(url_for('reference_system_remove_form', system_id=geonames.id, form_id=6),
+                              follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
