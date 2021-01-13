@@ -407,7 +407,6 @@ def display_form(self: Any,
                                                           str(precision_field.label),
                                                           str(precision_field)]))
             continue
-
         html += add_row(field, form_id=form_id)
 
     return Markup("""

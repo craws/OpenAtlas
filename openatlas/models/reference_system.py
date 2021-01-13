@@ -55,7 +55,7 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
-        return
+        return  # pragma: no cover
 
     def add_forms(self, form: FlaskForm) -> None:
         for form_id in form.forms.data:
@@ -82,7 +82,7 @@ class ReferenceSystem(Entity):
         self.update(form)
         precision_default_id = None
         entity_with_updated_nodes = Entity.get_by_id(self.id, nodes=True)
-        if entity_with_updated_nodes.nodes:
+        if entity_with_updated_nodes.nodes:  # Get default precision id if it was set
             precision_default_id = list(entity_with_updated_nodes.nodes.keys())[0].id
         sql = '''
             UPDATE web.reference_system SET (name, website_url, resolver_url, identifier_example,

@@ -14,6 +14,7 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'GeoNames' in rv.data
             geonames = ReferenceSystem.get_by_name('GeoNames')
             wikidata = ReferenceSystem.get_by_name('Wikidata')
+            precision_id = Node.get_hierarchy('External Reference Match').subs[0]
 
             rv = self.app.get(url_for('reference_system_insert'))
             assert b'Resolver URL' in rv.data
@@ -29,30 +30,25 @@ class ReferenceSystemTest(TestBaseCase):
             rv = self.app.post(url_for('reference_system_update', id_=geonames.id),
                                follow_redirects=True,
                                data={'name': 'GeoNames',
+                                     Node.get_hierarchy('External Reference Match').id:
+                                         precision_id,
                                      'website_url': 'https://www.geonames2.org/',
                                      'resolver_url': 'https://www.geonames2.org/',
-                                     'forms-0': 6})
+                                     'forms-0': wikidata.forms[4]})
             assert b'Changes have been saved.' in rv.data
 
             rv = self.app.post(url_for('actor_insert', code='E21'), data={
                 'name': 'Actor test',
                 'reference_system_id_' + str(wikidata.id): 'Q123',
                 self.precision_geonames: '',
-                self.precision_wikidata: Node.get_hierarchy('External Reference Match').subs[0]})
+                self.precision_wikidata: precision_id})
             person_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=wikidata.id), follow_redirects=True)
             assert b'Actor test' in rv.data
-
-            #rv = self.app.post(url_for('place_insert'), data={
-            #    'name': 'Reference test',
-            #    'reference_system_id_' + str(geonames.id): '123',
-            #    self.precision_geonames: Node.get_hierarchy('External Reference Match').subs[0],
-            #    self.precision_wikidata: ''})
-            #place_id = rv.location.split('/')[-1]
-            #rv = self.app.get(url_for('entity_view', id_=geonames.id), follow_redirects=True)
-            #assert b'Reference test' in rv.data
-            #self.app.get(url_for('place_index', id_=place_id, action='delete'))
-
+            rv = self.app.get(url_for('entity_view', id_=person_id), follow_redirects=True)
+            assert b'Wikidata' in rv.data
+            rv = self.app.get(url_for('actor_update', id_=person_id))
+            assert b'Q123' in rv.data
             rv = self.app.get(url_for('reference_system_index', id_=wikipedia.id, action='delete'))
             assert b'deleted' in rv.data
 
@@ -63,6 +59,24 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'The name is already in use.' in rv.data
             rv = self.app.get(url_for('reference_system_index', id_=geonames.id, action='delete'))
             assert b'Deletion not possible' in rv.data
+            rv = self.app.post(url_for('actor_insert', code='E21'), data={
+                'name': 'Actor with Wikidata but without precision',
+                'reference_system_id_' + str(wikidata.id): 'Q123',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
+            assert b'required' in rv.data
+            rv = self.app.post(url_for('actor_insert', code='E21'), data={
+                'name': 'Actor with invalid Wikidata id',
+                'reference_system_id_' + str(wikidata.id): 'invalid id',
+                self.precision_geonames: '',
+                self.precision_wikidata: precision_id})
+            assert b'Wrong id format' in rv.data
+            rv = self.app.post(url_for('place_insert'),
+                               data={'name': 'Reference test',
+                                     'reference_system_id_' + str(geonames.id): 'invalid id',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
+            assert b'Wrong id format' in rv.data
             rv = self.app.get(url_for('reference_system_remove_form',
                                       system_id=geonames.id,
                                       form_id=geonames.forms[0]),

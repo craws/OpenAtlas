@@ -47,6 +47,8 @@ class ActorTests(TestBaseCase):
                     self.precision_wikidata: ''}
             rv = self.app.post(url_for('actor_insert', code='E21'), data=data)
             actor_id = rv.location.split('/')[-1]
+            self.app.post(url_for('actor_insert', code='E74'), data=data)
+            self.app.post(url_for('actor_insert', code='E40'), data=data)
             rv = self.app.post(url_for('actor_insert', code='E21', origin_id=residence_id),
                                data=data,
                                follow_redirects=True)

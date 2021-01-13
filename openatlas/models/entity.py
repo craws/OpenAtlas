@@ -222,8 +222,6 @@ class Entity:
         from openatlas.models.node import Node
         if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
             return ''
-        if self.system_type and self.system_type.startswith('external reference '):
-            return ''   # e.g. "External Reference GeoNames"
         root_name = self.view_name.title()
         if self.view_name in ['reference', 'place']:
             root_name = self.system_type.title()
@@ -396,14 +394,6 @@ class Entity:
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Entity(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def get_by_name_and_system_type(name: Union[str, int], system_type: str) -> Optional[Entity]:
-        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
-        g.execute(sql, {'name': str(name), 'system_type': system_type})
-        if g.cursor.rowcount:
-            return Entity.get_by_id(g.cursor.fetchone()[0])
-        return None
 
     @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
