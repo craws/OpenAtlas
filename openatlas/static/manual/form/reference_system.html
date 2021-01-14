@@ -170,36 +170,37 @@
 <h1>Reference Systems<a class="headerlink" href="#reference-systems" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Reference systems can be used to link entities to external sources e.g. to Wikidata or GeoNames
-which are already included in the default application. You can see a list of available systems when
+<p>Reference systems can be used to link entities to external sources, e.g. to
+<a class="reference external" href="https://www.wikidata.org/">Wikidata</a>  or <a class="reference external" href="https://www.geonames.org/">GeoNames</a>
+which are already included in the default application. You can see a list of available systems by
 clicking the <strong>Reference system</strong> button on the start page. Links consists of an identifier (id)
 and a precision.</p>
 <div class="section" id="id">
-<h2>Id<a class="headerlink" href="#id" title="Permalink to this headline">¶</a></h2>
+<h2>ID<a class="headerlink" href="#id" title="Permalink to this headline">¶</a></h2>
 <p>The identifier of the entity in the external reference system. For GeoNames and Wikidata it will be
 checked for a valid format.</p>
 </div>
 <div class="section" id="precision">
 <h2>Precision<a class="headerlink" href="#precision" title="Permalink to this headline">¶</a></h2>
 <p>The precision is a required field. There may be a default set already. The two possible
-(<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>) values are:</p>
+(<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>) based values are:</p>
 <ul class="simple">
-<li>Close match: Concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.</li>
-<li>Exact match: High degree of confidence that the concepts can be used interchangeably.</li>
+<li><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications</li>
+<li><strong>Exact match</strong>: High degree of confidence that the concepts can be used interchangeably</li>
 </ul>
-<p>E.g. if a historical project links the city Vienna to Wikidata a close match would be more suitable
+<p>E.g. if a historical project links the city of Vienna to Wikidata, a <strong>close match</strong> would be more suitable,
 because the Wikidata entry is more about the current city and not the historical one.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>Admins and manager can add, updated and delete external reference systems.</p>
 <ul class="simple">
-<li>Name - e.g. Wikipedia, can not be changed for Wikidata or GeoNames</li>
-<li>Website URL - an URL to the project site of the reference system</li>
-<li>Resolver URL - if available an URL that can be linked to in combination with the id</li>
-<li>Example ID - an example id to show the desired format e.g. Q123 for Wikidata</li>
-<li>External Reference Match - a default can be set here, e.g. close match for GeoNames at an historical project</li>
-<li>Description - a short description which will be shown in forms when hovering the mouse over the <strong>i</strong> icon</li>
+<li><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</li>
+<li><strong>Website URL</strong> - an URL to the project site of the reference system</li>
+<li><strong>Resolver URL</strong> - if available an URL that can be linked to in combination with the id, e.g. <a class="reference external" href="https://www.wikidata.org/wiki/">https://www.wikidata.org/wiki/</a></li>
+<li><strong>Example ID</strong> - an example id to show the desired format e.g. Q123 for Wikidata</li>
+<li><strong>External Reference Match</strong> - a default precision can be set here, e.g. close match for GeoNames for a historical project</li>
+<li><strong>Description</strong> - a short description, which will be shown in forms when hovering the mouse over the <strong>i</strong> icon</li>
 </ul>
 </div>
 </div>
