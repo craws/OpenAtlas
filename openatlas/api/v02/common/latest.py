@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from flasgger import swag_from
+# from flasgger import swag_from
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
@@ -15,7 +15,7 @@ from openatlas.util.util import api_access
 
 class GetLatest(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @swag_from("../swagger/latest.yml", endpoint="latest")
+    # @swag_from("../swagger/latest.yml", endpoint="latest")
     def get(self, latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         # Todo: Think about to get latest into the pagination

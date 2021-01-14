@@ -16,7 +16,7 @@ Execute install/upgrade/5.7.0.sql after making backups
 A new version of the API replaced the version 0.1. Since the new version 0.2 supports flask-restful
 swagger new packages are needed:
 
-    # apt install python3-flask-restful python3-flasgger
+    # apt install python3-flask-restful
 
 ### 5.5.1 to 5.6.0
 Execute install/upgrade/5.6.0.sql after making backups (can also be done in Admin/Execute SQL)

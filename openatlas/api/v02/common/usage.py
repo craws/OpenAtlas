@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from flasgger import swag_from
+# from flasgger import swag_from
 from flask import Response, url_for
 from flask_restful import Resource, marshal
 
@@ -10,11 +10,10 @@ from openatlas.util.util import api_access
 
 class ShowUsage(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @swag_from("../swagger/usage.yml", endpoint="usage")
+    # @swag_from("../swagger/usage.yml", endpoint="usage")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         usage = {
-            'message': 'The path you entered is not correct. Please confer: ' + url_for(
-                'flasgger.apidocs', _external=True),
+            'message': 'The path you entered is not correct.',
             'examples':
                 {'entity': url_for('entity', id_=23, _external=True),
                  'code': url_for('code', code='actor', _external=True),
