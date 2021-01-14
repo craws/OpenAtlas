@@ -42,6 +42,9 @@ class PlaceTest(TestBaseCase):
             assert b'Asgard' in rv.data and b'An entry has been created' in rv.data
             rv = self.app.get(url_for('entity_view', id_=precision))
             assert b'Asgard' in rv.data
+            rv = self.app.get(url_for('entity_view',
+                                      id_=ReferenceSystem.get_by_name('GeoNames').id))
+            assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{
                 "type":"Feature",

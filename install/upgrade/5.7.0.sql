@@ -17,7 +17,7 @@ CREATE TABLE web.reference_system (
 );
 
 ALTER TABLE web.reference_system OWNER TO openatlas;
-COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.'
+COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the application. Can not be deleted or renamed in the UI.';
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_name_key UNIQUE (name);
 ALTER TABLE ONLY web.reference_system ADD CONSTRAINT reference_system_pkey PRIMARY KEY (entity_id);
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.reference_system FOR EACH ROW EXECUTE PROCEDURE model.update_modified();

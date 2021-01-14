@@ -20,10 +20,18 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Resolver URL' in rv.data
             data = {'name': 'Wikipedia',
                     'website_url': 'https://wikipedia.org',
-                    'resolver_url': 'https://wikipedia.org'}
+                    'resolver_url': 'https://wikipedia.org',
+                    'forms': [geonames.forms[0]]}
             rv = self.app.post(url_for('reference_system_insert'), follow_redirects=True, data=data)
             assert b'An entry has been created.' in rv.data
-            wikipedia = ReferenceSystem.get_by_name('Wikipedia')
+            wikipedia_id = ReferenceSystem.get_by_name('Wikipedia').id
+            rv = self.app.get(url_for('reference_system_remove_form',
+                                      system_id=wikipedia_id,
+                                      form_id=geonames.forms[0]),
+                              follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
+            rv = self.app.get(url_for('reference_system_index', id_=wikipedia_id, action='delete'))
+            assert b'The entry has been deleted' in rv.data
 
             rv = self.app.post(url_for('reference_system_update', id_=geonames.id))
             assert b'Website URL' in rv.data
@@ -33,8 +41,7 @@ class ReferenceSystemTest(TestBaseCase):
                                      Node.get_hierarchy('External Reference Match').id:
                                          precision_id,
                                      'website_url': 'https://www.geonames2.org/',
-                                     'resolver_url': 'https://www.geonames2.org/',
-                                     'forms-0': wikidata.forms[4]})
+                                     'resolver_url': 'https://www.geonames2.org/'})
             assert b'Changes have been saved.' in rv.data
 
             rv = self.app.post(url_for('actor_insert', code='E21'), data={
@@ -49,8 +56,6 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Wikidata' in rv.data
             rv = self.app.get(url_for('actor_update', id_=person_id))
             assert b'Q123' in rv.data
-            rv = self.app.get(url_for('reference_system_index', id_=wikipedia.id, action='delete'))
-            assert b'deleted' in rv.data
 
             # Testing errors
             rv = self.app.post(url_for('reference_system_insert'),
