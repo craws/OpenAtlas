@@ -102,6 +102,8 @@ def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
         tab_name = link_.range.view_name.capitalize().replace(' ', '-')
         if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
             tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
+        if tab_name == 'Place':
+            tab_name = link_.range.system_type.title().replace(' ', '-')
         tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
     for form_id, form_ in entity.get_forms().items():
         if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):

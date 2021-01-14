@@ -51,11 +51,10 @@ class Node(Entity):
         g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
         places = g.cursor.fetchall()
         nodes = {}
-
         for row in types + places:
             node = Node(row)
             nodes[node.id] = node
-            node.count = row.count + row.count_property
+            node.count = row.count if row.count else row.count_property
             node.count_subs = 0
             node.subs = []
             node.locked = False

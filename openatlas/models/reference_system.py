@@ -42,8 +42,8 @@ class ReferenceSystem(Entity):
                 ) AS nodes
             FROM model.entity e
             JOIN web.reference_system rs ON e.id = rs.entity_id
-            LEFT JOIN model.link l ON e.id = l.domain_id
-            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2')
+            LEFT JOIN model.link l ON e.id = l.domain_id AND l.property_code = 'P67'
+            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code = 'P2'
             GROUP BY e.id, e.name, e.class_code, e.description, e.system_type, e.created,
                 e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, rs.entity_id;"""

@@ -40,6 +40,9 @@ class PlaceTest(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been created' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=precision))
+            assert b'Asgard' in rv.data
+
             data['gis_points'] = """[{
                 "type":"Feature",
                 "geometry":{"type":"Point","coordinates":[9,17]},

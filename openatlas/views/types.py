@@ -111,6 +111,8 @@ def node_view(node: Node) -> str:
     if root and root.value_type:  # pragma: no cover
         tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
+        if entity.class_.code == 'E32':  # Don't add reference systems themselves
+            continue  # pragma: no cover
         if node.class_.code == 'E53':  # pragma: no cover
             object_ = entity.get_linked_entity('P53', inverse=True)
             if not object_:  # If it's a location show the object, continue otherwise
