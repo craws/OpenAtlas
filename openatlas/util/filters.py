@@ -504,4 +504,4 @@ def display_external_references(self: Any, entity: Entity) -> str:
     html = '<br>'.join(system_links)
     if not html:
         return ''
-    return Markup('<h2>' + display.uc_first(_('external references')) + '</h2>' + html)
+    return Markup('<h2>' + display.uc_first(_('external reference systems')) + '</h2>' + html)
