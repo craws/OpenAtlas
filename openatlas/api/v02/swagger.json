@@ -370,6 +370,9 @@
           },
           "type": {
             "type": "string"
+          },
+          "reference_system": {
+            "type": "string"
           }
         }
       },

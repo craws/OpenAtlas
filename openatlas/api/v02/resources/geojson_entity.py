@@ -125,6 +125,16 @@ class GeoJsonEntity:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
+    def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+        ref = []
+        for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
+            system = g.reference_systems[link.domain.id]
+            ref.append({'identifier': (system.resolver_url if system.resolver_url else '') + link.description,
+                        'type': g.nodes[link.type.id].name,
+                        'reference_system': system.name})
+        return ref if ref else None
+
+    @staticmethod
     def get_entity_by_id(id_: int) -> Entity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
@@ -170,8 +180,8 @@ class GeoJsonEntity:
                 'show'] else None
 
         # Todo: adapt Geonames for new reference systems
-        # features['links'] = GeoJsonEntity.get_external(entity) if 'links' in parser[
-        #    'show'] else None
+        features['links'] = GeoJsonEntity.get_reference_systems(entity) if 'links' in parser[
+           'show'] else None
 
         # Geometry
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':

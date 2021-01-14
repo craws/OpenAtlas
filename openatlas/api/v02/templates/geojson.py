@@ -20,7 +20,8 @@ class GeoJson:
                       'url': fields.String}
 
         links = {'type': fields.String,
-                 'identifier': fields.String}
+                 'identifier': fields.String,
+                 'reference_system': fields.String}
 
         types = {'identifier': fields.String,
                  'label': fields.String,
