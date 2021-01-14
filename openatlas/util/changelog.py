@@ -1,9 +1,11 @@
 class Changelog:
     versions = {
         '5.7.0': ['TBA', {
+            'feature': {
+                '1292': 'External reference systems'},
             'fix': {
-                '1434': 'Types of Human Remains are not displayed in Overview'
-            }}],
+                '1427': 'API: Pageing is broken',
+                '1434': 'Types of Human Remains are not displayed in Overview'}}],
         '5.6.0': ['2020-11-30', {
             'feature': {
                 '930': 'Wikidata API',
