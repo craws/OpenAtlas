@@ -24,9 +24,9 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
-from openatlas.util.display import (convert_size, delete_link, format_date, format_datetime,
-                                    get_disk_space_info, get_file_path, link, sanitize, truncate,
-                                    uc_first)
+from openatlas.util.display import (convert_size, delete_link, format_date,
+                                    format_datetime, get_disk_space_info, get_file_path, link,
+                                    sanitize, truncate, uc_first)
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group, send_mail
 
@@ -263,6 +263,8 @@ def admin_orphans() -> str:
               'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
     tables['circular'].rows = [[link(entity)] for entity in Entity.get_circular()]
     for entity in Entity.get_orphans():
+        if entity.class_.code == 'E32':  # Skip external reference systems
+            continue
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name].rows.append([link(entity),
                                   link(entity.class_),

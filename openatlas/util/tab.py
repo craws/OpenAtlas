@@ -45,7 +45,8 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
         </li>'''.format(
         active=' active' if active else '',
         selected='true' if active else 'false',
-        label=uc_first(_(id_.replace('_', ' '))) + (format_tab_number(table) if table else ''),
+        label=uc_first(_(id_.replace('_', ' ').replace('-', ' '))) + (
+            format_tab_number(table) if table else ''),
         id=id_.replace('_', '-').replace(' ', '-'))
 
 

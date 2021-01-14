@@ -10,7 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, add_system_data, add_type_data,
                                     format_entry_begin, format_entry_end, get_appearance,
@@ -38,7 +38,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @required_group('contributor')
 def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form('actor', code=code, origin=origin)
+    form = build_form(g.classes[code].name.lower().replace(' ', '_'), code=code, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     form.alias.append_entry('')
@@ -51,7 +51,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def actor_update(id_: int) -> Union[str, Response]:
     actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
-    form = build_form('actor', actor)
+    form = build_form(g.classes[actor.class_.code].name.lower().replace(' ', '_'), actor)
     if form.validate_on_submit():
         if was_modified(form, actor):  # pragma: no cover
             del form.save
@@ -85,7 +85,7 @@ def save(form: FlaskForm,
             actor = Entity.insert(code, form.name.data)
             log_action = 'insert'
         actor.update(form)
-        Reference.update(form, actor)
+        ReferenceSystem.update_links(form, actor)
         if form.residence.data:
             object_ = Entity.get_by_id(form.residence.data, view_name='place')
             actor.link('P74', object_.get_linked_entity_safe('P53'))
@@ -142,8 +142,9 @@ def actor_view(actor: Entity) -> str:
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,
                                                origin_id=actor.id))
-            if domain.system_type.startswith('external reference'):
-                actor.external_references.append(link_)
+            if domain.view_name == 'reference_system':
+                actor.reference_systems.append(link_)
+                continue
         data = add_remove_link(data, domain.name, link_, actor, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
 

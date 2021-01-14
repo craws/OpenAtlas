@@ -11,8 +11,6 @@ class ContentForm(FlaskForm):  # type: ignore
 
 
 class ModulesForm(FlaskForm):  # type: ignore
-    module_wikidata = BooleanField('Wikidata')
-    module_geonames = BooleanField('GeoNames')
     module_map_overlay = BooleanField(_('map overlay'))
     module_notes = BooleanField(_('notes'))
     module_sub_units = BooleanField(_('sub units'))
@@ -78,7 +76,6 @@ class MapForm(FlaskForm):  # type: ignore
     map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
     map_cluster_max_radius = IntegerField(_('max cluster radius'))
     geonames_username = StringField('GeoNames ' + _('username'))
-    geonames_url = StringField('GeoNames URL')
     save = SubmitField(_('save'))
 
 

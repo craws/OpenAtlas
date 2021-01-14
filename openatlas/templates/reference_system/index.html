@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title_name %} - {{ _('reference system')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ [_('reference system')]|crumb }}
+{% endblock %}
+{% block content %}
+    <div class="toolbar">
+        {{ 'tools/reference_system'|manual }}
+        {% if 'contributor'|is_authorized %}
+            {{ _('reference system')|button(url_for('reference_system_insert')) }}
+        {% endif %}
+    </div>
+    <div>
+        {{ table.display('reference_system')|safe }}
+    </div>
+{% endblock %}
+
+

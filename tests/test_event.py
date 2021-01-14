@@ -2,7 +2,9 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase, random_string
+from openatlas.models.node import Node
+from openatlas.models.reference_system import ReferenceSystem
+from tests.base import TestBaseCase
 
 
 class EventTest(TestBaseCase):
@@ -10,11 +12,12 @@ class EventTest(TestBaseCase):
     def test_event(self) -> None:
         with app.app_context():  # type: ignore
             # Create entities for event
-            place_name = random_string()
-            rv = self.app.post(url_for('place_insert'), data={'name': place_name})
+            place_name = 'Lewis and Clark'
+            rv = self.app.post(url_for('place_insert'), data={'name': place_name,
+                                                              self.precision_geonames: '',
+                                                              self.precision_wikidata: ''})
             residence_id = rv.location.split('/')[-1]
-            actor_name = random_string()
-            event_name = random_string()
+            actor_name = 'Captain Miller'
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', actor_name)
@@ -26,11 +29,12 @@ class EventTest(TestBaseCase):
             # Insert
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
-            data = {'name': event_name,
-                    'place': residence_id}
+            data = {'name': 'Event Horizon',
+                    'place': residence_id,
+                    self.precision_wikidata: ''}
             rv = self.app.post(url_for('event_insert', code='E7', origin_id=reference.id),
                                data=data, follow_redirects=True)
-            assert bytes(event_name, 'utf-8') in rv.data
+            assert bytes('Event Horizon', 'utf-8') in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 activity_id = Entity.get_by_menu_item('event')[0].id
@@ -43,7 +47,9 @@ class EventTest(TestBaseCase):
             assert b'Location' not in rv.data
 
             # Acquisition
-            event_name2 = random_string(8)
+            event_name2 = 'Second event'
+            wikidata = 'reference_system_id_' + str(ReferenceSystem.get_by_name('Wikidata').id)
+            precision = Node.get_hierarchy('External Reference Match').subs[0]
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': event_name2,
                                      'given_place': [residence_id],
@@ -52,10 +58,12 @@ class EventTest(TestBaseCase):
                                      'begin_year_from': '1949',
                                      'begin_month_from': '10',
                                      'begin_day_from': '8',
-                                     'end_year_from': '1951'})
+                                     'end_year_from': '1951',
+                                     wikidata: 'Q123',
+                                     self.precision_wikidata: precision})
             event_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=event_id))
-            assert bytes(event_name, 'utf-8') in rv.data
+            assert b'Event Horizon' in rv.data
 
             # Move
             rv = self.app.post(url_for('event_insert', code='E9'),
@@ -63,23 +71,32 @@ class EventTest(TestBaseCase):
                                      'place_to': residence_id,
                                      'place_from': residence_id,
                                      'object': carrier.id,
-                                     'person': actor.id})
+                                     'person': actor.id,
+                                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=move_id))
+            assert b'Keep it moving' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=carrier.id))
             assert b'Keep it moving' in rv.data
             rv = self.app.get(url_for('event_update', id_=move_id))
             assert b'Keep it moving' in rv.data
 
             # Add another event and test if events are seen at place
-            event_name3 = random_string()
+            event_name3 = 'Third event'
             self.app.post(url_for('event_insert', code='E8'),
-                          data={'name': event_name3, 'given_place': [residence_id]})
+                          data={'name': event_name3,
+                                'given_place': [residence_id],
+                                self.precision_geonames: '',
+                                self.precision_wikidata: ''})
             rv = self.app.get(url_for('entity_view', id_=residence_id))
             assert bytes(place_name, 'utf-8') in rv.data
             rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert bytes(actor_name, 'utf-8') in rv.data
             rv = self.app.post(url_for('event_insert', code='E8'), follow_redirects=True,
-                               data={'name': event_name, 'continue_': 'yes'})
+                               data={'name': 'Event Horizon',
+                                     'continue_': 'yes',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Event' in rv.data
@@ -101,14 +118,14 @@ class EventTest(TestBaseCase):
 
             # Update
             rv = self.app.get(url_for('event_update', id_=activity_id))
-            assert bytes(event_name, 'utf-8') in rv.data
+            assert b'Event Horizon' in rv.data
             rv = self.app.get(url_for('event_update', id_=event_id))
-            assert bytes(event_name, 'utf-8') in rv.data
-            data = {'name': 'Event updated'}
+            assert b'Event Horizon' in rv.data
+            data['name'] = 'Event updated'
             rv = self.app.post(url_for('event_update', id_=event_id),
                                data=data,
                                follow_redirects=True)
-            assert b'Event updated' in rv.data
+            assert b'Changes have been saved' in rv.data
 
             # Test super event validation
             data = {'name': 'Event Horizon', 'event': event_id}

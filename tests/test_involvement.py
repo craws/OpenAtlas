@@ -14,7 +14,9 @@ class InvolvementTests(TestBaseCase):
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': 'Event Horizon',
                                      'begin_year_from': '949', 'begin_month_from': '10',
-                                     'begin_day_from': '8', 'end_year_from': '1951'})
+                                     'begin_day_from': '8', 'end_year_from': '1951',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

@@ -1,5 +1,5 @@
 <script>
-    var geoNamesModule = {{ 'true' if geonames_buttons else 'false' }};
+    var geoNamesModule = {{ 'true' if geonames_module else 'false' }};
     var geoNamesUsername = '{{ session['settings']['geonames_username'] }}';
     var thunderforestKey = '{{ config['THUNDERFOREST_KEY'] }}';
     var gisPointAll = {{ gis_data['gisPointAll']|safe }};

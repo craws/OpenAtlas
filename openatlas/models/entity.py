@@ -63,7 +63,7 @@ class Entity:
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = ''  # Used to build URLs
-        self.external_references: List[Link] = []
+        self.reference_systems: List[Link] = []
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
@@ -72,6 +72,8 @@ class Entity:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
         elif self.class_.code == 'E55':
             self.view_name = 'node'
+        elif self.class_.code == 'E32':
+            self.view_name = 'reference_system'
         self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '_')
@@ -218,10 +220,8 @@ class Entity:
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_name or self.view_name == 'actor':  # Actors have no base type
+        if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
             return ''
-        if self.system_type and self.system_type.startswith('external reference '):
-            return ''   # e.g. "External Reference GeoNames"
         root_name = self.view_name.title()
         if self.view_name in ['reference', 'place']:
             root_name = self.system_type.title()
@@ -311,8 +311,7 @@ class Entity:
             abort(422)
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
-            RETURNING id;"""
+            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s) RETURNING id;"""
         params = {'name': str(name).strip(),
                   'code': code,
                   'system_type': system_type.strip() if system_type else None,
@@ -395,14 +394,6 @@ class Entity:
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Entity(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def get_by_name_and_system_type(name: Union[str, int], system_type: str) -> Optional[Entity]:
-        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
-        g.execute(sql, {'name': str(name), 'system_type': system_type})
-        if g.cursor.rowcount:
-            return Entity.get_by_id(g.cursor.fetchone()[0])
-        return None
 
     @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
@@ -510,6 +501,8 @@ class Entity:
                 sql_where.append("e.system_type = 'stratigraphic unit'")
             elif name == 'find':
                 sql_where.append("e.class_code = 'E22'")
+            elif name == 'human remains':
+                sql_where.append("e.class_code = 'E20'")
             elif name == 'reference':
                 sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
                     codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))
@@ -518,7 +511,7 @@ class Entity:
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
         g.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
 
-        # Prepare date filter
+        # Repopulate date fields with autocompleted values
         from_date = Date.form_to_datetime64(form.begin_year.data,
                                             form.begin_month.data,
                                             form.begin_day.data)
@@ -526,8 +519,6 @@ class Entity:
                                           form.end_month.data,
                                           form.end_day.data,
                                           to_date=True)
-
-        # Refill form in case dates were completed
         if from_date:
             string = str(from_date)
             if string.startswith('-') or string.startswith('0000'):
@@ -537,7 +528,6 @@ class Entity:
             form.begin_day.raw_data = None
             form.begin_month.data = int(parts[1])
             form.begin_day.data = int(parts[2])
-
         if to_date:
             string = str(to_date)
             if string.startswith('-') or string.startswith('0000'):
@@ -548,6 +538,7 @@ class Entity:
             form.end_month.data = int(parts[1])
             form.end_day.data = int(parts[2])
 
+        # Get search results
         entities = []
         for row in g.cursor.fetchall():
             entity = None

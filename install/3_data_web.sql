@@ -1,6 +1,5 @@
-SET search_path = web;
 
-INSERT INTO "group" (name) VALUES
+INSERT INTO web.group (name) VALUES
     ('admin'),
     ('contributor'),
     ('editor'),
@@ -14,7 +13,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
     'test@example.com',
     (SELECT id FROM web.group WHERE name = 'admin'));
 
-INSERT INTO settings (name, value) VALUES
+INSERT INTO web.settings (name, value) VALUES
     ('api_public', ''),
     ('debug_mode', ''),
     ('default_language', 'en'),
@@ -24,7 +23,6 @@ INSERT INTO settings (name, value) VALUES
     ('file_upload_max_size', '10'),
     ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
     ('geonames_username', 'openatlas'),
-    ('geonames_url', 'https://www.geonames.org/'),
     ('log_level', '6'),
     ('logo_file_id', ''),
     ('mail', ''),
@@ -40,12 +38,29 @@ INSERT INTO settings (name, value) VALUES
     ('map_zoom_max', '18'),
     ('minimum_jstree_search', '1'),
     ('minimum_password_length', '12'),
-    ('module_geonames', 'True'),
     ('module_map_overlay', 'True'),
     ('module_notes', 'True'),
     ('module_sub_units', 'True'),
-    ('module_wikidata', 'True'),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),
     ('reset_confirm_hours', '24'),
     ('site_name', 'OpenAtlas');
+
+-- External Reference Systems
+INSERT INTO model.entity (name, class_code, description) VALUES
+    ('GeoNames', 'E32', 'Geographical database covering all countries and many places.'),
+    ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.');
+
+INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
+VALUES (true,
+        'GeoNames',
+        (SELECT id FROM model.entity WHERE name = 'GeoNames' AND class_code = 'E32'),
+        'https://www.geonames.org/',
+        'https://www.geonames.org/',
+        '1234567'),
+       (true,
+        'Wikidata',
+        (SELECT id FROM model.entity WHERE name = 'Wikidata' AND class_code = 'E32'),
+        'https://www.wikidata.org/entity/',
+        'https://www.wikidata.org',
+        'Q123');

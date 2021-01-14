@@ -354,12 +354,12 @@ function importNewPoint(geo, popup) {
 }
 
 function importGeonamesID(geo, popup) {
-    $('#geonames_id').val(geo.geonameId);
+    $('.GeoNames').val(geo.geonameId);
     popup._close();
 }
 
 function importAll(geo, popup) {
-    $('#geonames_id').val(geo.geonameId);
+    $('.GeoNames').val(geo.geonameId);
     popup._close();
     point =
         `{"type": "Feature", "geometry":

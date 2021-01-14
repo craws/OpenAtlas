@@ -107,7 +107,7 @@ $(document).ready(function () {
    * documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
    * bootstrap version needs to be manually set d/t
    */
-  $('#wikidata_id').autoComplete({
+  $('.Wikidata').autoComplete({
     bootstrapVersion: '4',
     resolver: 'custom',
     formatResult: function (item) {
@@ -126,7 +126,7 @@ $(document).ready(function () {
         }
     }
   }).on('autocomplete.select', function(evt,item) {
-      $('#wikidata_id').val(item.id);
+      $('.Wikidata').val(item.id);
   });
 });
 

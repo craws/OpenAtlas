@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
-from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link, uc_first)
@@ -53,11 +53,11 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
 def place_insert(origin_id: Optional[int] = None,
                  system_type: Optional[str] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    geonames_buttons = False
+    geonames_module = False
     title = 'place'
     form = build_form('place', origin=origin)
     if not origin:
-        geonames_buttons = True if current_user.settings['module_geonames'] else False
+        geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
     elif origin.system_type == 'place':
         title = 'feature'
         form = build_form('feature', origin=origin)
@@ -84,7 +84,7 @@ def place_insert(origin_id: Optional[int] = None,
                            origin=origin,
                            structure=structure,
                            gis_data=gis_data,
-                           geonames_buttons=geonames_buttons,
+                           geonames_module=geonames_module,
                            overlays=overlays)
 
 
@@ -93,7 +93,7 @@ def place_insert(origin_id: Optional[int] = None,
 def place_update(id_: int) -> Union[str, Response]:
     object_ = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='place')
     location = object_.get_linked_entity_safe('P53', nodes=True)
-    geonames_buttons = False
+    geonames_module = False
     if object_.system_type == 'feature':
         form = build_form('feature', object_, location=location)
     elif object_.system_type == 'stratigraphic unit':
@@ -103,7 +103,7 @@ def place_update(id_: int) -> Union[str, Response]:
     elif object_.system_type == 'human remains':
         form = build_form('human_remains', object_, location=location)
     else:
-        geonames_buttons = True if current_user.settings['module_geonames'] else False
+        geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
         form = build_form('place', object_, location=location)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
@@ -128,7 +128,7 @@ def place_update(id_: int) -> Union[str, Response]:
                            structure=structure,
                            gis_data=Gis.get_all([object_], structure),
                            overlays=Overlay.get_by_object(object_),
-                           geonames_buttons=geonames_buttons)
+                           geonames_module=geonames_module)
 
 
 def place_view(obj: Entity) -> str:
@@ -172,8 +172,9 @@ def place_view(obj: Entity) -> str:
             data = add_edit_link(
                 data,
                 url_for('reference_link_update', link_id=link_.id, origin_id=obj.id))
-            if domain.system_type.startswith('external reference'):
-                obj.external_references.append(link_)
+            if domain.view_name == 'reference_system':
+                obj.reference_systems.append(link_)
+                continue
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
@@ -241,7 +242,7 @@ def save(form: FlaskForm,
             object_.link('P53', location)
         object_.update(form)
         location.update(form)
-        Reference.update(form, object_)
+        ReferenceSystem.update_links(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'

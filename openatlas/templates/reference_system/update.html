@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('reference_system_index') }}">{{ _('reference system')|uc_first }}</a>&nbsp;
+    >&nbsp; {{ entity|link|safe }}&nbsp;
+    >&nbsp; {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+    {% if modifier %}
+        <p class="error">
+            {{ _('error modified by %(username)s', username=modifier|safe) }}
+        </p>
+        <p>
+            {{ _('reload')|button(url_for('reference_system_update', id_=entity.id)) }}
+        </p>
+    {% endif %}
+    {{ form|display_form(manual_page='menu/reference_system') }}
+{% endblock %}

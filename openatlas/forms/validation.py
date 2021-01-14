@@ -76,18 +76,21 @@ def validate(self: FlaskForm) -> bool:
                 self.event.errors.append(_('error node self as super'))
                 valid = False
 
-    # External references
-    if hasattr(self, 'wikidata_id') and self.wikidata_id.data:  # pragma: no cover
-        if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
-            self.wikidata_id.errors.append(uc_first(_('wrong Wikidata Id format') + '.'))
-            valid = False
-        else:
-            self.wikidata_id.data = uc_first(self.wikidata_id.data)
-    for name in g.external:
-        if hasattr(self, name + '_id'):
-            if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
+    # External reference systems
+    for field_id, field in self.__dict__.items():
+        if field_id.startswith('reference_system_id_') and field.data:
+            if not getattr(self, field_id.replace('id_', 'precision_')).data:
                 valid = False
-                getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
+                field.errors.append(uc_first(_('precision required')))
+            if field.label.text == 'Wikidata':
+                if field.data[0].upper() != 'Q' or not field.data[1:].isdigit():
+                    field.errors.append(uc_first(_('wrong id format') + '.'))
+                    valid = False
+                else:
+                    field.data = uc_first(field.data)
+            if field.label.text == 'GeoNames' and not field.data.isnumeric():
+                field.errors.append(uc_first(_('wrong id format') + '.'))
+                valid = False
 
     # Membership
     if hasattr(self, 'member_origin_id'):
@@ -101,5 +104,4 @@ def validate(self: FlaskForm) -> bool:
         if self.relation_origin_id.data in ast.literal_eval(self.actor.data):
             self.actor.errors.append(_("Can't link to itself."))
             valid = False
-
     return valid

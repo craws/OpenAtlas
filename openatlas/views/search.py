@@ -57,7 +57,7 @@ class SearchForm(FlaskForm):  # type: ignore
 @required_group('readonly')
 def search_index() -> str:
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
-               'reference', 'file']
+               'human remains', 'reference', 'file']
     form = SearchForm()
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
     form.classes.default = choices

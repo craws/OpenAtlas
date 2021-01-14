@@ -292,9 +292,30 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
 
 
--------------------------------
--- Web hierarchies and forms --
--------------------------------
+---------------
+-- Web forms --
+---------------
+
+INSERT INTO web.form (name, extendable) VALUES
+('File', True),
+('Source', True),
+('Event', True),
+('Person', True),
+('Group', True),
+('Legal Body', True),
+('Place', True),
+('Feature', True),
+('Stratigraphic Unit', True),
+('Find', True),
+('Bibliography', True),
+('Edition', True),
+('Information Carrier', True),
+('Actor Actor Relation', False),
+('Involvement', False),
+('Member', False),
+('Source Translation', False),
+('External Reference', True);
+
 INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
 ((SELECT id FROM entity WHERE name='License'), 'License', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False, False, False),
@@ -317,26 +338,6 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 ((SELECT id FROM entity WHERE name='External Reference'), 'External Reference', False, True, False, False, False),
 ((SELECT id FROM model.entity WHERE name='External Reference Match'), 'External Reference Match', False, True, False, False, True);
 
-INSERT INTO web.form (name, extendable) VALUES
-('File', True),
-('Source', True),
-('Event', True),
-('Person', True),
-('Group', True),
-('Legal Body', True),
-('Place', True),
-('Feature', True),
-('Stratigraphic Unit', True),
-('Find', True),
-('Bibliography', True),
-('Edition', True),
-('Information Carrier', True),
-('Actor Actor Relation', False),
-('Involvement', False),
-('Member', False),
-('Source Translation', False),
-('External Reference', True);
-
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='License'),(SELECT id FROM web.form WHERE name='File')),
 ((SELECT id FROM web.hierarchy WHERE name='Sex'),(SELECT id FROM web.form WHERE name='Person')),
@@ -358,3 +359,10 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='Find')),
 ((SELECT id FROM web.hierarchy WHERE name='External Reference'),(SELECT id FROM web.form WHERE name='External Reference'));
 
+INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
+((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='Place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Person')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Group')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Legal Body')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));

@@ -6,10 +6,9 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm, widgets
 from flask_wtf.csrf import generate_csrf
-from wtforms import (BooleanField, FieldList, FileField, HiddenField, IntegerField, SelectField,
+from wtforms import (BooleanField, FieldList, FileField, HiddenField, SelectField,
                      SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -21,31 +20,41 @@ from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
-forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
-         'actor_actor_relation': ['date', 'description', 'continue'],
+forms = {'actor_actor_relation': ['date', 'description', 'continue'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'wikidata', 'description', 'continue'],
-         'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'event': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue'],
+         'feature': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
+                     'map'],
          'file': ['name', 'description'],
-         'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'find': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
+                  'map'],
+         'group': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                   'continue'],
          'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'wikidata', 'reference_systems', 'description',
+                           'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
+         'legal_body': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                        'continue'],
          'note': ['description'],
-         'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
-                   'map'],
+         'person': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
+                    'continue'],
+         'place': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'geonames',
+                   'description', 'continue', 'map'],
+         'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
+         'stratigraphic_unit': ['name', 'date', 'wikidata', 'reference_systems', 'description',
+                                'continue', 'map']}
 
 
 def build_form(name: str,
@@ -72,7 +81,8 @@ def build_form(name: str,
     code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name, code)
     add_fields(Form, name, code, item, origin)
-    add_external_references(Form, name)
+    if 'reference_systems' in forms[name]:
+        add_reference_systems(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
     if 'description' in forms[name]:
@@ -86,15 +96,15 @@ def build_form(name: str,
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(Form(obj=item), item, location)
+        form = populate_form(name, Form(obj=item), item, location)
     customize_labels(name, form)
     return form
 
 
-def populate_form(form: FlaskForm,
+def populate_form(name: str,
+                  form: FlaskForm,
                   item: Union[Entity, Link],
                   location: Optional[Entity]) -> FlaskForm:
-
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -116,14 +126,17 @@ def populate_form(form: FlaskForm,
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = nodes_
 
-    # External references
-    for name in g.external:
-        if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
-            link_ = Reference.get_link(item, name)
-            if link_ and not getattr(form, name + '_id').data:
-                reference = link_.domain
-                getattr(form, name + '_id').data = reference.name if reference else ''
-                getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
+    # Reference systems
+    if 'reference_systems' in forms[name]:
+        system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
+                        if link_.domain.view_name == 'reference_system'}
+        for field in form:
+            if field.id.startswith('reference_system_id_'):
+                system_id = int(field.id.replace('reference_system_id_', ''))
+                if system_id in system_links:
+                    field.data = system_links[system_id].description
+                    getattr(form, 'reference_system_precision_{id}'.format(
+                        id=system_id)).data = str(system_links[system_id].type.id)
 
     return form
 
@@ -160,26 +173,26 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
 
 
 # TODO: this should probably go to a custom field in field.py
-def add_external_references(form: Any, form_name: str) -> None:
-    for name, ref in g.external.items():
-        if name not in forms[form_name] or not current_user.settings['module_' + name]:
-            continue  # pragma: no cover, in tests all modules are activated
-        if name == 'geonames':
-            field = IntegerField(
-                ref['name'] + ' Id',
-                [OptionalValidator()],
-                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
-        else:
-            field = StringField(
-                ref['name'] + ' Id',
-                [OptionalValidator()],
-                render_kw={'autocomplete': 'off', 'placeholder': ref['placeholder']})
-        setattr(form, name + '_id', field)
+def add_reference_systems(form: Any, form_name: str) -> None:
+    precisions = [('', '')]
+    for id_ in Node.get_hierarchy('External Reference Match').subs:
+        precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
+    for system in g.reference_systems.values():
+        forms_ = [form_['name'] for form_ in system.get_forms().values()]
+        if form_name.replace('_', ' ').title() not in forms_:
+            continue
         setattr(form,
-                name + '_precision',
+                'reference_system_id_{id}'.format(id=system.id),
+                StringField(system.name,
+                            validators=[OptionalValidator()],
+                            description=system.description,
+                            render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
+
+        setattr(form,
+                'reference_system_precision_{id}'.format(id=system.id),
                 SelectField(uc_first(_('precision')),
-                            choices=app.config['REFERENCE_PRECISION'],
-                            default='close match' if name == 'geonames' else ''))
+                            choices=precisions,
+                            default=system.precision_default_id))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
@@ -212,13 +225,9 @@ def add_types(form: Any, name: str, code: Union[str, None]) -> None:
 def add_fields(form: Any,
                name: str,
                code: Union[str, None],
-               item: Union[Entity, Link, None],
+               item: Union[Entity, Node, Link, None],
                origin: Union[Entity, None]) -> None:
-    if name == 'actor':
-        setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField(_('born in') if code == 'E21' else _('begins in')))
-        setattr(form, 'ends_in', TableField(_('died in') if code == 'E21' else _('ends in')))
-    elif name == 'actor_actor_relation':
+    if name == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
             setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
@@ -238,6 +247,10 @@ def add_fields(form: Any,
             setattr(form, 'person', TableMultiField())
     elif name == 'file' and not item:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
+    elif name == 'group':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField(_('begins in')))
+        setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'hierarchy':
         if (code and code == 'custom') or (item and not item.value_type):
             setattr(form, 'multiple', BooleanField(_('multiple'),
@@ -254,11 +267,36 @@ def add_fields(form: Any,
             involved_with = 'actor' if origin.view_name == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
+    elif name == 'legal_body':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField(_('begins in')))
+        setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
+    elif name == 'person':
+        setattr(form, 'residence', TableField(_('residence')))
+        setattr(form, 'begins_in', TableField(_('born in')))
+        setattr(form, 'ends_in', TableField(_('died in')))
+    elif name == 'reference_system':
+        setattr(form, 'website_url', StringField(_('website URL'),
+                                                 validators=[OptionalValidator(), URL()]))
+        setattr(form, 'resolver_url', StringField(_('resolver URL'),
+                                                  validators=[OptionalValidator(), URL()]))
+        setattr(form, 'placeholder', StringField(_('example ID')))
+        precision_node_id = str(Node.get_hierarchy('External Reference Match').id)
+        setattr(form, precision_node_id, TreeField(precision_node_id))
+        choices = ReferenceSystem.get_form_choices(item)
+        if choices:
+            setattr(form, 'forms', SelectMultipleField(
+                _('forms'),
+                render_kw={'disabled': True},
+                choices=choices,
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False),
+                coerce=int))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
 

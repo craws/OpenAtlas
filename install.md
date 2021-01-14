@@ -15,7 +15,7 @@ more knowledge about server administration.
     # apt install python3 python3-bcrypt python3-dateutil  python3-psycopg2 python3-fuzzywuzzy
     # apt install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
     # apt install python3-markdown python3-numpy python3-pandas python3-jinja2 python3-flask-cors
-    # apt install python-flask-restful python3-flasgger 
+    # apt install python-flask-restful python3-flasgger
 
 ### Apache 2.4
 
@@ -63,7 +63,7 @@ Add the postgis extension to the database
 Import the scripts: 1_structure.sql,  2_data_web.sql,  3_data_model.sql, 4_data_node.sql
 
     $ cd install
-    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_node.sql | psql -d openatlas -f -
 
 **Important!** A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
 
@@ -131,7 +131,7 @@ As postgres
     $ createdb openatlas_test -O openatlas
     $ psql openatlas_test -c "CREATE EXTENSION postgis;"
     $ cd install
-    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas_test -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql  4_data_node.sql | psql -d openatlas_test -f -
 
 Copy instance/example_testing.py to instance/testing.py and add/change values as appropriate.
 

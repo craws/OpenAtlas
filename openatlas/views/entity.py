@@ -33,10 +33,13 @@ def entity_view(id_: int) -> Union[str, Response]:
             else:
                 tab_hash = '#menu-tab-custom_collapse-'
             return redirect(url_for('node_index') + tab_hash + str(id_))
-    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-    if not entity.view_name:  # pragma: no cover
-        flash(_("This entity can't be viewed directly."), 'error')
-        abort(400)
+    if id_ in g.reference_systems:
+        entity = g.reference_systems[id_]
+    else:
+        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        if not entity.view_name:  # pragma: no cover
+            flash(_("This entity can't be viewed directly."), 'error')
+            abort(400)
     # Return the respective view function, e.g. place_view() in views/place.py if it is a place
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)

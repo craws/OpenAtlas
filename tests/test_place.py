@@ -8,6 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
+from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase
 
 
@@ -25,15 +26,23 @@ class PlaceTest(TestBaseCase):
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
                 place_node = Node.get_hierarchy('Place')
                 source = Entity.insert('E33', 'Necronomicon')
+            geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
+            precision = Node.get_hierarchy('External Reference Match').subs[0]
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
                     'geonames_precision': 'close match',
-                    unit_node.id: str([unit_sub1.id, unit_sub2.id])}
+                    unit_node.id: str([unit_sub1.id, unit_sub2.id]),
+                    geonames: '123456',
+                    self.precision_geonames: precision,
+                    self.precision_wikidata: ''}
             rv = self.app.post(url_for('place_insert', origin_id=reference.id),
                                data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been created' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=precision))
+            assert b'Asgard' in rv.data
+
             data['gis_points'] = """[{
                 "type":"Feature",
                 "geometry":{"type":"Point","coordinates":[9,17]},

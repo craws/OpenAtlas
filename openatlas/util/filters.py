@@ -305,7 +305,6 @@ def add_row(field,
     css_class += ' integer' if type(field) is IntegerField else ''
     for validator in field.validators:
         css_class += ' email' if type(validator) is Email else ''
-
     errors = ' <span class="error">{errors}</span>'.format(
         errors=' '.join(display.uc_first(error) for error in field.errors)) if field.errors else ''
     return """
@@ -316,7 +315,7 @@ def add_row(field,
         label=label if isinstance(label, str) else field.label,
         tooltip=display.tooltip(field.description),
         value=value if value else field(class_=css_class).replace('> ', '>'),
-        css_row='external-reference' if field.id in [name + '_id' for name in g.external] else '',
+        css_row='external-reference' if field.id.startswith('reference_system_') else '',
         errors=errors)
 
 
@@ -353,7 +352,7 @@ def display_form(self: Any,
         # These fields will be added in combination with other fields
         if type(field) is ValueFloatField or field.id.startswith('insert_'):
             continue
-        if field.id in [reference + '_precision' for reference in g.external]:
+        if field.id.startswith('reference_system_precision'):
             continue
 
         if field.type in ['CSRFTokenField', 'HiddenField']:
@@ -401,14 +400,13 @@ def display_form(self: Any,
             html += add_row(field, '', text)
             continue
 
-        # External Reference
-        if field.id in [name + '_id' for name in g.external]:
-            precision_field = getattr(form, field.id.replace('_id', '_precision'))
-            html += add_row(field, field.label, ' '.join([str(field),
+        # External reference system
+        if field.id.startswith('reference_system_id_'):
+            precision_field = getattr(form, field.id.replace('id_', 'precision_'))
+            html += add_row(field, field.label, ' '.join([str(field(class_=field.label.text)),
                                                           str(precision_field.label),
                                                           str(precision_field)]))
             continue
-
         html += add_row(field, form_id=form_id)
 
     return Markup("""
@@ -436,8 +434,9 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
+    url = url_for(entity.view_name + '_index', action='delete', id_=entity.id)
     return display.button(_('delete'),
-                          url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                          url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
@@ -489,18 +488,20 @@ def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_external_references(self: Any, entity: Entity) -> str:
-    """ Formats external references for display."""
-    html = ''
-    for link_ in entity.external_references:
-        url = link_.domain.name
-        name = display.truncate(url.replace('http://', '').replace('https://', ''), span=False)
-        if link_.description:
-            name = link_.description
-        if link_.domain.system_type.startswith('external reference '):
-            reference = link_.domain.system_type.replace('external reference ', '')
-            name = g.external[reference]['name'] + ' (' + link_.domain.name + ')'
-            url = g.external[reference]['url'] + link_.domain.name
-        html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
+    system_links = []
+    for link_ in entity.reference_systems:
+        system = g.reference_systems[link_.domain.id]
+        name = link_.description
+        if system.resolver_url:
+            name = '<a href="{url}" target="_blank">{name}</a>'.format(
+                url=system.resolver_url + name,
+                name=name)
+        system_links.append('''{name} ({match} {at} {system_name})'''.format(
+            name=name,
+            match= g.nodes[link_.type.id].name,
+            at=_('at'),
+            system_name= display.link(link_.domain)))
+    html = '<br>'.join(system_links)
     if not html:
         return ''
     return Markup('<h2>' + display.uc_first(_('external references')) + '</h2>' + html)

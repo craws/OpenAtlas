@@ -3,7 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from tests.base import TestBaseCase, random_string
+from tests.base import TestBaseCase
 
 
 class ActorTests(TestBaseCase):
@@ -13,7 +13,10 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
             # Create entities for actor
-            rv = self.app.post(url_for('place_insert'), data={'name': random_string()})
+            rv = self.app.post(url_for('place_insert'), data={
+                'name': 'Captain Miller',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -39,9 +42,13 @@ class ActorTests(TestBaseCase):
                     'begin_day_from': '8',
                     'begin_year_to': '-1948',
                     'end_year_from': '2049',
-                    'end_year_to': '2050'}
+                    'end_year_to': '2050',
+                    self.precision_geonames: '',
+                    self.precision_wikidata: ''}
             rv = self.app.post(url_for('actor_insert', code='E21'), data=data)
             actor_id = rv.location.split('/')[-1]
+            self.app.post(url_for('actor_insert', code='E74'), data=data)
+            self.app.post(url_for('actor_insert', code='E40'), data=data)
             rv = self.app.post(url_for('actor_insert', code='E21', origin_id=residence_id),
                                data=data,
                                follow_redirects=True)

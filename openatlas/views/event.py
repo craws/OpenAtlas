@@ -12,7 +12,7 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.reference import Reference
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link)
@@ -107,7 +107,7 @@ def save(form: FlaskForm,
         else:
             abort(400)  # pragma: no cover, either event or code has to be provided
         event.update(form)
-        Reference.update(form, event)
+        ReferenceSystem.update_links(form, event)
         if form.event.data:
             event.link_string('P117', form.event.data)
         if hasattr(form, 'place') and form.place.data:
@@ -188,8 +188,9 @@ def event_view(event: Entity) -> str:
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,
                                                origin_id=event.id))
-            if domain.system_type.startswith('external reference'):
-                event.external_references.append(link_)
+            if domain.view_name == 'reference_system':
+                event.reference_systems.append(link_)
+                continue
         data = add_remove_link(data, domain.name, link_, event, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True) for location

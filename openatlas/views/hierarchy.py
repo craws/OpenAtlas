@@ -56,7 +56,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     table = Table(paging=False)
     for form_id, form_ in hierarchy.forms.items():
         link_ = link(_('remove'),
-                     url_for('hierarchy_remove_form', id_=hierarchy.id, remove_id=form_id))
+                     url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
         count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
     return render_template('hierarchy/update.html',
@@ -66,14 +66,14 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                            forms=[form.id for form in form.forms])
 
 
-@app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
+@app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
 @required_group('manager')
-def hierarchy_remove_form(id_: int, remove_id: int) -> Response:
+def hierarchy_remove_form(id_: int, form_id: int) -> Response:
     root = g.nodes[id_]
-    if Node.get_form_count(root, remove_id):
+    if Node.get_form_count(root, form_id):
         abort(403)  # pragma: no cover
     try:
-        Node.remove_form_from_hierarchy(root, remove_id)
+        Node.remove_form_from_hierarchy(root, form_id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         logger.log('error', 'database', 'remove form from hierarchy failed', e)
