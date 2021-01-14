@@ -128,10 +128,11 @@ class GeoJsonEntity:
     def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
         ref = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
-            system = g.reference_systems[link.domain.id]
-            ref.append({'identifier': (system.resolver_url if system.resolver_url else '') + link.description,
-                        'type': g.nodes[link.type.id].name,
-                        'reference_system': system.name})
+            if link.domain.class_.code == 'E32':
+                system = g.reference_systems[link.domain.id]
+                ref.append({'identifier': (system.resolver_url if system.resolver_url else '') + link.description,
+                            'type': g.nodes[link.type.id].name,
+                            'reference_system': system.name})
         return ref if ref else None
 
     @staticmethod
