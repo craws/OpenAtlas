@@ -6,7 +6,7 @@
 {% endblock %}
 {% block tab_info %}
     <div class="toolbar">
-        {{ 'menu/reference_system'|manual }}
+        {{ 'form/reference_system'|manual }}
         {% if 'manager'|is_authorized %}
             {{ _('edit')|button(url_for('reference_system_update', id_=entity.id)) }}
             {% if not entity.forms and not entity.system %}
