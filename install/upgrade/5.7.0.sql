@@ -70,7 +70,21 @@ INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Legal Body')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));
 
--- #1292: Reference systems - remove former reference systems settings
+-- #1292: Reference systems - copy already entered data in new system
+INSERT INTO model.link (domain_id, property_code, range_id, description, type_id)
+SELECT e2.id, 'P67', l.range_id, e.name, l.type_id AS precision_id FROM model.entity e
+JOIN model.link l ON e.id = l.domain_id
+JOIN model.entity e2 ON e2.name = 'GeoNames'
+WHERE e.system_type = 'external reference geonames';
+
+INSERT INTO model.link (domain_id, property_code, range_id, description, type_id)
+SELECT e2.id, 'P67', l.range_id, e.name, l.type_id AS precision_id FROM model.entity e
+JOIN model.link l ON e.id = l.domain_id
+JOIN model.entity e2 ON e2.name = 'Wikidata'
+WHERE e.system_type = 'external reference wikidata';
+
+-- #1292: Reference systems - remove former reference systems entities and module options
+DELETE FROM model.entity WHERE system_type IN ('external reference geonames', 'external reference wikidata');
 DELETE FROM web.settings WHERE name in ('geonames_url', 'module_geonames', 'module_wikidata');
 DELETE FROM web.user_settings WHERE name in ('module_geonames', 'module_wikidata');
 
