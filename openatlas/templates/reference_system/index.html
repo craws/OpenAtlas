@@ -6,7 +6,7 @@
 {% block content %}
     <div class="toolbar">
         {{ 'form/reference_system'|manual }}
-        {% if 'contributor'|is_authorized %}
+        {% if 'manager'|is_authorized %}
             {{ _('reference system')|button(url_for('reference_system_insert')) }}
         {% endif %}
     </div>
