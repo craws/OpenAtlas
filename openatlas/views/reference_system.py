@@ -124,11 +124,11 @@ def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
             log_action = 'update'
             entity.name = entity.name if entity.system else form.name.data
             entity.description = form.description.data
-            entity.website_url = form.website_url.data if form.website_url.data else None
-            entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
-            entity.placeholder = form.placeholder.data if form.placeholder.data else None
-            entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
-            entity.update_system(form)
+        entity.website_url = form.website_url.data if form.website_url.data else None
+        entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
+        entity.placeholder = form.placeholder.data if form.placeholder.data else None
+        entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
+        entity.update_system(form)
         if hasattr(form, 'forms'):
             entity.add_forms(form)
         g.cursor.execute('COMMIT')
