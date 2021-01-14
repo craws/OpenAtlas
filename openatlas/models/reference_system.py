@@ -117,8 +117,9 @@ class ReferenceSystem(Entity):
         choices = []
         for row in g.cursor.fetchall():
             if not entity or row.id not in entity.forms:
-                if entity and entity.name != 'GeoNames' or row.name == 'Place':
-                    choices.append((row.id, row.name))
+                if entity and entity.name == 'GeoNames' and row.name != 'Place':
+                    continue
+                choices.append((row.id, row.name))
         return choices
 
     @staticmethod
