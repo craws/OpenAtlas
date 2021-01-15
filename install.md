@@ -56,7 +56,7 @@ Create an openatlas database, make openatlas the owner of it
 
     $ createdb openatlas -O openatlas
 
-Add the postgis extension to the database
+Add postgis and unaccent extension to the database
 
     $ psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
