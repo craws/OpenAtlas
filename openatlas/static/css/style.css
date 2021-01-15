@@ -8,6 +8,17 @@ body {
     color: #000000;
 }
 
+.ui-progressbar {
+    height: 1em;
+    border: 1px black solid;
+}
+
+.ui-progressbar-value.ui-widget-header {
+    height: 0.9em;
+    background: green;
+    background-color: #007bff;
+}
+
 h1, h2, h3 {
     font-size: 100%;
 }
@@ -78,8 +89,6 @@ select {
     font-size: 26px;
     display: inline-flex;
 }
-
-
 
 table.dataTable th {
     white-space:nowrap;
