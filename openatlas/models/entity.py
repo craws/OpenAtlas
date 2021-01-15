@@ -388,7 +388,7 @@ class Entity:
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
-                current_user.settings['table_show_aliases'] else False
+                              current_user.settings['table_show_aliases'] else False
             sql = Entity.build_sql(nodes=True if menu_item == 'event' else False,
                                    aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
@@ -478,12 +478,13 @@ class Entity:
         if not form.term.data:
             return {}.values()
         sql = Entity.build_sql() + """
-            {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
-            AND {user_clause2} (""".format(
+            {user_clause} WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+            {description_clause}) AND {user_clause2} (""".format(
             user_clause="""
                 LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
             description_clause="""
-                OR lower(e.description) LIKE lower(%(term)s) """ if form.desc.data else '',
+                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s)) """
+            if form.desc.data else '',
             user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []
         for name in form.classes.data:

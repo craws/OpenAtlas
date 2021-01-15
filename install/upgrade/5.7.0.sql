@@ -3,6 +3,9 @@
 
 BEGIN;
 
+-- #1440: Search for unaccented characters
+CREATE EXTENSION unaccent;
+
 -- #1292: Reference systems - add new structure and data
 CREATE TABLE web.reference_system (
     entity_id integer NOT NULL,

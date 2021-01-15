@@ -58,7 +58,7 @@ Create an openatlas database, make openatlas the owner of it
 
 Add the postgis extension to the database
 
-    $ psql openatlas -c "CREATE EXTENSION postgis;"
+    $ psql openatlas -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
 Import the scripts: 1_structure.sql,  2_data_web.sql,  3_data_model.sql, 4_data_node.sql
 
@@ -129,7 +129,7 @@ Install required packages:
 As postgres
 
     $ createdb openatlas_test -O openatlas
-    $ psql openatlas_test -c "CREATE EXTENSION postgis;"
+    $ psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
     $ cd install
     $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql  4_data_node.sql | psql -d openatlas_test -f -
 

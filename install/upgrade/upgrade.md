@@ -1,5 +1,5 @@
 ## INFO
-Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
+Before executing SQL statements, backup the database. Replace database role "openatlas" if needed.
 
 If you are using git and want to update to the latest stable release you can fetch the master branch
 e.g.
@@ -11,12 +11,19 @@ After following the instructions restart Apache and test if the application is w
     service apache2 restart
 
 ### 5.6.0 to 5.7.0
-Execute install/upgrade/5.7.0.sql after making backups
 
-A new version of the API replaced the version 0.1. Since the new version 0.2 supports flask-restful
-swagger new packages are needed:
+#### Software
+API version 0.2 needs an additional package:
 
     # apt install python3-flask-restful
+
+#### Database
+Execute **install/upgrade/5.7.0.sql** after making backups. Can most likely not be done from
+within the application because superuser rights are needed to create the unaccent extension.
+
+If you are running tests be sure to also execute following in the test database:
+
+    CREATE EXTENSION unaccent;
 
 ### 5.5.1 to 5.6.0
 Execute install/upgrade/5.6.0.sql after making backups (can also be done in Admin/Execute SQL)
@@ -30,7 +37,7 @@ To install extra JavaScript (example commands for Linux/Debian in root of projec
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
 
-In case you get an error like "calmjs.cli not overwriting existing 'openatlas/static/package.json':
+In case you get an error like "calmjs.cli not overwriting existing 'openatlas/static/package.json'":
 Delete it and try again.
 
     $ rm openatlas/static/package.json
@@ -41,14 +48,14 @@ Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admi
 ### 5.5.0 to 5.6.0
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
-The new Wikidata module will be inactive by default but you can activate it as default at 
+The new Wikidata module will be inactive by default, but you can activate it as default at
 admin/modules after the upgrade.
 
 ### 5.4.0 to 5.5.0
 Execute install/upgrade/5.5.0.sql after making backups
 
 Default modules for new user can now be set at admin/modules which can be overridden in user
-profiles. You might want to check the default settings and your own profile after the upgrade.
+profiles. You might want to check the default settings, and your own profile after the upgrade.
 
 ### 5.3.0 to 5.4.0
 **Important**: we renamed our main branch which is also used for productive systems from **master**
@@ -81,7 +88,7 @@ A code base update (e.g. with git pull) and an Apache restart should be sufficie
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 ### 4.1.0 to 5.0.0
-WARNING - this is a major release and requires new software. JavaScript libraries are now installed
+WARNING - this is a major release and requires new software. JavaScript's libraries are now installed
 in a separate step.
 
 #### Software
