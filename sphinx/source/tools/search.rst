@@ -3,10 +3,11 @@ Search
 
 .. toctree::
 
-The global search finds entities containing the search term in their name or aliases.
+The global search finds entities containing the search term in their name or aliases. It is:
 
-* It is not case sensitive, e.g. **aDa lovelacE** will find **Ada Lovelace**
-* It is a full text search, e.g. **da Love** will find **Ada Lovelace**
+* Not case sensitive, e.g. **aDa lovelacE** will find **Ada Lovelace**
+* Full text, e.g. **da Love** will find **Ada Lovelace**
+* Unaccented, e.g. **Lovē** will find **Love** and vice-versa
 * You can use *%* as a placeholder, e.g. **Ada L%ce** will find **Ada Lovelace**
 
 After clicking on the search button in the top right you will be redirected to a result page where

@@ -3,7 +3,8 @@ class Changelog:
         '5.7.0': ['TBA', {
             'feature': {
                 '1292': 'External reference systems',
-                '1440': 'Search with unaccented characters'},
+                '1440': 'Search with unaccented characters',
+                '1386': 'API: Flask restful framework'},
             'fix': {
                 '1427': 'API: Pageing is broken',
                 '1434': 'Types of Human Remains are not displayed in Overview'}}],
