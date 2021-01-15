@@ -34,8 +34,6 @@ Modules
 Here you can adjust shown interface elements to your preferences. You still see e.g. existing sub
 units even when you deactivate them but the interface elements to add them will disappear.
 
-* **Wikidata** - to link to `Wikidata <https://www.wikidata.org>`_ at insert or update of an entity.
-* **GeoNames** - to link to `GeoNames <https://www.geonames.org>`_ at insert or update of a :doc:`/menu/place`.
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones (editor or above).
 * **Sub units** - to insert archeological sub units at places, see: :doc:`/menu/place`
 * **Notes** - an additional tool for your workflow, e.g. to add a personal reminder to an entity.

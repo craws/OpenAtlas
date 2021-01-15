@@ -19,6 +19,7 @@ Form fields
 * :doc:`/form/description`
 * **Location** - a :doc:`place` where the event occurred
 * **Sub event of** - events can be part of another event, e.g. a battle as a sub event of a war.
+* :doc:`/form/reference_system`
 
 Move
 ****

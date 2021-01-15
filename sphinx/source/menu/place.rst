@@ -17,6 +17,7 @@ Form fields
 * :doc:`/tools/map`
 * **Administrative Unit**
 * **Historical Place**
+* :doc:`/form/reference_system`
 
 You can edit administrative units and historical places at **Types** in the **Places** tab.
 

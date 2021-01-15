@@ -20,6 +20,7 @@ Form fields
 * **Residence** - a :doc:`place`, e.g. the location of an institute or the main residence of an actor
 * **Born in / Begins in** - the :doc:`place` where a person was born or a group/legal body began
 * **Died in / Ends in** - the :doc:`place` where a person died or a group/legal body ended
+* :doc:`/form/reference_system`
 
 Can be linked via tabs to
 -------------------------

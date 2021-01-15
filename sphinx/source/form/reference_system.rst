@@ -6,7 +6,7 @@ Reference Systems
 Reference systems can be used to link entities to external sources, e.g. to
 `Wikidata <https://www.wikidata.org/>`_  or `GeoNames <https://www.geonames.org/>`_
 which are already included in the default application. You can see a list of available systems by
-clicking the **Reference system** button on the start page. Links consists of an identifier (id)
+clicking the **Reference system** button on the start page. Links consists of an identifier (ID)
 and a precision.
 
 ID
@@ -31,9 +31,15 @@ Admins and manager can add, updated and delete external reference systems.
 
 * **Name** - e.g. Wikipedia; can not be changed for Wikidata or GeoNames
 * **Website URL** - an URL to the project site of the reference system
-* **Resolver URL** - if available an URL that can be linked to in combination with the id, e.g. https://www.wikidata.org/wiki/
+* **Resolver URL** - an URL that can be linked to in combination with an id, e.g. https://www.wikidata.org/wiki/
 * **Example ID** - an example id to show the desired format e.g. Q123 for Wikidata
-* **External Reference Match** - a default precision can be set here, e.g. close match for GeoNames for a historical project
-* **Description** - a short description, which will be shown in forms when hovering the mouse over the **i** icon
+* **External Reference Match** - default precision selected in forms
+* **Description** - a short description, shown in forms when mouse over the **i** icon
+* **Forms** - a checkbox list of available forms, for GeoNames only place is available
 
+Forms can be removed from a system by clicking on the tab with the corresponding form name and
+clicking the **Remove** button. This button is only available if there are no entities linked to the
+form.
 
+Reference systems can be deleted only if no forms are attached to it. Wikidata and GeoNames are
+integrated and cannot be deleted but if desired they can be disabled by removing the forms.

@@ -28,8 +28,7 @@ When in insert or update mode of a place you have following options available (c
 
 GeoNames
 --------
-The *GeoNames ID* field (available only if activated in your :doc:`profile`) can either be manually
-entered or imported from a map search result.
+The *GeoNames ID* field can either be manually entered or imported from a map search result.
 
 The checkbox **exact match** can be used if there is a high
 degree of confidence that the concepts can be used interchangeably. By default it is a
