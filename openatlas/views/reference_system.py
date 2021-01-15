@@ -31,8 +31,8 @@ def reference_system_index(action: Optional[str] = None, id_: Optional[int] = No
             entity.delete()
             logger.log_user(id_, 'delete')
             flash(_('entity deleted'), 'info')
-    table = Table([_('name'), _('count'), _('website URL'), _('resolver URL'),
-                   _('example identifier'), _('default match'), _('description')])
+    table = Table([_('name'), _('count'), _('website URL'), _('resolver URL'), _('example ID'),
+                   _('default precision'), _('description')])
     for entity in g.reference_systems.values():
         table.rows.append([
             link(entity),

@@ -147,7 +147,7 @@ def customize_labels(name: str, form: FlaskForm) -> None:
 
 
 def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
-    setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
+    setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
     if 'continue' in forms[name] and (name in ['involvement'] or not origin):
