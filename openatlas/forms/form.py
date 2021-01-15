@@ -110,7 +110,7 @@ def populate_form(name: str,
         date.populate_dates(form, item)
 
     # Nodes
-    nodes = item.nodes
+    nodes: Dict[Node, str] = item.nodes
     if location:  # Needed for administrative unit and historical place nodes
         nodes.update(location.nodes)
     form.opened.data = time.time()
@@ -146,7 +146,10 @@ def customize_labels(name: str, form: FlaskForm) -> None:
         form.description.label.text = _('content')
 
 
-def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
+def add_buttons(form: Any,
+                name: str,
+                entity: Union[Entity, None],
+                origin: Optional[Entity] = None) -> FlaskForm:
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form

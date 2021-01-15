@@ -51,11 +51,10 @@ class ReferenceSystem(Entity):
         return {row.id: ReferenceSystem(row) for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_by_name(name: str) -> Union[ReferenceSystem, None]:
+    def get_by_name(name: str) -> ReferenceSystem:
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
-        return  # pragma: no cover
 
     def add_forms(self, form: FlaskForm) -> None:
         for form_id in form.forms.data:
@@ -70,7 +69,7 @@ class ReferenceSystem(Entity):
             WHERE reference_system_id = %(reference_system_id)s AND form_id = %(form_id)s;"""
         g.execute(sql, {'reference_system_id': self.id, 'form_id': form_id})
 
-    def get_forms(self):
+    def get_forms(self) -> Dict[int, Dict[str, str]]:
         sql = """
             SELECT f.id, f.name FROM web.form f
             JOIN web.reference_system_form rsf ON f.id = rsf.form_id

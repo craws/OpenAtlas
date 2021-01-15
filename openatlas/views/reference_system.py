@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -72,7 +72,7 @@ def reference_system_update(id_: int) -> Union[str, Response]:
 
 @app.route('/reference_system/remove_form/<int:system_id>/<int:form_id>', methods=['POST', 'GET'])
 @required_group('manager')
-def reference_system_remove_form(system_id: int, form_id: int):
+def reference_system_remove_form(system_id: int, form_id: int) -> Response:
     # Todo: check if there are no form connections anymore
     try:
         g.reference_systems[system_id].remove_form(form_id)
@@ -85,9 +85,9 @@ def reference_system_remove_form(system_id: int, form_id: int):
 
 def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
     tabs = {name: Tab(name, origin=entity) for name in ['info']}
-    info: Dict[str, Union[str, List[str]]] = {_('website URL'): external_url(entity.website_url),
-                                              _('resolver URL'): external_url(entity.resolver_url),
-                                              _('example ID'): entity.placeholder}
+    info: Dict[str, Any] = {_('website URL'): external_url(entity.website_url),
+                            _('resolver URL'): external_url(entity.resolver_url),
+                            _('example ID'): entity.placeholder}
     add_type_data(entity, info)
     add_system_data(entity, info)
     for form_id, form_ in entity.get_forms().items():
@@ -114,7 +114,7 @@ def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
     return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
-def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
+def save(form: FlaskForm, entity: ReferenceSystem = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         if not entity:
@@ -135,7 +135,7 @@ def save(form: FlaskForm, entity: Optional[ReferenceSystem] = None) -> str:
         logger.log_user(entity.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
         return url_for('entity_view', id_=entity.id)
-    except IntegrityError as e:
+    except IntegrityError:
         g.cursor.execute('ROLLBACK')
         flash(_('error name exists'), 'error')
     except Exception as e:  # pragma: no cover

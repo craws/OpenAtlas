@@ -9,7 +9,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape
 from markupsafe import Markup
-from wtforms import IntegerField
+from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
@@ -292,7 +292,7 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
             <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
 
 
-def add_row(field,
+def add_row(field: Field,
             label: Optional[str] = None,
             value: Optional[str] = None,
             form_id: Optional[str] = None) -> str:

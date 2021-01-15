@@ -19,10 +19,10 @@ class TestBaseCase(unittest.TestCase):
         self.login()  # Login on default because needed almost everywhere
         with app.app_context():  # type: ignore
             self.app.get('/')  # Needed to get fieldnames below, to initialise g or something
-            self.precision_geonames = 'reference_system_precision_' + \
-                                      str(ReferenceSystem.get_by_name('GeoNames').id)
-            self.precision_wikidata = 'reference_system_precision_' + \
-                                      str(ReferenceSystem.get_by_name('Wikidata').id)
+            self.precision_geonames =\
+                'reference_system_precision_' + str(ReferenceSystem.get_by_name('GeoNames').id)
+            self.precision_wikidata =\
+                'reference_system_precision_' + str(ReferenceSystem.get_by_name('Wikidata').id)
 
     def login(self) -> None:
         with app.app_context():  # type: ignore

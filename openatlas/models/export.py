@@ -98,8 +98,7 @@ class Export:
                 port=app.config['DATABASE_PORT'],
                 user=app.config['DATABASE_USER'],
                 file=app.config['EXPORT_DIR'] / 'sql' / (
-                        Date.current_date_for_filename() + '_dump.sql')
-            )
+                        Date.current_date_for_filename() + '_dump.sql'))
             try:
                 subprocess.Popen(command,
                                  shell=True,
