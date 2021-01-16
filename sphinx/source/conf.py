@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-version = '5.7.0'
-release = '5.7.0'
+version = '5.8.0'
+release = '5.8.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
