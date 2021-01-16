@@ -16,14 +16,16 @@ checked for a valid format.
 
 Precision
 ---------
-The precision is a required field. There may be a default set already. The two possible
-(`SKOS <https://www.w3.org/TR/skos-primer/>`_) based values are:
+When linking to an external reference a precision is required. Available options are the
+`SKOS <https://www.w3.org/TR/skos-primer/>`_ based definitions of the confidence degree that
+concepts can be used interchangeable.
 
-* **Close match**: Concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications
+* **Close match**: Concepts are sufficiently similar that they can be used interchangeably in some
+  information retrieval applications
 * **Exact match**: High degree of confidence that the concepts can be used interchangeably
 
-E.g. if a historical project links the city of Vienna to Wikidata, a **close match** would be more suitable,
-because the Wikidata entry is more about the current city and not the historical one.
+E.g. if a historical project links the city of Vienna to Wikidata, a **close match** would be more
+suitable, because the Wikidata entry is more about the current city and not the historical one.
 
 Configuration
 -------------
@@ -31,7 +33,9 @@ Admins and manager can add, updated and delete external reference systems.
 
 * **Name** - e.g. Wikipedia; can not be changed for Wikidata or GeoNames
 * **Website URL** - an URL to the project site of the reference system
-* **Resolver URL** - an URL that can be linked to in combination with an id, e.g. https://www.wikidata.org/wiki/
+* **Resolver URL** - an URL that can be linked to in combination with an ID,
+  e.g. the resolver URL **https://www.wikidata.org/wiki/** would create together with a **Q123**
+  identifier the external link: https://www.wikidata.org/wiki/Q123
 * **Example ID** - an example id to show the desired format e.g. Q123 for Wikidata
 * **External Reference Match** - default precision selected in forms
 * **Description** - a short description, shown in forms when mouse over the **i** icon

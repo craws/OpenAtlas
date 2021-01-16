@@ -182,14 +182,16 @@ checked for a valid format.</p>
 </div>
 <div class="section" id="precision">
 <h2>Precision<a class="headerlink" href="#precision" title="Permalink to this headline">¶</a></h2>
-<p>The precision is a required field. There may be a default set already. The two possible
-(<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>) based values are:</p>
+<p>When linking to an external reference a precision is required. Available options are the
+<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of the confidence degree that
+concepts can be used interchangeable.</p>
 <ul class="simple">
-<li><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications</li>
+<li><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some
+information retrieval applications</li>
 <li><strong>Exact match</strong>: High degree of confidence that the concepts can be used interchangeably</li>
 </ul>
-<p>E.g. if a historical project links the city of Vienna to Wikidata, a <strong>close match</strong> would be more suitable,
-because the Wikidata entry is more about the current city and not the historical one.</p>
+<p>E.g. if a historical project links the city of Vienna to Wikidata, a <strong>close match</strong> would be more
+suitable, because the Wikidata entry is more about the current city and not the historical one.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -197,7 +199,9 @@ because the Wikidata entry is more about the current city and not the historical
 <ul class="simple">
 <li><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</li>
 <li><strong>Website URL</strong> - an URL to the project site of the reference system</li>
-<li><strong>Resolver URL</strong> - an URL that can be linked to in combination with an id, e.g. <a class="reference external" href="https://www.wikidata.org/wiki/">https://www.wikidata.org/wiki/</a></li>
+<li><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
+e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create together with a <strong>Q123</strong>
+identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></li>
 <li><strong>Example ID</strong> - an example id to show the desired format e.g. Q123 for Wikidata</li>
 <li><strong>External Reference Match</strong> - default precision selected in forms</li>
 <li><strong>Description</strong> - a short description, shown in forms when mouse over the <strong>i</strong> icon</li>
