@@ -296,8 +296,8 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
-            -- Delete location (E53) if it was a place or find
-            IF OLD.class_code IN ('E18', 'E22') THEN
+            -- Delete location (E53) if it was a place, find or human remains
+            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
