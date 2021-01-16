@@ -1,6 +1,6 @@
 class Changelog:
     versions = {
-        '5.7.0': ['TBA', {
+        '5.7.0': ['2021-01-16', {
             'feature': {
                 '1292': 'External reference systems',
                 '1440': 'Search with unaccented characters',

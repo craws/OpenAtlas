@@ -19,7 +19,7 @@ API version 0.2 needs an additional package:
 
 #### Database
 Execute **install/upgrade/5.7.0.sql** after making backups. Can most likely not be done from
-within the application because superuser rights are needed to create the unaccent extension.
+within the application because superuser rights are needed to create the PostgreSQL unaccent extension.
 
 If you are running tests be sure to also execute following in the test database:
 
