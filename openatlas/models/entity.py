@@ -455,7 +455,7 @@ class Entity:
     @staticmethod
     def delete_orphans(parameter: str) -> int:
         from openatlas.models.node import Node
-        class_codes = tuple(app.config['CODE_CLASS'].keys())
+        class_codes = tuple(app.config['CODE_CLASS'].keys()) + ('E32',)
         if parameter == 'orphans':
             class_codes = class_codes + ('E55',)
             sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
