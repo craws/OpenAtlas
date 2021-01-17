@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-# from flasgger import swag_from
+from flasgger import swag_from
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
@@ -17,7 +17,7 @@ from openatlas.util.util import api_access
 
 class GetQuery(Resource):  # type: ignore
     @api_access()  # type: ignore
-    # @swag_from("../swagger/query.yml", endpoint="query")
+    @swag_from("../swagger/query.yml", endpoint="query")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         entities = []
         parser = query_parser.parse_args()

@@ -1,7 +1,5 @@
 class Changelog:
     versions = {
-        '5.8.0': ['TBA', {
-            'feature': {}}],
         '5.7.0': ['2021-01-16', {
             'feature': {
                 '1292': 'External reference systems',
