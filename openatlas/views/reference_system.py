@@ -96,7 +96,7 @@ def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
     for link_ in entity.get_links('P67'):
         name = link_.description
         if entity.resolver_url:
-            name = '<a href="{url}" target="_blank">{name}</a>'.format(
+            name = '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
                 url=entity.resolver_url + name,
                 name=name)
         tab_name = link_.range.view_name.capitalize().replace(' ', '-')

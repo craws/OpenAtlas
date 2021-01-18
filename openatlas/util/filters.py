@@ -493,7 +493,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
         system = g.reference_systems[link_.domain.id]
         name = link_.description
         if system.resolver_url:
-            name = '<a href="{url}" target="_blank">{name}</a>'.format(
+            name = '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
                 url=system.resolver_url + name,
                 name=name)
         system_links.append('''{name} ({match} {at} {system_name})'''.format(

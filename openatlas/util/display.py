@@ -31,7 +31,8 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 # This file is used in combination with filters.py to collect HTML display code in one place
 
 def external_url(url: Union[str, None]) -> str:
-    return '<a target="blank_" href="{url}">{url}</a>'. format(url=url) if url else ''
+    return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'. format(
+        url=url) if url else ''
 
 
 def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:

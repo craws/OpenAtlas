@@ -12,7 +12,7 @@
         <div style="float:left; ">
             <div class="toolbar">
                 <p>
-                    <a class="{{ config['CSS']['button']['primary'] }}" href="/static/manual/index.html" target="_blank">
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="/static/manual/index.html" target="_blank" rel="noopener noreferrer">
                         <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
                     </a>
                     {{ _('model')|button(url_for('model_index')) }}
@@ -70,6 +70,6 @@
             <p>{{ intro|safe }}</p>
         {% endif %}
         <h1>OpenAtlas</h1>
-        <a target="_blank" rel="noopener" href="https://openatlas.eu/">OpenAtlas</a> {{ _('text_intro') }}
+        <a target="_blank" rel="noopener noreferrer" href="https://openatlas.eu/">OpenAtlas</a> {{ _('text_intro') }}
     {% endif %}
 {% endblock %}

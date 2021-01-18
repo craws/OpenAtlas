@@ -24,7 +24,7 @@
         </div>
         <div class="preview" style="float:left;">
             {% if preview %}
-                <a href="{{ url_for('display_file', filename=filename) }}" target="_blank">
+                <a href="{{ url_for('display_file', filename=filename) }}" rel="noopener noreferrer" target="_blank">
                     <img alt="{{ filename }}" src="{{ url_for('display_file', filename=filename) }}">
                 </a>
             {% elif not missing_file %}
