@@ -12,5 +12,5 @@
             {{ _('external reference')|button(url_for('reference_insert', category='external_reference')) }}
         {% endif %}
     </div>
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

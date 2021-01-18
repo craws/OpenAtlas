@@ -10,5 +10,5 @@
             {{ 'E84'|get_class_name|button(url_for('object_insert')) }}
         {% endif %}
     </div>
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

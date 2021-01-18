@@ -8,7 +8,7 @@
         {{ 'admin/data_integrity_checks'|manual }}
     </div>
     {% if table.rows %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% else %}
         <p>{{ _('Congratulations, everything looks fine!') }}</p>
     {% endif %}

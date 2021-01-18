@@ -10,5 +10,5 @@
             {{ _('file')|button(url_for('file_insert')) }}
         </div>
     {% endif %}
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

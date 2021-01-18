@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from flask import json, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from markupsafe import Markup
 
 
 class Table:
@@ -75,4 +76,4 @@ class Table:
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
             toolbar=css_toolbar if len(self.rows) <= current_user.settings['table_rows'] else '')
-        return html
+        return Markup(html)

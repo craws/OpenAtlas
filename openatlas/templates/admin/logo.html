@@ -4,5 +4,5 @@
     <a href="{{ url_for('admin_index') }}#tab-files">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('logo')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

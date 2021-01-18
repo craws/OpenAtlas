@@ -10,5 +10,5 @@
             {{ _('source')|button(url_for('source_insert')) }}
         </div>
     {% endif %}
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

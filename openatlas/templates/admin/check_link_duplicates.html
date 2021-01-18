@@ -11,9 +11,9 @@
         {% endif %}
     </div>
     {% if duplicates %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% elif table.rows %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}

@@ -4,5 +4,5 @@
     {{ [[_('model'), 'model_index'], _('properties')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

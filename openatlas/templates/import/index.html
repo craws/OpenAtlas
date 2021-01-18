@@ -10,5 +10,5 @@
             {{ _('project')|button(url_for('import_project_insert')) }}
         {% endif %}
     </div>
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}
