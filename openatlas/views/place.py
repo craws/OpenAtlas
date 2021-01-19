@@ -43,7 +43,7 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                                            nodes=True,
                                            aliases=current_user.settings['table_show_aliases']):
         table.rows.append(get_base_table_data(place))
-    return render_template('place/index.html', table=table, gis_data=Gis.get_all())
+    return render_template('entity/index.html', table=table, class_='place', gis_data=Gis.get_all())
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])

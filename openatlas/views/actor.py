@@ -30,7 +30,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['actor'], defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
     table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('actor')]
-    return render_template('actor/index.html', table=table)
+    return render_template('entity/index.html', table=table, class_='actor')
 
 
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])

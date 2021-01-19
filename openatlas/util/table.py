@@ -40,7 +40,7 @@ class Table:
         self.order = order if order else ''
         self.defs = defs if defs else ''
 
-    def display(self, name: str = 'table') -> str:
+    def display(self, name: Optional[str] = 'default') -> str:
         from openatlas.util.display import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'

@@ -80,7 +80,7 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['reference'])
     table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('reference')]
-    return render_template('reference/index.html', table=table)
+    return render_template('entity/index.html', table=table, class_='reference')
 
 
 @app.route('/reference/insert/<category>', methods=['POST', 'GET'])

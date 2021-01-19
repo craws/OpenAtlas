@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block title_name %} - {{ _(class_|replace('_', ' '))|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {% if class_ == 'file' %}
+        {{ [[_('admin'), 'admin_index'], _('file')]|crumb }}
+    {% else %}
+        {{ [_(class_|replace('_', ' '))]|crumb }}
+    {% endif %}
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col">
+            <div class="toolbar">
+                {{ ('menu/' + class_)|manual }}
+                {% if 'contributor'|is_authorized %}
+                        {% if class_ in ['actor', 'event'] %}
+                            {% for code in config.CLASS_CODES[class_] %}
+                                {{ (code|get_class_name)|button(url_for(class_ + '_insert', code=code)) }}
+                            {% endfor %}
+                        {% elif class_ == 'object' %}
+                            {{ 'E84'|get_class_name|button(url_for('object_insert')) }}
+                        {% elif class_ == 'reference' %}
+                            {{ _('bibliography')|button(url_for('reference_insert', category='bibliography')) }}
+                            {{ _('edition')|button(url_for('reference_insert', category='edition')) }}
+                            {{ _('external reference')|button(url_for('reference_insert', category='external_reference')) }}
+                        {% elif class_ == 'reference_system' %}
+                            {% if 'manager'|is_authorized %}
+                                {{ _('reference system')|button(url_for('reference_system_insert')) }}
+                            {% endif %}
+                        {% else %}
+                            {{ _(class_)|button(url_for(class_ + '_insert')) }}
+                        {% endif %}
+                {% endif %}
+            </div>
+            {{ table.display() }}
+        </div>
+        {% if gis_data %}
+            <div class="col">
+                <div id="map"></div>
+            </div>
+        {% endif %}
+    </div>
+    {% if class_ == 'place' %}
+        <script src="/static/js/map/map.js"></script>
+    {% endif %}
+{% endblock %}

@@ -42,7 +42,7 @@ def reference_system_index(action: Optional[str] = None, id_: Optional[int] = No
             entity.placeholder,
             link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
             entity.description])
-    return render_template('reference_system/index.html', table=table)
+    return render_template('entity/index.html', table=table, class_='reference_system')
 
 
 @app.route('/reference_system/insert', methods=['POST', 'GET'])

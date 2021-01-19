@@ -81,7 +81,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description])
-    return render_template('file/index.html', table=table)
+    return render_template('entity/index.html', table=table, class_='file')
 
 
 @app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])

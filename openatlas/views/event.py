@@ -31,7 +31,7 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['event'], defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
     table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('event')]
-    return render_template('event/index.html', table=table)
+    return render_template('entity/index.html', table=table, class_='event')
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
