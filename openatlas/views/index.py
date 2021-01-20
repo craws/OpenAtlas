@@ -32,7 +32,7 @@ class FeedbackForm(FlaskForm):  # type: ignore
 
 @app.route('/')
 @app.route('/overview')
-def index() -> str:
+def overview() -> str:
     tables = {'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
               'bookmarks': Table(['name', 'class', 'first', 'last'],
                                  defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
@@ -59,7 +59,7 @@ def index() -> str:
             if count:
                 tables['overview'].rows.append([
                     uc_first(_(name)) if name in ['find', 'human remains'] else link(
-                        _(name), url_for(name + '_index')),
+                        _(name), url_for('index', class_=name)),
                     format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([

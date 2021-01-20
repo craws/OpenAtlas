@@ -16,21 +16,7 @@ from openatlas.util.display import (add_edit_link, add_remove_link, add_system_d
                                     format_entry_begin, format_entry_end, get_appearance,
                                     get_base_table_data, get_profile_image_table_link, link)
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-@app.route('/actor')
-@app.route('/actor/<action>/<int:id_>')
-@required_group('readonly')
-def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if id_ and action == 'delete':
-        Entity.delete_(id_)
-        logger.log_user(id_, 'delete')
-        flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['actor'], defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
-    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('actor')]
-    return render_template('entity/index.html', table=table, class_='actor')
 
 
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])

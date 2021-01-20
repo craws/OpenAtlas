@@ -17,21 +17,7 @@ from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link)
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-@app.route('/event')
-@app.route('/event/<action>/<int:id_>')
-@required_group('readonly')
-def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if id_ and action == 'delete':
-        Entity.delete_(id_)
-        logger.log_user(id_, 'delete')
-        flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['event'], defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
-    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('event')]
-    return render_template('entity/index.html', table=table, class_='event')
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])

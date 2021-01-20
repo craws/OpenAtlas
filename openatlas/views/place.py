@@ -18,32 +18,7 @@ from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link, uc_first)
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-@app.route('/place')
-@app.route('/place/<action>/<int:id_>')
-@required_group('readonly')
-def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
-    if id_ and action == 'delete':
-        entity = Entity.get_by_id(id_)
-        parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
-        if entity.get_linked_entities(['P46']):
-            flash(_('Deletion not possible if subunits exists'), 'error')
-            return redirect(url_for('entity_view', id_=id_))
-        entity.delete()
-        logger.log_user(id_, 'delete')
-        flash(_('entity deleted'), 'info')
-        if parent:
-            tab = '#tab-' + entity.system_type.replace(' ', '-')
-            return redirect(url_for('entity_view', id_=parent.id) + tab)
-    table = Table(Table.HEADERS['place'], defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
-    for place in Entity.get_by_system_type('place',
-                                           nodes=True,
-                                           aliases=current_user.settings['table_show_aliases']):
-        table.rows.append(get_base_table_data(place))
-    return render_template('entity/index.html', table=table, class_='place', gis_data=Gis.get_all())
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])

@@ -40,6 +40,10 @@ class Table:
         self.order = order if order else ''
         self.defs = defs if defs else ''
 
+        right_align_columns = ['begin', 'end', 'size']
+        targets = [index for index, item in enumerate(self.header) if item in right_align_columns]
+        self.defs = [{'className': 'dt-body-right', 'targets': targets}] if targets else ''
+
     def display(self, name: Optional[str] = 'default') -> str:
         from openatlas.util.display import uc_first
         if not self.rows:

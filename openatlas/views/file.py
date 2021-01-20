@@ -1,4 +1,3 @@
-import datetime
 import os
 from typing import Any, Optional, Union
 
@@ -12,11 +11,10 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.display import (add_edit_link, add_remove_link, convert_size, format_date,
-                                    get_base_table_data, get_entity_data, get_file_path, link)
+from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
+                                    get_entity_data, get_file_path, link)
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats, required_group, was_modified
+from openatlas.util.util import required_group, was_modified
 
 
 @app.route('/download/<path:filename>')
@@ -47,41 +45,6 @@ def file_remove_profile_image(entity_id: int) -> Response:
     entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
     return redirect(url_for('entity_view', id_=entity.id))
-
-
-@app.route('/file/index')
-@app.route('/file/<action>/<int:id_>')
-@required_group('readonly')
-def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if id_ and action == 'delete':
-        try:
-            Entity.delete_(id_)
-            logger.log_user(id_, 'delete')
-            flash(_('entity deleted'), 'info')
-        except Exception as e:  # pragma: no cover
-            logger.log('error', 'database', 'Deletion failed', e)
-            flash(_('error database'), 'error')
-        try:
-            path = get_file_path(id_)
-            if path:  # Only delete the file on disk if it exists to prevent a missing file error
-                path.unlink()
-        except Exception as e:  # pragma: no cover
-            logger.log('error', 'file', 'file deletion failed', e)
-            flash(_('error file delete'), 'error')
-    table = Table(['date'] + Table.HEADERS['file'])
-    file_stats = get_file_stats()
-    for entity in Entity.get_by_system_type('file', nodes=True):
-        date = 'N/A'
-        if entity.id in file_stats:
-            date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
-        table.rows.append([
-            date,
-            link(entity),
-            entity.print_base_type(),
-            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
-            file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
-            entity.description])
-    return render_template('entity/index.html', table=table, class_='file')
 
 
 @app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
