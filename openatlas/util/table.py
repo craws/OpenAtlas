@@ -24,6 +24,8 @@ class Table:
                'place': ['name', 'type', 'begin', 'end', 'description'],
                'relation': ['relation', 'actor', 'first', 'last', 'description'],
                'reference': ['name', 'class', 'type', 'description'],
+               'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
+                                    'default precision', 'description'],
                'source': ['name', 'type', 'description'],
                'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
                'text': ['text', 'type', 'content']}

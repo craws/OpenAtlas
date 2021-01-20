@@ -1,10 +1,9 @@
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2 import IntegrityError
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -13,36 +12,7 @@ from openatlas.forms.form import build_form
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import add_system_data, add_type_data, button, external_url, link
 from openatlas.util.tab import Tab
-from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
-
-
-@app.route('/reference_system')
-@app.route('/reference_system/<action>/<int:id_>')
-@required_group('readonly')
-def reference_system_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if id_ and action == 'delete':
-        entity = g.reference_systems[id_]
-        if entity.forms:
-            flash(_('Deletion not possible because forms are attached'), 'error')
-        elif entity.system:
-            abort(403)
-        else:
-            entity.delete()
-            logger.log_user(id_, 'delete')
-            flash(_('entity deleted'), 'info')
-    table = Table([_('name'), _('count'), _('website URL'), _('resolver URL'), _('example ID'),
-                   _('default precision'), _('description')])
-    for entity in g.reference_systems.values():
-        table.rows.append([
-            link(entity),
-            entity.count if entity.count else '',
-            external_url(entity.website_url),
-            external_url(entity.resolver_url),
-            entity.placeholder,
-            link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
-            entity.description])
-    return render_template('entity/index.html', table=table, class_='reference_system')
 
 
 @app.route('/reference_system/insert', methods=['POST', 'GET'])
