@@ -446,19 +446,20 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types']
         view_name = ''
         if entity:
             view_name = entity.view_name
         if origin:
             view_name = origin.view_name
-        for item in items:
+        for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
             if view_name:
                 css = 'active' if view_name.replace('node', 'types') == item else ''
             else:
                 css = 'active' if request.path.startswith('/' + item) else ''
             html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
                 css=css, item=item, label=display.uc_first(_(item)))
+        html += '<a href="/types" class="nav-item nav-link">{label}</a>'.format(
+                label=display.uc_first(_('types')))
     return html
 
 

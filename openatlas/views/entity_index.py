@@ -1,5 +1,5 @@
 import datetime
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -11,8 +11,8 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.util.display import (convert_size, external_url, format_date, get_base_table_data,
-                                    get_file_path, link)
+from openatlas.util.display import (button, convert_size, external_url, format_date,
+                                    get_base_table_data, get_file_path, link)
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group
 
@@ -21,14 +21,35 @@ from openatlas.util.util import get_file_stats, is_authorized, required_group
 @app.route('/index/<class_>/<int:delete_id>')
 @required_group('readonly')
 def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
-    if delete_id:
+    if delete_id:  # To prevent additional redirects deletion is done before showing index
         url = delete_entity(class_, delete_id)
-        if url:
+        if url:  # e.g. an error occurred and entry is shown again
             return redirect(url)
     return render_template('entity/index.html',
-                           table=get_table(class_),
                            class_=class_,
+                           table=get_table(class_),
+                           buttons=get_buttons(class_) if is_authorized('contributor') else [],
                            gis_data=Gis.get_all() if class_ == 'place' else None)
+
+
+def get_buttons(class_: str) -> List[str]:
+    buttons = []
+    if class_ in ['actor', 'event']:
+        for code in app.config['CLASS_CODES'][class_]:
+            buttons.append(button(g.classes[code].name, url_for(class_ + '_insert', code=code)))
+    elif class_ == 'object':
+        buttons = [button(g.classes['E84'].name, url_for('object_insert'))]
+    elif class_ == 'reference':
+        buttons = [button(_('bibliography'), url_for('reference_insert', category='bibliography')),
+                   button(_('edition'), url_for('reference_insert', category='external_reference')),
+                   button(_('external reference'),
+                          url_for('reference_insert', category='external_reference'))]
+    elif class_ == 'reference_system':
+        if is_authorized('manager'):
+            buttons = [button(_('reference system'), url_for('reference_system_insert'))]
+    else:
+        buttons = [button(_(class_), url_for(class_ + '_insert'))]
+    return buttons
 
 
 def get_table(class_: str) -> Table:
