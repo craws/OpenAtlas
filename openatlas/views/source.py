@@ -129,8 +129,11 @@ def source_view(source: Entity) -> str:
         data = add_remove_link(data, domain.name, link_, source, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     source.note = User.get_note(source)
-    return render_template('source/view.html',
+
+    return render_template('entity/view.html',
                            entity=source,
                            tabs=tabs,
                            info=get_entity_data(source),
+                           crumb=[[_(source.view_name), url_for('entity_view', id_=source.id)],
+                                  source.name],
                            profile_image_id=profile_image_id)

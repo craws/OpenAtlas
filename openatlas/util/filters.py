@@ -97,6 +97,24 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def crumb2(self: Any, crumbs: List[Any]) -> str:
+    items = []
+    for item in crumbs:
+        if not item:
+            continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
+        elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
+            items.append(display.link(item))
+        elif isinstance(item, list):
+            items.append('<a href="{url}">{label}</a>'.format(
+                url=item[1],
+                label=display.truncate(display.uc_first(str(item[0])))))
+        else:
+            items.append(display.uc_first(item))
+    return Markup('&nbsp;>&nbsp; '.join(items))
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
@@ -434,7 +452,7 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    url = url_for(entity.view_name + '_index', action='delete', id_=entity.id)
+    url = url_for('index', class_=entity.view_name, delete_id_=entity.id)
     return display.button(_('delete'),
                           url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")

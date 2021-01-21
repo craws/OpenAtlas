@@ -1,11 +1,11 @@
 {% extends "tabs.html" %}
 {% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('source'), 'source_index'], entity.name]|crumb }}
+    {{ crumb|crumb2 }}
 {% endblock %}
 {% block tab_info %}
     <div class="toolbar">
-        {{ 'menu/source'|manual }}
+        {{ ('menu/' + entity.view_name)|manual }}
         {% if 'contributor'|is_authorized %}
             {{ _('edit')|button(url_for('source_update', id_=entity.id)) }}
             {{ entity|display_delete_link }}
