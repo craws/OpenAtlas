@@ -1,9 +1,11 @@
 import pathlib
 import unittest
+from typing import Optional
 
 import psycopg2
 
 from openatlas import app
+from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 
 
@@ -19,9 +21,9 @@ class TestBaseCase(unittest.TestCase):
         self.login()  # Login on default because needed almost everywhere
         with app.app_context():  # type: ignore
             self.app.get('/')  # Needed to get fieldnames below, to initialise g or something
-            self.precision_geonames =\
+            self.precision_geonames = \
                 'reference_system_precision_' + str(ReferenceSystem.get_by_name('GeoNames').id)
-            self.precision_wikidata =\
+            self.precision_wikidata = \
                 'reference_system_precision_' + str(ReferenceSystem.get_by_name('Wikidata').id)
 
     def login(self) -> None:
@@ -45,3 +47,21 @@ class TestBaseCase(unittest.TestCase):
             with open(pathlib.Path(app.root_path).parent / 'install' / file_name,
                       encoding='utf8') as sqlFile:
                 cursor.execute(sqlFile.read())
+
+
+def insert_entity(name: str, class_: str, origin: Optional[Entity] = None) -> Optional[Entity]:
+    entity = None
+    if class_ in ['place', 'feature', 'stratigraphic_unit']:
+        if class_ == 'place':
+            entity = Entity.insert('E18', name, 'place')
+        elif class_ == 'feature':
+            entity = Entity.insert('E18', name, 'feature')
+        elif class_ == 'stratigraphic_unit':
+            entity = Entity.insert('E18', name, 'stratigraphic unit')
+        if origin:
+            origin.link('P46', entity)
+        location = Entity.insert('E53', 'Location of ' + name, 'place location')
+        entity.link('P53', location)
+    if class_ == 'external_reference':
+        entity = Entity.insert('E31', name, 'external_reference')
+    return entity
