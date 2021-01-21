@@ -18,7 +18,7 @@ class NoteTest(TestBaseCase):
                                data={'description': 'A nice description'},
                                follow_redirects=True)
             assert b'Note added' in rv.data
-            rv = self.app.get(url_for('index'))
+            rv = self.app.get(url_for('overview'))
             assert b'A nice description' in rv.data
             rv = self.app.get(url_for('note_update', entity_id=actor.id))
             assert b'A nice description' in rv.data

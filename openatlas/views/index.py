@@ -96,7 +96,7 @@ def index_feedback() -> Union[str, Response]:
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')
-        return redirect(url_for('index'))
+        return redirect(url_for('overview'))
     return render_template('index/feedback.html', form=form)
 
 
