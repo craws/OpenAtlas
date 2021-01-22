@@ -7,10 +7,14 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
+from openatlas.util.display import link
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.display import uc_first
+from openatlas.models.user import User
+from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
+                                    get_entity_data, get_profile_image_table_link, uc_first)
+from openatlas.util.tab import Tab
 from openatlas.util.util import required_group
 from openatlas.views.reference import AddReferenceForm
 from openatlas.views.types import node_view
@@ -40,9 +44,52 @@ def entity_view(id_: int) -> Union[str, Response]:
         if not entity.view_name:  # pragma: no cover
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
-    # Return the respective view function, e.g. place_view() in views/place.py if it is a place
-    return getattr(sys.modules['openatlas.views.' + entity.view_name],
-                   '{name}_view'.format(name=entity.view_name))(entity)
+
+    if entity.view_name not in ['source']:
+        # Return the respective view function, e.g. place_view() in views/place.py if it is a place
+        return getattr(sys.modules['openatlas.views.' + entity.view_name],
+                       '{name}_view'.format(name=entity.view_name))(entity)
+
+    if entity.view_name == 'source':
+        tabs = {name: Tab(name, origin=entity) for name in [
+            'info', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+            'human_remains', 'reference', 'text', 'file']}
+        for text in entity.get_linked_entities('P73', nodes=True):
+            tabs['text'].table.rows.append([link(text),
+                                            next(iter(text.nodes)).name if text.nodes else '',
+                                            text.description])
+        for link_ in entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
+            tabs[range_.table_name].table.rows.append(data)
+        profile_image_id = entity.get_profile_image_id()
+        for link_ in entity.get_links('P67', True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.view_name == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(get_profile_image_table_link(domain, entity, extension, profile_image_id))
+                if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    profile_image_id = domain.id
+            if domain.view_name not in ['file']:
+                data.append(link_.description)
+                data = add_edit_link(data, url_for('reference_link_update',
+                                                   link_id=link_.id,
+                                                   origin_id=entity.id))
+            data = add_remove_link(data, domain.name, link_, entity, domain.view_name)
+            tabs[domain.view_name].table.rows.append(data)
+        entity.note = User.get_note(entity)
+
+    return render_template('entity/view.html',
+                           entity=entity,
+                           tabs=tabs,
+                           info=get_entity_data(entity),
+                           crumb=[[_(entity.view_name), url_for('entity_view', id_=entity.id)],
+                                  entity.name],
+                           profile_image_id=profile_image_id)
+
+
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])

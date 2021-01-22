@@ -9,10 +9,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
-from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_profile_image_table_link, link)
-from openatlas.util.tab import Tab
+from openatlas.util.display import (link)
 from openatlas.util.util import required_group, was_modified
 
 
@@ -97,43 +94,3 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
         flash(_('error transaction'), 'error')
         url = url_for('source_insert', origin_id=origin.id if origin else None)
     return url
-
-
-def source_view(source: Entity) -> str:
-    tabs = {name: Tab(name, origin=source) for name in [
-        'info', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find', 'human_remains',
-        'reference', 'text', 'file']}
-    for text in source.get_linked_entities('P73', nodes=True):
-        tabs['text'].table.rows.append([link(text),
-                                        next(iter(text.nodes)).name if text.nodes else '',
-                                        text.description])
-    for link_ in source.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data = add_remove_link(data, range_.name, link_, source, range_.table_name)
-        tabs[range_.table_name].table.rows.append(data)
-    profile_image_id = source.get_profile_image_id()
-    for link_ in source.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
-            extension = data[3]
-            data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-        if domain.view_name not in ['file']:
-            data.append(link_.description)
-            data = add_edit_link(data, url_for('reference_link_update',
-                                               link_id=link_.id,
-                                               origin_id=source.id))
-        data = add_remove_link(data, domain.name, link_, source, domain.view_name)
-        tabs[domain.view_name].table.rows.append(data)
-    source.note = User.get_note(source)
-
-    return render_template('entity/view.html',
-                           entity=source,
-                           tabs=tabs,
-                           info=get_entity_data(source),
-                           crumb=[[_(source.view_name), url_for('entity_view', id_=source.id)],
-                                  source.name],
-                           profile_image_id=profile_image_id)
