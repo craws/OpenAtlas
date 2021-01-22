@@ -10,14 +10,10 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_profile_image_table_link, link)
-from openatlas.util.tab import Tab
-from openatlas.util.util import is_authorized, required_group, was_modified
+from openatlas.util.display import (link)
+from openatlas.util.util import required_group, was_modified
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
@@ -132,58 +128,3 @@ def save(form: FlaskForm,
         flash(_('error transaction'), 'error')
         url = url_for('event_index')
     return url
-
-
-def event_view(event: Entity) -> str:
-    tabs = {name: Tab(name, origin=event) for name in ['info', 'subs', 'source', 'actor',
-                                                       'reference', 'file']}
-    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
-        tabs['subs'].table.rows.append(get_base_table_data(sub_event))
-    tabs['actor'].table.header.insert(5, _('activity'))  # Add a table column for activity
-    for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
-        first = link_.first
-        if not link_.first and event.first:
-            first = '<span class="inactive">' + event.first + '</span>'
-        last = link_.last
-        if not link_.last and event.last:
-            last = '<span class="inactive">' + event.last + '</span>'
-        data = [link(link_.range),
-                g.classes[link_.range.class_.code].name,
-                link_.type.name if link_.type else '',
-                first,
-                last,
-                g.properties[link_.property.code].name_inverse,
-                link_.description]
-        if is_authorized('contributor'):
-            data.append(
-                link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=event.id)))
-        data = add_remove_link(data, link_.range.name, link_, event, 'actor')
-        tabs['actor'].table.rows.append(data)
-    profile_image_id = event.get_profile_image_id()
-    event.note = User.get_note(event)
-    for link_ in event.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':
-            extension = data[3]
-            data.append(get_profile_image_table_link(domain, event, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-        if domain.view_name not in ['source', 'file']:
-            data.append(link_.description)
-            data = add_edit_link(data, url_for('reference_link_update',
-                                               link_id=link_.id,
-                                               origin_id=event.id))
-            if domain.view_name == 'reference_system':
-                event.reference_systems.append(link_)
-                continue
-        data = add_remove_link(data, domain.name, link_, event, domain.view_name)
-        tabs[domain.view_name].table.rows.append(data)
-    objects = [location.get_linked_entity_safe('P53', True) for location
-               in event.get_linked_entities(['P7', 'P26', 'P27'])]
-    return render_template('event/view.html',
-                           entity=event,
-                           tabs=tabs,
-                           info=get_entity_data(event),
-                           profile_image_id=profile_image_id,
-                           gis_data=Gis.get_all(objects) if objects else None)

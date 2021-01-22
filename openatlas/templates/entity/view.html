@@ -4,23 +4,33 @@
     {{ crumb|crumb2 }}
 {% endblock %}
 {% block tab_info %}
-    <div class="toolbar">
-        {{ ('menu/' + entity.view_name)|manual }}
-        {% if 'contributor'|is_authorized %}
-            {{ _('edit')|button(url_for('source_update', id_=entity.id)) }}
-            {{ entity|display_delete_link }}
-        {% endif %}
-        {{ entity.id|bookmark_toggle }}
-    </div>
-    <h1>{{ entity.name }}</h1>
-    <div>
-        {{ profile_image_id|display_profile_image }}
-        <div style="float:left;">
-            {{ info|display_info }}
-            {{ entity|note }}
-            {{ entity|display_external_references }}
-            {{ entity|description }}
+    <div class="row">
+        <div class="col-6">
+            <div class="toolbar">
+                {{ ('menu/' + entity.view_name)|manual }}
+                {% if 'contributor'|is_authorized %}
+                    {{ _('edit')|button(url_for(entity.view_name + '_update', id_=entity.id)) }}
+                    {{ entity|display_delete_link }}
+                {% endif %}
+                {{ entity.id|bookmark_toggle }}
+            </div>
+            <h1>{{ entity.name }}</h1>
+            <div>
+                {{ profile_image_id|display_profile_image }}
+                <div style="float:left;">
+                    {{ info|display_info }}
+                    {{ entity|note }}
+                    {{ entity|display_external_references }}
+                    {{ entity|description }}
+                </div>
+            </div>
         </div>
-        <div style="clear:both;"></div>
+        {% if gis_data %}
+            <div class="col-6">
+                <div id="map" class="map"></div>
+                <script src="/static/js/map/map.js"></script>
+            </div>
+        {% endif %}
+
     </div>
 {% endblock %}
