@@ -35,4 +35,4 @@ class GetLatest(Resource):  # type: ignore
                 entities.append(GeoJsonEntity.get_entity(entity, parser))
             return entities
         else:
-            raise InvalidLimitError
+            raise InvalidLimitError  # pragma: no cover

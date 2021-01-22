@@ -1,6 +1,6 @@
 import pathlib
 import unittest
-from typing import Optional
+from typing import Dict, List, Optional
 
 import psycopg2
 
@@ -49,11 +49,12 @@ class TestBaseCase(unittest.TestCase):
                 cursor.execute(sqlFile.read())
 
 
-def insert_entity(name: str, class_: str, origin: Optional[Entity] = None) -> Optional[Entity]:
+def insert_entity(name: str, class_: str, origin: Optional[Entity] = None,
+                  description: Optional[str] = None) -> Optional[Entity]:
     entity = None
     if class_ in ['place', 'feature', 'stratigraphic_unit']:
         if class_ == 'place':
-            entity = Entity.insert('E18', name, 'place')
+            entity = Entity.insert('E18', name, 'place', description)
         elif class_ == 'feature':
             entity = Entity.insert('E18', name, 'feature')
         elif class_ == 'stratigraphic_unit':
@@ -64,4 +65,12 @@ def insert_entity(name: str, class_: str, origin: Optional[Entity] = None) -> Op
         entity.link('P53', location)
     if class_ == 'external_reference':
         entity = Entity.insert('E31', name, 'external_reference')
+    if class_ == 'reference_system':
+        entity = Entity.insert('E32', name)
+    if class_ == 'file':
+        entity = Entity.insert('E31', name, 'file')
+    if class_ == 'alias':
+        entity = Entity.insert('E41', name)
+
     return entity
+

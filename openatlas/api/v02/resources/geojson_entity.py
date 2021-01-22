@@ -13,13 +13,6 @@ from openatlas.util.display import format_date, get_file_path
 class GeoJsonEntity:
 
     @staticmethod
-    def to_camelcase(string: str) -> str:  # pragma: nocover
-        if not string:
-            return ''
-        words = string.split(' ')
-        return words[0] + ''.join(x.title() for x in words[1:])
-
-    @staticmethod
     def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
         for link in Link.get_links(entity.id):
@@ -37,7 +30,7 @@ class GeoJsonEntity:
     @staticmethod
     def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
         files = []
-        for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
                 files.append({'@id': url_for('entity', id_=link.domain.id, _external=True),
@@ -49,7 +42,7 @@ class GeoJsonEntity:
         return files if files else None
 
     @staticmethod
-    def get_license(entity_id: int) -> str:  # pragma: nocover
+    def get_license(entity_id: int) -> str:
         file_license = ""
         for link in Link.get_links(entity_id):
             if link.property.code == "P2":
@@ -63,7 +56,7 @@ class GeoJsonEntity:
             nodes_dict = {'identifier': url_for('entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
-                if link.range.id == node.id and link.description:  # pragma: nocover
+                if link.range.id == node.id and link.description:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
@@ -72,7 +65,7 @@ class GeoJsonEntity:
 
             hierarchy = []
             for root in node.root:
-                hierarchy.append(g.nodes[root].name)  # pragma: nocover
+                hierarchy.append(g.nodes[root].name)
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
@@ -127,10 +120,11 @@ class GeoJsonEntity:
     @staticmethod
     def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
         ref = []
-        for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if link.domain.class_.code == 'E32':
                 system = g.reference_systems[link.domain.id]
-                ref.append({'identifier': (system.resolver_url if system.resolver_url else '') + link.description,
+                ref.append({'identifier': (
+                                              system.resolver_url if system.resolver_url else '') + link.description,
                             'type': g.nodes[link.type.id].name,
                             'reference_system': system.name})
         return ref if ref else None
@@ -140,7 +134,7 @@ class GeoJsonEntity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         # Todo: get_by_id return an abort if id does not exist... I don't get to the exception
-        except EntityDoesNotExistError:
+        except EntityDoesNotExistError:  # pragma: nocover
             raise EntityDoesNotExistError
         return entity
 
@@ -159,7 +153,7 @@ class GeoJsonEntity:
             features['description'] = [{'value': entity.description}]
 
         # Alias
-        if entity.aliases and 'names' in parser['show']:  # pragma: nocover
+        if entity.aliases and 'names' in parser['show']:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
@@ -182,7 +176,7 @@ class GeoJsonEntity:
 
         # Todo: adapt Geonames for new reference systems
         features['links'] = GeoJsonEntity.get_reference_systems(entity) if 'links' in parser[
-           'show'] else None
+            'show'] else None
 
         # Geometry
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':

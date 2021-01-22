@@ -49,11 +49,11 @@ class Filter:
 
         for i in data:
             if not i:
-                raise FilterOperatorError
+                raise FilterOperatorError  # pragma: no cover
 
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
-                raise NoSearchStringError
+                raise NoSearchStringError  # pragma: no cover
             column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')' if \
                 Filter.compare_operators[filter_[2]] == 'LIKE' else Filter.valid_columns[
                 filter_[1]]
@@ -70,13 +70,13 @@ class Filter:
         if Filter.valid_columns[filter_[1]] in Filter.valid_date_column.values():
             try:
                 datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
-            except InvalidSearchDateError:
+            except InvalidSearchDateError:  # pragma: no cover
                 raise InvalidSearchDateError
         # Check if search term is an integer if column is id
         if Filter.valid_columns[filter_[1]] == 'e.id':
             try:
                 int(filter_[3])
-            except InvalidSearchNumberError:
+            except InvalidSearchNumberError:  # pragma: no cover
                 raise InvalidSearchNumberError
         # If operator is LIKE then % are needed
         term = '%' + filter_[3] + '%' if Filter.compare_operators[filter_[2]] == 'LIKE' else \
