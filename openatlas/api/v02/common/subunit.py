@@ -31,7 +31,7 @@ class GetSubunit(Resource):  # type: ignore
         # Get first level of subunits
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
+        except Exception:  # pragma: no cover
             raise EntityDoesNotExistError
         structure = get_structure(entity)
         data = []

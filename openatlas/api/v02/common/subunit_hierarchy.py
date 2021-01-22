@@ -30,12 +30,12 @@ class GetSubunitHierarchy(Resource):  # type: ignore
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except EntityDoesNotExistError:
+        except EntityDoesNotExistError:  # pragma: no cover
             raise EntityDoesNotExistError
         if entity.class_.code in ['E18']:
             return GetSubunitHierarchy.get_subunits_recursive(entity, [])
         else:
-            raise InvalidSubunitError
+            raise InvalidSubunitError  # pragma: no cover
 
     @staticmethod
     def get_subunits_recursive(entity: Optional[Entity], data: List[Dict[str, Any]]) \

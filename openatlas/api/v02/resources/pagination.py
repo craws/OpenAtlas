@@ -27,7 +27,7 @@ class Pagination:
                 total = list(
                     itertools.islice(total, total.index(int(parser['first'])), None))
             else:
-                raise EntityDoesNotExistError
+                raise EntityDoesNotExistError  # pragma: no cover
         else:
             pass
         # Finding the entity with the wanted id

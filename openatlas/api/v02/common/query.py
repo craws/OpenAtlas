@@ -22,7 +22,7 @@ class GetQuery(Resource):  # type: ignore
         entities = []
         parser = query_parser.parse_args()
         if not parser['entities'] and not parser['codes'] and not parser['classes']:
-            raise QueryEmptyError
+            raise QueryEmptyError  # pragma: no cover
         template = GeoJson.pagination(parser['show'])
         if parser['entities']:
             for entity in parser['entities']:
