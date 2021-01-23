@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas.models.gis import Gis
-from openatlas.util.display import link
+from openatlas.util.display import get_file_path, link
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
@@ -46,15 +46,32 @@ def entity_view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    if entity.view_name not in ['source', 'event']:
+    if entity.view_name not in ['source', 'event', 'file']:
         # Return the respective view function, e.g. place_view() in views/place.py if it is a place
         return getattr(sys.modules['openatlas.views.' + entity.view_name],
                        '{name}_view'.format(name=entity.view_name))(entity)
 
     objects = None
-    profile_image_id = None
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info', entity)}
+    if entity.view_name == 'file':
+        entity.image_id = entity.id if get_file_path(entity.id) else None
+        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+                     'human_remains', 'reference', 'node']:
+            tabs[name] = Tab(name, entity)
+        for link_ in entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
+            tabs[range_.table_name].table.rows.append(data)
+        for link_ in entity.get_links('P67', True):
+            data = get_base_table_data(link_.domain)
+            data.append(link_.description)
+            data = add_edit_link(data,
+                                 url_for('reference_link_update', link_id=link_.id,
+                                         origin_id=entity.id))
+            data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
+            tabs['reference'].table.rows.append(data)
     if entity.view_name == 'source':
         for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                      'human_remains', 'text']:
@@ -101,16 +118,16 @@ def entity_view(id_: int) -> Union[str, Response]:
     if entity.view_name in ['event', 'source']:
         tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
-        profile_image_id = entity.get_profile_image_id()
+        entity.image_id = entity.get_profile_image_id()
         for link_ in entity.get_links('P67', True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.view_name == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    get_profile_image_table_link(domain, entity, extension, profile_image_id))
-                if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    profile_image_id = domain.id
+                    get_profile_image_table_link(domain, entity, extension, entity.image_id))
+                if not entity.image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    entity.image_id = domain.id
             if domain.view_name not in ['source', 'file']:
                 data.append(link_.description)
                 data = add_edit_link(data, url_for('reference_link_update',
@@ -127,9 +144,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                            gis_data=Gis.get_all(objects) if objects else None,
                            tabs=tabs,
                            info=get_entity_data(entity),
-                           crumb=[[_(entity.view_name), url_for('entity_view', id_=entity.id)],
-                                  entity.name],
-                           profile_image_id=profile_image_id)
+                           crumb=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                                  entity.name])
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])

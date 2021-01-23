@@ -13,10 +13,11 @@
                     {{ entity|display_delete_link }}
                 {% endif %}
                 {{ entity.id|bookmark_toggle }}
+                {{ entity|download_button }}
             </div>
             <h1>{{ entity.name }}</h1>
             <div>
-                {{ profile_image_id|display_profile_image }}
+                {{ entity|display_profile_image }}
                 <div style="float:left;">
                     {{ info|display_info }}
                     {{ entity|note }}
@@ -31,6 +32,5 @@
                 <script src="/static/js/map/map.js"></script>
             </div>
         {% endif %}
-
     </div>
 {% endblock %}

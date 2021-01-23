@@ -49,8 +49,9 @@ class Entity:
         self.end_to = None
         self.end_comment = None
         self.note: Optional[str] = None  # User specific, private note for an entity
-        self.origin_id: Optional[int] = None
+        self.origin_id: Optional[int] = None  # Used e.g., for navigation in views
         self.location: Optional[Entity] = None  # Needed for API
+        self.image_id: Optional[int] = None  # Will be set in entity views
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)

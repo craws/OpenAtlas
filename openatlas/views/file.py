@@ -11,9 +11,7 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_file_path, link)
-from openatlas.util.tab import Tab
+from openatlas.util.display import link
 from openatlas.util.util import required_group, was_modified
 
 
@@ -85,35 +83,6 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
-
-
-def file_view(file: Entity) -> str:
-    tabs = {name: Tab(name, origin=file) for name in [
-        'info', 'source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-        'human_remains', 'reference', 'node']}
-    for link_ in file.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data = add_remove_link(data, range_.name, link_, file, range_.table_name)
-        tabs[range_.table_name].table.rows.append(data)
-    for link_ in file.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        data.append(link_.description)
-        data = add_edit_link(data,
-                             url_for('reference_link_update', link_id=link_.id, origin_id=file.id))
-        data = add_remove_link(data, link_.domain.name, link_, file, 'reference')
-        tabs['reference'].table.rows.append(data)
-    path = get_file_path(file.id)
-    preview = False
-    if path and path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-        preview = True
-    return render_template('file/view.html',
-                           missing_file=False if path else True,
-                           entity=file,
-                           info=get_entity_data(file),
-                           tabs=tabs,
-                           preview=preview,
-                           filename=path.name if path else False)
 
 
 def save(form: FlaskForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:

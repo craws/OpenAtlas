@@ -277,22 +277,41 @@ def description(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_profile_image(self: Any, image_id: int) -> str:
-    if not image_id:
+def download_button(self: Any, entity: Entity) -> str:
+    if entity.view_name != 'file':
         return ''
-    path = display.get_file_path(image_id)
-    if path:
+    html = '<span class="error">{msg}</span>'.format(msg=display.uc_first(_('missing file')))
+    if entity.image_id:
+        path = display.get_file_path(entity.image_id)
+        html = display.button(_('download'), url_for('download_file', filename=path.name))
+    return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_profile_image(self: Any, entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
+    path = display.get_file_path(entity.image_id)
+    if not path:
+        return ''
+    if entity.view_name == 'file':
+        if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
+            html = '''
+                <a href="{url}" rel="noopener noreferrer" target="_blank">
+                    <img style="max-width:{width}px;" alt="image" src="{url}">
+                </a>'''.format(url=url_for('display_file', filename=path.name),
+                               width=session['settings']['profile_image_width'])
+        else:
+            html = display.uc_first(_('no preview available'))
+    else:
         html = """
-            <div id="profile_image_div">
-                <a href="/entity/{id}">
-                    <img style="max-width:{width}px;" alt="profile image" src="{src}">
-                </a>
-            </div>
-            """.format(id=image_id,
-                       src=url_for('display_file', filename=path.name),
-                       width=session['settings']['profile_image_width'])
-        return Markup(html)
-    return ''  # pragma no cover
+            <a href="{url}">
+                <img style="max-width:{width}px;" alt="image" src="{src}">
+            </a>""".format(url=url_for('entity_view', id_=entity.image_id),
+                           src=url_for('display_file', filename=path.name),
+                           width=session['settings']['profile_image_width'])
+    return Markup('<div id="profile_image_div">{html}</div>'.format(html=html))
 
 
 @jinja2.contextfilter
