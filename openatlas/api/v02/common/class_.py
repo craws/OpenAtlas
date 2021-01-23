@@ -33,7 +33,7 @@ class GetByClass(Resource):  # type: ignore
     def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if class_code not in g.classes:
-            raise InvalidCidocClassCode
+            raise InvalidCidocClassCode  # pragma: no cover
         for entity in Query.get_by_class_code_api(class_code, parser):
             entities.append(entity)
         return entities
