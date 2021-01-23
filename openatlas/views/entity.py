@@ -57,7 +57,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     tabs = {'info': Tab('info', entity)}
     if entity.view_name == 'source':
         for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                     'human_remains', 'reference', 'text', 'file']:
+                     'human_remains', 'text']:
             tabs[name] = Tab(name, entity)
         for text in entity.get_linked_entities('P73', nodes=True):
             tabs['text'].table.rows.append([link(text),
@@ -68,26 +68,9 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = get_base_table_data(range_)
             data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
             tabs[range_.table_name].table.rows.append(data)
-        profile_image_id = entity.get_profile_image_id()
-        for link_ in entity.get_links('P67', True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.view_name == 'file':  # pragma: no cover
-                extension = data[3]
-                data.append(
-                    get_profile_image_table_link(domain, entity, extension, profile_image_id))
-                if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    profile_image_id = domain.id
-            if domain.view_name not in ['file']:
-                data.append(link_.description)
-                data = add_edit_link(data, url_for('reference_link_update',
-                                                   link_id=link_.id,
-                                                   origin_id=entity.id))
-            data = add_remove_link(data, domain.name, link_, entity, domain.view_name)
-            tabs[domain.view_name].table.rows.append(data)
 
     if entity.view_name == 'event':
-        for name in ['info', 'subs', 'source', 'actor', 'reference', 'file']:
+        for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)
         for sub_event in entity.get_linked_entities('P117', inverse=True, nodes=True):
             tabs['subs'].table.rows.append(get_base_table_data(sub_event))
@@ -112,12 +95,17 @@ def entity_view(id_: int) -> Union[str, Response]:
                          url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
             data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
-        profile_image_id = entity.get_profile_image_id()
+        objects = [location.get_linked_entity_safe('P53', True) for location
+                   in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
+    if entity.view_name in ['event', 'source']:
+        tabs['reference'] = Tab('reference', entity)
+        tabs['file'] = Tab('file', entity)
+        profile_image_id = entity.get_profile_image_id()
         for link_ in entity.get_links('P67', True):
             domain = link_.domain
             data = get_base_table_data(domain)
-            if domain.view_name == 'file':
+            if domain.view_name == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
                     get_profile_image_table_link(domain, entity, extension, profile_image_id))
@@ -133,8 +121,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                     continue
             data = add_remove_link(data, domain.name, link_, entity, domain.view_name)
             tabs[domain.view_name].table.rows.append(data)
-        objects = [location.get_linked_entity_safe('P53', True) for location
-                   in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
     return render_template('entity/view.html',
                            entity=entity,
