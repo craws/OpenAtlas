@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -6,9 +6,9 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.display import button, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized
-from openatlas.util.display import button, uc_first
 
 # Needed for translations of tab titles
 _('member of')
@@ -27,12 +27,10 @@ _('legal_notice_for_frontend')
 _('contact_for_frontend')
 
 
-def format_tab_number(param: Union[int, Table]) -> str:
-    length = len(param.rows) if isinstance(param, Table) else param
-    return ' <span class="tab-counter">' + format_number(length) + '</span>' if length else ''
-
-
 def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    label = uc_first(_(id_.replace('_', ' ').replace('-', ' ')))
+    label += ' <span class="tab-counter">{counter}</span>'.format(
+        counter=format_number(len(table.rows))) if table and len(table.rows) else ''
     return '''
         <li class="nav-item">
             <a 
@@ -42,12 +40,10 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
                 aria-selected="{selected}" 
                 href="#tab-{id}">{label}
             </a>
-        </li>'''.format(
-        active=' active' if active else '',
-        selected='true' if active else 'false',
-        label=uc_first(_(id_.replace('_', ' ').replace('-', ' '))) + (
-            format_tab_number(table) if table else ''),
-        id=id_.replace('_', '-').replace(' ', '-'))
+        </li>'''.format(active=' active' if active else '',
+                        selected='true' if active else 'false',
+                        label=label,
+                        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
