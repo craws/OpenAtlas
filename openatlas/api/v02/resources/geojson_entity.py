@@ -7,7 +7,7 @@ from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.display import format_date, get_file_path
+from openatlas.util.display import get_file_path
 
 
 class GeoJsonEntity:
@@ -74,20 +74,11 @@ class GeoJsonEntity:
     @staticmethod
     def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
         time = {}
-        if entity.begin_from:
-            start = {'earliest': format_date(entity.begin_from)}
-            if entity.begin_to:
-                start['latest'] = format_date(entity.begin_to)
-            if entity.begin_comment:
-                start['comment'] = entity.begin_comment
-            time['start'] = start
-        if entity.end_from:
-            end = {'earliest': format_date(entity.end_from)}
-            if entity.end_to:
-                end['latest'] = format_date(entity.end_to)
-            if entity.end_comment:
-                end['comment'] = entity.end_comment
-            time['end'] = end
+        start = {'earliest': entity.begin_from, 'latest': entity.begin_to,
+                 'comment': entity.begin_comment}
+        time['start'] = start
+        end = {'earliest': entity.end_from, 'latest': entity.end_to, 'comment': entity.end_comment}
+        time['end'] = end
         return time if time else None
 
     @staticmethod
@@ -123,8 +114,8 @@ class GeoJsonEntity:
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if link.domain.class_.code == 'E32':
                 system = g.reference_systems[link.domain.id]
-                ref.append({'identifier': (
-                                              system.resolver_url if system.resolver_url else '') + link.description,
+                ref.append({'identifier': (system.resolver_url if system.resolver_url else '')
+                                          + link.description,
                             'type': g.nodes[link.type.id].name,
                             'reference_system': system.name})
         return ref if ref else None
@@ -170,11 +161,9 @@ class GeoJsonEntity:
             'show'] else None
 
         # Time spans
-        if entity.begin_from or entity.end_from:
-            features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
-                'show'] else None
+        features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
+            'show'] else None
 
-        # Todo: adapt Geonames for new reference systems
         features['links'] = GeoJsonEntity.get_reference_systems(entity) if 'links' in parser[
             'show'] else None
 

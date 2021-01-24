@@ -9,6 +9,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
+from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -19,18 +20,42 @@ class ApiTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
-                place.link('P2', Entity.get_by_id(66))  # Adding Type Settlement
+                # Adding Dates to place
+                place.begin_from = '2018-01-31'
+                place.begin_to = '2018-03-01'
+                place.begin_comment = 'Begin of the Nostromos'
+                place.end_from = '2019-01-31'
+                place.end_to = '2019-03-01'
+                place.end_comment = 'Destruction of the Nostromos'
+                # Adding Type Settlement
+                place.link('P2', Entity.get_by_id(66))
+                # Adding Alias
                 alias = insert_entity('Cargo hauler', 'alias')
                 place.link('P1', alias)
+                # Adding External Reference
                 external_reference = insert_entity('https://openatlas.eu', 'external_reference')
                 external_reference.link('P67', place, description='OpenAtlas Website')
+                # Adding feature to place
                 feature = insert_entity('Feature', 'feature', place)
+                # Adding stratigraphic to place
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
+                # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative Unit')
-                reference = insert_entity('https://www.wikidata.org/wiki/Q123', 'reference_system')
+                # Adding File to place
                 file = insert_entity('Datei', 'file')
                 file.link('P67', place)
-                file.link('P2', Entity.get_by_id(49))  # Adding License, Not good practice I think
+                ## Adding License directly with ID, Not good practice I think
+                file.link('P2', Node.get_hierarchy('License'))
+                # Adding value Type
+                value_type = Node.get_hierarchy('Dimensions')
+                place.link('P2', value_type, '23.0')
+
+
+                # Geonames Test
+                geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
+                precision = Node.get_hierarchy('External Reference Match').subs[0]
+                place.link('P67', Entity.get_by_id(1))
+
 
             # Path Tests
             rv = self.app.get(url_for('usage'))
@@ -98,6 +123,8 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='place', filter='or|id|eq|' + str(place.id)))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            assert b'Nostromos' in rv.data
 
             # Parameter: last
             rv = self.app.get(url_for('class', class_code='E18', last=place.id))
@@ -109,8 +136,8 @@ class ApiTests(TestBaseCase):
             # Parameter: show
             rv = self.app.get(url_for('class', class_code='E31', show='types'))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('class', class_code='E31', show='when'))
-            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('class', class_code='E18', show='when'))
+            assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('class', class_code='E31', show='none'))
             assert b'https://openatlas.eu' in rv.data
 
