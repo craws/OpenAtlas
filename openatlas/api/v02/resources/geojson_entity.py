@@ -99,11 +99,11 @@ class GeoJsonEntity:
                      WHERE e.id = %(entity_id)s;""".format(shape=shape)
             g.execute(sql, {'entity_id': entity.id})
             for row in g.cursor.fetchall():
-                test = ast.literal_eval(row.geojson)
-                test['title'] = row.name.replace('"', '\"') if row.name else ''
-                test['description'] = row.description.replace('"',
+                meta = ast.literal_eval(row.geojson)
+                meta['title'] = row.name.replace('"', '\"') if row.name else ''
+                meta['description'] = row.description.replace('"',
                                                               '\"') if row.description else ''
-                geom.append(test)
+                geom.append(meta)
         if len(geom) == 1:
             return geom[0]
         else:

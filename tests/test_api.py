@@ -20,6 +20,7 @@ class ApiTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
+
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
                 place.begin_to = '2018-03-01'
@@ -27,33 +28,40 @@ class ApiTests(TestBaseCase):
                 place.end_from = '2019-01-31'
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
+
                 # Adding Type Settlement
                 place.link('P2', Entity.get_by_id(66))
+
                 # Adding Alias
                 alias = insert_entity('Cargo hauler', 'alias')
                 place.link('P1', alias)
+
                 # Adding External Reference
                 external_reference = insert_entity('https://openatlas.eu', 'external_reference')
                 external_reference.link('P67', place, description='OpenAtlas Website')
+
                 # Adding feature to place
                 feature = insert_entity('Feature', 'feature', place)
+
                 # Adding stratigraphic to place
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
+
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative Unit')
+
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
                 file.link('P67', place)
                 file.link('P2', Node.get_hierarchy('License'))
-                # Adding value Type
+
+                # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
 
-                # Geonames Test
+                # Adding Geonames
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
                 precision_id = Node.get_hierarchy('External Reference Match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
-
 
             # Path Tests
             rv = self.app.get(url_for('usage'))
@@ -157,71 +165,71 @@ class ApiTests(TestBaseCase):
             assert b'8' in rv.data
 
     @raises(EntityDoesNotExistError)
-    def error_class_entity(self):
+    def error_class_entity(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
-    def error_query_query(self):
+    def error_query_query(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('query'))
 
     @raises(InvalidSubunitError)
-    def error_node_invalid(self):
+    def error_node_invalid(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('node_entities', id_=1234))
 
     @raises(InvalidSubunitError)
-    def error_node_all_invalid(self):
+    def error_node_all_invalid(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('node_entities_all', id_=1234))
 
     @raises(InvalidCidocClassCode)
-    def error_class_invalid(self):
+    def error_class_invalid(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
-    def error_code_invalid(self):
+    def error_code_invalid(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='Invalid'))
 
     @raises(InvalidLimitError)
-    def error_latest_invalid(self):
+    def error_latest_invalid(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('latest', latest='99999999'))
 
     @raises(EntityDoesNotExistError)
-    def error_subunit_entity(self):
+    def error_subunit_entity(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('subunit', id_='99999999'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_1(self):
+    def error_filter_operator_1(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='Wrong|name|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_2(self):
+    def error_filter_operator_2(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|Wrong|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_3(self):
+    def error_filter_operator_3(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|name|Wrong|Nostromos'))
 
     @raises(NoSearchStringError)
-    def error_filter_search(self):
+    def error_filter_search(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|name|Wrong|'))
 
     @raises(InvalidSearchDateError)
-    def error_filter_date(self):
+    def error_filter_date(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|begin_from|like|WRONG'))
 
     @raises(InvalidSearchNumberError)
-    def error_filter_date(self):
+    def error_filter_date(self):  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|id|eq|WRONG'))
