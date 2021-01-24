@@ -60,8 +60,9 @@ class GeoJsonEntity:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
-            if 'unit' not in nodes_dict and node.description:
-                nodes_dict['description'] = node.description
+            ##### If errors occure with value types, then add this line. Otherwise, delete it.
+            # if 'unit' not in nodes_dict and node.description:
+            #     nodes_dict['description'] = node.description
 
             hierarchy = []
             for root in node.root:

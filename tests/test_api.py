@@ -44,17 +44,15 @@ class ApiTests(TestBaseCase):
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
                 file.link('P67', place)
-                ## Adding License directly with ID, Not good practice I think
                 file.link('P2', Node.get_hierarchy('License'))
                 # Adding value Type
                 value_type = Node.get_hierarchy('Dimensions')
-                place.link('P2', value_type, '23.0')
-
+                place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
 
                 # Geonames Test
-                geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
-                precision = Node.get_hierarchy('External Reference Match').subs[0]
-                place.link('P67', Entity.get_by_id(1))
+                geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
+                precision_id = Node.get_hierarchy('External Reference Match').subs[0]
+                geonames.link('P67', place, description='2761369', type_id=precision_id)
 
 
             # Path Tests

@@ -69,8 +69,6 @@ def insert_entity(name: str, class_: str, origin: Optional[Entity] = None,
         entity = Entity.insert('E31', name, 'file')
     if class_ == 'alias':
         entity = Entity.insert('E41', name)
-    if class_ == 'type':
-        entity = Entity.insert('E55', name, description)
 
     return entity
 
