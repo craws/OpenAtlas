@@ -31,7 +31,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 # This file is used in combination with filters.py to collect HTML display code in one place
 
 def external_url(url: Union[str, None]) -> str:
-    return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'. format(
+    return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'.format(
         url=url) if url else ''
 
 
@@ -307,11 +307,10 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
 
 
 def get_entity_data(entity: 'Entity',
-                    location: Optional['Entity'] = None) -> Dict[str, Union[str, List[str]]]:
-    """
-    Return related entity information for a table for view.
-    The location parameter is for places which have a location attached.
-    """
+                    location: Optional['Entity'] = None,  # Used for place views
+                    event_links: Optional[List[Link]] = None  # Used for actor views
+                    ) -> Dict[str, Union[str, List[str]]]:
+    """ Collect and return related information for entity views."""
     data: Dict[str, Union[str, List[str]]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
@@ -330,18 +329,14 @@ def get_entity_data(entity: 'Entity',
     # Types
     add_type_data(entity, data, location=location)
 
-    # Info for files
-    if entity.system_type == 'file':
+    # Class specific information
+    if entity.view_name == 'file':
         data[_('size')] = print_file_size(entity)
         data[_('extension')] = get_file_extension(entity)
-
-    # Info for source
-    if entity.system_type == 'source content':
+    elif entity.view_name == 'source':
         data[_('information carrier')] = [link(recipient) for recipient in
                                           entity.get_linked_entities(['P128'], inverse=True)]
-
-    # Info for events
-    if entity.class_.code in app.config['CLASS_CODES']['event']:
+    elif entity.view_name == 'event':
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data[_('sub event of')] = link(super_event)
@@ -349,15 +344,13 @@ def get_entity_data(entity: 'Entity',
             place = entity.get_linked_entity('P7')
             if place:
                 data[_('location')] = link(place.get_linked_entity_safe('P53', True))
-
-        # Info for acquisitions
+        # Acquisition
         if entity.class_.code == 'E8':
             data[_('recipient')] = [link(recipient) for recipient in
                                     entity.get_linked_entities(['P22'])]
             data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
             data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
-
-        # Info for moves
+        # Move
         if entity.class_.code == 'E9':
             person_data = []
             object_data = []
@@ -368,6 +361,31 @@ def get_entity_data(entity: 'Entity',
                     object_data.append(linked_entity)
             data[_('person')] = [link(object_) for object_ in person_data]
             data[_('object')] = [link(object_) for object_ in object_data]
+    elif entity.view_name == 'actor':
+        begin_place = entity.get_linked_entity('OA8')
+        begin_object = None
+        if begin_place:
+            begin_object = begin_place.get_linked_entity_safe('P53', True)
+            entity.objects.append(begin_object)
+        end_place = entity.get_linked_entity('OA9')
+        end_object = None
+        if end_place:
+            end_object = end_place.get_linked_entity_safe('P53', True)
+            entity.objects.append(end_object)
+        residence_place = entity.get_linked_entity('P74')
+        residence_object = None
+        if residence_place:
+            residence_object = residence_place.get_linked_entity_safe('P53', True)
+            entity.objects.append(residence_object)
+        appears_first, appears_last = get_appearance(event_links)
+        data[_('alias')] = list(entity.aliases.values())
+        data[_('born') if entity.class_.code == 'E21' else _('begin')] = format_entry_begin(
+            entity, begin_object)
+        data[_('died') if entity.class_.code == 'E21' else _('end')] = format_entry_end(
+            entity, end_object)
+        data[_('appears first')] = appears_first
+        data[_('appears last')] = appears_last
+        data[_('residence')] = link(residence_object) if residence_object else ''
     return add_system_data(entity, data)
 
 

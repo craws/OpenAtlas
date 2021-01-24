@@ -52,6 +52,7 @@ class Entity:
         self.origin_id: Optional[int] = None  # Used e.g., for navigation in views
         self.location: Optional[Entity] = None  # Needed for API
         self.image_id: Optional[int] = None  # Will be set in entity views
+        self.objects = []  # Set in entity view and used to e.g. show related places on map
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)

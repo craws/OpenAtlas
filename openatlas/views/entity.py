@@ -7,14 +7,14 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas.models.gis import Gis
-from openatlas.util.display import get_file_path, link
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_profile_image_table_link, uc_first)
+                                    get_entity_data, get_file_path, get_profile_image_table_link,
+                                    link, uc_first)
 from openatlas.util.tab import Tab
 from openatlas.util.util import is_authorized, required_group
 from openatlas.views.reference import AddReferenceForm
@@ -46,14 +46,79 @@ def entity_view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    if entity.view_name not in ['source', 'event', 'file']:
+    if entity.view_name not in ['source', 'event', 'file', 'actor']:
         # Return the respective view function, e.g. place_view() in views/place.py if it is a place
         return getattr(sys.modules['openatlas.views.' + entity.view_name],
                        '{name}_view'.format(name=entity.view_name))(entity)
 
-    objects = None
     entity.note = User.get_note(entity)
+    event_links = None  # Only used for actor
     tabs = {'info': Tab('info', entity)}
+
+    if entity.view_name == 'actor':
+        for name in ['source', 'event', 'relation', 'member_of', 'member']:
+            tabs[name] = Tab(name, entity)
+        event_links = entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
+        for link_ in event_links:
+            event = link_.domain
+            places = event.get_linked_entities(['P7', 'P26', 'P27'])
+            link_.object_ = None
+            for place in places:
+                object_ = place.get_linked_entity_safe('P53', True)
+                entity.objects.append(object_)
+                link_.object_ = object_  # Needed later for first/last appearance info
+            first = link_.first
+            if not link_.first and event.first:
+                first = '<span class="inactive">' + event.first + '</span>'
+            last = link_.last
+            if not link_.last and event.last:
+                last = '<span class="inactive">' + event.last + '</span>'
+            data = [link(event),
+                    g.classes[event.class_.code].name,
+                    link(link_.type),
+                    first,
+                    last,
+                    link_.description]
+            data = add_edit_link(data,
+                                 url_for('involvement_update', id_=link_.id, origin_id=entity.id))
+            data = add_remove_link(data, link_.domain.name, link_, entity, 'event')
+            tabs['event'].table.rows.append(data)
+
+        for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
+            type_ = ''
+            if entity.id == link_.domain.id:
+                related = link_.range
+                if link_.type:
+                    type_ = link(link_.type.get_name_directed(),
+                                 url_for('entity_view', id_=link_.type.id))
+            else:
+                related = link_.domain
+                if link_.type:
+                    type_ = link(link_.type.get_name_directed(True),
+                                 url_for('entity_view', id_=link_.type.id))
+            data = [type_, link(related), link_.first, link_.last, link_.description]
+            data = add_edit_link(data,
+                                 url_for('relation_update', id_=link_.id, origin_id=entity.id))
+            data = add_remove_link(data, related.name, link_, entity, 'relation')
+            tabs['relation'].table.rows.append(data)
+        for link_ in entity.get_links('P107', True):
+            data = [link(link_.domain), link(link_.type), link_.first, link_.last,
+                    link_.description]
+            data = add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=entity.id))
+            data = add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
+            tabs['member_of'].table.rows.append(data)
+        if entity.class_.code not in app.config['CLASS_CODES']['group']:
+            del tabs['member']
+        else:
+            for link_ in entity.get_links('P107'):
+                data = [link(link_.range), link(link_.type), link_.first, link_.last,
+                        link_.description]
+                if is_authorized('contributor'):
+                    data.append(link(_('edit'),
+                                     url_for('member_update', id_=link_.id, origin_id=entity.id)))
+                data = add_remove_link(data, link_.range.name, link_, entity, 'member')
+                tabs['member'].table.rows.append(data)
+
     if entity.view_name == 'file':
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
@@ -112,10 +177,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                          url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
             data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
-        objects = [location.get_linked_entity_safe('P53', True) for location
-                   in entity.get_linked_entities(['P7', 'P26', 'P27'])]
+        entity.objects = [location.get_linked_entity_safe('P53', True) for location
+                          in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
-    if entity.view_name in ['event', 'source']:
+    if entity.view_name in ['actor', 'event', 'source']:
         tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
         entity.image_id = entity.get_profile_image_id()
@@ -138,12 +203,11 @@ def entity_view(id_: int) -> Union[str, Response]:
                     continue
             data = add_remove_link(data, domain.name, link_, entity, domain.view_name)
             tabs[domain.view_name].table.rows.append(data)
-
     return render_template('entity/view.html',
                            entity=entity,
-                           gis_data=Gis.get_all(objects) if objects else None,
+                           gis_data=Gis.get_all(entity.objects) if entity.objects else None,
                            tabs=tabs,
-                           info=get_entity_data(entity),
+                           info=get_entity_data(entity, event_links=event_links),
                            crumb=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
                                   entity.name])
 
