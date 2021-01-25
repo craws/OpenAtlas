@@ -26,7 +26,9 @@ class GeoJson:
         types = {'identifier': fields.String,
                  'label': fields.String,
                  'description': fields.String,
-                 'hierarchy': fields.String}
+                 'hierarchy': fields.String,
+                 'value': fields.Float,
+                 'unit': fields.String}
 
         names = {'alias': fields.String}
 
