@@ -1,12 +1,12 @@
 from typing import Any
 
-from flask import send_file
+from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
 from openatlas.api.image_manipulation import ImageManipulation
 from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneError
-from openatlas.api.v02.resources.parser import default_parser, image_parser
+from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import api_access
@@ -27,10 +27,11 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
     if license_:
         if parser['download']:
             return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
-        image = ImageManipulation.handle_image(str(app.config['UPLOAD_DIR']) + '/' + filename,
-                                               parser)
-        return send_file(image, mimetype='image/jpeg')
-        # return send_from_directory(app.config['UPLOAD_DIR'], filename)
+        if parser['thumbnail']:
+            return send_file(
+                ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
+                                                  parser['thumbnail']), mimetype='image/jpeg')
+        return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise AccessDeniedError
 
 
