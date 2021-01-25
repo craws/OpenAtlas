@@ -55,7 +55,7 @@ def display_citation_example(self: Any, code: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
-    if not structure or len(structure['siblings']) < 2:
+    if entity.view_name != 'place' or not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
     prev_id = None

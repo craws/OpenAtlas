@@ -10,10 +10,13 @@
                 {{ ('menu/' + entity.view_name)|manual }}
                 {% if 'contributor'|is_authorized %}
                     {{ _('edit')|button(url_for(entity.view_name + '_update', id_=entity.id)) }}
-                    {{ entity|display_delete_link }}
+                    {% if not subunits %}
+                        {{ entity|display_delete_link }}
+                    {% endif %}
                 {% endif %}
                 {{ entity.id|bookmark_toggle }}
                 {{ entity|download_button }}
+                {{ entity|siblings_pager(structure) }}
             </div>
             <h1>{{ entity.name }}</h1>
             <div>

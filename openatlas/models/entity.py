@@ -43,12 +43,12 @@ class Entity:
         self.modified = row.modified
         self.class_ = g.classes[row.class_code]  # The CIDOC class
         self.system_type = row.system_type  # Internal type to differ between same CIDOC classes
-        self.reference_systems: List[Link] = []  # List of links to external reference systems
+        self.reference_systems: List[Link] = []  # Links to external reference systems
         self.note: Optional[str] = None  # User specific, private note for an entity
-        self.origin_id: Optional[int] = None  # Used e.g., for navigation in views
-        self.location: Optional[Entity] = None  # Needed for API
+        self.origin_id: Optional[int] = None  # For navigation when coming from another entity
         self.image_id: Optional[int] = None  # Set in entity view and used for profile image
         self.linked_places = []  # Set in entity view and used to show related places on map
+        self.location: Optional[Entity] = None  # The respective location if entity is a place
 
         # Dates
         self.begin_from = None

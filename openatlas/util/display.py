@@ -225,10 +225,9 @@ def add_system_data(entity: 'Entity',
 
 
 def add_type_data(entity: 'Entity',
-                  data: Dict[str, Union[str, List[str]]],
-                  location: Optional['Entity'] = None) -> Dict[str, Union[str, List[str]]]:
-    if location:
-        entity.nodes.update(location.nodes)  # Add location types
+                  data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
+    if entity.location:
+        entity.nodes.update(entity.location.nodes)  # Add location types
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
@@ -307,7 +306,6 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
 
 
 def get_entity_data(entity: 'Entity',
-                    location: Optional['Entity'] = None,  # Used for place views
                     event_links: Optional[List[Link]] = None  # Used for actor views
                     ) -> Dict[str, Union[str, List[str]]]:
     """ Collect and return related information for entity views."""
@@ -327,7 +325,7 @@ def get_entity_data(entity: 'Entity',
     data[_('end')] = (to_link if to_link else '') + format_entry_end(entity)
 
     # Types
-    add_type_data(entity, data, location=location)
+    add_type_data(entity, data)
 
     # Class specific information
     if entity.view_name == 'file':

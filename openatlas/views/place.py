@@ -2,7 +2,6 @@ from typing import Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -14,11 +13,8 @@ from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_profile_image_table_link, link, uc_first)
-from openatlas.util.tab import Tab
-from openatlas.util.util import is_authorized, required_group, was_modified
+from openatlas.util.display import link
+from openatlas.util.util import required_group, was_modified
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])
@@ -104,88 +100,6 @@ def place_update(id_: int) -> Union[str, Response]:
                            gis_data=Gis.get_all([object_], structure),
                            overlays=Overlay.get_by_object(object_),
                            geonames_module=geonames_module)
-
-
-def place_view(obj: Entity) -> str:
-    tabs = {name: Tab(name, origin=obj) for name in [
-        'info', 'source', 'event', 'actor', 'reference', 'file']}
-    if obj.system_type == 'place':
-        tabs['feature'] = Tab('feature', origin=obj)
-    elif obj.system_type == 'feature':
-        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=obj)
-    elif obj.system_type == 'stratigraphic unit':
-        tabs['find'] = Tab('find', origin=obj,)
-        tabs['human_remains'] = Tab('human_remains', origin=obj)
-    obj.note = User.get_note(obj)
-    location = obj.get_linked_entity_safe('P53', nodes=True)
-    profile_image_id = obj.get_profile_image_id()
-    if current_user.settings['module_map_overlay'] and is_authorized('editor'):
-        tabs['file'].table.header.append(uc_first(_('overlay')))
-    overlays = Overlay.get_by_object(obj)
-    for link_ in obj.get_links('P67', inverse=True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':
-            extension = data[3]
-            data.append(get_profile_image_table_link(domain, obj, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-            if is_authorized('editor') and current_user.settings['module_map_overlay']:
-                if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    if domain.id in overlays:
-                        data = add_edit_link(data,
-                                             url_for('overlay_update', id_=overlays[domain.id].id))
-                    else:
-                        data.append(link(_('link'), url_for('overlay_insert',
-                                                            image_id=domain.id,
-                                                            place_id=obj.id,
-                                                            link_id=link_.id)))
-                else:  # pragma: no cover
-                    data.append('')
-        if domain.view_name not in ['source', 'file']:
-            data.append(link_.description)
-            data = add_edit_link(
-                data,
-                url_for('reference_link_update', link_id=link_.id, origin_id=obj.id))
-            if domain.view_name == 'reference_system':
-                obj.reference_systems.append(link_)
-                continue
-        data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
-        tabs[domain.view_name].table.rows.append(data)
-    event_ids = []  # Keep track of already inserted events to prevent doubles
-    for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
-        tabs['event'].table.rows.append(get_base_table_data(event))
-        event_ids.append(event.id)
-    for event in obj.get_linked_entities('P24', inverse=True):
-        if event.id not in event_ids:  # Don't add again if already in table
-            tabs['event'].table.rows.append(get_base_table_data(event))
-    for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-        actor = Entity.get_by_id(link_.domain.id, view_name='actor')
-        tabs['actor'].table.rows.append([link(actor),
-                                         g.properties[link_.property.code].name,
-                                         actor.class_.name,
-                                         actor.first,
-                                         actor.last,
-                                         actor.description])
-    structure = get_structure(obj)
-    if structure:
-        for entity in structure['subunits']:
-            data = get_base_table_data(entity)
-            tabs[entity.system_type.replace(' ', '_')].table.rows.append(data)
-    gis_data = Gis.get_all([obj], structure)
-    if gis_data['gisPointSelected'] == '[]' \
-            and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]' \
-            and (not structure or not structure['super_id']):
-        gis_data = {}
-    return render_template('place/view.html',
-                           entity=obj,
-                           tabs=tabs,
-                           overlays=overlays,
-                           info=get_entity_data(obj, location),
-                           gis_data=gis_data,
-                           structure=structure,
-                           profile_image_id=profile_image_id)
 
 
 def save(form: FlaskForm,
