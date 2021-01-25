@@ -1,4 +1,3 @@
-import sys
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for
@@ -27,7 +26,7 @@ from openatlas.views.types import node_view
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
 def entity_view(id_: int) -> Union[str, Response]:
-    if id_ in g.nodes:
+    if id_ in g.nodes:  # Nodes have their own view
         node = g.nodes[id_]
         if node.root:
             return node_view(node)
@@ -49,11 +48,6 @@ def entity_view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    if entity.view_name not in ['source', 'event', 'file', 'actor', 'place', 'reference']:
-        # Return the respective view function, e.g. place_view() in views/place.py if it is a place
-        return getattr(sys.modules['openatlas.views.' + entity.view_name],
-                       '{name}_view'.format(name=entity.view_name))(entity)
-
     event_links = None  # Needed for actor
     structure = None  # Needed for place
     gis_data = None  # Needed for place
@@ -62,7 +56,19 @@ def entity_view(id_: int) -> Union[str, Response]:
     tabs = {'info': Tab('info', entity)}
 
     # Todo: this if/else is way too long, maybe refactor with object/inheritance?
-    if entity.view_name == 'reference':
+    if entity.view_name == 'object':
+        for name in ['source', 'event']:
+            tabs[name] = Tab(name, entity)
+        for link_ in entity.get_links('P128'):
+            data = get_base_table_data(link_.range)
+            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.table_name)
+            tabs['source'].table.rows.append(data)
+        for link_ in entity.get_links('P25', inverse=True):
+            data = get_base_table_data(link_.domain)
+            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.table_name)
+            tabs['event'].table.rows.append(data)
+
+    elif entity.view_name == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
                      'find', 'human_remains', 'file']:
             tabs[name] = Tab(name, entity)

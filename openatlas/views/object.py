@@ -8,9 +8,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
-from openatlas.models.user import User
-from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
-from openatlas.util.tab import Tab
+from openatlas.util.display import link
 from openatlas.util.util import required_group, was_modified
 
 
@@ -40,23 +38,6 @@ def object_update(id_: int) -> Union[str, Response]:
         save(form, object_)
         return redirect(url_for('entity_view', id_=id_))
     return render_template('object/update.html', form=form, object_=object_)
-
-
-def object_view(object_: Entity) -> str:
-    tabs = {name: Tab(name, origin=object_) for name in ['info', 'source', 'event']}
-    for link_ in object_.get_links('P128'):
-        data = get_base_table_data(link_.range)
-        data = add_remove_link(data, link_.range.name, link_, object_, link_.range.table_name)
-        tabs['source'].table.rows.append(data)
-    for link_ in object_.get_links('P25', inverse=True):
-        data = get_base_table_data(link_.domain)
-        data = add_remove_link(data, link_.range.name, link_, object_, link_.range.table_name)
-        tabs['event'].table.rows.append(data)
-    object_.note = User.get_note(object_)
-    return render_template('object/view.html',
-                           entity=object_,
-                           tabs=tabs,
-                           info=get_entity_data(object_))
 
 
 def save(form: Any, object_: Optional[Entity] = None) -> str:
