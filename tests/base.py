@@ -65,8 +65,6 @@ def insert_entity(name: str, class_: str, origin: Optional[Entity] = None,
         entity.link('P53', location)
     if class_ == 'external_reference':
         entity = Entity.insert('E31', name, 'external_reference')
-    if class_ == 'reference_system':
-        entity = Entity.insert('E32', name)
     if class_ == 'file':
         entity = Entity.insert('E31', name, 'file')
     if class_ == 'alias':
