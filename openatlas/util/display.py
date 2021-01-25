@@ -366,17 +366,17 @@ def get_entity_data(entity: 'Entity',
         begin_object = None
         if begin_place:
             begin_object = begin_place.get_linked_entity_safe('P53', True)
-            entity.objects.append(begin_object)
+            entity.linked_places.append(begin_object)
         end_place = entity.get_linked_entity('OA9')
         end_object = None
         if end_place:
             end_object = end_place.get_linked_entity_safe('P53', True)
-            entity.objects.append(end_object)
+            entity.linked_places.append(end_object)
         residence_place = entity.get_linked_entity('P74')
         residence_object = None
         if residence_place:
             residence_object = residence_place.get_linked_entity_safe('P53', True)
-            entity.objects.append(residence_object)
+            entity.linked_places.append(residence_object)
         appears_first, appears_last = get_appearance(event_links)
         data[_('alias')] = list(entity.aliases.values())
         data[_('born') if entity.class_.code == 'E21' else _('begin')] = format_entry_begin(

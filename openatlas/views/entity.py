@@ -65,7 +65,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             link_.object_ = None
             for place in places:
                 object_ = place.get_linked_entity_safe('P53', True)
-                entity.objects.append(object_)
+                entity.linked_places.append(object_)
                 link_.object_ = object_  # Needed later for first/last appearance info
             first = link_.first
             if not link_.first and event.first:
@@ -177,8 +177,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                          url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
             data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
-        entity.objects = [location.get_linked_entity_safe('P53', True) for location
-                          in entity.get_linked_entities(['P7', 'P26', 'P27'])]
+        entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
+                                in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
     if entity.view_name in ['actor', 'event', 'source']:
         tabs['reference'] = Tab('reference', entity)
@@ -205,7 +205,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs[domain.view_name].table.rows.append(data)
     return render_template('entity/view.html',
                            entity=entity,
-                           gis_data=Gis.get_all(entity.objects) if entity.objects else None,
+                           gis_data=Gis.get_all(entity.linked_places) if entity.linked_places else None,
                            tabs=tabs,
                            info=get_entity_data(entity, event_links=event_links),
                            crumb=[[_(entity.view_name), url_for('index', class_=entity.view_name)],

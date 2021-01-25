@@ -39,20 +39,24 @@ class Entity:
             self.aliases = {k: v for k, v in sorted(self.aliases.items(), key=lambda item: item[1])}
         self.name = row.name
         self.description = row.description if row.description else ''
-        self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
+        self.class_ = g.classes[row.class_code]  # The CIDOC class
+        self.system_type = row.system_type  # Internal type to differ between same CIDOC classes
+        self.reference_systems: List[Link] = []  # List of links to external reference systems
+        self.note: Optional[str] = None  # User specific, private note for an entity
+        self.origin_id: Optional[int] = None  # Used e.g., for navigation in views
+        self.location: Optional[Entity] = None  # Needed for API
+        self.image_id: Optional[int] = None  # Set in entity view and used for profile image
+        self.linked_places = []  # Set in entity view and used to show related places on map
+
+        # Dates
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
         self.end_from = None
         self.end_to = None
         self.end_comment = None
-        self.note: Optional[str] = None  # User specific, private note for an entity
-        self.origin_id: Optional[int] = None  # Used e.g., for navigation in views
-        self.location: Optional[Entity] = None  # Needed for API
-        self.image_id: Optional[int] = None  # Will be set in entity views
-        self.objects = []  # Set in entity view and used to e.g. show related places on map
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)
@@ -63,9 +67,9 @@ class Entity:
             self.first = format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = format_date(self.end_from, 'year') if self.end_from else None
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
-        self.class_ = g.classes[row.class_code]
-        self.view_name = ''  # Used to build URLs
-        self.reference_systems: List[Link] = []
+
+        # view_name is used in views, e.g. person and group both have view_name actor
+        self.view_name = ''
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
