@@ -4,7 +4,7 @@ from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
-from openatlas.api.v02.resources.error import AccessDeniedError
+from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneError
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -28,3 +28,10 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
             return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise AccessDeniedError
+
+
+@app.route('/api/0.1/', strict_slashes=False)
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def path_error() -> Any:  # pragma: no cover
+    raise ResourceGoneError

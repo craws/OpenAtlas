@@ -50,6 +50,10 @@ class QueryEmptyError(Exception):
     pass
 
 
+class ResourceGoneError(Exception):
+    pass
+
+
 errors = {
     "InternalServerError": {
         "message": "Something went wrong",
@@ -104,5 +108,9 @@ errors = {
     "QueryEmptyError": {
         "message": "Query path needs one or more parameter: classes, items or entities.",
         "status": 404
+    },
+    "ResourceGoneError": {
+        "message": "This resource is gone.",
+        "status": 410
     },
 }
