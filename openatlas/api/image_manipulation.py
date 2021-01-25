@@ -8,12 +8,11 @@ class ImageManipulation:
 
     @staticmethod
     def handle_image(path: str, parser: Dict[str, str]) -> BytesIO:
-        parser['thumbnail'] = False
+        thumb_size = parser['thumbnail']
         img_io = BytesIO()
         img = Image.open(path)
-        if parser['thumbnail']:
-            img.thumbnail((200, 200))
-
+        if thumb_size:
+            img.thumbnail((thumb_size, thumb_size))
         img.save(img_io, 'JPEG')
         img_io.seek(0)
 
