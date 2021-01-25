@@ -14,10 +14,7 @@ from openatlas.forms.field import TableField
 from openatlas.forms.form import build_add_reference_form, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
-                                    get_entity_data, get_profile_image_table_link, link, uc_first)
-from openatlas.util.tab import Tab
+from openatlas.util.display import link, uc_first
 from openatlas.util.util import required_group, was_modified
 
 
@@ -100,35 +97,6 @@ def reference_update(id_: int) -> Union[str, Response]:
         save(form, reference)
         return redirect(url_for('entity_view', id_=id_))
     return render_template('reference/update.html', form=form, reference=reference)
-
-
-def reference_view(reference: Entity) -> str:
-    tabs = {name: Tab(name, origin=reference) for name in [
-        'info', 'source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-        'human_remains', 'file']}
-    for link_ in reference.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        data = add_remove_link(data, domain.name, link_, reference, 'file')
-        tabs['file'].table.rows.append(data)
-    profile_image_id = reference.get_profile_image_id()
-    for link_ in reference.get_links(['P67', 'P128']):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data.append(link_.description)
-        if range_.view_name == 'file':  # pragma: no cover
-            data.append(get_profile_image_table_link(range_, reference, data[3], profile_image_id))
-        data = add_edit_link(data, url_for('reference_link_update',
-                                           link_id=link_.id,
-                                           origin_id=reference.id))
-        data = add_remove_link(data, range_.name, link_, reference, range_.table_name)
-        tabs[range_.table_name].table.rows.append(data)
-    reference.note = User.get_note(reference)
-    return render_template('reference/view.html',
-                           entity=reference,
-                           tabs=tabs,
-                           info=get_entity_data(reference),
-                           profile_image_id=profile_image_id)
 
 
 def save(form: Any,

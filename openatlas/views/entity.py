@@ -49,7 +49,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    if entity.view_name not in ['source', 'event', 'file', 'actor', 'place']:
+    if entity.view_name not in ['source', 'event', 'file', 'actor', 'place', 'reference']:
         # Return the respective view function, e.g. place_view() in views/place.py if it is a place
         return getattr(sys.modules['openatlas.views.' + entity.view_name],
                        '{name}_view'.format(name=entity.view_name))(entity)
@@ -60,8 +60,23 @@ def entity_view(id_: int) -> Union[str, Response]:
     overlays = None  # Needed for place
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info', entity)}
+
     # Todo: this if/else is way too long, maybe refactor with object/inheritance?
-    if entity.view_name == 'place':
+    if entity.view_name == 'reference':
+        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
+                     'find', 'human_remains', 'file']:
+            tabs[name] = Tab(name, entity)
+        for link_ in entity.get_links(['P67', 'P128']):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data.append(link_.description)
+            data = add_edit_link(data, url_for('reference_link_update',
+                                               link_id=link_.id,
+                                               origin_id=entity.id))
+            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
+            tabs[range_.table_name].table.rows.append(data)
+
+    elif entity.view_name == 'place':
         for name in ['source', 'event', 'actor', 'reference']:
             tabs[name] = Tab(name, entity)
         if entity.system_type == 'place':
@@ -225,11 +240,11 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
-    if entity.view_name in ['actor', 'event', 'place', 'source']:
-        tabs['reference'] = Tab('reference', entity)
+    if entity.view_name in ['actor', 'event', 'place', 'source', 'reference']:
+        if entity.view_name != 'reference':  # No references for reference
+            tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
         entity.image_id = entity.get_profile_image_id()
-
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
