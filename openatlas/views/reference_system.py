@@ -1,4 +1,4 @@
-from typing import Any, Dict, Union
+from typing import Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -10,9 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import add_system_data, add_type_data, button, external_url, link
-from openatlas.util.tab import Tab
-from openatlas.util.util import is_authorized, required_group
+from openatlas.util.util import required_group
 
 
 @app.route('/reference_system/insert', methods=['POST', 'GET'])
@@ -51,37 +49,6 @@ def reference_system_remove_form(system_id: int, form_id: int) -> Response:
         logger.log('error', 'database', 'remove form failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('entity_view', id_=system_id))
-
-
-def reference_system_view(entity: ReferenceSystem) -> Union[str, Response]:
-    tabs = {name: Tab(name, origin=entity) for name in ['info']}
-    info: Dict[str, Any] = {_('website URL'): external_url(entity.website_url),
-                            _('resolver URL'): external_url(entity.resolver_url),
-                            _('example ID'): entity.placeholder}
-    add_type_data(entity, info)
-    add_system_data(entity, info)
-    for form_id, form_ in entity.get_forms().items():
-        tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'), origin=entity)
-        tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
-    for link_ in entity.get_links('P67'):
-        name = link_.description
-        if entity.resolver_url:
-            name = '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
-                url=entity.resolver_url + name,
-                name=name)
-        tab_name = link_.range.view_name.capitalize().replace(' ', '-')
-        if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
-            tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
-        if tab_name == 'Place':
-            tab_name = link_.range.system_type.title().replace(' ', '-')
-        tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
-    for form_id, form_ in entity.get_forms().items():
-        if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
-            tabs[form_['name'].replace(' ', '-')].buttons = [
-                button(_('remove'), url_for('reference_system_remove_form',
-                                            system_id=entity.id,
-                                            form_id=form_id))]
-    return render_template('reference_system/view.html', entity=entity, tabs=tabs, info=info)
 
 
 def save(form: FlaskForm, entity: ReferenceSystem = None) -> str:

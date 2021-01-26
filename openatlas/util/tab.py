@@ -65,7 +65,6 @@ class Tab:
             table.header = table.header + ['page']
 
         if name == 'actor':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             if code in ['E18', 'E22', 'E20']:
                 table.header = ['actor', _('property'), 'class', 'first', 'last', 'description']
                 table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
@@ -85,7 +84,6 @@ class Tab:
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
-            table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
             if code in class_codes['actor']:
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
             if code == 'E84':
@@ -124,10 +122,8 @@ class Tab:
                                                               origin_id=id_,
                                                               system_type='human_remains'))]
         elif name == 'member':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'),
                               url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
@@ -145,7 +141,6 @@ class Tab:
                                                            category=category,
                                                            origin_id=id_)))
         elif name == 'relation':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name

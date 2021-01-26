@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Dict, List, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -13,10 +13,12 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
+from openatlas.util.display import (add_edit_link, add_remove_link, button, get_base_table_data,
                                     get_entity_data, get_file_path, get_profile_image_table_link,
                                     link, uc_first)
+from openatlas.util.filters import display_delete_link
 from openatlas.util.tab import Tab
 from openatlas.util.util import is_authorized, required_group
 from openatlas.views.reference import AddReferenceForm
@@ -55,8 +57,34 @@ def entity_view(id_: int) -> Union[str, Response]:
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info', entity)}
 
-    # Todo: this if/else is way too long, maybe refactor with object/inheritance?
-    if entity.view_name == 'object':
+    # Todo: moving functionality from separate views here was an important step but this if/else is
+    #  way too long and error prone to manage or expand, maybe refactor with object/inheritance?
+
+    if entity.view_name == 'reference_system':
+        for form_id, form_ in entity.get_forms().items():
+            tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'),
+                                                        origin=entity)
+            tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
+        for link_ in entity.get_links('P67'):
+            name = link_.description
+            if entity.resolver_url:
+                name = \
+                    '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
+                        url=entity.resolver_url + name, name=name)
+            tab_name = link_.range.view_name.capitalize().replace(' ', '-')
+            if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
+                tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
+            if tab_name == 'Place':
+                tab_name = link_.range.system_type.title().replace(' ', '-')
+            tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
+        for form_id, form_ in entity.get_forms().items():
+            if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
+                tabs[form_['name'].replace(' ', '-')].buttons = [
+                    button(_('remove'), url_for('reference_system_remove_form',
+                                                system_id=entity.id,
+                                                form_id=form_id))]
+
+    elif entity.view_name == 'object':
         for name in ['source', 'event']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links('P128'):
@@ -288,21 +316,40 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs[domain.view_name].table.rows.append(data)
     if not gis_data:
         gis_data = Gis.get_all(entity.linked_places) if entity.linked_places else None
-    crumb = [[_(entity.view_name), url_for('index', class_=entity.view_name)], entity.name]
-    if structure:
-        crumb = [[_(entity.view_name), url_for('index', class_=entity.view_name)],
-                 structure['place'],
-                 structure['feature'],
-                 structure['stratigraphic_unit'],
-                 entity.name]
     return render_template('entity/view.html',
                            entity=entity,
                            tabs=tabs,
+                           buttons=add_buttons(entity),
                            structure=structure,  # Needed for place views
                            overlays=overlays,  # Needed for place views
                            gis_data=gis_data,
                            info=get_entity_data(entity, event_links=event_links),
-                           crumb=crumb)
+                           crumb=add_crumbs(entity, structure))
+
+
+def add_crumbs(entity: Entity, structure: Optional[Dict[str, Any]]) -> List[str]:
+    crumbs = [[_(entity.view_name.replace('_', ' ')),
+               url_for('index', class_=entity.view_name)], entity.name]
+    if structure:
+        crumbs = [[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                  structure['place'],
+                  structure['feature'],
+                  structure['stratigraphic_unit'],
+                  entity.name]
+    return crumbs
+
+
+def add_buttons(entity: Union[Entity, ReferenceSystem]) -> List[str]:
+    buttons = []
+    if entity.view_name in ['reference_system']:
+        if is_authorized('manager'):
+            buttons.append(button(_('edit'), url_for(entity.view_name + '_update', id_=entity.id)))
+            if not entity.forms and not entity.system:
+                buttons.append(display_delete_link(None, entity))
+    elif is_authorized('contributor'):
+        buttons.append(button(_('edit'), url_for(entity.view_name + '_update', id_=entity.id)))
+        buttons.append(display_delete_link(None, entity))
+    return buttons
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])

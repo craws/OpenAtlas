@@ -8,12 +8,7 @@
         <div class="col-6">
             <div class="toolbar">
                 {{ ('menu/' + entity.view_name)|manual }}
-                {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for(entity.view_name + '_update', id_=entity.id)) }}
-                    {% if not subunits %}
-                        {{ entity|display_delete_link }}
-                    {% endif %}
-                {% endif %}
+                {{ buttons|join(' ') }}
                 {{ entity.id|bookmark_toggle }}
                 {{ entity|download_button }}
                 {{ entity|siblings_pager(structure) }}

@@ -26,9 +26,10 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.imports import Project
     from openatlas.models.link import Link
     from openatlas.models.user import User
+    from openatlas.models.reference_system import ReferenceSystem
 
 
-# This file is used in combination with filters.py to collect HTML display code in one place
+# This file is used in combination with filters.py to centralize HTML display code
 
 def external_url(url: Union[str, None]) -> str:
     return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'.format(
@@ -305,7 +306,7 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
            + '..' + '</span>'  # pragma: no cover
 
 
-def get_entity_data(entity: 'Entity',
+def get_entity_data(entity: Union['Entity', 'ReferenceSystem'],
                     event_links: Optional[List[Link]] = None  # Used for actor views
                     ) -> Dict[str, Union[str, List[str]]]:
     """ Collect and return related information for entity views."""
@@ -328,6 +329,7 @@ def get_entity_data(entity: 'Entity',
     add_type_data(entity, data)
 
     # Class specific information
+    # Todo: like in views/entity this if/else is too long and error prone
     if entity.view_name == 'file':
         data[_('size')] = print_file_size(entity)
         data[_('extension')] = get_file_extension(entity)
@@ -384,6 +386,10 @@ def get_entity_data(entity: 'Entity',
         data[_('appears first')] = appears_first
         data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
+    elif entity.view_name == 'reference_system':
+        data[_('website URL')] = external_url(entity.website_url)
+        data[_('resolver URL')] = external_url(entity.resolver_url)
+        data[_('example ID')] = entity.placeholder
     return add_system_data(entity, data)
 
 
