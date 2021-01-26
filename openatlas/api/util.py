@@ -4,7 +4,7 @@ from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
-from openatlas.api.image_manipulation import ImageManipulation
+from openatlas.util.image_manipulation import ImageManipulation
 from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneError
 from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
