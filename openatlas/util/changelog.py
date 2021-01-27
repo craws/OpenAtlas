@@ -1,5 +1,11 @@
 class Changelog:
     versions = {
+        '5.7.2': ['2021-01-27', {
+            'fix': {
+                '1455': 'Network graphic error'}}],
+        '5.7.1': ['2021-01-26', {
+            'fix': {
+                '1454': 'Error in install instructions'}}],
         '5.7.0': ['2021-01-16', {
             'feature': {
                 '1292': 'External reference systems',

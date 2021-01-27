@@ -15,13 +15,11 @@ class Network:
     sql_where = """
         AND ((e.system_type IS NULL AND e.class_code != 'E53')
                 OR (e.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
-                                            'source translation')
-                        AND e.system_type NOT LIKE 'external reference%%'))"""
+                                            'source translation'))) AND e.class_code != 'E32'"""
     sql_where2 = """
         AND ((e2.system_type IS NULL AND e2.class_code != 'E53')
                 OR (e2.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
-                                            'source translation')
-                    AND e2.system_type NOT LIKE 'external reference%%'))"""
+                                            'source translation'))) AND e2.class_code != 'E32'"""
 
     @staticmethod
     def get_edges() -> Iterator[NamedTupleCursor.Record]:
