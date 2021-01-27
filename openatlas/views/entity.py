@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -11,6 +11,8 @@ from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
@@ -22,27 +24,24 @@ from openatlas.util.filters import display_delete_link
 from openatlas.util.tab import Tab
 from openatlas.util.util import is_authorized, required_group
 from openatlas.views.reference import AddReferenceForm
-from openatlas.views.types import node_view
 
 
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
 def entity_view(id_: int) -> Union[str, Response]:
     if id_ in g.nodes:  # Nodes have their own view
-        node = g.nodes[id_]
-        if node.root:
-            return node_view(node)
-        else:  # pragma: no cover
-            if node.class_.code == 'E53':
+        entity = g.nodes[id_]
+        if not entity.root:
+            if entity.class_.code == 'E53':
                 tab_hash = '#menu-tab-places_collapse-'
-            elif node.standard:
+            elif entity.standard:
                 tab_hash = '#menu-tab-standard_collapse-'
-            elif node.value_type:
+            elif entity.value_type:
                 tab_hash = '#menu-tab-value_collapse-'
             else:
                 tab_hash = '#menu-tab-custom_collapse-'
             return redirect(url_for('node_index') + tab_hash + str(id_))
-    if id_ in g.reference_systems:
+    elif id_ in g.reference_systems:
         entity = g.reference_systems[id_]
     else:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
@@ -60,7 +59,36 @@ def entity_view(id_: int) -> Union[str, Response]:
     # Todo: moving functionality from separate views here was an important step but this if/else is
     #  way too long and error prone to manage or expand, maybe refactor with object/inheritance?
 
-    if entity.view_name == 'reference_system':
+    if entity.view_name == 'node':
+        for name in ['subs', 'entities']:
+            tabs[name] = Tab(name, entity)
+        root = g.nodes[entity.root[-1]] if entity.root else None
+        if root and root.value_type:  # pragma: no cover
+            tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
+        for item in entity.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
+            if item.class_.code == 'E32':  # Don't add reference systems themselves
+                continue  # pragma: no cover
+            if entity.class_.code == 'E53':  # pragma: no cover
+                object_ = item.get_linked_entity('P53', inverse=True)
+                if not object_:  # If it's a location show the object, continue otherwise
+                    continue
+                item = object_
+            data = [link(item)]
+            if root and root.value_type:  # pragma: no cover
+                data.append(format_number(item.nodes[entity]))
+            data.append(g.classes[item.class_.code].name)
+            data.append(item.description)
+            tabs['entities'].table.rows.append(data)
+        for sub_id in entity.subs:
+            sub = g.nodes[sub_id]
+            tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
+        if not tabs['entities'].table.rows:  # If no entities available get links with this type_id
+            tabs['entities'].table.header = [_('domain'), _('range')]
+            for row in Link.get_entities_by_node(entity):
+                tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
+                                                    link(Entity.get_by_id(row.range_id))])
+
+    elif entity.view_name == 'reference_system':
         for form_id, form_ in entity.get_forms().items():
             tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'),
                                                         origin=entity)
@@ -274,8 +302,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
-    if entity.view_name in ['actor', 'event', 'place', 'source', 'reference']:
-        if entity.view_name != 'reference':  # No references for reference
+    if entity.view_name in ['actor', 'event', 'node', 'place', 'source', 'reference']:
+        if entity.view_name not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
         entity.image_id = entity.get_profile_image_id()
@@ -327,7 +355,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                            crumb=add_crumbs(entity, structure))
 
 
-def add_crumbs(entity: Entity, structure: Optional[Dict[str, Any]]) -> List[str]:
+def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
     crumbs = [[_(entity.view_name.replace('_', ' ')),
                url_for('index', class_=entity.view_name)], entity.name]
     if structure:
@@ -336,15 +364,24 @@ def add_crumbs(entity: Entity, structure: Optional[Dict[str, Any]]) -> List[str]
                   structure['feature'],
                   structure['stratigraphic_unit'],
                   entity.name]
+    elif entity.view_name == 'node':
+        crumbs = [[_('types'), url_for('node_index')],
+                  link(g.nodes[entity.root[-1]]),
+                  entity.name]
     return crumbs
 
 
-def add_buttons(entity: Union[Entity, ReferenceSystem]) -> List[str]:
+def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
     buttons = []
-    if entity.view_name in ['reference_system']:
+    if entity.view_name == 'node':
+        if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
+            buttons.append(button(_('edit'), url_for(entity.view_name + '_update', id_=entity.id)))
+            if not entity.locked and entity.count < 1 and not entity.subs:
+                buttons.append(display_delete_link(None, entity))
+    elif entity.view_name == 'reference_system':
         if is_authorized('manager'):
             buttons.append(button(_('edit'), url_for(entity.view_name + '_update', id_=entity.id)))
-            if not entity.forms and not entity.system:
+            if not entity.forms and not entity.locked:
                 buttons.append(display_delete_link(None, entity))
     elif is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for(entity.view_name + '_update', id_=entity.id)))

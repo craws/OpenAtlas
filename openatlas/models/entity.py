@@ -57,6 +57,8 @@ class Entity:
         self.end_from = None
         self.end_to = None
         self.end_comment = None
+        self.first = None
+        self.last = None
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)
@@ -91,11 +93,15 @@ class Entity:
         LEFT JOIN model.link l2 on e.id = l2.range_id
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
-    def get_linked_entity(self, code: str, inverse: bool = False,
+    def get_linked_entity(self,
+                          code: str,
+                          inverse: bool = False,
                           nodes: bool = False) -> Optional[Entity]:
         return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entity_safe(self, code: str, inverse: bool = False,
+    def get_linked_entity_safe(self,
+                               code: str,
+                               inverse: bool = False,
                                nodes: bool = False) -> Entity:
         return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
 

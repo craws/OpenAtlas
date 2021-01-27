@@ -17,7 +17,7 @@
                         <div class="tab-pane fade" role="tabpanel" id="tab-{{ id_|replace('_', '-') }}">
                             {% if tab.buttons  %}
                                 <div class="toolbar">
-                                    {{ buttons|join(' ') }}
+                                    {{ tab.buttons|join(' ') }}
                                 </div>
                             {% endif %}
                             {% if tab.table.rows %}
