@@ -368,6 +368,10 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
         crumbs = [[_('types'), url_for('node_index')],
                   link(g.nodes[entity.root[-1]]),
                   entity.name]
+    elif entity.view_name == 'translation':
+        crumbs = [[_('source'), url_for('index', class_='source')],
+                  link(entity.get_linked_entity('P73', True)),
+                  entity.name]
     return crumbs
 
 
