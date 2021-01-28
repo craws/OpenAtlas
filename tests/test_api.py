@@ -30,7 +30,7 @@ class ApiTests(TestBaseCase):
                 place.end_comment = 'Destruction of the Nostromos'
 
                 # Adding Type Settlement
-                place.link('P2', Entity.get_by_id(66))
+                place.link('P2', Node.get_hierarchy('Place'))
 
                 # Adding Alias
                 alias = insert_entity('Cargo hauler', 'alias')

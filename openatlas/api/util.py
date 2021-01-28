@@ -4,8 +4,9 @@ from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
-from openatlas.api.v02.resources.error import AccessDeniedError
-from openatlas.api.v02.resources.parser import default_parser
+from openatlas.util.image_manipulation import ImageManipulation
+from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneError
+from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import api_access
@@ -15,7 +16,7 @@ from openatlas.util.util import api_access
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def display_file_api(filename: str) -> Any:  # pragma: no cover
-    parser = default_parser.parse_args()
+    parser = image_parser.parse_args()
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
@@ -26,5 +27,16 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
     if license_:
         if parser['download']:
             return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
+        if parser['thumbnail']:
+            return send_file(
+                ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
+                                                  parser['thumbnail']), mimetype='image/jpeg')
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise AccessDeniedError
+
+
+@app.route('/api/0.1/', strict_slashes=False)
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def path_error() -> Any:  # pragma: no cover
+    raise ResourceGoneError
