@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 5.7.0 to 5.8.0
+
+    # apt install libmagickwand-dev
+
 ### 5.6.0 to 5.7.0
 
 #### Software
