@@ -80,7 +80,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('involvement_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 buttons.append(button(g.classes[code].name,
-                                      url_for('actor_insert', code=code, origin_id=id_)))
+                                      url_for('insert', class_=code, origin_id=id_)))
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
@@ -144,7 +144,7 @@ class Tab:
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name
-                buttons.append(button(label, url_for('insert', code=code, origin_id=id_)))
+                buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'source':
             if system_type == 'file':
                 buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='source'))]
@@ -153,7 +153,7 @@ class Tab:
                                   url_for('reference_add', id_=id_, class_name='source'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_source', id_=id_))]
-            buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
+            buttons.append(button(_('source'), url_for('insert', class_='source', origin_id=id_)))
         elif name == 'subs':
             if code in ['E53', 'E55']:
                 table.header = [_('name'), _('count'), _('info')]

@@ -36,7 +36,7 @@ def get_buttons(class_: str) -> List[str]:
     buttons = []
     if class_ in ['actor', 'event']:
         for code in app.config['CLASS_CODES'][class_]:
-            buttons.append(button(g.classes[code].name, url_for('insert', code=code)))
+            buttons.append(button(g.classes[code].name, url_for('insert', class_=code)))
     elif class_ == 'object':
         buttons = [button(g.classes['E84'].name, url_for('object_insert'))]
     elif class_ == 'reference':
@@ -48,7 +48,7 @@ def get_buttons(class_: str) -> List[str]:
         if is_authorized('manager'):
             buttons = [button(_('reference system'), url_for('reference_system_insert'))]
     else:
-        buttons = [button(_(class_), url_for(class_ + '_insert'))]
+        buttons = [button(_(class_), url_for('insert', class_=class_))]
     return buttons
 
 
