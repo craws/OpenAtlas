@@ -14,10 +14,10 @@ from openatlas.util.display import (link)
 from openatlas.util.util import required_group, was_modified
 
 
-@app.route('/actor/insert/<code>', methods=['POST', 'GET'])
-@app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/insert/<code>', methods=['POST', 'GET'])
+@app.route('/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
+def insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(g.classes[code].name.lower().replace(' ', '_'), code=code, origin=origin)
     if form.validate_on_submit():
@@ -25,82 +25,92 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
     form.alias.append_entry('')
     if origin and origin.system_type == 'place':
         form.residence.data = origin_id
-    return render_template('actor/insert.html', form=form, code=code, origin=origin)
+    view_name = 'actor'
+    crumb = [[_(view_name), url_for('index', class_=view_name)], '+ ' + g.classes[code].name]
+    if origin:
+        crumb = [[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                 origin, '+ ' + g.classes[code].name]
+    return render_template('entity/insert.html',
+                           form=form,
+                           crumb=crumb,
+                           code=code,
+                           origin=origin,
+                           view_name=view_name)
 
 
-@app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_update(id_: int) -> Union[str, Response]:
-    actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
-    form = build_form(g.classes[actor.class_.code].name.lower().replace(' ', '_'), actor)
+def update(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    form = build_form(g.classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
     if form.validate_on_submit():
-        if was_modified(form, actor):  # pragma: no cover
+        if was_modified(form, entity):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(logger.get_log_for_advanced_view(actor.id)['modifier'])
-            return render_template('actor/update.html', form=form, actor=actor, modifier=modifier)
-        save(form, actor)
+            modifier = link(logger.get_log_for_advanced_view(entity.id)['modifier'])
+            return render_template('entity/update.html', form=form, entity=entity, modifier=modifier)
+        save(form, entity)
         return redirect(url_for('entity_view', id_=id_))
-    residence = actor.get_linked_entity('P74')
+    residence = entity.get_linked_entity('P74')
     form.residence.data = residence.get_linked_entity_safe('P53', True).id if residence else ''
-    first = actor.get_linked_entity('OA8')
+    first = entity.get_linked_entity('OA8')
     form.begins_in.data = first.get_linked_entity_safe('P53', True).id if first else ''
-    last = actor.get_linked_entity('OA9')
+    last = entity.get_linked_entity('OA9')
     form.ends_in.data = last.get_linked_entity_safe('P53', True).id if last else ''
-    for alias in actor.aliases.values():
+    for alias in entity.aliases.values():
         form.alias.append_entry(alias)
     form.alias.append_entry('')
-    return render_template('actor/update.html', form=form, actor=actor)
+    return render_template('entity/update.html', form=form, entity=entity)
 
 
 def save(form: FlaskForm,
-         actor: Optional[Entity] = None,
+         entity: Optional[Entity] = None,
          code: str = '',
          origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'
-        if actor:
-            actor.delete_links(['P74', 'OA8', 'OA9'])
+        if entity:
+            entity.delete_links(['P74', 'OA8', 'OA9'])
         else:
-            actor = Entity.insert(code, form.name.data)
+            entity = Entity.insert(code, form.name.data)
             log_action = 'insert'
-        actor.update(form)
-        ReferenceSystem.update_links(form, actor)
+        entity.update(form)
+        ReferenceSystem.update_links(form, entity)
         if form.residence.data:
             object_ = Entity.get_by_id(form.residence.data, view_name='place')
-            actor.link('P74', object_.get_linked_entity_safe('P53'))
+            entity.link('P74', object_.get_linked_entity_safe('P53'))
         if form.begins_in.data:
             object_ = Entity.get_by_id(form.begins_in.data, view_name='place')
-            actor.link('OA8', object_.get_linked_entity_safe('P53'))
+            entity.link('OA8', object_.get_linked_entity_safe('P53'))
         if form.ends_in.data:
             object_ = Entity.get_by_id(form.ends_in.data, view_name='place')
-            actor.link('OA9', object_.get_linked_entity_safe('P53'))
+            entity.link('OA9', object_.get_linked_entity_safe('P53'))
 
-        url = url_for('entity_view', id_=actor.id)
+        url = url_for('entity_view', id_=entity.id)
         if origin:
             if origin.view_name == 'reference':
-                link_id = origin.link('P67', actor)[0]
+                link_id = origin.link('P67', entity)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.view_name in ['source', 'file']:
-                origin.link('P67', actor)
-                url = url_for('entity_view', id_=origin.id) + '#tab-actor'
+                origin.link('P67', entity)
+                url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.view_name
             elif origin.view_name == 'event':
-                link_id = origin.link('P11', actor)[0]
+                link_id = origin.link('P11', entity)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif origin.view_name == 'actor':
-                link_id = origin.link('OA7', actor)[0]
+            elif origin.view_name == entity.view_name:
+                link_id = origin.link('OA7', entity)[0]
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
             elif origin.view_name == 'place':
-                url = url_for('entity_view', id_=origin.id) + '#tab-actor'
+                url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.view_name
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
-            url = url_for('actor_insert', code=code)
-        logger.log_user(actor.id, log_action)
+            url = url_for('entity_insert', code=code)
+        logger.log_user(entity.id, log_action)
         g.cursor.execute('COMMIT')
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        return redirect(url_for('actor_index'))
+        return redirect(url_for('entity_index', class_=entity.view_name))
     return url

@@ -144,7 +144,7 @@ class Tab:
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name
-                buttons.append(button(label, url_for('actor_insert', code=code, origin_id=id_)))
+                buttons.append(button(label, url_for('insert', code=code, origin_id=id_)))
         elif name == 'source':
             if system_type == 'file':
                 buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='source'))]

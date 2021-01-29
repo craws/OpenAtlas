@@ -36,7 +36,7 @@ def get_buttons(class_: str) -> List[str]:
     buttons = []
     if class_ in ['actor', 'event']:
         for code in app.config['CLASS_CODES'][class_]:
-            buttons.append(button(g.classes[code].name, url_for(class_ + '_insert', code=code)))
+            buttons.append(button(g.classes[code].name, url_for('insert', code=code)))
     elif class_ == 'object':
         buttons = [button(g.classes['E84'].name, url_for('object_insert'))]
     elif class_ == 'reference':

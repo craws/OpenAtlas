@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
-{% block title_name %} - {{ actor.name }}{% endblock %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], actor, _('edit')]|crumb }}
+    {{ crumb|crumb2 }}
 {% endblock %}
 {% block content %}
     {% if modifier %}
@@ -9,8 +9,8 @@
             {{ _('error modified by %(username)s', username=modifier|safe) }}
         </p>
         <p>
-            {{ _('reload')|button(url_for('actor_update', id_=actor.id)) }}
+            {{ _('reload')|button(url_for('update', id_=entity.id)) }}
         </p>
     {% endif %}
-    {{ form|display_form(manual_page='menu/actor') }}
+    {{ form|display_form(manual_page='entity/' + entity.view_name) }}
 {% endblock %}
