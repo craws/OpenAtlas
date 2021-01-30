@@ -101,13 +101,13 @@ class Tab:
                                       url_for('reference_add', id_=id_, class_name='event'))]
                 for code in class_codes['event']:
                     label = g.classes[code].name
-                    buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
+                    buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'feature':
             if current_user.settings['module_sub_units'] and system_type == 'place':
-                buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('feature'), url_for('insert', class_='feature', origin_id=id_))]
         elif name == 'find':
             if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
-                buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('find'), url_for('insert', class_='find', origin_id=id_))]
         elif name == 'file':
             table.header = Table.HEADERS['file'] + [_('main image')]
             if code in class_codes['reference']:
@@ -118,9 +118,9 @@ class Tab:
             buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
         elif name == 'human_remains':
             if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
-                buttons = [button(_('human remains'), url_for('place_insert',
+                buttons = [button(_('human remains'), url_for('insert',
                                                               origin_id=id_,
-                                                              system_type='human_remains'))]
+                                                              class_='human_remains'))]
         elif name == 'member':
             buttons = [button(_('link'), url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
@@ -133,7 +133,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='place'))]
             elif code in class_codes['source']:
                 buttons = [button(_('link'), url_for('source_add', id_=id_, class_name='place'))]
-            buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
+            buttons.append(button(_('place'), url_for('insert', class_='place', origin_id=id_)))
         elif name == 'reference':
             buttons = [button(_('link'), url_for('entity_add_reference', id_=id_))]
             for category in ['bibliography', 'edition', 'external reference']:
@@ -161,7 +161,9 @@ class Tab:
                 table.header = Table.HEADERS['event']
         elif name == 'stratigraphic_unit':
             if current_user.settings['module_sub_units'] and system_type == 'feature':
-                buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('stratigraphic unit'), url_for('insert',
+                                                                   class_='stratigraphic_unit',
+                                                                   origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
 

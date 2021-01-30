@@ -58,7 +58,6 @@ def entity_view(id_: int) -> Union[str, Response]:
 
     # Todo: moving functionality from separate views here was an important step but this if/else is
     #  way too long and error prone to manage or expand, maybe refactor with object/inheritance?
-
     if entity.view_name == 'node':
         for name in ['subs', 'entities']:
             tabs[name] = Tab(name, entity)
@@ -111,7 +110,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                     button(_('remove'), url_for('reference_system_remove_form',
                                                 system_id=entity.id,
                                                 form_id=form_id))]
-
     elif entity.view_name == 'object':
         for name in ['source', 'event']:
             tabs[name] = Tab(name, entity)
@@ -123,7 +121,6 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = get_base_table_data(link_.domain)
             data = add_remove_link(data, link_.range.name, link_, entity, link_.range.table_name)
             tabs['event'].table.rows.append(data)
-
     elif entity.view_name == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
                      'find', 'human_remains', 'file']:
@@ -137,7 +134,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                                                origin_id=entity.id))
             data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
             tabs[range_.table_name].table.rows.append(data)
-
     elif entity.view_name == 'place':
         for name in ['source', 'event', 'actor', 'reference']:
             tabs[name] = Tab(name, entity)
@@ -166,16 +162,15 @@ def entity_view(id_: int) -> Union[str, Response]:
                                              actor.description])
         structure = get_structure(entity)
         if structure:
-            for entity in structure['subunits']:
-                data = get_base_table_data(entity)
-                tabs[entity.system_type.replace(' ', '_')].table.rows.append(data)
+            for item in structure['subunits']:
+                data = get_base_table_data(item)
+                tabs[item.system_type.replace(' ', '_')].table.rows.append(data)
         gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
                 and (not structure or not structure['super_id']):
             gis_data = {}
-
     elif entity.view_name == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
             tabs[name] = Tab(name, entity)
@@ -204,7 +199,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                                  url_for('involvement_update', id_=link_.id, origin_id=entity.id))
             data = add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
-
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
             type_ = ''
             if entity.id == link_.domain.id:
@@ -239,7 +233,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                                      url_for('member_update', id_=link_.id, origin_id=entity.id)))
                 data = add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
-
     elif entity.view_name == 'file':
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
@@ -258,7 +251,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                                          origin_id=entity.id))
             data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
-
     elif entity.view_name == 'source':
         for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                      'human_remains', 'text']:
@@ -272,7 +264,6 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = get_base_table_data(range_)
             data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
             tabs[range_.table_name].table.rows.append(data)
-
     elif entity.view_name == 'event':
         for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)
@@ -301,7 +292,6 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-
     if entity.view_name in ['actor', 'event', 'node', 'place', 'source', 'reference']:
         if entity.view_name not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
