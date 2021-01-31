@@ -1,8 +1,0 @@
-{% extends 'layout.html' %}
-{% block title_name %} - {{ object_.name }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('object'), 'object_index'], object_, _('edit')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form(manual_page='menu/object') }}
-{% endblock %}

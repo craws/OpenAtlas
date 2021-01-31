@@ -31,6 +31,8 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     elif class_ in app.config['CLASS_CODES']['event']:
         # Todo: it's inconsistently to actor that event has only one form for different classes.
         form = build_form('event', origin=origin, code=class_)
+    elif class_ == 'E84':
+        form = build_form('information_carrier', origin=origin)
     else:
         form = build_form(class_, origin=origin)
     if form.validate_on_submit():
@@ -148,6 +150,9 @@ def update(id_: int) -> Union[str, Response]:
 
 
 def populate_insert_form(form: FlaskForm, view_name: str, class_: str, origin: Entity) -> None:
+    if view_name == 'source':
+        if origin and origin.class_.code == 'E84':
+            form.information_carrier.data = [origin.id]
     if view_name == 'actor':
         if origin.system_type == 'place':
             form.residence.data = origin.id
@@ -215,6 +220,8 @@ def save(form: FlaskForm,
                 entity = Entity.insert('E33', form.name.data, 'source content')
             elif class_ == 'file':
                 entity = Entity.insert('E31', form.name.data, 'file')
+            elif class_ == 'E84':
+                entity = Entity.insert('E84', form.name.data, 'information carrier')
             elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
                 if class_ == 'human_remains':
                     entity = Entity.insert('E20', form.name.data, 'human remains')

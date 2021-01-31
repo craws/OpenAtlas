@@ -263,7 +263,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
-            tabs[range_.table_name].table.rows.append(data)
+            if range_.table_name in tabs:  # e.g. source has no tab for object (information carrier)
+                tabs[range_.table_name].table.rows.append(data)
     elif entity.view_name == 'event':
         for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)

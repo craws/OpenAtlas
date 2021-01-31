@@ -63,7 +63,6 @@ class Tab:
         table = Table(Table.HEADERS[name]) if name in Table.HEADERS else Table()
         if name == 'reference' or (code in class_codes['reference'] and system_type != 'file'):
             table.header = table.header + ['page']
-
         if name == 'actor':
             if code in ['E18', 'E22', 'E20']:
                 table.header = ['actor', _('property'), 'class', 'first', 'last', 'description']
@@ -88,7 +87,7 @@ class Tab:
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
             if code == 'E84':
                 buttons = [button(g.classes['E9'].name,
-                                  url_for('event_insert', code='E9', origin_id=id_))]
+                                  url_for('insert', class_='E9', origin_id=id_))]
             else:
                 if system_type == 'file':
                     buttons = [button('link', url_for('file_add', id_=id_, class_name='event'))]
