@@ -1,9 +1,10 @@
+import os
 from typing import Any, Dict, List, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from werkzeug.utils import redirect
+from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
@@ -23,7 +24,6 @@ from openatlas.util.util import required_group, was_modified
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-
     if class_ in app.config['CLASS_CODES']['actor']:
         # Todo: can't use g.classes[class_].name because it's already translated, needs fixing.
         form_name = {'E21': 'person', 'E74': 'group', 'E40': 'legal_body'}
@@ -54,16 +54,18 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         structure = get_structure(super_=origin)
         gis_data = Gis.get_all([origin] if origin else None, structure)
         overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
-    return render_template('entity/insert.html',
-                           form=form,
-                           crumb=add_crumbs(view_name, class_, origin, structure, insert_=True),
-                           class_=class_,
-                           origin=origin,
-                           view_name=view_name,
-                           structure=structure,
-                           gis_data=gis_data,
-                           geonames_module=geonames_module,
-                           overlays=overlays)
+    return render_template(
+        'entity/insert.html',
+        form=form,
+        crumb=add_crumbs(view_name, class_, origin, structure, insert_=True),
+        class_=class_,
+        origin=origin,
+        view_name=view_name,
+        structure=structure,
+        gis_data=gis_data,
+        geonames_module=geonames_module,
+        writeable=True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,  # For files
+        overlays=overlays)
 
 
 def add_crumbs(view_name: str,
@@ -211,6 +213,8 @@ def save(form: FlaskForm,
             action = 'insert'
             if class_ == 'source':
                 entity = Entity.insert('E33', form.name.data, 'source content')
+            elif class_ == 'file':
+                entity = Entity.insert('E31', form.name.data, 'file')
             elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
                 if class_ == 'human_remains':
                     entity = Entity.insert('E20', form.name.data, 'human remains')
@@ -227,9 +231,15 @@ def save(form: FlaskForm,
                 entity.link('P53', location)
             else:
                 entity = Entity.insert(class_, form.name.data)
+            if entity.view_name == 'file':
+                file_ = request.files['file']
+                # Add an 'a' to prevent emtpy filename, this won't affect stored information
+                filename = secure_filename('a' + file_.filename)  # type: ignore
+                new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
+                file_.save(str(app.config['UPLOAD_DIR'] / new_name))
         entity.update(form)
         update_links(entity, form, action, location)
-        url = get_redirect_url(form, entity, class_, origin)
+        url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
         g.cursor.execute('COMMIT')
         flash(_('entity created') if action == 'insert' else _('info update'), 'info')
@@ -304,16 +314,19 @@ def update_links(entity: Entity, form, action: str, location: Optional[Entity] =
             entity.link_string('P128', form.information_carrier.data, inverse=True)
 
 
-def get_redirect_url(form: FlaskForm,
-                     entity: Entity,
-                     class_: Optional[str] = '',
-                     origin: Optional[Entity] = None) -> str:
+def link_and_get_redirect_url(form: FlaskForm,
+                              entity: Entity,
+                              class_: Optional[str] = '',
+                              origin: Optional[Entity] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
     if origin:
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.view_name
         if origin.view_name == 'reference':
             link_id = origin.link('P67', entity)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+        elif entity.system_type == 'file':
+            entity.link('P67', origin)
+            url = url_for('entity_view', id_=origin.id) + '#tab-file'
         elif origin.view_name in ['place', 'feature', 'stratigraphic unit']:
             url = url_for('entity_view', id_=entity.id)
             origin.link('P46', entity)

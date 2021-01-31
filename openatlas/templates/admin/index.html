@@ -30,7 +30,7 @@
                             {{  _('edit')|button(url_for('admin_settings', category='files')) }}
                         {% endif %}
                         {{ _('list')|button(url_for('index', class_='file')) }}
-                        {{ _('file')|button(url_for('file_insert')) }}
+                        {{ _('file')|button(url_for('insert', class_='file')) }}
                     </div>
                     <div style="float:left;">
                         {% for dir, value in writeable_dirs.items() %}

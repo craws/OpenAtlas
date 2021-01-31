@@ -115,7 +115,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='file'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]
-            buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
+            buttons.append(button(_('file'), url_for('insert', class_='file', origin_id=id_)))
         elif name == 'human_remains':
             if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
                 buttons = [button(_('human remains'), url_for('insert',

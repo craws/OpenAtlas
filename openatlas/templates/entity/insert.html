@@ -5,7 +5,20 @@
 {% endblock %}
 {% block content %}
     {% if view_name != 'place' %}
-        {{ form|display_form(manual_page='entity/' + view_name) }}
+        {% if view_name == 'file' %}
+            <p>
+                {{ _('max size')|uc_first }}:
+                <span style="font-weight: bold;">{{ session['settings']['file_upload_max_size'] }} MB</span>.
+                {{ _('if exceeded you will receive a connection error')|uc_first }}.
+                {{ _('allowed extensions')|uc_first }}:
+                <span style="font-weight: bold;">{{ ', '.join(session['settings']['file_upload_allowed_extension']) }}</span>
+            </p>
+        {% endif %}
+        {% if view_name == 'file' and not writeable %}
+            <span class="error">{{ _('directory not writable')|uc_first }}</span>
+        {% else %}
+            {{ form|display_form(manual_page='entity/' + view_name) }}
+        {% endif %}
     {% else %}
         <div class="row">
             <div class="col-4">
@@ -24,6 +37,3 @@
         </div>
     {% endif %}
 {% endblock %}
-
-
-
