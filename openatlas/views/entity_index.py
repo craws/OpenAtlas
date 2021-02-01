@@ -45,7 +45,7 @@ def get_buttons(class_: str) -> List[str]:
                    button(_('external reference'), url_for('insert', class_='external_reference'))]
     elif class_ == 'reference_system':
         if is_authorized('manager'):
-            buttons = [button(_('reference system'), url_for('reference_system_insert'))]
+            buttons = [button(_('reference system'), url_for('insert', class_='reference_system'))]
     else:
         buttons = [button(_(class_), url_for('insert', class_=class_))]
     return buttons

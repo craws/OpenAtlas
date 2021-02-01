@@ -26,7 +26,7 @@ class AddReferenceForm(FlaskForm):  # type: ignore
 @app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_add(id_: int, class_name: str) -> Union[str, Response]:
-    reference = Entity.get_by_id(id_, view_name='reference')
+    reference = Entity.get_by_id(id_)
     form = build_add_reference_form(class_name)
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'

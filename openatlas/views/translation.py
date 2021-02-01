@@ -16,7 +16,7 @@ from openatlas.util.util import required_group
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
-    source = Entity.get_by_id(source_id, view_name='source')
+    source = Entity.get_by_id(source_id)
     form = build_form('source_translation')
     if form.validate_on_submit():
         translation = save(form, source=source)

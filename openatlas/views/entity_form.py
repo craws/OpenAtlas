@@ -1,9 +1,11 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
+import psycopg2
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
@@ -16,13 +18,15 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import link, uc_first
-from openatlas.util.util import required_group, was_modified
+from openatlas.util.util import is_authorized, required_group, was_modified
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
+    if class_ == 'reference system' and not is_authorized('manager'):
+        abort(403)
     origin = Entity.get_by_id(origin_id) if origin_id else None
     if class_ in app.config['CLASS_CODES']['actor']:
         # Todo: can't use g.classes[class_].name because it's already translated, needs fixing.
@@ -96,6 +100,9 @@ def add_crumbs(view_name: str,
 @required_group('contributor')
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    if entity.system_type == 'reference system' and not is_authorized('manager'):
+        abort(403)
+
     # Archaeological sub units
     geonames_module = False
     structure = None
@@ -127,7 +134,8 @@ def update(id_: int) -> Union[str, Response]:
         form = build_form(entity.view_name, entity)
     if entity.view_name == 'event':
         form.event_id.data = entity.id
-
+    elif entity.class_.code == 'E32':  # reference system
+        form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
         if was_modified(form, entity):  # pragma: no cover
             del form.save
@@ -211,7 +219,7 @@ def populate_update_form(form: FlaskForm, entity: Entity) -> None:
 
 
 def save(form: FlaskForm,
-         entity: Optional[Entity] = None,
+         entity: Optional[Union[Entity, ReferenceSystem]] = None,
          class_: Optional[str] = '',
          origin: Optional[Entity] = None,
          location: Optional[Entity] = None) -> Union[str, Response]:
@@ -241,7 +249,9 @@ def save(form: FlaskForm,
                 location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
                 entity.link('P53', location)
             elif class_ in ('bibliography', 'edition', 'external_reference'):
-                entity = Entity.insert('E31', form.name.data, class_)
+                entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
+            elif class_ == 'reference_system':
+                entity = ReferenceSystem.insert_system(form)
             else:
                 entity = Entity.insert(class_, form.name.data)
             if entity.view_name == 'file':
@@ -250,7 +260,19 @@ def save(form: FlaskForm,
                 filename = secure_filename('a' + file_.filename)  # type: ignore
                 new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
                 file_.save(str(app.config['UPLOAD_DIR'] / new_name))
-        entity.update(form)
+
+        if entity.class_.code == 'E32':  # reference system
+            entity.name = entity.name if hasattr(entity, 'system') and entity.system \
+                else form.name.data
+            entity.description = form.description.data
+            entity.website_url = form.website_url.data if form.website_url.data else None
+            entity.resolver_url = form.resolver_url.data if form.resolver_url.data else None
+            entity.placeholder = form.placeholder.data if form.placeholder.data else None
+            entity.update_system(form)
+            if hasattr(form, 'forms'):
+                entity.add_forms(form)
+        else:
+            entity.update(form)
         update_links(entity, form, action, location)
         url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
@@ -264,6 +286,10 @@ def save(form: FlaskForm,
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             url = url_for('index', class_=entity.view_name)
+    except psycopg2.IntegrityError:
+        g.cursor.execute('ROLLBACK')
+        flash(_('error name exists'), 'error')  # Could happen e.g. with reference system
+        url = url_for('index', class_=entity.view_name)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
@@ -288,13 +314,13 @@ def update_links(entity: Entity, form, action: str, location: Optional[Entity] =
         if action == 'update':
             entity.delete_links(['P74', 'OA8', 'OA9'])
         if form.residence.data:
-            object_ = Entity.get_by_id(form.residence.data, view_name='place')
+            object_ = Entity.get_by_id(form.residence.data)
             entity.link('P74', object_.get_linked_entity_safe('P53'))
         if form.begins_in.data:
-            object_ = Entity.get_by_id(form.begins_in.data, view_name='place')
+            object_ = Entity.get_by_id(form.begins_in.data)
             entity.link('OA8', object_.get_linked_entity_safe('P53'))
         if form.ends_in.data:
-            object_ = Entity.get_by_id(form.ends_in.data, view_name='place')
+            object_ = Entity.get_by_id(form.ends_in.data)
             entity.link('OA9', object_.get_linked_entity_safe('P53'))
     if entity.view_name == 'event':
         if action == 'update':

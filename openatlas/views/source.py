@@ -13,7 +13,7 @@ from openatlas.util.util import required_group
 @app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def source_add(id_: int, class_name: str) -> Union[str, Response]:
-    source = Entity.get_by_id(id_, view_name='source')
+    source = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'])

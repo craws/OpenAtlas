@@ -62,8 +62,8 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
     form = build_form('involvement', link_)
     form.activity.choices = [('P11', g.properties['P11'].name)]
-    event = Entity.get_by_id(link_.domain.id, view_name='event')
-    actor = Entity.get_by_id(link_.range.id, view_name='actor')
+    event = Entity.get_by_id(link_.domain.id)
+    actor = Entity.get_by_id(link_.range.id)
     origin = event if origin_id == event.id else actor
     if event.class_.code in ['E7', 'E8']:
         form.activity.choices.append(('P14', g.properties['P14'].name))

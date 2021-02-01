@@ -332,15 +332,13 @@ class Entity:
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int,
-                  nodes: bool = False,
-                  aliases: bool = False,
-                  view_name: Optional[str] = None) -> Entity:
-        from openatlas import logger
-        if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
-            return g.nodes[entity_id]
+    def get_by_id(id_: int, nodes: bool = False, aliases: bool = False) -> Entity:
+        if id_ in g.nodes:
+            return g.nodes[id_]
+        if id_ in g.reference_systems:
+            return g.reference_systems[id_]
         sql = Entity.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-        g.execute(sql, {'id': entity_id})
+        g.execute(sql, {'id': id_})
         try:
             entity = Entity(g.cursor.fetchone())
         except AttributeError:
@@ -348,10 +346,6 @@ class Entity:
                 raise AttributeError  # pragma: no cover, re-raise if user activity view
             abort(418)
             return Entity(g.cursor.fetchone())  # pragma: no cover, this line is just for type check
-        if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
-            logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
-                       format(id=entity_id, view=entity.view_name, request=view_name))
-            abort(422)
         return entity
 
     @staticmethod

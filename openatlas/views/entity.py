@@ -153,7 +153,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if event.id not in event_ids:  # Don't add again if already in table
                 tabs['event'].table.rows.append(get_base_table_data(event))
         for link_ in entity.location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-            actor = Entity.get_by_id(link_.domain.id, view_name='actor')
+            actor = Entity.get_by_id(link_.domain.id)
             tabs['actor'].table.rows.append([link(actor),
                                              g.properties[link_.property.code].name,
                                              actor.class_.name,
@@ -376,7 +376,7 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
     elif entity.view_name == 'reference_system':
         if is_authorized('manager'):
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            if not entity.forms and not entity.locked:
+            if not entity.forms and not entity.system:
                 buttons.append(display_delete_link(None, entity))
     elif is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
