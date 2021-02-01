@@ -75,7 +75,9 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    crumbs = [[_(view_name), url_for('index', class_=view_name)], link(origin)]
+    crumbs = [[_(origin.view_name) if origin else _(view_name),
+               url_for('index', class_=origin.view_name if origin else view_name)],
+              link(origin)]
     if structure:
         crumbs = [[_(origin.view_name), url_for('index', class_=origin.view_name)],
                   structure['place'],
@@ -103,6 +105,8 @@ def update(id_: int) -> Union[str, Response]:
 
     if entity.view_name == 'actor':
         form = build_form(g.classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
+    elif entity.view_name == 'reference':
+        form = build_form(entity.system_type.replace(' ', '_'), entity)
     elif entity.view_name == 'place':
         structure = get_structure(entity)
         location = entity.get_linked_entity_safe('P53', nodes=True)
@@ -236,6 +240,8 @@ def save(form: FlaskForm,
                     entity = Entity.insert('E18', form.name.data, system_type)
                 location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
                 entity.link('P53', location)
+            elif class_ in ('bibliography', 'edition', 'external_reference'):
+                entity = Entity.insert('E31', form.name.data, class_)
             else:
                 entity = Entity.insert(class_, form.name.data)
             if entity.view_name == 'file':
@@ -334,6 +340,9 @@ def link_and_get_redirect_url(form: FlaskForm,
         elif entity.system_type == 'file':
             entity.link('P67', origin)
             url = url_for('entity_view', id_=origin.id) + '#tab-file'
+        elif entity.view_name == 'reference':
+            link_id = entity.link('P67', origin)[0]
+            url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
         elif origin.view_name in ['place', 'feature', 'stratigraphic unit']:
             url = url_for('entity_view', id_=entity.id)
             origin.link('P46', entity)

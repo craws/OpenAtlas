@@ -135,10 +135,10 @@ class Tab:
             buttons.append(button(_('place'), url_for('insert', class_='place', origin_id=id_)))
         elif name == 'reference':
             buttons = [button(_('link'), url_for('entity_add_reference', id_=id_))]
-            for category in ['bibliography', 'edition', 'external reference']:
-                buttons.append(button(_(category), url_for('reference_insert',
-                                                           category=category,
-                                                           origin_id=id_)))
+            for item in ['bibliography', 'edition', 'external reference']:
+                buttons.append(button(_(item), url_for('insert',
+                                                       class_=item.replace(' ', '_'),
+                                                       origin_id=id_)))
         elif name == 'relation':
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:

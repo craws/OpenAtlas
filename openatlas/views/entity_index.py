@@ -40,10 +40,9 @@ def get_buttons(class_: str) -> List[str]:
     elif class_ == 'object':
         buttons = [button(g.classes['E84'].name, url_for('insert', class_='E84'))]
     elif class_ == 'reference':
-        buttons = [button(_('bibliography'), url_for('reference_insert', category='bibliography')),
-                   button(_('edition'), url_for('reference_insert', category='external_reference')),
-                   button(_('external reference'),
-                          url_for('reference_insert', category='external_reference'))]
+        buttons = [button(_('bibliography'), url_for('insert', class_='bibliography')),
+                   button(_('edition'), url_for('insert', class_='edition')),
+                   button(_('external reference'), url_for('insert', class_='external_reference'))]
     elif class_ == 'reference_system':
         if is_authorized('manager'):
             buttons = [button(_('reference system'), url_for('reference_system_insert'))]

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('reference')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, linked_object, _(edit)]|crumb }}
+    {{ crumb|crumb2 }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}

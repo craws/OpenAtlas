@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('reference')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('reference'), 'reference_index'], reference, _('link')]|crumb }}
+    {{ crumb|crumb2 }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}
