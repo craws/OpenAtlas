@@ -343,7 +343,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                            overlays=overlays,  # Needed for place views
                            gis_data=gis_data,
                            info=get_entity_data(entity, event_links=event_links),
-                           crumb=add_crumbs(entity, structure))
+                           title=entity.name,
+                           crumbs=add_crumbs(entity, structure))
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
@@ -393,7 +394,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             entity.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('entity_view', id_=id_) + '#tab-file')
     form = build_table_form('file', entity.get_linked_entities('P67', inverse=True))
-    return render_template('entity/add_file.html', entity=entity, form=form)
+    return render_template('form.html', entity=entity, form=form)
 
 
 @app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
@@ -407,7 +408,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
             entity.link_string(property_code, request.form['checkbox_values'], inverse=inverse)
         return redirect(url_for('entity_view', id_=id_) + '#tab-source')
     form = build_table_form('source', entity.get_linked_entities(property_code, inverse=inverse))
-    return render_template('entity/add_source.html', entity=entity, form=form)
+    return render_template('form.html', entity=entity, form=form)
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
@@ -422,6 +423,6 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
     return render_template('entity/add_reference.html',
                            entity=entity,
                            form=form,
-                           crumb=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
-                                  entity,
-                                  _('link') + ' ' + uc_first(_('reference'))])
+                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                                   entity,
+                                   _('link') + ' ' + uc_first(_('reference'))])

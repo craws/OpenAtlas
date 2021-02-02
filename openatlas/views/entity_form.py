@@ -63,7 +63,6 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     return render_template(
         'entity/insert.html',
         form=form,
-        crumb=add_crumbs(view_name, class_, origin, structure, insert_=True),
         class_=class_,
         origin=origin,
         view_name=view_name,
@@ -71,7 +70,9 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         gis_data=gis_data,
         geonames_module=geonames_module,
         writeable=True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,  # For files
-        overlays=overlays)
+        overlays=overlays,
+        title=_(view_name),
+        crumbs=add_crumbs(view_name, class_, origin, structure, insert_=True),)
 
 
 def add_crumbs(view_name: str,
@@ -151,14 +152,15 @@ def update(id_: int) -> Union[str, Response]:
     return render_template('entity/update.html',
                            form=form,
                            entity=entity,
-                           crumb=add_crumbs(view_name=entity.view_name,
-                                            class_=entity.class_.name,
-                                            origin=entity,
-                                            structure=structure),
                            structure=structure,
                            gis_data=gis_data,
                            overlays=overlays,
-                           geonames_module=geonames_module)
+                           geonames_module=geonames_module,
+                           title=entity.name,
+                           crumbs=add_crumbs(view_name=entity.view_name,
+                                             class_=entity.class_.name,
+                                             origin=entity,
+                                             structure=structure))
 
 
 def populate_insert_form(form: FlaskForm, view_name: str, class_: str, origin: Entity) -> None:

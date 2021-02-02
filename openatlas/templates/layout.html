@@ -49,7 +49,9 @@
     {% endif %}
     <title>
         {{ session['settings']['site_name'] }}
-        {% block title_name %}{% endblock %}
+        {% if title %}
+            - {{ title|uc_first }}
+        {% endif %}
     </title>
 </head>
 <body>

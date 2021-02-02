@@ -29,7 +29,10 @@ def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
                            class_=class_,
                            table=get_table(class_),
                            buttons=get_buttons(class_) if is_authorized('contributor') else [],
-                           gis_data=Gis.get_all() if class_ == 'place' else None)
+                           gis_data=Gis.get_all() if class_ == 'place' else None,
+                           title=_(class_.replace('_', ' ')),
+                           crumbs=[[_('admin'), url_for('admin_index')], _('file')]
+                           if class_ == 'file' else [_(class_.replace('_', ' '))])
 
 
 def get_buttons(class_: str) -> List[str]:

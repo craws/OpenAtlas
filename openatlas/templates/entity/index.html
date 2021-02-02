@@ -1,12 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _(class_|replace('_', ' '))|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {% if class_ == 'file' %}
-        {{ [[_('admin'), 'admin_index'], _('file')]|crumb }}
-    {% else %}
-        {{ [_(class_|replace('_', ' '))]|crumb }}
-    {% endif %}
-{% endblock %}
 {% block content %}
     <div class="row">
         <div class="col">

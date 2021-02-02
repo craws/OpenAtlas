@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block content %}
     <form id="newsletter-form" name="newsletter_form" method="post">
         {{ form.csrf_token }}

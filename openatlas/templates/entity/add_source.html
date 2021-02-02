@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block title_name %} - {{ _('source')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('link') + ' ' + _('source')|uc_first]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|safe }}
-{% endblock %}

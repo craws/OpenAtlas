@@ -1,8 +1,4 @@
 {% extends 'layout.html' %}
-{% block title_name %} - {{ _(view_name)|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ crumb|crumb2 }}
-{% endblock %}
 {% block content %}
     {% if view_name != 'place' %}
         {% if view_name == 'file' %}

@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block content %}
     {{ form|display_form(manual_page='admin/' + category) }}
 {% endblock %}

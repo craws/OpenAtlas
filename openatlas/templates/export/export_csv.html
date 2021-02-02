@@ -1,10 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('export CSV')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <div class="toolbar">
-        <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('export CSV')|uc_first }}
-    </div>
-{% endblock %}
 {% block content %}
     {% if writeable %}
         <div style="float:left;margin-right: 1em;">

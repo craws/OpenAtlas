@@ -1,8 +1,4 @@
 {% extends 'layout.html' %}
-{% block title_name %} - {{ entity.name }}{% endblock %}
-{% block breadcrumb %}
-    {{ crumb|crumb2 }}
-{% endblock %}
 {% block content %}
     {% if modifier %}
         <p class="error">

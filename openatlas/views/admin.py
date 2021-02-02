@@ -84,6 +84,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
                            imports=Import.get_all_projects(),
+                           title=_('admin'),
                            crumbs=[_('admin')],
                            info={'file': get_form_settings(FilesForm()),
                                  'general': get_form_settings(GeneralForm()),
@@ -111,6 +112,7 @@ def admin_content(item: str) -> Union[str, Response]:
                            item=item,
                            form=form,
                            languages=languages,
+                           title=_('content'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-content'],
                                    _(item)])
 
@@ -122,6 +124,7 @@ def admin_check_links() -> str:
         'admin/check_links.html',
         table=Table(['domain', 'property', 'range'],
                     rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
+        title=_('admin'),
         crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                 _('check links')])
 
@@ -159,6 +162,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
     return render_template('admin/check_link_duplicates.html',
                            table=table,
                            duplicates=duplicates,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    _('check link duplicates')])
 
@@ -196,6 +200,7 @@ def admin_settings(category: str) -> Union[str, Response]:
     return render_template('admin/settings.html',
                            form=form,
                            category=category,
+                           title=_('settings'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-' + (
                                'data' if category == 'api' else category)], _(category)])
 
@@ -218,6 +223,7 @@ def admin_check_similar() -> str:
     return render_template('admin/check_similar.html',
                            table=table,
                            form=form,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    _('check similar names')])
 
@@ -270,6 +276,7 @@ def admin_check_dates() -> str:
         tables['involvement_dates'].rows.append(data)
     return render_template('admin/check_dates.html',
                            tables=tables,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    _('check dates')])
 
@@ -324,6 +331,7 @@ def admin_orphans() -> str:
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
     return render_template('admin/check_orphans.html',
                            tables=tables,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    _('orphans')])
 
@@ -377,6 +385,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             date])
     return render_template('admin/logo.html',
                            table=table,
+                           title=_('logo'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-files'],
                                    _('logo')])
 
@@ -404,6 +413,7 @@ def admin_log() -> str:
     return render_template('admin/log.html',
                            table=table,
                            form=form,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-general'],
                                    _('system log')])
 
@@ -447,5 +457,6 @@ def admin_newsletter() -> Union[str, Response]:
     return render_template('admin/newsletter.html',
                            form=form,
                            table=table,
+                           title=_('newsletter'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
                                    _('newsletter')])

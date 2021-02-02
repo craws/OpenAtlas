@@ -1,10 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('export SQL')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <div class="toolbar">
-        <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('export SQL')|uc_first }}
-    </div>
-{% endblock %}
 {% block content %}
     {% if writeable %}
         {{ form|display_form(manual_page='admin/export') }}

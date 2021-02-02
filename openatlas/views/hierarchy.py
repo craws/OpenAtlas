@@ -10,7 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import link, sanitize
+from openatlas.util.display import link, sanitize, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
@@ -28,7 +28,11 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
-    return render_template('hierarchy/insert.html', form=form, param=param)
+    return render_template('hierarchy/insert.html',
+                           form=form,
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   '+ ' + uc_first(_(param))])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
@@ -60,10 +64,13 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
     return render_template('hierarchy/update.html',
-                           node=hierarchy,
                            form=form,
                            table=table,
-                           forms=[form.id for form in form.forms])
+                           forms=[form.id for form in form.forms],
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   hierarchy,
+                                   _('edit')])
 
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
