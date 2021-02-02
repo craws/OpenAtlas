@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('import')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('import')|uc_first }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'admin/import'|manual }}
