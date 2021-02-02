@@ -1,6 +1,7 @@
 from typing import Any, Union
 
 from flask import render_template, request, send_from_directory, url_for
+from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -43,10 +44,16 @@ def file_remove_profile_image(entity_id: int) -> Response:
 @app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def file_add(id_: int, class_name: str) -> Union[str, Response]:
-    file = Entity.get_by_id(id_)
+    entity = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            file.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=file.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, file.get_linked_entities('P67'))
-    return render_template('add_file.html', entity=file, class_name=class_name, form=form)
+            entity.link_string('P67', request.form['checkbox_values'])
+        return redirect(url_for('entity_view', id_=entity.id) + '#tab-' + class_name)
+    form = build_table_form(class_name, entity.get_linked_entities('P67'))
+    return render_template('form.html',
+                           entity=entity,
+                           class_name=class_name,
+                           form=form,
+                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                                   entity,
+                                   _('link') + ' ' + _('file')])

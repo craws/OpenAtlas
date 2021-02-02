@@ -1,13 +1,5 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {% if category == 'api' %}
-        <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>
-    {% else %}
-        <a href="{{ url_for('admin_index') }}#tab-{{ category }}">{{ _('admin')|uc_first }}</a>
-    {% endif %}
-    &nbsp;> {{ _(category)|uc_first }}
-{% endblock %}
 {% block content %}
     {{ form|display_form(manual_page='admin/' + category) }}
 {% endblock %}

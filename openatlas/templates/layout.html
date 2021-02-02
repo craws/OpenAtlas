@@ -149,7 +149,7 @@
     </nav>
     <nav aria-label="breadcrumb">
         <div class="breadcrumb">
-            {% block breadcrumb %}{% endblock %}
+            {{ crumbs|lay_breadcrumbs }}
             <div id="site-name-and-version">
                 {{ session['settings']['site_name'] }}
                 <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>

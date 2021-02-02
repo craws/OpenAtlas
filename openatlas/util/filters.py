@@ -97,7 +97,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def crumb2(self: Any, crumbs: List[Any]) -> str:
+def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
