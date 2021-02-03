@@ -114,17 +114,17 @@ def index_content(item: str) -> str:
 
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
-    return render_template('400.html', e=e), 400
+    return render_template('400.html', crumb=['400 - Bad Request'], e=e), 400
 
 
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return render_template('403.html', e=e), 403
+    return render_template('403.html', crumb=['403 - Forbidden'], e=e), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return render_template('404.html', e=e), 404
+    return render_template('404.html', crumb=['404 - File not found'], e=e), 404
 
 
 @app.errorhandler(405)  # pragma: no cover
@@ -134,12 +134,12 @@ def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(418)
 def invalid_id(e: Exception) -> Tuple[str, int]:
-    return render_template('418.html', e=e), 418
+    return render_template('418.html', crumb=["418 - I’m a teapot"], e=e), 418
 
 
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:
-    return render_template('422.html', e=e), 422
+    return render_template('422.html', crumb=['422 - Unprocessable entity'], e=e), 422
 
 
 @app.route('/changelog')

@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block title_name %} - {{ node.name }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], root, node, _('edit')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form(manual_page='form/type') }}
-{% endblock %}

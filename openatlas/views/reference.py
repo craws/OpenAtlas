@@ -13,7 +13,7 @@ from openatlas.forms.field import TableField
 from openatlas.forms.form import build_add_reference_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.display import link, uc_first
+from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
@@ -36,9 +36,7 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     if reference.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template('display_form.html',
-                           reference=reference,
                            form=form,
-                           class_name=class_name,
                            title=_('reference'),
                            crumbs=[[_('reference'), url_for('index', class_='reference')],
                                    reference,
@@ -64,9 +62,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
     return render_template('display_form.html',
-                           origin=origin,
                            form=form,
-                           linked_object=linked_object,
                            crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
                                    origin,
                                    linked_object,

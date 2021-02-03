@@ -29,7 +29,11 @@ def node_index() -> str:
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
+    return render_template('types/index.html',
+                           nodes=nodes,
+                           placeholder=_('type to search'),
+                           title=_('types'),
+                           crumbs=[_('types')])
 
 
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
@@ -45,7 +49,13 @@ def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Resp
         getattr(form, str(root.id)).data = super_id if super_id != root.id else None
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
-    return render_template('types/insert.html', form=form, root=root)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='form/type',
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   '+'])
 
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
@@ -59,7 +69,13 @@ def node_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         save(form, node)
         return redirect(url_for('entity_view', id_=id_))
-    return render_template('types/update.html', node=node, root=root, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           title=node.name,
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   node,
+                                   _('edit')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -97,7 +113,15 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         flash(_('Entities were updated'), 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     getattr(form, str(root.id)).data = node.id
-    return render_template('types/move.html', node=node, root=root, form=form)
+    return render_template('types/move.html',
+                           node=node,
+                           root=root,
+                           form=form,
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   node,
+                                   _('move')])
 
 
 def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
