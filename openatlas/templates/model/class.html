@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block title_name %} - {{ _('model')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('model'), 'model_index'], _('classes')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ table.display() }}
-{% endblock %}

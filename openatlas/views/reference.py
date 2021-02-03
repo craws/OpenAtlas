@@ -35,13 +35,14 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_name)
     if reference.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
-    return render_template('reference/add.html',
+    return render_template('display_form.html',
                            reference=reference,
                            form=form,
                            class_name=class_name,
-                           crumb=[[_('reference'), url_for('index', class_='reference')],
-                                  reference,
-                                  _('link')])
+                           title=_('reference'),
+                           crumbs=[[_('reference'), url_for('index', class_='reference')],
+                                   reference,
+                                   _('link')])
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
@@ -62,11 +63,11 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     if link_.domain.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
-    return render_template('reference/link-update.html',
+    return render_template('display_form.html',
                            origin=origin,
                            form=form,
                            linked_object=linked_object,
-                           crumb=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
-                                  origin,
-                                  linked_object,
-                                  _('edit')])
+                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                                   origin,
+                                   linked_object,
+                                   _('edit')])

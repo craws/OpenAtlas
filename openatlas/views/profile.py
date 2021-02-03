@@ -52,7 +52,9 @@ def profile_index() -> str:
     return render_template('profile/index.html',
                            info={'profile': get_form_settings(ProfileForm(), True),
                                  'modules': get_form_settings(ModulesForm(), True),
-                                 'display': get_form_settings(DisplayForm(), True)})
+                                 'display': get_form_settings(DisplayForm(), True)},
+                           title=_('profile'),
+                           crumbs=[_('profile')])
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
@@ -85,7 +87,12 @@ def profile_settings(category: str) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index') + '#tab-' + category)
     set_form_settings(form, True)
-    return render_template('profile/settings.html', form=form, category=category)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='admin/' + category,
+                           title=_('profile'),
+                           crumbs=[[_('profile'), url_for('profile_index') + '#tab-' + category],
+                                   _(category)])
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])
@@ -98,4 +105,8 @@ def profile_password() -> Union[str, Response]:
         current_user.update()
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))
-    return render_template('profile/password.html', form=form)
+    return render_template('profile/password.html',
+                           form=form,
+                           title=_('profile'),
+                           crumbs=[[_('profile'), url_for('profile_index')],
+                                   _('change password')])

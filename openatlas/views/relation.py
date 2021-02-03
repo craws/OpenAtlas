@@ -11,6 +11,7 @@ from openatlas.forms.form import build_form
 from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
@@ -40,7 +41,12 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('relation_insert', origin_id=origin_id))
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
-    return render_template('relation/insert.html', origin=origin, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           title=_('relation'),
+                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                                   origin,
+                                   '+ ' + uc_first(_('relation'))])
 
 
 @app.route('/relation/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -72,4 +78,10 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     if origin.id == range_.id:
         form.inverse.data = True
-    return render_template('relation/update.html', origin=origin, form=form, related=related)
+    return render_template('display_form.html',
+                           form=form,
+                           title=_('relation'),
+                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                                   origin,
+                                   related,
+                                   _('edit')])

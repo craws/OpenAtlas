@@ -10,8 +10,8 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.display import link
-from openatlas.util.util import (required_group)
+from openatlas.util.display import uc_first
+from openatlas.util.util import required_group
 
 
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
@@ -23,12 +23,12 @@ def note_insert(entity_id: int) -> Union[str, Response]:
         save(form, entity=entity)
         return redirect(url_for('entity_view', id_=entity.id))
     return render_template(
-        'note/insert.html',
+        'display_form.html',
         form=form,
         entity=entity,
-        crumb=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
-               entity,
-               '+' + _('note')])
+        crumbs=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
+                entity,
+                '+ ' + uc_first(_('note'))])
 
 
 @app.route('/note/update/<int:entity_id>', methods=['POST', 'GET'])
@@ -42,12 +42,12 @@ def note_update(entity_id: int) -> Union[str, Response]:
     form.save.label.text = _('update')
     form.description.data = User.get_note(entity)
     return render_template(
-        'note/update.html',
+        'display_form.html',
         form=form,
         entity=entity,
-        crumb=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
-               entity,
-               _('edit note')])
+        crumbs=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
+                entity,
+                _('edit note')])
 
 
 def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:

@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
+from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
@@ -24,7 +25,11 @@ def translation_insert(source_id: int) -> Union[str, Response]:
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))
         return redirect(url_for('entity_view', id_=translation.id))
-    return render_template('translation/insert.html', source=source, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           crumbs=[[_('source'), url_for('index', class_='source')],
+                                   source,
+                                   '+ ' + uc_first(_('text'))])
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
@@ -45,10 +50,13 @@ def translation_update(id_: int) -> Union[str, Response]:
         save(form, translation)
         flash(_('info update'), 'info')
         return redirect(url_for('entity_view', id_=translation.id))
-    return render_template('translation/update.html',
-                           translation=translation,
-                           source=source,
-                           form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           title=translation.name,
+                           crumbs=[[_('source'), url_for('index', class_='source')],
+                                   source,
+                                   translation,
+                                   _('edit')])
 
 
 def save(form: FlaskForm,

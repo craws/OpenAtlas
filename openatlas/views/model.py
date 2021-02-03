@@ -59,14 +59,22 @@ def model_index() -> str:
                            test_result=test_result,
                            domain=domain,
                            property=property_,
-                           range=range_)
+                           range=range_,
+                           title=_('model'),
+                           crumbs=[_('model')])
 
 
 @app.route('/overview/model/class/<code>')
 @required_group('readonly')
 def class_entities(code: str) -> str:
     table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class_code(code)])
-    return render_template('model/class_entities.html', table=table, class_=g.classes[code])
+    return render_template('table.html',
+                           table=table,
+                           title=_('model'),
+                           crumbs=[[_('model'), url_for('model_index')],
+                                   [_('classes'), url_for('class_index')],
+                                   link(g.classes[code]),
+                                   _('entities')])
 
 
 @app.route('/overview/model/class')
@@ -84,7 +92,11 @@ def class_index() -> str:
                 count = link(format_number(class_.count),
                              url_for('class_entities', code=class_.code))
         table.rows.append([link(class_), class_.name, count])
-    return render_template('model/class.html', table=table)
+    return render_template('table.html',
+                           table=table,
+                           title=_('model'),
+                           crumbs=[[_('model'), url_for('model_index')],
+                                   _('classes')])
 
 
 @app.route('/overview/model/property')
@@ -106,7 +118,11 @@ def property_index() -> str:
                            link(classes[property_.range_class_code]),
                            classes[property_.range_class_code].name,
                            format_number(property_.count) if property_.count else ''])
-    return render_template('model/property.html', table=table)
+    return render_template('table.html',
+                           table=table,
+                           title=_('model'),
+                           crumbs=[[_('model'), url_for('model_index')],
+                                   _('properties')])
 
 
 @app.route('/overview/model/class_view/<code>')
@@ -134,7 +150,11 @@ def class_view(code: str) -> str:
     return render_template('model/class_view.html',
                            class_=class_,
                            tables=tables,
-                           info={'code': class_.code, 'name': class_.name})
+                           info={'code': class_.code, 'name': class_.name},
+                           title=_('model'),
+                           crumbs=[[_('model'), url_for('model_index')],
+                                   [_('classes'), url_for('class_index')],
+                                   class_.code])
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -155,7 +175,14 @@ def property_view(code: str) -> str:
                                     {'sType': 'numeric', 'targets': [0]}])
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
-    return render_template('model/property_view.html', property=property_, tables=tables, info=info)
+    return render_template('model/property_view.html',
+                           tables=tables,
+                           property_=property_,
+                           info=info,
+                           title=_('model'),
+                           crumbs=[[_('model'), url_for('model_index')],
+                                   [_('properties'), url_for('property_index')],
+                                   property_.code])
 
 
 class NetworkForm(FlaskForm):  # type: ignore
@@ -200,4 +227,6 @@ def model_network(dimensions: Optional[int] = None) -> str:
                            form=form,
                            dimensions=dimensions,
                            network_params=params,
-                           json_data=Network.get_network_json(form, params, dimensions))
+                           json_data=Network.get_network_json(form, params, dimensions),
+                           title=_('model'),
+                           crumbs=[_('network visualization')])

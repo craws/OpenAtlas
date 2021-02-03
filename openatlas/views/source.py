@@ -1,6 +1,7 @@
 from typing import Union
 
 from flask import render_template, request, url_for
+from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -19,4 +20,9 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
             source.link_string('P67', request.form['checkbox_values'])
         return redirect(url_for('entity_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
-    return render_template('source/add.html', source=source, class_name=class_name, form=form)
+    return render_template('form.html',
+                           form=form,
+                           title=_('source'),
+                           crumbs=[[_('source'), url_for('index', class_='source')],
+                                   source,
+                                   _('link') + ' ' + _(class_name)])

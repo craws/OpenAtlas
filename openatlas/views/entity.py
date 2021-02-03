@@ -425,4 +425,4 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
                            form=form,
                            crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
                                    entity,
-                                   _('link') + ' ' + uc_first(_('reference'))])
+                                   _('link')])

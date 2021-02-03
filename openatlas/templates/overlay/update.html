@@ -1,11 +1,7 @@
 {% extends 'layout.html' %}
-{% block title_name %} - {{ _('overlay')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('place'), 'place_index'], place, image, _('update overlay')]|crumb }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ _('remove')|button(url_for('overlay_remove', id_=overlay.id, place_id=place.id), onclick="return confirm('" +  _('remove')|uc_first + "?');") }}
+        {{ _('remove')|button(url_for('overlay_remove', id_=overlay.id, place_id=entity.id), onclick="return confirm('" +  _('remove')|uc_first + "?');") }}
     </div>
     <form method="post">
         {{ form.csrf_token }}

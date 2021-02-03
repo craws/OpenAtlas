@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('model')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('model'), 'model_index'], [_('properties'), 'property_index'], property.code]|crumb }}
-{% endblock %}
 {% block content %}
     <div style="float:left;" class="col-sm-2">
         <p><strong>{{ _('info')|uc_first }}</strong></p>
@@ -23,6 +19,6 @@
     <div style="clear:both"></div>
     <div class="description">
         <strong>{{ _('description')|uc_first }}</strong>
-        <p>{{ property.comment }}</p>
+        <p>{{ property_.comment }}</p>
     </div>
 {% endblock %}
