@@ -1,7 +1,4 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ [_('overview')]|crumb }}
-{% endblock %}
 {% block content %}
     {% if current_user.is_authenticated %}
         {% if tables.overview['rows'] %}

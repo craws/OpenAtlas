@@ -1,8 +1,0 @@
-{% extends 'layout.html' %}
-{% block title_name %} - {{ _('involvement')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, linked_object, _('edit')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form }}
-{% endblock %}

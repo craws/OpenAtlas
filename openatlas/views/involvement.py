@@ -53,7 +53,11 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin.view_name == 'event' else 'event'
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
-    return render_template('involvement/insert.html', origin=origin, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                                   origin,
+                                   _('involvement')])
 
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -88,7 +92,10 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description
-    return render_template('involvement/update.html',
+    return render_template('display_form.html',
                            origin=origin,
                            form=form,
-                           linked_object=event if origin_id != event.id else actor)
+                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                                   origin,
+                                   event if origin_id != event.id else actor,
+                                   _('edit')])

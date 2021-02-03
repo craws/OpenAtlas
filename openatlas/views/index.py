@@ -71,6 +71,7 @@ def overview() -> str:
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     return render_template('index/index.html',
                            intro=Content.get_translation('intro'),
+                           crumbs=[_('overview')],
                            tables=tables)
 
 
@@ -97,12 +98,18 @@ def index_feedback() -> Union[str, Response]:
         else:
             flash(_('error mail send'), 'error')
         return redirect(url_for('overview'))
-    return render_template('index/feedback.html', form=form)
+    return render_template('index/feedback.html',
+                           form=form,
+                           title=_('feedback'),
+                           crumbs=[_('feedback')])
 
 
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
-    return render_template('index/content.html', text=Content.get_translation(item), title=item)
+    return render_template('index/content.html',
+                           text=Content.get_translation(item),
+                           title=_(_(item)),
+                           crumbs=[_(item)])
 
 
 @app.errorhandler(400)
@@ -137,7 +144,10 @@ def unprocessable_entity(e: Exception) -> Tuple[str, int]:
 
 @app.route('/changelog')
 def index_changelog() -> str:
-    return render_template('index/changelog.html', versions=Changelog.versions)
+    return render_template('index/changelog.html',
+                           title=_('changelog'),
+                           crumbs=[_('changelog')],
+                           versions=Changelog.versions)
 
 
 @app.route('/unsubscribe/<code>')
@@ -150,4 +160,6 @@ def index_unsubscribe(code: str) -> str:
         user.update()
         user.remove_newsletter()
         text = _('You have successfully unsubscribed. You can subscribe again in your Profile.')
-    return render_template('index/unsubscribe.html', text=text)
+    return render_template('index/unsubscribe.html',
+                           text=text,
+                           crumbs=[_('unsubscribe newsletter')])

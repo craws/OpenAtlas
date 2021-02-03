@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('changelog')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('changelog')]|crumb }}
-{% endblock %}
 {% block content %}
     {% for version_name, version in versions.items() %}
         <div class="changelog-version">
