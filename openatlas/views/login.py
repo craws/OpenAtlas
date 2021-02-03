@@ -76,7 +76,7 @@ def login() -> Union[str, Response]:
         else:
             logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
             flash(_('error username'), 'error')
-    return render_template('login/index.html', form=form)
+    return render_template('login/index.html', title=_('login'), crumbs=[_('login')], form=form)
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
@@ -111,7 +111,10 @@ def reset_password() -> Union[str, Response]:
                 flash(_('Failed to send password reset confirmation mail to %(email)s.',
                         email=form.email.data), 'error')
             return redirect(url_for('login'))
-    return render_template('login/reset_password.html', form=form)
+    return render_template('login/reset_password.html',
+                           form=form,
+                           crumbs=[[_('login'), url_for('login')],
+                                   _('Forgot your password?')])
 
 
 @app.route('/reset_confirm/<code>')

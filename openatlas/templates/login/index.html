@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('login')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('login')]|crumb }}
-{% endblock %}
 {% block content %}
     {{ form|display_form('login-form') }}
     {% if config.DEMO_MODE %}

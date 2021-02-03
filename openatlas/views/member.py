@@ -11,6 +11,7 @@ from openatlas.forms.form import build_form
 from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
@@ -43,7 +44,11 @@ def member_insert(origin_id: int, code: Optional[str] = 'member') -> Union[str, 
             return redirect(url_for('member_insert', origin_id=origin_id, code=code))
         tab = '#tab-member' if code == 'member' else '#tab-member-of'
         return redirect(url_for('entity_view', id_=origin.id) + tab)
-    return render_template('member/insert.html', origin=origin, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                                   origin,
+                                   _('member')])
 
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -71,4 +76,9 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     related = range_ if origin_id == domain.id else domain
-    return render_template('member/update.html', origin=origin, form=form, related=related)
+    return render_template('display_form.html',
+                           form=form,
+                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                                   origin,
+                                   related,
+                                   _('edit')])
