@@ -197,10 +197,10 @@ def admin_settings(category: str) -> Union[str, Response]:
         tab = 'email' if category == 'mail' else tab
         return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
-    return render_template('admin/settings.html',
+    return render_template('display_form.html',
                            form=form,
-                           category=category,
-                           title=_('settings'),
+                           manual_page='admin/' + category,
+                           title=_('admin'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-' + (
                                'data' if category == 'api' else category)], _(category)])
 

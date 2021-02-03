@@ -420,7 +420,7 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
         entity.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
-    return render_template('entity/add_reference.html',
+    return render_template('display_form.html',
                            entity=entity,
                            form=form,
                            crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],

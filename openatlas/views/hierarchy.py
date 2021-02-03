@@ -28,8 +28,9 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
-    return render_template('hierarchy/insert.html',
+    return render_template('display_form.html',
                            form=form,
+                           manual_page='form/type',
                            title=_('types'),
                            crumbs=[[_('types'), url_for('node_index')],
                                    '+ ' + uc_first(_(param))])
@@ -63,10 +64,11 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                      url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
         count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
-    return render_template('hierarchy/update.html',
+    return render_template('display_form.html',
                            form=form,
                            table=table,
                            forms=[form.id for form in form.forms],
+                           manual_page='form/type',
                            title=_('types'),
                            crumbs=[[_('types'), url_for('node_index')],
                                    hierarchy,

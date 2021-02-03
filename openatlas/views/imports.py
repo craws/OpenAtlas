@@ -56,8 +56,9 @@ def import_project_insert() -> Union[str, Response]:
         id_ = Import.insert_project(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
-    return render_template('import/project_insert.html',
+    return render_template('display_form.html',
                            form=form,
+                           manual_page='admin/import',
                            title=_('import'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    [_('import'), url_for('import_index')],
@@ -96,8 +97,9 @@ def import_project_update(id_: int) -> Union[str, Response]:
         Import.update_project(project)
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
-    return render_template('import/project_update.html',
+    return render_template('display_form.html',
                            form=form,
+                           manual_page='admin/import',
                            title=_('import'),
                            crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
                                    [_('import'), url_for('import_index')],

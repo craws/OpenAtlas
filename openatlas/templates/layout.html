@@ -51,6 +51,8 @@
         {{ session['settings']['site_name'] }}
         {% if title %}
             - {{ title|uc_first }}
+        {% elif entity %}
+            - {{ entity.name }}
         {% endif %}
     </title>
 </head>
