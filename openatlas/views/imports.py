@@ -56,7 +56,12 @@ def import_project_insert() -> Union[str, Response]:
         id_ = Import.insert_project(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
-    return render_template('import/project_insert.html', form=form)
+    return render_template('import/project_insert.html',
+                           form=form,
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   '+ ' + uc_first(_('project'))])
 
 
 @app.route('/import/project/view/<int:id_>')
@@ -70,7 +75,13 @@ def import_project_view(id_: int) -> str:
                            entity.origin_id,
                            format_date(entity.created)])
     project = Import.get_project_by_id(id_)
-    return render_template('import/project_view.html', project=project, table=table)
+    return render_template('import/project_view.html',
+                           project=project,
+                           table=table,
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   project.name])
 
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
@@ -85,7 +96,13 @@ def import_project_update(id_: int) -> Union[str, Response]:
         Import.update_project(project)
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
-    return render_template('import/project_update.html', project=project, form=form)
+    return render_template('import/project_update.html',
+                           form=form,
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   project,
+                                   _('edit')])
 
 
 @app.route('/import/project/delete/<int:id_>')

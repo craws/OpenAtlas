@@ -1,9 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('import')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;>&nbsp;
-    {{ [[_('import'), 'import_index'], project.name]|crumb }}
-{% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-6">
