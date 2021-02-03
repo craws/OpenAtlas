@@ -472,6 +472,8 @@ def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     url = url_for('index', class_=entity.view_name, delete_id=entity.id)
+    if entity.system_type == 'source translation':
+        url = url_for('translation_delete', id_=entity.id)
     return display.button(_('delete'),
                           url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")

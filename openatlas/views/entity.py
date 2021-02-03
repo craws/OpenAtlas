@@ -371,7 +371,7 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
     buttons = []
     if entity.view_name == 'node':
         if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
-            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
+            buttons.append(button(_('edit'), url_for('node_update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:
                 buttons.append(display_delete_link(None, entity))
     elif entity.view_name == 'reference_system':
@@ -379,6 +379,9 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.forms and not entity.system:
                 buttons.append(display_delete_link(None, entity))
+    elif entity.system_type == 'source translation':
+        buttons.append(button(_('edit'), url_for('translation_update', id_=entity.id)))
+        buttons.append(display_delete_link(None, entity))
     elif is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         buttons.append(display_delete_link(None, entity))

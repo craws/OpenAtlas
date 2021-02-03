@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
@@ -49,12 +50,13 @@ def translation_insert(source_id: int) -> Union[str, Response]:
                                    '+ ' + uc_first(_('text'))])
 
 
-@app.route('/source/translation/delete/<int:id_>/<int:source_id>')
+@app.route('/source/translation/delete/<int:id_>')
 @required_group('contributor')
-def translation_delete(id_: int, source_id: int) -> Response:
+def translation_delete(id_: int) -> Response:
+    source = Link.get_linked_entity_safe(id_, 'P73', inverse=True)
     Entity.delete_(id_)
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('entity_view', id_=source_id))
+    return redirect(url_for('entity_view', id_=source.id) + '#tab-text')
 
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
