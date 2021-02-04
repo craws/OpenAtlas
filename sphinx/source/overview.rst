@@ -1,0 +1,13 @@
+Overview
+========
+
+.. toctree::
+
+The overview page can be reached when clicking on the logo at the upper left.
+When logged in following is displayed:
+
+* an overview table of already entered entities
+* links to manual, :doc:`/tools/model` and network visualizations
+* a list of the latest entries
+* your bookmarks
+* your notes

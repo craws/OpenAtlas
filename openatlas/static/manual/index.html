@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>OpenAtlas manual &mdash; OpenAtlas 5.7.0 documentation</title>
+  <title>OpenAtlas manual &mdash; OpenAtlas 5.8.0 documentation</title>
   
 
   
@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Menu" href="menu/index.html" /> 
+    <link rel="next" title="Overview" href="overview.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                5.7.0
+                5.8.0
               </div>
             
           
@@ -88,7 +88,8 @@
             
             
               <ul>
-<li class="toctree-l1"><a class="reference internal" href="menu/index.html">Menu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="entity/index.html">Entity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="form/index.html">Form</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="admin/index.html">Admin</a></li>
@@ -163,15 +164,19 @@ OpenAtlas <a class="reference external" href="https://openatlas.eu">website</a> 
 Redmine <a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki/Wiki">Wiki</a>.</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="menu/index.html">Menu</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="menu/overview.html">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/source.html">Source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/event.html">Event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/actor.html">Actor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/place.html">Place</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/reference.html">Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu/object.html">Object</a></li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a><ul class="simple">
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="entity/index.html">Entity</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="entity/source.html">Source</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/event.html">Event</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/actor.html">Actor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/place.html">Place</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/reference.html">Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/object.html">Object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="form/type.html">Types</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/file.html">File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/reference_system.html">Reference System</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="form/index.html">Form</a><ul>
@@ -180,7 +185,7 @@ Redmine <a class="reference external" href="https://redmine.openatlas.eu/project
 <li class="toctree-l2"><a class="reference internal" href="form/date.html">Date</a></li>
 <li class="toctree-l2"><a class="reference internal" href="form/description.html">Description</a></li>
 <li class="toctree-l2"><a class="reference internal" href="form/type.html">Type</a></li>
-<li class="toctree-l2"><a class="reference internal" href="form/reference_system.html">Reference Systems</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/reference_system.html">reference_system</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tools/index.html">Tools</a><ul>
@@ -188,14 +193,13 @@ Redmine <a class="reference external" href="https://redmine.openatlas.eu/project
 <li class="toctree-l2"><a class="reference internal" href="tools/profile.html">Profile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools/map.html">Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools/network.html">Network visualization</a></li>
-<li class="toctree-l2"><a class="reference internal" href="tools/file.html">File</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools/table.html">Table</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools/model.html">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="tools/api.html">API</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="admin/index.html">Admin</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="admin/files.html">Files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="entity/file.html">File</a></li>
 <li class="toctree-l2"><a class="reference internal" href="admin/user.html">User</a></li>
 <li class="toctree-l2"><a class="reference internal" href="admin/general.html">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="admin/mail.html">Mail</a></li>
@@ -227,7 +231,7 @@ Redmine <a class="reference external" href="https://redmine.openatlas.eu/project
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="menu/index.html" class="btn btn-neutral float-right" title="Menu" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="overview.html" class="btn btn-neutral float-right" title="Overview" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
     </div>

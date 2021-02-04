@@ -10,7 +10,8 @@ Redmine `Wiki <https://redmine.openatlas.eu/projects/uni/wiki/Wiki>`_.
 .. toctree::
    :maxdepth: 2
 
-   menu/index
+   overview
+   entity/index
    form/index
    tools/index
    admin/index
