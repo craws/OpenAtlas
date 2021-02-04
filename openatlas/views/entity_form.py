@@ -397,9 +397,11 @@ def link_and_get_redirect_url(form: FlaskForm,
     elif hasattr(form, 'continue_') and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
         if class_ == 'sub':
-            if origin.system_type == 'place':
+            if entity.system_type == 'place':
+                class_ = 'feature'
+            if entity.system_type == 'feature':
                 class_ = 'stratigraphic_unit'
-            elif origin.system_type == 'feature':
+            elif entity.system_type == 'stratigraphic unit':
                 class_ = 'find'
         url = url_for('insert', class_=class_, origin_id=entity.id)
     return url
