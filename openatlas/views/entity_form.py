@@ -46,6 +46,8 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     view_name = app.config['CODE_CLASS'][class_] if class_ in g.classes else class_
     if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
         view_name = 'place'
+    elif class_ in ['bibliography', 'edition', 'external_reference']:
+        view_name = 'reference'
     geonames_module = False
     if origin:
         populate_insert_form(form, view_name, class_, origin)
@@ -85,7 +87,7 @@ def add_crumbs(view_name: str,
               link(origin)]
     if structure:
         crumbs = [[_(origin.view_name), url_for('index', class_=origin.view_name)],
-                  structure['place'],
+                  structure['place'] if origin.system_type != 'place' else '',
                   structure['feature'],
                   structure['stratigraphic_unit'],
                   link(origin)]
