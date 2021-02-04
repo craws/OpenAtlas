@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -24,7 +24,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         # Todo: duplicate check doesn't seem to work for empty hierarchies
         if Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return render_template('hierarchy/insert.html', form=form)
+            return render_template('display_form.html', form=form)
         save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
@@ -101,7 +101,9 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form: FlaskForm, node=None, value_type: bool = False) -> Node:  # type: ignore
+def save(form: FlaskForm,
+         node: Optional[Node] = None,
+         value_type: bool = False) -> Node:  # type: ignore
     g.cursor.execute('BEGIN')
     try:
         if node:

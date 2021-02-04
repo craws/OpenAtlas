@@ -78,25 +78,6 @@ def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def crumb(self: Any, crumbs: List[Any]) -> str:
-    items = []
-    for item in crumbs:
-        if not item:
-            continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
-        elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
-            items.append(display.link(item))
-        elif isinstance(item, list):
-            items.append('<a href="{url}">{label}</a>'.format(
-                # If there are more than 2 arguments pass them as parameters with **
-                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
-                label=display.truncate(display.uc_first(str(item[0])))))
-        else:
-            items.append(display.uc_first(item))
-    return Markup('&nbsp;>&nbsp; '.join(items))
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:

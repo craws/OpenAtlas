@@ -51,9 +51,8 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=entity.id) + '#tab-' + class_name)
     form = build_table_form(class_name, entity.get_linked_entities('P67'))
     return render_template('form.html',
-                           entity=entity,
-                           class_name=class_name,
                            form=form,
+                           title=entity.name,
                            crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
                                    entity,
-                                   _('link') + ' ' + _('file')])
+                                   _('link') + ' ' + _(class_name)])

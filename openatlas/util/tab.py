@@ -110,7 +110,7 @@ class Tab:
         elif name == 'file':
             table.header = Table.HEADERS['file'] + [_('main image')]
             if code in class_codes['reference']:
-                table.header = Table.HEADERS['file'] + [_('main image')]
+                table.header = Table.HEADERS['file']
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='file'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]

@@ -10,28 +10,28 @@ class ReferenceTest(TestBaseCase):
     def test_reference(self) -> None:
         with app.app_context():  # type: ignore
             # Reference insert
-            rv = self.app.get(url_for('reference_insert', category='bibliography'))
+            rv = self.app.get(url_for('insert', class_='bibliography'))
             assert b'+ Bibliography' in rv.data
-            rv = self.app.get(url_for('reference_insert', category='edition'))
+            rv = self.app.get(url_for('insert', class_='edition'))
             assert b'+ Edition' in rv.data
             data = {'name': 'https://openatlas.eu', 'description': 'Reference description'}
-            rv = self.app.post(url_for('reference_insert', category='external_reference'), data=data)
+            rv = self.app.post(url_for('insert', class_='external_reference'), data=data)
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 reference = Entity.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('reference_insert', category='external_reference'),
+            rv = self.app.post(url_for('insert', class_='external_reference'),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('reference_index'))
+            rv = self.app.get(url_for('index', class_='reference'))
             assert b'https://openatlas.eu' in rv.data
 
             # Reference update
-            rv = self.app.get(url_for('reference_update', id_=reference.id))
+            rv = self.app.get(url_for('update', id_=reference.id))
             assert b'https://openatlas.eu' in rv.data
             data['name'] = 'http://updated.openatlas.eu'
-            rv = self.app.post(url_for('reference_update', id_=reference.id),
+            rv = self.app.post(url_for('update', id_=reference.id),
                                data=data,
                                follow_redirects=True)
             assert b'http://updated.openatlas.eu' in rv.data
@@ -59,5 +59,5 @@ class ReferenceTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Reference delete
-            rv = self.app.get(url_for('reference_index', action='delete', id_=reference.id))
+            rv = self.app.get(url_for('index', class_='reference', delete_id=reference.id))
             assert b'The entry has been deleted.' in rv.data

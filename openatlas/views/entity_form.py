@@ -103,6 +103,8 @@ def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if entity.system_type == 'reference system' and not is_authorized('manager'):
         abort(403)
+    if not entity.view_name:  # pragma: no cover
+        abort(422)
 
     # Archaeological sub units
     geonames_module = False
@@ -113,7 +115,7 @@ def update(id_: int) -> Union[str, Response]:
 
     if entity.view_name == 'actor':
         form = build_form(g.classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
-    elif entity.view_name == 'reference':
+    elif entity.view_name in ['object', 'reference']:
         form = build_form(entity.system_type.replace(' ', '_'), entity)
     elif entity.view_name == 'place':
         structure = get_structure(entity)
@@ -133,6 +135,7 @@ def update(id_: int) -> Union[str, Response]:
             form = build_form('place', entity, location=location)
     else:
         form = build_form(entity.view_name, entity)
+
     if entity.view_name == 'event':
         form.event_id.data = entity.id
     elif entity.class_.code == 'E32':  # reference system
@@ -291,7 +294,7 @@ def save(form: FlaskForm,
     except psycopg2.IntegrityError:
         g.cursor.execute('ROLLBACK')
         flash(_('error name exists'), 'error')  # Could happen e.g. with reference system
-        url = url_for('index', class_=entity.view_name)
+        url = url_for('index', class_='reference_system')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)

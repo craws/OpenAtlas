@@ -45,7 +45,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity = g.reference_systems[id_]
     else:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        if not entity.view_name:  # pragma: no cover
+        if not entity.view_name:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
@@ -293,7 +293,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-    if entity.view_name in ['actor', 'event', 'node', 'place', 'source', 'reference']:
+    if entity.view_name in ['actor', 'event', 'node', 'place', 'source']:
         if entity.view_name not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
@@ -397,7 +397,13 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             entity.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('entity_view', id_=id_) + '#tab-file')
     form = build_table_form('file', entity.get_linked_entities('P67', inverse=True))
-    return render_template('form.html', entity=entity, form=form)
+    return render_template('form.html',
+                           entity=entity,
+                           form=form,
+                           title=entity.name,
+                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                                   entity,
+                                   _('link') + ' ' + _('file')])
 
 
 @app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
@@ -411,7 +417,12 @@ def entity_add_source(id_: int) -> Union[str, Response]:
             entity.link_string(property_code, request.form['checkbox_values'], inverse=inverse)
         return redirect(url_for('entity_view', id_=id_) + '#tab-source')
     form = build_table_form('source', entity.get_linked_entities(property_code, inverse=inverse))
-    return render_template('form.html', entity=entity, form=form)
+    return render_template('form.html',
+                           form=form,
+                           title=entity.name,
+                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                                   entity,
+                                   _('link') + ' ' + _('source')])
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
@@ -428,4 +439,4 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
                            form=form,
                            crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
                                    entity,
-                                   _('link')])
+                                   _('link') + ' ' + _('reference')])
