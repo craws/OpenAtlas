@@ -30,7 +30,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         return redirect(url_for('node_index') + '#menu-tab-' + param)
     return render_template('display_form.html',
                            form=form,
-                           manual_page='form/type',
+                           manual_page='entity/type',
                            title=_('types'),
                            crumbs=[[_('types'), url_for('node_index')],
                                    '+ ' + uc_first(_(param))])
@@ -68,7 +68,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                            form=form,
                            table=table,
                            forms=[form.id for form in form.forms],
-                           manual_page='form/type',
+                           manual_page='entity/type',
                            title=_('types'),
                            crumbs=[[_('types'), url_for('node_index')],
                                    hierarchy,

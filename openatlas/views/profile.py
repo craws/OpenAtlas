@@ -89,7 +89,7 @@ def profile_settings(category: str) -> Union[str, Response]:
     set_form_settings(form, True)
     return render_template('display_form.html',
                            form=form,
-                           manual_page='admin/' + category,
+                           manual_page='profile/' + category,
                            title=_('profile'),
                            crumbs=[[_('profile'), url_for('profile_index') + '#tab-' + category],
                                    _(category)])

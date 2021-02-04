@@ -18,6 +18,6 @@ The menu structure reflects that workflow.
    place
    reference
    object
-   Types </form/type>
+   type
    file
    reference_system

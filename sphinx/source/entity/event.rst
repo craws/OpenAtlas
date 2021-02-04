@@ -14,7 +14,7 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 Form fields
 -----------
 * :doc:`/form/name`
-* :doc:`/form/type`
+* :doc:`type`
 * :doc:`/form/date`
 * :doc:`/form/description`
 * **Location** - a :doc:`place` where the event occurred

@@ -11,7 +11,7 @@ several entities.
 Form fields
 -----------
 * :doc:`/form/name`
-* :doc:`/form/type`
+* :doc:`type`
 * :doc:`Information carrier </entity/object>`
 * **Content** - a source content usually contains a summary or the whole text of the source
 

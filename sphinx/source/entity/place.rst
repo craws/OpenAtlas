@@ -11,7 +11,7 @@ Form fields
 -----------
 * :doc:`/form/name`
 * :doc:`/form/alias`
-* :doc:`/form/type`
+* :doc:`type`
 * :doc:`/form/date`
 * :doc:`/form/description`
 * :doc:`/tools/map`

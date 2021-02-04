@@ -51,7 +51,7 @@ def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Resp
         form.name.data = request.form['name_search']
     return render_template('display_form.html',
                            form=form,
-                           manual_page='form/type',
+                           manual_page='entity/type',
                            title=_('types'),
                            crumbs=[[_('types'), url_for('node_index')],
                                    root,

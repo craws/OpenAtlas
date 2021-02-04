@@ -305,12 +305,15 @@ def display_content_translation(self: Any, text: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
-    path_elements= site.split('/')
-    first = path_elements[0]
-    second = path_elements[1] + '.html'
-    path = pathlib.Path(app.root_path) / 'static' / 'manual' / first / second
-    if not path.exists():
-        print('Missing manual link: ' + str(path))
+    try:
+        parts = site.split('/')
+        first = parts[0]
+        second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
+        path = pathlib.Path(app.root_path) / 'static' / 'manual' / first / second
+        if not path.exists():
+            print('Missing manual link: ' + str(path))
+            return ''
+    except:
         return ''
     return Markup("""
         <a class="manual" href="/static/manual/{site}.html" target="_blank" title="{label}">

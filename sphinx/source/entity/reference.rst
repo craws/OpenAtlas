@@ -14,7 +14,7 @@ Available reference classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 Form fields
 -----------
 * :doc:`/form/name` - or an **URL** field in case of an external references
-* :doc:`/form/type`
+* :doc:`type`
 * :doc:`/form/description`
 
 Citation example

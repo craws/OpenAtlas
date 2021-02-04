@@ -17,7 +17,7 @@ Form fields
 -----------
 * **File** - here you can chose a file from your computer
 * :doc:`/form/name` - if empty it will be prefilled after the file selection with the filename
-* **License** - which works like a :doc:`/form/type`, it is a good practice to define one
+* **License** - which works like a :doc:`type`, it is a good practice to define one
 * :doc:`/form/description`
 
 
