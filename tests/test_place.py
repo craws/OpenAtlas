@@ -209,12 +209,16 @@ class PlaceTest(TestBaseCase):
                         'continue_': 'sub',
                         self.precision_geonames: precision,
                         self.precision_wikidata: ''}
-                self.app.get(url_for('insert', class_='place', origin_id=place.id))
-                rv = self.app.post(url_for('insert', class_='place', origin_id=place.id),
+                self.app.get(url_for('insert', class_='place'))
+                rv = self.app.post(url_for('insert', class_='place'),
                                    data=data,
                                    follow_redirects=True)
-                assert b'Insert and add find' in rv.data
+                assert b'Insert and add strati' in rv.data
                 data['name'] = "It's not a bug, it's a feature!"
+                rv = self.app.get(url_for('insert',
+                                          class_='stratigraphic_unit',
+                                          origin_id=place.id))
+                assert b'Insert and add find' in rv.data
                 rv = self.app.post(url_for('insert', class_='place', origin_id=place.id),
                                    data=data)
                 feat_id = rv.location.split('/')[-1]
@@ -230,23 +234,20 @@ class PlaceTest(TestBaseCase):
                               data={'name': "I'm a stratigraphic unit"})
                 dimension_node_id = Node.get_hierarchy('Dimensions').subs[0]
                 data = {'name': 'You never find me',
-                        str(dimension_node_id): '50',
+                        dimension_node_id: '50',
                         self.precision_geonames: precision,
                         self.precision_wikidata: ''}
-                rv = self.app.post(url_for('insert',
-                                           class_='place',
-                                           origin_id=stratigraphic_id),
+                rv = self.app.post(url_for('insert', class_='place', origin_id=stratigraphic_id),
                                    data=data)
                 find_id = rv.location.split('/')[-1]
-                self.app.get(url_for('update', id_=find_id))
                 self.app.post(url_for('update', id_=find_id), data=data)
+                self.app.get(url_for('update', id_=find_id))
                 data = {'name': 'My human remains',
                         self.precision_geonames: precision,
                         self.precision_wikidata: ''}
                 rv = self.app.post(url_for('insert',
-                                           class_='place',
-                                           origin_id=stratigraphic_id,
-                                           system_type='human_remains'),
+                                           class_='human_remains',
+                                           origin_id=stratigraphic_id),
                                    data=data)
                 human_remains_id = rv.location.split('/')[-1]
                 rv = self.app.get(url_for('update', id_=human_remains_id))

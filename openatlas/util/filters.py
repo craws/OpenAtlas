@@ -311,7 +311,7 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
         second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
         path = pathlib.Path(app.root_path) / 'static' / 'manual' / first / second
         if not path.exists():
-            print('Missing manual link: ' + str(path))
+            # print('Missing manual link: ' + str(path))
             return ''
     except:
         return ''

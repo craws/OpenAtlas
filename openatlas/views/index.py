@@ -138,7 +138,7 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> Tuple[str, int]:
+def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
     return render_template('422.html', crumbs=['422 - Unprocessable entity'], e=e), 422
 
 

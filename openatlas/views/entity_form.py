@@ -26,7 +26,7 @@ from openatlas.util.util import is_authorized, required_group, was_modified
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     if class_ == 'reference system' and not is_authorized('manager'):
-        abort(403)
+        abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
     if class_ in app.config['CLASS_CODES']['actor']:
         # Todo: can't use g.classes[class_].name because it's already translated, needs fixing.
@@ -104,9 +104,9 @@ def add_crumbs(view_name: str,
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if entity.system_type == 'reference system' and not is_authorized('manager'):
-        abort(403)
-    if not entity.view_name:  # pragma: no cover
-        abort(422)
+        abort(403)  # pragma: no cover
+    if not entity.view_name:
+        abort(422)  # pragma: no cover
 
     # Archaeological sub units
     geonames_module = False
@@ -386,11 +386,11 @@ def link_and_get_redirect_url(form: FlaskForm,
         elif origin.view_name == 'event':  # Involvement, coming from actor
             link_id = origin.link('P11', entity)[0]
             url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-        elif origin.view_name == 'actor':  # Involvement, coming from event
-            link_id = entity.link('P11', origin)[0]
+        elif origin.view_name == 'actor' and entity.view_name == 'event':
+            link_id = entity.link('P11', origin)[0]  # Involvement, coming from event
             url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
         elif origin.view_name == 'actor' and entity.view_name == 'actor':
-            link_id = origin.link('OA7', entity)[0]
+            link_id = origin.link('OA7', entity)[0]  # Actor with actor relation
             url = url_for('relation_update', id_=link_id, origin_id=origin.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = url_for('insert', class_=class_, origin_id=origin.id if origin else None)
@@ -399,7 +399,7 @@ def link_and_get_redirect_url(form: FlaskForm,
         if class_ == 'sub':
             if entity.system_type == 'place':
                 class_ = 'feature'
-            if entity.system_type == 'feature':
+            elif entity.system_type == 'feature':
                 class_ = 'stratigraphic_unit'
             elif entity.system_type == 'stratigraphic unit':
                 class_ = 'find'

@@ -35,15 +35,14 @@ class ReferenceSystemTest(TestBaseCase):
 
             rv = self.app.post(url_for('update', id_=geonames.id))
             assert b'Website URL' in rv.data
-            rv = self.app.post(url_for('update', id_=geonames.id),
-                               follow_redirects=True,
-                               data={'name': 'GeoNames',
-                                     Node.get_hierarchy('External Reference Match').id:
-                                         precision_id,
-                                     'website_url': 'https://www.geonames2.org/',
-                                     'resolver_url': 'https://www.geonames2.org/'})
+            data = {'name': 'GeoNames',
+                    Node.get_hierarchy('External Reference Match').id: precision_id,
+                    'website_url': 'https://www.geonames2.org/',
+                    'resolver_url': 'https://www.geonames2.org/'}
+            rv = self.app.post(url_for('update', id_=geonames.id), follow_redirects=True, data=data)
             assert b'Changes have been saved.' in rv.data
-
+            rv = self.app.post(url_for('update', id_=geonames.id), follow_redirects=True, data=data)
+            assert b'https://www.geonames2.org/' in rv.data
             rv = self.app.post(url_for('insert', class_='E21'), data={
                 'name': 'Actor test',
                 'reference_system_id_' + str(wikidata.id): 'Q123',
