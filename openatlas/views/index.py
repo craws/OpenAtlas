@@ -32,7 +32,7 @@ class FeedbackForm(FlaskForm):  # type: ignore
 
 @app.route('/')
 @app.route('/overview')
-def index() -> str:
+def overview() -> str:
     tables = {'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
               'bookmarks': Table(['name', 'class', 'first', 'last'],
                                  defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
@@ -59,7 +59,7 @@ def index() -> str:
             if count:
                 tables['overview'].rows.append([
                     uc_first(_(name)) if name in ['find', 'human remains'] else link(
-                        _(name), url_for(name + '_index')),
+                        _(name), url_for('index', class_=name)),
                     format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
@@ -71,6 +71,7 @@ def index() -> str:
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     return render_template('index/index.html',
                            intro=Content.get_translation('intro'),
+                           crumbs=[_('overview')],
                            tables=tables)
 
 
@@ -96,28 +97,34 @@ def index_feedback() -> Union[str, Response]:
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')
-        return redirect(url_for('index'))
-    return render_template('index/feedback.html', form=form)
+        return redirect(url_for('overview'))
+    return render_template('index/feedback.html',
+                           form=form,
+                           title=_('feedback'),
+                           crumbs=[_('feedback')])
 
 
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
-    return render_template('index/content.html', text=Content.get_translation(item), title=item)
+    return render_template('index/content.html',
+                           text=Content.get_translation(item),
+                           title=_(_(item)),
+                           crumbs=[_(item)])
 
 
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
-    return render_template('400.html', e=e), 400
+    return render_template('400.html', crumbs=['400 - Bad Request'], e=e), 400
 
 
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return render_template('403.html', e=e), 403
+    return render_template('403.html', crumbs=['403 - Forbidden'], e=e), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return render_template('404.html', e=e), 404
+    return render_template('404.html', crumbs=['404 - File not found'], e=e), 404
 
 
 @app.errorhandler(405)  # pragma: no cover
@@ -127,17 +134,20 @@ def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(418)
 def invalid_id(e: Exception) -> Tuple[str, int]:
-    return render_template('418.html', e=e), 418
+    return render_template('418.html', crumbs=["418 - I’m a teapot"], e=e), 418
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> Tuple[str, int]:
-    return render_template('422.html', e=e), 422
+def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+    return render_template('422.html', crumbs=['422 - Unprocessable entity'], e=e), 422
 
 
 @app.route('/changelog')
 def index_changelog() -> str:
-    return render_template('index/changelog.html', versions=Changelog.versions)
+    return render_template('index/changelog.html',
+                           title=_('changelog'),
+                           crumbs=[_('changelog')],
+                           versions=Changelog.versions)
 
 
 @app.route('/unsubscribe/<code>')
@@ -150,4 +160,6 @@ def index_unsubscribe(code: str) -> str:
         user.update()
         user.remove_newsletter()
         text = _('You have successfully unsubscribed. You can subscribe again in your Profile.')
-    return render_template('index/unsubscribe.html', text=text)
+    return render_template('index/unsubscribe.html',
+                           text=text,
+                           crumbs=[_('unsubscribe newsletter')])

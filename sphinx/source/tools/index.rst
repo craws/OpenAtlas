@@ -8,7 +8,6 @@ Tools
    profile
    map
    network
-   file
    table
    model
    api

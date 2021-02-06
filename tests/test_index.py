@@ -3,7 +3,6 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -38,13 +37,6 @@ class IndexTests(TestBaseCase):
 
             rv = self.app.get(url_for('entity_view', id_=666), follow_redirects=True)
             assert b'teapot' in rv.data  # Id not found error
-
-            # Test wrong entity for update
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'Game master')
-            rv = self.app.get(url_for('event_update', id_=actor.id), follow_redirects=True)
-            assert b'422 - Unprocessable entity' in rv.data
 
             rv = self.app.get('/404')
             assert b'not found' in rv.data

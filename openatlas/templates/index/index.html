@@ -1,7 +1,4 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ [_('overview')]|crumb }}
-{% endblock %}
 {% block content %}
     {% if current_user.is_authenticated %}
         {% if tables.overview['rows'] %}
@@ -12,11 +9,11 @@
         <div style="float:left; ">
             <div class="toolbar">
                 <p>
-                    <a class="{{ config['CSS']['button']['primary'] }}" href="/static/manual/index.html" target="_blank">
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="/static/manual/index.html" target="_blank" rel="noopener noreferrer">
                         <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
                     </a>
                     {{ _('model')|button(url_for('model_index')) }}
-                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('reference_system_index') }}">
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('index', class_='reference_system') }}">
                         {{ _('reference system')|uc_first }}
                     </a>
                 </p>
@@ -70,6 +67,6 @@
             <p>{{ intro|safe }}</p>
         {% endif %}
         <h1>OpenAtlas</h1>
-        <a target="_blank" rel="noopener" href="https://openatlas.eu/">OpenAtlas</a> {{ _('text_intro') }}
+        <a target="_blank" rel="noopener noreferrer" href="https://openatlas.eu/">OpenAtlas</a> {{ _('text_intro') }}
     {% endif %}
 {% endblock %}

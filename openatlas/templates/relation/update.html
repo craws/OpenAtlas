@@ -1,8 +1,0 @@
-{% extends 'layout.html' %}
-{% block title_name %} - {{ _('relation')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], origin, related, _('edit')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form }}
-{% endblock %}

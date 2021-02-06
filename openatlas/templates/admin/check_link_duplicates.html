@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('check link duplicates')|uc_first }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'admin/data_integrity_checks'|manual }}
@@ -11,9 +7,9 @@
         {% endif %}
     </div>
     {% if duplicates %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% elif table.rows %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}

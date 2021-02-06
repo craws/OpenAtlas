@@ -440,4 +440,4 @@ class Changelog:
         '0.0.1': ['2014-11-05', {
             'feature': {
                 '': 'Initial version based on the "Zend Base" project from '
-                    '<a target="_blank" rel="noopener" href="https://craws.net">craws.net</a>'}}]}
+                    '<a target="_blank" rel="noopener noreferrer" href="https://craws.net">craws.net</a>'}}]}

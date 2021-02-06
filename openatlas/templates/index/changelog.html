@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('changelog')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('changelog')]|crumb }}
-{% endblock %}
 {% block content %}
     {% for version_name, version in versions.items() %}
         <div class="changelog-version">
@@ -17,7 +13,7 @@
                     <li class="changelog">
                         {% if issue_number %}
                             {{ issue_type|uc_first }}
-                            <a target="_blank" rel="noopener" href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
+                            <a target="_blank" rel="noopener noreferrer" href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
                                 #{{ issue_number }}
                             </a>
                             {{ issue_text|safe }}

@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('login')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('login')]|crumb }}
-{% endblock %}
 {% block content %}
     {{ form|display_form('login-form') }}
     {% if config.DEMO_MODE %}
@@ -19,6 +15,6 @@
         </p>
     {% endif %}
     <p>
-        <a href="/static/manual/troubleshooting/login.html" target="_blank">{{ _('troubleshooting')|uc_first }}</a>
+        <a href="/static/manual/troubleshooting/login.html" target="_blank" rel="noopener noreferrer">{{ _('troubleshooting')|uc_first }}</a>
     </p>
 {% endblock %}

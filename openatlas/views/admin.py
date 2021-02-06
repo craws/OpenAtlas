@@ -84,6 +84,8 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
                            imports=Import.get_all_projects(),
+                           title=_('admin'),
+                           crumbs=[_('admin')],
                            info={'file': get_form_settings(FilesForm()),
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),
@@ -106,16 +108,25 @@ def admin_content(item: str) -> Union[str, Response]:
     content = Content.get_content()
     for language in languages:
         form.__getattribute__(language).data = content[item][language]
-    return render_template('admin/content.html', item=item, form=form, languages=languages)
+    return render_template('admin/content.html',
+                           item=item,
+                           form=form,
+                           languages=languages,
+                           title=_('content'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-content'],
+                                   _(item)])
 
 
 @app.route('/admin/check_links')
 @required_group('contributor')
 def admin_check_links() -> str:
-    table = Table(['domain', 'property', 'range'],
-                  rows=[[result['domain'], result['property'], result['range']] for result in
-                        Link.check_links()])
-    return render_template('admin/check_links.html', table=table)
+    return render_template(
+        'admin/check_links.html',
+        table=Table(['domain', 'property', 'range'],
+                    rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
+        title=_('admin'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                _('check links')])
 
 
 @app.route('/admin/check_link_duplicates')
@@ -148,7 +159,12 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
     else:  # If no exact duplicates where found check if single types are used multiple times
         table = Table(['entity', 'class', 'base type', 'incorrect multiple types'],
                       rows=Link.check_single_type_duplicates())
-    return render_template('admin/check_link_duplicates.html', table=table, duplicates=duplicates)
+    return render_template('admin/check_link_duplicates.html',
+                           table=table,
+                           duplicates=duplicates,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('check link duplicates')])
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
@@ -181,7 +197,12 @@ def admin_settings(category: str) -> Union[str, Response]:
         tab = 'email' if category == 'mail' else tab
         return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category=category)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='admin/' + category,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-' + (
+                               'data' if category == 'api' else category)], _(category)])
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -199,7 +220,12 @@ def admin_check_similar() -> str:
             for entity in sample['entities']:
                 html += '<br><br><br><br><br>' + link(entity)  # Workaround for linebreaks in tables
             table.rows.append([html, len(sample['entities']) + 1])
-    return render_template('admin/check_similar.html', table=table, form=form)
+    return render_template('admin/check_similar.html',
+                           table=table,
+                           form=form,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('check similar names')])
 
 
 @app.route('/admin/orphans/delete/<parameter>')
@@ -248,7 +274,11 @@ def admin_check_dates() -> str:
                 link_.description,
                 link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
         tables['involvement_dates'].rows.append(data)
-    return render_template('admin/check_dates.html', tables=tables)
+    return render_template('admin/check_dates.html',
+                           tables=tables,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('check dates')])
 
 
 @app.route('/admin/orphans')
@@ -299,8 +329,11 @@ def admin_orphans() -> str:
                 file.suffix,
                 link(_('download'), url_for('download_file', filename=file.name)),
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
-
-    return render_template('admin/check_orphans.html', tables=tables)
+    return render_template('admin/check_orphans.html',
+                           tables=tables,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('orphans')])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -350,7 +383,11 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,
             date])
-    return render_template('admin/logo.html', table=table)
+    return render_template('admin/logo.html',
+                           table=table,
+                           title=_('logo'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-files'],
+                                   _('logo')])
 
 
 @app.route('/admin/log', methods=['POST', 'GET'])
@@ -373,7 +410,12 @@ def admin_log() -> str:
                            row.message,
                            user,
                            row.info])
-    return render_template('admin/log.html', table=table, form=form)
+    return render_template('admin/log.html',
+                           table=table,
+                           form=form,
+                           title=_('admin'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-general'],
+                                   _('system log')])
 
 
 @app.route('/admin/log/delete')
@@ -412,4 +454,9 @@ def admin_newsletter() -> Union[str, Response]:
                 user.email,
                 '<input value="{id}" name="recipient" type="checkbox" checked="checked">'.format(
                     id=user.id)])
-    return render_template('admin/newsletter.html', form=form, table=table)
+    return render_template('admin/newsletter.html',
+                           form=form,
+                           table=table,
+                           title=_('newsletter'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
+                                   _('newsletter')])

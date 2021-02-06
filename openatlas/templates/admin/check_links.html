@@ -1,14 +1,10 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('check links')|uc_first }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'admin/data_integrity_checks'|manual }}
     </div>
     {% if table.rows %}
-        {{ table.display()|safe }}
+        {{ table.display() }}
     {% else %}
         <p>{{ _('Congratulations, everything looks fine!') }}</p>
     {% endif %}

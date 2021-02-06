@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+{% block content %}
+    {% if modifier %}
+        <p class="error">
+            {{ _('error modified by %(username)s', username=modifier|safe) }}
+        </p>
+        <p>
+            {{ _('reload')|button(url_for('update', id_=entity.id)) }}
+        </p>
+    {% endif %}
+    {% if entity.view_name != 'place' %}
+        {{ form|display_form(manual_page='entity/' + entity.view_name) }}
+        {{ entity.view_name|display_citation_example }}
+    {% else %}
+        <div class="row">
+            <div class="col-4">
+                <div id='map-info-display' style="float:left;">
+                    {{ form|display_form(manual_page='entity/' + entity.view_name) }}
+                </div>
+            </div>
+            <div class="col-8">
+                <div id="map" class="map"></div>
+            </div>
+            <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Leaflet.draw-1.0.2.css">
+            <script src="/static/vendor/leaflet-1.3.4/EasyButton-2.3.0/src/easy-button.js"></script>
+            <script src="/static/vendor/leaflet-1.3.4/Leaflet.draw-1.0.2.js"></script>
+            <script src="/static/js/map/map.js"></script>
+            <script src="/static/js/map/draw.js"></script>
+        </div>
+    {% endif %}
+{% endblock %}

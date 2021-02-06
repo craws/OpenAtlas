@@ -41,7 +41,11 @@ def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
     for project in Import.get_all_projects():
         table.rows.append([link(project), format_number(project.count), project.description])
-    return render_template('import/index.html', table=table)
+    return render_template('import/index.html',
+                           table=table,
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('import')])
 
 
 @app.route('/import/project/insert', methods=['POST', 'GET'])
@@ -52,7 +56,13 @@ def import_project_insert() -> Union[str, Response]:
         id_ = Import.insert_project(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
-    return render_template('import/project_insert.html', form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='admin/import',
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   '+ ' + uc_first(_('project'))])
 
 
 @app.route('/import/project/view/<int:id_>')
@@ -66,7 +76,13 @@ def import_project_view(id_: int) -> str:
                            entity.origin_id,
                            format_date(entity.created)])
     project = Import.get_project_by_id(id_)
-    return render_template('import/project_view.html', project=project, table=table)
+    return render_template('import/project_view.html',
+                           project=project,
+                           table=table,
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   project.name])
 
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
@@ -81,7 +97,14 @@ def import_project_update(id_: int) -> Union[str, Response]:
         Import.update_project(project)
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
-    return render_template('import/project_update.html', project=project, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='admin/import',
+                           title=_('import'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   [_('import'), url_for('import_index')],
+                                   project,
+                                   _('edit')])
 
 
 @app.route('/import/project/delete/<int:id_>')
@@ -220,12 +243,14 @@ def import_data(project_id: int, class_code: str) -> str:
         except Exception:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html',
-                                   project=project,
                                    form=form,
-                                   class_code=class_code,
-                                   class_label=class_label,
                                    messages=messages,
-                                   file_data=file_data)
+                                   file_data=file_data,
+                                   title=_('import'),
+                                   crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                           [_('import'), url_for('import_index')],
+                                           project,
+                                           class_label])
 
         if not form.preview.data and checked_data:
             if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:

@@ -1,12 +1,8 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-general">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('system log')|uc_first }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ _('delete all logs')|button(url_for('admin_log_delete'), onclick="return confirm('" + _('delete all logs')|uc_first + "?')") }}
     </div>
     {{ form|display_form }}
-    {{ table.display()|safe }}
+    {{ table.display() }}
 {% endblock %}

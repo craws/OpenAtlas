@@ -1,11 +1,7 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('types')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('types')]|crumb }}
-{% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'form/type'|manual }}
+        {{ 'entity/type'|manual }}
     </div>
     <div>
         <ul class="nav nav-tabs" role="tablist">

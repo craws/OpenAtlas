@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-user">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('newsletter')|uc_first }}
-{% endblock %}
 {% block content %}
     <form id="newsletter-form" name="newsletter_form" method="post">
         {{ form.csrf_token }}
@@ -12,7 +8,7 @@
             {{ form.save(class_=config['CSS']['button']['primary']) }}
         </div>
         <div style="float:left;margin-left:1em;">
-            {{ table.display()|safe }}
+            {{ table.display() }}
         </div>
     </form>
 {% endblock %}

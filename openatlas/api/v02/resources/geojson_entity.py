@@ -83,7 +83,8 @@ class GeoJsonEntity:
         return time if time else None
 
     @staticmethod
-    def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
+    # Todo: API coverage, remove no cover below
+    def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:  # pragma: nocover
         if entity.class_.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []

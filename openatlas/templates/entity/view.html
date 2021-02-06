@@ -1,0 +1,30 @@
+{% extends "tabs.html" %}
+{% block tab_info %}
+    <div class="row">
+        <div class="col-6">
+            <div class="toolbar">
+                {{ ('entity/' + entity.view_name)|manual }}
+                {{ buttons|join(' ') }}
+                {{ entity.id|bookmark_toggle }}
+                {{ entity|download_button }}
+                {{ entity|siblings_pager(structure) }}
+            </div>
+            <h1>{{ entity.name }}</h1>
+            <div>
+                {{ entity|display_profile_image }}
+                <div style="float:left;">
+                    {{ info|display_info }}
+                    {{ entity|note }}
+                    {{ entity|display_external_references }}
+                    {{ entity|description }}
+                </div>
+            </div>
+        </div>
+        {% if gis_data %}
+            <div class="col-6">
+                <div id="map" class="map"></div>
+                <script src="/static/js/map/map.js"></script>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

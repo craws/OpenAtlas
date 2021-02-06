@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('feedback')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [_('feedback')]|crumb }}
-{% endblock %}
 {% block content %}
     <p>
         {{ _('feedback intro') }}:
@@ -11,7 +7,7 @@
         <li>
             <p>
                 {{ _('feedback redmine') }}:
-                <a href="http://redmine.openatlas.eu/projects/uni" target="_blank" rel="noopener">
+                <a href="https://redmine.openatlas.eu/projects/uni" target="_blank" rel="noopener noreferrer">
                     https://redmine.openatlas.eu
                 </a>
             </p>

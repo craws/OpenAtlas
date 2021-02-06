@@ -1,9 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('import')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;>&nbsp;
-    {{ [[_('import'), 'import_index'], project, class_label]|crumb }}
-{% endblock %}
 {% block content %}
     {% if file_data.file %}
         <div class="toolbar">
@@ -37,7 +32,7 @@
                     {{ _('preview')|uc_first }}
                 {% endif %}
             </h2>
-            {{ table.display()|safe }}
+            {{ table.display() }}
         {% endif %}
     {% endif %}
 {% endblock %}

@@ -3,7 +3,7 @@ Admin
 
 .. toctree::
 
-   files
+   File </entity/file>
    user
    general
    mail

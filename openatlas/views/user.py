@@ -93,7 +93,12 @@ def user_activity(user_id: int = 0) -> str:
         user = User.get_by_id(row.user_id)
         user = link(user) if user else 'id ' + str(row.user_id)
         table.rows.append([format_date(row.created), user, _(row.action), entity])
-    return render_template('user/activity.html', table=table, form=form)
+    return render_template('user/activity.html',
+                           table=table,
+                           form=form,
+                           title=_('user'),
+                           crumbs=[[_('admin'), url_for('admin_index')],
+                                   _('activity')])
 
 
 @app.route('/admin/user/view/<int:id_>')
@@ -108,7 +113,12 @@ def user_view(id_: int) -> str:
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'): user.login_failed_count if is_authorized('manager') else ''}
-    return render_template('user/view.html', user=user, info=info)
+    return render_template('user/view.html',
+                           user=user,
+                           info=info,
+                           title=user.username,
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
+                                   user.username])
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
@@ -133,7 +143,13 @@ def user_update(id_: int) -> Union[str, Response]:
         return redirect(url_for('user_view', id_=id_))
     if user.id == current_user.id:
         del form.active
-    return render_template('user/update.html', form=form, user=user)
+    return render_template('display_form.html',
+                           form=form,
+                           title=user.username,
+                           manual_page='admin/user',
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
+                                   user,
+                                   _('edit')])
 
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
@@ -162,7 +178,11 @@ def user_insert() -> Union[str, Response]:
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))
-    return render_template('user/insert.html', form=form)
+    return render_template('user/insert.html',
+                           form=form,
+                           title=_('user'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
+                                   '+ ' + uc_first(_('user'))])
 
 
 def get_groups() -> List[Tuple[str, str]]:
