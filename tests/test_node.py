@@ -59,8 +59,9 @@ class NodeTest(TestBaseCase):
             assert b'Type can&#39;t have a sub as super.' in rv.data
 
             # Test value type
-            rv = self.app.get(url_for('node_update', id_=dimension_node.subs[0]),
-                              follow_redirects=True)
+            rv = self.app.get(url_for('entity_view', id_=dimension_node.subs[0]))
+            assert b'Unit' in rv.data
+            rv = self.app.get(url_for('node_update', id_=dimension_node.subs[0]))
             assert b'Dimensions' in rv.data
 
             # Test delete system node
