@@ -94,7 +94,8 @@ def api_access():  # type: ignore
             # Raise error if 1. User not logged in 2. API is NOT public 3. IP is not in whitelist
             if not current_user.is_authenticated and not session['settings']['api_public'] \
                     and ip not in app.config['ALLOWED_IPS']:
-                raise AccessDeniedError
+                # Todo: API coverage, remove no cover below
+                raise AccessDeniedError  # pragma: no cover
             return f(*args, **kwargs)
 
         return wrapped
