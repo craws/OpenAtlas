@@ -46,10 +46,11 @@ def button(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_citation_example(self: Any, code: str) -> str:
-    example = Content.get_translation('citation_example')
-    if not example or code not in ['edition', 'bibliography']:
+    text = Content.get_translation('citation_example')
+    if not text or code != 'reference':
         return ''
-    return Markup('<h1>' + display.uc_first(_('citation_example')) + '</h1>' + example)
+    return Markup('<h1>{title}</h1>{text}'.format(title=display.uc_first(_('citation_example')),
+                                                  text=text))
 
 
 @jinja2.contextfilter
@@ -275,7 +276,7 @@ def display_profile_image(self: Any, entity: Entity) -> str:
         return ''
     path = display.get_file_path(entity.image_id)
     if not path:
-        return ''
+        return ''  # pragma: no cover
     if entity.view_name == 'file':
         if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
             html = '''
@@ -284,7 +285,7 @@ def display_profile_image(self: Any, entity: Entity) -> str:
                 </a>'''.format(url=url_for('display_file', filename=path.name),
                                width=session['settings']['profile_image_width'])
         else:
-            html = display.uc_first(_('no preview available'))
+            html = display.uc_first(_('no preview available'))  # pragma: no cover
     else:
         html = """
             <a href="{url}">
@@ -313,7 +314,7 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
         if not path.exists():
             # print('Missing manual link: ' + str(path))
             return ''
-    except:
+    except:  # pragma: no cover
         return ''
     return Markup("""
         <a class="manual" href="/static/manual/{site}.html" target="_blank" title="{label}">

@@ -10,6 +10,7 @@
     {% endif %}
     {% if entity.view_name != 'place' %}
         {{ form|display_form(manual_page='entity/' + entity.view_name) }}
+        {{ entity.view_name|display_citation_example }}
     {% else %}
         <div class="row">
             <div class="col-4">

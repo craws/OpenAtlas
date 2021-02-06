@@ -88,6 +88,10 @@ class PlaceTest(TestBaseCase):
             rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
             assert b'Val-hall' in rv.data
 
+            # Test error when viewing the corresponding location
+            rv = self.app.get(url_for('entity_view', id_=place.id+1))
+            assert b'be viewed directly' in rv.data
+
             # Test with same GeoNames id
             rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
             assert b'Val-hall' in rv.data

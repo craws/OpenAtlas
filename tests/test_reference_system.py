@@ -22,9 +22,13 @@ class ReferenceSystemTest(TestBaseCase):
                     'website_url': 'https://wikipedia.org',
                     'resolver_url': 'https://wikipedia.org',
                     'forms': [geonames.forms[0]]}
-            rv = self.app.post(url_for('insert', class_='reference_system'), follow_redirects=True, data=data)
+            rv = self.app.post(url_for('insert', class_='reference_system'), follow_redirects=True,
+                               data=data)
             assert b'An entry has been created.' in rv.data
             wikipedia_id = ReferenceSystem.get_by_name('Wikipedia').id
+            rv = self.app.get(url_for('index', class_='reference_system', delete_id=wikipedia_id),
+                              follow_redirects=True)
+            assert b'Deletion not possible if forms are attached' in rv.data
             rv = self.app.get(url_for('reference_system_remove_form',
                                       system_id=wikipedia_id,
                                       form_id=geonames.forms[0]),
@@ -43,11 +47,11 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Changes have been saved.' in rv.data
             rv = self.app.post(url_for('update', id_=geonames.id), follow_redirects=True, data=data)
             assert b'https://www.geonames2.org/' in rv.data
-            rv = self.app.post(url_for('insert', class_='E21'), data={
-                'name': 'Actor test',
-                'reference_system_id_' + str(wikidata.id): 'Q123',
-                self.precision_geonames: '',
-                self.precision_wikidata: precision_id})
+            rv = self.app.post(url_for('insert', class_='E21'),
+                               data={'name': 'Actor test',
+                                     'reference_system_id_' + str(wikidata.id): 'Q123',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: precision_id})
             person_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=wikidata.id), follow_redirects=True)
             assert b'Actor test' in rv.data

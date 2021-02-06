@@ -101,8 +101,7 @@ def delete_entity(class_: str, id_: int) -> Optional[str]:
             abort(403)
         if entity.forms:
             flash(_('Deletion not possible if forms are attached'), 'error')
-            url = url_for('entity_view', id_=id_)
-
+            return url_for('entity_view', id_=id_)
     if class_ == 'place':
         entity = Entity.get_by_id(id_)
         parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)

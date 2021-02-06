@@ -120,11 +120,16 @@ class ContentTests(TestBaseCase):
             assert b'Log level' in rv.data
 
             # Content
+            rv = self.app.post(url_for('admin_content', item='citation_example'),
+                               data={'en': 'citation as example', 'de': ''},
+                               follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
+            rv = self.app.get(url_for('insert', class_='edition'))
+            assert b'citation as example' in rv.data
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
-            data = {'en': 'My legal notice', 'de': 'German notice'}
             rv = self.app.post(url_for('admin_content', item='legal_notice'),
-                               data=data,
+                               data={'en': 'My legal notice', 'de': 'German notice'},
                                follow_redirects=True)
             assert b'My legal notice' in rv.data
             self.app.get('/index/setlocale/de')
