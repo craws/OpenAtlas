@@ -384,7 +384,8 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
         buttons.append(display_delete_link(None, entity))
     elif is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-        buttons.append(display_delete_link(None, entity))
+        if entity.view_name != 'place' or not entity.get_linked_entities('P46'):
+            buttons.append(display_delete_link(None, entity))
     return buttons
 
 

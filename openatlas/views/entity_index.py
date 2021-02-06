@@ -105,9 +105,9 @@ def delete_entity(class_: str, id_: int) -> Optional[str]:
     if class_ == 'place':
         entity = Entity.get_by_id(id_)
         parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
-        if entity.get_linked_entities(['P46']):
+        if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
-            url = url_for('entity_view', id_=id_)
+            return url_for('entity_view', id_=id_)
         entity.delete()
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
