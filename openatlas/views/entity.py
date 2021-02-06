@@ -351,7 +351,8 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
     crumbs = [[_(entity.view_name.replace('_', ' ')),
                url_for('index', class_=entity.view_name)], entity.name]
     if structure:
-        crumbs = [[_(entity.view_name), url_for('index', class_=entity.view_name)],
+        crumbs = [[_(entity.view_name).replace('_', ' '),
+                   url_for('index', class_=entity.view_name)],
                   structure['place'],
                   structure['feature'],
                   structure['stratigraphic_unit'],

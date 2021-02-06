@@ -28,7 +28,7 @@ _('contact_for_frontend')
 
 
 def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
-    label = uc_first(_(id_.replace('_', ' ').replace('-', ' ')))
+    label = uc_first(_(id_.replace('_', ' ').replace('-', ' ').lower()))
     label += ' <span class="tab-counter">{counter}</span>'.format(
         counter=format_number(len(table.rows))) if table and len(table.rows) else ''
     return '''

@@ -82,11 +82,11 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    crumbs = [[_(origin.view_name) if origin else _(view_name),
+    crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
                url_for('index', class_=origin.view_name if origin else view_name)],
               link(origin)]
     if structure:
-        crumbs = [[_(origin.view_name), url_for('index', class_=origin.view_name)],
+        crumbs = [[_('place'), url_for('index', class_='place')],
                   structure['place'] if origin.system_type != 'place' else '',
                   structure['feature'],
                   structure['stratigraphic_unit'],
