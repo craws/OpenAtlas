@@ -63,7 +63,7 @@ def login() -> Union[str, Response]:
                     user.login_failed_count = 0
                     user.update()
                     logger.log('info', 'auth', 'Login of ' + user.username)
-                    return redirect(request.args.get('next') or url_for('index'))
+                    return redirect(request.args.get('next') or url_for('overview'))
                 else:
                     logger.log('notice', 'auth', 'Inactive login try ' + user.username)
                     flash(_('error inactive'), 'error')
@@ -76,13 +76,13 @@ def login() -> Union[str, Response]:
         else:
             logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
             flash(_('error username'), 'error')
-    return render_template('login/index.html', form=form)
+    return render_template('login/index.html', title=_('login'), crumbs=[_('login')], form=form)
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
 def reset_password() -> Union[str, Response]:
     if current_user.is_authenticated:  # Prevent password reset if already logged in
-        return redirect(url_for('index'))
+        return redirect(url_for('overview'))
     form = PasswordResetForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = User.get_by_email(form.email.data)
@@ -111,7 +111,10 @@ def reset_password() -> Union[str, Response]:
                 flash(_('Failed to send password reset confirmation mail to %(email)s.',
                         email=form.email.data), 'error')
             return redirect(url_for('login'))
-    return render_template('login/reset_password.html', form=form)
+    return render_template('login/reset_password.html',
+                           form=form,
+                           crumbs=[[_('login'), url_for('login')],
+                                   _('Forgot your password?')])
 
 
 @app.route('/reset_confirm/<code>')

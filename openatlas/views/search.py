@@ -69,7 +69,11 @@ def search_index() -> str:
         table = build_search_table(form)
     elif form.validate_on_submit():
         table = build_search_table(form)
-    return render_template('search/index.html', form=form, table=table)
+    return render_template('search/index.html',
+                           form=form,
+                           table=table,
+                           title=_('search'),
+                           crumbs=[_('search')])
 
 
 def build_search_table(form: FlaskForm) -> Table:

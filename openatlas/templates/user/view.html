@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ user.username }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-user">{{ _('admin')|uc_first }}</a>&nbsp;> {{ user.username }}
-{% endblock %}
 {% block content %}
     {% if 'manager'|is_authorized %}
         <div class="toolbar">

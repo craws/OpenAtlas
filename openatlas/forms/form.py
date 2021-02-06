@@ -153,7 +153,8 @@ def add_buttons(form: Any,
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in forms[name] and (name in ['involvement'] or not origin):
+    if 'continue' in forms[name] and (
+            name in ['involvement', 'find', 'human_remains'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '

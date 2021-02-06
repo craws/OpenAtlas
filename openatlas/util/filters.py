@@ -46,16 +46,17 @@ def button(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_citation_example(self: Any, code: str) -> str:
-    example = Content.get_translation('citation_example')
-    if not example or code not in ['edition', 'bibliography']:
+    text = Content.get_translation('citation_example')
+    if not text or code != 'reference':
         return ''
-    return Markup('<h1>' + display.uc_first(_('citation_example')) + '</h1>' + example)
+    return Markup('<h1>{title}</h1>{text}'.format(title=display.uc_first(_('citation_example')),
+                                                  text=text))
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
-    if not structure or len(structure['siblings']) < 2:
+    if entity.view_name != 'place' or not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
     prev_id = None
@@ -78,7 +79,7 @@ def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def crumb(self: Any, crumbs: List[Any]) -> str:
+def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
@@ -87,8 +88,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             items.append(display.link(item))
         elif isinstance(item, list):
             items.append('<a href="{url}">{label}</a>'.format(
-                # If there are more than 2 arguments pass them as parameters with **
-                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
+                url=item[1],
                 label=display.truncate(display.uc_first(str(item[0])))))
         else:
             items.append(display.uc_first(item))
@@ -259,22 +259,41 @@ def description(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_profile_image(self: Any, image_id: int) -> str:
-    if not image_id:
+def download_button(self: Any, entity: Entity) -> str:
+    if entity.view_name != 'file':
         return ''
-    path = display.get_file_path(image_id)
-    if path:
+    html = '<span class="error">{msg}</span>'.format(msg=display.uc_first(_('missing file')))
+    if entity.image_id:
+        path = display.get_file_path(entity.image_id)
+        html = display.button(_('download'), url_for('download_file', filename=path.name))
+    return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_profile_image(self: Any, entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
+    path = display.get_file_path(entity.image_id)
+    if not path:
+        return ''  # pragma: no cover
+    if entity.view_name == 'file':
+        if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
+            html = '''
+                <a href="{url}" rel="noopener noreferrer" target="_blank">
+                    <img style="max-width:{width}px;" alt="image" src="{url}">
+                </a>'''.format(url=url_for('display_file', filename=path.name),
+                               width=session['settings']['profile_image_width'])
+        else:
+            html = display.uc_first(_('no preview available'))  # pragma: no cover
+    else:
         html = """
-            <div id="profile_image_div">
-                <a href="/entity/{id}">
-                    <img style="max-width:{width}px;" alt="profile image" src="{src}">
-                </a>
-            </div>
-            """.format(id=image_id,
-                       src=url_for('display_file', filename=path.name),
-                       width=session['settings']['profile_image_width'])
-        return Markup(html)
-    return ''  # pragma no cover
+            <a href="{url}">
+                <img style="max-width:{width}px;" alt="image" src="{src}">
+            </a>""".format(url=url_for('entity_view', id_=entity.image_id),
+                           src=url_for('display_file', filename=path.name),
+                           width=session['settings']['profile_image_width'])
+    return Markup('<div id="profile_image_div">{html}</div>'.format(html=html))
 
 
 @jinja2.contextfilter
@@ -287,6 +306,16 @@ def display_content_translation(self: Any, text: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
+    try:
+        parts = site.split('/')
+        first = parts[0]
+        second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
+        path = pathlib.Path(app.root_path) / 'static' / 'manual' / first / second
+        if not path.exists():
+            # print('Missing manual link: ' + str(path))
+            return ''
+    except:  # pragma: no cover
+        return ''
     return Markup("""
         <a class="manual" href="/static/manual/{site}.html" target="_blank" title="{label}">
             <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
@@ -434,7 +463,9 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    url = url_for(entity.view_name + '_index', action='delete', id_=entity.id)
+    url = url_for('index', class_=entity.view_name, delete_id=entity.id)
+    if entity.system_type == 'source translation':
+        url = url_for('translation_delete', id_=entity.id)
     return display.button(_('delete'),
                           url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
@@ -446,19 +477,28 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types']
         view_name = ''
         if entity:
             view_name = entity.view_name
         if origin:
             view_name = origin.view_name
-        for item in items:
-            if view_name:
-                css = 'active' if view_name.replace('node', 'types') == item else ''
-            else:
-                css = 'active' if request.path.startswith('/' + item) else ''
-            html += '<a href="/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
-                css=css, item=item, label=display.uc_first(_(item)))
+        for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
+            css = ''
+            if (view_name and view_name.replace('node', 'types') == item) or \
+                    request.path.startswith('/index/' + item) or\
+                    request.path.startswith('/insert/' + item):
+                css = 'active'
+            html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
+                css=css,
+                item=item,
+                label=display.uc_first(_(item)))
+        css = ''
+        if request.path.startswith('/types') or (entity and entity.class_.code == 'E55'):
+            css = 'active'
+        html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+            css=css,
+            url=url_for('node_index'),
+            label=display.uc_first(_('types')))
     return html
 
 
@@ -493,7 +533,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
         system = g.reference_systems[link_.domain.id]
         name = link_.description
         if system.resolver_url:
-            name = '<a href="{url}" target="_blank">{name}</a>'.format(
+            name = '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
                 url=system.resolver_url + name,
                 name=name)
         system_links.append('''{name} ({match} {at} {system_name})'''.format(

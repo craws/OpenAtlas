@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -6,9 +6,9 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.display import button, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized
-from openatlas.util.display import button, uc_first
 
 # Needed for translations of tab titles
 _('member of')
@@ -27,12 +27,10 @@ _('legal_notice_for_frontend')
 _('contact_for_frontend')
 
 
-def format_tab_number(param: Union[int, Table]) -> str:
-    length = len(param.rows) if isinstance(param, Table) else param
-    return ' <span class="tab-counter">' + format_number(length) + '</span>' if length else ''
-
-
 def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    label = uc_first(_(id_.replace('_', ' ').replace('-', ' ').lower()))
+    label += ' <span class="tab-counter">{counter}</span>'.format(
+        counter=format_number(len(table.rows))) if table and len(table.rows) else ''
     return '''
         <li class="nav-item">
             <a 
@@ -42,12 +40,10 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
                 aria-selected="{selected}" 
                 href="#tab-{id}">{label}
             </a>
-        </li>'''.format(
-        active=' active' if active else '',
-        selected='true' if active else 'false',
-        label=uc_first(_(id_.replace('_', ' ').replace('-', ' '))) + (
-            format_tab_number(table) if table else ''),
-        id=id_.replace('_', '-').replace(' ', '-'))
+        </li>'''.format(active=' active' if active else '',
+                        selected='true' if active else 'false',
+                        label=label,
+                        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
@@ -67,9 +63,7 @@ class Tab:
         table = Table(Table.HEADERS[name]) if name in Table.HEADERS else Table()
         if name == 'reference' or (code in class_codes['reference'] and system_type != 'file'):
             table.header = table.header + ['page']
-
         if name == 'actor':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             if code in ['E18', 'E22', 'E20']:
                 table.header = ['actor', _('property'), 'class', 'first', 'last', 'description']
                 table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
@@ -85,16 +79,15 @@ class Tab:
                 buttons = [button(_('link'), url_for('involvement_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 buttons.append(button(g.classes[code].name,
-                                      url_for('actor_insert', code=code, origin_id=id_)))
+                                      url_for('insert', class_=code, origin_id=id_)))
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
-            table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
             if code in class_codes['actor']:
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
             if code == 'E84':
                 buttons = [button(g.classes['E9'].name,
-                                  url_for('event_insert', code='E9', origin_id=id_))]
+                                  url_for('insert', class_='E9', origin_id=id_))]
             else:
                 if system_type == 'file':
                     buttons = [button('link', url_for('file_add', id_=id_, class_name='event'))]
@@ -107,31 +100,29 @@ class Tab:
                                       url_for('reference_add', id_=id_, class_name='event'))]
                 for code in class_codes['event']:
                     label = g.classes[code].name
-                    buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
+                    buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'feature':
             if current_user.settings['module_sub_units'] and system_type == 'place':
-                buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('feature'), url_for('insert', class_='feature', origin_id=id_))]
         elif name == 'find':
             if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
-                buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('find'), url_for('insert', class_='find', origin_id=id_))]
         elif name == 'file':
             table.header = Table.HEADERS['file'] + [_('main image')]
             if code in class_codes['reference']:
-                table.header = Table.HEADERS['file'] + [_('main image')]
+                table.header = Table.HEADERS['file']
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='file'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]
-            buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
+            buttons.append(button(_('file'), url_for('insert', class_='file', origin_id=id_)))
         elif name == 'human_remains':
             if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
-                buttons = [button(_('human remains'), url_for('place_insert',
+                buttons = [button(_('human remains'), url_for('insert',
                                                               origin_id=id_,
-                                                              system_type='human_remains'))]
+                                                              class_='human_remains'))]
         elif name == 'member':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'),
                               url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
@@ -141,19 +132,18 @@ class Tab:
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='place'))]
             elif code in class_codes['source']:
                 buttons = [button(_('link'), url_for('source_add', id_=id_, class_name='place'))]
-            buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
+            buttons.append(button(_('place'), url_for('insert', class_='place', origin_id=id_)))
         elif name == 'reference':
             buttons = [button(_('link'), url_for('entity_add_reference', id_=id_))]
-            for category in ['bibliography', 'edition', 'external reference']:
-                buttons.append(button(_(category), url_for('reference_insert',
-                                                           category=category,
-                                                           origin_id=id_)))
+            for item in ['bibliography', 'edition', 'external reference']:
+                buttons.append(button(_(item), url_for('insert',
+                                                       class_=item.replace(' ', '_'),
+                                                       origin_id=id_)))
         elif name == 'relation':
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name
-                buttons.append(button(label, url_for('actor_insert', code=code, origin_id=id_)))
+                buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'source':
             if system_type == 'file':
                 buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='source'))]
@@ -162,7 +152,7 @@ class Tab:
                                   url_for('reference_add', id_=id_, class_name='source'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_source', id_=id_))]
-            buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
+            buttons.append(button(_('source'), url_for('insert', class_='source', origin_id=id_)))
         elif name == 'subs':
             if code in ['E53', 'E55']:
                 table.header = [_('name'), _('count'), _('info')]
@@ -170,7 +160,9 @@ class Tab:
                 table.header = Table.HEADERS['event']
         elif name == 'stratigraphic_unit':
             if current_user.settings['module_sub_units'] and system_type == 'feature':
-                buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
+                buttons = [button(_('stratigraphic unit'), url_for('insert',
+                                                                   class_='stratigraphic_unit',
+                                                                   origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
 

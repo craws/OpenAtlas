@@ -4,7 +4,7 @@ Network visualization
 .. toctree::
 
 With the integration of `D3.js <https://d3js.org/>`_ data can be visualized as a network graph
-available at one of the **Network visualization** buttons at the :doc:`/menu/overview`.
+available at one of the **Network visualization** buttons at the :doc:`/overview`.
 
 .. figure:: network_classic.png
    :align: left

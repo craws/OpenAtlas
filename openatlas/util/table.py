@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from flask import json, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from markupsafe import Markup
 
 
 class Table:
@@ -23,6 +24,8 @@ class Table:
                'place': ['name', 'type', 'begin', 'end', 'description'],
                'relation': ['relation', 'actor', 'first', 'last', 'description'],
                'reference': ['name', 'class', 'type', 'description'],
+               'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
+                                    'default precision', 'description'],
                'source': ['name', 'type', 'description'],
                'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
                'text': ['text', 'type', 'content']}
@@ -38,11 +41,15 @@ class Table:
         self.paging = paging
         self.order = order if order else ''
         self.defs = defs if defs else ''
+        if not self.defs:
+            right_align = ['begin', 'end', 'size']
+            targets = [index for index, item in enumerate(self.header) if item in right_align]
+            self.defs = [{'className': 'dt-body-right', 'targets': targets}] if targets else ''
 
-    def display(self, name: str = 'table') -> str:
+    def display(self, name: Optional[str] = 'default') -> str:
         from openatlas.util.display import uc_first
         if not self.rows:
-            return '<p>' + uc_first(_('no entries')) + '</p>'
+            return Markup('<p>' + uc_first(_('no entries')) + '</p>')
         columns: List[Dict[str, str]] = [{'title': _(item).capitalize() if item else ''} for item in
                                          self.header]
         columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]  # Add empty
@@ -75,4 +82,4 @@ class Table:
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
             toolbar=css_toolbar if len(self.rows) <= current_user.settings['table_rows'] else '')
-        return html
+        return Markup(html)

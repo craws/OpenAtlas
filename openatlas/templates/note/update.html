@@ -1,8 +1,0 @@
-{% extends 'layout.html' %}
-{% block title_name %} - {{ _('note')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('edit note')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form }}
-{% endblock %}

@@ -2,6 +2,12 @@ class Changelog:
     versions = {
         '5.8.0': ['TBA', {
             'feature': {}}],
+        '5.7.2': ['2021-01-27', {
+            'fix': {
+                '1455': 'Network graphic error'}}],
+        '5.7.1': ['2021-01-26', {
+            'fix': {
+                '1454': 'Error in install instructions'}}],
         '5.7.0': ['2021-01-16', {
             'feature': {
                 '1292': 'External reference systems',
@@ -434,4 +440,4 @@ class Changelog:
         '0.0.1': ['2014-11-05', {
             'feature': {
                 '': 'Initial version based on the "Zend Base" project from '
-                    '<a target="_blank" rel="noopener" href="https://craws.net">craws.net</a>'}}]}
+                    '<a target="_blank" rel="noopener noreferrer" href="https://craws.net">craws.net</a>'}}]}

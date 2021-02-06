@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -10,7 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import link, sanitize
+from openatlas.util.display import link, sanitize, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
@@ -24,11 +24,16 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         # Todo: duplicate check doesn't seem to work for empty hierarchies
         if Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return render_template('hierarchy/insert.html', form=form)
+            return render_template('display_form.html', form=form)
         save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
-    return render_template('hierarchy/insert.html', form=form, param=param)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='entity/type',
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   '+ ' + uc_first(_(param))])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
@@ -59,11 +64,15 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                      url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
         count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([form_['name'], format_number(count) if count else link_])
-    return render_template('hierarchy/update.html',
-                           node=hierarchy,
+    return render_template('display_form.html',
                            form=form,
                            table=table,
-                           forms=[form.id for form in form.forms])
+                           forms=[form.id for form in form.forms],
+                           manual_page='entity/type',
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   hierarchy,
+                                   _('edit')])
 
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
@@ -92,7 +101,9 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form: FlaskForm, node=None, value_type: bool = False) -> Node:  # type: ignore
+def save(form: FlaskForm,
+         node: Optional[Node] = None,
+         value_type: bool = False) -> Node:  # type: ignore
     g.cursor.execute('BEGIN')
     try:
         if node:

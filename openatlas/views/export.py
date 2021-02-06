@@ -61,7 +61,13 @@ def export_sql() -> Union[str, Response]:
         if is_authorized('admin') and writeable:
             data.append(delete_link(file.name, url_for('delete_sql', filename=file.name)))
         table.rows.append(data)
-    return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
+    return render_template('export/export_sql.html',
+                           form=form,
+                           table=table,
+                           writeable=writeable,
+                           title=_('export SQL'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('export SQL')])
 
 
 @app.route('/download/sql/<filename>')
@@ -110,7 +116,13 @@ def export_csv() -> Union[str, Response]:
         if is_authorized('admin') and writeable:
             data.append(delete_link(file.name, url_for('delete_csv', filename=file.name)))
         table.rows.append(data)
-    return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
+    return render_template('export/export_csv.html',
+                           form=form,
+                           table=table,
+                           writeable=writeable,
+                           title=_('export CSV'),
+                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
+                                   _('export CSV')])
 
 
 @app.route('/delete/csv/<filename>')

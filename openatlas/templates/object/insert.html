@@ -1,8 +1,0 @@
-{% extends 'layout.html' %}
-{% block title_name %} - {{ _('object')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('object'), 'object_index'], '+ ' + g.classes.E84.name]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form(manual_page='menu/object') }}
-{% endblock %}

@@ -28,39 +28,57 @@ class NodeTest(TestBaseCase):
             rv = self.app.get(url_for('node_update', id_=node_id))
             assert b'My secret node' in rv.data and b'Super' in rv.data
             self.app.post(url_for('node_insert', root_id=sex_node.id), data=data)
-            rv = self.app.post(url_for('node_update', id_=node_id), data=data,
+            rv = self.app.post(url_for('node_update', id_=node_id),
+                               data=data,
                                follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            # Test insert an continue
+            # Insert an continue
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('node_insert', root_id=actor_node.id), data=data,
+            rv = self.app.post(url_for('node_insert', root_id=actor_node.id),
+                               data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = ''
 
-            # Test forbidden system node
-            rv = self.app.post(url_for('node_update', id_=actor_node.id), data=data,
+            # Forbidden system node
+            rv = self.app.post(url_for('node_update', id_=actor_node.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Forbidden' in rv.data
 
-            # Test update with self as root
+            # Update with self as root
             data[str(actor_node.id)] = node_id
-            rv = self.app.post(url_for('node_update', id_=node_id), data=data,
+            rv = self.app.post(url_for('node_update', id_=node_id),
+                               data=data,
                                follow_redirects=True)
             assert b'Type can&#39;t have itself as super.' in rv.data
 
-            # Test update with a child as root
+            # Update with a child as root
             rv = self.app.post(url_for('node_insert', root_id=actor_node.id), data=data)
             child_node_id = rv.location.split('/')[-1].replace('node#tab-', '')
             data[str(actor_node.id)] = child_node_id
-            rv = self.app.post(url_for('node_update', id_=node_id), data=data,
+            rv = self.app.post(url_for('node_update', id_=node_id),
+                               data=data,
                                follow_redirects=True)
             assert b'Type can&#39;t have a sub as super.' in rv.data
 
-            # Test value type
-            rv = self.app.get(url_for('node_update', id_=dimension_node.subs[0]),
+            # Custom type
+            rv = self.app.get(url_for('entity_view', id_=sex_node.id), follow_redirects=True)
+            assert b'Male' in rv.data
+
+            # Administrative Unit
+            rv = self.app.get(url_for('entity_view',
+                                      id_=Node.get_hierarchy('Administrative Unit').id),
                               follow_redirects=True)
+            assert b'Austria' in rv.data
+
+            # Value type
+            rv = self.app.get(url_for('entity_view', id_=dimension_node.id), follow_redirects=True)
+            assert b'Height' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=dimension_node.subs[0]))
+            assert b'Unit' in rv.data
+            rv = self.app.get(url_for('node_update', id_=dimension_node.subs[0]))
             assert b'Dimensions' in rv.data
 
             # Test delete system node

@@ -20,16 +20,16 @@ class FileTest(TestBaseCase):
                 node_id = Node.get_hierarchy('Sex').subs[0]
 
             # Insert
-            rv = self.app.get(url_for('file_insert', origin_id=actor.id))
+            rv = self.app.get(url_for('insert', class_='file', origin_id=actor.id))
             assert b'+ File' in rv.data
             logo = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
             with open(logo, 'rb') as img:
-                rv = self.app.post(url_for('file_insert', origin_id=actor.id),
+                rv = self.app.post(url_for('insert', class_='file', origin_id=actor.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with open(logo, 'rb') as img:
-                rv = self.app.post(url_for('file_insert', origin_id=reference.id),
+                rv = self.app.post(url_for('insert', class_='file', origin_id=reference.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)
             assert b'An entry has been created' in rv.data
@@ -51,12 +51,13 @@ class FileTest(TestBaseCase):
             assert b'Logo' in rv.data
 
             with open(pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') as invalid_file:
-                rv = self.app.post(url_for('file_insert', origin_id=actor.id),
+                rv = self.app.post(url_for('insert', class_='file', origin_id=actor.id),
                                    data={'name': 'Invalid file', 'file': invalid_file},
                                    follow_redirects=True)
             assert b'File type not allowed' in rv.data
 
-            rv = self.app.post(url_for('file_insert', origin_id=actor.id), follow_redirects=True,
+            rv = self.app.post(url_for('insert', class_='file', origin_id=actor.id),
+                               follow_redirects=True,
                                data={'name': 'This is not a file'})
             assert b'This field is required' in rv.data
 
@@ -72,7 +73,7 @@ class FileTest(TestBaseCase):
                 pass  # Calling with "with" to prevent unclosed files warning
 
             # Index
-            rv = self.app.get(url_for('file_index'))
+            rv = self.app.get(url_for('index', class_='file'))
             assert b'OpenAtlas logo' in rv.data
 
             # Set and unset as main image
@@ -89,22 +90,25 @@ class FileTest(TestBaseCase):
             assert b'777' in rv.data
 
             # Update
-            rv = self.app.get(url_for('file_update', id_=file_id))
+            rv = self.app.get(url_for('update', id_=file_id))
             assert b'OpenAtlas logo' in rv.data
-            rv = self.app.post(url_for('file_update', id_=file_id), data={'name': 'Updated file'},
+            rv = self.app.post(url_for('update', id_=file_id),
+                               data={'name': 'Updated file'},
                                follow_redirects=True)
             assert b'Changes have been saved' in rv.data and b'Updated file' in rv.data
 
             rv = self.app.get(url_for('file_add', id_=file_id, class_name='actor'))
-            assert b'Link Actor' in rv.data
+            assert b'Link actor' in rv.data
             rv = self.app.post(url_for('file_add', id_=file_id, class_name='actor'),
-                               data={'checkbox_values': [actor.id]}, follow_redirects=True)
+                               data={'checkbox_values': [actor.id]},
+                               follow_redirects=True)
             assert b'File keeper' in rv.data
 
             rv = self.app.post(url_for('entity_add_file', id_=node_id),
-                               data={'checkbox_values': str([file_id])}, follow_redirects=True)
+                               data={'checkbox_values': str([file_id])},
+                               follow_redirects=True)
             assert b'Updated file' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('file_index', action='delete', id_=file_id))
+            rv = self.app.get(url_for('index', class_='file', delete_id=file_id))
             assert b'The entry has been deleted' in rv.data

@@ -1,8 +1,4 @@
 {% extends "layout.html" %}
-{% block title_name %} - {{ _('content')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-content">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _(item)|uc_first }}
-{% endblock %}
 {% block content %}
     <form method="post">
         {{ form.csrf_token }}

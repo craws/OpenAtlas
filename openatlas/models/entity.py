@@ -39,18 +39,26 @@ class Entity:
             self.aliases = {k: v for k, v in sorted(self.aliases.items(), key=lambda item: item[1])}
         self.name = row.name
         self.description = row.description if row.description else ''
-        self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
+        self.class_ = g.classes[row.class_code]  # The CIDOC class
+        self.system_type = row.system_type  # Internal type to differ between same CIDOC classes
+        self.reference_systems: List[Link] = []  # Links to external reference systems
+        self.note: Optional[str] = None  # User specific, private note for an entity
+        self.origin_id: Optional[int] = None  # For navigation when coming from another entity
+        self.image_id: Optional[int] = None  # Set in entity view and used for profile image
+        self.linked_places = []  # Set in entity view and used to show related places on map
+        self.location: Optional[Entity] = None  # The respective location if entity is a place
+
+        # Dates
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
         self.end_from = None
         self.end_to = None
         self.end_comment = None
-        self.note: Optional[str] = None  # User specific, private note for an entity
-        self.origin_id: Optional[int] = None
-        self.location: Optional[Entity] = None  # Needed for API
+        self.first = None
+        self.last = None
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)
@@ -61,9 +69,9 @@ class Entity:
             self.first = format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = format_date(self.end_from, 'year') if self.end_from else None
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
-        self.class_ = g.classes[row.class_code]
-        self.view_name = ''  # Used to build URLs
-        self.reference_systems: List[Link] = []
+
+        # view_name is used in views, e.g. person and group both have view_name actor
+        self.view_name = ''
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
@@ -85,11 +93,15 @@ class Entity:
         LEFT JOIN model.link l2 on e.id = l2.range_id
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
-    def get_linked_entity(self, code: str, inverse: bool = False,
+    def get_linked_entity(self,
+                          code: str,
+                          inverse: bool = False,
                           nodes: bool = False) -> Optional[Entity]:
         return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entity_safe(self, code: str, inverse: bool = False,
+    def get_linked_entity_safe(self,
+                               code: str,
+                               inverse: bool = False,
                                nodes: bool = False) -> Entity:
         return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
 
@@ -320,15 +332,13 @@ class Entity:
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int,
-                  nodes: bool = False,
-                  aliases: bool = False,
-                  view_name: Optional[str] = None) -> Entity:
-        from openatlas import logger
-        if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
-            return g.nodes[entity_id]
+    def get_by_id(id_: int, nodes: bool = False, aliases: bool = False) -> Entity:
+        if id_ in g.nodes:
+            return g.nodes[id_]
+        if id_ in g.reference_systems:
+            return g.reference_systems[id_]
         sql = Entity.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-        g.execute(sql, {'id': entity_id})
+        g.execute(sql, {'id': id_})
         try:
             entity = Entity(g.cursor.fetchone())
         except AttributeError:
@@ -336,10 +346,6 @@ class Entity:
                 raise AttributeError  # pragma: no cover, re-raise if user activity view
             abort(418)
             return Entity(g.cursor.fetchone())  # pragma: no cover, this line is just for type check
-        if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
-            logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
-                       format(id=entity_id, view=entity.view_name, request=view_name))
-            abort(422)
         return entity
 
     @staticmethod

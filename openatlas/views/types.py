@@ -1,7 +1,7 @@
 from typing import Dict, Optional, Union
 
 from flask import abort, flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -9,12 +9,8 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.form import build_move_form, build_node_form
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.util.display import (add_remove_link, get_base_table_data, get_entity_data,
-                                    get_profile_image_table_link, link, tree_select)
-from openatlas.util.tab import Tab
-from openatlas.util.table import Table
+from openatlas.util.display import (tree_select)
 from openatlas.util.util import required_group
 
 
@@ -33,7 +29,11 @@ def node_index() -> str:
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
+    return render_template('types/index.html',
+                           nodes=nodes,
+                           placeholder=_('type to search'),
+                           title=_('types'),
+                           crumbs=[_('types')])
 
 
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
@@ -49,7 +49,13 @@ def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Resp
         getattr(form, str(root.id)).data = super_id if super_id != root.id else None
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
-    return render_template('types/insert.html', form=form, root=root)
+    return render_template('display_form.html',
+                           form=form,
+                           manual_page='entity/type',
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   '+'])
 
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
@@ -63,7 +69,13 @@ def node_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         save(form, node)
         return redirect(url_for('entity_view', id_=id_))
-    return render_template('types/update.html', node=node, root=root, form=form)
+    return render_template('display_form.html',
+                           form=form,
+                           title=node.name,
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   node,
+                                   _('edit')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -101,55 +113,15 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         flash(_('Entities were updated'), 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     getattr(form, str(root.id)).data = node.id
-    return render_template('types/move.html', node=node, root=root, form=form)
-
-
-def node_view(node: Node) -> str:
-    root = g.nodes[node.root[-1]] if node.root else None
-    super_ = g.nodes[node.root[0]] if node.root else None
-    tabs = {name: Tab(name, origin=node) for name in ['info', 'subs', 'entities', 'file']}
-    if root and root.value_type:  # pragma: no cover
-        tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
-    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-        if entity.class_.code == 'E32':  # Don't add reference systems themselves
-            continue  # pragma: no cover
-        if node.class_.code == 'E53':  # pragma: no cover
-            object_ = entity.get_linked_entity('P53', inverse=True)
-            if not object_:  # If it's a location show the object, continue otherwise
-                continue
-            entity = object_
-        data = [link(entity)]
-        if root and root.value_type:  # pragma: no cover
-            data.append(format_number(entity.nodes[node]))
-        data.append(g.classes[entity.class_.code].name)
-        data.append(entity.description)
-        tabs['entities'].table.rows.append(data)
-    profile_image_id = node.get_profile_image_id()
-    for link_ in node.get_links('P67', inverse=True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
-            extension = data[3]
-            data.append(get_profile_image_table_link(domain, node, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-        data = add_remove_link(data, domain.name, link_, node, domain.view_name)
-        tabs[domain.view_name].table.rows.append(data)
-    for sub_id in node.subs:
-        sub = g.nodes[sub_id]
-        tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
-    if not tabs['entities'].table.rows:  # If no entities available get links with this type_id
-        tabs['entities'].table = Table([_('domain'), _('range')])
-        for row in Link.get_entities_by_node(node):
-            tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
-                                                link(Entity.get_by_id(row.range_id))])
-    return render_template('types/view.html',
-                           entity=node,
-                           super_=super_,
-                           tabs=tabs,
+    return render_template('types/move.html',
+                           node=node,
                            root=root,
-                           info=get_entity_data(node),
-                           profile_image_id=profile_image_id)
+                           form=form,
+                           title=_('types'),
+                           crumbs=[[_('types'), url_for('node_index')],
+                                   root,
+                                   node,
+                                   _('move')])
 
 
 def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
