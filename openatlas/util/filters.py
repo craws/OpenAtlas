@@ -483,14 +483,22 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
         if origin:
             view_name = origin.view_name
         for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
-            if view_name:
-                css = 'active' if view_name.replace('node', 'types') == item else ''
-            else:
-                css = 'active' if request.path.startswith('/' + item) else ''
+            css = ''
+            if (view_name and view_name.replace('node', 'types') == item) or \
+                    request.path.startswith('/index/' + item) or\
+                    request.path.startswith('/insert/' + item):
+                css = 'active'
             html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
-                css=css, item=item, label=display.uc_first(_(item)))
-        html += '<a href="/types" class="nav-item nav-link">{label}</a>'.format(
-                label=display.uc_first(_('types')))
+                css=css,
+                item=item,
+                label=display.uc_first(_(item)))
+        css = ''
+        if request.path.startswith('/types') or (entity and entity.class_.code == 'E55'):
+            css = 'active'
+        html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+            css=css,
+            url=url_for('node_index'),
+            label=display.uc_first(_('types')))
     return html
 
 
