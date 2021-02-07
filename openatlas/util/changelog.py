@@ -1,7 +1,8 @@
 class Changelog:
     versions = {
         '5.8.0': ['TBA', {
-            'feature': {}}],
+            'feature': {
+                '1456': 'Artificial objects'}}],
         '5.7.2': ['2021-01-27', {
             'fix': {
                 '1455': 'Network graphic error'}}],
