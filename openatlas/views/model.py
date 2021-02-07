@@ -199,6 +199,7 @@ class NetworkForm(FlaskForm):  # type: ignore
     color_E18 = StringField(default='#FF0000', render_kw=kw_params)
     color_E20 = StringField(default='#AAAA00', render_kw=kw_params)
     color_E21 = StringField(default='#34B522', render_kw=kw_params)
+    color_E22 = StringField(default='#EE82EE', render_kw=kw_params)
     color_E31 = StringField(default='#FFA500', render_kw=kw_params)
     color_E33 = StringField(default='#FFA500', render_kw=kw_params)
     color_E40 = StringField(default='#34623C', render_kw=kw_params)

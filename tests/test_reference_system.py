@@ -64,7 +64,7 @@ class ReferenceSystemTest(TestBaseCase):
             rv = self.app.post(url_for('insert', class_='reference_system'),
                                follow_redirects=True,
                                data={'name': 'GeoNames'})
-            assert b'The name is already in use.' in rv.data
+            assert b'A transaction error occurred' in rv.data
             rv = self.app.get(url_for('index', class_='reference_system', delete_id=geonames.id))
             assert b'403' in rv.data
             rv = self.app.post(url_for('insert', class_='E21'),

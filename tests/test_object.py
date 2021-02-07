@@ -56,3 +56,13 @@ class ObjectTest(TestBaseCase):
                                data={'name': 'This will be continued', 'continue_': 'yes'},
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
+            # Artificial object
+            rv = self.app.get(url_for('insert', class_='artificial_object'))
+            assert b'+ Artificial object' in rv.data
+            rv = self.app.post(url_for('insert', class_='artificial_object'),
+                               data={'name': 'Lucky coin'},
+                               follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            rv = self.app.get(url_for('index', class_='object'))
+            assert b'Lucky coin' in rv.data

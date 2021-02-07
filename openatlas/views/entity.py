@@ -101,8 +101,10 @@ def entity_view(id_: int) -> Union[str, Response]:
             tab_name = link_.range.view_name.capitalize().replace(' ', '-')
             if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
                 tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
-            if tab_name == 'Place':
+            elif tab_name == 'Place':
                 tab_name = link_.range.system_type.title().replace(' ', '-')
+            elif tab_name == 'Object':  # pragma: no cover
+                tab_name = 'Artificial-Object'
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
         for form_id, form_ in entity.get_forms().items():
             if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
@@ -123,7 +125,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['event'].table.rows.append(data)
     elif entity.view_name == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
-                     'find', 'human_remains', 'file']:
+                     'find', 'human_remains', 'file', 'object']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links(['P67', 'P128']):
             range_ = link_.range
@@ -236,7 +238,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     elif entity.view_name == 'file':
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                     'human_remains', 'reference', 'node']:
+                     'human_remains', 'reference', 'node', 'object']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links('P67'):
             range_ = link_.range
@@ -293,7 +295,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-    if entity.view_name in ['actor', 'event', 'node', 'place', 'source']:
+    if entity.view_name in ['actor', 'event', 'node', 'place', 'source', 'object']:
         if entity.view_name not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)

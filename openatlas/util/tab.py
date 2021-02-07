@@ -85,7 +85,7 @@ class Tab:
         elif name == 'event':
             if code in class_codes['actor']:
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
-            if code == 'E84':
+            if code in ['E84'] or origin and origin.view_name == 'object':
                 buttons = [button(g.classes['E9'].name,
                                   url_for('insert', class_='E9', origin_id=id_))]
             else:

@@ -26,35 +26,30 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {'actor_actor_relation': ['date', 'description', 'continue'],
+         'artificial_object':
+             ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue'],
-         'feature': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
-                     'map'],
+         'event': ['name', 'date', 'reference_systems', 'description', 'continue'],
+         'feature': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
          'file': ['name', 'description'],
-         'find': ['name', 'date', 'wikidata', 'reference_systems', 'description', 'continue',
-                  'map'],
-         'group': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
-                   'continue'],
+         'find': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'group': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
          'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'wikidata', 'reference_systems', 'description',
-                           'continue', 'map'],
+         'human_remains': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
-         'legal_body': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
-                        'continue'],
+         'legal_body': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
          'note': ['description'],
-         'person': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'description',
-                    'continue'],
-         'place': ['name', 'alias', 'date', 'wikidata', 'reference_systems', 'geonames',
-                   'description', 'continue', 'map'],
+         'person': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
+         'place': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue', 'map'],
          'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'wikidata', 'reference_systems', 'description',
-                                'continue', 'map']}
+         'stratigraphic_unit':
+             ['name', 'date', 'reference_systems', 'description', 'continue', 'map']}
 
 
 def build_form(name: str,

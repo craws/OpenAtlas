@@ -363,7 +363,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.code == 'E21':
                     person_data.append(linked_entity)
-                elif linked_entity.class_.code == 'E84':
+                elif linked_entity.class_.code in ['E22', 'E84']:
                     object_data.append(linked_entity)
             data[_('person')] = [link(object_) for object_ in person_data]
             data[_('object')] = [link(object_) for object_ in object_data]

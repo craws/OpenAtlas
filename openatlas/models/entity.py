@@ -74,6 +74,8 @@ class Entity:
         self.view_name = ''
         if self.system_type == 'file':
             self.view_name = 'file'
+        elif self.system_type == 'artificial object':
+            self.view_name = 'object'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
             self.view_name = 'translation'
         elif self.class_.code in app.config['CODE_CLASS']:
@@ -235,12 +237,10 @@ class Entity:
         if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
             return ''
         root_name = self.view_name.title()
-        if self.view_name in ['reference', 'place']:
+        if self.view_name in ['reference', 'place', 'object']:
             root_name = self.system_type.title()
         elif self.view_name == 'file':
             root_name = 'License'
-        elif self.class_.code == 'E84':
-            root_name = 'Information Carrier'
         root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
@@ -384,7 +384,6 @@ class Entity:
 
     @staticmethod
     def get_by_menu_item(menu_item: str) -> List[Entity]:
-        # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
@@ -392,6 +391,10 @@ class Entity:
         elif menu_item == 'reference':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
+        elif menu_item == 'object':
+            sql = Entity.build_sql(nodes=True) + """
+                WHERE e.class_code IN %(codes)s OR e.system_type = 'artificial object'
+                GROUP BY e.id;"""
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
                               current_user.settings['table_show_aliases'] else False

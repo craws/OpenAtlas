@@ -1,7 +1,6 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-import psycopg2
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -82,6 +81,7 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
+    view_name = 'object' if view_name == 'artificial_object' else view_name
     crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
                url_for('index', class_=origin.view_name if origin else view_name)],
               link(origin)]
@@ -176,7 +176,7 @@ def populate_insert_form(form: FlaskForm, view_name: str, class_: str, origin: E
         if origin.system_type == 'place':
             form.residence.data = origin.id
     elif view_name == 'event':
-        if origin.class_.code == 'E84':
+        if origin.view_name == 'object':
             form.object.data = [origin.id]
         elif origin.class_.code == 'E18':
             if class_ == 'E9':
@@ -211,7 +211,7 @@ def populate_update_form(form: FlaskForm, entity: Entity) -> None:
             for entity in entity.get_linked_entities('P25'):
                 if entity.class_.code == 'E21':
                     person_data.append(entity.id)
-                elif entity.class_.code == 'E84':
+                elif entity.class_.code in ['E22', 'E84']:
                     object_data.append(entity.id)
             form.person.data = person_data
             form.object.data = object_data
@@ -235,7 +235,11 @@ def save(form: FlaskForm,
     try:
         if not entity:
             action = 'insert'
-            if class_ == 'source':
+            if class_ == 'artificial_object':
+                entity = Entity.insert('E22', form.name.data, 'artificial object')
+                location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
+                entity.link('P53', location)
+            elif class_ == 'source':
                 entity = Entity.insert('E33', form.name.data, 'source content')
             elif class_ == 'file':
                 entity = Entity.insert('E31', form.name.data, 'file')
@@ -268,7 +272,7 @@ def save(form: FlaskForm,
                 new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
                 file_.save(str(app.config['UPLOAD_DIR'] / new_name))
 
-        if entity.class_.code == 'E32':  # reference system
+        if entity.class_.code == 'E32':  # Reference system
             entity.name = entity.name if hasattr(entity, 'system') and entity.system \
                 else form.name.data
             entity.description = form.description.data
@@ -293,10 +297,6 @@ def save(form: FlaskForm,
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             url = url_for('index', class_=entity.view_name)
-    except psycopg2.IntegrityError:
-        g.cursor.execute('ROLLBACK')
-        flash(_('error name exists'), 'error')  # Could happen e.g. with reference system
-        url = url_for('index', class_='reference_system')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
@@ -305,8 +305,10 @@ def save(form: FlaskForm,
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             view_name = class_
-            if view_name in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
+            if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
                 view_name = 'place'
+            elif class_ in ['artificial_object']:
+                view_name = 'object'
             url = url_for('index', class_=view_name)
     return url
 
@@ -314,7 +316,7 @@ def save(form: FlaskForm,
 def update_links(entity: Entity, form, action: str, location: Optional[Entity] = None) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
-    if entity.view_name in ['actor', 'event', 'place']:
+    if entity.view_name in ['actor', 'event', 'place', 'object']:
         ReferenceSystem.update_links(form, entity)
 
     if entity.view_name == 'actor':
