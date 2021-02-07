@@ -3,7 +3,10 @@ Object
 
 .. toctree::
 
-This menu item is for physical objects. Currently only **Information Carrier** is available.
+Physical objects can be entered here, these are:
+
+* Artificial objects like e.g. a coin
+* Information carrier
 
 .. include:: navigation.rst
 
@@ -17,3 +20,4 @@ Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
 * :doc:`event` - when it was moved at a **Move** event
+* :doc:`file`
