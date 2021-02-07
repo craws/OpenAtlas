@@ -255,7 +255,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['reference'].table.rows.append(data)
     elif entity.view_name == 'source':
         for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                     'human_remains', 'text']:
+                     'human_remains', 'object', 'text']:
             tabs[name] = Tab(name, entity)
         for text in entity.get_linked_entities('P73', nodes=True):
             tabs['text'].table.rows.append([link(text),
