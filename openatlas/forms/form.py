@@ -123,17 +123,20 @@ def populate_form(name: str,
 
     # Reference systems
     if 'reference_systems' in forms[name]:
-        system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
-                        if link_.domain.view_name == 'reference_system'}
-        for field in form:
-            if field.id.startswith('reference_system_id_'):
-                system_id = int(field.id.replace('reference_system_id_', ''))
-                if system_id in system_links:
-                    field.data = system_links[system_id].description
-                    getattr(form, 'reference_system_precision_{id}'.format(
-                        id=system_id)).data = str(system_links[system_id].type.id)
-
+        populate_reference_systems(form, item)
     return form
+
+
+def populate_reference_systems(form: FlaskForm, item:Union[Entity, Link]) -> None:
+    system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
+                    if link_.domain.view_name == 'reference_system'}
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            system_id = int(field.id.replace('reference_system_id_', ''))
+            if system_id in system_links:
+                field.data = system_links[system_id].description
+                getattr(form, 'reference_system_precision_{id}'.format(
+                    id=system_id)).data = str(system_links[system_id].type.id)
 
 
 def customize_labels(name: str, form: FlaskForm) -> None:
@@ -315,6 +318,7 @@ def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) ->
         name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
         is_node_form = HiddenField()
 
+    add_reference_systems(Form, 'Type')
     root = g.nodes[node.root[-1]] if node else root
     setattr(Form, str(root.id), TreeField(str(root.id)))
     if root.directional:

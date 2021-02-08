@@ -7,9 +7,10 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
-from openatlas.forms.form import build_move_form, build_node_form
+from openatlas.forms.form import build_move_form, build_node_form, populate_reference_systems
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import (tree_select)
 from openatlas.util.util import required_group
 
@@ -69,6 +70,7 @@ def node_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         save(form, node)
         return redirect(url_for('entity_view', id_=id_))
+    populate_reference_systems(form, node)
     return render_template('display_form.html',
                            form=form,
                            title=node.name,
@@ -153,6 +155,7 @@ def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[st
         if root and not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
         node.update()
+        ReferenceSystem.update_links(form, node)
 
         # Update super if changed and node is not a root node
         if super_ and (super_ == 'new' or super_.id != new_super_id):

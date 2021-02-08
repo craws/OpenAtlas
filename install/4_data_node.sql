@@ -322,7 +322,8 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Involvement', False),
 ('Member', False),
 ('Source Translation', False),
-('External Reference', True);
+('External Reference', True),
+('Type', True);
 
 INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
 ((SELECT id FROM entity WHERE name='Artificial Object'), 'Artificial Object', False, True, False, False, False),

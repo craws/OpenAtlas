@@ -16,4 +16,7 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Artificial Object'),(SELECT id FROM web.form WHERE name='Artificial Object'));
 
+-- #1091 References for Types
+INSERT INTO web.form (name, extendable) VALUES ('Type', True):
+
 END;

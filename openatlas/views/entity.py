@@ -105,6 +105,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                 tab_name = link_.range.system_type.title().replace(' ', '-')
             elif tab_name == 'Object':  # pragma: no cover
                 tab_name = 'Artificial-Object'
+            elif tab_name == 'Node':  # pragma: no cover
+                tab_name = 'Type'
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
         for form_id, form_ in entity.get_forms().items():
             if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
