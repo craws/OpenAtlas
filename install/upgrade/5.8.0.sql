@@ -16,4 +16,14 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Artificial Object'),(SELECT id FROM web.form WHERE name='Artificial Object'));
 
+-- # Refactor modules
+ALTER TABLE model.entity ADD COLUMN system_class text;
+UPDATE model.entity SET system_class = 'acquisition' WHERE class_code = 'E8';
+UPDATE model.entity SET system_class = 'activity' WHERE class_code ='E7';
+UPDATE model.entity SET system_class = 'actor_appellation' WHERE class_code ='E82';
+UPDATE model.entity SET system_class = 'appellation' WHERE class_code ='E41';
+UPDATE model.entity SET system_class = 'artificial_object' WHERE class_code = 'E22' AND system_type = 'artificial object';
+UPDATE model.entity SET system_class = 'bibliography' WHERE class_code ='E31' AND system_type = 'bibliography';
+UPDATE model.entity SET system_class = '' WHERE class_code ='';
+
 END;
