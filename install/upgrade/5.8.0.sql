@@ -33,15 +33,18 @@ UPDATE model.entity SET system_class = 'group' WHERE class_code = 'E74';
 UPDATE model.entity SET system_class = 'human_remains' WHERE class_code = 'E20' AND system_type = 'human remains';
 UPDATE model.entity SET system_class = 'information_carrier' WHERE class_code = 'E84' AND system_type = 'information carrier';
 UPDATE model.entity SET system_class = 'legal_body' WHERE class_code = 'E40';
-UPDATE model.entity SET system_class = 'location' WHERE class_code = 'E33' AND system_type = '';
+UPDATE model.entity SET system_class = 'location' WHERE class_code = 'E53' AND system_type IS NULL;
 UPDATE model.entity SET system_class = 'move' WHERE class_code = 'E9';
 UPDATE model.entity SET system_class = 'object_location' WHERE class_code = 'E53' AND system_type = 'place location';
 UPDATE model.entity SET system_class = 'person' WHERE class_code = 'E21';
 UPDATE model.entity SET system_class = 'place' WHERE class_code = 'E18' AND system_type = 'place';
-UPDATE model.entity SET system_class = 'reference_system' WHERE class_code = 'E32' and system_type = 'reference system';
-UPDATE model.entity SET system_class = 'source' WHERE class_code = 'source content';
+UPDATE model.entity SET system_class = 'reference_system' WHERE class_code = 'E32';
+UPDATE model.entity SET system_class = 'source' WHERE class_code = 'E33' AND system_type = 'source content';
 UPDATE model.entity SET system_class = 'stratigraphic_unit' WHERE class_code = 'E18' AND system_type = 'stratigraphic unit';
-UPDATE model.entity SET system_class = 'translation' WHERE class_code = 'source translation';
+UPDATE model.entity SET system_class = 'translation' WHERE class_code = 'E33' AND system_type = 'source translation';
 UPDATE model.entity SET system_class = 'type' WHERE class_code = 'E55';
+
+ALTER TABLE model.entity ALTER COLUMN system_class SET NOT NULL;
+-- ALTER TABLE model.entity DROP COLUMN system_type;
 
 END;
