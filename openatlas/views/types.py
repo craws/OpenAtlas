@@ -37,26 +37,20 @@ def node_index() -> str:
                            crumbs=[_('types')])
 
 
-@app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
-@app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
+@app.route('/types/insert/<int:super_id>')
 @required_group('editor')
-def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
-    root = g.nodes[root_id]
+def node_insert(super_id: int) -> Union[str, Response]:
+    super_ = g.nodes[super_id]
+    root = g.nodes[super_.root[-1]] if super_.root else super_
     form = build_node_form(root=root)
-    # Check if form is valid and if it wasn't a submit of the search form
-    if 'name_search' not in request.form and form.validate_on_submit():
+    if form.validate_on_submit():
         return redirect(save(form, root=root))
-    if super_id:
-        getattr(form, str(root.id)).data = super_id if super_id != root.id else None
-    if 'name_search' in request.form:
-        form.name.data = request.form['name_search']
+    getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
     return render_template('display_form.html',
                            form=form,
                            manual_page='entity/type',
                            title=_('types'),
-                           crumbs=[[_('types'), url_for('node_index')],
-                                   root,
-                                   '+'])
+                           crumbs=[[_('types'), url_for('node_index')], root, '+'])
 
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])

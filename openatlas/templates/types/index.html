@@ -29,37 +29,15 @@
                                         <div class="row">
                                             <div class="col-6 contentbox">
                                                 <div class="toolbar">
-                                                    {% if node.locked or not 'editor'|is_authorized %}
-                                                        <input
-                                                                class="tree-filter"
-                                                                id="{{ node.name|sanitize }}-tree-search"
-                                                                placeholder="{{ placeholder|uc_first }}"
-                                                                name="name_search"
-                                                                style="width:8em;"
-                                                                type="text">
-                                                    {% else %}
-                                                        <form method="post"
-                                                              action="{{ url_for('node_insert', root_id=node.id) }}"
-                                                              style="display: inline;"
-                                                        >
-                                                            <input type="hidden" name="csrf_token"
-                                                                   value="{{ csrf_token() }}">
-                                                            <input
-                                                                    class="tree-filter"
-                                                                    id="{{ node.name|sanitize }}-tree-search"
-                                                                    placeholder="{{ placeholder|uc_first }}"
-                                                                    name="name_search"
-                                                                    style="width:8em;"
-                                                                    type="text">
-                                                            {% if not node.locked %}
-                                                                <input type="hidden" name="mode" value="insert">
-                                                                <button class="{{ config.CSS.button.primary }}"
-                                                                        type="submit" value="insert"
-                                                                        name="add-node-submit">+
-                                                                </button>
-
-                                                            {% endif %}
-                                                        </form>
+                                                    <input
+                                                      class="tree-filter"
+                                                      id="{{ node.name|sanitize }}-tree-search"
+                                                      placeholder="{{ placeholder|uc_first }}"
+                                                      name="name_search"
+                                                      style="width:8em;"
+                                                      type="text">
+                                                    {% if 'editor'|is_authorized and not node.locked %}
+                                                      {{ ''|button(url_for('node_insert', super_id=node.id)) }}
                                                     {% endif %}
                                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                                                         {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}
