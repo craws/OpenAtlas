@@ -140,7 +140,7 @@ def update(id_: int) -> Union[str, Response]:
 
     if entity.view_name == 'event':
         form.event_id.data = entity.id
-    elif entity.class_.code == 'E32':  # reference system
+    elif entity.class_.code == 'E32' and entity.system:  # reference system
         form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
         if was_modified(form, entity):  # pragma: no cover
