@@ -19,8 +19,8 @@ class SystemClass:
                  table_headers: Optional[List[str]] = None) -> None:
         self.name = name
         self.cidoc_class: CidocClass = g.classes[cidoc_class]
-        self.view_class = view_class if view_class else name
         self.write_access = write_access
+        self.view_class = view_class
         self.tabs = tabs if tabs else []
         self.form_fields = form_fields if form_fields else []
         self.table_headers = table_headers if table_headers else []
@@ -85,6 +85,7 @@ instances: Dict[str, SystemClass] = {
     'file': SystemClass(
         name='file',
         cidoc_class='E31',
+        view_class='file',
         tabs=[],
         form_fields=[],
         table_headers=[]),
@@ -126,6 +127,7 @@ instances: Dict[str, SystemClass] = {
     'location': SystemClass(
         name='location',
         cidoc_class='E53',
+        view_class='type',
         tabs=[],
         form_fields=[],
         table_headers=[]),
@@ -136,6 +138,9 @@ instances: Dict[str, SystemClass] = {
         tabs=[],
         form_fields=[],
         table_headers=[]),
+    'object_location': SystemClass(
+        name='object_location',
+        cidoc_class='E53'),
     'person': SystemClass(
         name='person',
         cidoc_class='E21',
@@ -143,24 +148,24 @@ instances: Dict[str, SystemClass] = {
         tabs=[],
         form_fields=[],
         table_headers=[]),
-    'physical_object': SystemClass(
-        name='physical_object',
-        cidoc_class='E18'),
     'place': SystemClass(
         name='place',
         cidoc_class='E18',
+        view_class='place',
         tabs=[],
         form_fields=[],
         table_headers=[]),
     'reference_system': SystemClass(
         name='reference_system',
         cidoc_class='E32',
+        view_class='reference_system',
         tabs=[],
         form_fields=[],
         table_headers=[]),
     'source': SystemClass(
         name='source',
         cidoc_class='E33',
+        view_class='source',
         tabs=[],
         form_fields=[],
         table_headers=[]),
@@ -174,12 +179,14 @@ instances: Dict[str, SystemClass] = {
     'translation': SystemClass(
         name='translation',
         cidoc_class='E33',
+        view_class='translation',
         tabs=[],
         form_fields=[],
         table_headers=[]),
     'type': SystemClass(
         name='type',
         cidoc_class='E55',
+        view_class='type',
         write_access='editor',
         tabs=[],
         form_fields=[],
