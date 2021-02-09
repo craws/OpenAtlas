@@ -467,6 +467,8 @@ def display_delete_link(self: Any, entity: Entity) -> str:
     url = url_for('index', class_=entity.view_name, delete_id=entity.id)
     if entity.system_type == 'source translation':
         url = url_for('translation_delete', id_=entity.id)
+    elif entity.id in g.nodes:
+        url = url_for('node_delete', id_=entity.id)
     return display.button(_('delete'),
                           url,
                           onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
