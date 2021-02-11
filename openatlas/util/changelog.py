@@ -4,7 +4,8 @@ class Changelog:
             'feature': {
                 '1091': 'References for Types',
                 '1187': 'Add files for objects',
-                '1456': 'Artificial objects'}}],
+                '1456': 'Artificial objects',
+                '1461': 'Also search in date comments'}}],
         '5.7.2': ['2021-01-27', {
             'fix': {
                 '1455': 'Network graphic error'}}],
