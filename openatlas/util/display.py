@@ -332,7 +332,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     # Class specific information
     # Todo: like in views/entity this if/else is too long and error prone
     if entity.view_name == 'node':
-        data[_('super')] = link(g.nodes[entity.root[-1]])
+        data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id

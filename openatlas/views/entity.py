@@ -355,19 +355,21 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
     crumbs = [[_(entity.view_name.replace('_', ' ')),
                url_for('index', class_=entity.view_name)], entity.name]
     if structure:
-        crumbs = [[_(entity.view_name).replace('_', ' '),
-                   url_for('index', class_=entity.view_name)],
-                  structure['place'],
-                  structure['feature'],
-                  structure['stratigraphic_unit'],
-                  entity.name]
+        crumbs = [
+            [_(entity.view_name).replace('_', ' '), url_for('index', class_=entity.view_name)],
+            structure['place'],
+            structure['feature'],
+            structure['stratigraphic_unit'],
+            entity.name]
     elif entity.view_name == 'node':
-        crumbs = [[_('types'), url_for('node_index')],
-                  link(g.nodes[entity.root[-1]]),
-                  entity.name]
+        crumbs = [[_('types'), url_for('node_index')]]
+        if entity.root:
+            for node_id in reversed(entity.root):
+                crumbs += [g.nodes[node_id]]
+        crumbs += [entity.name]
     elif entity.view_name == 'translation':
         crumbs = [[_('source'), url_for('index', class_='source')],
-                  link(entity.get_linked_entity('P73', True)),
+                  entity.get_linked_entity('P73', True),
                   entity.name]
     return crumbs
 

@@ -41,6 +41,7 @@ forms = {'actor_actor_relation': ['date', 'description', 'continue'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
+         'node': ['name', 'reference_systems', 'continue'],
          'legal_body': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
          'note': ['description'],
          'person': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
@@ -55,7 +56,7 @@ forms = {'actor_actor_relation': ['date', 'description', 'continue'],
 def build_form(name: str,
                item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
                code: Optional[str] = None,
-               origin: Optional[Entity] = None,
+               origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
     # Builds a form for CIDOC CRM entities which has to be dynamic because of types,
     # module settings and class specific fields
@@ -92,6 +93,10 @@ def build_form(name: str,
         form = Form()
     else:
         form = populate_form(name, Form(obj=item), item, location)
+    if hasattr(form, 'is_node_form'):
+        node = item if item else origin
+        root = g.nodes[node.root[-1]] if node.root else node
+        getattr(form, str(root.id)).label.text = 'super'
     customize_labels(name, form)
     return form
 
@@ -127,7 +132,7 @@ def populate_form(name: str,
     return form
 
 
-def populate_reference_systems(form: FlaskForm, item:Union[Entity, Link]) -> None:
+def populate_reference_systems(form: FlaskForm, item: Union[Entity, Link]) -> None:
     system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
                     if link_.domain.view_name == 'reference_system'}
     for field in form:
@@ -152,7 +157,7 @@ def add_buttons(form: Any,
     if entity:
         return form
     if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains'] or not origin):
+            name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -228,7 +233,7 @@ def add_fields(form: Any,
                name: str,
                code: Union[str, None],
                item: Union[Entity, Node, Link, None],
-               origin: Union[Entity, None]) -> None:
+               origin: Union[Entity, Node, None]) -> None:
     if name == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
@@ -278,6 +283,17 @@ def add_fields(form: Any,
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
+    elif name == 'node':
+        setattr(form, 'is_node_form', HiddenField())
+        node = item if item else origin
+        root = g.nodes[node.root[-1]] if node.root else node
+        setattr(form, str(root.id), TreeField(str(root.id)))
+        if root.directional:
+            setattr(form, 'name_inverse', StringField(_('inverse')))
+        if root.value_type:
+            setattr(form, 'description', StringField(_('unit')))
+        else:
+            setattr(form, 'description', TextAreaField(_('description')))
     elif name == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
@@ -311,40 +327,6 @@ def build_add_reference_form(class_name: str) -> FlaskForm:
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
     return Form()
-
-
-def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) -> FlaskForm:
-    class Form(FlaskForm):  # type: ignore
-        name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-        is_node_form = HiddenField()
-
-    add_reference_systems(Form, 'Type')
-    root = g.nodes[node.root[-1]] if node else root
-    setattr(Form, str(root.id), TreeField(str(root.id)))
-    if root.directional:
-        setattr(Form, 'name_inverse', StringField(_('inverse')))
-    if root.value_type:
-        setattr(Form, 'description', StringField(_('unit')))
-    else:
-        setattr(Form, 'description', TextAreaField(_('description')))
-    setattr(Form, 'save', SubmitField(uc_first(_('save') if node else _('insert'))))
-    if not node:
-        setattr(Form, 'continue_', HiddenField())
-        setattr(Form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
-    form = Form()
-    getattr(form, str(root.id)).label.text = 'super'
-
-    # Set field data if available and only if it's a GET request
-    if node and request and request.method == 'GET':
-        name_parts = node.name.split(' (')
-        form.name.data = name_parts[0]
-        form.description.data = node.description
-        if root.directional and len(name_parts) > 1:
-            form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
-        if root:  # Set super if exists and is not same as root
-            super_ = g.nodes[node.root[0]]
-            getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
-    return form
 
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
