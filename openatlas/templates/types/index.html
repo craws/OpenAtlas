@@ -37,7 +37,7 @@
                                                       style="width:8em;"
                                                       type="text">
                                                     {% if 'editor'|is_authorized and not node.locked %}
-                                                      {{ ''|button(url_for('node_insert', super_id=node.id)) }}
+                                                      {{ ''|button(url_for('insert', class_='node', origin_id=node.id)) }}
                                                     {% endif %}
                                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                                                         {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}

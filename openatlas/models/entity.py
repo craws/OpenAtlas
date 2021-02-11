@@ -20,6 +20,7 @@ from openatlas.forms.date import format_date
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
+    from openatlas.models.reference_system import ReferenceSystem
 
 
 class Entity:
@@ -332,7 +333,9 @@ class Entity:
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(id_: int, nodes: bool = False, aliases: bool = False) -> Entity:
+    def get_by_id(id_: int,
+                  nodes: bool = False,
+                  aliases: bool = False) -> Union[Entity, Node, 'ReferenceSystem']:
         if id_ in g.nodes:
             return g.nodes[id_]
         if id_ in g.reference_systems:

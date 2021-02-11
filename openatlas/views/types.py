@@ -1,16 +1,14 @@
-from typing import Dict, Optional, Union
+from typing import Dict, Union
 
-from flask import abort, flash, g, render_template, request, url_for
+from flask import abort, flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas import app, logger
-from openatlas.forms.form import build_move_form, build_node_form, populate_reference_systems
+from openatlas import app
+from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import (tree_select)
 from openatlas.util.util import required_group
 
@@ -35,43 +33,6 @@ def node_index() -> str:
                            placeholder=_('type to search'),
                            title=_('types'),
                            crumbs=[_('types')])
-
-
-@app.route('/types/insert/<int:super_id>')
-@required_group('editor')
-def node_insert(super_id: int) -> Union[str, Response]:
-    super_ = g.nodes[super_id]
-    root = g.nodes[super_.root[-1]] if super_.root else super_
-    form = build_node_form(root=root)
-    if form.validate_on_submit():
-        return redirect(save(form, root=root))
-    getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
-    return render_template('display_form.html',
-                           form=form,
-                           manual_page='entity/type',
-                           title=_('types'),
-                           crumbs=[[_('types'), url_for('node_index')], root, '+'])
-
-
-@app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
-def node_update(id_: int) -> Union[str, Response]:
-    node = g.nodes[id_]
-    root = g.nodes[node.root[-1]] if node.root else None
-    if node.standard or (root and root.locked):
-        abort(403)
-    form = build_node_form(node=node)
-    if form.validate_on_submit():
-        save(form, node)
-        return redirect(url_for('entity_view', id_=id_))
-    populate_reference_systems(form, node)
-    return render_template('display_form.html',
-                           form=form,
-                           title=node.name,
-                           crumbs=[[_('types'), url_for('node_index')],
-                                   root,
-                                   node,
-                                   _('edit')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -118,54 +79,3 @@ def node_move_entities(id_: int) -> Union[str, Response]:
                                    root,
                                    node,
                                    _('move')])
-
-
-def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
-    g.cursor.execute('BEGIN')
-    super_ = None
-    log_action = 'insert'
-    try:
-        if node:
-            log_action = 'update'
-            root = g.nodes[node.root[-1]] if node.root else None
-            super_ = g.nodes[node.root[0]] if node.root else None
-        elif root:
-            node = Entity.insert(root.class_.code, form.name.data)
-            super_ = 'new'
-        else:
-            abort(404)  # pragma: no cover, either node or root has to be provided
-        new_super_id = getattr(form, str(root.id)).data  # type: ignore
-        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]  # type: ignore
-        if new_super.id == node.id:
-            flash(_('error node self as super'), 'error')
-            return None
-        if new_super.root and node.id in new_super.root:
-            flash(_('error node sub as super'), 'error')
-            return None
-        node.description = form.description.data
-        node.name = form.name.data
-        if root and root.directional and form.name_inverse.data.strip():
-            node.name += ' (' + form.name_inverse.data.strip() + ')'
-        if root and not root.directional:
-            node.name = node.name.replace('(', '').replace(')', '')
-        node.update()
-        ReferenceSystem.update_links(form, node)
-
-        # Update super if changed and node is not a root node
-        if super_ and (super_ == 'new' or super_.id != new_super_id):
-            property_code = 'P127' if node.class_.code == 'E55' else 'P89'
-            node.delete_links([property_code])
-            node.link(property_code, new_super)
-        g.cursor.execute('COMMIT')
-        url = url_for('entity_view', id_=node.id)
-        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
-            url = url_for('node_insert', root_id=root.id,  # type: ignore
-                          super_id=new_super_id if new_super_id else None)
-        logger.log_user(node.id, log_action)
-        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
-        url = url_for('node_index')
-    return url

@@ -16,51 +16,45 @@ class NodeTest(TestBaseCase):
                 sex_node = Node.get_hierarchy('Sex')
             rv = self.app.get(url_for('node_index'))
             assert b'Actor Actor Relation' in rv.data
-            rv = self.app.get(url_for('node_insert', root_id=actor_node.id, super_id=actor_node.id))
+            rv = self.app.get(url_for('insert', class_='node', origin_id=actor_node.id))
             assert b'Actor Actor Relation' in rv.data
-            rv = self.app.post(url_for('node_insert', root_id=actor_node.id),
+            rv = self.app.post(url_for(url_for('insert', class_='node', origin_id=actor_node.id)),
                                data={'name_search': 'new'})
             assert b'Inverse' in rv.data
             data = {'name': 'My secret node', 'name_inverse': 'Do I look inverse?',
                     'description': 'Very important!'}
-            rv = self.app.post(url_for('node_insert', root_id=actor_node.id), data=data)
+            rv = self.app.post(url_for('insert', class_='node', origin_id=actor_node.id), data=data)
             node_id = rv.location.split('/')[-1].replace('node#tab-', '')
-            rv = self.app.get(url_for('node_update', id_=node_id))
+            rv = self.app.get(url_for('update', id_=node_id))
             assert b'My secret node' in rv.data and b'Super' in rv.data
-            self.app.post(url_for('node_insert', root_id=sex_node.id), data=data)
-            rv = self.app.post(url_for('node_update', id_=node_id),
-                               data=data,
-                               follow_redirects=True)
+            self.app.post(url_for('insert', class_='node', origin_id=sex_node.id), data=data)
+            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
             # Insert an continue
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('node_insert', root_id=actor_node.id),
+            rv = self.app.post(url_for('insert', class_='node', origin_id=actor_node.id),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = ''
 
             # Forbidden system node
-            rv = self.app.post(url_for('node_update', id_=actor_node.id),
+            rv = self.app.post(url_for('update', id_=actor_node.id),
                                data=data,
                                follow_redirects=True)
             assert b'Forbidden' in rv.data
 
             # Update with self as root
             data[str(actor_node.id)] = node_id
-            rv = self.app.post(url_for('node_update', id_=node_id),
-                               data=data,
-                               follow_redirects=True)
+            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
             assert b'Type can&#39;t have itself as super.' in rv.data
 
             # Update with a child as root
-            rv = self.app.post(url_for('node_insert', root_id=actor_node.id), data=data)
+            rv = self.app.post(url_for('insert', class_='node', origin_id=actor_node.id), data=data)
             child_node_id = rv.location.split('/')[-1].replace('node#tab-', '')
             data[str(actor_node.id)] = child_node_id
-            rv = self.app.post(url_for('node_update', id_=node_id),
-                               data=data,
-                               follow_redirects=True)
+            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
             assert b'Type can&#39;t have a sub as super.' in rv.data
 
             # Custom type
@@ -78,7 +72,7 @@ class NodeTest(TestBaseCase):
             assert b'Height' in rv.data
             rv = self.app.get(url_for('entity_view', id_=dimension_node.subs[0]))
             assert b'Unit' in rv.data
-            rv = self.app.get(url_for('node_update', id_=dimension_node.subs[0]))
+            rv = self.app.get(url_for('update', id_=dimension_node.subs[0]))
             assert b'Dimensions' in rv.data
 
             # Test delete system node

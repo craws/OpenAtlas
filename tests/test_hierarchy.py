@@ -32,7 +32,7 @@ class HierarchyTest(TestBaseCase):
             assert b'+ Custom' in rv.data
 
             data = {'name': 'My secret node', 'description': 'Very important!'}
-            rv = self.app.post(url_for('node_insert', root_id=node.id), data=data)
+            rv = self.app.post(url_for('insert', class_='node', origin_id=node.id), data=data)
             node_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_remove_form', id_=node.id, form_id=3),
                               follow_redirects=True)
