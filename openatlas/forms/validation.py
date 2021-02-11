@@ -82,7 +82,7 @@ def validate(self: FlaskForm) -> bool:
             if not getattr(self, field_id.replace('id_', 'precision_')).data:
                 valid = False
                 field.errors.append(uc_first(_('precision required')))
-            if field.label.text == 'Wikidata':
+            if field.label.text in ['Wikidata']:
                 if field.data[0].upper() != 'Q' or not field.data[1:].isdigit():
                     field.errors.append(uc_first(_('wrong id format') + '.'))
                     valid = False

@@ -432,7 +432,7 @@ def display_form(self: Any,
         # External reference system
         if field.id.startswith('reference_system_id_'):
             precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-            class_ = 'Wikidata' if field.label.text == 'Wikidata' else ''
+            class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
             html += add_row(field, field.label, ' '.join([str(field(class_=class_)),
                                                           str(precision_field.label),
                                                           str(precision_field)]))
