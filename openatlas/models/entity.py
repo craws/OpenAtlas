@@ -492,7 +492,9 @@ class Entity:
             user_clause="""
                 LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
             description_clause="""
-                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s)) """
+                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
             if form.desc.data else '',
             user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []
