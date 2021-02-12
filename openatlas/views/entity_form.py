@@ -158,6 +158,20 @@ def update(id_: int) -> Union[str, Response]:
     elif entity.class_.code == 'E32' and entity.system:  # reference system
         form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
+        if entity.id in g.nodes:
+            valid = True
+            root = g.nodes[entity.root[-1]]
+            new_super_id = getattr(form, str(root.id)).data
+            new_super = g.nodes[int(new_super_id)] if new_super_id else None
+            if new_super:
+                if new_super.id == entity.id:
+                    flash(_('error node self as super'), 'error')
+                    valid = False
+                if new_super.root and entity.id in new_super.root:
+                    flash(_('error node sub as super'), 'error')
+                    valid = False
+            if not valid:
+                return redirect(url_for('entity_view', id_=entity.id))
         if was_modified(form, entity):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
@@ -254,18 +268,11 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         form.information_carrier.data = [item.id for item in
                                          entity.get_linked_entities('P128', inverse=True)]
 
-#    if new_super.id == node.id:
-#        flash(_('error node self as super'), 'error')
-#        return None
-#    if new_super.root and node.id in new_super.root:
-#        flash(_('error node sub as super'), 'error')
-#        return None
 
-#    if root and root.directional and form.name_inverse.data.strip():
-#        node.name += ' (' + form.name_inverse.data.strip() + ')'
-#    if root and not root.directional:
-#        node.name = node.name.replace('(', '').replace(')', '')
-
+       #if root and root.directional and form.name_inverse.data.strip():
+       #    node.name += ' (' + form.name_inverse.data.strip() + ')'
+       #if root and not root.directional:
+       #    node.name = node.name.replace('(', '').replace(')', '')
 
 def save(form: FlaskForm,
          entity: Optional[Union[Entity, Node, ReferenceSystem]] = None,

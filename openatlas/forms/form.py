@@ -93,11 +93,7 @@ def build_form(name: str,
         form = Form()
     else:
         form = populate_form(name, Form(obj=item), item, location)
-    if hasattr(form, 'is_node_form'):
-        node = item if item else origin
-        root = g.nodes[node.root[-1]] if node.root else node
-        getattr(form, str(root.id)).label.text = 'super'
-    customize_labels(name, form)
+    customize_labels(name, form, item, origin)
     return form
 
 
@@ -144,9 +140,16 @@ def populate_reference_systems(form: FlaskForm, item: Union[Entity, Link]) -> No
                     id=system_id)).data = str(system_links[system_id].type.id)
 
 
-def customize_labels(name: str, form: FlaskForm) -> None:
+def customize_labels(name: str,
+                     form: FlaskForm,
+                     item: Optional[Entity, Link] = None,
+                     origin: Union[Entity, Node, None] = None,) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
+    if name == 'node':
+        node = item if item else origin
+        root = g.nodes[node.root[-1]] if node.root else node
+        getattr(form, str(root.id)).label.text = 'super'
 
 
 def add_buttons(form: Any,
