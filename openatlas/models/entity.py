@@ -144,7 +144,7 @@ class Entity:
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
         from openatlas.util.display import sanitize
-        if form:
+        if form:  # e.g. imports have no forms
             self.save_nodes(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
@@ -154,6 +154,11 @@ class Entity:
             if hasattr(form, 'alias') and (self.system_type == 'place' or
                                            self.class_.code in app.config['CLASS_CODES']['actor']):
                 self.update_aliases(form)
+            if hasattr(form, 'name_inverse'):  # a directional node, e.g. actor actor relation
+                self.name = form.name.data.replace('(', '').replace(')', '').strip()
+                if form.name_inverse.data.strip():
+                    inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
+                    self.name += ' (' + inverse + ')'
 
         if self.class_.code == 'E53':
             self.name = sanitize(self.name, 'node')

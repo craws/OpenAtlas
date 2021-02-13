@@ -256,11 +256,12 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         if entity.class_.code == 'E8':  # Form data for acquisition
             form.given_place.data = [entity.id for entity in entity.get_linked_entities('P24')]
     elif entity.view_name == 'node':
-        name_parts = entity.name.split(' (')
-        form.name.data = name_parts[0]
+        if hasattr(form, 'name_inverse'):  # a directional node, e.g. actor actor relation
+            name_parts = entity.name.split(' (')
+            form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
         root = g.nodes[entity.root[-1]] if entity.root else entity
-        if root.directional and len(name_parts) > 1:
-            form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
         if root:  # Set super if exists and is not same as root
             super_ = g.nodes[entity.root[0]]
             getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
@@ -268,11 +269,6 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         form.information_carrier.data = [item.id for item in
                                          entity.get_linked_entities('P128', inverse=True)]
 
-
-       #if root and root.directional and form.name_inverse.data.strip():
-       #    node.name += ' (' + form.name_inverse.data.strip() + ')'
-       #if root and not root.directional:
-       #    node.name = node.name.replace('(', '').replace(')', '')
 
 def save(form: FlaskForm,
          entity: Optional[Union[Entity, Node, ReferenceSystem]] = None,
