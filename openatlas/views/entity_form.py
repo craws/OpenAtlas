@@ -119,7 +119,7 @@ def update(id_: int) -> Union[str, Response]:
         abort(403)  # pragma: no cover
     elif entity.view_name == 'node':
         root = g.nodes[entity.root[-1]] if entity.root else None
-        if not is_authorized('editor') or entity.standard or (root and root.locked):
+        if not is_authorized('editor') or (not root and (entity.standard or entity.locked)):
             abort(403)  # pragma: no cover
     if not entity.view_name:
         abort(422)  # pragma: no cover
@@ -127,7 +127,6 @@ def update(id_: int) -> Union[str, Response]:
     # Archaeological sub units
     geonames_module = False
     structure = None
-    location = None
     gis_data = None
     overlays = None
     if entity.view_name == 'actor':
@@ -181,7 +180,7 @@ def update(id_: int) -> Union[str, Response]:
                 entity=entity,
                 structure=structure,
                 modifier=link(logger.get_log_for_advanced_view(entity.id)['modifier']))
-        return redirect(save(form, entity, location=location))
+        return redirect(save(form, entity))
     populate_update_form(form, entity)
     return render_template('entity/update.html',
                            form=form,
@@ -273,8 +272,7 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
 def save(form: FlaskForm,
          entity: Optional[Union[Entity, Node, ReferenceSystem]] = None,
          class_: Optional[str] = '',
-         origin: Optional[Entity] = None,
-         location: Optional[Entity] = None) -> Union[str, Response]:
+         origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     action = 'update'
     try:
@@ -293,7 +291,7 @@ def save(form: FlaskForm,
                 entity.add_forms(form)
         else:
             entity.update(form)
-        update_links(entity, form, action, origin, location)
+        update_links(entity, form, action, origin)
         url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
         g.cursor.execute('COMMIT')
@@ -354,8 +352,7 @@ def insert_entity(form: FlaskForm,
             elif origin and origin.system_type == 'feature':
                 system_type = 'stratigraphic unit'
             entity = Entity.insert('E18', form.name.data, system_type)
-        location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
-        entity.link('P53', location)
+        entity.link('P53', Entity.insert('E53', 'Location of ' + form.name.data, 'place location'))
     elif class_ in ('bibliography', 'edition', 'external_reference'):
         entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
     elif class_ == 'reference_system':
@@ -374,8 +371,7 @@ def insert_entity(form: FlaskForm,
 def update_links(entity: Union[Entity, Node],
                  form: FlaskForm,
                  action: str,
-                 origin: Optional[Union[Entity, Node]],
-                 location: Optional[Entity] = None) -> None:
+                 origin: Optional[Union[Entity, Node]]) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
     if entity.view_name in ['actor', 'event', 'place', 'object']:
@@ -415,6 +411,7 @@ def update_links(entity: Union[Entity, Node],
     elif entity.view_name == 'place':
         if action == 'update':
             Gis.delete_by_entity(entity)
+        location = entity.get_linked_entity_safe('P53')
         location.update(form)
         Gis.insert(location, form)
     elif entity.view_name == 'source':
@@ -439,7 +436,7 @@ def link_and_get_redirect_url(form: FlaskForm,
                               class_: Optional[str] = '',
                               origin: Union[Entity, Node, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
-    if origin:
+    if origin and entity.view_name != 'node':
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.view_name
         if origin.view_name == 'reference':
             link_id = origin.link('P67', entity)[0]

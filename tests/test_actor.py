@@ -13,10 +13,10 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('index', class_='actor'))
             assert b'No entries' in rv.data
             # Create entities for actor
-            rv = self.app.post(url_for('insert', class_='place'), data={
-                'name': 'Captain Miller',
-                self.precision_geonames: '',
-                self.precision_wikidata: ''})
+            rv = self.app.post(url_for('insert', class_='place'),
+                               data={'name': 'Captain Miller',
+                                     self.precision_geonames: '',
+                                     self.precision_wikidata: ''})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

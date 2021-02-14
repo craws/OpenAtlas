@@ -18,13 +18,14 @@ class NodeTest(TestBaseCase):
             assert b'Actor Actor Relation' in rv.data
             rv = self.app.get(url_for('insert', class_='node', origin_id=actor_node.id))
             assert b'Actor Actor Relation' in rv.data
-            rv = self.app.post(url_for(url_for('insert', class_='node', origin_id=actor_node.id)),
+            rv = self.app.post(url_for('insert', class_='node', origin_id=actor_node.id),
                                data={'name_search': 'new'})
             assert b'Inverse' in rv.data
-            data = {'name': 'My secret node', 'name_inverse': 'Do I look inverse?',
+            data = {'name': 'My secret node',
+                    'name_inverse': 'Do I look inverse?',
                     'description': 'Very important!'}
             rv = self.app.post(url_for('insert', class_='node', origin_id=actor_node.id), data=data)
-            node_id = rv.location.split('/')[-1].replace('node#tab-', '')
+            node_id = rv.location.split('/')[-1].replace('#tab-node', '')
             rv = self.app.get(url_for('update', id_=node_id))
             assert b'My secret node' in rv.data and b'Super' in rv.data
             self.app.post(url_for('insert', class_='node', origin_id=sex_node.id), data=data)
