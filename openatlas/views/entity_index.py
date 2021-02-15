@@ -41,7 +41,7 @@ def get_buttons(class_: str) -> List[str]:
         for code in app.config['CLASS_CODES'][class_]:
             buttons.append(button(g.classes[code].name, url_for('insert', class_=code)))
     elif class_ == 'object':
-        buttons = [button(_('artificial object'), url_for('insert', class_='artificial_object')),
+        buttons = [button(_('artifact'), url_for('insert', class_='artifact')),
                    button(g.classes['E84'].name, url_for('insert', class_='E84'))]
     elif class_ == 'reference':
         buttons = [button(_('bibliography'), url_for('insert', class_='bibliography')),

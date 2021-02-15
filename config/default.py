@@ -38,9 +38,8 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # External References
 REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-EXTERNAL_REFERENCES_FORMS = ['Artificial Object', 'Event', 'Feature', 'Find', 'Group',
-                             'Human Remains', 'Legal Body', 'Person', 'Place', 'Stratigraphic Unit',
-                             'Type']
+EXTERNAL_REFERENCES_FORMS = ['Artifact', 'Event', 'Feature', 'Find', 'Group', 'Human Remains',
+                             'Legal Body', 'Person', 'Place', 'Stratigraphic Unit', 'Type']
 
 # Modules
 MODULES = ['map_overlay', 'notes', 'sub_units']

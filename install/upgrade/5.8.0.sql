@@ -14,7 +14,12 @@ INSERT INTO web.form (name, extendable) VALUES ('Artificial Object', True);
 INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
 ((SELECT id FROM model.entity WHERE name='Artificial Object'), 'Artificial Object', False, True, False, False, False);
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-((SELECT id FROM web.hierarchy WHERE name='Artificial Object'),(SELECT id FROM web.form WHERE name='Artificial Object'));
+((SELECT id FROM web.hierarchy WHERE name='Artificial Object'), (SELECT id FROM web.form WHERE name='Artificial Object'));
+
+-- If you executed above at an upgrade of a development version before use this instead
+-- UPDATE model.entity SET name = 'Artifact' WHERE name = 'Artificial Object';
+-- UPDATE model.entity SET system_type = 'artifact' WHERE system_type = 'artificial object';
+-- UPDATE web.form SET name = 'Artifact' WHERE name = 'Artificial Object';
 
 -- #1091 References for Types
 INSERT INTO web.form (name, extendable) VALUES ('Type', True):

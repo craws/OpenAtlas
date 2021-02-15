@@ -104,7 +104,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             elif tab_name == 'Place':
                 tab_name = link_.range.system_type.title().replace(' ', '-')
             elif tab_name == 'Object':  # pragma: no cover
-                tab_name = 'Artificial-Object'
+                tab_name = 'Artifact'
             elif tab_name == 'Node':  # pragma: no cover
                 tab_name = 'Type'
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])

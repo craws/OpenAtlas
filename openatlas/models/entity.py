@@ -75,7 +75,7 @@ class Entity:
         self.view_name = ''
         if self.system_type == 'file':
             self.view_name = 'file'
-        elif self.system_type == 'artificial object':
+        elif self.system_type == 'artifact':
             self.view_name = 'object'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
             self.view_name = 'translation'
@@ -401,7 +401,7 @@ class Entity:
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         elif menu_item == 'object':
             sql = Entity.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s OR e.system_type = 'artificial object'
+                WHERE e.class_code IN %(codes)s OR e.system_type = 'artifact'
                 GROUP BY e.id;"""
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \

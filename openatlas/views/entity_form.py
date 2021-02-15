@@ -87,7 +87,7 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, Node, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    view_name = 'object' if view_name == 'artificial_object' else view_name
+    view_name = 'object' if view_name == 'artifact' else view_name
     crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
                url_for('index', class_=origin.view_name if origin else view_name)],
               link(origin)]
@@ -317,7 +317,7 @@ def save(form: FlaskForm,
             else:
                 if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
                     view_name = 'place'
-                elif class_ in ['artificial_object']:
+                elif class_ in ['artifact']:
                     view_name = 'object'
                 url = url_for('index', class_=view_name)
     return url
@@ -327,8 +327,8 @@ def insert_entity(form: FlaskForm,
                   class_: Optional[str] = '',
                   origin: Optional[Union[Entity, Node]] = None
                   ) -> Union[Entity, Node, ReferenceSystem]:
-    if class_ == 'artificial_object':
-        entity = Entity.insert('E22', form.name.data, 'artificial object')
+    if class_ == 'artifact':
+        entity = Entity.insert('E22', form.name.data, 'artifact')
         location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
         entity.link('P53', location)
     elif class_ == 'node':

@@ -26,7 +26,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {'actor_actor_relation': ['date', 'description', 'continue'],
-         'artificial_object': ['name', 'date', 'description', 'continue', 'map'],
+         'artifact': ['name', 'date', 'description', 'continue', 'map'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
