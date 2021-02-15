@@ -21,7 +21,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 -- UPDATE model.entity SET system_type = 'artifact' WHERE system_type = 'artificial object';
 -- UPDATE web.form SET name = 'Artifact' WHERE name = 'Artificial Object';
 
--- #1091 References for Types
-INSERT INTO web.form (name, extendable) VALUES ('Type', True):
+-- #1091 Reference systems for types
+INSERT INTO web.form (name, extendable) VALUES ('Type', True);
 
 END;
