@@ -81,7 +81,7 @@ class Entity:
             self.view_name = 'translation'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
-        elif self.class_.code == 'E55':
+        elif self.class_.code == 'E55' or self.class_.code == 'E53' and not self.system_type:
             self.view_name = 'node'
         elif self.class_.code == 'E32':
             self.view_name = 'reference_system'
