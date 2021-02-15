@@ -26,31 +26,29 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {'actor_actor_relation': ['date', 'description', 'continue'],
-         'artificial_object':
-             ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'artificial_object': ['name', 'date', 'description', 'continue', 'map'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'reference_systems', 'description', 'continue'],
-         'feature': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'event': ['name', 'date', 'description', 'continue'],
+         'feature': ['name', 'date', 'description', 'continue', 'map'],
          'file': ['name', 'description'],
-         'find': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
-         'group': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
+         'find': ['name', 'date', 'description', 'continue', 'map'],
+         'group': ['name', 'alias', 'date', 'description', 'continue'],
          'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
-         'node': ['name', 'reference_systems', 'continue'],
-         'legal_body': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
+         'node': ['name', 'continue'],
+         'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
          'note': ['description'],
-         'person': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
-         'place': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'person': ['name', 'alias', 'date', 'description', 'continue'],
+         'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
          'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit':
-             ['name', 'date', 'reference_systems', 'description', 'continue', 'map']}
+         'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
 
 
 def build_form(name: str,
@@ -65,7 +63,7 @@ def build_form(name: str,
         opened = HiddenField()
         validate = validate
 
-    if 'name' in forms[name]:
+    if 'name' in forms[name]:  # Set label and validators for name field
         label = _('URL') if name == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
         setattr(Form, 'name', StringField(label,
@@ -77,8 +75,7 @@ def build_form(name: str,
     code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name, code)
     add_fields(Form, name, code, item, origin)
-    if 'reference_systems' in forms[name]:
-        add_reference_systems(Form, name)
+    add_reference_systems(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
     if 'description' in forms[name]:
@@ -92,15 +89,14 @@ def build_form(name: str,
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(name, Form(obj=item), item, location)
+        form = populate_form(Form(obj=item), item, location)
     customize_labels(name, form, item, origin)
     return form
 
 
-def populate_form(name: str,
-                  form: FlaskForm,
+def populate_form(form: FlaskForm,
                   item: Union[Entity, Link],
-                  location: Optional[Entity]) -> FlaskForm:
+                  location: Union[Entity, None]) -> FlaskForm:
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -121,14 +117,12 @@ def populate_form(name: str,
     for root_id, nodes_ in node_data.items():
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = nodes_
-
-    # Reference systems
-    if 'reference_systems' in forms[name]:
+    if isinstance(item, Entity):
         populate_reference_systems(form, item)
     return form
 
 
-def populate_reference_systems(form: FlaskForm, item: Union[Entity, Link]) -> None:
+def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
     system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
                     if link_.domain.view_name == 'reference_system'}
     for field in form:
@@ -189,7 +183,8 @@ def add_reference_systems(form: Any, form_name: str) -> None:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in g.reference_systems.values():
         forms_ = [form_['name'] for form_ in system.get_forms().values()]
-        if form_name.replace('_', ' ').title() not in forms_:
+        form_name = form_name.replace('_', ' ').title().replace('Node', 'Type')
+        if form_name not in forms_:
             continue
         setattr(form,
                 'reference_system_id_{id}'.format(id=system.id),

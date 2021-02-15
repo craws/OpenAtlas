@@ -374,7 +374,7 @@ def update_links(entity: Union[Entity, Node],
                  origin: Optional[Union[Entity, Node]]) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
-    if entity.view_name in ['actor', 'event', 'place', 'object']:
+    if entity.view_name in ['actor', 'event', 'place', 'object', 'node']:
         ReferenceSystem.update_links(form, entity)
 
     if entity.view_name == 'actor':
