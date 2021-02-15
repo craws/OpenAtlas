@@ -49,7 +49,9 @@ class TestBaseCase(unittest.TestCase):
                 cursor.execute(sqlFile.read())
 
 
-def insert_entity(name: str, class_: str, origin: Optional[Entity] = None,
+def insert_entity(name: str,
+                  class_: str,
+                  origin: Optional[Entity] = None,
                   description: Optional[str] = None) -> Optional[Entity]:
     entity = None
     if class_ in ['place', 'feature', 'stratigraphic_unit']:
