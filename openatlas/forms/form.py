@@ -40,7 +40,7 @@ forms = {'actor_actor_relation': ['date', 'description', 'continue'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
-         'node': ['name', 'continue'],
+         'node': ['name', 'description', 'continue'],
          'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
          'note': ['description'],
          'person': ['name', 'alias', 'date', 'description', 'continue'],
@@ -81,6 +81,12 @@ def build_form(name: str,
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
+        if name == 'node':  # Change description field if value type
+            node = item if item else origin
+            root = g.nodes[node.root[-1]] if node.root else node
+            if root.value_type:
+                del Form.description
+                setattr(Form, 'description', StringField(_('unit')))
     if 'map' in forms[name]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -288,10 +294,6 @@ def add_fields(form: Any,
         setattr(form, str(root.id), TreeField(str(root.id)))
         if root.directional:
             setattr(form, 'name_inverse', StringField(_('inverse')))
-        if root.value_type:
-            setattr(form, 'description', StringField(_('unit')))
-        else:
-            setattr(form, 'description', TextAreaField(_('description')))
     elif name == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
