@@ -78,7 +78,7 @@ class Tab:
                 table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
                 buttons = [button(_('link'), url_for('involvement_insert', origin_id=id_))]
             for code in class_codes['actor']:
-                buttons.append(button(g.classes[code].name,
+                buttons.append(button(g.cidoc_classes[code].name,
                                       url_for('insert', class_=code, origin_id=id_)))
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
@@ -86,7 +86,7 @@ class Tab:
             if code in class_codes['actor']:
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
             if code in ['E84'] or origin and origin.view_name == 'object':
-                buttons = [button(g.classes['E9'].name,
+                buttons = [button(g.cidoc_classes['E9'].name,
                                   url_for('insert', class_='E9', origin_id=id_))]
             else:
                 if system_type == 'file':
@@ -99,7 +99,7 @@ class Tab:
                     buttons = [button('link',
                                       url_for('reference_add', id_=id_, class_name='event'))]
                 for code in class_codes['event']:
-                    label = g.classes[code].name
+                    label = g.cidoc_classes[code].name
                     buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'feature':
             if current_user.settings['module_sub_units'] and system_type == 'place':
@@ -142,7 +142,7 @@ class Tab:
         elif name == 'relation':
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
-                label = g.classes[code].name
+                label = g.cidoc_classes[code].name
                 buttons.append(button(label, url_for('insert', class_=code, origin_id=id_)))
         elif name == 'source':
             if system_type == 'file':

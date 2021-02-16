@@ -45,7 +45,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity = g.reference_systems[id_]
     else:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        if not entity.view_name:
+        if not entity.view_class:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
@@ -56,26 +56,21 @@ def entity_view(id_: int) -> Union[str, Response]:
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info', entity)}
 
-    # Todo: moving functionality from separate views here was an important step but this if/else is
-    #  way too long and error prone to manage or expand, maybe refactor with object/inheritance?
-    if entity.view_name == 'node':
+    if entity.view_class == 'type':
         for name in ['subs', 'entities']:
             tabs[name] = Tab(name, entity)
         root = g.nodes[entity.root[-1]] if entity.root else None
         if root and root.value_type:  # pragma: no cover
             tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
         for item in entity.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-            if item.class_.code == 'E32':  # Don't add reference systems themselves
+            if item.system_class == ['location', 'reference_system']:
                 continue  # pragma: no cover
-            if entity.class_.code == 'E53':  # pragma: no cover
-                object_ = item.get_linked_entity('P53', inverse=True)
-                if not object_:  # If it's a location show the object, continue otherwise
-                    continue
-                item = object_
+            if entity.system_class == 'object_location':  # pragma: no cover
+                item = item.get_linked_entity('P53', inverse=True)
             data = [link(item)]
             if root and root.value_type:  # pragma: no cover
                 data.append(format_number(item.nodes[entity]))
-            data.append(g.classes[item.class_.code].name)
+            data.append(g.cidoc_classes[item.cidoc_class.code].name)
             data.append(item.description)
             tabs['entities'].table.rows.append(data)
         for sub_id in entity.subs:
@@ -100,7 +95,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                         url=entity.resolver_url + name, name=name)
             tab_name = link_.range.view_name.capitalize().replace(' ', '-')
             if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
-                tab_name = g.classes[link_.range.class_.code].name.replace(' ', '-')
+                tab_name = g.cidoc_classes[link_.range.class_.code].name.replace(' ', '-')
             elif tab_name == 'Place':
                 tab_name = link_.range.system_type.title().replace(' ', '-')
             elif tab_name == 'Object':  # pragma: no cover
@@ -160,7 +155,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             actor = Entity.get_by_id(link_.domain.id)
             tabs['actor'].table.rows.append([link(actor),
                                              g.properties[link_.property.code].name,
-                                             actor.class_.name,
+                                             actor.system_class.name,
                                              actor.first,
                                              actor.last,
                                              actor.description])
@@ -194,7 +189,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if not link_.last and event.last:
                 last = '<span class="inactive">' + event.last + '</span>'
             data = [link(event),
-                    g.classes[event.class_.code].name,
+                    g.cidoc_classes[event.class_.code].name,
                     link(link_.type),
                     first,
                     last,
@@ -283,7 +278,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if not link_.last and entity.last:
                 last = '<span class="inactive">' + entity.last + '</span>'
             data = [link(link_.range),
-                    g.classes[link_.range.class_.code].name,
+                    g.cidoc_classes[link_.range.class_.code].name,
                     link_.type.name if link_.type else '',
                     first,
                     last,

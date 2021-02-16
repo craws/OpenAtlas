@@ -99,13 +99,13 @@ class CidocProperty:
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True
-        return self.find_subs(attr, class_id, g.classes[valid_domain_id].sub)
+        return self.find_subs(attr, class_id, g.cidoc_classes[valid_domain_id].sub)
 
     def find_subs(self, attr: str, class_id: int, valid_subs: List[int]) -> bool:
         for sub_id in valid_subs:
             if sub_id == class_id:
                 return True
-            elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
+            elif self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
                 return True
         return False
 

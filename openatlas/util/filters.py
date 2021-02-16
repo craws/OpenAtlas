@@ -186,7 +186,7 @@ def table_select_model(self: Any,
                        name: str,
                        selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     if name in ['domain', 'range']:
-        entities = g.classes
+        entities = g.cidoc_classes
     else:
         entities = g.properties
     table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
@@ -241,7 +241,7 @@ def table_select_model(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def get_class_name(self: Any, code: str) -> str:
-    return g.classes[code].name
+    return g.cidoc_classes[code].name
 
 
 @jinja2.contextfilter

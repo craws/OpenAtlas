@@ -34,7 +34,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
     if class_ in app.config['CLASS_CODES']['actor']:
-        # Todo: can't use g.classes[class_].name because it's already translated, needs fixing.
+        # Todo: can't use g.cidoc_classes[class_].name because it's already translated, needs fixing
         form_name = {'E21': 'person', 'E74': 'group', 'E40': 'legal_body'}
         form = build_form(form_name[class_], code=class_, origin=origin)
     elif class_ in app.config['CLASS_CODES']['event']:
@@ -48,7 +48,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         return redirect(save(form, class_=class_, origin=origin))
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
-    view_name = app.config['CODE_CLASS'][class_] if class_ in g.classes else class_
+    view_name = app.config['CODE_CLASS'][class_] if class_ in g.cidoc_classes else class_
     if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
         view_name = 'place'
     elif class_ in ['bibliography', 'edition', 'external_reference']:
@@ -104,7 +104,8 @@ def add_crumbs(view_name: str,
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
     if insert_:
-        crumbs = crumbs + ['+ ' + (g.classes[class_].name if class_ in g.classes else uc_first(
+        crumbs = crumbs + ['+ ' + (g.cidoc_classes[class_].name
+                                   if class_ in g.cidoc_classes else uc_first(
             _(class_.replace('_', ' '))))]
     else:
         crumbs = crumbs + [_('edit')]
@@ -130,7 +131,7 @@ def update(id_: int) -> Union[str, Response]:
     gis_data = None
     overlays = None
     if entity.view_name == 'actor':
-        form = build_form(g.classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
+        form = build_form(g.cidoc_classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
     elif entity.view_name in ['object', 'reference']:
         form = build_form(entity.system_type.replace(' ', '_'), entity)
     elif entity.view_name == 'place':

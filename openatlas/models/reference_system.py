@@ -31,7 +31,7 @@ class ReferenceSystem(Entity):
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
         sql = """
-            SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
+            SELECT e.id, e.name, e.class_code, e.description, e.system_class, e.created, e.modified,
                 rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, COUNT(l.id) AS count,
                 (SELECT ARRAY(

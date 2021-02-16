@@ -103,13 +103,13 @@ class Link:
             range_ = entity if inverse else linked_entity
             domain_error = True
             range_error = True
-            if property_.find_object('domain_class_code', g.classes[domain.class_.code].code):
+            if property_.find_object('domain_class_code', g.cidoc_classes[domain.class_.code].code):
                 domain_error = False
-            if property_.find_object('range_class_code', g.classes[range_.class_.code].code):
+            if property_.find_object('range_class_code', g.cidoc_classes[range_.class_.code].code):
                 range_error = False
             if domain_error or range_error:
-                text = _('error link') + ': ' + g.classes[domain.class_.code].code + ' > '
-                text += property_code + ' > ' + g.classes[range_.class_.code].code
+                text = _('error link') + ': ' + g.cidoc_classes[domain.class_.code].code + ' > '
+                text += property_code + ' > ' + g.cidoc_classes[range_.class_.code].code
                 logger.log('error', 'model', text)
                 flash(text, 'error')
                 continue

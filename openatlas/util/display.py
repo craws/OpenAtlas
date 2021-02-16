@@ -423,13 +423,11 @@ def get_base_table_data(entity: 'Entity',
             data[0] = ''.join([data[0]] + [alias])
         else:
             data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
-    if entity.view_name in ['event', 'actor']:
-        data.append(g.classes[entity.class_.code].name)
-    if entity.view_name in ['reference'] and entity.system_type != 'file':
-        data.append(uc_first(_(entity.system_type)))
-    if entity.view_name in ['event', 'place', 'source', 'reference', 'file', 'object']:
+
+    data.append(uc_first(_(entity.system_class).replace('_', ' ')))
+    if entity.view_class in ['event', 'place', 'source', 'reference', 'file', 'object']:
         data.append(entity.print_base_type())
-    if entity.system_type == 'file':
+    if entity.system_class == 'file':
         if file_stats:
             data.append(convert_size(
                 file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
@@ -438,7 +436,8 @@ def get_base_table_data(entity: 'Entity',
         else:
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
-    if entity.view_name in ['event', 'actor', 'place']:
+    if entity.system_class in ['event', 'actor', 'place']:
+        # Todo: get information if date from forms
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     data.append(entity.description)

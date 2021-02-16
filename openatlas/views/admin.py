@@ -269,7 +269,7 @@ def admin_check_dates() -> str:
         actor = link_.range
         data = [link(actor),
                 link(event),
-                g.classes[event.class_.code].name,
+                g.cidoc_classes[event.class_.code].name,
                 link_.type.name if link_.type else '',
                 link_.description,
                 link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]

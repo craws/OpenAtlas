@@ -39,10 +39,10 @@ def get_buttons(class_: str) -> List[str]:
     buttons = []
     if class_ in ['actor', 'event']:
         for code in app.config['CLASS_CODES'][class_]:
-            buttons.append(button(g.classes[code].name, url_for('insert', class_=code)))
+            buttons.append(button(g.cidoc_classes[code].name, url_for('insert', class_=code)))
     elif class_ == 'object':
         buttons = [button(_('artifact'), url_for('insert', class_='artifact')),
-                   button(g.classes['E84'].name, url_for('insert', class_='E84'))]
+                   button(g.cidoc_classes['E84'].name, url_for('insert', class_='E84'))]
     elif class_ == 'reference':
         buttons = [button(_('bibliography'), url_for('insert', class_='bibliography')),
                    button(_('edition'), url_for('insert', class_='edition')),
@@ -83,13 +83,7 @@ def get_table(class_: str) -> Table:
                 link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
                 entity.description])
     else:
-        if class_ == 'place':
-            entities = Entity.get_by_system_type(
-                'place',
-                nodes=True,
-                aliases=current_user.settings['table_show_aliases'])
-        else:
-            entities = Entity.get_by_menu_item(class_)
+        entities = Entity.get_by_system_class(g.view_class_mapping[class_])
         table.rows = [get_base_table_data(item) for item in entities]
     return table
 

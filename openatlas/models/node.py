@@ -30,7 +30,7 @@ class Node(Entity):
     def get_all_nodes() -> Dict[int, Node]:
         """ Get and return all type and place nodes"""
         sql = """
-            SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
+            SELECT e.id, e.name, e.class_code, e.description, e.system_class, e.created, e.modified,
                 es.id AS super_id, COUNT(l2.id) AS count, COUNT(l3.id) AS count_property
             FROM model.entity e                
 

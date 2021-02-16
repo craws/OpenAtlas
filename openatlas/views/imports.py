@@ -147,7 +147,7 @@ def import_data(project_id: int, class_code: str) -> str:
     elif class_code == 'E33':  # pragma: no cover
         class_label = uc_first('source')
     else:
-        class_label = g.classes[class_code].name
+        class_label = g.cidoc_classes[class_code].name
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)  # type: ignore

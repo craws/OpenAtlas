@@ -44,14 +44,14 @@ def overview() -> str:
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
             tables['bookmarks'].rows.append([link(entity),
-                                             g.classes[entity.class_.code].name,
+                                             g.cidoc_classes[entity.class_.code].name,
                                              entity.first,
                                              entity.last,
                                              bookmark_toggle(entity.id, True)])
         for entity_id, text in User.get_notes().items():
             entity = Entity.get_by_id(entity_id)
             tables['notes'].rows.append([link(entity),
-                                         g.classes[entity.class_.code].name,
+                                         g.cidoc_classes[entity.class_.code].name,
                                          entity.first,
                                          entity.last,
                                          text])
@@ -64,7 +64,7 @@ def overview() -> str:
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity),
-                g.classes[entity.class_.code].name,
+                g.cidoc_classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
                 format_date(entity.created),

@@ -27,7 +27,7 @@ class LinkCheckForm(FlaskForm):  # type: ignore
 def model_index() -> str:
     form = LinkCheckForm()
     form_classes = {}
-    for code, class_ in g.classes.items():
+    for code, class_ in g.cidoc_classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
@@ -37,8 +37,8 @@ def model_index() -> str:
     form.property.choices = form_properties.items()
     test_result = None
     if form.validate_on_submit():
-        domain = g.classes[form.domain.data]
-        range_ = g.classes[form.range.data]
+        domain = g.cidoc_classes[form.domain.data]
+        range_ = g.cidoc_classes[form.range.data]
         property_ = g.properties[form.property.data]
         domain_is_valid = property_.find_object('domain_class_code', domain.code)
         range_is_valid = property_.find_object('range_class_code', range_.code)
@@ -48,7 +48,7 @@ def model_index() -> str:
                        'domain_error': False if domain_is_valid else True,
                        'range_error': False if range_is_valid else True}
     else:
-        domain = g.classes['E1']
+        domain = g.cidoc_classes['E1']
         property_ = g.properties['P1']
         range_ = domain
         form.domain.data = domain.code
@@ -73,7 +73,7 @@ def class_entities(code: str) -> str:
                            title=_('model'),
                            crumbs=[[_('model'), url_for('model_index')],
                                    [_('classes'), url_for('class_index')],
-                                   link(g.classes[code]),
+                                   link(g.cidoc_classes[code]),
                                    _('entities')])
 
 
@@ -84,7 +84,7 @@ def class_index() -> str:
                   defs=[{'className': 'dt-body-right', 'targets': 2},
                         {'orderDataType': 'cidoc-model', 'targets': [0]},
                         {'sType': 'numeric', 'targets': [0]}])
-    for class_id, class_ in g.classes.items():
+    for class_id, class_ in g.cidoc_classes.items():
         count = ''
         if class_.count:
             count = format_number(class_.count)
@@ -102,7 +102,7 @@ def class_index() -> str:
 @app.route('/overview/model/property')
 @required_group('readonly')
 def property_index() -> str:
-    classes = g.classes
+    classes = g.cidoc_classes
     properties = g.properties
     table = Table(
         ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name', 'count'],
@@ -128,14 +128,14 @@ def property_index() -> str:
 @app.route('/overview/model/class_view/<code>')
 @required_group('readonly')
 def class_view(code: str) -> str:
-    class_ = g.classes[code]
+    class_ = g.cidoc_classes[code]
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(paging=False,
                               defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                     {'sType': 'numeric', 'targets': [0]}])
         for code_ in getattr(class_, table):
-            tables[table].rows.append([link(g.classes[code_]), g.classes[code_].name])
+            tables[table].rows.append([link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name])
     tables['domains'] = Table(paging=False,
                               defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                     {'sType': 'numeric', 'targets': [0]}])
@@ -161,8 +161,8 @@ def class_view(code: str) -> str:
 @required_group('readonly')
 def property_view(code: str) -> str:
     property_ = g.properties[code]
-    domain = g.classes[property_.domain_class_code]
-    range_ = g.classes[property_.range_class_code]
+    domain = g.cidoc_classes[property_.domain_class_code]
+    range_ = g.cidoc_classes[property_.range_class_code]
     info = {'code': property_.code,
             'name': property_.name,
             'inverse': property_.name_inverse,
@@ -222,7 +222,7 @@ def model_network(dimensions: Optional[int] = None) -> str:
                                           'charge': form.charge.data,
                                           'distance': form.distance.data}}
     for code in Network.classes:
-        form.classes.choices.append((code, g.classes[code].name))
+        form.cidoc_classes.choices.append((code, g.cidoc_classes[code].name))
         params['classes'][code] = {'color': getattr(form, 'color_' + code).data}
     return render_template('model/network2.html' if dimensions else 'model/network.html',
                            form=form,

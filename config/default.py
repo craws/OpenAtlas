@@ -70,31 +70,5 @@ PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Human Remains',
               'Information Carrier', 'Place', 'Source', 'Stratigraphic Unit']
 
-# Mappings between model and user interface
-CODE_CLASS = {
-    'E21': 'actor',
-    'E40': 'actor',
-    'E74': 'actor',
-    'E7': 'event',
-    'E8': 'event',
-    'E9': 'event',
-    'E84': 'object',
-    'E18': 'place',
-    'E20': 'place',
-    'E22': 'place',
-    'E31': 'reference',
-    'E33': 'source'}
-
-CLASS_CODES = {
-    'actor': ['E21', 'E74', 'E40'],
-    'event': ['E7', 'E8', 'E9'],
-    'group': ['E40', 'E74'],
-    'information_carrier': ['E84'],
-    'object': ['E84'],
-    'person': ['E21'],
-    'place': ['E18', 'E20', 'E22'],
-    'reference': ['E31'],
-    'source': ['E33']}
-
 CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
                   'secondary': 'btn btn-secondary btn-xsm'}}
