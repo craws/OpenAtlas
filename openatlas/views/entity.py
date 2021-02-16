@@ -104,7 +104,9 @@ def entity_view(id_: int) -> Union[str, Response]:
             elif tab_name == 'Place':
                 tab_name = link_.range.system_type.title().replace(' ', '-')
             elif tab_name == 'Object':  # pragma: no cover
-                tab_name = 'Artificial-Object'
+                tab_name = 'Artifact'
+            elif tab_name == 'Node':  # pragma: no cover
+                tab_name = 'Type'
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
         for form_id, form_ in entity.get_forms().items():
             if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
@@ -353,19 +355,21 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
     crumbs = [[_(entity.view_name.replace('_', ' ')),
                url_for('index', class_=entity.view_name)], entity.name]
     if structure:
-        crumbs = [[_(entity.view_name).replace('_', ' '),
-                   url_for('index', class_=entity.view_name)],
-                  structure['place'],
-                  structure['feature'],
-                  structure['stratigraphic_unit'],
-                  entity.name]
+        crumbs = [
+            [_(entity.view_name).replace('_', ' '), url_for('index', class_=entity.view_name)],
+            structure['place'],
+            structure['feature'],
+            structure['stratigraphic_unit'],
+            entity.name]
     elif entity.view_name == 'node':
-        crumbs = [[_('types'), url_for('node_index')],
-                  link(g.nodes[entity.root[-1]]),
-                  entity.name]
+        crumbs = [[_('types'), url_for('node_index')]]
+        if entity.root:
+            for node_id in reversed(entity.root):
+                crumbs += [g.nodes[node_id]]
+        crumbs += [entity.name]
     elif entity.view_name == 'translation':
         crumbs = [[_('source'), url_for('index', class_='source')],
-                  link(entity.get_linked_entity('P73', True)),
+                  entity.get_linked_entity('P73', True),
                   entity.name]
     return crumbs
 
@@ -374,7 +378,7 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
     buttons = []
     if entity.view_name == 'node':
         if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
-            buttons.append(button(_('edit'), url_for('node_update', id_=entity.id)))
+            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:
                 buttons.append(display_delete_link(None, entity))
     elif entity.view_name == 'reference_system':

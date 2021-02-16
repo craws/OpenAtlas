@@ -2,8 +2,10 @@ class Changelog:
     versions = {
         '5.8.0': ['TBA', {
             'feature': {
+                '1091': 'Reference systems for types',
                 '1187': 'Add files for objects',
-                '1456': 'Artificial objects'}}],
+                '1456': 'Artifacts',
+                '1461': 'Also search in date comments'}}],
         '5.7.2': ['2021-01-27', {
             'fix': {
                 '1455': 'Network graphic error'}}],

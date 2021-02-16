@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -13,11 +13,15 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import link, uc_first
 from openatlas.util.util import is_authorized, required_group, was_modified
+
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from openatlas.models.entity import Entity
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
@@ -25,6 +29,8 @@ from openatlas.util.util import is_authorized, required_group, was_modified
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     if class_ == 'reference system' and not is_authorized('manager'):
+        abort(403)  # pragma: no cover
+    elif class_ == 'node' and not is_authorized('editor'):
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
     if class_ in app.config['CLASS_CODES']['actor']:
@@ -78,10 +84,10 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
 
 def add_crumbs(view_name: str,
                class_: str,
-               origin: Union[Entity, None],
+               origin: Union[Entity, Node, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    view_name = 'object' if view_name == 'artificial_object' else view_name
+    view_name = 'object' if view_name == 'artifact' else view_name
     crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
                url_for('index', class_=origin.view_name if origin else view_name)],
               link(origin)]
@@ -91,6 +97,12 @@ def add_crumbs(view_name: str,
                   structure['feature'],
                   structure['stratigraphic_unit'],
                   link(origin)]
+    if view_name == 'node':
+        crumbs = [[_('types'), url_for('node_index')]]
+        if origin and origin.root:
+            for node_id in reversed(origin.root):
+                crumbs += [link(g.nodes[node_id])]
+        crumbs += [origin]
     if insert_:
         crumbs = crumbs + ['+ ' + (g.classes[class_].name if class_ in g.classes else uc_first(
             _(class_.replace('_', ' '))))]
@@ -105,16 +117,18 @@ def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if entity.system_type == 'reference system' and not is_authorized('manager'):
         abort(403)  # pragma: no cover
+    elif entity.view_name == 'node':
+        root = g.nodes[entity.root[-1]] if entity.root else None
+        if not is_authorized('editor') or (not root and (entity.standard or entity.locked)):
+            abort(403)  # pragma: no cover
     if not entity.view_name:
         abort(422)  # pragma: no cover
 
     # Archaeological sub units
     geonames_module = False
     structure = None
-    location = None
     gis_data = None
     overlays = None
-
     if entity.view_name == 'actor':
         form = build_form(g.classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
     elif entity.view_name in ['object', 'reference']:
@@ -140,9 +154,23 @@ def update(id_: int) -> Union[str, Response]:
 
     if entity.view_name == 'event':
         form.event_id.data = entity.id
-    elif entity.class_.code == 'E32':  # reference system
+    elif entity.class_.code == 'E32' and entity.system:  # reference system
         form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
+        if entity.id in g.nodes:
+            valid = True
+            root = g.nodes[entity.root[-1]]
+            new_super_id = getattr(form, str(root.id)).data
+            new_super = g.nodes[int(new_super_id)] if new_super_id else None
+            if new_super:
+                if new_super.id == entity.id:
+                    flash(_('error node self as super'), 'error')
+                    valid = False
+                if new_super.root and entity.id in new_super.root:
+                    flash(_('error node sub as super'), 'error')
+                    valid = False
+            if not valid:
+                return redirect(url_for('entity_view', id_=entity.id))
         if was_modified(form, entity):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
@@ -152,7 +180,7 @@ def update(id_: int) -> Union[str, Response]:
                 entity=entity,
                 structure=structure,
                 modifier=link(logger.get_log_for_advanced_view(entity.id)['modifier']))
-        return redirect(save(form, entity, location=location))
+        return redirect(save(form, entity))
     populate_update_form(form, entity)
     return render_template('entity/update.html',
                            form=form,
@@ -168,13 +196,19 @@ def update(id_: int) -> Union[str, Response]:
                                              structure=structure))
 
 
-def populate_insert_form(form: FlaskForm, view_name: str, class_: str, origin: Entity) -> None:
+def populate_insert_form(form: FlaskForm,
+                         view_name: str,
+                         class_: str,
+                         origin: Union[Entity, Node]) -> None:
     if view_name == 'source':
         if origin and origin.class_.code == 'E84':
             form.information_carrier.data = [origin.id]
-    if view_name == 'actor':
+    elif view_name == 'actor':
         if origin.system_type == 'place':
             form.residence.data = origin.id
+    elif view_name == 'node':
+        root_id = origin.root[-1] if origin.root else origin.id
+        getattr(form, str(root_id)).data = origin.id if origin.id != root_id else None
     elif view_name == 'event':
         if origin.view_name == 'object':
             form.object.data = [origin.id]
@@ -185,7 +219,7 @@ def populate_insert_form(form: FlaskForm, view_name: str, class_: str, origin: E
                 form.place.data = origin.id
 
 
-def populate_update_form(form: FlaskForm, entity: Entity) -> None:
+def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
     if hasattr(form, 'alias'):
         for alias in entity.aliases.values():
             form.alias.append_entry(alias)
@@ -220,58 +254,31 @@ def populate_update_form(form: FlaskForm, entity: Entity) -> None:
             form.place.data = place.get_linked_entity_safe('P53', True).id if place else ''
         if entity.class_.code == 'E8':  # Form data for acquisition
             form.given_place.data = [entity.id for entity in entity.get_linked_entities('P24')]
+    elif entity.view_name == 'node':
+        if hasattr(form, 'name_inverse'):  # a directional node, e.g. actor actor relation
+            name_parts = entity.name.split(' (')
+            form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
+        root = g.nodes[entity.root[-1]] if entity.root else entity
+        if root:  # Set super if exists and is not same as root
+            super_ = g.nodes[entity.root[0]]
+            getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
     elif entity.view_name == 'source':
         form.information_carrier.data = [item.id for item in
                                          entity.get_linked_entities('P128', inverse=True)]
 
 
 def save(form: FlaskForm,
-         entity: Optional[Union[Entity, ReferenceSystem]] = None,
+         entity: Optional[Union[Entity, Node, ReferenceSystem]] = None,
          class_: Optional[str] = '',
-         origin: Optional[Entity] = None,
-         location: Optional[Entity] = None) -> Union[str, Response]:
+         origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     action = 'update'
     try:
         if not entity:
             action = 'insert'
-            if class_ == 'artificial_object':
-                entity = Entity.insert('E22', form.name.data, 'artificial object')
-                location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
-                entity.link('P53', location)
-            elif class_ == 'source':
-                entity = Entity.insert('E33', form.name.data, 'source content')
-            elif class_ == 'file':
-                entity = Entity.insert('E31', form.name.data, 'file')
-            elif class_ == 'E84':
-                entity = Entity.insert('E84', form.name.data, 'information carrier')
-            elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
-                if class_ == 'human_remains':
-                    entity = Entity.insert('E20', form.name.data, 'human remains')
-                elif origin and origin.system_type == 'stratigraphic unit':
-                    entity = Entity.insert('E22', form.name.data, 'find')
-                else:
-                    system_type = 'place'
-                    if origin and origin.system_type == 'place':
-                        system_type = 'feature'
-                    elif origin and origin.system_type == 'feature':
-                        system_type = 'stratigraphic unit'
-                    entity = Entity.insert('E18', form.name.data, system_type)
-                location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
-                entity.link('P53', location)
-            elif class_ in ('bibliography', 'edition', 'external_reference'):
-                entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
-            elif class_ == 'reference_system':
-                entity = ReferenceSystem.insert_system(form)
-            else:
-                entity = Entity.insert(class_, form.name.data)
-            if entity.view_name == 'file':
-                file_ = request.files['file']
-                # Add an 'a' to prevent emtpy filename, this won't affect stored information
-                filename = secure_filename('a' + file_.filename)  # type: ignore
-                new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-                file_.save(str(app.config['UPLOAD_DIR'] / new_name))
-
+            entity = insert_entity(form, class_, origin)
         if entity.class_.code == 'E32':  # Reference system
             entity.name = entity.name if hasattr(entity, 'system') and entity.system \
                 else form.name.data
@@ -284,7 +291,7 @@ def save(form: FlaskForm,
                 entity.add_forms(form)
         else:
             entity.update(form)
-        update_links(entity, form, action, location)
+        update_links(entity, form, action, origin)
         url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
         g.cursor.execute('COMMIT')
@@ -305,18 +312,69 @@ def save(form: FlaskForm,
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             view_name = class_
-            if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
-                view_name = 'place'
-            elif class_ in ['artificial_object']:
-                view_name = 'object'
-            url = url_for('index', class_=view_name)
+            if class_ == 'node':
+                url = url_for('node_index')
+            else:
+                if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
+                    view_name = 'place'
+                elif class_ in ['artifact']:
+                    view_name = 'object'
+                url = url_for('index', class_=view_name)
     return url
 
 
-def update_links(entity: Entity, form, action: str, location: Optional[Entity] = None) -> None:
+def insert_entity(form: FlaskForm,
+                  class_: Optional[str] = '',
+                  origin: Optional[Union[Entity, Node]] = None
+                  ) -> Union[Entity, Node, ReferenceSystem]:
+    if class_ == 'artifact':
+        entity = Entity.insert('E22', form.name.data, 'artifact')
+        location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
+        entity.link('P53', location)
+    elif class_ == 'node':
+        root = g.nodes[origin.root[-1]] if origin.root else origin
+        entity = Entity.insert(root.class_.code, form.name.data)
+    elif class_ == 'source':
+        entity = Entity.insert('E33', form.name.data, 'source content')
+    elif class_ == 'file':
+        entity = Entity.insert('E31', form.name.data, 'file')
+    elif class_ == 'E84':
+        entity = Entity.insert('E84', form.name.data, 'information carrier')
+    elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
+        if class_ == 'human_remains':
+            entity = Entity.insert('E20', form.name.data, 'human remains')
+        elif origin and origin.system_type == 'stratigraphic unit':
+            entity = Entity.insert('E22', form.name.data, 'find')
+        else:
+            system_type = 'place'
+            if origin and origin.system_type == 'place':
+                system_type = 'feature'
+            elif origin and origin.system_type == 'feature':
+                system_type = 'stratigraphic unit'
+            entity = Entity.insert('E18', form.name.data, system_type)
+        entity.link('P53', Entity.insert('E53', 'Location of ' + form.name.data, 'place location'))
+    elif class_ in ('bibliography', 'edition', 'external_reference'):
+        entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
+    elif class_ == 'reference_system':
+        entity = ReferenceSystem.insert_system(form)
+    else:
+        entity = Entity.insert(class_, form.name.data)
+    if entity.view_name == 'file':
+        file_ = request.files['file']
+        # Add an 'a' to prevent emtpy filename, this won't affect stored information
+        filename = secure_filename('a' + file_.filename)  # type: ignore
+        new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
+        file_.save(str(app.config['UPLOAD_DIR'] / new_name))
+    return entity
+
+
+def update_links(entity: Union[Entity, Node],
+                 form: FlaskForm,
+                 action: str,
+                 origin: Optional[Union[Entity, Node]]) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
-    if entity.view_name in ['actor', 'event', 'place', 'object']:
+    if entity.view_name in ['actor', 'event', 'place', 'object', 'node']:
         ReferenceSystem.update_links(form, entity)
 
     if entity.view_name == 'actor':
@@ -353,6 +411,7 @@ def update_links(entity: Entity, form, action: str, location: Optional[Entity] =
     elif entity.view_name == 'place':
         if action == 'update':
             Gis.delete_by_entity(entity)
+        location = entity.get_linked_entity_safe('P53')
         location.update(form)
         Gis.insert(location, form)
     elif entity.view_name == 'source':
@@ -360,14 +419,24 @@ def update_links(entity: Entity, form, action: str, location: Optional[Entity] =
             entity.delete_links(['P128'], inverse=True)
         if form.information_carrier.data:
             entity.link_string('P128', form.information_carrier.data, inverse=True)
+    elif entity.view_name == 'node':
+        node = origin if origin else entity
+        root = g.nodes[node.root[-1]] if node.root else node
+        super_id = g.nodes[node.root[0]] if node.root else node
+        new_super_id = getattr(form, str(root.id)).data
+        new_super = g.nodes[int(new_super_id)] if new_super_id else root
+        if super_id != new_super.id:
+            property_code = 'P127' if entity.class_.code == 'E55' else 'P89'
+            entity.delete_links([property_code])
+            entity.link(property_code, new_super)
 
 
 def link_and_get_redirect_url(form: FlaskForm,
                               entity: Entity,
                               class_: Optional[str] = '',
-                              origin: Optional[Entity] = None) -> str:
+                              origin: Union[Entity, Node, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
-    if origin:
+    if origin and entity.view_name != 'node':
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.view_name
         if origin.view_name == 'reference':
             link_id = origin.link('P67', entity)[0]
@@ -395,7 +464,12 @@ def link_and_get_redirect_url(form: FlaskForm,
             link_id = origin.link('OA7', entity)[0]  # Actor with actor relation
             url = url_for('relation_update', id_=link_id, origin_id=origin.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
-        url = url_for('insert', class_=class_, origin_id=origin.id if origin else None)
+        if entity.view_name == 'node':
+            root_id = origin.root[-1] if origin.root else origin.id
+            super_id = getattr(form, str(root_id)).data
+            url = url_for('insert', class_=class_, origin_id=str(super_id) if super_id else root_id)
+        else:
+            url = url_for('insert', class_=class_, origin_id=origin.id if origin else None)
     elif hasattr(form, 'continue_') and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
         if class_ == 'sub':

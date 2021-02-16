@@ -7,8 +7,8 @@ from markupsafe import Markup
 
 
 class Table:
-    HEADERS = {'artificial_object': ['name', 'type', 'begin', 'end', 'description'],
-               'actor': ['name', 'class', 'begin', 'end', 'description'],
+    HEADERS = {'actor': ['name', 'class', 'begin', 'end', 'description'],
+               'artifact': ['name', 'type', 'begin', 'end', 'description'],
                'entities': ['name', 'class', 'info'],
                'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
                'feature': ['name', 'type', 'begin', 'end', 'description'],

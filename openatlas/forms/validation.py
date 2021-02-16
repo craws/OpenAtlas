@@ -1,6 +1,6 @@
 import ast
 
-from flask import g, request, session
+from flask import request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
