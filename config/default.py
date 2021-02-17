@@ -45,7 +45,7 @@ EXTERNAL_REFERENCES_FORMS = ['Artificial Object', 'Event', 'Feature', 'Find', 'G
 MODULES = ['map_overlay', 'notes', 'sub_units']
 
 # API
-API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
+API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS),  # Todo: move to backend config
 ALLOWED_IPS = ['127.0.0.1']  # Todo: move to backend config
 
