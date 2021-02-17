@@ -80,7 +80,6 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
-            # Todo: Expected Nostromos too, only get Asgard
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
