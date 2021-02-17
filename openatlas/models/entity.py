@@ -42,8 +42,7 @@ class Entity:
         self.created = row.created
         self.modified = row.modified
         self.cidoc_class = g.cidoc_classes[row.class_code]  # The CIDOC class
-        self.system_class = g.classes[row.system_class]  # Internal type
-        self.view_class = self.system_class.view_class  # Used to group similar classes
+        self.class_ = g.classes[row.system_class]  # Internal class
         self.reference_systems: List[Link] = []  # Links to external reference systems
         self.note: Optional[str] = None  # User specific, private note for an entity
         self.origin_id: Optional[int] = None  # For navigation when coming from another entity
@@ -139,9 +138,9 @@ class Entity:
                     inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
                     self.name += ' (' + inverse + ')'
 
-        if self.system_class == 'node':
+        if self.class_ == 'node':
             self.name = sanitize(self.name, 'node')
-        elif self.system_class == 'object_location':
+        elif self.class_ == 'object_location':
             self.name = 'Location of ' + self.name
             self.description = None
         sql = """
@@ -175,7 +174,7 @@ class Entity:
         Entity.delete_(delete_ids)  # Delete obsolete aliases
         for alias in new_aliases:  # Insert new aliases if not empty
             if alias.strip():
-                if self.view_class == 'actor':
+                if self.class_.view == 'actor':
                     self.link('P131', Entity.insert('E82', alias))
                 else:
                     self.link('P1', Entity.insert('E41', alias))
@@ -223,9 +222,9 @@ class Entity:
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_class:
+        if not self.class_.view:
             return ''
-        root_name = 'License' if self.system_class == 'file' else self.system_class.title()
+        root_name = 'License' if self.class_ == 'file' else self.class_.title()
         root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:

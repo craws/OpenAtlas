@@ -424,10 +424,10 @@ def get_base_table_data(entity: 'Entity',
         else:
             data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
 
-    data.append(uc_first(_(entity.system_class).replace('_', ' ')))
-    if entity.view_class in ['event', 'place', 'source', 'reference', 'file', 'object']:
+    data.append(uc_first(_(entity.class_).replace('_', ' ')))
+    if entity.class_.view in ['event', 'place', 'source', 'reference', 'file', 'object']:
         data.append(entity.print_base_type())
-    if entity.system_class == 'file':
+    if entity.class_.name == 'file':
         if file_stats:
             data.append(convert_size(
                 file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
@@ -436,7 +436,7 @@ def get_base_table_data(entity: 'Entity',
         else:
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
-    if entity.system_class in ['event', 'actor', 'place']:
+    if entity.class_.name in ['event', 'actor', 'place']:
         # Todo: get information if date from forms
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')

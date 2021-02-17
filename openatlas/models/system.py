@@ -19,7 +19,7 @@ class SystemClass:
         self.name = name
         self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.write_access = write_access
-        self.view_class = view_class_mapping[name] if name in view_class_mapping else None
+        self.view = view_class_mapping[name] if name in view_class_mapping else None
         self.tabs = tabs if tabs else []
         self.form_fields = form_fields if form_fields else []
         self.table_headers = table_headers if table_headers else []
@@ -44,6 +44,7 @@ def get_class_view_mapping() -> Dict['str', 'str']:
         for class_ in classes:
             mapping[class_] = view
     return mapping
+
 
 system_classes: Dict[str, SystemClass] = {
     'acquisition': SystemClass(

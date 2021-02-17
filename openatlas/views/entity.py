@@ -45,7 +45,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity = g.reference_systems[id_]
     else:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        if not entity.view_class:
+        if not entity.class_.view:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
@@ -56,16 +56,16 @@ def entity_view(id_: int) -> Union[str, Response]:
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info', entity)}
 
-    if entity.view_class == 'type':
-        for name in ['subs', 'entities']:
-            tabs[name] = Tab(name, entity)
+    if entity.class_.view == 'type':
+        tabs['subs'] = Tab('subs', entity)
+        tabs['entities'] = Tab('entities', entity)
         root = g.nodes[entity.root[-1]] if entity.root else None
         if root and root.value_type:  # pragma: no cover
             tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
         for item in entity.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-            if item.system_class == ['location', 'reference_system']:
+            if item.class_.name in ['location', 'reference_system']:
                 continue  # pragma: no cover
-            if entity.system_class == 'object_location':  # pragma: no cover
+            if entity.class_.name == 'object_location':  # pragma: no cover
                 item = item.get_linked_entity('P53', inverse=True)
             data = [link(item)]
             if root and root.value_type:  # pragma: no cover
@@ -155,7 +155,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             actor = Entity.get_by_id(link_.domain.id)
             tabs['actor'].table.rows.append([link(actor),
                                              g.properties[link_.property.code].name,
-                                             actor.system_class.name,
+                                             actor.class_.name,
                                              actor.first,
                                              actor.last,
                                              actor.description])
