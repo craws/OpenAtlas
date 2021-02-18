@@ -1,6 +1,6 @@
 class Changelog:
     versions = {
-        '5.8.0': ['TBA', {
+        '6.0.0': ['TBA', {
             'feature': {
                 '1091': 'Reference systems for types',
                 '1109': 'Sustainable web map services',

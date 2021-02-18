@@ -11,8 +11,8 @@ After following the instructions restart Apache and test if the application is w
     service apache2 restart
 
 
-### 5.7.x to 5.8.0
-Execute **install/upgrade/5.8.0.sql** after making backups.
+### 5.7.x to 6.0.0
+Execute **install/upgrade/6.0.0.sql** after making backups.
 
 ### 5.6.0 to 5.7.0
 
