@@ -3,6 +3,7 @@ class Changelog:
         '5.8.0': ['TBA', {
             'feature': {
                 '1091': 'Reference systems for types',
+                '1109': 'Sustainable web map services',
                 '1187': 'Add files for objects',
                 '1456': 'Artifacts',
                 '1461': 'Also search in date comments'}}],
