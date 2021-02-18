@@ -30,7 +30,7 @@ UPDATE model.entity SET system_class = 'acquisition' WHERE class_code = 'E8';
 UPDATE model.entity SET system_class = 'activity' WHERE class_code ='E7';
 UPDATE model.entity SET system_class = 'actor_appellation' WHERE class_code = 'E82';
 UPDATE model.entity SET system_class = 'appellation' WHERE class_code = 'E41';
-UPDATE model.entity SET system_class = 'artificial_object' WHERE class_code = 'E22' AND system_type = 'artificial object';
+UPDATE model.entity SET system_class = 'artifact' WHERE class_code = 'E22' AND system_type IN ('artificial object', 'artifact');
 UPDATE model.entity SET system_class = 'bibliography' WHERE class_code = 'E31' AND system_type = 'bibliography';
 UPDATE model.entity SET system_class = 'edition' WHERE class_code = 'E31' AND system_type = 'edition';
 UPDATE model.entity SET system_class = 'external_reference' WHERE class_code = 'E31' AND system_type = 'external reference';
@@ -39,7 +39,7 @@ UPDATE model.entity SET system_class = 'file' WHERE class_code = 'E31' AND syste
 UPDATE model.entity SET system_class = 'find' WHERE class_code = 'E22' AND system_type = 'find';
 UPDATE model.entity SET system_class = 'group' WHERE class_code = 'E74';
 UPDATE model.entity SET system_class = 'human_remains' WHERE class_code = 'E20' AND system_type = 'human remains';
-UPDATE model.entity SET system_class = 'information_carrier' WHERE class_code = 'E84' AND system_type = 'information carrier';
+UPDATE model.entity SET class_code = 'E22', system_class = 'artifact' WHERE class_code = 'E84';
 UPDATE model.entity SET system_class = 'legal_body' WHERE class_code = 'E40';
 UPDATE model.entity SET system_class = 'location' WHERE class_code = 'E53' AND system_type IS NULL;
 UPDATE model.entity SET system_class = 'move' WHERE class_code = 'E9';
