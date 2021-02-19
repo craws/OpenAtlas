@@ -1,4 +1,4 @@
--- Upgrade 5.7.x to 5.8.0
+-- Upgrade 5.7.x to 6.0.0
 -- Be sure to backup the database and read the upgrade notes before executing this!
 
 BEGIN;
