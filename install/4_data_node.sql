@@ -1,14 +1,5 @@
 SET search_path = model;
 
--------------------------
--- Information Carrier --
--------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Information Carrier', 'Categories for information carriers. A medieval charter for example may be an information carrier that has a specific content. A later copy of that charter that may be stored in another place/archive will also contain the same content. Therefore we provide different types of information carriers like: Original document, Copy of document etc.');
-INSERT INTO entity (class_code, name) VALUES ('E55', 'Original Document'), ('E55', 'Copy of Document');
-INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Information Carrier'), (SELECT id FROM entity WHERE name='Original Document')),
-('P127', (SELECT id FROM entity WHERE name='Information Carrier'), (SELECT id FROM entity WHERE name='Copy of Document'));
-
 ------------------
 -- Bibliography --
 ------------------
@@ -30,27 +21,27 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Edition'), (SELECT id FROM entity WHERE name='Chronicle Edition'));
 
 ------------------------
--- External Reference --
+-- External reference --
 ------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'External Reference', 'Categories for the classification of external references like a link to Wikipedia');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'External reference', 'Categories for the classification of external references like a link to Wikipedia');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Link');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='External Reference'), (SELECT id FROM entity WHERE name='Link'));
+('P127', (SELECT id FROM entity WHERE name='External reference'), (SELECT id FROM entity WHERE name='Link'));
 
 ------------------------
--- External Reference Match--
+-- External reference match--
 ------------------------
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'External Reference Match', 'SKOS based definition of the confidence degree that concepts can be used interchangeable.');
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'External reference match', 'SKOS based definition of the confidence degree that concepts can be used interchangeable.');
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'exact match', 'High degree of confidence that the concepts can be used interchangeably.');
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'close match', 'Concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications.');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM model.entity WHERE name='External Reference Match'), (SELECT id FROM model.entity WHERE name='exact match')),
-('P127', (SELECT id FROM model.entity WHERE name='External Reference Match'), (SELECT id FROM model.entity WHERE name='close match'));
+('P127', (SELECT id FROM model.entity WHERE name='External reference match'), (SELECT id FROM model.entity WHERE name='exact match')),
+('P127', (SELECT id FROM model.entity WHERE name='External reference match'), (SELECT id FROM model.entity WHERE name='close match'));
 
 --------------------
--- Actor Function --
+-- Actor function --
 --------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Actor Function', 'Definitions of an actor''s function within a group or legal body. An actor can for example be member of a legal body and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the legal body "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the legal body "Roman Empire" from 800 to 814 in the function "Emperor".');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Actor function', 'Definitions of an actor''s function within a group. An actor can for example be member of a group and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the group "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the group "Roman Empire" from 800 to 814 in the function "Emperor".');
 INSERT INTO entity (class_code, name) VALUES
 ('E55', 'Bishop'),
 ('E55', 'Abbot'),
@@ -59,12 +50,12 @@ INSERT INTO entity (class_code, name) VALUES
 ('E55', 'Count'),
 ('E55', 'King');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='Bishop')),
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='Abbot')),
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='Pope')),
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='Emperor')),
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='Count')),
-('P127', (SELECT id FROM entity WHERE name='Actor Function'), (SELECT id FROM entity WHERE name='King'));
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='Bishop')),
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='Abbot')),
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='Pope')),
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='Emperor')),
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='Count')),
+('P127', (SELECT id FROM entity WHERE name='Actor function'), (SELECT id FROM entity WHERE name='King'));
 
 -----------------
 -- Involvement --
@@ -144,9 +135,9 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Open license'), (SELECT id FROM entity WHERE name='CC BY-SA 4.0'));
 
 --------------------------
--- Actor Actor Relation --
+-- Actor actor relation --
 --------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Actor Actor Relation', 'Categories for the relationship between two actors. This may be a mutual relationship (e.g. actor A is friend of actor B and vice versa), or a directional relationship (e.g. actor A is the child of actor B, while actor B is the parent of actor A).');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Actor actor relation', 'Categories for the relationship between two actors. This may be a mutual relationship (e.g. actor A is friend of actor B and vice versa), or a directional relationship (e.g. actor A is the child of actor B, while actor B is the parent of actor A).');
 INSERT INTO entity (class_code, name) VALUES
 ('E55', 'Kindredship'),
 ('E55', 'Parent of (Child of)'),
@@ -160,10 +151,10 @@ INSERT INTO entity (class_code, name) VALUES
 ('E55', 'Economical'),
 ('E55', 'Provider of (Customer of)');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Actor Actor Relation'), (SELECT id FROM entity WHERE name='Kindredship')),
-('P127', (SELECT id FROM entity WHERE name='Actor Actor Relation'), (SELECT id FROM entity WHERE name='Social')),
-('P127', (SELECT id FROM entity WHERE name='Actor Actor Relation'), (SELECT id FROM entity WHERE name='Political')),
-('P127', (SELECT id FROM entity WHERE name='Actor Actor Relation'), (SELECT id FROM entity WHERE name='Economical')),
+('P127', (SELECT id FROM entity WHERE name='Actor actor relation'), (SELECT id FROM entity WHERE name='Kindredship')),
+('P127', (SELECT id FROM entity WHERE name='Actor actor relation'), (SELECT id FROM entity WHERE name='Social')),
+('P127', (SELECT id FROM entity WHERE name='Actor actor relation'), (SELECT id FROM entity WHERE name='Political')),
+('P127', (SELECT id FROM entity WHERE name='Actor actor relation'), (SELECT id FROM entity WHERE name='Economical')),
 ('P127', (SELECT id FROM entity WHERE name='Kindredship'), (SELECT id FROM entity WHERE name='Parent of (Child of)')),
 ('P127', (SELECT id FROM entity WHERE name='Social'), (SELECT id FROM entity WHERE name='Friend of')),
 ('P127', (SELECT id FROM entity WHERE name='Social'), (SELECT id FROM entity WHERE name='Enemy of')),
@@ -205,39 +196,30 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Pit'));
 
 ------------------------
--- Stratigraphic Unit --
+-- Stratigraphic unit --
 ------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphic Unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphic unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Burial'), ('E55', 'Deposit');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Burial')),
-('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Deposit'));
-
------------
--- Find --
------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Find', 'Classification of the archaeological find e.g. weapon, jewellery ...');
-INSERT INTO entity (class_code, name) VALUES ('E55', 'Weapon'), ('E55', 'Jewellery');
-INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Find'), (SELECT id FROM entity WHERE name='Weapon')),
-('P127', (SELECT id FROM entity WHERE name='Find'), (SELECT id FROM entity WHERE name='Jewellery'));
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic unit'), (SELECT id FROM entity WHERE name='Burial')),
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic unit'), (SELECT id FROM entity WHERE name='Deposit'));
 
 -------------------
--- Human Remains --
+-- Human remains --
 -------------------
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Human Remains', 'Human remains, that for example were discovered during archaeological excavations. They are associated with a stratigraphic unit (in most cases a skeleton) that is composed of (P46) one or multiple parts (in most cases bones) that are classified as biological objects (E20). From a hierarchical point of view the human remains are one level below the stratigraphic unit respectively the entity whose sum of parts resembles the individual/skeleton. This way individual bones or body parts can be treated individually and be connected with separate classifications (e.g. Injuries of the right upper arm or caries on a certain tooth).');
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Human remains', 'Human remains, that for example were discovered during archaeological excavations. They are associated with a stratigraphic unit (in most cases a skeleton) that is composed of (P46) one or multiple parts (in most cases bones) that are classified as biological objects (E20). From a hierarchical point of view the human remains are one level below the stratigraphic unit respectively the entity whose sum of parts resembles the individual/skeleton. This way individual bones or body parts can be treated individually and be connected with separate classifications (e.g. Injuries of the right upper arm or caries on a certain tooth).');
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Upper Body', '');
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Lower Body', '');
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Upper Body'));
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Lower Body'));
-INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type) VALUES ((SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), 'Human Remains', False, True, False, False);
-INSERT INTO web.form (name, extendable) VALUES ('Human Remains', True);
-INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name='Human Remains'),(SELECT id FROM web.form WHERE name='Human Remains'));
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Upper Body'));
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Lower Body'));
+INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type) VALUES ((SELECT id FROM model.entity WHERE name='Human remains' AND class_code = 'E55'), 'Human remains', False, True, False, False);
+INSERT INTO web.form (name, extendable) VALUES ('Human remains', True);
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name='Human remains'),(SELECT id FROM web.form WHERE name='Human remains'));
 
 -------------------------
--- Administrative Unit --
+-- Administrative unit --
 -------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E53', 'Administrative Unit', 'Hierarchy of administrative units like "Austria", "Germany", "Italy" and their respective subunits like "Lower Austria", "Styria" and their subunits etc.');
+INSERT INTO entity (class_code, name, description) VALUES ('E53', 'Administrative unit', 'Hierarchy of administrative units like "Austria", "Germany", "Italy" and their respective subunits like "Lower Austria", "Styria" and their subunits etc.');
 INSERT INTO entity (class_code, name) VALUES
 ('E53', 'Austria'),
 ('E53', 'Wien'),
@@ -248,39 +230,39 @@ INSERT INTO entity (class_code, name) VALUES
 ('E53', 'Slovakia'),
 ('E53', 'Slovenia');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Austria')),
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Italy')),
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Germany')),
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Czech Republic')),
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Slovakia')),
-('P89', (SELECT id FROM entity WHERE name='Administrative Unit'), (SELECT id FROM entity WHERE name='Slovenia')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Austria')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Italy')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Germany')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Czech Republic')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Slovakia')),
+('P89', (SELECT id FROM entity WHERE name='Administrative unit'), (SELECT id FROM entity WHERE name='Slovenia')),
 ('P89', (SELECT id FROM entity WHERE name='Austria'), (SELECT id FROM entity WHERE name='Wien')),
 ('P89', (SELECT id FROM entity WHERE name='Austria'), (SELECT id FROM entity WHERE name='Niederösterreich'));
 
 ----------------------
--- Historical Place --
+-- Historical place --
 ----------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E53', 'Historical Place', 'Hierarchy of historical places respectively historical administrative units like: Duchy of Bavaria, Lombard Kingdom etc.');
+INSERT INTO entity (class_code, name, description) VALUES ('E53', 'Historical place', 'Hierarchy of historical places respectively historical administrative units like: Duchy of Bavaria, Lombard Kingdom etc.');
 INSERT INTO entity (class_code, name) VALUES
 ('E53', 'Carantania'),
 ('E53', 'Marcha Orientalis'),
 ('E53', 'Comitatus Iauntal'),
 ('E53', 'Kingdom of Serbia');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P89', (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Carantania')),
-('P89', (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Marcha Orientalis')),
-('P89', (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Comitatus Iauntal')),
-('P89', (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Kingdom of Serbia'));
+('P89', (SELECT id FROM entity WHERE name='Historical place'), (SELECT id FROM entity WHERE name='Carantania')),
+('P89', (SELECT id FROM entity WHERE name='Historical place'), (SELECT id FROM entity WHERE name='Marcha Orientalis')),
+('P89', (SELECT id FROM entity WHERE name='Historical place'), (SELECT id FROM entity WHERE name='Comitatus Iauntal')),
+('P89', (SELECT id FROM entity WHERE name='Historical place'), (SELECT id FROM entity WHERE name='Kingdom of Serbia'));
 
 ------------------------
--- Source Translation --
+-- Source translation --
 ------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Source Translation', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Source translation', '');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Original Text'), ('E55', 'Translation'), ('E55', 'Transliteration');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Original Text')),
-('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Translation')),
-('P127', (SELECT id FROM entity WHERE name='Source Translation'), (SELECT id FROM entity WHERE name='Transliteration'));
+('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Original Text')),
+('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Translation')),
+('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Transliteration'));
 
 -----------------
 -- Value types --
@@ -310,19 +292,16 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Event', True),
 ('Person', True),
 ('Group', True),
-('Legal Body', True),
 ('Place', True),
 ('Feature', True),
-('Stratigraphic Unit', True),
-('Find', True),
+('Stratigraphic unit', True),
 ('Bibliography', True),
 ('Edition', True),
-('Information Carrier', True),
-('Actor Actor Relation', False),
+('Actor actor relation', False),
 ('Involvement', False),
 ('Member', False),
-('Source Translation', False),
-('External Reference', True),
+('Source translation', False),
+('External reference', True),
 ('Type', True);
 
 INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
@@ -330,23 +309,21 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 ((SELECT id FROM entity WHERE name='License'), 'License', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True, False, False),
-((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, False, False, False),
+((SELECT id FROM entity WHERE name='Actor actor relation'), 'Actor actor relation', False, True, True, False, False),
+((SELECT id FROM entity WHERE name='Actor function'), 'Actor function', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False, False, False),
 ((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphic Unit', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False, False, False),
+((SELECT id FROM entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='Source Translation'), 'Source Translation', False, False, False, False, False),
-((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False, False, False),
-((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False, False, False),
+((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False, False),
+((SELECT id FROM entity WHERE name='Administrative unit'), 'Administrative unit', True, True, False, False, False),
+((SELECT id FROM entity WHERE name='Historical place'), 'Historical place', True, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', True, False, False, True, False),
-((SELECT id FROM entity WHERE name='External Reference'), 'External Reference', False, True, False, False, False),
-((SELECT id FROM entity WHERE name='External Reference Match'), 'External Reference Match', False, True, False, False, True);
+((SELECT id FROM entity WHERE name='External reference'), 'External reference', False, True, False, False, False),
+((SELECT id FROM entity WHERE name='External reference match'), 'External reference match', False, True, False, False, True);
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Artifact'),(SELECT id FROM web.form WHERE name='Artifact')),
@@ -355,25 +332,22 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Source'),(SELECT id FROM web.form WHERE name='Source')),
 ((SELECT id FROM web.hierarchy WHERE name='Event'),(SELECT id FROM web.form WHERE name='Event')),
 ((SELECT id FROM web.hierarchy WHERE name='Place'),(SELECT id FROM web.form WHERE name='Place')),
-((SELECT id FROM web.hierarchy WHERE name='Administrative Unit'),(SELECT id FROM web.form WHERE name='Place')),
-((SELECT id FROM web.hierarchy WHERE name='Historical Place'),(SELECT id FROM web.form WHERE name='Place')),
+((SELECT id FROM web.hierarchy WHERE name='Administrative unit'),(SELECT id FROM web.form WHERE name='Place')),
+((SELECT id FROM web.hierarchy WHERE name='Historical place'),(SELECT id FROM web.form WHERE name='Place')),
 ((SELECT id FROM web.hierarchy WHERE name='Feature'),(SELECT id FROM web.form WHERE name='Feature')),
-((SELECT id FROM web.hierarchy WHERE name='Stratigraphic Unit'),(SELECT id FROM web.form WHERE name='Stratigraphic Unit')),
-((SELECT id FROM web.hierarchy WHERE name='Find'),(SELECT id FROM web.form WHERE name='Find')),
+((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'),(SELECT id FROM web.form WHERE name='Stratigraphic unit')),
 ((SELECT id FROM web.hierarchy WHERE name='Bibliography'),(SELECT id FROM web.form WHERE name='Bibliography')),
 ((SELECT id FROM web.hierarchy WHERE name='Edition'),(SELECT id FROM web.form WHERE name='Edition')),
-((SELECT id FROM web.hierarchy WHERE name='Information Carrier'),(SELECT id FROM web.form WHERE name='Information Carrier')),
-((SELECT id FROM web.hierarchy WHERE name='Actor Actor Relation'),(SELECT id FROM web.form WHERE name='Actor Actor Relation')),
+((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'),(SELECT id FROM web.form WHERE name='Actor actor relation')),
 ((SELECT id FROM web.hierarchy WHERE name='Involvement'),(SELECT id FROM web.form WHERE name='Involvement')),
-((SELECT id FROM web.hierarchy WHERE name='Actor Function'),(SELECT id FROM web.form WHERE name='Member')),
-((SELECT id FROM web.hierarchy WHERE name='Source Translation'),(SELECT id FROM web.form WHERE name='Source Translation')),
-((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='Find')),
-((SELECT id FROM web.hierarchy WHERE name='External Reference'),(SELECT id FROM web.form WHERE name='External Reference'));
+((SELECT id FROM web.hierarchy WHERE name='Actor function'),(SELECT id FROM web.form WHERE name='Member')),
+((SELECT id FROM web.hierarchy WHERE name='Source translation'),(SELECT id FROM web.form WHERE name='Source translation')),
+((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='Artifact')),
+((SELECT id FROM web.hierarchy WHERE name='External reference'),(SELECT id FROM web.form WHERE name='External reference'));
 
 INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
 ((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='Place')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Place')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Person')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Group')),
-((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Legal Body')),
 ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));

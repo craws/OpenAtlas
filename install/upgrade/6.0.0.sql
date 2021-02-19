@@ -4,27 +4,28 @@
 BEGIN;
 
 -- #1456 Artificial objects
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Artificial Object', '');
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Artifact', '');
 INSERT INTO model.entity (class_code, name) VALUES ('E55', 'Coin'), ('E55', 'Statue');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM model.entity WHERE name='Artificial Object'), (SELECT id FROM model.entity WHERE name='Coin')),
-('P127', (SELECT id FROM model.entity WHERE name='Artificial Object'), (SELECT id FROM model.entity WHERE name='Statue'));
+('P127', (SELECT id FROM model.entity WHERE name='Artifact'), (SELECT id FROM model.entity WHERE name='Coin')),
+('P127', (SELECT id FROM model.entity WHERE name='Artifact'), (SELECT id FROM model.entity WHERE name='Statue'));
 
-INSERT INTO web.form (name, extendable) VALUES ('Artificial Object', True);
+INSERT INTO web.form (name, extendable) VALUES ('Artifact', True);
 INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
-((SELECT id FROM model.entity WHERE name='Artificial Object'), 'Artificial Object', False, True, False, False, False);
+((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', False, True, False, False, False);
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-((SELECT id FROM web.hierarchy WHERE name='Artificial Object'), (SELECT id FROM web.form WHERE name='Artificial Object'));
+((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM web.form WHERE name='Artifact'));
 
 -- If you executed above at an upgrade of a development version before use this instead
 -- UPDATE model.entity SET name = 'Artifact' WHERE name = 'Artificial Object';
 -- UPDATE model.entity SET system_type = 'artifact' WHERE system_type = 'artificial object';
 -- UPDATE web.form SET name = 'Artifact' WHERE name = 'Artificial Object';
+-- UPDATE web.hierarchy SET name = 'Artifact' WHERE name = 'Artificial Object';
 
 -- #1091 Reference systems for types
 INSERT INTO web.form (name, extendable) VALUES ('Type', True);
 
--- # Refactor modules
+-- #1091 Refactor modules
 ALTER TABLE model.entity ADD COLUMN system_class text;
 UPDATE model.entity SET system_class = 'acquisition' WHERE class_code = 'E8';
 UPDATE model.entity SET system_class = 'activity' WHERE class_code ='E7';
@@ -55,4 +56,14 @@ UPDATE model.entity SET system_class = 'type' WHERE class_code = 'E55';
 ALTER TABLE model.entity ALTER COLUMN system_class SET NOT NULL;
 -- ALTER TABLE model.entity DROP COLUMN system_type;
 
+-- #1091 Restructure and rename standard types
+UPDATE web.hierarchy SET name = UPPER(substring(name FROM 1 FOR 1)) || LOWER(substring(name FROM 2 FOR LENGTH(name))) WHERE standard = True;
+UPDATE model.entity AS e SET name = h.name FROM web.hierarchy AS h WHERE e.id = h.id AND h.standard = True;
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM web.hierarchy WHERE name = 'Information carrier'), (SELECT id FROM web.hierarchy WHERE name = 'Artifact')),
+    ('P127', (SELECT id FROM web.hierarchy WHERE name = 'Find'), (SELECT id FROM web.hierarchy WHERE name = 'Artifact'));
+DELETE FROM web.hierarchy WHERE name IN ('Information carrier', 'Find', 'Legal body');
+DELETE FROM web.form WHERE name in ('Information carrier', 'Find', 'Legal body');
+UPDATE model.entity SET description = 'Definitions of an actor''s function within a group. An actor can for example be member of a group and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the group "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the group "Roman Empire" from 800 to 814 in the function "Emperor".'
+WHERE class_code = 'E55' AND name = 'Actor function';
 END;
