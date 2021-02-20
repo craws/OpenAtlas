@@ -49,6 +49,7 @@ class Entity:
         self.image_id: Optional[int] = None  # Set in view and used for profile image
         self.linked_places: List[Entity] = []  # Set in view and used to show related places on map
         self.location: Optional[Entity] = None  # The respective location if entity is a place
+        self.info_data: Dict[str, Union[str, List[str]]]  # Used for detail views
 
         # Dates
         self.begin_from = None

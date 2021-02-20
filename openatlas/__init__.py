@@ -9,7 +9,6 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 
-
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
@@ -85,10 +84,13 @@ def before_request() -> None:
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
-    from openatlas.models.system import system_classes, view_class_mapping, get_class_view_mapping
+    from openatlas.models.system import (system_classes, view_class_mapping, get_class_view_mapping,
+                                         table_headers)
+    g.table_headers = table_headers
     g.classes = system_classes
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = get_class_view_mapping()
+
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
     session['settings'] = Settings.get_settings()
