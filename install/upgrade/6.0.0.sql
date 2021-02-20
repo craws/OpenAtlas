@@ -54,7 +54,6 @@ UPDATE model.entity SET system_class = 'translation' WHERE class_code = 'E33' AN
 UPDATE model.entity SET system_class = 'type' WHERE class_code = 'E55';
 
 ALTER TABLE model.entity ALTER COLUMN system_class SET NOT NULL;
--- ALTER TABLE model.entity DROP COLUMN system_type;
 
 -- #1091 Restructure and rename standard types
 UPDATE web.hierarchy SET name = UPPER(substring(name FROM 1 FOR 1)) || LOWER(substring(name FROM 2 FOR LENGTH(name))) WHERE standard = True;
@@ -63,7 +62,17 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
     ('P127', (SELECT id FROM web.hierarchy WHERE name = 'Information carrier'), (SELECT id FROM web.hierarchy WHERE name = 'Artifact')),
     ('P127', (SELECT id FROM web.hierarchy WHERE name = 'Find'), (SELECT id FROM web.hierarchy WHERE name = 'Artifact'));
 DELETE FROM web.hierarchy WHERE name IN ('Information carrier', 'Find', 'Legal body');
-DELETE FROM web.form WHERE name in ('Information carrier', 'Find', 'Legal body');
 UPDATE model.entity SET description = 'Definitions of an actor''s function within a group. An actor can for example be member of a group and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the group "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the group "Roman Empire" from 800 to 814 in the function "Emperor".'
 WHERE class_code = 'E55' AND name = 'Actor function';
+
+
+-- #1091 Restructure and rename forms
+UPDATE web.form SET name = LOWER(REPLACE(name, ' ', '_'));
+UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'information_carrier') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
+UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'find') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
+UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'legal_body') WHERE form_id = (SELECT id FROM web.form WHERE name = 'group');
+DELETE FROM web.form WHERE name IN ('information_carrier', 'find', 'legal_body');
+
+-- ALTER TABLE model.entity DROP COLUMN system_type;
+
 END;
