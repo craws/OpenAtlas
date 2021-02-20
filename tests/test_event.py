@@ -51,7 +51,7 @@ class EventTest(TestBaseCase):
             # Acquisition
             event_name2 = 'Second event'
             wikidata = 'reference_system_id_' + str(ReferenceSystem.get_by_name('Wikidata').id)
-            precision = Node.get_hierarchy('External Reference Match').subs[0]
+            precision = Node.get_hierarchy('External reference match').subs[0]
             rv = self.app.post(url_for('insert', class_='E8'),
                                data={'name': event_name2,
                                      'given_place': [residence_id],

@@ -18,10 +18,13 @@ class SystemClass:
         self.name = name
         self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.write_access = write_access
-        self.view = view_class_mapping[name] if name in view_class_mapping else None
         self.tabs = tabs if tabs else []
         self.form_fields = form_fields if form_fields else []
         self.table_headers = table_headers if table_headers else []
+        self.view = None
+        for item, classes in view_class_mapping.items():
+            if name in classes:
+                self.view = item
 
 
 view_class_mapping = {
@@ -33,7 +36,7 @@ view_class_mapping = {
     'reference': ['bibliography', 'edition', 'external_reference'],
     'reference_system': ['reference_system'],
     'source': ['source'],
-    'type': ['location', 'type'],
+    'type': ['administrative_unit', 'node'],
     'translation': ['translation']}
 
 table_headers = {
@@ -83,6 +86,11 @@ system_classes: Dict[str, SystemClass] = {
     'actor_appellation': SystemClass(
         name='appellation',
         cidoc_class='E82'),
+    'administrative_unit': SystemClass(
+        name='administrative_unit',
+        cidoc_class='E53',
+        tabs=[],
+        form_fields=[]),
     'appellation': SystemClass(
         name='appellation',
         cidoc_class='E41'),
@@ -139,11 +147,6 @@ system_classes: Dict[str, SystemClass] = {
     'legal_body': SystemClass(
         name='legal_body',
         cidoc_class='E40',
-        tabs=[],
-        form_fields=[]),
-    'location': SystemClass(
-        name='location',
-        cidoc_class='E53',
         tabs=[],
         form_fields=[]),
     'move': SystemClass(

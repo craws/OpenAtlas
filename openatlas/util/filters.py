@@ -56,7 +56,7 @@ def display_citation_example(self: Any, code: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
-    if entity.view_name != 'place' or not structure or len(structure['siblings']) < 2:
+    if entity.class_.view != 'place' or not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
     prev_id = None
@@ -250,7 +250,7 @@ def description(self: Any, entity: Entity) -> str:
     if not entity.description:
         return ''
     label = display.uc_first(_('description'))
-    if hasattr(entity, 'system_type') and entity.system_type == 'source content':
+    if hasattr(entity, 'system_type') and entity.class_.name == 'source content':
         label = display.uc_first(_('content'))
     return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
         label=label,
@@ -260,7 +260,7 @@ def description(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def download_button(self: Any, entity: Entity) -> str:
-    if entity.view_name != 'file':
+    if entity.class_.view != 'file':
         return ''
     html = '<span class="error">{msg}</span>'.format(msg=display.uc_first(_('missing file')))
     if entity.image_id:
@@ -277,7 +277,7 @@ def display_profile_image(self: Any, entity: Entity) -> str:
     path = display.get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    if entity.view_name == 'file':
+    if entity.class_.view == 'file':
         if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
             html = '''
                 <a href="{url}" rel="noopener noreferrer" target="_blank">
@@ -464,8 +464,8 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    url = url_for('index', class_=entity.view_name, delete_id=entity.id)
-    if entity.system_type == 'source translation':
+    url = url_for('index', class_=entity.class_.view, delete_id=entity.id)
+    if entity.class_.name == 'source_translation':
         url = url_for('translation_delete', id_=entity.id)
     elif entity.id in g.nodes:
         url = url_for('node_delete', id_=entity.id)
@@ -482,9 +482,9 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
     if current_user.is_authenticated:
         view_name = ''
         if entity:
-            view_name = entity.view_name
+            view_name = entity.class_.view
         if origin:
-            view_name = origin.view_name
+            view_name = origin.class_.view
         for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
             css = ''
             if (view_name and view_name.replace('node', 'types') == item) or \

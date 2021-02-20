@@ -14,7 +14,7 @@ from openatlas import app
 from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.display import get_file_extension, link
+from openatlas.util.display import get_file_extension, link, uc_first
 from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -225,7 +225,7 @@ class Entity:
         from openatlas.models.node import Node
         if not self.class_.view:
             return ''
-        root_name = 'License' if self.class_ == 'file' else self.class_.title()
+        root_name = 'License' if self.class_ == 'file' else uc_first(self.class_.name)
         root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:

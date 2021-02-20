@@ -316,7 +316,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     # Dates
     from_link = ''
     to_link = ''
-    if entity.class_.code == 'E9':  # Add places to dates if it's a move
+    if entity.class_.name == 'move':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
             from_link = link(place_from.get_linked_entity_safe('P53', True)) + ' '
@@ -331,18 +331,18 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
 
     # Class specific information
     # Todo: like in views/entity this if/else is too long and error prone
-    if entity.view_name == 'node':
+    if entity.class_.view == 'node':
         data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
-    elif entity.view_name == 'file':
+    elif entity.class_.view == 'file':
         data[_('size')] = print_file_size(entity)
         data[_('extension')] = get_file_extension(entity)
-    elif entity.view_name == 'source':
+    elif entity.class_.view == 'source':
         data[_('information carrier')] = [link(recipient) for recipient in
                                           entity.get_linked_entities(['P128'], inverse=True)]
-    elif entity.view_name == 'event':
+    elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data[_('sub event of')] = link(super_event)
@@ -367,7 +367,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
                     object_data.append(linked_entity)
             data[_('person')] = [link(object_) for object_ in person_data]
             data[_('object')] = [link(object_) for object_ in object_data]
-    elif entity.view_name == 'actor':
+    elif entity.class_.view == 'actor':
         begin_place = entity.get_linked_entity('OA8')
         begin_object = None
         if begin_place:
@@ -392,7 +392,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
         data[_('appears first')] = appears_first
         data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
-    elif entity.view_name == 'reference_system':
+    elif entity.class_.view == 'reference_system':
         data[_('website URL')] = external_url(entity.website_url)
         data[_('resolver URL')] = external_url(entity.resolver_url)
         data[_('example ID')] = entity.placeholder

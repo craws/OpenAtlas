@@ -112,8 +112,7 @@ class Node(Entity):
 
     @staticmethod
     def get_hierarchy(name: str) -> Node:
-        return [root for root in g.nodes.values() if
-                root.name == name.replace('_', ' ') and not root.root][0]
+        return [root for root in g.nodes.values() if root.name == name and not root.root][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> List[Dict[str, Any]]:

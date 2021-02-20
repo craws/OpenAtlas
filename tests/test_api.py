@@ -60,7 +60,7 @@ class ApiTests(TestBaseCase):
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy('External Reference Match').subs[0]
+                precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
             # Path Tests

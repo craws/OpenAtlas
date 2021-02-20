@@ -185,7 +185,7 @@ def add_buttons(form: Any,
 # TODO: this should probably go to a custom field in field.py
 def add_reference_systems(form: Any, form_name: str) -> None:
     precisions = [('', '')]
-    for id_ in Node.get_hierarchy('External Reference Match').subs:
+    for id_ in Node.get_hierarchy('External reference match').subs:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in g.reference_systems.values():
         forms_ = [form_['name'] for form_ in system.get_forms().values()]
@@ -304,7 +304,7 @@ def add_fields(form: Any,
         setattr(form, 'resolver_url', StringField(_('resolver URL'),
                                                   validators=[OptionalValidator(), URL()]))
         setattr(form, 'placeholder', StringField(_('example ID')))
-        precision_node_id = str(Node.get_hierarchy('External Reference Match').id)
+        precision_node_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
         choices = ReferenceSystem.get_form_choices(item)
         if choices:

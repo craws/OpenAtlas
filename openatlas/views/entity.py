@@ -32,7 +32,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     if id_ in g.nodes:  # Nodes have their own view
         entity = g.nodes[id_]
         if not entity.root:
-            if entity.class_.code == 'E53':
+            if entity.class_.name == 'administrative_unit':
                 tab_hash = '#menu-tab-places_collapse-'
             elif entity.standard:
                 tab_hash = '#menu-tab-standard_collapse-'
@@ -284,9 +284,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                     g.properties[link_.property.code].name_inverse,
                     link_.description]
             if is_authorized('contributor'):
-                data.append(
-                    link(_('edit'),
-                         url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
+                data.append(link(_('edit'),
+                                 url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
             data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
@@ -380,7 +379,7 @@ def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.forms and not entity.system:
                 buttons.append(display_delete_link(None, entity))
-    elif entity.system_type == 'source translation':
+    elif entity.class_.name == 'source_translation':
         buttons.append(button(_('edit'), url_for('translation_update', id_=entity.id)))
         buttons.append(display_delete_link(None, entity))
     elif is_authorized('contributor'):
@@ -399,13 +398,14 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             entity.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('entity_view', id_=id_) + '#tab-file')
     form = build_table_form('file', entity.get_linked_entities('P67', inverse=True))
-    return render_template('form.html',
-                           entity=entity,
-                           form=form,
-                           title=entity.name,
-                           crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
-                                   entity,
-                                   _('link') + ' ' + _('file')])
+    return render_template(
+        'form.html',
+        entity=entity,
+        form=form,
+        title=entity.name,
+        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+                entity,
+                _('link') + ' ' + _('file')])
 
 
 @app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
@@ -419,12 +419,13 @@ def entity_add_source(id_: int) -> Union[str, Response]:
             entity.link_string(property_code, request.form['checkbox_values'], inverse=inverse)
         return redirect(url_for('entity_view', id_=id_) + '#tab-source')
     form = build_table_form('source', entity.get_linked_entities(property_code, inverse=inverse))
-    return render_template('form.html',
-                           form=form,
-                           title=entity.name,
-                           crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
-                                   entity,
-                                   _('link') + ' ' + _('source')])
+    return render_template(
+        'form.html',
+        form=form,
+        title=entity.name,
+        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+                entity,
+                _('link') + ' ' + _('source')])
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
@@ -436,9 +437,10 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
         entity.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
-    return render_template('display_form.html',
-                           entity=entity,
-                           form=form,
-                           crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
-                                   entity,
-                                   _('link') + ' ' + _('reference')])
+    return render_template(
+        'display_form.html',
+        entity=entity,
+        form=form,
+        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+                entity,
+                _('link') + ' ' + _('reference')])

@@ -27,7 +27,7 @@ class PlaceTest(TestBaseCase):
                 place_node = Node.get_hierarchy('Place')
                 source = Entity.insert('E33', 'Necronomicon')
             geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
-            precision = Node.get_hierarchy('External Reference Match').subs[0]
+            precision = Node.get_hierarchy('External reference match').subs[0]
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
