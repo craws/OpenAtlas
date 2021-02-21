@@ -423,7 +423,8 @@ def get_base_table_data(entity: 'Entity',
             data[0] = ''.join([data[0]] + [alias])
         else:
             data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
-    if entity.class_.view in ['actor', 'event', 'reference']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
+            entity.class_.name == 'find':
         data.append(entity.class_.label)
     if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
         data.append(entity.print_standard_type())

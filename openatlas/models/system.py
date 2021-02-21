@@ -45,11 +45,10 @@ view_class_mapping = {
 
 table_headers = {
     'actor': ['name', 'class', 'begin', 'end', 'description'],
-    'artifact': ['name', 'type', 'begin', 'end', 'description'],
+    'artifact': ['name', 'class', 'type', 'begin', 'end', 'description'],
     'entities': ['name', 'class', 'info'],
     'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
     'feature': ['name', 'type', 'begin', 'end', 'description'],
-    'find': ['name', 'type', 'begin', 'end', 'description'],
     'file': ['name', 'license', 'size', 'extension', 'description'],
     'group': ['name', 'class', 'begin', 'end', 'description'],
     'human_remains': ['name', 'type', 'begin', 'end', 'description'],
@@ -116,6 +115,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
         'artifact': SystemClass(
             name='artifact',
             cidoc_class='E22',
+            standard_type='Artifact',
             label=_('artifact'),
             form_fields=[]),
         'bibliography': SystemClass(
@@ -152,6 +152,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
         'find': SystemClass(
             name='find',
             cidoc_class='E22',
+            standard_type='Artifact',
             label=_('find'),
             form_fields=[]),
         'group': SystemClass(
