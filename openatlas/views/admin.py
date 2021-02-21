@@ -295,11 +295,11 @@ def admin_orphans() -> str:
     for entity in Entity.get_orphans():
         if entity.class_.code == 'E32':  # Skip external reference systems
             continue
-        name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
+        name = 'unlinked' if entity.class_.view else 'orphans'
         tables[name].rows.append([link(entity),
                                   link(entity.class_),
                                   entity.print_standard_type(),
-                                  entity.system_type,
+                                  entity.class_.label,
                                   format_date(entity.created),
                                   format_date(entity.modified),
                                   entity.description])
@@ -308,13 +308,13 @@ def admin_orphans() -> str:
 
     # Get orphaned file entities with no corresponding file
     entity_file_ids = []
-    for entity in Entity.get_by_system_type('file', nodes=True):
+    for entity in Entity.get_by_system_class('file', nodes=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
                                                  link(entity.class_),
                                                  entity.print_standard_type(),
-                                                 entity.system_type,
+                                                 entity.class_.label,
                                                  format_date(entity.created),
                                                  format_date(entity.modified),
                                                  entity.description])

@@ -259,27 +259,11 @@ class Node(Entity):
             return
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
-        system_type = ''
-        class_code: List[str] = []
-        if form_name == 'Source':
-            system_type = 'source content'
-        elif form_name == 'Event':
-            class_code = app.config['CLASS_CODES']['event']
-        elif form_name == 'Person':
-            class_code = ['E21']
-        elif form_name == 'Group':
-            class_code = ['E74']
-        elif form_name == 'Legal Body':
-            class_code = ['E40']
-        else:
-            system_type = form_name.lower()
         sql = """
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
-            WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
-            sql_where='e.system_type =' if system_type else 'e.class_code IN')
-        g.execute(sql, {'node_ids': tuple(node_ids),
-                        'params': system_type if system_type else tuple(class_code)})
+            WHERE l.property_code = 'P2' AND e.system_class = %(form_name)s;"""
+        g.execute(sql, {'node_ids': tuple(node_ids), 'classes': form_name})
         return g.cursor.fetchone()[0]
 
     @staticmethod

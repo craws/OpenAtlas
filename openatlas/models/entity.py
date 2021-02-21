@@ -348,7 +348,7 @@ class Entity:
     def get_by_project_id(project_id: int) -> List[Entity]:
         sql = """
             SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
-                e.system_type,
+                e.system_class,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
             ) as nodes
@@ -415,24 +415,26 @@ class Entity:
 
     @staticmethod
     def delete_orphans(parameter: str) -> int:
-        from openatlas.models.node import Node
-        class_codes = tuple(app.config['CODE_CLASS'].keys()) + ('E32',)
-        if parameter == 'orphans':
-            class_codes = class_codes + ('E55',)
-            sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
-        elif parameter == 'unlinked':
-            sql_where = Entity.sql_orphan + " AND e.class_code IN %(class_codes)s"
-        elif parameter == 'types':
-            count = 0
-            for node in Node.get_node_orphans():
-                node.delete()
-                count += 1
-            return count
-        else:
-            return 0
-        sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
-        g.execute(sql, {'class_codes': class_codes})
-        return g.cursor.rowcount
+        # Todo: do I really want to look into this? This function is very scary
+        return 0
+        # from openatlas.models.node import Node
+        # class_codes = tuple(app.config['CODE_CLASS'].keys()) + ('E32',)
+        # if parameter == 'orphans':
+        #     class_codes = class_codes + ('E55',)
+        #     sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
+        # elif parameter == 'unlinked':
+        #     sql_where = Entity.sql_orphan + " AND e.class_code IN %(class_codes)s"
+        # elif parameter == 'types':
+        #     count = 0
+        #     for node in Node.get_node_orphans():
+        #         node.delete()
+        #         count += 1
+        #     return count
+        # else:
+        #     return 0
+        # sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
+        # g.execute(sql, {'class_codes': class_codes})
+        # return g.cursor.rowcount
 
     @staticmethod
     def search(form: FlaskForm) -> ValuesView[Entity]:

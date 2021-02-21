@@ -33,11 +33,10 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     elif class_ == 'node' and not is_authorized('editor'):
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    if class_ in app.config['CLASS_CODES']['actor']:
-        # Todo: can't use g.cidoc_classes[class_].name because it's already translated, needs fixing
+    if class_ in g.class_view_mapper['actor']:
         form_name = {'E21': 'person', 'E74': 'group', 'E40': 'legal_body'}
         form = build_form(form_name[class_], code=class_, origin=origin)
-    elif class_ in app.config['CLASS_CODES']['event']:
+    elif class_ in g.class_view_mapper['event']:
         # Todo: it's inconsistently to actor that event has only one form for different classes.
         form = build_form('event', origin=origin, code=class_)
     elif class_ == 'E84':
@@ -48,11 +47,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         return redirect(save(form, class_=class_, origin=origin))
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
-    view_name = app.config['CODE_CLASS'][class_] if class_ in g.cidoc_classes else class_
-    if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
-        view_name = 'place'
-    elif class_ in ['bibliography', 'edition', 'external_reference']:
-        view_name = 'reference'
+    view_name = g.classes[class_].view
     geonames_module = False
     if origin:
         populate_insert_form(form, view_name, class_, origin)

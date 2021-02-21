@@ -6,9 +6,8 @@ from flask import g
 from flask_login import current_user
 from psycopg2.extras import NamedTupleCursor
 
-from openatlas import app
+from openatlas.util.display import sanitize
 from openatlas.util.util import is_float
-from openatlas.util.display import sanitize, uc_first
 
 
 class Project:
@@ -65,11 +64,11 @@ class Import:
         return [row.origin_id for row in g.cursor.fetchall()]
 
     @staticmethod
-    def check_duplicates(class_code: str, names: List[str]) -> List[str]:
+    def check_duplicates(class_: str, names: List[str]) -> List[str]:
         sql = """
             SELECT DISTINCT name FROM model.entity
-            WHERE class_code = %(class_code)s AND LOWER(name) IN %(names)s;"""
-        g.execute(sql, {'class_code': class_code, 'names': tuple(names)})
+            WHERE system_class = %(class_)s AND LOWER(name) IN %(names)s;"""
+        g.execute(sql, {'class_': class_, 'names': tuple(names)})
         return [row.name for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -82,7 +81,7 @@ class Import:
                         'description': sanitize(project.description, 'text')})
 
     @staticmethod
-    def check_type_id(type_id: str, class_code: str) -> bool:  # pragma: no cover
+    def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
         if not type_id.isdigit():
             return False
         elif int(type_id) not in g.nodes:
@@ -92,24 +91,19 @@ class Import:
             valid_type = False
             root = g.nodes[g.nodes[int(type_id)].root[0]]
             for form_id, form_object in root.forms.items():
-                if form_object['name'] == uc_first(app.config['CODE_CLASS'][class_code]):
+                if form_object['name'] == class_:
                     valid_type = True
             if not valid_type:
                 return False
         return True
 
     @staticmethod
-    def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
+    def import_data(project: 'Project', class_: str, data: List[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
         for row in data:
-            system_type = None
-            if class_code == 'E33':  # pragma: no cover
-                system_type = 'source content'
-            elif class_code == 'E18':
-                system_type = 'place'
             desc = row['description'] if 'description' in row and row['description'] else None
-            entity = Entity.insert(class_code, row['name'], system_type, desc)
+            entity = Entity.insert(g.classes[class_].cidoc_class, row['name'], class_, desc)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
@@ -136,7 +130,7 @@ class Import:
             # Types
             if 'type_ids' in row and row['type_ids']:  # pragma: no cover
                 for type_id in row['type_ids'].split():
-                    if not Import.check_type_id(type_id, class_code):
+                    if not Import.check_type_id(type_id, class_):
                         continue
                     sql = """
                         INSERT INTO model.link (property_code, domain_id, range_id)
@@ -144,7 +138,7 @@ class Import:
                     g.execute(sql, {'domain_id': entity.id, 'type_id': int(type_id)})
 
             # GIS
-            if class_code == 'E18':
+            if class_ == 'place':
                 location = Entity.insert('E53', 'Location of ' + row['name'], 'place location')
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):

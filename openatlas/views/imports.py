@@ -71,7 +71,7 @@ def import_project_view(id_: int) -> str:
     table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in Entity.get_by_project_id(id_):
         table.rows.append([link(entity),
-                           entity.class_.name,
+                           entity.class_.label,
                            entity.description,
                            entity.origin_id,
                            format_date(entity.created)])
@@ -133,21 +133,16 @@ class ImportForm(FlaskForm):  # type: ignore
         return valid
 
 
-@app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
+@app.route('/import/data/<int:project_id>/<class_>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_data(project_id: int, class_code: str) -> str:
+def import_data(project_id: int, class_: str) -> str:
     project = Import.get_project_by_id(project_id)
     form = ImportForm()
     table = None
     imported = False
     messages: Dict[str, List[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
-    if class_code == 'E18':
-        class_label = uc_first('place')
-    elif class_code == 'E33':  # pragma: no cover
-        class_label = uc_first('source')
-    else:
-        class_label = g.cidoc_classes[class_code].name
+    class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)  # type: ignore
@@ -156,7 +151,7 @@ def import_data(project_id: int, class_code: str) -> str:
                                                      'end_to', 'end_comment', 'type_ids'],
                                          'valid': [],
                                          'invalid': []}
-        if class_code == 'E18':
+        if class_ == 'place':
             columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(str(file_path))
@@ -190,7 +185,7 @@ def import_data(project_id: int, class_code: str) -> str:
                     if item == 'type_ids':  # pragma: no cover
                         type_ids = []
                         for type_id in value.split():
-                            if Import.check_type_id(type_id, class_code):
+                            if Import.check_type_id(type_id, class_):
                                 type_ids.append(type_id)
                             else:
                                 type_ids.append('<span class="error">' + type_id + '</span>')
@@ -235,7 +230,7 @@ def import_data(project_id: int, class_code: str) -> str:
             if existing:
                 messages['error'].append(_('IDs already in database') + ': ' + ', '.join(existing))
             if form.duplicate.data:  # Check for possible duplicates
-                duplicates = Import.check_duplicates(class_code, names)
+                duplicates = Import.check_duplicates(class_, names)
                 if duplicates:  # pragma: no cover
                     messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
             if messages['error']:
@@ -256,7 +251,7 @@ def import_data(project_id: int, class_code: str) -> str:
             if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
                 g.cursor.execute('BEGIN')
                 try:
-                    Import.import_data(project, class_code, checked_data)
+                    Import.import_data(project, class_, checked_data)
                     g.cursor.execute('COMMIT')
                     logger.log('info', 'import', 'import: ' + str(len(checked_data)))
                     flash(_('import of') + ': ' + str(len(checked_data)), 'info')
@@ -269,7 +264,7 @@ def import_data(project_id: int, class_code: str) -> str:
                            project=project,
                            form=form,
                            file_data=file_data,
-                           class_code=class_code,
+                           class_=class_,
                            class_label=class_label,
                            table=table,
                            imported=imported,

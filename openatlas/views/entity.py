@@ -220,7 +220,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=entity.id))
             data = add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
             tabs['member_of'].table.rows.append(data)
-        if entity.class_.code not in app.config['CLASS_CODES']['group']:
+        if entity.class_.name != 'group':
             del tabs['member']
         else:
             for link_ in entity.get_links('P107'):
