@@ -57,7 +57,7 @@ table_headers = {
     'human_remains': ['name', 'type', 'begin', 'end', 'description'],
     'member': ['member', 'function', 'first', 'last', 'description'],
     'member_of': ['member of', 'function', 'first', 'last', 'description'],
-    'node': ['name', 'description'],
+    'type': ['name', 'description'],
     'object': ['name', 'type', 'description'],
     'person': ['name', 'class', 'begin', 'end', 'description'],
     'place': ['name', 'type', 'begin', 'end', 'description'],
@@ -66,6 +66,7 @@ table_headers = {
     'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
                          'default precision', 'description'],
     'source': ['name', 'type', 'description'],
+    'subs': ['name', 'count', 'info'],
     'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
     'text': ['text', 'type', 'content']}
 
@@ -111,6 +112,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
         'administrative_unit': SystemClass(
             name='administrative_unit',
             cidoc_class='E53',
+            label=_('administrative unit'),
             tabs=[],
             form_fields=[]),
         'appellation': SystemClass(
@@ -212,7 +214,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
             label=_('source'),
             standard_type='Source',
             tabs=['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                  'human_remains', 'reference', 'node', 'object'],
+                  'human_remains', 'artifact', 'reference', 'type'],
             form_fields=[]),
         'stratigraphic_unit': SystemClass(
             name='stratigraphic_unit',

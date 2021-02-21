@@ -45,15 +45,15 @@
                     {{ _('first login') }}
                 {% endif %}
             </p>
+            {% if tables.latest.rows %}
+                <h1>{{ _('latest')|uc_first }}</h1>
+                {{ tables.latest.display('latest')|safe }}
+                <div class="toolbar">
+                    {{ _('Show all activity')|button(url_for('user_activity')) }}
+                </div>
+            {% endif %}
         </div>
         <div style="clear:both;"></div>
-        {% if tables.latest.rows %}
-            <h1>{{ _('latest')|uc_first }}</h1>
-            {{ tables.latest.display('latest')|safe }}
-            <div class="toolbar">
-                {{ _('Show all activity')|button(url_for('user_activity')) }}
-            </div>
-        {% endif %}
         {% if tables.bookmarks.rows %}
             <h1>{{ _('bookmarks')|uc_first }}</h1>
             {{ tables.bookmarks.display('bookmarks')|safe }}

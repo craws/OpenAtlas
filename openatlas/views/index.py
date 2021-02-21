@@ -55,11 +55,20 @@ def overview() -> str:
                                          entity.first,
                                          entity.last,
                                          text])
+        print(Entity.get_overview_counts().items())
         for name, count in Entity.get_overview_counts().items():
             if count:
+                url = url_for('index', class_=g.class_view_mapping[name])
+                if name == 'administrative_unit':
+                    url = url_for('node_index') + '#menu-tab-places'
+                elif name == 'type':
+                    url = url_for('node_index')
+                elif name == 'find':
+                    url = url_for('index', class_='artifact')
+                elif name in ['feature', 'stratigraphic_unit', 'translation']:
+                    url = ''
                 tables['overview'].rows.append([
-                    uc_first(_(name)) if name in ['find', 'human remains'] else link(
-                        _(name), url_for('index', class_=name)),
+                    link(g.classes[name].label, url) if url else g.classes[name].label,
                     format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
@@ -71,7 +80,7 @@ def overview() -> str:
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     return render_template('index/index.html',
                            intro=Content.get_translation('intro'),
-                           crumbs=[_('overview')],
+                           crumbs=['overview'],
                            tables=tables)
 
 

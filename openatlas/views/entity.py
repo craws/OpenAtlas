@@ -57,7 +57,6 @@ def entity_view(id_: int) -> Union[str, Response]:
     tabs = {'info': Tab('info')}
     for tab_name in entity.class_.tabs:
         tabs[tab_name] = Tab(tab_name, entity)
-
     if entity.class_.view == 'type':
         tabs['subs'] = Tab('subs', entity)
         tabs['entities'] = Tab('entities', entity)
@@ -353,11 +352,10 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
             structure['feature'],
             structure['stratigraphic_unit'],
             entity.name]
-    elif entity.class_.view == 'node':
+    elif entity.class_.view == 'type':
         crumbs = [[_('types'), url_for('node_index')]]
         if entity.root:
-            for node_id in reversed(entity.root):
-                crumbs += [g.nodes[node_id]]
+            crumbs += [g.nodes[node_id] for node_id in reversed(entity.root)]
         crumbs += [entity.name]
     elif entity.class_.view == 'translation':
         crumbs = [[_('source'), url_for('index', class_='source')],

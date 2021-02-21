@@ -393,21 +393,12 @@ class Entity:
     @staticmethod
     def get_overview_counts() -> Dict[str, int]:
         sql = """
-            SELECT
-            SUM(CASE WHEN
-                class_code = 'E33' AND system_type = 'source content' THEN 1 END) AS source,
-            SUM(CASE WHEN class_code IN ('E7', 'E8') THEN 1 END) AS event,
-            SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
-            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
-            SUM(CASE WHEN class_code IN ('E31', 'E84') AND system_type != 'file' THEN 1 END)
-                AS reference,
-            SUM(CASE WHEN class_code = 'E22' THEN 1 END) AS find,
-            SUM(CASE WHEN system_type = 'human remains' THEN 1 END) AS "human remains",
-            SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
-            FROM model.entity;"""
-        g.execute(sql)
-        row = g.cursor.fetchone()
-        return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
+            SELECT system_class, COUNT(system_class)
+            FROM model.entity
+            WHERE system_class IN %(classes)s
+            GROUP BY system_class;"""
+        g.execute(sql, {'classes': tuple(g.class_view_mapping.keys())})
+        return {row.system_class: row.count for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_orphans() -> List[Entity]:
