@@ -55,8 +55,6 @@ def entity_view(id_: int) -> Union[str, Response]:
     overlays = None  # Needed for place
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info')}
-    for tab_name in entity.class_.tabs:
-        tabs[tab_name] = Tab(tab_name, entity)
     if entity.class_.view == 'type':
         tabs['subs'] = Tab('subs', entity)
         tabs['entities'] = Tab('entities', entity)
@@ -260,7 +258,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.name].table.rows.append(data)
+            tabs[range_.class_.view].table.rows.append(data)
     elif entity.class_.view == 'event':
         for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)
