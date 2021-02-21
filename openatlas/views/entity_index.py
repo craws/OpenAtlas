@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -28,39 +27,28 @@ def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     return render_template('entity/index.html',
                            class_=class_,
                            table=get_table(class_),
-                           buttons=get_buttons(class_) if is_authorized('contributor') else [],
+                           buttons=get_buttons(class_),
                            gis_data=Gis.get_all() if class_ == 'place' else None,
                            title=_(class_.replace('_', ' ')),
                            crumbs=[[_('admin'), url_for('admin_index')], _('file')]
                            if class_ == 'file' else [_(class_.replace('_', ' '))])
 
 
-def get_buttons(class_: str) -> List[str]:
+def get_buttons(view_name: str) -> List[str]:
     buttons = []
-    if class_ in ['actor', 'event']:
-        for code in app.config['CLASS_CODES'][class_]:
-            buttons.append(button(g.cidoc_classes[code].name, url_for('insert', class_=code)))
-    elif class_ == 'object':
-        buttons = [button(_('artifact'), url_for('insert', class_='artifact')),
-                   button(g.cidoc_classes['E84'].name, url_for('insert', class_='E84'))]
-    elif class_ == 'reference':
-        buttons = [button(_('bibliography'), url_for('insert', class_='bibliography')),
-                   button(_('edition'), url_for('insert', class_='edition')),
-                   button(_('external reference'), url_for('insert', class_='external_reference'))]
-    elif class_ == 'reference_system':
-        if is_authorized('manager'):
-            buttons = [button(_('reference system'), url_for('insert', class_='reference_system'))]
-    else:
-        buttons = [button(_(class_), url_for('insert', class_=class_))]
+    for class_name in g.view_class_mapping[view_name]:
+        class_ = g.classes[class_name]
+        if is_authorized(class_.write_access):
+            buttons.append(button(class_.label, url_for('insert', class_=class_name)))
     return buttons
 
 
 def get_table(class_: str) -> Table:
-    table = Table(Table.HEADERS[class_])
+    table = Table(g.table_headers[class_])
     if class_ == 'file':
-        table = Table(['date'] + Table.HEADERS['file'])
+        table.headers = ['date'] + table.headers
         file_stats = get_file_stats()
-        for entity in Entity.get_by_system_type('file', nodes=True):
+        for entity in Entity.get_by_system_class('file', nodes=True):
             date = 'N/A'
             if entity.id in file_stats:
                 date = format_date(
@@ -68,7 +56,7 @@ def get_table(class_: str) -> Table:
             table.rows.append([
                 date,
                 link(entity),
-                entity.print_base_type(),
+                entity.print_standard_type(),
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
                 entity.description])
@@ -83,7 +71,7 @@ def get_table(class_: str) -> Table:
                 link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
                 entity.description])
     else:
-        entities = Entity.get_by_system_class(g.view_class_mapping[class_])
+        entities = Entity.get_by_system_class(g.view_class_mapping[class_], nodes=True)
         table.rows = [get_base_table_data(item) for item in entities]
     return table
 
@@ -99,7 +87,7 @@ def delete_entity(class_: str, id_: int) -> Optional[str]:
             return url_for('entity_view', id_=id_)
     if class_ == 'place':
         entity = Entity.get_by_id(id_)
-        parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
+        parent = None if entity.class_.name == 'place' else entity.get_linked_entity('P46', True)
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('entity_view', id_=id_)
@@ -107,7 +95,7 @@ def delete_entity(class_: str, id_: int) -> Optional[str]:
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
         if parent:
-            tab = '#tab-' + entity.system_type.replace(' ', '-')
+            tab = '#tab-' + entity.class_.name.replace('_', '-')
             url = url_for('entity_view', id_=parent.id) + tab
     else:
         Entity.delete_(id_)

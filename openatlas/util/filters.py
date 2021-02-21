@@ -496,7 +496,7 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
                 item=item,
                 label=display.uc_first(_(item)))
         css = ''
-        if request.path.startswith('/types') or (entity and entity.class_.code == 'E55'):
+        if request.path.startswith('/types') or (entity and entity.class_.view == 'type'):
             css = 'active'
         html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
             css=css,

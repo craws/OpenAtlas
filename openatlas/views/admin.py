@@ -247,7 +247,7 @@ def admin_check_dates() -> str:
     for entity in Date.get_invalid_dates():
         tables['dates'].rows.append([link(entity),
                                      link(entity.class_),
-                                     entity.print_base_type(),
+                                     entity.print_standard_type(),
                                      entity.system_type,
                                      format_date(entity.created),
                                      format_date(entity.modified),
@@ -298,7 +298,7 @@ def admin_orphans() -> str:
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name].rows.append([link(entity),
                                   link(entity.class_),
-                                  entity.print_base_type(),
+                                  entity.print_standard_type(),
                                   entity.system_type,
                                   format_date(entity.created),
                                   format_date(entity.modified),
@@ -313,7 +313,7 @@ def admin_orphans() -> str:
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
                                                  link(entity.class_),
-                                                 entity.print_base_type(),
+                                                 entity.print_standard_type(),
                                                  entity.system_type,
                                                  format_date(entity.created),
                                                  format_date(entity.modified),
@@ -378,7 +378,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             truncate(entity.name),
-            entity.print_base_type(),
+            entity.print_standard_type(),
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,

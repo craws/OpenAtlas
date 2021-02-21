@@ -14,7 +14,7 @@ from openatlas import app
 from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.display import get_file_extension, link, uc_first
+from openatlas.util.display import get_file_extension, link
 from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -221,12 +221,11 @@ class Entity:
     def remove_profile_image(self) -> None:
         g.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': self.id})
 
-    def print_base_type(self) -> str:
+    def print_standard_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.class_.view:
+        if not self.class_.standard_type:
             return ''
-        root_name = 'License' if self.class_ == 'file' else uc_first(self.class_.name)
-        root_id = Node.get_hierarchy(root_name).id
+        root_id = Node.get_hierarchy(self.class_.standard_type).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
                 return link(node)
@@ -283,8 +282,9 @@ class Entity:
     def get_by_system_class(classes: [str, List[str]],
                             nodes: bool = False,
                             aliases: bool = False) -> List[Entity]:
-        sql = Entity.build_sql(nodes=nodes,
-                               aliases=aliases) + ' WHERE e.system_class = %(class)s GROUP BY e.id;'
+        sql = Entity.build_sql(
+            nodes=nodes,
+            aliases=aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
         g.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
         return [Entity(row) for row in g.cursor.fetchall()]
 

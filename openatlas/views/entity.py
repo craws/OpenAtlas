@@ -116,11 +116,11 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links('P128'):
             data = get_base_table_data(link_.range)
-            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.table_name)
+            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.class_.name)
             tabs['source'].table.rows.append(data)
         for link_ in entity.get_links('P25', inverse=True):
             data = get_base_table_data(link_.domain)
-            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.table_name)
+            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.class_.name)
             tabs['event'].table.rows.append(data)
     elif entity.class_.view == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
@@ -133,8 +133,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = add_edit_link(data, url_for('reference_link_update',
                                                link_id=link_.id,
                                                origin_id=entity.id))
-            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
-            tabs[range_.table_name].table.rows.append(data)
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.name].table.rows.append(data)
     elif entity.class_.view == 'place':
         for name in ['source', 'event', 'actor', 'reference']:
             tabs[name] = Tab(name, entity)
@@ -239,8 +239,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
-            tabs[range_.table_name].table.rows.append(data)
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.name].table.rows.append(data)
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
@@ -260,9 +260,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.table_name)
-            if range_.table_name in tabs:  # e.g. source has no tab for object (information carrier)
-                tabs[range_.table_name].table.rows.append(data)
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.name].table.rows.append(data)
     elif entity.class_.view == 'event':
         for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)
