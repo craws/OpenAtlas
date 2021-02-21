@@ -439,41 +439,22 @@ class Entity:
         if not form.term.data:
             return {}.values()
         sql = Entity.build_sql() + """
-            {user_clause} WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
-            {description_clause}) AND {user_clause2} (""".format(
-            user_clause="""
-                LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
-            description_clause="""
-                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
-            if form.desc.data else '',
-            user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
-        sql_where = []
-        for name in form.classes.data:
-            if name in ['source', 'event']:
-                sql_where.append("e.class_code IN ({codes})".format(
-                    codes=str(app.config['CLASS_CODES'][name])[1:-1]))
-            elif name == 'actor':
-                codes = app.config['CLASS_CODES'][name] + ['E82']  # Add alias
-                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
-            elif name == 'place':
-                sql_where.append("(e.class_code = 'E41' OR e.system_type = 'place')")
-            elif name == 'feature':
-                sql_where.append("e.system_type = 'feature'")
-            elif name == 'stratigraphic unit':
-                sql_where.append("e.system_type = 'stratigraphic unit'")
-            elif name == 'find':
-                sql_where.append("e.class_code = 'E22'")
-            elif name == 'human remains':
-                sql_where.append("e.class_code = 'E20'")
-            elif name == 'reference':
-                sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
-                    codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))
-            elif name == 'file':
-                sql_where.append(" e.system_type = 'file'")
-        sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
-        g.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
+            {user_clause}
+            WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+            {description_clause})
+            {user_clause2}
+            AND e.system_class IN %(classes)s GROUP BY e.id ORDER BY e.name;""".format(
+                user_clause="""
+                    LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
+                description_clause="""
+                    OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
+                if form.desc.data else '',
+                user_clause2=' AND ul.user_id = %(user_id)s ' if form.own.data else '')
+        g.execute(sql, {'term': '%' + form.term.data + '%',
+                        'user_id': current_user.id,
+                        'classes': tuple(form.classes.data)})
 
         # Repopulate date fields with autocompleted values
         from_date = Date.form_to_datetime64(form.begin_year.data,
@@ -505,14 +486,12 @@ class Entity:
         # Get search results
         entities = []
         for row in g.cursor.fetchall():
-            entity = None
-            if row.class_code == 'E82':  # If found in actor alias
+            if row.system_class == 'actor_appellation':  # If found in actor alias
                 entity = Link.get_linked_entity(row.id, 'P131', True)
-            elif row.class_code == 'E41':  # If found in place alias
+            elif row.system_class == 'appellation':  # If found in place alias
                 entity = Link.get_linked_entity(row.id, 'P1', True)
-            elif row.class_code == 'E18':
-                if row.system_type in form.classes.data:
-                    entity = Entity(row)
+            elif row.system_class not in form.classes.data:
+                entity = None
             else:
                 entity = Entity(row)
 

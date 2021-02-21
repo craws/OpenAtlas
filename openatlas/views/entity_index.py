@@ -46,7 +46,7 @@ def get_buttons(view: str) -> List[str]:
 def get_table(view: str) -> Table:
     table = Table(g.table_headers[view])
     if view == 'file':
-        table.headers = ['date'] + table.headers
+        table.header = ['date'] + table.header
         file_stats = get_file_stats()
         for entity in Entity.get_by_system_class('file', nodes=True):
             date = 'N/A'
