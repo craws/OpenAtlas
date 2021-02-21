@@ -16,39 +16,36 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group
 
 
-@app.route('/index/<class_>')
-@app.route('/index/<class_>/<int:delete_id>')
+@app.route('/index/<view>')
+@app.route('/index/<view>/<int:delete_id>')
 @required_group('readonly')
-def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
+def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # To prevent additional redirects deletion is done before showing index
-        url = delete_entity(class_, delete_id)
+        url = delete_entity(view, delete_id)
         if url:  # e.g. an error occurred and entry is shown again
             return redirect(url)
     return render_template('entity/index.html',
-                           class_=class_,
-                           table=get_table(class_),
-                           buttons=get_buttons(class_),
-                           gis_data=Gis.get_all() if class_ == 'place' else None,
-                           title=_(class_.replace('_', ' ')),
+                           class_=view,
+                           table=get_table(view),
+                           buttons=get_buttons(view),
+                           gis_data=Gis.get_all() if view == 'place' else None,
+                           title=_(view.replace('_', ' ')),
                            crumbs=[[_('admin'), url_for('admin_index')], _('file')]
-                           if class_ == 'file' else [_(class_.replace('_', ' '))])
+                           if view == 'file' else [_(view).replace('_', ' ')])
 
 
-def get_buttons(view_name: str) -> List[str]:
+def get_buttons(view: str) -> List[str]:
     buttons = []
-    if view_name in ['artifact', 'place']:
-        class_names = [view_name]
-    else:
-        class_names = g.view_class_mapping[view_name]
+    class_names = [view] if view in ['artifact', 'place'] else g.view_class_mapping[view]
     for name in class_names:
         if is_authorized(g.classes[name].write_access):
             buttons.append(button(g.classes[name].label, url_for('insert', class_=name)))
     return buttons
 
 
-def get_table(class_: str) -> Table:
-    table = Table(g.table_headers[class_])
-    if class_ == 'file':
+def get_table(view: str) -> Table:
+    table = Table(g.table_headers[view])
+    if view == 'file':
         table.headers = ['date'] + table.headers
         file_stats = get_file_stats()
         for entity in Entity.get_by_system_class('file', nodes=True):
@@ -63,7 +60,7 @@ def get_table(class_: str) -> Table:
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
                 entity.description])
-    elif class_ == 'reference_system':
+    elif view == 'reference_system':
         for entity in g.reference_systems.values():
             table.rows.append([
                 link(entity),
@@ -74,7 +71,7 @@ def get_table(class_: str) -> Table:
                 link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
                 entity.description])
     else:
-        classes = ['place'] if class_ == 'place' else g.view_class_mapping[class_]
+        classes = ['place'] if view == 'place' else g.view_class_mapping[view]
         entities = Entity.get_by_system_class(classes, nodes=True)
         table.rows = [get_base_table_data(item) for item in entities]
     return table

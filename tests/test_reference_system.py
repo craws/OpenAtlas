@@ -10,7 +10,7 @@ class ReferenceSystemTest(TestBaseCase):
 
     def test_reference_system(self) -> None:
         with app.app_context():  # type: ignore
-            rv = self.app.get(url_for('index', class_='reference_system'))
+            rv = self.app.get(url_for('index', view='reference_system'))
             assert b'GeoNames' in rv.data
             geonames = ReferenceSystem.get_by_name('GeoNames')
             wikidata = ReferenceSystem.get_by_name('Wikidata')
@@ -26,7 +26,7 @@ class ReferenceSystemTest(TestBaseCase):
                                data=data)
             assert b'An entry has been created.' in rv.data
             wikipedia_id = ReferenceSystem.get_by_name('Wikipedia').id
-            rv = self.app.get(url_for('index', class_='reference_system', delete_id=wikipedia_id),
+            rv = self.app.get(url_for('index', view='reference_system', delete_id=wikipedia_id),
                               follow_redirects=True)
             assert b'Deletion not possible if forms are attached' in rv.data
             rv = self.app.get(url_for('reference_system_remove_form',
@@ -34,7 +34,7 @@ class ReferenceSystemTest(TestBaseCase):
                                       form_id=geonames.forms[0]),
                               follow_redirects=True)
             assert b'Changes have been saved' in rv.data
-            rv = self.app.get(url_for('index', class_='reference_system', delete_id=wikipedia_id))
+            rv = self.app.get(url_for('index', view='reference_system', delete_id=wikipedia_id))
             assert b'The entry has been deleted' in rv.data
 
             rv = self.app.post(url_for('update', id_=geonames.id))
@@ -65,7 +65,7 @@ class ReferenceSystemTest(TestBaseCase):
                                follow_redirects=True,
                                data={'name': 'GeoNames'})
             assert b'A transaction error occurred' in rv.data
-            rv = self.app.get(url_for('index', class_='reference_system', delete_id=geonames.id))
+            rv = self.app.get(url_for('index', view='reference_system', delete_id=geonames.id))
             assert b'403' in rv.data
             rv = self.app.post(url_for('insert', class_='E21'),
                                data={'name': 'Actor with Wikidata but without precision',
@@ -90,5 +90,5 @@ class ReferenceSystemTest(TestBaseCase):
                                       form_id=geonames.forms[0]),
                               follow_redirects=True)
             assert b'Changes have been saved' in rv.data
-            rv = self.app.get(url_for('index', class_='reference_system', delete_id=geonames.id))
+            rv = self.app.get(url_for('index', view='reference_system', delete_id=geonames.id))
             assert b'403 - Forbidden' in rv.data

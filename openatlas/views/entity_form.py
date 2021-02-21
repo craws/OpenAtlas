@@ -89,10 +89,10 @@ def add_crumbs(view_name: str,
                insert_: Optional[bool] = False) -> List[Any]:
     view_name = 'object' if view_name == 'artifact' else view_name
     crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
-               url_for('index', class_=origin.view_name if origin else view_name)],
+               url_for('index', view=origin.view_name if origin else view_name)],
               link(origin)]
     if structure:
-        crumbs = [[_('place'), url_for('index', class_='place')],
+        crumbs = [[_('place'), url_for('index', view='place')],
                   structure['place'] if origin.system_type != 'place' else '',
                   structure['feature'],
                   structure['stratigraphic_unit'],
@@ -304,7 +304,7 @@ def save(form: FlaskForm,
         if action == 'update':
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
-            url = url_for('index', class_=entity.view_name)
+            url = url_for('index', view=entity.view_name)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
@@ -320,7 +320,7 @@ def save(form: FlaskForm,
                     view_name = 'place'
                 elif class_ in ['artifact']:
                     view_name = 'object'
-                url = url_for('index', class_=view_name)
+                url = url_for('index', view=view_name)
     return url
 
 

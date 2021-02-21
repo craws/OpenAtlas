@@ -100,7 +100,7 @@ class EventTest(TestBaseCase):
                                      self.precision_geonames: '',
                                      self.precision_wikidata: ''})
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('index', class_='event'))
+            rv = self.app.get(url_for('index', view='event'))
             assert b'Event' in rv.data
             self.app.get(url_for('entity_view', id_=activity_id))
 
@@ -133,5 +133,5 @@ class EventTest(TestBaseCase):
             assert b'error' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('index', class_='event', delete_id=event_id))
+            rv = self.app.get(url_for('index', view='event', delete_id=event_id))
             assert b'The entry has been deleted.' in rv.data

@@ -73,7 +73,7 @@ class FileTest(TestBaseCase):
                 pass  # Calling with "with" to prevent unclosed files warning
 
             # Index
-            rv = self.app.get(url_for('index', class_='file'))
+            rv = self.app.get(url_for('index', view='file'))
             assert b'OpenAtlas logo' in rv.data
 
             # Set and unset as main image
@@ -110,5 +110,5 @@ class FileTest(TestBaseCase):
             assert b'Updated file' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('index', class_='file', delete_id=file_id))
+            rv = self.app.get(url_for('index', view='file', delete_id=file_id))
             assert b'The entry has been deleted' in rv.data

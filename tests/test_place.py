@@ -78,7 +78,7 @@ class PlaceTest(TestBaseCase):
                 actor = Entity.insert('E21', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
-            rv = self.app.get(url_for('index', class_='place'))
+            rv = self.app.get(url_for('index', view='place'))
             assert b'Asgard' in rv.data
             rv = self.app.get(url_for('update', id_=place.id))
             assert b'Valhalla' in rv.data
@@ -263,11 +263,11 @@ class PlaceTest(TestBaseCase):
             assert b'a stratigraphic unit' in rv.data
             rv = self.app.get(url_for('entity_view', id_=find_id))
             assert b'You never' in rv.data
-            rv = self.app.get(url_for('index', class_='place', delete_id=place.id),
+            rv = self.app.get(url_for('index', view='place', delete_id=place.id),
                               follow_redirects=True)
             assert b'not possible if subunits' in rv.data
-            rv = self.app.get(url_for('index', class_='place', delete_id=find_id),
+            rv = self.app.get(url_for('index', view='place', delete_id=find_id),
                               follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            rv = self.app.get(url_for('index', class_='place', delete_id=place2.id))
+            rv = self.app.get(url_for('index', view='place', delete_id=place2.id))
             assert b'The entry has been deleted.' in rv.data

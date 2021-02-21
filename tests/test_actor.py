@@ -10,7 +10,7 @@ class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
         with app.app_context():  # type: ignore
-            rv = self.app.get(url_for('index', class_='actor'))
+            rv = self.app.get(url_for('index', view='actor'))
             assert b'No entries' in rv.data
             # Create entities for actor
             rv = self.app.post(url_for('insert', class_='place'),
@@ -86,7 +86,7 @@ class ActorTests(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('index', class_='actor'))
+            rv = self.app.get(url_for('index', view='actor'))
             assert b'Sigourney Weaver' in rv.data
 
             # Add to actor
@@ -130,5 +130,5 @@ class ActorTests(TestBaseCase):
             assert b'removed' in rv.data
 
             # Actor delete
-            rv = self.app.get(url_for('index', class_='actor', delete_id=actor_id))
+            rv = self.app.get(url_for('index', view='actor', delete_id=actor_id))
             assert b'The entry has been deleted.' in rv.data

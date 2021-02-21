@@ -13,7 +13,7 @@
                         <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
                     </a>
                     {{ _('model')|button(url_for('model_index')) }}
-                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('index', class_='reference_system') }}">
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('index', view='reference_system') }}">
                         {{ _('reference system')|uc_first }}
                     </a>
                 </p>

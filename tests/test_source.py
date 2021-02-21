@@ -43,7 +43,7 @@ class SourceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'I care for you' in rv.data
 
-            rv = self.app.get(url_for('index', class_='source'))
+            rv = self.app.get(url_for('index', view='source'))
             assert b'Test source' in rv.data
 
             # Link source
@@ -104,5 +104,5 @@ class SourceTest(TestBaseCase):
             self.app.post(url_for('translation_insert', source_id=source.id), data=data)
 
             # Delete source
-            rv = self.app.get(url_for('index', class_='source', delete_id=source.id))
+            rv = self.app.get(url_for('index', view='source', delete_id=source.id))
             assert b'The entry has been deleted.' in rv.data

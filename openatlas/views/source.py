@@ -27,7 +27,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
     return render_template('form.html',
                            form=form,
                            title=_('source'),
-                           crumbs=[[_('source'), url_for('index', class_='source')],
+                           crumbs=[[_('source'), url_for('index', view='source')],
                                    source,
                                    _('link') + ' ' + _(class_name)])
 
@@ -45,7 +45,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=translation.id))
     return render_template('display_form.html',
                            form=form,
-                           crumbs=[[_('source'), url_for('index', class_='source')],
+                           crumbs=[[_('source'), url_for('index', view='source')],
                                    source,
                                    '+ ' + uc_first(_('text'))])
 
@@ -72,7 +72,7 @@ def translation_update(id_: int) -> Union[str, Response]:
     return render_template('display_form.html',
                            form=form,
                            title=translation.name,
-                           crumbs=[[_('source'), url_for('index', class_='source')],
+                           crumbs=[[_('source'), url_for('index', view='source')],
                                    source,
                                    translation,
                                    _('edit')])

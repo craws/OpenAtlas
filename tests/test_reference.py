@@ -24,7 +24,7 @@ class ReferenceTest(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('index', class_='reference'))
+            rv = self.app.get(url_for('index', view='reference'))
             assert b'https://openatlas.eu' in rv.data
 
             # Reference update
@@ -59,5 +59,5 @@ class ReferenceTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Reference delete
-            rv = self.app.get(url_for('index', class_='reference', delete_id=reference.id))
+            rv = self.app.get(url_for('index', view='reference', delete_id=reference.id))
             assert b'The entry has been deleted.' in rv.data

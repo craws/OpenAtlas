@@ -34,12 +34,9 @@ class FeedbackForm(FlaskForm):  # type: ignore
 @app.route('/overview')
 def overview() -> str:
     tables = {'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-              'bookmarks': Table(['name', 'class', 'first', 'last'],
-                                 defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
-              'notes': Table(['name', 'class', 'first', 'last', _('note')],
-                             defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
-              'latest': Table(order=[[4, 'desc']],
-                              defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])}
+              'bookmarks': Table(['name', 'class', 'first', 'last']),
+              'notes': Table(['name', 'class', 'first', 'last', _('note')]),
+              'latest': Table(order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
@@ -55,16 +52,15 @@ def overview() -> str:
                                          entity.first,
                                          entity.last,
                                          text])
-        print(Entity.get_overview_counts().items())
         for name, count in Entity.get_overview_counts().items():
             if count:
-                url = url_for('index', class_=g.class_view_mapping[name])
+                url = url_for('index', view=g.class_view_mapping[name])
                 if name == 'administrative_unit':
                     url = url_for('node_index') + '#menu-tab-places'
                 elif name == 'type':
                     url = url_for('node_index')
                 elif name == 'find':
-                    url = url_for('index', class_='artifact')
+                    url = url_for('index', view='artifact')
                 elif name in ['feature', 'stratigraphic_unit', 'translation']:
                     url = ''
                 tables['overview'].rows.append([
@@ -72,11 +68,11 @@ def overview() -> str:
                     format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
+                format_date(entity.created),
                 link(entity),
                 entity.class_.label,
                 entity.first,
                 entity.last,
-                format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     return render_template('index/index.html',
                            intro=Content.get_translation('intro'),

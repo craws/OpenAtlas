@@ -344,10 +344,10 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
     crumbs = [[_(entity.class_.view.replace('_', ' ')),
-               url_for('index', class_=entity.class_.view)], entity.name]
+               url_for('index', view=entity.class_.view)], entity.name]
     if structure:
         crumbs = [
-            [_(entity.class_.view).replace('_', ' '), url_for('index', class_=entity.class_.view)],
+            [_(entity.class_.view).replace('_', ' '), url_for('index', view=entity.class_.view)],
             structure['place'],
             structure['feature'],
             structure['stratigraphic_unit'],
@@ -358,7 +358,7 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
             crumbs += [g.nodes[node_id] for node_id in reversed(entity.root)]
         crumbs += [entity.name]
     elif entity.class_.view == 'translation':
-        crumbs = [[_('source'), url_for('index', class_='source')],
+        crumbs = [[_('source'), url_for('index', view='source')],
                   entity.get_linked_entity('P73', True),
                   entity.name]
     return crumbs
@@ -400,7 +400,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
         entity=entity,
         form=form,
         title=entity.name,
-        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+        crumbs=[[_(entity.class_.view), url_for('index', view=entity.class_.view)],
                 entity,
                 _('link') + ' ' + _('file')])
 
@@ -420,7 +420,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
         'form.html',
         form=form,
         title=entity.name,
-        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+        crumbs=[[_(entity.class_.view), url_for('index', view=entity.class_.view)],
                 entity,
                 _('link') + ' ' + _('source')])
 
@@ -438,6 +438,6 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
         'display_form.html',
         entity=entity,
         form=form,
-        crumbs=[[_(entity.class_.view), url_for('index', class_=entity.class_.view)],
+        crumbs=[[_(entity.class_.view), url_for('index', view=entity.class_.view)],
                 entity,
                 _('link') + ' ' + _('reference')])

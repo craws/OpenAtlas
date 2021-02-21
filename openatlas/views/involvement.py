@@ -55,7 +55,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     return render_template('display_form.html',
                            form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
                                    origin,
                                    _('involvement')])
 
@@ -95,7 +95,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     return render_template('display_form.html',
                            origin=origin,
                            form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
                                    origin,
                                    event if origin_id != event.id else actor,
                                    _('edit')])

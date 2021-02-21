@@ -53,6 +53,6 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
     return render_template('form.html',
                            form=form,
                            title=entity.name,
-                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
+                           crumbs=[[_(entity.view_name), url_for('index', view=entity.view_name)],
                                    entity,
                                    _('link') + ' ' + _(class_name)])

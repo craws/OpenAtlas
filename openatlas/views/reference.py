@@ -38,7 +38,7 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     return render_template('display_form.html',
                            form=form,
                            title=_('reference'),
-                           crumbs=[[_('reference'), url_for('index', class_='reference')],
+                           crumbs=[[_('reference'), url_for('index', view='reference')],
                                    reference,
                                    _('link')])
 
@@ -63,7 +63,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
     return render_template('display_form.html',
                            form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
+                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
                                    origin,
                                    linked_object,
                                    _('edit')])

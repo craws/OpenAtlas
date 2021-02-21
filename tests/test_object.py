@@ -19,7 +19,7 @@ class ObjectTest(TestBaseCase):
                                data={'name': 'Love-letter'},
                                follow_redirects=True)
             assert b'Love-letter' in rv.data
-            rv = self.app.get(url_for('index', class_='object'))
+            rv = self.app.get(url_for('index', view='object'))
             assert b'Love-letter' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -48,7 +48,7 @@ class ObjectTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
 
-            rv = self.app.get(url_for('index', class_='object', delete_id=object_.id))
+            rv = self.app.get(url_for('index', view='object', delete_id=object_.id))
             assert b'has been deleted' in rv.data
 
             # Insert and continue
@@ -64,5 +64,5 @@ class ObjectTest(TestBaseCase):
                                data={'name': 'Lucky coin'},
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('index', class_='object'))
+            rv = self.app.get(url_for('index', view='object'))
             assert b'Lucky coin' in rv.data

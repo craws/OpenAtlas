@@ -44,7 +44,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
     return render_template('display_form.html',
                            form=form,
                            title=_('relation'),
-                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                           crumbs=[[_('actor'), url_for('index', view='actor')],
                                    origin,
                                    '+ ' + uc_first(_('relation'))])
 
@@ -81,7 +81,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
     return render_template('display_form.html',
                            form=form,
                            title=_('relation'),
-                           crumbs=[[_('actor'), url_for('index', class_='actor')],
+                           crumbs=[[_('actor'), url_for('index', view='actor')],
                                    origin,
                                    related,
                                    _('edit')])
