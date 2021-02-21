@@ -36,10 +36,13 @@ def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
 
 def get_buttons(view_name: str) -> List[str]:
     buttons = []
-    for class_name in g.view_class_mapping[view_name]:
-        class_ = g.classes[class_name]
-        if is_authorized(class_.write_access):
-            buttons.append(button(class_.label, url_for('insert', class_=class_name)))
+    if view_name in ['artifact', 'place']:
+        class_names = [view_name]
+    else:
+        class_names = g.view_class_mapping[view_name]
+    for name in class_names:
+        if is_authorized(g.classes[name].write_access):
+            buttons.append(button(g.classes[name].label, url_for('insert', class_=name)))
     return buttons
 
 
@@ -71,7 +74,8 @@ def get_table(class_: str) -> Table:
                 link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
                 entity.description])
     else:
-        entities = Entity.get_by_system_class(g.view_class_mapping[class_], nodes=True)
+        classes = ['place'] if class_ == 'place' else g.view_class_mapping[class_]
+        entities = Entity.get_by_system_class(classes, nodes=True)
         table.rows = [get_base_table_data(item) for item in entities]
     return table
 

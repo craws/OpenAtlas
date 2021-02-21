@@ -463,45 +463,47 @@ def sanitize(self: Any, string: str) -> str:
 @blueprint.app_template_filter()
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
-    name = entity.name.replace('\'', '')
-    url = url_for('index', class_=entity.class_.view, delete_id=entity.id)
     if entity.class_.name == 'source_translation':
         url = url_for('translation_delete', id_=entity.id)
     elif entity.id in g.nodes:
         url = url_for('node_delete', id_=entity.id)
+    else:
+        url = url_for('index', class_=entity.class_.view, delete_id=entity.id)
+    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
     return display.button(_('delete'),
                           url,
-                          onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
+                          onclick="return confirm('{confirm}')").format(confirm=confirm)
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    """ Returns HTML with the menu and mark appropriate item as selected."""
+    """ Returns menu HTML with (bold) marked selected item."""
+    if not current_user.is_authenticated:
+        return ''
+    view_name = ''
+    if entity:
+        view_name = entity.class_.view
+    if origin:
+        view_name = origin.class_.view
     html = ''
-    if current_user.is_authenticated:
-        view_name = ''
-        if entity:
-            view_name = entity.class_.view
-        if origin:
-            view_name = origin.class_.view
-        for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
-            css = ''
-            if (view_name and view_name.replace('node', 'types') == item) or \
-                    request.path.startswith('/index/' + item) or\
-                    request.path.startswith('/insert/' + item):
-                css = 'active'
-            html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
-                css=css,
-                item=item,
-                label=display.uc_first(_(item)))
+    for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
         css = ''
-        if request.path.startswith('/types') or (entity and entity.class_.view == 'type'):
+        if (view_name.replace('node', 'types') == item) or \
+                request.path.startswith('/index/' + item) or \
+                request.path.startswith('/insert/' + item):
             css = 'active'
-        html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+        html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
             css=css,
-            url=url_for('node_index'),
-            label=display.uc_first(_('types')))
+            item=item,
+            label=display.uc_first(_(item)))
+    css = ''
+    if request.path.startswith('/types') or (entity and entity.class_.view == 'type'):
+        css = 'active'
+    html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+        css=css,
+        url=url_for('node_index'),
+        label=display.uc_first(_('types')))
     return html
 
 

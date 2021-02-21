@@ -417,7 +417,7 @@ class Entity:
     @staticmethod
     def get_latest(limit: int) -> List[Entity]:
         sql = Entity.build_sql() + """
-            WHERE e.class_code IN %(codes)s GROUP BY e.id
+            WHERE e.system_class IN %(codes)s GROUP BY e.id
             ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.execute(sql, {'codes': tuple(g.class_view_mapping.keys()), 'limit': limit})
         return [Entity(row) for row in g.cursor.fetchall()]

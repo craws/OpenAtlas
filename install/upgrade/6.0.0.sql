@@ -17,8 +17,8 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM web.form WHERE name='Artifact'));
 
 -- If you executed above at an upgrade of a development version before use this instead
--- UPDATE model.entity SET name = 'Artifact' WHERE name = 'Artificial Object';
--- UPDATE model.entity SET system_type = 'artifact' WHERE system_type = 'artificial object';
+-- UPDATE model.entity SET name = 'Artifact' WHERE LOWER(name) = 'artificial object';
+-- UPDATE model.entity SET system_type = 'artifact' WHERE LOWER(system_type) = 'artificial object';
 -- UPDATE web.form SET name = 'Artifact' WHERE name = 'Artificial Object';
 -- UPDATE web.hierarchy SET name = 'Artifact' WHERE name = 'Artificial Object';
 
@@ -41,8 +41,8 @@ UPDATE model.entity SET system_class = 'file' WHERE class_code = 'E31' AND syste
 UPDATE model.entity SET system_class = 'find' WHERE class_code = 'E22' AND system_type = 'find';
 UPDATE model.entity SET system_class = 'group' WHERE class_code = 'E74';
 UPDATE model.entity SET system_class = 'human_remains' WHERE class_code = 'E20' AND system_type = 'human remains';
-UPDATE model.entity SET class_code = 'E22', system_class = 'artifact' WHERE class_code = 'E84';
-UPDATE model.entity SET system_class = 'legal_body' WHERE class_code = 'E40';
+UPDATE model.entity SET system_class = 'artifact', class_code = 'E22' WHERE class_code = 'E84';
+UPDATE model.entity SET system_class = 'group', class_code = 'E74' WHERE class_code = 'E40';
 UPDATE model.entity SET system_class = 'move' WHERE class_code = 'E9';
 UPDATE model.entity SET system_class = 'object_location' WHERE class_code = 'E53' AND system_type = 'place location';
 UPDATE model.entity SET system_class = 'person' WHERE class_code = 'E21';

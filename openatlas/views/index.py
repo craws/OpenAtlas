@@ -64,7 +64,7 @@ def overview() -> str:
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity),
-                g.cidoc_classes[entity.class_.code].name,
+                entity.class_.label,
                 entity.first,
                 entity.last,
                 format_date(entity.created),

@@ -21,7 +21,7 @@ def node_index() -> str:
         if node.root:
             continue
         type_ = 'custom'
-        if node.class_.code == 'E53':
+        if node.class_.name == 'administrative_unit':
             type_ = 'places'
         elif node.standard:
             type_ = 'standard'
