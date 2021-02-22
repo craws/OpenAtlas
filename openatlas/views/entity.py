@@ -102,7 +102,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                                              url_for('reference_system_remove_form',
                                                      system_id=entity.id,
                                                      form_id=form_id))]
-    elif entity.class_.name in ['artifact', 'find']:
+    elif entity.class_ == 'find':
         for name in ['source', 'event']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links('P128'):
@@ -115,7 +115,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['event'].table.rows.append(data)
     elif entity.class_.view == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
-                     'find', 'human_remains', 'file', 'object']:
+                     'human_remains', 'artifact', 'file']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links(['P67', 'P128']):
             range_ = link_.range
@@ -125,15 +125,17 @@ def entity_view(id_: int) -> Union[str, Response]:
                                                link_id=link_.id,
                                                origin_id=entity.id))
             data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.name].table.rows.append(data)
+            tabs[range_.class_.view].table.rows.append(data)
     elif entity.class_.view == 'place':
-        for name in ['source', 'event', 'actor', 'reference']:
-            tabs[name] = Tab(name, entity)
-        if entity.system_type == 'place':
+        tabs['source'] = Tab('source', entity)
+        tabs['event'] = Tab('event', entity)
+        tabs['reference'] = Tab('reference', entity)
+        if entity.class_.name == 'place':
+            tabs['actor'] = Tab('actor', entity)
             tabs['feature'] = Tab('feature', origin=entity)
-        elif entity.system_type == 'feature':
+        elif entity.class_.name == 'feature':
             tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=entity)
-        elif entity.system_type == 'stratigraphic unit':
+        elif entity.class_.name == 'stratigraphic_unit':
             tabs['find'] = Tab('find', origin=entity)
             tabs['human_remains'] = Tab('human_remains', origin=entity)
         entity.location = entity.get_linked_entity_safe('P53', nodes=True)
@@ -144,24 +146,24 @@ def entity_view(id_: int) -> Union[str, Response]:
         for event in entity.get_linked_entities('P24', inverse=True):
             if event.id not in event_ids:  # Don't add again if already in table
                 tabs['event'].table.rows.append(get_base_table_data(event))
-        for link_ in entity.location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-            actor = Entity.get_by_id(link_.domain.id)
-            tabs['actor'].table.rows.append([link(actor),
-                                             g.properties[link_.property.code].name,
-                                             actor.class_.name,
-                                             actor.first,
-                                             actor.last,
-                                             actor.description])
+        if 'actor' in tabs:
+            for link_ in entity.location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
+                actor = Entity.get_by_id(link_.domain.id)
+                tabs['actor'].table.rows.append([link(actor),
+                                                 g.properties[link_.property.code].name,
+                                                 actor.class_.name,
+                                                 actor.first,
+                                                 actor.last,
+                                                 actor.description])
         structure = get_structure(entity)
         if structure:
             for item in structure['subunits']:
-                data = get_base_table_data(item)
-                tabs[item.system_type.replace(' ', '_')].table.rows.append(data)
+                tabs[item.class_name].table.rows.append(get_base_table_data(item))
         gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
-                and gis_data['gisPolygonSelected'] == '[]' \
-                and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['super_id']):
+            and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]' \
+            and (not structure or not structure['super_id']):
             gis_data = {}
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
@@ -266,13 +268,14 @@ def entity_view(id_: int) -> Union[str, Response]:
             last = link_.last
             if not link_.last and entity.last:
                 last = '<span class="inactive">' + entity.last + '</span>'
-            data = [link(link_.range),
-                    link_.range.class_.label,
-                    link_.type.name if link_.type else '',
-                    first,
-                    last,
-                    g.properties[link_.property.code].name_inverse,
-                    link_.description]
+            data = [
+                link(link_.range),
+                link_.range.class_.label,
+                link_.type.name if link_.type else '',
+                first,
+                last,
+                g.properties[link_.property.code].name_inverse,
+                link_.description]
             if is_authorized('contributor'):
                 data.append(link(_('edit'),
                                  url_for('involvement_update', id_=link_.id, origin_id=entity.id)))
@@ -296,7 +299,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 if not entity.image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' and is_authorized('editor') and \
-                        current_user.settings['module_map_overlay']:
+                    current_user.settings['module_map_overlay']:
                     tabs['file'].table.header.append(uc_first(_('overlay')))
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -350,7 +353,7 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
         if entity.root:
             crumbs += [g.nodes[node_id] for node_id in reversed(entity.root)]
         crumbs += [entity.name]
-    elif entity.class_.view == 'translation':
+    elif entity.class_.view == 'source_translation':
         crumbs = [[_('source'), url_for('index', view='source')],
                   entity.get_linked_entity('P73', True),
                   entity.name]
@@ -359,7 +362,7 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
 
 def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
     buttons = []
-    if entity.class_.view == 'node':
+    if isinstance(entity, Node):
         if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:

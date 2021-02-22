@@ -16,32 +16,32 @@ def get_structure(object_: Optional[Entity] = None,
 
     if super_:
         super_id = super_.id
-        if super_.system_type == 'stratigraphic unit':
+        if super_.class_.name == 'stratigraphic_unit':
             feature = super_.get_linked_entity_safe('P46', inverse=True)
             place = feature.get_linked_entity_safe('P46', inverse=True)
-        elif super_.system_type == 'feature':
+        elif super_.class_.name == 'feature':
             place = super_.get_linked_entity_safe('P46', inverse=True)
-        elif super_.system_type == 'place':
+        elif super_.class_.name == 'place':
             place = super_
             siblings = super_.get_linked_entities('P46')
     elif not object_:
         return None
     else:
-        if object_.system_type not in ['find', 'human remains']:
+        if object_.class_.name not in ['find', 'human remains']:
             subunits = object_.get_linked_entities('P46', nodes=True)
 
-        if object_.system_type in ['find', 'human remains']:
+        if object_.class_.name in ['find', 'human_remains']:
             stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
             super_id = stratigraphic_unit.id
             feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
             place = feature.get_linked_entity_safe('P46', inverse=True)
             siblings = stratigraphic_unit.get_linked_entities('P46')
-        elif object_.system_type == 'stratigraphic unit':
+        elif object_.class_.name == 'stratigraphic_unit':
             feature = object_.get_linked_entity_safe('P46', inverse=True)
             super_id = feature.id
             place = feature.get_linked_entity_safe('P46', inverse=True)
             siblings = feature.get_linked_entities('P46')
-        elif object_.system_type == 'feature':
+        elif object_.class_.name == 'feature':
             place = object_.get_linked_entity_safe('P46', inverse=True)
             super_id = place.id
             siblings = place.get_linked_entities('P46')

@@ -86,9 +86,9 @@ def before_request() -> None:
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
-    from openatlas.models.system import (get_system_classes, get_class_view_mapping, table_headers,
-                                         view_class_mapping)
-    g.table_headers = table_headers
+    from openatlas.models.system import (get_system_classes, get_class_view_mapping,
+                                         get_table_headers, view_class_mapping)
+    g.table_headers = get_table_headers()
     g.classes = get_system_classes()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = get_class_view_mapping()

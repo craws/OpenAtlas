@@ -49,8 +49,8 @@ UPDATE model.entity SET system_class = 'person' WHERE class_code = 'E21';
 UPDATE model.entity SET system_class = 'place' WHERE class_code = 'E18' AND system_type = 'place';
 UPDATE model.entity SET system_class = 'reference_system' WHERE class_code = 'E32';
 UPDATE model.entity SET system_class = 'source' WHERE class_code = 'E33' AND system_type = 'source content';
+UPDATE model.entity SET system_class = 'source_translation' WHERE class_code = 'E33' AND system_type = 'source translation';
 UPDATE model.entity SET system_class = 'stratigraphic_unit' WHERE class_code = 'E18' AND system_type = 'stratigraphic unit';
-UPDATE model.entity SET system_class = 'translation' WHERE class_code = 'E33' AND system_type = 'source translation';
 UPDATE model.entity SET system_class = 'type' WHERE class_code = 'E55';
 
 ALTER TABLE model.entity ALTER COLUMN system_class SET NOT NULL;

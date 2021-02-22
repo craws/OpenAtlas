@@ -249,11 +249,9 @@ def get_class_name(self: Any, code: str) -> str:
 def description(self: Any, entity: Entity) -> str:
     if not entity.description:
         return ''
-    label = display.uc_first(_('description'))
-    if hasattr(entity, 'system_type') and entity.class_.name == 'source content':
-        label = display.uc_first(_('content'))
+    label = _('content') if entity.class_.name == 'source' else _('description')
     return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
-        label=label,
+        label=display.uc_first(label),
         description=entity.description.replace('\r\n', '<br>')))
 
 

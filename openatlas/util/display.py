@@ -30,7 +30,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.reference_system import ReferenceSystem
 
 
-# This file is used in combination with filters.py to centralize HTML display code
+# Functions that return HTML code but aren't called from templates (these are in filters.py)
 
 def external_url(url: Union[str, None]) -> str:
     return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'.format(
@@ -200,7 +200,7 @@ def add_system_data(entity: 'Entity',
         return data  # pragma: no cover
     info = openatlas.logger.get_log_for_advanced_view(entity.id)
     if 'entity_show_class' in current_user.settings and current_user.settings['entity_show_class']:
-        data[_('class')] = link(entity.class_)
+        data[_('class')] = link(entity.cidoc_class)
     if 'entity_show_dates' in current_user.settings and current_user.settings['entity_show_dates']:
         data[_('created')] = format_date(entity.created) + ' ' + link(info['creator'])
         if info['modified']:

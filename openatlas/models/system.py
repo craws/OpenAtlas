@@ -24,7 +24,6 @@ class SystemClass:
         self.standard_type = standard_type
         self.write_access = write_access
         self.form_fields = form_fields if form_fields else []
-        self.table_headers = table_headers if table_headers else []
         self.view = None
         for item, classes in view_class_mapping.items():
             if name in classes:
@@ -41,31 +40,7 @@ view_class_mapping = {
     'reference_system': ['reference_system'],
     'source': ['source'],
     'type': ['administrative_unit', 'type'],
-    'translation': ['translation']}
-
-table_headers = {
-    'actor': ['name', 'class', 'begin', 'end', 'description'],
-    'artifact': ['name', 'class', 'type', 'begin', 'end', 'description'],
-    'entities': ['name', 'class', 'info'],
-    'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
-    'feature': ['name', 'type', 'begin', 'end', 'description'],
-    'file': ['name', 'license', 'size', 'extension', 'description'],
-    'group': ['name', 'class', 'begin', 'end', 'description'],
-    'human_remains': ['name', 'type', 'begin', 'end', 'description'],
-    'member': ['member', 'function', 'first', 'last', 'description'],
-    'member_of': ['member of', 'function', 'first', 'last', 'description'],
-    'type': ['name', 'description'],
-    'object': ['name', 'type', 'description'],
-    'person': ['name', 'class', 'begin', 'end', 'description'],
-    'place': ['name', 'type', 'begin', 'end', 'description'],
-    'relation': ['relation', 'actor', 'first', 'last', 'description'],
-    'reference': ['name', 'class', 'type', 'description'],
-    'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
-                         'default precision', 'description'],
-    'source': ['name', 'type', 'description'],
-    'subs': ['name', 'count', 'info'],
-    'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
-    'text': ['text', 'type', 'content']}
+    'source_translation': ['source_translation']}
 
 """
 missing standard_types:
@@ -77,6 +52,32 @@ Administrative unit
 Historical place
 External reference match
 """
+
+
+def get_table_headers():
+    return {
+        'actor': ['name', 'class', 'begin', 'end', 'description'],
+        'artifact': ['name', 'class', 'type', 'begin', 'end', 'description'],
+        'entities': ['name', 'class', 'info'],
+        'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
+        'feature': ['name', 'type', 'begin', 'end', 'description'],
+        'file': ['name', 'license', 'size', 'extension', 'description'],
+        'group': ['name', 'class', 'begin', 'end', 'description'],
+        'human_remains': ['name', 'type', 'begin', 'end', 'description'],
+        'member': ['member', 'function', 'first', 'last', 'description'],
+        'member_of': ['member of', 'function', 'first', 'last', 'description'],
+        'type': ['name', 'description'],
+        'object': ['name', 'type', 'description'],
+        'person': ['name', 'class', 'begin', 'end', 'description'],
+        'place': ['name', 'type', 'begin', 'end', 'description'],
+        'relation': ['relation', 'actor', 'first', 'last', 'description'],
+        'reference': ['name', 'class', 'type', 'description'],
+        'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
+                             'default precision', 'description'],
+        'source': ['name', 'type', 'description'],
+        'subs': ['name', 'count', 'info'],
+        'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
+        'text': ['text', 'type', 'content']}
 
 
 def get_class_view_mapping() -> Dict['str', 'str']:
@@ -203,8 +204,8 @@ def get_system_classes() -> Dict[str, SystemClass]:
             label=_('stratigraphic unit'),
             standard_type='Stratigraphic unit',
             form_fields=[]),
-        'translation': SystemClass(
-            name='translation',
+        'source_translation': SystemClass(
+            name='source_translation',
             cidoc_class='E33',
             label=_('translation'),
             form_fields=[]),
