@@ -209,7 +209,7 @@ def admin_settings(category: str) -> Union[str, Response]:
 @required_group('contributor')
 def admin_check_similar() -> str:
     form = SimilarForm()
-    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
+    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                'reference', 'file']
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
     table = None

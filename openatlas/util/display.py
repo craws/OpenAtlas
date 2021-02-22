@@ -348,14 +348,14 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
 
         if entity.class_.name == 'move':
             person_data = []
-            object_data = []
+            artifact_data = []
             for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.code == 'E21':
                     person_data.append(linked_entity)
-                elif linked_entity.class_.code in ['E22', 'E84']:
-                    object_data.append(linked_entity)
-            data[_('person')] = [link(object_) for object_ in person_data]
-            data[_('object')] = [link(object_) for object_ in object_data]
+                elif linked_entity.class_.name in ['artifact', 'find']:
+                    artifact_data.append(linked_entity)
+            data[_('person')] = [link(item) for item in person_data]
+            data[_('artifact')] = [link(item) for item in artifact_data]
         else:
             place = entity.get_linked_entity('P7')
             if place:

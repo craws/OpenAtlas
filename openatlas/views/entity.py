@@ -284,7 +284,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
-    if entity.class_.view in ['actor', 'event', 'node', 'place', 'source', 'object']:
+    if entity.class_.view in ['actor', 'event', 'node', 'place', 'source', 'artifact']:
         if entity.class_.view not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
         tabs['file'] = Tab('file', entity)
@@ -299,7 +299,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 if not entity.image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' and is_authorized('editor') and \
-                    current_user.settings['module_map_overlay']:
+                        current_user.settings['module_map_overlay']:
                     tabs['file'].table.header.append(uc_first(_('overlay')))
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:

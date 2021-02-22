@@ -250,7 +250,7 @@ def add_fields(form: Any,
         elif code == 'E9':
             setattr(form, 'place_from', TableField(_('from')))
             setattr(form, 'place_to', TableField(_('to')))
-            setattr(form, 'object', TableMultiField())
+            setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
     elif name == 'file' and not item:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
@@ -332,7 +332,7 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     elif class_name == 'place':
         entities = Entity.get_by_class('place', nodes=True, aliases=True)
     else:
-        entities = Entity.get_by_menu_item(class_name)
+        entities = Entity.get_by_view(class_name)
 
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + Table.HEADERS[class_name], order=[[1, 'asc']])

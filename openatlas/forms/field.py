@@ -40,7 +40,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             aliases = current_user.settings['table_show_aliases']
             entities = Entity.get_by_class('place', nodes=True, aliases=aliases)
         else:
-            entities = Entity.get_by_menu_item(class_)
+            entities = Entity.get_by_view(class_)
 
         for entity in entities:
             data = get_base_table_data(entity)
@@ -111,7 +111,7 @@ class TableSelect(HiddenInput):  # type: ignore
         elif class_ == 'file':
             entities = Entity.get_by_class('file')
         else:
-            entities = Entity.get_by_menu_item(class_)
+            entities = Entity.get_by_view(class_)
         table = Table(Table.HEADERS[class_])
 
         # Table definitions (aligning)

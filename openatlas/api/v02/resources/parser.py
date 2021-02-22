@@ -44,7 +44,7 @@ query_parser.add_argument('classes', type=str, action='append',
                           help="{error_msg}")
 query_parser.add_argument('codes', type=str, action='append', help="{error_msg}",
                           case_sensitive=False,
-                          choices=('actor', 'event', 'place', 'reference', 'source', 'object'))
+                          choices=('actor', 'event', 'place', 'reference', 'source', 'artifact'))
 
 image_parser = default_parser.copy()
 image_parser.add_argument('thumbnail', type=int, help="Not a valid tuple")

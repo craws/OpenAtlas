@@ -27,7 +27,7 @@ def get_structure(object_: Optional[Entity] = None,
     elif not object_:
         return None
     else:
-        if object_.class_.name not in ['find', 'human remains']:
+        if object_.class_.name not in ['find', 'human_remains']:
             subunits = object_.get_linked_entities('P46', nodes=True)
 
         if object_.class_.name in ['find', 'human_remains']:

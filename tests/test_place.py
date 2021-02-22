@@ -23,7 +23,7 @@ class PlaceTest(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
+                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
                 place_node = Node.get_hierarchy('Place')
                 source = Entity.insert('E33', 'Necronomicon')
             geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)

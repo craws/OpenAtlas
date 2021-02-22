@@ -32,8 +32,8 @@ class GetByCode(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
-        if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
+        if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'artifact']:
             raise InvalidCodeError  # pragma: no cover
-        for entity in Query.get_by_menu_item_api(code_, parser):
+        for entity in Query.get_by_view(code_, parser):
             entities.append(entity)
         return entities

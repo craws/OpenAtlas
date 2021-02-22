@@ -82,7 +82,6 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, Node, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    view_name = 'object' if view_name == 'artifact' else view_name
     crumbs = [[_(origin.view_name.replace('_', ' ')) if origin else _(view_name.replace('_', ' ')),
                url_for('index', view=origin.view_name if origin else view_name)],
               link(origin)]
@@ -127,7 +126,7 @@ def update(id_: int) -> Union[str, Response]:
     overlays = None
     if entity.view_name == 'actor':
         form = build_form(g.cidoc_classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
-    elif entity.view_name in ['object', 'reference']:
+    elif entity.view_name in ['artifact', 'reference']:
         form = build_form(entity.class_.name, entity)
     elif entity.view_name == 'place':
         structure = get_structure(entity)
@@ -206,7 +205,7 @@ def populate_insert_form(form: FlaskForm,
         root_id = origin.root[-1] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id if origin.id != root_id else None
     elif view_name == 'event':
-        if origin.view_name == 'object':
+        if origin.view_name == 'artifact':
             form.object.data = [origin.id]
         elif origin.class_.code == 'E18':
             if class_ == 'E9':
@@ -314,7 +313,7 @@ def save(form: FlaskForm,
                 if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
                     view_name = 'place'
                 elif class_ in ['artifact']:
-                    view_name = 'object'
+                    view_name = 'artifact'
                 url = url_for('index', view=view_name)
     return url
 
@@ -338,7 +337,7 @@ def insert_entity(form: FlaskForm,
         entity = Entity.insert('E84', form.name.data, 'information carrier')
     elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
         if class_ == 'human_remains':
-            entity = Entity.insert('E20', form.name.data, 'human remains')
+            entity = Entity.insert('E20', form.name.data, 'human_remains')
         elif origin and origin.class_.name == 'stratigraphic_unit':
             entity = Entity.insert('E22', form.name.data, 'find')
         else:
@@ -346,7 +345,7 @@ def insert_entity(form: FlaskForm,
             if origin and origin.class_.name == 'place':
                 system_class = 'feature'
             elif origin and origin.class_.name == 'feature':
-                system_class = 'stratigraphic unit'
+                system_class = 'stratigraphic_unit'
             entity = Entity.insert('E18', form.name.data, system_class)
         entity.link('P53', Entity.insert('E53', 'Location of ' + form.name.data, 'place location'))
     elif class_ in ('bibliography', 'edition', 'external_reference'):
@@ -370,7 +369,7 @@ def update_links(entity: Union[Entity, Node],
                  origin: Optional[Union[Entity, Node]]) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
-    if entity.view_name in ['actor', 'event', 'place', 'object', 'node']:
+    if entity.view_name in ['actor', 'event', 'place', 'artifact', 'node']:
         ReferenceSystem.update_links(form, entity)
 
     if entity.view_name == 'actor':
@@ -443,7 +442,7 @@ def link_and_get_redirect_url(form: FlaskForm,
         elif entity.view_name == 'reference':
             link_id = entity.link('P67', origin)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        elif origin.view_name in ['place', 'feature', 'stratigraphic unit']:
+        elif origin.view_name in ['place', 'feature', 'stratigraphic_unit']:
             url = url_for('entity_view', id_=entity.id)
             origin.link('P46', entity)
         elif origin.view_name in ['source', 'file']:

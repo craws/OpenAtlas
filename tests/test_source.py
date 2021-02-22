@@ -18,14 +18,14 @@ class SourceTest(TestBaseCase):
                 actor = Entity.insert('E21', 'Gillian Anderson Gillian Anderson ')
                 carrier = Entity.insert('E84', 'I care for you', 'information carrier')
                 file = Entity.insert('E31', 'X-Files', 'file')
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
+                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
 
             rv = self.app.post(url_for('insert', class_='source', origin_id=origin.id),
                                data={'name': 'Test source'}, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                source = Entity.get_by_menu_item('source')[0]
+                source = Entity.get_by_view('source')[0]
             rv = self.app.post(url_for('insert', class_='source', origin_id=reference.id),
                                data={'name': 'Test source'}, follow_redirects=True)
             assert b'https://openatlas.eu' in rv.data

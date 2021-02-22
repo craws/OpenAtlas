@@ -32,11 +32,12 @@ class TestBaseCase(unittest.TestCase):
 
     @staticmethod
     def setup_database() -> None:
-        connection = psycopg2.connect(database=app.config['DATABASE_NAME'],
-                                      host=app.config['DATABASE_HOST'],
-                                      user=app.config['DATABASE_USER'],
-                                      password=app.config['DATABASE_PASS'],
-                                      port=app.config['DATABASE_PORT'])
+        connection = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            host=app.config['DATABASE_HOST'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'])
         connection.autocommit = True
         cursor = connection.cursor()
         for file_name in ['1_structure.sql',
@@ -60,7 +61,7 @@ def insert_entity(name: str,
         elif class_ == 'feature':
             entity = Entity.insert('E18', name, 'feature')
         elif class_ == 'stratigraphic_unit':
-            entity = Entity.insert('E18', name, 'stratigraphic unit')
+            entity = Entity.insert('E18', name, 'stratigraphic_unit')
         if origin:
             origin.link('P46', entity)
         location = Entity.insert('E53', 'Location of ' + name, 'place location')

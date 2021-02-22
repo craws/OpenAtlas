@@ -67,7 +67,6 @@ def get_table_headers():
         'member': ['member', 'function', 'first', 'last', 'description'],
         'member_of': ['member of', 'function', 'first', 'last', 'description'],
         'type': ['name', 'description'],
-        'object': ['name', 'type', 'description'],
         'person': ['name', 'class', 'begin', 'end', 'description'],
         'place': ['name', 'type', 'begin', 'end', 'description'],
         'relation': ['relation', 'actor', 'first', 'last', 'description'],

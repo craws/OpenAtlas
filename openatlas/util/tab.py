@@ -99,7 +99,7 @@ class Tab:
             if current_user.settings['module_sub_units'] and class_name == 'place':
                 buttons = [button('feature', url_for('insert', class_='feature', origin_id=id_))]
         elif name == 'find':
-            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic_unit':
                 buttons = [button(_('find'), url_for('insert', class_='find', origin_id=id_))]
         elif name == 'file':
             if view_name == 'reference':
@@ -109,7 +109,7 @@ class Tab:
                 buttons = [button('link', url_for('entity_add_file', id_=id_))]
             buttons.append(button('file', url_for('insert', class_='file', origin_id=id_)))
         elif name == 'human_remains':
-            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic_unit':
                 buttons = [button('human remains', url_for('insert',
                                                            origin_id=id_,
                                                            class_='human_remains'))]

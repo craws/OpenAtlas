@@ -25,7 +25,7 @@ class EventTest(TestBaseCase):
                 file = Entity.insert('E31', 'X-Files', 'file')
                 source = Entity.insert('E33', 'Necronomicon', 'source content')
                 carrier = Entity.insert('E84', 'I care for you', 'information carrier')
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
+                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
 
             # Insert
             rv = self.app.get(url_for('insert', class_='E7'))
@@ -39,7 +39,7 @@ class EventTest(TestBaseCase):
             assert bytes('Event Horizon', 'utf-8') in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                activity_id = Entity.get_by_menu_item('event')[0].id
+                activity_id = Entity.get_by_view('event')[0].id
             self.app.post(url_for('insert', class_='E7', origin_id=actor.id), data=data)
             self.app.post(url_for('insert', class_='E7', origin_id=file.id), data=data)
             self.app.post(url_for('insert', class_='E7', origin_id=source.id), data=data)

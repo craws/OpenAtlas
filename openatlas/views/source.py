@@ -86,7 +86,7 @@ def save(form: FlaskForm,
         if entity:
             logger.log_user(entity.id, 'update')
         elif source:
-            entity = Entity.insert('E33', form.name.data, 'source translation')
+            entity = Entity.insert('E33', form.name.data, 'source_translation')
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:
