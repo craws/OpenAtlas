@@ -55,7 +55,7 @@ class ExportTest(TestBaseCase):
             # View an imported entity
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place_id = Entity.get_by_system_type('place')[0].id
+                place_id = Entity.get_by_class('place')[0].id
             rv = self.app.get(url_for('entity_view', id_=place_id))
             assert b'Yup' in rv.data
 

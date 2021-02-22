@@ -245,13 +245,14 @@ def admin_check_dates() -> str:
               'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
                               'description'])}
     for entity in Date.get_invalid_dates():
-        tables['dates'].rows.append([link(entity),
-                                     link(entity.class_),
-                                     entity.print_standard_type(),
-                                     entity.system_type,
-                                     format_date(entity.created),
-                                     format_date(entity.modified),
-                                     entity.description])
+        tables['dates'].rows.append([
+            link(entity),
+            link(entity.class_),
+            entity.print_standard_type(),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
     for link_ in Date.get_invalid_link_dates():
         label = ''
         if link_.property.code == 'OA7':  # pragma: no cover
@@ -308,7 +309,7 @@ def admin_orphans() -> str:
 
     # Get orphaned file entities with no corresponding file
     entity_file_ids = []
-    for entity in Entity.get_by_system_class('file', nodes=True):
+    for entity in Entity.get_by_class('file', nodes=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
@@ -349,7 +350,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
         return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
     if is_authorized('admin'):  # Delete all files with no corresponding entity
-        entity_file_ids = [entity.id for entity in Entity.get_by_system_type('file')]
+        entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
         for file in app.config['UPLOAD_DIR'].iterdir():
             if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
                 try:

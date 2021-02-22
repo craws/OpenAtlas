@@ -33,7 +33,7 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
         entity = Entity.get_by_id(getattr(form, class_name).data)
         reference.link(property_code, entity, form.page.data)
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_name)
-    if reference.system_type == 'external reference':
+    if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template('display_form.html',
                            form=form,
@@ -58,7 +58,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     form.page.data = link_.description
-    if link_.domain.system_type == 'external reference':
+    if link_.domain.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
     return render_template('display_form.html',

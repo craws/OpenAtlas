@@ -29,13 +29,13 @@ class Query(Entity):
         clause = Filter.get_filter(parameters=parameters, parser=parser)
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {clause}
+                WHERE e.class_code IN %(codes)s AND e.system_class = 'source' {clause}
                  GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
                                                                   order=', '.join(parser['column']),
                                                                   sort=parser['sort'])
         elif menu_item == 'reference':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {clause} 
+                WHERE e.class_code IN %(codes)s AND e.system_class != 'file' {clause}
                  GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
                                                                   order=', '.join(parser['column']),
                                                                   sort=parser['sort'])

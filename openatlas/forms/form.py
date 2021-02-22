@@ -168,7 +168,7 @@ def add_buttons(form: Any,
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
         setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('feature')))
-    elif name == 'feature' and origin and origin.system_type == 'place':
+    elif name == 'feature' and origin and origin.class_.name == 'place':
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
         setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('stratigraphic unit')))
@@ -328,9 +328,9 @@ def build_add_reference_form(class_name: str) -> FlaskForm:
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes."""
     if class_name == 'file':
-        entities = Entity.get_by_system_type('file', nodes=True)
+        entities = Entity.get_by_class('file', nodes=True)
     elif class_name == 'place':
-        entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
+        entities = Entity.get_by_class('place', nodes=True, aliases=True)
     else:
         entities = Entity.get_by_menu_item(class_name)
 

@@ -11,7 +11,7 @@ class Filter:
 
     valid_columns: Dict[str, str] = {'id': 'e.id', 'class_code': 'e.class_code',
                                      'name': 'e.name', 'description': 'e.description',
-                                     'system_type': 'e.system_type',
+                                     'system_class': 'e.system_class',
                                      'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
                                      'created': 'e.created', 'modified': 'e.modified',
                                      'end_to': 'e.end_to', 'end_from': 'e.end_from'}

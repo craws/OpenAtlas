@@ -48,7 +48,7 @@ def get_table(view: str) -> Table:
     if view == 'file':
         table.header = ['date'] + table.header
         file_stats = get_file_stats()
-        for entity in Entity.get_by_system_class('file', nodes=True):
+        for entity in Entity.get_by_class('file', nodes=True):
             date = 'N/A'
             if entity.id in file_stats:
                 date = format_date(
@@ -72,7 +72,7 @@ def get_table(view: str) -> Table:
                 entity.description])
     else:
         classes = ['place'] if view == 'place' else g.view_class_mapping[view]
-        entities = Entity.get_by_system_class(classes, nodes=True)
+        entities = Entity.get_by_class(classes, nodes=True)
         table.rows = [get_base_table_data(item) for item in entities]
     return table
 

@@ -88,7 +88,7 @@ def add_crumbs(view_name: str,
               link(origin)]
     if structure:
         crumbs = [[_('place'), url_for('index', view='place')],
-                  structure['place'] if origin.system_type != 'place' else '',
+                  structure['place'] if origin.class_.name != 'place' else '',
                   structure['feature'],
                   structure['stratigraphic_unit'],
                   link(origin)]
@@ -111,7 +111,7 @@ def add_crumbs(view_name: str,
 @required_group('contributor')
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-    if entity.system_type == 'reference system' and not is_authorized('manager'):
+    if entity.class_.name == 'reference_system' and not is_authorized('manager'):
         abort(403)  # pragma: no cover
     elif entity.view_name == 'node':
         root = g.nodes[entity.root[-1]] if entity.root else None
@@ -128,19 +128,19 @@ def update(id_: int) -> Union[str, Response]:
     if entity.view_name == 'actor':
         form = build_form(g.cidoc_classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
     elif entity.view_name in ['object', 'reference']:
-        form = build_form(entity.system_type.replace(' ', '_'), entity)
+        form = build_form(entity.class_.name, entity)
     elif entity.view_name == 'place':
         structure = get_structure(entity)
         location = entity.get_linked_entity_safe('P53', nodes=True)
         gis_data = Gis.get_all([entity], structure)
         overlays = Overlay.get_by_object(entity)
-        if entity.system_type == 'feature':
+        if entity.class_.name == 'feature':
             form = build_form('feature', entity, location=location)
-        elif entity.system_type == 'stratigraphic unit':
+        elif entity.class_.name == 'stratigraphic_unit':
             form = build_form('stratigraphic_unit', entity, location=location)
-        elif entity.system_type == 'find':
+        elif entity.class_.name == 'find':
             form = build_form('find', entity, location=location)
-        elif entity.system_type == 'human remains':
+        elif entity.class_.name == 'human_remains':
             form = build_form('human_remains', entity, location=location)
         else:
             geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
@@ -200,7 +200,7 @@ def populate_insert_form(form: FlaskForm,
         if origin and origin.class_.code == 'E84':
             form.information_carrier.data = [origin.id]
     elif view_name == 'actor':
-        if origin.system_type == 'place':
+        if origin.class_.name == 'place':
             form.residence.data = origin.id
     elif view_name == 'node':
         root_id = origin.root[-1] if origin.root else origin.id
@@ -339,15 +339,15 @@ def insert_entity(form: FlaskForm,
     elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
         if class_ == 'human_remains':
             entity = Entity.insert('E20', form.name.data, 'human remains')
-        elif origin and origin.system_type == 'stratigraphic unit':
+        elif origin and origin.class_.name == 'stratigraphic_unit':
             entity = Entity.insert('E22', form.name.data, 'find')
         else:
-            system_type = 'place'
-            if origin and origin.system_type == 'place':
-                system_type = 'feature'
-            elif origin and origin.system_type == 'feature':
-                system_type = 'stratigraphic unit'
-            entity = Entity.insert('E18', form.name.data, system_type)
+            system_class = 'place'
+            if origin and origin.class_.name == 'place':
+                system_class = 'feature'
+            elif origin and origin.class_.name == 'feature':
+                system_class = 'stratigraphic unit'
+            entity = Entity.insert('E18', form.name.data, system_class)
         entity.link('P53', Entity.insert('E53', 'Location of ' + form.name.data, 'place location'))
     elif class_ in ('bibliography', 'edition', 'external_reference'):
         entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
@@ -355,7 +355,7 @@ def insert_entity(form: FlaskForm,
         entity = ReferenceSystem.insert_system(form)
     else:
         entity = Entity.insert(class_, form.name.data)
-    if entity.view_name == 'file':
+    if entity.class_.name == 'file':
         file_ = request.files['file']
         # Add an 'a' to prevent emtpy filename, this won't affect stored information
         filename = secure_filename('a' + file_.filename)  # type: ignore
@@ -437,7 +437,7 @@ def link_and_get_redirect_url(form: FlaskForm,
         if origin.view_name == 'reference':
             link_id = origin.link('P67', entity)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        elif entity.system_type == 'file':
+        elif entity.class_.name == 'file':
             entity.link('P67', origin)
             url = url_for('entity_view', id_=origin.id) + '#tab-file'
         elif entity.view_name == 'reference':
@@ -469,11 +469,11 @@ def link_and_get_redirect_url(form: FlaskForm,
     elif hasattr(form, 'continue_') and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
         if class_ == 'sub':
-            if entity.system_type == 'place':
+            if entity.class_.name == 'place':
                 class_ = 'feature'
-            elif entity.system_type == 'feature':
+            elif entity.class_.name == 'feature':
                 class_ = 'stratigraphic_unit'
-            elif entity.system_type == 'stratigraphic unit':
+            elif entity.class_.name == 'stratigraphic_unit':
                 class_ = 'find'
         url = url_for('insert', class_=class_, origin_id=entity.id)
     return url

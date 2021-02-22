@@ -71,7 +71,7 @@ class PlaceTest(TestBaseCase):
             assert b'Necronomicon' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                places = Entity.get_by_system_type('place')
+                places = Entity.get_by_class('place')
                 place = places[0]
                 place2 = places[1]
                 location = place2.get_linked_entity_safe('P53')
@@ -121,9 +121,10 @@ class PlaceTest(TestBaseCase):
                  [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
                  [298.9893436362036, -5.888919049309554]]]},
                 "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
-            rv = self.app.post(url_for('insert', class_='place', origin_id=source.id),
-                               data=data,
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('insert', class_='place', origin_id=source.id),
+                data=data,
+                follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
@@ -135,56 +136,53 @@ class PlaceTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file = Entity.get_by_system_type('file')[0]
+                file = Entity.get_by_class('file')[0]
                 link_id = Link.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
             assert b'X-Files' in rv.data
             data = {'top_left_easting': 42, 'top_left_northing': 12,
                     'bottom_right_easting': 43, 'bottom_right_northing': 13}
-            rv = self.app.post(url_for('overlay_insert',
-                                       image_id=file.id,
-                                       place_id=place.id,
-                                       link_id=link_id),
-                               data=data,
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('overlay_insert', image_id=file.id, place_id=place.id, link_id=link_id),
+                data=data,
+                follow_redirects=True)
             assert b'Edit' in rv.data
             if os.name == "posix":  # Ignore for other OS e.g. Windows
                 with app.test_request_context():
                     app.preprocess_request()  # type: ignore
                     overlay = Overlay.get_by_object(place)
                     overlay_id = overlay[list(overlay.keys())[0]].id
-                rv = self.app.get(url_for('overlay_update',
-                                          id_=overlay_id,
-                                          place_id=place.id,
-                                          link_id=link_id))
+                rv = self.app.get(
+                    url_for('overlay_update', id_=overlay_id, place_id=place.id, link_id=link_id))
                 assert b'42' in rv.data
-                rv = self.app.post(url_for('overlay_update',
-                                           id_=overlay_id,
-                                           place_id=place.id,
-                                           link_id=link_id),
-                                   data=data,
-                                   follow_redirects=True)
+                rv = self.app.post(
+                    url_for('overlay_update', id_=overlay_id, place_id=place.id, link_id=link_id),
+                    data=data,
+                    follow_redirects=True)
                 assert b'Changes have been saved' in rv.data
-                self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
-                             follow_redirects=True)
+                self.app.get(
+                    url_for('overlay_remove', id_=overlay_id, place_id=place.id),
+                    follow_redirects=True)
 
             # Add to place
             rv = self.app.get(url_for('entity_add_file', id_=place.id))
             assert b'Link file' in rv.data
 
-            rv = self.app.post(url_for('entity_add_file', id_=place.id),
-                               data={'checkbox_values': str([file.id])},
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('entity_add_file', id_=place.id),
+                data={'checkbox_values': str([file.id])},
+                follow_redirects=True)
             assert b'X-Files' in rv.data
 
             rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='place'))
             assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
             assert b'Link reference' in rv.data
-            rv = self.app.post(url_for('entity_add_reference', id_=place.id),
-                               data={'reference': reference.id, 'page': '777'},
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('entity_add_reference', id_=place.id),
+                data={'reference': reference.id, 'page': '777'},
+                follow_redirects=True)
             assert b'777' in rv.data
 
             # Place types

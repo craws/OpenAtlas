@@ -279,9 +279,9 @@ class Entity:
         return sql
 
     @staticmethod
-    def get_by_system_class(classes: [str, List[str]],
-                            nodes: bool = False,
-                            aliases: bool = False) -> List[Entity]:
+    def get_by_class(classes: [str, List[str]],
+                     nodes: bool = False,
+                     aliases: bool = False) -> List[Entity]:
         sql = Entity.build_sql(
             nodes=nodes,
             aliases=aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
@@ -300,7 +300,7 @@ class Entity:
     @staticmethod
     def insert(code: str,
                name: str,
-               system_type: Optional[str] = None,
+               system_class: Optional[str] = None,
                description: Optional[str] = None) -> Entity:
         from openatlas.util.display import sanitize
         from openatlas import logger
@@ -308,12 +308,13 @@ class Entity:
             logger.log('error', 'database', 'Insert entity without name')
             abort(422)
         sql = """
-            INSERT INTO model.entity (name, system_type, class_code, description)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s) RETURNING id;"""
-        params = {'name': str(name).strip(),
-                  'code': code,
-                  'system_type': system_type.strip() if system_type else None,
-                  'description': sanitize(description, 'text') if description else None}
+            INSERT INTO model.entity (name, system_class, class_code, description)
+            VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
+        params = {
+            'name': str(name).strip(),
+            'code': code,
+            'system_class': system_class,
+            'description': sanitize(description, 'text') if description else None}
         g.execute(sql, params)
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
@@ -374,7 +375,7 @@ class Entity:
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
         # Todo: rewrite form to take multiple system classes
         class_ = form.classes.data
-        entities = Entity.get_by_system_class(class_)
+        entities = Entity.get_by_class(class_)
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
         for sample in entities:

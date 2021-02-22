@@ -38,7 +38,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_class('place', nodes=True, aliases=aliases)
         else:
             entities = Entity.get_by_menu_item(class_)
 
@@ -103,13 +103,13 @@ class TableSelect(HiddenInput):  # type: ignore
         class_ = 'place' if field.id in place_fields else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_class('place', nodes=True, aliases=aliases)
         elif class_ == 'reference':
-            entities = Entity.get_by_system_type('bibliography') + \
-                       Entity.get_by_system_type('edition') + \
-                       Entity.get_by_system_type('external reference')
+            entities = Entity.get_by_class('bibliography') + \
+                       Entity.get_by_class('edition') + \
+                       Entity.get_by_class('external_reference')
         elif class_ == 'file':
-            entities = Entity.get_by_system_type('file')
+            entities = Entity.get_by_class('file')
         else:
             entities = Entity.get_by_menu_item(class_)
         table = Table(Table.HEADERS[class_])

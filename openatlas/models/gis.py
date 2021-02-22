@@ -83,7 +83,7 @@ class Gis:
                 LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
                 WHERE place.class_code = 'E53'
                     AND l.property_code = 'P53'
-                    AND (object.system_type = 'place' OR object.id IN %(extra_ids)s)
+                    AND (object.system_class = 'place' OR object.id IN %(extra_ids)s)
                 GROUP BY object.id, {shape}.id;""".format(shape=shape, polygon_sql=polygon_sql)
             g.execute(sql, {'extra_ids': tuple(extra_ids)})
             place_root = Node.get_hierarchy('Place')

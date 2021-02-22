@@ -35,7 +35,7 @@ class FileTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                files = Entity.get_by_system_type('file')
+                files = Entity.get_by_class('file')
                 file_id = files[0].id
                 file_id2 = files[1].id
 

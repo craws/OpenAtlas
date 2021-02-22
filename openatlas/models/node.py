@@ -42,13 +42,12 @@ class Node(Entity):
             LEFT JOIN model.link l2 ON e.id = l2.range_id AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
             
-            WHERE e.class_code = %(class_code)s
-                AND (e.system_type IS NULL OR e.system_type != 'place location')
+            WHERE e.system_class = %(system_class)s
             GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
-        g.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})
+        g.execute(sql, {'system_class': 'type', 'property_code': 'P127'})
         types = g.cursor.fetchall()
-        g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
+        g.execute(sql, {'system_class': 'administrative_unit', 'property_code': 'P89'})
         places = g.cursor.fetchall()
         nodes = {}
         for row in types + places:

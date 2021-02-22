@@ -31,7 +31,7 @@ class GeoJsonEntity:
     def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
         files = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
-            if link.domain.system_type == 'file':
+            if link.domain.class_.name == 'file':
                 path = get_file_path(link.domain.id)
                 files.append({'@id': url_for('entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,

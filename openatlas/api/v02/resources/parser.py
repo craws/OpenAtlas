@@ -22,7 +22,7 @@ entity_parser.add_argument('sort', choices=('desc', 'asc'), type=str, default='a
 entity_parser.add_argument('column', type=str, default=['name'], action='append',
                            case_sensitive=False,
                            help='{error_msg}', choices=(
-        'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
+        'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_class',
         'begin_from', 'begin_to', 'end_from', 'end_to'))
 entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append')
 # Todo: Dismiss negative value
