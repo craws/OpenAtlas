@@ -542,7 +542,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = Date.datetime64_to_timestamp(value)
-        return date_ if date_ else ''
+        return date_.lstrip('0') if date_ else ''
     return value.date().isoformat()
 
 
