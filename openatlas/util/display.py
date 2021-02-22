@@ -233,7 +233,7 @@ def add_type_data(entity: 'Entity',
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
-        label = 'type' if root.name in app.config['BASE_TYPES'] else root.name
+        label = 'type' if root.standard else root.name
         if root.name not in type_data:
             type_data[label] = []
         text = ''
@@ -326,12 +326,11 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     data[_('begin')] = (from_link if from_link else '') + format_entry_begin(entity)
     data[_('end')] = (to_link if to_link else '') + format_entry_end(entity)
 
-    # Types
     add_type_data(entity, data)
 
     # Class specific information
-    # Todo: like in views/entity this if/else is too long and error prone
-    if entity.class_.view == 'node':
+    from openatlas.models.node import Node
+    if isinstance(entity, Node):
         data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
@@ -346,18 +345,8 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data[_('sub event of')] = link(super_event)
-        if not entity.class_.code == 'E9':
-            place = entity.get_linked_entity('P7')
-            if place:
-                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
-        # Acquisition
-        if entity.class_.code == 'E8':
-            data[_('recipient')] = [link(recipient) for recipient in
-                                    entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
-        # Move
-        if entity.class_.code == 'E9':
+
+        if entity.class_.name == 'move':
             person_data = []
             object_data = []
             for linked_entity in entity.get_linked_entities(['P25']):
@@ -367,6 +356,17 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
                     object_data.append(linked_entity)
             data[_('person')] = [link(object_) for object_ in person_data]
             data[_('object')] = [link(object_) for object_ in object_data]
+        else:
+            place = entity.get_linked_entity('P7')
+            if place:
+                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
+
+        if entity.class_.name == 'acquisition':
+            data[_('recipient')] = [link(recipient) for recipient in
+                                    entity.get_linked_entities(['P22'])]
+            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
+
     elif entity.class_.view == 'actor':
         begin_place = entity.get_linked_entity('OA8')
         begin_object = None

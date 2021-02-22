@@ -22,6 +22,7 @@ from openatlas.util.display import (add_edit_link, add_remove_link, button, get_
                                     link, uc_first)
 from openatlas.util.filters import display_delete_link
 from openatlas.util.tab import Tab
+from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
 from openatlas.views.reference import AddReferenceForm
 
@@ -55,7 +56,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     overlays = None  # Needed for place
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info')}
-    if entity.class_.view == 'type':
+    if isinstance(entity, Node):
         tabs['subs'] = Tab('subs', entity)
         tabs['entities'] = Tab('entities', entity)
         root = g.nodes[entity.root[-1]] if entity.root else None
@@ -69,7 +70,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = [link(item)]
             if root and root.value_type:  # pragma: no cover
                 data.append(format_number(item.nodes[entity]))
-            data.append(g.cidoc_classes[item.cidoc_class.code].name)
+            data.append(item.class_.label)
             data.append(item.description)
             tabs['entities'].table.rows.append(data)
         for sub_id in entity.subs:
@@ -80,35 +81,28 @@ def entity_view(id_: int) -> Union[str, Response]:
             for row in Link.get_entities_by_node(entity):
                 tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
                                                     link(Entity.get_by_id(row.range_id))])
-
-    elif entity.class_.view == 'reference_system':
+    elif isinstance(entity, ReferenceSystem):
         for form_id, form_ in entity.get_forms().items():
-            tabs[form_['name'].replace(' ', '-')] = Tab(form_['name'].replace(' ', '-'),
-                                                        origin=entity)
-            tabs[form_['name'].replace(' ', '-')].table.header = [_('entity'), 'id', _('precision')]
+            name = form_['name'].replace(' ', '-')
+            tabs[name] = Tab(name, origin=entity)
+            tabs[name].table = Table([_('entity'), 'id', _('precision')])
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:
                 name = \
                     '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
                         url=entity.resolver_url + name, name=name)
-            tab_name = link_.range.class_.view.capitalize().replace(' ', '-')
-            if tab_name == 'Actor':  # Instead actor the tabs person, group and legal body are shown
-                tab_name = g.cidoc_classes[link_.range.class_.code].name.replace(' ', '-')
-            elif tab_name == 'Place':
-                tab_name = link_.range.system_type.title().replace(' ', '-')
-            elif tab_name == 'Object':  # pragma: no cover
-                tab_name = 'Artifact'
-            elif tab_name == 'Node':  # pragma: no cover
-                tab_name = 'Type'
+            tab_name = link_.range.class_.view.replace('_', '-')
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
+
         for form_id, form_ in entity.get_forms().items():
-            if not tabs[form_['name'].replace(' ', '-')].table.rows and is_authorized('manager'):
-                tabs[form_['name'].replace(' ', '-')].buttons = [
-                    button(_('remove'), url_for('reference_system_remove_form',
-                                                system_id=entity.id,
-                                                form_id=form_id))]
-    elif entity.class_.view == 'object':
+            name = form_['name'].replace(' ', '-')
+            if not tabs[name].table.rows and is_authorized('manager'):
+                tabs[name].buttons = [button(_('remove'),
+                                             url_for('reference_system_remove_form',
+                                                     system_id=entity.id,
+                                                     form_id=form_id))]
+    elif entity.class_.name in ['artifact', 'find']:
         for name in ['source', 'event']:
             tabs[name] = Tab(name, entity)
         for link_ in entity.get_links('P128'):
@@ -188,7 +182,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if not link_.last and event.last:
                 last = '<span class="inactive">' + event.last + '</span>'
             data = [link(event),
-                    g.cidoc_classes[event.class_.code].name,
+                    event.class_.label,
                     link(link_.type),
                     first,
                     last,
@@ -247,8 +241,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'source':
-        for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                     'human_remains', 'object', 'text']:
+        for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'human_remains',
+                     'artifact', 'text']:
             tabs[name] = Tab(name, entity)
         for text in entity.get_linked_entities('P73', nodes=True):
             tabs['text'].table.rows.append([link(text),
@@ -273,7 +267,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if not link_.last and entity.last:
                 last = '<span class="inactive">' + entity.last + '</span>'
             data = [link(link_.range),
-                    g.cidoc_classes[link_.range.class_.code].name,
+                    link_.range.class_.label,
                     link_.type.name if link_.type else '',
                     first,
                     last,
@@ -286,6 +280,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
+
     if entity.class_.view in ['actor', 'event', 'node', 'place', 'source', 'object']:
         if entity.class_.view not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)

@@ -396,7 +396,7 @@ def display_form(self: Any,
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
-            if node.name in app.config['BASE_TYPES']:
+            if node.standard:
                 label = display.uc_first(_('type'))
             if field.label.text == 'super':
                 label = display.uc_first(_('super'))

@@ -71,7 +71,7 @@ UPDATE web.form SET name = LOWER(REPLACE(name, ' ', '_'));
 UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'information_carrier') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
 UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'find') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
 UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'legal_body') WHERE form_id = (SELECT id FROM web.form WHERE name = 'group');
-DELETE FROM web.form WHERE name IN ('information_carrier', 'find', 'legal_body');
+DELETE FROM web.form WHERE name IN ('information_carrier', 'legal_body');
 
 -- ALTER TABLE model.entity DROP COLUMN system_type;
 

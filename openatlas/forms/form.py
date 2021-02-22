@@ -73,7 +73,7 @@ def build_form(name: str,
     if 'alias' in forms[name]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     code = item.class_.code if item and isinstance(item, Entity) else code
-    add_types(Form, name, code)
+    add_types(Form, name)
     add_fields(Form, name, code, item, origin)
     add_reference_systems(Form, name)
     if 'date' in forms[name]:
@@ -213,15 +213,11 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
         add_value_type_fields(form, sub.subs)
 
 
-def add_types(form: Any, name: str, code: Union[str, None]) -> None:
-    code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    type_name = name.replace('_', ' ').title()
-    if code in code_class:
-        type_name = code_class[code]
-    types = OrderedDict(Node.get_nodes_for_form(type_name))
-    for node in types.values():
-        if node.name in app.config['BASE_TYPES']:
-            types.move_to_end(node.id, last=False)  # Move standard type to top
+def add_types(form: Any, name: str) -> None:
+    types = OrderedDict(Node.get_nodes_for_form(g.classes[name].standard_type))
+    for node in types.values():  # Move standard type to top
+        if node.standard:
+            types.move_to_end(node.id, last=False)
             break
 
     for node in types.values():

@@ -62,10 +62,8 @@ LOG_LEVELS = {0: 'emergency',
               6: 'info',
               7: 'debug'}
 
-# Types
+# Todo: defining PROPERTY_TYPES below makes adaptions very fragile and has to go
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
-BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Human Remains',
-              'Information Carrier', 'Place', 'Source', 'Stratigraphic Unit']
 
 CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
                   'secondary': 'btn btn-secondary btn-xsm'}}
