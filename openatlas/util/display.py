@@ -350,7 +350,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             person_data = []
             artifact_data = []
             for linked_entity in entity.get_linked_entities(['P25']):
-                if linked_entity.class_.code == 'E21':
+                if linked_entity.class_.name == 'person':
                     person_data.append(linked_entity)
                 elif linked_entity.class_.name in ['artifact', 'find']:
                     artifact_data.append(linked_entity)
@@ -385,9 +385,9 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             entity.linked_places.append(residence_object)
         appears_first, appears_last = get_appearance(event_links)
         data[_('alias')] = list(entity.aliases.values())
-        data[_('born') if entity.class_.code == 'E21' else _('begin')] = format_entry_begin(
+        data[_('born') if entity.class_.code == 'person' else _('begin')] = format_entry_begin(
             entity, begin_object)
-        data[_('died') if entity.class_.code == 'E21' else _('end')] = format_entry_end(
+        data[_('died') if entity.class_.code == 'person' else _('end')] = format_entry_end(
             entity, end_object)
         data[_('appears first')] = appears_first
         data[_('appears last')] = appears_last

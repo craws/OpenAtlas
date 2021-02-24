@@ -7,6 +7,7 @@ from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_file_path
 
 
@@ -114,7 +115,7 @@ class GeoJsonEntity:
     def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
         ref = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
-            if link.domain.class_.code == 'E32':
+            if isinstance(link.domain, ReferenceSystem):
                 system = g.reference_systems[link.domain.id]
                 ref.append({'identifier': (system.resolver_url if system.resolver_url else '')
                                           + link.description,
@@ -170,9 +171,9 @@ class GeoJsonEntity:
             'show'] else None
 
         # Geometry
-        if 'geometry' in parser['show'] and entity.class_.code == 'E53':
+        if 'geometry' in parser['show'] and entity.class_.name == 'object_location':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
-        elif 'geometry' in parser['show'] and entity.class_.code == 'E18':
+        elif 'geometry' in parser['show'] and entity.class_.view == 'place':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(
                 Link.get_linked_entity(entity.id, 'P53'))
 

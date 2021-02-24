@@ -405,8 +405,8 @@ def entity_add_file(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def entity_add_source(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
-    property_code = 'P128' if entity.class_.code == 'E84' else 'P67'
-    inverse = False if entity.class_.code == 'E84' else True
+    property_code = 'P128' if entity.class_.name in ['artifact', 'find'] else 'P67'
+    inverse = False if entity.class_.name in ['artifact', 'find'] else True
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string(property_code, request.form['checkbox_values'], inverse=inverse)

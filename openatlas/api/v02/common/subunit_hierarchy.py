@@ -32,7 +32,7 @@ class GetSubunitHierarchy(Resource):  # type: ignore
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except EntityDoesNotExistError:  # pragma: no cover
             raise EntityDoesNotExistError
-        if entity.class_.code in ['E18']:
+        if entity.class_.name == 'place':
             return GetSubunitHierarchy.get_subunits_recursive(entity, [])
         else:
             raise InvalidSubunitError  # pragma: no cover

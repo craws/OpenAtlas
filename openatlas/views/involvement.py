@@ -20,27 +20,29 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     form = build_form('involvement', origin=origin)
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
-    if origin.class_.code in ['E7', 'E8']:
+    if origin.class_.name in ['acquisition', 'activity']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
-    if origin.class_.code == 'E8':
-        form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
-        form.activity.choices.append(('P23', g.properties['P23'].name_inverse))
+        if origin.class_.code == 'acquisition':
+            form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
+            form.activity.choices.append(('P23', g.properties['P23'].name_inverse))
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
             if origin.class_.view == 'event':
                 for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
-                    link_ = Link.get_by_id(origin.link(form.activity.data,
-                                                       actor,
-                                                       form.description.data)[0])
+                    link_ = Link.get_by_id(origin.link(
+                        form.activity.data,
+                        actor,
+                        form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
             else:
                 for event in Entity.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_ = Link.get_by_id(event.link(form.activity.data,
-                                                      origin,
-                                                      form.description.data)[0])
+                    link_ = Link.get_by_id(event.link(
+                        form.activity.data,
+                        origin,
+                        form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -70,11 +72,11 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)
     origin = event if origin_id == event.id else actor
-    if event.class_.code in ['E7', 'E8']:
+    if event.class_.code in ['acquisition', 'activity']:
         form.activity.choices.append(('P14', g.properties['P14'].name))
-    if event.class_.code == 'E8':
-        form.activity.choices.append(('P22', g.properties['P22'].name))
-        form.activity.choices.append(('P23', g.properties['P23'].name))
+        if event.class_.code == 'acquisition':
+            form.activity.choices.append(('P22', g.properties['P22'].name))
+            form.activity.choices.append(('P23', g.properties['P23'].name))
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:

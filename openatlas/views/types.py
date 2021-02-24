@@ -52,7 +52,7 @@ def node_delete(id_: int) -> Response:
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    if node.class_.code == 'E53':
+    if node.class_.name == 'administrative_unit':
         tab_hash = '#menu-tab-places_collapse-'
     elif root.standard:
         tab_hash = '#menu-tab-standard_collapse-'

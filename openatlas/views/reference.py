@@ -29,7 +29,7 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
     form = build_add_reference_form(class_name)
     if form.validate_on_submit():
-        property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
+        property_code = 'P128' if reference.class_.name in ['artifact', 'find'] else 'P67'
         entity = Entity.get_by_id(getattr(form, class_name).data)
         reference.link(property_code, entity, form.page.data)
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_name)
