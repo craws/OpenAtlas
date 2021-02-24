@@ -23,8 +23,8 @@ class EventTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', actor_name)
                 file = Entity.insert('E31', 'X-Files', 'file')
-                source = Entity.insert('E33', 'Necronomicon', 'source content')
-                carrier = Entity.insert('E84', 'I care for you', 'information carrier')
+                source = Entity.insert('E33', 'Necronomicon', 'source')
+                carrier = Entity.insert('E84', 'I care for you', 'information_carrier')
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
 
             # Insert

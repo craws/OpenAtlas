@@ -16,7 +16,7 @@ class SourceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 origin = Entity.insert('E21', 'David Duchovny')
                 actor = Entity.insert('E21', 'Gillian Anderson Gillian Anderson ')
-                carrier = Entity.insert('E84', 'I care for you', 'information carrier')
+                carrier = Entity.insert('E84', 'I care for you', 'information_carrier')
                 file = Entity.insert('E31', 'X-Files', 'file')
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
 

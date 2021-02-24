@@ -331,11 +331,11 @@ def insert_entity(form: FlaskForm,
         root = g.nodes[origin.root[-1]] if origin.root else origin
         entity = Entity.insert(root.class_.code, form.name.data)
     elif class_ == 'source':
-        entity = Entity.insert('E33', form.name.data, 'source content')
+        entity = Entity.insert('E33', form.name.data, 'source')
     elif class_ == 'file':
         entity = Entity.insert('E31', form.name.data, 'file')
     elif class_ == 'E84':
-        entity = Entity.insert('E84', form.name.data, 'information carrier')
+        entity = Entity.insert('E84', form.name.data, 'information_carrier')
     elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
         if class_ == 'human_remains':
             entity = Entity.insert('E20', form.name.data, 'human_remains')
