@@ -40,18 +40,20 @@ def overview() -> str:
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
-            tables['bookmarks'].rows.append([link(entity),
-                                             g.cidoc_classes[entity.class_.code].name,
-                                             entity.first,
-                                             entity.last,
-                                             bookmark_toggle(entity.id, True)])
+            tables['bookmarks'].rows.append([
+                link(entity),
+                entity.class_.label,
+                entity.first,
+                entity.last,
+                bookmark_toggle(entity.id, True)])
         for entity_id, text in User.get_notes().items():
             entity = Entity.get_by_id(entity_id)
-            tables['notes'].rows.append([link(entity),
-                                         g.cidoc_classes[entity.class_.code].name,
-                                         entity.first,
-                                         entity.last,
-                                         text])
+            tables['notes'].rows.append([
+                link(entity),
+                entity.class_.label,
+                entity.first,
+                entity.last,
+                text])
         for name, count in Entity.get_overview_counts().items():
             if count:
                 url = url_for('index', view=g.class_view_mapping[name])

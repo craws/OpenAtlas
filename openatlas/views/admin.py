@@ -240,16 +240,15 @@ def admin_orphans_delete(parameter: str) -> Response:
 @required_group('contributor')
 def admin_check_dates() -> str:
     # Get invalid date combinations (e.g. begin after end)
-    tables = {'link_dates': Table(['link', 'domain', 'range']),
-              'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
-              'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
-                              'description'])}
+    tables = {
+        'link_dates': Table(['link', 'domain', 'range']),
+        'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
+        'dates': Table(['name', 'class', 'type', 'created', 'updated', 'description'])}
     for entity in Date.get_invalid_dates():
         tables['dates'].rows.append([
             link(entity),
-            link(entity.class_),
+            link(entity.class_.label),
             entity.print_standard_type(),
-            entity.class_.label,
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
@@ -270,7 +269,7 @@ def admin_check_dates() -> str:
         actor = link_.range
         data = [link(actor),
                 link(event),
-                g.cidoc_classes[event.class_.code].name,
+                event.class_.code.name,
                 link_.type.name if link_.type else '',
                 link_.description,
                 link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]

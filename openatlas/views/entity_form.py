@@ -98,13 +98,7 @@ def add_crumbs(view_name: str,
             for node_id in reversed(origin.root):
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
-    if insert_:
-        crumbs = crumbs + ['+ ' + (g.cidoc_classes[class_].name
-                                   if class_ in g.cidoc_classes else uc_first(
-            _(class_.replace('_', ' '))))]
-    else:
-        crumbs = crumbs + [_('edit')]
-    return crumbs
+    return crumbs + (['+ ' + g.classes[class_].label] if insert_ else crumbs + [_('edit')])
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
@@ -126,7 +120,7 @@ def update(id_: int) -> Union[str, Response]:
     gis_data = None
     overlays = None
     if entity.class_.view == 'actor':
-        form = build_form(g.cidoc_classes[entity.class_.code].name.lower().replace(' ', '_'), entity)
+        form = build_form(entity.class_.name, entity)
     elif entity.class_.view in ['artifact', 'reference']:
         form = build_form(entity.class_.name, entity)
     elif entity.class_.view == 'place':
