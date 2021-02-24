@@ -40,13 +40,13 @@ class CidocClass:
             FROM model.class c
             LEFT JOIN model.entity e ON c.code = e.class_code
             GROUP BY (c.id, c.name, c.comment);""")
-        classes = {row.code: CidocClass(_name=row.name,
-                                        code=row.code,
-                                        id=row.id,
-                                        comment=row.comment,
-                                        count=row.count,
-                                        i18n={}, sub=[], super=[]
-                                        ) for row in g.cursor.fetchall()}
+        classes = {row.code: CidocClass(
+            _name=row.name,
+            code=row.code,
+            id=row.id,
+            comment=row.comment,
+            count=row.count,
+            i18n={}, sub=[], super=[]) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)

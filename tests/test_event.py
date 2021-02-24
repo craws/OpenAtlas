@@ -24,7 +24,7 @@ class EventTest(TestBaseCase):
                 actor = Entity.insert('E21', actor_name)
                 file = Entity.insert('E31', 'X-Files', 'file')
                 source = Entity.insert('E33', 'Necronomicon', 'source')
-                carrier = Entity.insert('E84', 'I care for you', 'information_carrier')
+                carrier = Entity.insert('E22', 'Artifact', 'artifact')
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
 
             # Insert

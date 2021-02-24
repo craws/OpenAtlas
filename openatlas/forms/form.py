@@ -37,7 +37,6 @@ forms = {'actor_actor_relation': ['date', 'description', 'continue'],
          'group': ['name', 'alias', 'date', 'description', 'continue'],
          'hierarchy': ['name', 'description'],
          'human_remains': ['name', 'date', 'description', 'continue', 'map'],
-         'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
          'node': ['name', 'description', 'continue'],
@@ -72,7 +71,6 @@ def build_form(name: str,
 
     if 'alias' in forms[name]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
-    code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name)
     add_fields(Form, name, code, item, origin)
     add_reference_systems(Form, name)
@@ -312,7 +310,7 @@ def add_fields(form: Any,
                 widget=widgets.ListWidget(prefix_label=False),
                 coerce=int))
     elif name == 'source':
-        setattr(form, 'information_carrier', TableMultiField())
+        setattr(form, 'artifact', TableMultiField())
 
 
 def build_add_reference_form(class_: str) -> FlaskForm:
@@ -372,7 +370,7 @@ def build_move_form(node: Node) -> FlaskForm:
     setattr(Form, str(root.id), TreeField(str(root.id)))
     form = Form(obj=node)
     choices = []
-    if root.class_.code == 'E53':
+    if root.class_.name == 'administrative_unit':
         for entity in node.get_linked_entities('P89', True):
             place = entity.get_linked_entity('P53', True)
             if place:

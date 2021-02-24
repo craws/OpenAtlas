@@ -22,7 +22,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
     if origin.class_.name in ['acquisition', 'activity']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
-        if origin.class_.code == 'acquisition':
+        if origin.class_.name == 'acquisition':
             form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
             form.activity.choices.append(('P23', g.properties['P23'].name_inverse))
     if form.validate_on_submit():
@@ -72,9 +72,9 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)
     origin = event if origin_id == event.id else actor
-    if event.class_.code in ['acquisition', 'activity']:
+    if event.class_.name in ['acquisition', 'activity']:
         form.activity.choices.append(('P14', g.properties['P14'].name))
-        if event.class_.code == 'acquisition':
+        if event.class_.name == 'acquisition':
             form.activity.choices.append(('P22', g.properties['P22'].name))
             form.activity.choices.append(('P23', g.properties['P23'].name))
     if form.validate_on_submit():

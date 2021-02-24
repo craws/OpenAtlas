@@ -79,8 +79,9 @@ def entity_view(id_: int) -> Union[str, Response]:
         if not tabs['entities'].table.rows:  # If no entities available get links with this type_id
             tabs['entities'].table.header = [_('domain'), _('range')]
             for row in Link.get_entities_by_node(entity):
-                tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
-                                                    link(Entity.get_by_id(row.range_id))])
+                tabs['entities'].table.rows.append([
+                    link(Entity.get_by_id(row.domain_id)),
+                    link(Entity.get_by_id(row.range_id))])
     elif isinstance(entity, ReferenceSystem):
         for form_id, form_ in entity.get_forms().items():
             name = form_['name'].replace(' ', '-')
@@ -98,10 +99,11 @@ def entity_view(id_: int) -> Union[str, Response]:
         for form_id, form_ in entity.get_forms().items():
             name = form_['name'].replace(' ', '-')
             if not tabs[name].table.rows and is_authorized('manager'):
-                tabs[name].buttons = [button(_('remove'),
-                                             url_for('reference_system_remove_form',
-                                                     system_id=entity.id,
-                                                     form_id=form_id))]
+                tabs[name].buttons = [
+                    button(_('remove'),
+                           url_for('reference_system_remove_form',
+                                   system_id=entity.id,
+                                   form_id=form_id))]
     elif entity.class_ == 'find':
         for name in ['source', 'event']:
             tabs[name] = Tab(name, entity)
@@ -121,9 +123,9 @@ def entity_view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            data = add_edit_link(data, url_for('reference_link_update',
-                                               link_id=link_.id,
-                                               origin_id=entity.id))
+            data = add_edit_link(
+                data,
+                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
             data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
             tabs[range_.class_.view].table.rows.append(data)
     elif entity.class_.view == 'place':
@@ -240,9 +242,9 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
-            data = add_edit_link(data,
-                                 url_for('reference_link_update', link_id=link_.id,
-                                         origin_id=entity.id))
+            data = add_edit_link(
+                data,
+                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
             data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'source':
