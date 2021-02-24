@@ -14,8 +14,8 @@ class SourceTest(TestBaseCase):
             assert b'+ Source' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                origin = Entity.insert('E21', 'David Duchovny')
-                actor = Entity.insert('E21', 'Gillian Anderson Gillian Anderson ')
+                origin = Entity.insert('E21', 'David Duchovny', 'person')
+                actor = Entity.insert('E21', 'Gillian Anderson Gillian Anderson', 'person')
                 carrier = Entity.insert('E22', 'Artifact', 'artifact')
                 file = Entity.insert('E31', 'X-Files', 'file')
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
