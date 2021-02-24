@@ -253,12 +253,12 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 id="{name}-button"
                 class="{button_class}"
                 onclick="$('#{name}-modal').modal('show')">
-                    {change_label}
+                {change_label}
             </span>
             <div
                 id="{name}-selection"
                 style="text-align:left;">
-                    {selection}
+                {selection}
             </div>
             <div
                 id="{name}-modal"
@@ -275,7 +275,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 class="btn btn-outline-primary btn-sm"
                                 data-dismiss="modal"
                                 aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
+                                <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
@@ -292,7 +292,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 class="btn btn-outline-primary btn-sm"
                                 data-dismiss="modal"
                                 onclick="selectFromTreeMulti({name})">
-                                    {close_label}
+                                {close_label}
                             </button>
                         </div>
                     </div>
@@ -353,8 +353,14 @@ class TreeSelect(HiddenInput):  # type: ignore
                 readonly="readonly"
                 value="{selection}"
                 placeholder="{change_label}">
-            <a href="#" id="{name}-clear" {clear_style} class="{button_class}"
-                onclick="clearSelect('{name}');">{clear_label}</a>
+            <a 
+                href="#" 
+                id="{name}-clear" 
+                {clear_style} 
+                class="{button_class}"
+                onclick="clearSelect('{name}');">
+                {clear_label}
+            </a>
             <div
                 id="{name}-modal"
                 class="modal fade"
@@ -365,19 +371,29 @@ class TreeSelect(HiddenInput):  # type: ignore
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{title}</h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal" aria-label="Close">
+                            <button 
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal"
+                                aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input class="tree-filter" id="{name}-tree-search"
-                                placeholder="{filter}" type="text">
-                            <div id="{name}-tree" style="text-align: left!important;"></div>
+                            <input 
+                                class="tree-filter"
+                                id="{name}-tree-search"
+                                placeholder="{filter}"
+                                type="text">
+                                <div id="{name}-tree" style="text-align: left!important;"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal">{close_label}</button>
+                            <button 
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal">
+                                {close_label}
+                            </button>
                         </div>
                     </div>
                 </div>
