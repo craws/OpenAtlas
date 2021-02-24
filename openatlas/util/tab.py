@@ -60,96 +60,103 @@ class Tab:
         id_ = origin.id
         buttons: List[str] = []
         table = Table(g.table_headers[name])
-        view_name = origin.class_.view
-        class_name = origin.class_.name
+        view = origin.class_.view
+        class_ = origin.class_
 
         if name == 'reference':
             table.header = table.header + ['page']
         if name == 'actor':
-            if view_name == 'place':
+            if view == 'place':
                 table.header = ['actor', 'property', 'class', 'first', 'last', 'description']
-            elif view_name == 'file':
-                buttons = [button('link', url_for('file_add', id_=id_, class_name='actor'))]
-            elif view_name == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name='actor'))]
-            elif view_name == 'source':
-                buttons = [button('link', url_for('source_add', id_=id_, class_name='actor'))]
-            elif view_name == 'event':
+            elif view == 'file':
+                buttons = [button('link', url_for('file_add', id_=id_, class_name=name))]
+            elif view == 'reference':
+                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+            elif view == 'source':
+                buttons = [button('link', url_for('source_add', id_=id_, class_name=name))]
+            elif view == 'event':
                 table.header = ['actor', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
             for item in g.view_class_mapping['actor']:
-                buttons.append(button(item, url_for('insert', class_=item, origin_id=id_)))
+                buttons.append(button(g.classes[item].label,
+                                      url_for('insert', class_=item, origin_id=id_)))
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
-            if view_name == 'file':
+            if view == 'file':
                 buttons = [button('link', url_for('file_add', id_=id_, class_name='event'))]
-            elif view_name == 'actor':
+            elif view == 'actor':
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
-            elif view_name == 'source':
+            elif view == 'source':
                 buttons = [button('link', url_for('source_add', id_=id_, class_name='event'))]
-            elif view_name == 'reference':
+            elif view == 'reference':
                 buttons = [button('link', url_for('reference_add', id_=id_, class_name='event'))]
             for item in g.view_class_mapping['event']:
-                buttons.append(button(item, url_for('insert', class_=item, origin_id=id_)))
-            if view_name == 'artifact':
-                buttons = [button('move', url_for('insert', class_='move', origin_id=id_))]
+                buttons.append(button(g.classes[item].label,
+                                      url_for('insert', class_=item, origin_id=id_)))
+            if view == 'artifact':
+                buttons = [button(g.classes['move'].label,
+                                  url_for('insert', class_='move', origin_id=id_))]
         elif name == 'feature':
-            if current_user.settings['module_sub_units'] and class_name == 'place':
-                buttons = [button('feature', url_for('insert', class_='feature', origin_id=id_))]
+            if current_user.settings['module_sub_units'] and class_.name == 'place':
+                buttons = [button(class_.label, url_for('insert', class_=name, origin_id=id_))]
         elif name == 'find':
-            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic_unit':
-                buttons = [button(_('find'), url_for('insert', class_='find', origin_id=id_))]
+            if current_user.settings['module_sub_units'] and class_.name == 'stratigraphic_unit':
+                buttons = [button(g.classes[name].label,
+                                  url_for('insert', class_=name, origin_id=id_))]
         elif name == 'file':
-            if view_name == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name='file'))]
+            if view == 'reference':
+                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
             else:
                 table.header += [_('main image')]
                 buttons = [button('link', url_for('entity_add_file', id_=id_))]
-            buttons.append(button('file', url_for('insert', class_='file', origin_id=id_)))
+            buttons.append(button(g.classes[name].label,
+                                  url_for('insert', class_=name, origin_id=id_)))
         elif name == 'human_remains':
-            if current_user.settings['module_sub_units'] and class_name == 'stratigraphic_unit':
-                buttons = [button('human remains', url_for('insert',
-                                                           origin_id=id_,
-                                                           class_='human_remains'))]
+            if current_user.settings['module_sub_units'] and class_.name == 'stratigraphic_unit':
+                buttons = [button(g.classes[name].label,
+                                  url_for('insert', origin_id=id_, class_=name))]
         elif name == 'member':
             buttons = [button('link', url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
             buttons = [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
-            if class_name == 'file':
-                buttons = [button('link', url_for('file_add', id_=id_, class_name='place'))]
-            elif view_name == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name='place'))]
-            elif view_name == 'source':
-                buttons = [button('link', url_for('source_add', id_=id_, class_name='place'))]
-            buttons.append(button('place', url_for('insert', class_='place', origin_id=id_)))
+            if class_.name == 'file':
+                buttons = [button('link', url_for('file_add', id_=id_, class_name=name))]
+            elif view == 'reference':
+                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+            elif view == 'source':
+                buttons = [button('link', url_for('source_add', id_=id_, class_name=name))]
+            buttons.append(button(g.classes[name].label,
+                                  url_for('insert', class_=name, origin_id=id_)))
         elif name == 'reference':
             buttons = [button('link', url_for('entity_add_reference', id_=id_))]
             for item in g.view_class_mapping['reference']:
-                buttons.append(button(item, url_for('insert', class_=item, origin_id=id_)))
+                buttons.append(button(g.classes[item].label,
+                                      url_for('insert', class_=item, origin_id=id_)))
         elif name == 'relation':
             buttons = [button('link', url_for('relation_insert', origin_id=id_))]
             for item in g.view_class_mapping['actor']:
-                buttons.append(button(item, url_for('insert', class_=item, origin_id=id_)))
+                buttons.append(button(g.classes[item].label,
+                                      url_for('insert', class_=item, origin_id=id_)))
         elif name == 'source':
-            if class_name == 'file':
-                buttons = [button(_('link'), url_for('file_add', id_=id_, class_name='source'))]
-            elif view_name == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name='source'))]
+            if class_.name == 'file':
+                buttons = [button(_('link'), url_for('file_add', id_=id_, class_name=name))]
+            elif view == 'reference':
+                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
             else:
                 buttons = [button('link', url_for('entity_add_source', id_=id_))]
-            buttons.append(button('source', url_for('insert', class_='source', origin_id=id_)))
+            buttons.append(button(g.classes['source'].label,
+                                  url_for('insert', class_=name, origin_id=id_)))
         elif name == 'subs':
             table.header = [_('name'), _('count'), _('info')]
-            if view_name == 'event':
+            if view == 'event':
                 table.header = g.table_headers['event']
         elif name == 'stratigraphic_unit':
-            if current_user.settings['module_sub_units'] and class_name == 'feature':
-                buttons = [button(_('stratigraphic unit'), url_for('insert',
-                                                                   class_='stratigraphic_unit',
-                                                                   origin_id=id_))]
+            if current_user.settings['module_sub_units'] and class_.name == 'feature':
+                buttons = [button(g.classes['stratigraphic_unit'].label,
+                                  url_for('insert', class_=name, origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
 
