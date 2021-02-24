@@ -175,7 +175,7 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'X-Files' in rv.data
 
-            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='place'))
+            rv = self.app.get(url_for('reference_add', id_=reference.id, class_='place'))
             assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
             assert b'Link reference' in rv.data

@@ -315,28 +315,28 @@ def add_fields(form: Any,
         setattr(form, 'information_carrier', TableMultiField())
 
 
-def build_add_reference_form(class_name: str) -> FlaskForm:
+def build_add_reference_form(class_: str) -> FlaskForm:
     class Form(FlaskForm):  # type: ignore
         pass
 
-    setattr(Form, class_name, TableField(_(class_name), [InputRequired()]))
+    setattr(Form, class_, TableField(_(class_), [InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
     return Form()
 
 
-def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
+def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes."""
-    if class_name == 'file':
+    if class_ == 'file':
         entities = Entity.get_by_class('file', nodes=True)
-    elif class_name == 'place':
+    elif class_ == 'place':
         entities = Entity.get_by_class('place', nodes=True, aliases=True)
     else:
-        entities = Entity.get_by_view(class_name)
+        entities = Entity.get_by_view(class_)
 
     linked_ids = [entity.id for entity in linked_entities]
-    table = Table([''] + g.table_headers[class_name], order=[[1, 'asc']])
-    file_stats = get_file_stats() if class_name == 'file' else None
+    table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
+    file_stats = get_file_stats() if class_ == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
@@ -354,7 +354,7 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
         </form>""".format(link=uc_first(_('link')),
                           token=generate_csrf(),
                           class_=app.config['CSS']['button']['primary'],
-                          table=table.display(class_name))
+                          table=table.display(class_))
 
 
 def build_move_form(node: Node) -> FlaskForm:

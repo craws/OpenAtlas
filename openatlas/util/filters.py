@@ -240,12 +240,6 @@ def table_select_model(self: Any,
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_class_name(self: Any, code: str) -> str:
-    return g.cidoc_classes[code].name
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def description(self: Any, entity: Entity) -> str:
     if not entity.description:
         return ''

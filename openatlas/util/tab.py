@@ -69,11 +69,11 @@ class Tab:
             if view == 'place':
                 table.header = ['actor', 'property', 'class', 'first', 'last', 'description']
             elif view == 'file':
-                buttons = [button('link', url_for('file_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('file_add', id_=id_, class_=name))]
             elif view == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('reference_add', id_=id_, class_=name))]
             elif view == 'source':
-                buttons = [button('link', url_for('source_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('source_add', id_=id_, class_=name))]
             elif view == 'event':
                 table.header = ['actor', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
@@ -84,14 +84,14 @@ class Tab:
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
             if view == 'file':
-                buttons = [button('link', url_for('file_add', id_=id_, class_name='event'))]
+                buttons = [button('link', url_for('file_add', id_=id_, class_='event'))]
             elif view == 'actor':
                 table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
             elif view == 'source':
-                buttons = [button('link', url_for('source_add', id_=id_, class_name='event'))]
+                buttons = [button('link', url_for('source_add', id_=id_, class_='event'))]
             elif view == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name='event'))]
+                buttons = [button('link', url_for('reference_add', id_=id_, class_='event'))]
             for item in g.view_class_mapping['event']:
                 buttons.append(button(g.classes[item].label,
                                       url_for('insert', class_=item, origin_id=id_)))
@@ -107,7 +107,7 @@ class Tab:
                                   url_for('insert', class_=name, origin_id=id_))]
         elif name == 'file':
             if view == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('reference_add', id_=id_, class_=name))]
             else:
                 table.header += [_('main image')]
                 buttons = [button('link', url_for('entity_add_file', id_=id_))]
@@ -123,11 +123,11 @@ class Tab:
             buttons = [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'place':
             if class_.name == 'file':
-                buttons = [button('link', url_for('file_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('file_add', id_=id_, class_=name))]
             elif view == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('reference_add', id_=id_, class_=name))]
             elif view == 'source':
-                buttons = [button('link', url_for('source_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('source_add', id_=id_, class_=name))]
             buttons.append(button(g.classes[name].label,
                                   url_for('insert', class_=name, origin_id=id_)))
         elif name == 'reference':
@@ -142,9 +142,9 @@ class Tab:
                                       url_for('insert', class_=item, origin_id=id_)))
         elif name == 'source':
             if class_.name == 'file':
-                buttons = [button(_('link'), url_for('file_add', id_=id_, class_name=name))]
+                buttons = [button(_('link'), url_for('file_add', id_=id_, class_=name))]
             elif view == 'reference':
-                buttons = [button('link', url_for('reference_add', id_=id_, class_name=name))]
+                buttons = [button('link', url_for('reference_add', id_=id_, class_=name))]
             else:
                 buttons = [button('link', url_for('entity_add_source', id_=id_))]
             buttons.append(button(g.classes['source'].label,

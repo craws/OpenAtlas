@@ -52,14 +52,13 @@ class SourceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Test source' in rv.data
 
-            self.app.get(url_for('source_add', id_=source.id, origin_id=actor.id,
-                                 class_name='actor'))
-            rv = self.app.post(url_for('source_add', id_=source.id, class_name='actor'),
+            self.app.get(url_for('source_add', id_=source.id, origin_id=actor.id, class_='actor'))
+            rv = self.app.post(url_for('source_add', id_=source.id, class_='actor'),
                                data={'checkbox_values': [actor.id]}, follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'Gillian Anderson' in rv.data
-            rv = self.app.get(url_for('source_add', id_=source.id, class_name='place'))
+            rv = self.app.get(url_for('source_add', id_=source.id, class_='place'))
             assert b'Link place' in rv.data
 
             # Update source

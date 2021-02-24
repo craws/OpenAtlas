@@ -158,12 +158,12 @@ def entity_view(id_: int) -> Union[str, Response]:
         structure = get_structure(entity)
         if structure:
             for item in structure['subunits']:
-                tabs[item.class_name].table.rows.append(get_base_table_data(item))
+                tabs[item.class_.name].table.rows.append(get_base_table_data(item))
         gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
-            and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]' \
-            and (not structure or not structure['super_id']):
+                and gis_data['gisPolygonSelected'] == '[]' \
+                and gis_data['gisLineSelected'] == '[]' \
+                and (not structure or not structure['super_id']):
             gis_data = {}
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
@@ -228,12 +228,15 @@ def entity_view(id_: int) -> Union[str, Response]:
                 data = add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
     elif entity.class_.view == 'file':
+        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
+                     'artifact', 'human_remains', 'reference', 'type']:
+            tabs[name] = Tab(name, entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
             data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.name].table.rows.append(data)
+            tabs[range_.class_.view].table.rows.append(data)
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)

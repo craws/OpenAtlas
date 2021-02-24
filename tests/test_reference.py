@@ -40,9 +40,9 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 batman = Entity.insert('E21', 'Batman')
-            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='actor'))
+            rv = self.app.get(url_for('reference_add', id_=reference.id, class_='actor'))
             assert b'Batman' in rv.data
-            rv = self.app.post(url_for('reference_add', id_=reference.id, class_name='actor'),
+            rv = self.app.post(url_for('reference_add', id_=reference.id, class_='actor'),
                                data={'actor': batman.id},
                                follow_redirects=True)
             assert b'http://updated.openatlas.eu' in rv.data

@@ -82,9 +82,9 @@ class FileTest(TestBaseCase):
             self.app.get(url_for('file_remove_profile_image', entity_id=actor.id))
 
             # Add to reference
-            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='file'))
+            rv = self.app.get(url_for('reference_add', id_=reference.id, class_='file'))
             assert b'OpenAtlas logo' in rv.data
-            rv = self.app.post(url_for('reference_add', id_=reference.id, class_name='file'),
+            rv = self.app.post(url_for('reference_add', id_=reference.id, class_='file'),
                                data={'file': file_id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data
@@ -97,9 +97,9 @@ class FileTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Changes have been saved' in rv.data and b'Updated file' in rv.data
 
-            rv = self.app.get(url_for('file_add', id_=file_id, class_name='actor'))
+            rv = self.app.get(url_for('file_add', id_=file_id, class_='actor'))
             assert b'Link actor' in rv.data
-            rv = self.app.post(url_for('file_add', id_=file_id, class_name='actor'),
+            rv = self.app.post(url_for('file_add', id_=file_id, class_='actor'),
                                data={'checkbox_values': [actor.id]},
                                follow_redirects=True)
             assert b'File keeper' in rv.data
