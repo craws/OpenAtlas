@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.9 (Debian 11.9-0+deb10u1)
--- Dumped by pg_dump version 11.9 (Debian 11.9-0+deb10u1)
+-- Dumped from database version 11.10 (Debian 11.10-0+deb10u1)
+-- Dumped by pg_dump version 11.10 (Debian 11.10-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -668,7 +668,8 @@ CREATE TABLE model.entity (
     begin_comment text,
     end_from timestamp without time zone,
     end_to timestamp without time zone,
-    end_comment text
+    end_comment text,
+    system_class text NOT NULL
 );
 
 
@@ -818,8 +819,6 @@ ALTER TABLE model.property_id_seq OWNER TO openatlas;
 ALTER SEQUENCE model.property_id_seq OWNED BY model.property.id;
 
 
-SET default_with_oids = false;
-
 --
 -- Name: property_inheritance; Type: TABLE; Schema: model; Owner: openatlas
 --
@@ -855,8 +854,6 @@ ALTER TABLE model.property_inheritance_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inheritance.id;
 
-
-SET default_with_oids = false;
 
 --
 -- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
