@@ -296,7 +296,7 @@ INSERT INTO web.form (name, extendable) VALUES
 ('file', True),
 ('find', True),
 ('group', True),
-('human_remains', True)
+('human_remains', True),
 ('involvement', False),
 ('member', False),
 ('source', True),
@@ -324,7 +324,7 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 ((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Stratigraphic unit'), 'Stratigraphic unit', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False, False),
--- custom examples
+
 ((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', True, False, False, True, False),
 ((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False, False, False);
 
@@ -336,7 +336,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Bibliography'),(SELECT id FROM web.form WHERE name='bibliography')),
 ((SELECT id FROM web.hierarchy WHERE name='Edition'),(SELECT id FROM web.form WHERE name='edition')),
 ((SELECT id FROM web.hierarchy WHERE name='Event'),(SELECT id FROM web.form WHERE name='event')),
-((SELECT id FROM web.hierarchy WHERE name='External reference'),(SELECT id FROM web.form WHERE name='external_reference'));
+((SELECT id FROM web.hierarchy WHERE name='External reference'),(SELECT id FROM web.form WHERE name='external_reference')),
 ((SELECT id FROM web.hierarchy WHERE name='Feature'),(SELECT id FROM web.form WHERE name='feature')),
 ((SELECT id FROM web.hierarchy WHERE name='Historical place'),(SELECT id FROM web.form WHERE name='place')),
 ((SELECT id FROM web.hierarchy WHERE name='Involvement'),(SELECT id FROM web.form WHERE name='involvement')),
@@ -345,13 +345,13 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Place'),(SELECT id FROM web.form WHERE name='place')),
 ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'),(SELECT id FROM web.form WHERE name='stratigraphic_unit')),
 ((SELECT id FROM web.hierarchy WHERE name='Source translation'),(SELECT id FROM web.form WHERE name='source_translation')),
--- custom examples
+
 ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='artifact')),
 ((SELECT id FROM web.hierarchy WHERE name='Sex'),(SELECT id FROM web.form WHERE name='person'));
 
 INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
-((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='Place')),
-((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Place')),
-((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Person')),
-((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Group')),
-((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='Event'));
+((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='place')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='person')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='group')),
+((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='event'));
