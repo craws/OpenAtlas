@@ -335,7 +335,7 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
         entities = Entity.get_by_view(class_name)
 
     linked_ids = [entity.id for entity in linked_entities]
-    table = Table([''] + Table.HEADERS[class_name], order=[[1, 'asc']])
+    table = Table([''] + g.table_headers[class_name], order=[[1, 'asc']])
     file_stats = get_file_stats() if class_name == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:

@@ -371,7 +371,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         Settings.set_logo(id_)
         return redirect(url_for('admin_index') + '#tab-file')
     file_stats = get_file_stats()
-    table = Table([''] + Table.HEADERS['file'] + ['date'])
+    table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in file_stats:

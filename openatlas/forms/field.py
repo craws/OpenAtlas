@@ -27,7 +27,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         class_ = field.id if field.id != 'given_place' else 'place'
 
         # Make checkbox column sortable and show selected on top
-        table = Table([''] + Table.HEADERS[class_], order=[[0, 'desc'], [1, 'asc']])
+        table = Table([''] + g.table_headers[class_], order=[[0, 'desc'], [1, 'asc']])
 
         # Table definitions (ordering and aligning)
         table.defs = [{'orderDataType': 'dom-checkbox', 'targets': 0}]
@@ -53,25 +53,40 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table.rows.append(data)
         selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
-            <span id="{name}-button" class="{button_class}"
-                onclick="$('#{name}-modal').modal('show')">{change_label}</span><br>
+            <span
+                id="{name}-button"
+                class="{button_class}"
+                onclick="$('#{name}-modal').modal('show')">
+                    {change_label}
+            </span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
-            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
+            <div
+                id="{name}-modal"
+                class="modal fade"
+                tabindex="-1"
+                role="dialog"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document" style="max-width: 100%!important;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{title}</h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">{table}</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
                                 data-dismiss="modal"
-                                onclick="selectFromTableMulti('{name}')">{close_label}</button>
+                                onclick="selectFromTableMulti('{name}')">
+                                    {close_label}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -112,13 +127,7 @@ class TableSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_class('file')
         else:
             entities = Entity.get_by_view(class_)
-        table = Table(Table.HEADERS[class_])
-
-        # Table definitions (aligning)
-        if class_ == 'event':
-            table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
-        elif class_ in ['actor', 'group', 'feature', 'place']:
-            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
+        table = Table(g.table_headers[class_])
 
         selection = ''
         for entity in entities:
@@ -129,14 +138,19 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
-                            href="#">{entity_name}</a>
+                        <a
+                            onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
+                            href="#">
+                                {entity_name}
+                        </a>
                     </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """
                     <a
                         onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
-                        href="#">{entity_name}</a>
+                        href="#">
+                            {entity_name}
+                    </a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
@@ -144,7 +158,7 @@ class TableSelect(HiddenInput):  # type: ignore
                 else:
                     data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
             data.insert(0, """
-                <div style="position: relative; top: 10px;" >
+                <div style="position: relative; top: 10px;">
                     <div
                         class="btn btn-outline-primary btn-xsm"
                         style="position: absolute; top: -22px;"
@@ -158,26 +172,49 @@ class TableSelect(HiddenInput):  # type: ignore
                            label=uc_first(_('select'))))
             table.rows.append(data)
         html = """
-            <input id="{name}-button" name="{name}-button" class="table-select {required}"
-                type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}" onclick="$('#{name}-modal').modal('show');">
-            <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
-                onclick="clearSelect('{name}');">{clear_label}</a>
-            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
+            <input
+                id="{name}-button"
+                name="{name}-button"
+                class="table-select {required}"
+                type="text"
+                placeholder="{change_label}"
+                onfocus="this.blur()"
+                readonly="readonly"
+                value="{selection}"
+                onclick="$('#{name}-modal').modal('show');">
+            <a href="#"
+                id="{name}-clear"
+                class="{button_class}"
+                {clear_style}
+                onclick="clearSelect('{name}');">
+                    {clear_label}
+            </a>
+            <div
+                id="{name}-modal"
+                class="modal fade"
+                tabindex="-1"
+                role="dialog"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document" style="max-width: 100%!important;">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{title}</h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">{table}</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal">{close_label}</button>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal">
+                                    {close_label}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -212,29 +249,51 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="{button_class}"
-                onclick="$('#{name}-modal').modal('show')">{change_label}</span>
-            <div id="{name}-selection" style="text-align:left;">{selection}</div>
-            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
+            <span
+                id="{name}-button"
+                class="{button_class}"
+                onclick="$('#{name}-modal').modal('show')">
+                    {change_label}
+            </span>
+            <div
+                id="{name}-selection"
+                style="text-align:left;">
+                    {selection}
+            </div>
+            <div
+                id="{name}-modal"
+                class="modal fade"
+                tabindex="-1"
+                role="dialog"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{title}</h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal"
+                                aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">
-                            <input class="tree-filter" id="{name}-tree-search"
-                                placeholder="{filter}" type="text">
+                            <input
+                                class="tree-filter"
+                                id="{name}-tree-search"
+                                placeholder="{filter}"
+                                type="text">
                             <div id="{name}-tree" style="text-align: left!important;"></div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
+                            <button
+                                type="button"
+                                class="btn btn-outline-primary btn-sm"
                                 data-dismiss="modal"
-                                onclick="selectFromTreeMulti({name})">{close_label}</button>
+                                onclick="selectFromTreeMulti({name})">
+                                    {close_label}
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -284,7 +343,10 @@ class TreeSelect(HiddenInput):  # type: ignore
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
         html = """
-            <input id="{name}-button" name="{name}-button" type="text"
+            <input
+                id="{name}-button"
+                name="{name}-button"
+                type="text"
                 class="table-select {required}"
                 onfocus="this.blur()"
                 onclick="$('#{name}-modal').modal('show')"
@@ -293,7 +355,11 @@ class TreeSelect(HiddenInput):  # type: ignore
                 placeholder="{change_label}">
             <a href="#" id="{name}-clear" {clear_style} class="{button_class}"
                 onclick="clearSelect('{name}');">{clear_label}</a>
-            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
+            <div
+                id="{name}-modal"
+                class="modal fade"
+                tabindex="-1"
+                role="dialog"
                 aria-hidden="true">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
