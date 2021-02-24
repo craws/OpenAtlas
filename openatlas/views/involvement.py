@@ -28,7 +28,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            if origin.view_name == 'event':
+            if origin.class_.view == 'event':
                 for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
                     link_ = Link.get_by_id(origin.link(form.activity.data,
                                                        actor,
@@ -51,13 +51,14 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
-        tab = 'actor' if origin.view_name == 'event' else 'event'
+        tab = 'actor' if origin.class_.view == 'event' else 'event'
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
-                                   origin,
-                                   _('involvement')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[[_(origin.class_.view), url_for('index', view=origin.class_.view)],
+                origin,
+                _('involvement')])
 
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -87,15 +88,16 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = 'actor' if origin.view_name == 'event' else 'event'
+        tab = 'actor' if origin.class_.view == 'event' else 'event'
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description
-    return render_template('display_form.html',
-                           origin=origin,
-                           form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
-                                   origin,
-                                   event if origin_id != event.id else actor,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        origin=origin,
+        form=form,
+        crumbs=[[_(origin.class_.view), url_for('index', view=origin.class_.view)],
+                origin,
+                event if origin_id != event.id else actor,
+                _('edit')])

@@ -54,16 +54,18 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = '#tab-' + (link_.range.view_name if origin.view_name == 'reference' else 'reference')
+        tab = '#tab-' + (
+            link_.range.class_.view if origin.class_.view == 'reference' else 'reference')
         return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     form.page.data = link_.description
     if link_.domain.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', view=origin.view_name)],
-                                   origin,
-                                   linked_object,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[[_(origin.class_.view), url_for('index', view=origin.class_.view)],
+                origin,
+                linked_object,
+                _('edit')])

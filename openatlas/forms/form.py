@@ -130,7 +130,7 @@ def populate_form(form: FlaskForm,
 
 def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
     system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
-                    if link_.domain.view_name == 'reference_system'}
+                    if isinstance(link_.domain, ReferenceSystem)}
     for field in form:
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
@@ -271,7 +271,7 @@ def add_fields(form: Any,
                                                    coerce=int))
     elif name == 'involvement':
         if not item and origin:
-            involved_with = 'actor' if origin.view_name == 'event' else 'event'
+            involved_with = 'actor' if origin.class_.view == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
     elif name == 'legal_body':
