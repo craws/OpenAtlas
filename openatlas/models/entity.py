@@ -294,7 +294,6 @@ class Entity:
     def get_by_view(view: str, nodes: bool = False, aliases: bool = False) -> List[Entity]:
         return Entity.get_by_class(g.view_class_mapping[view], nodes, aliases)
 
-
     @staticmethod
     def get_display_files() -> List[Entity]:
         g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_class = 'file' GROUP BY e.id;")

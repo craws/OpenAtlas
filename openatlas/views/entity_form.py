@@ -79,11 +79,12 @@ def add_crumbs(view_name: str,
         url_for('index', view=origin.class_.view if origin else view_name)],
         link(origin)]
     if structure:
-        crumbs = [[_('place'), url_for('index', view='place')],
-                  structure['place'] if origin.class_.name != 'place' else '',
-                  structure['feature'],
-                  structure['stratigraphic_unit'],
-                  link(origin)]
+        crumbs = [
+            [_('place'), url_for('index', view='place')],
+            structure['place'] if origin.class_.name != 'place' else '',
+            structure['feature'],
+            structure['stratigraphic_unit'],
+            link(origin)]
     if view_name == 'node':
         crumbs = [[_('types'), url_for('node_index')]]
         if origin and origin.root:
@@ -108,31 +109,20 @@ def update(id_: int) -> Union[str, Response]:
 
     # Archaeological sub units
     geonames_module = False
+    if entity.class_.name == 'place' and  ReferenceSystem.get_by_name('GeoNames').forms:
+        geonames_module = True
     structure = None
     gis_data = None
     overlays = None
-    if entity.class_.view == 'actor':
-        form = build_form(entity.class_.name, entity)
-    elif entity.class_.view in ['artifact', 'reference']:
-        form = build_form(entity.class_.name, entity)
-    elif entity.class_.view == 'place':
+    location = None
+
+    if entity.class_.view == 'place':
         structure = get_structure(entity)
         location = entity.get_linked_entity_safe('P53', nodes=True)
         gis_data = Gis.get_all([entity], structure)
         overlays = Overlay.get_by_object(entity)
-        if entity.class_.name == 'feature':
-            form = build_form('feature', entity, location=location)
-        elif entity.class_.name == 'stratigraphic_unit':
-            form = build_form('stratigraphic_unit', entity, location=location)
-        elif entity.class_.name == 'find':
-            form = build_form('find', entity, location=location)
-        elif entity.class_.name == 'human_remains':
-            form = build_form('human_remains', entity, location=location)
-        else:
-            geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
-            form = build_form('place', entity, location=location)
-    else:
-        form = build_form(entity.class_.view, entity)
+
+    form = build_form(entity.class_.name, entity, location=location)
 
     if entity.class_.view == 'event':
         form.event_id.data = entity.id
@@ -193,9 +183,9 @@ def populate_insert_form(form: FlaskForm,
         getattr(form, str(root_id)).data = origin.id if origin.id != root_id else None
     elif view_name == 'event':
         if origin.class_.view == 'artifact':
-            form.object.data = [origin.id]
+            form.artifact.data = [origin.id]
         elif origin.class_.view == 'place':
-            if class_ == 'E9':
+            if class_ == 'move':
                 form.place_from.data = origin.id
             else:
                 form.place.data = origin.id
@@ -218,19 +208,19 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         form.event.data = super_event.id if super_event else ''
         if entity.class_.name == 'move':
             place_from = entity.get_linked_entity('P27')
-            form.place_from.data = place_from.get_linked_entity_safe('P53',
-                                                                     True).id if place_from else ''
+            form.place_from.data = place_from.get_linked_entity_safe(
+                'P53', True).id if place_from else ''
             place_to = entity.get_linked_entity('P26')
             form.place_to.data = place_to.get_linked_entity_safe('P53', True).id if place_to else ''
             person_data = []
             object_data = []
             for entity in entity.get_linked_entities('P25'):
-                if entity.class_.code == 'person':
+                if entity.class_.name == 'person':
                     person_data.append(entity.id)
                 elif entity.class_.view in ['artifact']:
                     object_data.append(entity.id)
             form.person.data = person_data
-            form.object.data = object_data
+            form.artifact.data = object_data
         else:
             place = entity.get_linked_entity('P7')
             form.place.data = place.get_linked_entity_safe('P53', True).id if place else ''
@@ -367,8 +357,8 @@ def update_links(entity: Union[Entity, Node],
         if entity.class_.name == 'acquisition' and form.given_place.data:
             entity.link_string('P24', form.given_place.data)
         if entity.class_.name == 'move':
-            if form.object.data:  # Moved objects
-                entity.link_string('P25', form.object.data)
+            if form.artifact.data:  # Moved objects
+                entity.link_string('P25', form.artifact.data)
             if form.person.data:  # Moved persons
                 entity.link_string('P25', form.person.data)
             if form.place_from.data:  # Link place for move from

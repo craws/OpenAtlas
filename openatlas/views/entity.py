@@ -292,6 +292,11 @@ def entity_view(id_: int) -> Union[str, Response]:
     if entity.class_.view in ['actor', 'event', 'node', 'place', 'source', 'artifact']:
         if entity.class_.view not in ['node', 'reference']:
             tabs['reference'] = Tab('reference', entity)
+        if entity.class_.view in ['artifact', 'find']:
+            tabs['event'] = Tab('event', entity)
+            for link_ in entity.get_links('P25', True):
+                data = get_base_table_data(link_.domain)
+                tabs['event'].table.rows.append(data)
         tabs['file'] = Tab('file', entity)
         entity.image_id = entity.get_profile_image_id()
         for link_ in entity.get_links('P67', inverse=True):

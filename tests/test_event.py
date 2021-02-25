@@ -47,7 +47,7 @@ class EventTest(TestBaseCase):
             self.app.post(url_for('insert', class_='activity', origin_id=source.id), data=data)
             rv = self.app.get(url_for('insert', class_='activity', origin_id=residence_id))
             assert b'Location' in rv.data
-            rv = self.app.get(url_for('insert', class_='E9', origin_id=residence_id))
+            rv = self.app.get(url_for('insert', class_='move', origin_id=residence_id))
             assert b'Location' not in rv.data
 
             # Acquisition
@@ -70,13 +70,13 @@ class EventTest(TestBaseCase):
             assert b'Event Horizon' in rv.data
 
             # Move
-            rv = self.app.post(url_for('insert', class_='E9'),
-                               data={'name': 'Keep it moving',
-                                     'place_to': residence_id,
-                                     'place_from': residence_id,
-                                     'object': carrier.id,
-                                     'person': actor.id,
-                                     self.precision_wikidata: ''})
+            rv = self.app.post(url_for('insert', class_='move'), data={
+                'name': 'Keep it moving',
+                'place_to': residence_id,
+                'place_from': residence_id,
+                'artifact': carrier.id,
+                'person': actor.id,
+                self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=move_id))
             assert b'Keep it moving' in rv.data

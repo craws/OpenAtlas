@@ -26,20 +26,21 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {
+    'acquisition': ['name', 'date', 'description', 'continue'],
+    'activity': ['name', 'date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
     'bibliography': ['name', 'description', 'continue'],
     'edition': ['name', 'description', 'continue'],
     'external_reference': ['name', 'description', 'continue'],
-    'event': ['name', 'date', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
     'find': ['name', 'date', 'description', 'continue', 'map'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
-    'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
     'member': ['date', 'description', 'continue'],
+    'move': ['name', 'date', 'description', 'continue'],
     'node': ['name', 'description', 'continue'],
     'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
     'note': ['description'],
@@ -48,7 +49,8 @@ forms = {
     'reference_system': ['name', 'description'],
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
-    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
+    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
+    'hierarchy': ['name', 'description'], }
 
 
 def build_form(class_: str,
@@ -56,19 +58,20 @@ def build_form(class_: str,
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
-    # Builds a form for CIDOC CRM entities which has to be dynamic because of types,
-    # module settings and class specific fields
 
+    # Builds a dynamic form regarding types, module settings and class specific fields
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
         validate = validate
 
     if 'name' in forms[class_]:  # Set label and validators for name field
         label = _('URL') if class_ == 'external_reference' else _('name')
-        validators = [InputRequired(), URL()] if class_ == 'external_reference' else [InputRequired()]
-        setattr(Form, 'name', StringField(label,
-                                          validators=validators,
-                                          render_kw={'autofocus': True}))
+        validators = [InputRequired(), URL()] if class_ == 'external_reference' else [
+            InputRequired()]
+        setattr(
+            Form,
+            'name',
+            StringField(label, validators=validators, render_kw={'autofocus': True}))
 
     if 'alias' in forms[class_]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
@@ -159,7 +162,7 @@ def add_buttons(form: Any,
     if entity:
         return form
     if 'continue' in forms[name] and (
-        name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
+            name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -229,16 +232,16 @@ def add_types(form: Any, class_: str) -> None:
 
 
 def add_fields(form: Any,
-               name: str,
-               class_: Union[str, None],
+               class_: str,
+               code: Union[str, None],
                item: Union[Entity, Node, Link, None],
                origin: Union[Entity, Node, None]) -> None:
-    if name == 'actor_actor_relation':
+    if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
             setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
             setattr(form, 'relation_origin_id', HiddenField())
-    elif name == 'event':
+    elif class_ in ['activity', 'acquisition', 'move']:
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
         if class_ == 'activity':
@@ -246,54 +249,56 @@ def add_fields(form: Any,
         if class_ == 'acquisition':
             setattr(form, 'place', TableField(_('location')))
             setattr(form, 'given_place', TableMultiField(_('given place')))
-        elif class_ == 'E9':
+        elif class_ == 'move':
             setattr(form, 'place_from', TableField(_('from')))
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
-    elif name == 'file' and not item:
+    elif class_ == 'file' and not item:
         setattr(form, 'file', FileField(_('file'), [InputRequired()]))
-    elif name == 'group':
+    elif class_ == 'group':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
-    elif name == 'hierarchy':
+    elif class_ == 'hierarchy':
         if class_ == 'custom' or (item and not item.value_type):
-            setattr(form, 'multiple', BooleanField(_('multiple'),
-                                                   description=_('tooltip hierarchy multiple')))
-        setattr(form, 'forms', SelectMultipleField(_('forms'),
-                                                   render_kw={'disabled': True},
-                                                   description=_('tooltip hierarchy forms'),
-                                                   choices=[],
-                                                   option_widget=widgets.CheckboxInput(),
-                                                   widget=widgets.ListWidget(prefix_label=False),
-                                                   coerce=int))
-    elif name == 'involvement':
+            setattr(form, 'multiple', BooleanField(
+                _('multiple'),
+                description=_('tooltip hierarchy multiple')))
+        setattr(form, 'forms', SelectMultipleField(
+            _('forms'),
+            render_kw={'disabled': True},
+            description=_('tooltip hierarchy forms'),
+            choices=[],
+            option_widget=widgets.CheckboxInput(),
+            widget=widgets.ListWidget(prefix_label=False),
+            coerce=int))
+    elif class_ == 'involvement':
         if not item and origin:
             involved_with = 'actor' if origin.class_.view == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
-    elif name == 'legal_body':
+    elif class_ == 'legal_body':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
-    elif name == 'member' and not item:
+    elif class_ == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
-    elif name == 'node':
+    elif class_ == 'node':
         setattr(form, 'is_node_form', HiddenField())
         node = item if item else origin
         root = g.nodes[node.root[-1]] if node.root else node
         setattr(form, str(root.id), TreeField(str(root.id)))
         if root.directional:
             setattr(form, 'name_inverse', StringField(_('inverse')))
-    elif name == 'person':
+    elif class_ == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
         setattr(form, 'ends_in', TableField(_('died in')))
-    elif name == 'reference_system':
+    elif class_ == 'reference_system':
         setattr(form, 'website_url', StringField(_('website URL'),
                                                  validators=[OptionalValidator(), URL()]))
         setattr(form, 'resolver_url', StringField(_('resolver URL'),
@@ -310,7 +315,7 @@ def add_fields(form: Any,
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False),
                 coerce=int))
-    elif name == 'source':
+    elif class_ == 'source':
         setattr(form, 'artifact', TableMultiField())
 
 

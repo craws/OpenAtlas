@@ -35,7 +35,7 @@ view_class_mapping = {
     'event': ['activity', 'acquisition', 'move'],
     'file': ['file'],
     'artifact': ['artifact', 'find'],
-    'place': ['feature', 'find', 'human_remains', 'place', 'stratigraphic_unit'],
+    'place': ['feature', 'human_remains', 'place', 'stratigraphic_unit'],
     'reference': ['bibliography', 'edition', 'external_reference'],
     'reference_system': ['reference_system'],
     'source': ['source'],
