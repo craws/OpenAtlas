@@ -251,8 +251,8 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
 
 
 def save(form: FlaskForm,
-         entity: Optional[Union[Entity, Node, ReferenceSystem]] = None,
-         class_: Optional[str] = '',
+         entity: Optional[Entity] = None,
+         class_: Optional[str] = None,
          origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     action = 'update'
@@ -272,6 +272,7 @@ def save(form: FlaskForm,
                 entity.add_forms(form)
         else:
             entity.update(form)
+            class_ = entity.class_.name
         update_links(entity, form, action, origin)
         url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
@@ -284,7 +285,7 @@ def save(form: FlaskForm,
         if action == 'update':
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
-            url = url_for('index', view=entity.class_.view)
+            url = url_for('index', view=g.classes[class_].view)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
@@ -292,15 +293,9 @@ def save(form: FlaskForm,
         if action == 'update':
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
-            view_name = class_
+            url = url_for('index', view=g.classes[class_].view)
             if class_ == 'node':
                 url = url_for('node_index')
-            else:
-                if class_ in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
-                    view_name = 'place'
-                elif class_ in ['artifact']:
-                    view_name = 'artifact'
-                url = url_for('index', view=view_name)
     return url
 
 
@@ -406,8 +401,8 @@ def update_links(entity: Union[Entity, Node],
 
 def link_and_get_redirect_url(form: FlaskForm,
                               entity: Entity,
-                              class_: Optional[str] = '',
-                              origin: Union[Entity, Node, None] = None) -> str:
+                              class_: str,
+                              origin: Union[Entity, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
     if origin and isinstance(entity, Node):
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.class_.view

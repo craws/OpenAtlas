@@ -103,13 +103,13 @@ class Link:
             range_ = entity if inverse else linked_entity
             domain_error = True
             range_error = True
-            if property_.find_object('domain_class_code', g.cidoc_classes[domain.class_.code].code):
+            if property_.find_object('domain_class_code', domain.class_.cidoc_class.code):
                 domain_error = False
-            if property_.find_object('range_class_code', g.cidoc_classes[range_.class_.code].code):
+            if property_.find_object('range_class_code', range_.class_.cidoc_class.code):
                 range_error = False
             if domain_error or range_error:
-                text = _('error link') + ': ' + g.cidoc_classes[domain.class_.code].code + ' > '
-                text += property_code + ' > ' + g.cidoc_classes[range_.class_.code].code
+                text = _('error link') + ': ' + domain.class_.cidoc_class.code + ' > '
+                text += property_code + ' > ' + range_.class_.cidoc_class.code
                 logger.log('error', 'model', text)
                 flash(text, 'error')
                 continue
@@ -119,11 +119,12 @@ class Link:
                     %(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s)
                 RETURNING id;"""
             # Todo: build only one sql and get execution out of loop
-            g.execute(sql, {'property_code': property_code,
-                            'domain_id': domain.id,
-                            'range_id': range_.id,
-                            'description': description,
-                            'type_id': type_id})
+            g.execute(sql, {
+                'property_code': property_code,
+                'domain_id': domain.id,
+                'range_id': range_.id,
+                'description': description,
+                'type_id': type_id})
             new_link_ids.append(g.cursor.fetchone()[0])
         return new_link_ids
 

@@ -243,8 +243,10 @@ class Entity:
     def delete_(id_param: Union[int, List[int]]) -> None:
         if not is_authorized('contributor'):
             abort(403)  # pragma: no cover
+        if not id_param:
+            return
         # Triggers psql function model.delete_entity_related() for deleting related entities."""
-        g.execute('DELETE FROM model.entity WHERE IN %(ids)s;', {
+        g.execute('DELETE FROM model.entity WHERE id IN %(ids)s;', {
             'ids': tuple(id_param if isinstance(id_param, list) else [id_param])})
 
     @staticmethod

@@ -25,32 +25,33 @@ from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
-forms = {'actor_actor_relation': ['date', 'description', 'continue'],
-         'artifact': ['name', 'date', 'description', 'continue', 'map'],
-         'bibliography': ['name', 'description', 'continue'],
-         'edition': ['name', 'description', 'continue'],
-         'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'description', 'continue'],
-         'feature': ['name', 'date', 'description', 'continue', 'map'],
-         'file': ['name', 'description'],
-         'find': ['name', 'date', 'description', 'continue', 'map'],
-         'group': ['name', 'alias', 'date', 'description', 'continue'],
-         'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'description', 'continue', 'map'],
-         'involvement': ['date', 'description', 'continue'],
-         'member': ['date', 'description', 'continue'],
-         'node': ['name', 'description', 'continue'],
-         'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
-         'note': ['description'],
-         'person': ['name', 'alias', 'date', 'description', 'continue'],
-         'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
-         'reference_system': ['name', 'description'],
-         'source': ['name', 'description', 'continue'],
-         'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
+forms = {
+    'actor_actor_relation': ['date', 'description', 'continue'],
+    'artifact': ['name', 'date', 'description', 'continue', 'map'],
+    'bibliography': ['name', 'description', 'continue'],
+    'edition': ['name', 'description', 'continue'],
+    'external_reference': ['name', 'description', 'continue'],
+    'event': ['name', 'date', 'description', 'continue'],
+    'feature': ['name', 'date', 'description', 'continue', 'map'],
+    'file': ['name', 'description'],
+    'find': ['name', 'date', 'description', 'continue', 'map'],
+    'group': ['name', 'alias', 'date', 'description', 'continue'],
+    'hierarchy': ['name', 'description'],
+    'human_remains': ['name', 'date', 'description', 'continue', 'map'],
+    'involvement': ['date', 'description', 'continue'],
+    'member': ['date', 'description', 'continue'],
+    'node': ['name', 'description', 'continue'],
+    'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
+    'note': ['description'],
+    'person': ['name', 'alias', 'date', 'description', 'continue'],
+    'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
+    'reference_system': ['name', 'description'],
+    'source': ['name', 'description', 'continue'],
+    'source_translation': ['name', 'description', 'continue'],
+    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
 
 
-def build_form(name: str,
+def build_form(class_: str,
                item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
@@ -62,39 +63,39 @@ def build_form(name: str,
         opened = HiddenField()
         validate = validate
 
-    if 'name' in forms[name]:  # Set label and validators for name field
-        label = _('URL') if name == 'external_reference' else _('name')
-        validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
+    if 'name' in forms[class_]:  # Set label and validators for name field
+        label = _('URL') if class_ == 'external_reference' else _('name')
+        validators = [InputRequired(), URL()] if class_ == 'external_reference' else [InputRequired()]
         setattr(Form, 'name', StringField(label,
                                           validators=validators,
                                           render_kw={'autofocus': True}))
 
-    if 'alias' in forms[name]:
+    if 'alias' in forms[class_]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
-    add_types(Form, name)
-    add_fields(Form, name, code, item, origin)
-    add_reference_systems(Form, name)
-    if 'date' in forms[name]:
+    add_types(Form, class_)
+    add_fields(Form, class_, code, item, origin)
+    add_reference_systems(Form, class_)
+    if 'date' in forms[class_]:
         date.add_date_fields(Form)
-    if 'description' in forms[name]:
-        label = _('content') if name == 'source' else _('description')
+    if 'description' in forms[class_]:
+        label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
-        if name == 'node':  # Change description field if value type
+        if class_ == 'node':  # Change description field if value type
             node = item if item else origin
             root = g.nodes[node.root[-1]] if node.root else node
             if root.value_type:
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
-    if 'map' in forms[name]:
+    if 'map' in forms[class_]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
-    add_buttons(Form, name, item, origin)
+    add_buttons(Form, class_, item, origin)
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
         form = populate_form(Form(obj=item), item, location)
-    customize_labels(name, form, item, origin)
+    customize_labels(class_, form, item, origin)
     return form
 
 
@@ -141,7 +142,7 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
 def customize_labels(name: str,
                      form: FlaskForm,
                      item: Optional[Entity, Link] = None,
-                     origin: Union[Entity, Node, None] = None,) -> None:
+                     origin: Union[Entity, Node, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
     if name == 'node':
@@ -158,7 +159,7 @@ def add_buttons(form: Any,
     if entity:
         return form
     if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
+        name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -211,8 +212,8 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
         add_value_type_fields(form, sub.subs)
 
 
-def add_types(form: Any, name: str) -> None:
-    types = OrderedDict(Node.get_nodes_for_form(g.classes[name].standard_type))
+def add_types(form: Any, class_: str) -> None:
+    types = OrderedDict(Node.get_nodes_for_form(class_))
     for node in types.values():  # Move standard type to top
         if node.standard:
             types.move_to_end(node.id, last=False)
