@@ -151,7 +151,7 @@ class Node(Entity):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if type(field) is ValueFloatField and entity.class_.name != 'administrative_unit':
+            if type(field) is ValueFloatField and entity.class_.name ['administrative_unit', 'type']:
                 if field.data is not None:  # Allow to save 0 but not empty
                     entity.link('P2', g.nodes[int(field.name)], field.data)
             elif type(field) in (TreeField, TreeMultiField) and field.data:
@@ -163,7 +163,7 @@ class Node(Entity):
                 if root.class_.name == 'administrative_unit':
                     if entity.class_.name == 'administrative_unit':
                         entity.link('P89', range_)
-                elif entity.class_.name != 'administrative_unit':
+                elif entity.class_.name not in ['administrative_unit', 'type']:
                     entity.link('P2', range_)
 
     @staticmethod
