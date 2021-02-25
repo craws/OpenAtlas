@@ -88,13 +88,15 @@ class ContentTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 Entity.insert('person', 'I have the same name!')
                 Entity.insert('person', 'I have the same name!')
-            rv = self.app.post(url_for('admin_check_similar'),
-                               follow_redirects=True,
-                               data={'classes': 'actor', 'ratio': 100})
+            rv = self.app.post(
+                url_for('admin_check_similar'),
+                follow_redirects=True,
+                data={'classes': 'actor', 'ratio': 100})
             assert b'I have the same name!' in rv.data
-            rv = self.app.post(url_for('admin_check_similar'),
-                               follow_redirects=True,
-                               data={'classes': 'file', 'ratio': 100})
+            rv = self.app.post(
+                url_for('admin_check_similar'),
+                follow_redirects=True,
+                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
 
     def test_settings(self) -> None:

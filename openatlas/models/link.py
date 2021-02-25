@@ -257,9 +257,10 @@ class Link:
             range_is_valid = property_.find_object('range_class_code', row.range)
             invalid_linking = []
             if not domain_is_valid or not range_is_valid:
-                invalid_linking.append({'property': row.property,
-                                        'domain': row.domain,
-                                        'range': row.range})
+                invalid_linking.append({
+                    'property': row.property,
+                    'domain': row.domain,
+                    'range': row.range})
             for item in invalid_linking:
                 sql = """
                     SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description,
@@ -270,15 +271,17 @@ class Link:
                     WHERE l.property_code = %(property)s
                         AND d.class_code = %(domain)s
                         AND r.class_code = %(range)s;"""
-                g.execute(sql, {'property': item['property'],
-                                'domain': item['domain'],
-                                'range': item['range']})
+                g.execute(sql, {
+                    'property': item['property'],
+                    'domain': item['domain'],
+                    'range': item['range']})
                 for row2 in g.cursor.fetchall():
                     domain = Entity.get_by_id(row2.domain_id)
                     range_ = Entity.get_by_id(row2.range_id)
-                    invalid_links.append({'domain': link(domain) + ' (' + domain.class_.code + ')',
-                                          'property': link(g.properties[row2.property_code]),
-                                          'range': link(range_) + ' (' + range_.class_.code + ')'})
+                    invalid_links.append({
+                        'domain': link(domain) + ' (' + domain.cidoc_class.code + ')',
+                        'property': link(g.properties[row2.property_code]),
+                        'range': link(range_) + ' (' + range_.cidoc_class.code + ')'})
         return invalid_links
 
     @staticmethod

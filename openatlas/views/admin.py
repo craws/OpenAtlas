@@ -123,11 +123,11 @@ def admin_content(item: str) -> Union[str, Response]:
 def admin_check_links() -> str:
     return render_template(
         'admin/check_links.html',
-        table=Table(['domain', 'property', 'range'],
-                    rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
+        table=Table(
+            ['domain', 'property', 'range'],
+            rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
         title=_('admin'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                _('check links')])
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check links')])
 
 
 @app.route('/admin/check_link_duplicates')
@@ -198,12 +198,14 @@ def admin_settings(category: str) -> Union[str, Response]:
         tab = 'email' if category == 'mail' else tab
         return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
-    return render_template('display_form.html',
-                           form=form,
-                           manual_page='admin/' + category,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-' + (
-                               'data' if category == 'api' else category)], _(category)])
+    return render_template(
+        'display_form.html',
+        form=form,
+        manual_page='admin/' + category,
+        title=_('admin'),
+        crumbs=[[_('admin'),
+                 url_for('admin_index') + '#tab-' + ('data' if category == 'api' else category)],
+                _(category)])
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -221,12 +223,14 @@ def admin_check_similar() -> str:
             for entity in sample['entities']:
                 html += '<br><br><br><br><br>' + link(entity)  # Workaround for linebreaks in tables
             table.rows.append([html, len(sample['entities']) + 1])
-    return render_template('admin/check_similar.html',
-                           table=table,
-                           form=form,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('check similar names')])
+    return render_template(
+        'admin/check_similar.html',
+        table=table,
+        form=form,
+        title=_('admin'),
+        crumbs=[[_('admin'),
+                 url_for('admin_index') + '#tab-data'],
+                _('check similar names')])
 
 
 @app.route('/admin/orphans/delete/<parameter>')
@@ -248,7 +252,7 @@ def admin_check_dates() -> str:
     for entity in Date.get_invalid_dates():
         tables['dates'].rows.append([
             link(entity),
-            link(entity.class_.label),
+            entity.class_.label,
             entity.print_standard_type(),
             format_date(entity.created),
             format_date(entity.modified),
@@ -268,12 +272,13 @@ def admin_check_dates() -> str:
     for link_ in Date.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
-        data = [link(actor),
-                link(event),
-                event.class_.code.name,
-                link_.type.name if link_.type else '',
-                link_.description,
-                link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
+        data = [
+            link(actor),
+            link(event),
+            event.class_.label,
+            link_.type.name if link_.type else '',
+            link_.description,
+            link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
         tables['involvement_dates'].rows.append(data)
     return render_template('admin/check_dates.html',
                            tables=tables,

@@ -4,11 +4,13 @@ import ast
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.display import uc_first
 
 
 class Node(Entity):
@@ -66,7 +68,12 @@ class Node(Entity):
         g.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         forms = {}
         for row in g.cursor.fetchall():
-            forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
+            forms[row.id] = {
+                'id': row.id,
+                'name': row.name,
+                'label': g.classes[row.name].label if row.name in g.classes
+                else uc_first(_(row.name.replace('_', ''))),
+                'extendable': row.extendable}
         sql = """
             SELECT h.id, h.name, h.multiple, h.standard, h.directional, h.value_type, h.locked,
                 (SELECT ARRAY(
@@ -122,10 +129,11 @@ class Node(Entity):
         items = []
         for id_ in nodes:
             item = g.nodes[id_]
-            items.append({'id': item.id,
-                          'text': item.name.replace("'", "&apos;"),
-                          'state': {'selected': 'true'} if item.id in selected_ids else '',
-                          'children': Node.walk_tree(item.subs, selected_ids)})
+            items.append({
+                'id': item.id,
+                'text': item.name.replace("'", "&apos;"),
+                'state': {'selected': 'true'} if item.id in selected_ids else '',
+                'children': Node.walk_tree(item.subs, selected_ids)})
         return items
 
     @staticmethod
@@ -141,7 +149,11 @@ class Node(Entity):
     @staticmethod
     def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         g.execute("SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
-        return [(r.id, r.name) for r in g.cursor.fetchall() if not root or r.id not in root.forms]
+        choices = []
+        for row in g.cursor.fetchall():
+            if g.classes[row.name].view != 'type' and (not root or row.id not in root.forms):
+                choices.append((row.id, g.classes[row.name].label))
+        return choices
 
     @staticmethod
     def save_entity_nodes(entity: Entity, form: Any) -> None:
@@ -261,7 +273,7 @@ class Node(Entity):
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2' AND e.system_class = %(form_name)s;"""
-        g.execute(sql, {'node_ids': tuple(node_ids), 'classes': form_name})
+        g.execute(sql, {'node_ids': tuple(node_ids), 'form_name': form_name})
         return g.cursor.fetchone()[0]
 
     @staticmethod

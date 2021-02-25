@@ -16,14 +16,14 @@ INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM web.form WHERE name='Artifact'));
 
+-- #1091 Reference systems for types
+INSERT INTO web.form (name, extendable) VALUES ('Type', True);
+
 -- If you executed above at an upgrade of a development version before use this instead
 -- UPDATE model.entity SET name = 'Artifact' WHERE LOWER(name) = 'artificial object';
 -- UPDATE model.entity SET system_type = 'artifact' WHERE LOWER(system_type) = 'artificial object';
 -- UPDATE web.form SET name = 'Artifact' WHERE name = 'Artificial Object';
 -- UPDATE web.hierarchy SET name = 'Artifact' WHERE name = 'Artificial Object';
-
--- #1091 Reference systems for types
-INSERT INTO web.form (name, extendable) VALUES ('Type', True);
 
 -- #1091 Refactor modules
 ALTER TABLE model.entity ADD COLUMN system_class text;
@@ -65,12 +65,29 @@ DELETE FROM web.hierarchy WHERE name IN ('Information carrier', 'Find', 'Legal b
 UPDATE model.entity SET description = 'Definitions of an actor''s function within a group. An actor can for example be member of a group and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the group "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the group "Roman Empire" from 800 to 814 in the function "Emperor".'
 WHERE class_code = 'E55' AND name = 'Actor function';
 
-
 -- #1091 Restructure and rename forms
 UPDATE web.form SET name = LOWER(REPLACE(name, ' ', '_'));
-UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'information_carrier') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
-UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'find') WHERE form_id = (SELECT id FROM web.form WHERE name = 'artifact');
-UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'legal_body') WHERE form_id = (SELECT id FROM web.form WHERE name = 'group');
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
+    (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'artifact') FROM web.hierarchy_form hf
+    JOIN web.form f ON hf.form_id = f.id AND f.name = 'find');
+UPDATE web.hierarchy_form SET form_id = (SELECT id FROM web.form WHERE name = 'group') WHERE form_id = (SELECT id FROM web.form WHERE name = 'legal_body');
+
+-- Split event form to acquisition, activity, move
+INSERT INTO web.form (name, extendable) VALUES
+    ('acquisition', True),
+    ('activity', True),
+    ('move', True);
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
+    (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'acquisition') FROM web.hierarchy_form hf
+    JOIN web.form f ON hf.form_id = f.id AND f.name = 'event');
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
+    (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'activity') FROM web.hierarchy_form hf
+    JOIN web.form f ON hf.form_id = f.id AND f.name = 'event');
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
+    (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'move') FROM web.hierarchy_form hf
+    JOIN web.form f ON hf.form_id = f.id AND f.name = 'event');
+DELETE FROM web.form WHERE name = 'event';
+
 DELETE FROM web.form WHERE name IN ('information_carrier', 'legal_body');
 
 -- ALTER TABLE model.entity DROP COLUMN system_type;

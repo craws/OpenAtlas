@@ -250,8 +250,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
         selected_ids = []
         root = g.nodes[int(field.id)]
         if field.data:
-            # Somehow field.data can be a string after a failed form validation, so fix that below
-            field.data = ast.literal_eval(field.data) if type(field.data) is str else field.data
+            field.data = ast.literal_eval(field.data) if isinstance(field.data, str) else field.data
             for entity_id in field.data:
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'

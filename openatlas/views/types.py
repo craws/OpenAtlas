@@ -28,11 +28,12 @@ def node_index() -> str:
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html',
-                           nodes=nodes,
-                           placeholder=_('type to search'),
-                           title=_('types'),
-                           crumbs=[_('types')])
+    return render_template(
+        'types/index.html',
+        nodes=nodes,
+        placeholder=_('type to search'),
+        title=_('types'),
+        crumbs=[_('types')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
