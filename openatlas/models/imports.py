@@ -102,15 +102,18 @@ class Import:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
         for row in data:
-            desc = row['description'] if 'description' in row and row['description'] else None
-            entity = Entity.insert(g.classes[class_].cidoc_class, row['name'], class_, desc)
+            entity = Entity.insert(
+                class_,
+                row['name'],
+                row['description'] if 'description' in row else None)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
-            g.execute(sql, {'project_id': project.id,
-                            'entity_id': entity.id,
-                            'user_id': current_user.id,
-                            'origin_id': row['id'] if 'id' in row and row['id'] else None})
+            g.execute(sql, {
+                'project_id': project.id,
+                'entity_id': entity.id,
+                'user_id': current_user.id,
+                'origin_id': row['id'] if 'id' in row and row['id'] else None})
 
             # Dates
             if 'begin_from' in row and row['begin_from']:
@@ -139,7 +142,7 @@ class Import:
 
             # GIS
             if class_ == 'place':
-                location = Entity.insert('E53', 'Location of ' + row['name'], 'place location')
+                location = Entity.insert('object_location', 'Location of ' + row['name'])
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):

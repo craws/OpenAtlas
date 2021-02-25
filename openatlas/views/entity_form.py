@@ -33,16 +33,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     elif class_ == 'node' and not is_authorized('editor'):
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    if class_ in g.view_class_mapping['actor']:
-        form_name = {'E21': 'person', 'E74': 'group', 'E40': 'legal_body'}
-        form = build_form(form_name[class_], code=class_, origin=origin)
-    elif class_ in g.view_class_mapping['event']:
-        # Todo: it's inconsistently to actor that event has only one form for different classes.
-        form = build_form('event', origin=origin, code=class_)
-    elif class_ == 'E84':
-        form = build_form('artifact', origin=origin)
-    else:
-        form = build_form(class_, origin=origin)
+    form = build_form(class_, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, class_=class_, origin=origin))
     if hasattr(form, 'alias'):
@@ -203,7 +194,7 @@ def populate_insert_form(form: FlaskForm,
     elif view_name == 'event':
         if origin.class_.view == 'artifact':
             form.object.data = [origin.id]
-        elif origin.class_.code == 'E18':
+        elif origin.class_.view == 'place':
             if class_ == 'E9':
                 form.place_from.data = origin.id
             else:
@@ -318,31 +309,25 @@ def insert_entity(form: FlaskForm,
                   origin: Optional[Union[Entity, Node]] = None
                   ) -> Union[Entity, Node, ReferenceSystem]:
     if class_ == 'artifact':
-        entity = Entity.insert('E22', form.name.data, 'artifact')
-        location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
+        entity = Entity.insert(class_, form.name.data)
+        location = Entity.insert('object_location', 'Location of ' + form.name.data)
         entity.link('P53', location)
     elif class_ == 'node':
         root = g.nodes[origin.root[-1]] if origin.root else origin
-        entity = Entity.insert(root.cidoc_class.code, form.name.data)
-    elif class_ == 'source':
-        entity = Entity.insert('E33', form.name.data, class_)
-    elif class_ == 'file':
-        entity = Entity.insert('E31', form.name.data, class_)
-    elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find']:
+        entity = Entity.insert(root.class_.name, form.name.data)
+    elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find', 'artifact']:
         if class_ == 'human_remains':
-            entity = Entity.insert('E20', form.name.data, 'human_remains')
+            entity = Entity.insert(class_, form.name.data)
         elif origin and origin.class_.name == 'stratigraphic_unit':
-            entity = Entity.insert('E22', form.name.data, 'find')
+            entity = Entity.insert('find', form.name.data)
         else:
             system_class = 'place'
             if origin and origin.class_.name == 'place':
                 system_class = 'feature'
             elif origin and origin.class_.name == 'feature':
                 system_class = 'stratigraphic_unit'
-            entity = Entity.insert('E18', form.name.data, system_class)
-        entity.link('P53', Entity.insert('E53', 'Location of ' + form.name.data, 'place location'))
-    elif class_ in ('bibliography', 'edition', 'external_reference'):
-        entity = Entity.insert('E31', form.name.data, class_.replace('_', ' '))
+            entity = Entity.insert(system_class, form.name.data)
+        entity.link('P53', Entity.insert('object_location', 'Location of ' + form.name.data))
     elif class_ == 'reference_system':
         entity = ReferenceSystem.insert_system(form)
     else:

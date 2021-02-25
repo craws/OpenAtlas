@@ -47,11 +47,11 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Changes have been saved.' in rv.data
             rv = self.app.post(url_for('update', id_=geonames.id), follow_redirects=True, data=data)
             assert b'https://www.geonames2.org/' in rv.data
-            rv = self.app.post(url_for('insert', class_='E21'),
-                               data={'name': 'Actor test',
-                                     'reference_system_id_' + str(wikidata.id): 'Q123',
-                                     self.precision_geonames: '',
-                                     self.precision_wikidata: precision_id})
+            rv = self.app.post(url_for('insert', class_='person'), data={
+                'name': 'Actor test',
+                'reference_system_id_' + str(wikidata.id): 'Q123',
+                self.precision_geonames: '',
+                self.precision_wikidata: precision_id})
             person_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=wikidata.id), follow_redirects=True)
             assert b'Actor test' in rv.data
@@ -67,23 +67,23 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'A transaction error occurred' in rv.data
             rv = self.app.get(url_for('index', view='reference_system', delete_id=geonames.id))
             assert b'403' in rv.data
-            rv = self.app.post(url_for('insert', class_='E21'),
-                               data={'name': 'Actor with Wikidata but without precision',
-                                     'reference_system_id_' + str(wikidata.id): 'Q123',
-                                     self.precision_geonames: '',
-                                     self.precision_wikidata: ''})
+            rv = self.app.post(url_for('insert', class_='person'), data={
+                'name': 'Actor with Wikidata but without precision',
+                'reference_system_id_' + str(wikidata.id): 'Q123',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
             assert b'required' in rv.data
-            rv = self.app.post(url_for('insert', class_='E21'),
-                               data={'name': 'Actor with invalid Wikidata id',
-                                     'reference_system_id_' + str(wikidata.id): 'invalid id',
-                                     self.precision_geonames: '',
-                                     self.precision_wikidata: precision_id})
+            rv = self.app.post(url_for('insert', class_='person'), data={
+                'name': 'Actor with invalid Wikidata id',
+                'reference_system_id_' + str(wikidata.id): 'invalid id',
+                self.precision_geonames: '',
+                self.precision_wikidata: precision_id})
             assert b'Wrong id format' in rv.data
-            rv = self.app.post(url_for('insert', class_='place'),
-                               data={'name': 'Reference test',
-                                     'reference_system_id_' + str(geonames.id): 'invalid id',
-                                     self.precision_geonames: '',
-                                     self.precision_wikidata: ''})
+            rv = self.app.post(url_for('insert', class_='place'), data={
+                'name': 'Reference test',
+                'reference_system_id_' + str(geonames.id): 'invalid id',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
             assert b'Wrong id format' in rv.data
             rv = self.app.get(url_for('reference_system_remove_form',
                                       system_id=geonames.id,

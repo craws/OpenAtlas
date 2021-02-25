@@ -21,29 +21,31 @@ class EventTest(TestBaseCase):
             actor_name = 'Captain Miller'
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', actor_name)
-                file = Entity.insert('E31', 'X-Files', 'file')
-                source = Entity.insert('E33', 'Necronomicon', 'source')
-                carrier = Entity.insert('E22', 'Artifact', 'artifact')
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
+                actor = Entity.insert('person', actor_name)
+                file = Entity.insert('file', 'X-Files')
+                source = Entity.insert('source', 'Necronomicon')
+                carrier = Entity.insert('artifact', 'Artifact')
+                reference = Entity.insert('external_reference', 'https://openatlas.eu')
 
             # Insert
-            rv = self.app.get(url_for('insert', class_='E7'))
+            rv = self.app.get(url_for('insert', class_='activity'))
             assert b'+ Activity' in rv.data
-            data = {'name': 'Event Horizon',
-                    'place': residence_id,
-                    self.precision_wikidata: ''}
-            rv = self.app.post(url_for('insert', class_='E7', origin_id=reference.id),
-                               data=data,
-                               follow_redirects=True)
+            data = {
+                'name': 'Event Horizon',
+                'place': residence_id,
+                self.precision_wikidata: ''}
+            rv = self.app.post(
+                url_for('insert', class_='activity', origin_id=reference.id),
+                data=data,
+                follow_redirects=True)
             assert bytes('Event Horizon', 'utf-8') in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 activity_id = Entity.get_by_view('event')[0].id
-            self.app.post(url_for('insert', class_='E7', origin_id=actor.id), data=data)
-            self.app.post(url_for('insert', class_='E7', origin_id=file.id), data=data)
-            self.app.post(url_for('insert', class_='E7', origin_id=source.id), data=data)
-            rv = self.app.get(url_for('insert', class_='E7', origin_id=residence_id))
+            self.app.post(url_for('insert', class_='activity', origin_id=actor.id), data=data)
+            self.app.post(url_for('insert', class_='activity', origin_id=file.id), data=data)
+            self.app.post(url_for('insert', class_='activity', origin_id=source.id), data=data)
+            rv = self.app.get(url_for('insert', class_='activity', origin_id=residence_id))
             assert b'Location' in rv.data
             rv = self.app.get(url_for('insert', class_='E9', origin_id=residence_id))
             assert b'Location' not in rv.data
@@ -52,7 +54,7 @@ class EventTest(TestBaseCase):
             event_name2 = 'Second event'
             wikidata = 'reference_system_id_' + str(ReferenceSystem.get_by_name('Wikidata').id)
             precision = Node.get_hierarchy('External reference match').subs[0]
-            rv = self.app.post(url_for('insert', class_='E8'),
+            rv = self.app.post(url_for('insert', class_='acquisition'),
                                data={'name': event_name2,
                                      'given_place': [residence_id],
                                      'place': residence_id,
@@ -85,20 +87,21 @@ class EventTest(TestBaseCase):
 
             # Add another event and test if events are seen at place
             event_name3 = 'Third event'
-            self.app.post(url_for('insert', class_='E8'),
-                          data={'name': event_name3,
-                                'given_place': [residence_id],
-                                self.precision_geonames: '',
-                                self.precision_wikidata: ''})
+            self.app.post(url_for('insert', class_='acquisition'), data={
+                'name': event_name3,
+                'given_place': [residence_id],
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
             rv = self.app.get(url_for('entity_view', id_=residence_id))
             assert bytes(place_name, 'utf-8') in rv.data
             rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert bytes(actor_name, 'utf-8') in rv.data
-            rv = self.app.post(url_for('insert', class_='E8'), follow_redirects=True,
-                               data={'name': 'Event Horizon',
-                                     'continue_': 'yes',
-                                     self.precision_geonames: '',
-                                     self.precision_wikidata: ''})
+            rv = self.app.post(
+                url_for('insert', class_='acquisition'), follow_redirects=True, data={
+                    'name': 'Event Horizon',
+                    'continue_': 'yes',
+                    self.precision_geonames: '',
+                    self.precision_wikidata: ''})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('index', view='event'))
             assert b'Event' in rv.data
@@ -113,9 +116,10 @@ class EventTest(TestBaseCase):
 
             rv = self.app.get(url_for('entity_add_reference', id_=event_id))
             assert b'Link reference' in rv.data
-            rv = self.app.post(url_for('entity_add_reference', id_=event_id),
-                               data={'reference': reference.id, 'page': '777'},
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('entity_add_reference', id_=event_id),
+                data={'reference': reference.id, 'page': '777'},
+                follow_redirects=True)
             assert b'777' in rv.data
 
             # Update

@@ -11,7 +11,7 @@ class NoteTest(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'Ripley')
+                actor = Entity.insert('person', 'Ripley')
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
             assert b'Description' in rv.data
             rv = self.app.post(url_for('note_insert', entity_id=actor.id),

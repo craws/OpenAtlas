@@ -23,33 +23,34 @@ class ActorTests(TestBaseCase):
                 sex_node = Node.get_hierarchy('Sex')
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
-                event = Entity.insert('E8', 'Event Horizon')
-                source = Entity.insert('E33', 'Necronomicon')
+                event = Entity.insert('acquisition', 'Event Horizon')
+                source = Entity.insert('source', 'Necronomicon')
 
             # Actor insert
-            rv = self.app.get(url_for('insert', class_='E21'))
+            rv = self.app.get(url_for('insert', class_='person'))
             assert b'+ Person' in rv.data
-            self.app.get(url_for('insert', class_='E21', origin_id=residence_id))
-            data = {sex_node.id: sex_node_sub_1.id,
-                    'name': 'Sigourney Weaver',
-                    'alias-1': 'Ripley',
-                    'residence': residence_id,
-                    'begins_in': residence_id,
-                    'ends_in': residence_id,
-                    'description': 'Susan Alexandra Weaver is an American actress.',
-                    'begin_year_from': '-1949',
-                    'begin_month_from': '10',
-                    'begin_day_from': '8',
-                    'begin_year_to': '-1948',
-                    'end_year_from': '2049',
-                    'end_year_to': '2050',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''}
-            rv = self.app.post(url_for('insert', class_='E21'), data=data)
+            self.app.get(url_for('insert', class_='person', origin_id=residence_id))
+            data = {
+                sex_node.id: sex_node_sub_1.id,
+                'name': 'Sigourney Weaver',
+                'alias-1': 'Ripley',
+                'residence': residence_id,
+                'begins_in': residence_id,
+                'ends_in': residence_id,
+                'description': 'Susan Alexandra Weaver is an American actress.',
+                'begin_year_from': '-1949',
+                'begin_month_from': '10',
+                'begin_day_from': '8',
+                'begin_year_to': '-1948',
+                'end_year_from': '2049',
+                'end_year_to': '2050',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''}
+            rv = self.app.post(url_for('insert', class_='person'), data=data)
             actor_id = rv.location.split('/')[-1]
-            self.app.post(url_for('insert', class_='E74'), data=data)
+            self.app.post(url_for('insert', class_='group'), data=data)
             self.app.post(url_for('insert', class_='E40'), data=data)
-            rv = self.app.post(url_for('insert', class_='E21', origin_id=residence_id),
+            rv = self.app.post(url_for('insert', class_='person', origin_id=residence_id),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
@@ -71,18 +72,18 @@ class ActorTests(TestBaseCase):
                                      'checkbox_values': str([actor_id])},
                                follow_redirects=True)
             assert b'Entities were updated' in rv.data
-            self.app.post(url_for('insert', class_='E21', origin_id=actor_id), data=data)
-            self.app.post(url_for('insert', class_='E21', origin_id=event.id), data=data)
-            self.app.post(url_for('insert', class_='E21', origin_id=source.id), data=data)
+            self.app.post(url_for('insert', class_='person', origin_id=actor_id), data=data)
+            self.app.post(url_for('insert', class_='person', origin_id=event.id), data=data)
+            self.app.post(url_for('insert', class_='person', origin_id=source.id), data=data)
             rv = self.app.post(url_for('insert', class_='external_reference'),
                                data={'name': 'https://openatlas.eu'})
             reference_id = rv.location.split('/')[-1]
-            rv = self.app.post(url_for('insert', class_='E21', origin_id=reference_id),
+            rv = self.app.post(url_for('insert', class_='person', origin_id=reference_id),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('insert', class_='E21'),
+            rv = self.app.post(url_for('insert', class_='person'),
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data

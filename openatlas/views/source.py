@@ -86,8 +86,7 @@ def save(form: FlaskForm,
         if entity:
             logger.log_user(entity.id, 'update')
         elif source:
-            entity = Entity.insert('E33', form.name.data, 'source_translation')
-            source.link('P73', entity)
+            source.link('P73', Entity.insert('source_translation', form.name.data))
             logger.log_user(entity.id, 'insert')
         else:
             abort(400)  # pragma: no cover, either entity or source has to be provided

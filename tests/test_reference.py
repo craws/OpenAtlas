@@ -39,7 +39,7 @@ class ReferenceTest(TestBaseCase):
             # Reference link
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                batman = Entity.insert('E21', 'Batman')
+                batman = Entity.insert('person', 'Batman')
             rv = self.app.get(url_for('reference_add', id_=reference.id, class_='actor'))
             assert b'Batman' in rv.data
             rv = self.app.post(url_for('reference_add', id_=reference.id, class_='actor'),
@@ -51,7 +51,7 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = batman.get_links('P67', True)[0].id
-                file = Entity.insert('E31', 'The X-Files', 'file')
+                file = Entity.insert('file', 'The X-Files')
                 file.link('P67', reference)
             rv = self.app.post(
                 url_for('reference_link_update', link_id=link_id, origin_id=reference.id),

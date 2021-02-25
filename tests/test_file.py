@@ -15,8 +15,8 @@ class FileTest(TestBaseCase):
             # Create entities for file
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'File keeper')
-                reference = Entity.insert('E31', 'Ancient Books', 'edition')
+                actor = Entity.insert('person', 'File keeper')
+                reference = Entity.insert('edition', 'Ancient Books')
                 node_id = Node.get_hierarchy('Sex').subs[0]
 
             # Insert

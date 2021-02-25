@@ -54,24 +54,11 @@ def insert_entity(name: str,
                   class_: str,
                   origin: Optional[Entity] = None,
                   description: Optional[str] = None) -> Optional[Entity]:
-    entity = None
-    if class_ in ['place', 'feature', 'stratigraphic_unit']:
-        if class_ == 'place':
-            entity = Entity.insert('E18', name, 'place', description)
-        elif class_ == 'feature':
-            entity = Entity.insert('E18', name, 'feature')
-        elif class_ == 'stratigraphic_unit':
-            entity = Entity.insert('E18', name, 'stratigraphic_unit')
+    entity = Entity.insert(class_, name, description)
+    if class_ in ['place', 'feature', 'stratigraphic_unit', 'find', 'artifact']:
+        location = Entity.insert('place_location', 'Location of ' + name)
+        entity.link('P53', location)
         if origin:
             origin.link('P46', entity)
-        location = Entity.insert('E53', 'Location of ' + name, 'place location')
-        entity.link('P53', location)
-    if class_ == 'external_reference':
-        entity = Entity.insert('E31', name, 'external_reference')
-    if class_ == 'file':
-        entity = Entity.insert('E31', name, 'file')
-    if class_ == 'alias':
-        entity = Entity.insert('E41', name)
-
     return entity
 

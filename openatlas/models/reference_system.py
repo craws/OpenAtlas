@@ -11,7 +11,6 @@ from openatlas.models.entity import Entity
 
 
 class ReferenceSystem(Entity):
-    # Class for external reference systems like Wikidata or GeoNames
     website_url = None
     resolver_url = None
     placeholder = None
@@ -92,12 +91,13 @@ class ReferenceSystem(Entity):
             = (%(name)s, %(website_url)s, %(resolver_url)s, %(identifier_example)s,
                 %(precision_default_id)s)
             WHERE entity_id = %(entity_id)s;'''
-        g.execute(sql, {'entity_id': self.id,
-                        'name': self.name,
-                        'website_url': self.website_url,
-                        'resolver_url': self.resolver_url,
-                        'identifier_example': self.placeholder,
-                        'precision_default_id': precision_default_id})
+        g.execute(sql, {
+            'entity_id': self.id,
+            'name': self.name,
+            'website_url': self.website_url,
+            'resolver_url': self.resolver_url,
+            'identifier_example': self.placeholder,
+            'precision_default_id': precision_default_id})
 
     @staticmethod
     def update_links(form: FlaskForm, entity: Entity) -> None:
@@ -114,8 +114,9 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def get_form_choices(entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
-        g.execute("SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
-                  {'forms': tuple(app.config['EXTERNAL_REFERENCES_FORMS'])})
+        g.execute(
+            "SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
+            {'forms': tuple(app.config['EXTERNAL_REFERENCES_FORMS'])})
         choices = []
         for row in g.cursor.fetchall():
             if not entity or row.id not in entity.forms:
@@ -126,12 +127,13 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def insert_system(form: FlaskForm) -> Entity:
-        entity = Entity.insert('E32', form.name.data, description=form.description.data)
+        entity = Entity.insert('reference_system', form.name.data, form.description.data)
         sql = '''
             INSERT INTO web.reference_system (entity_id, name, website_url, resolver_url)
             VALUES (%(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);'''
-        g.execute(sql, {'entity_id': entity.id,
-                        'name': entity.name,
-                        'website_url': form.website_url.data if form.website_url.data else None,
-                        'resolver_url': form.resolver_url.data if form.resolver_url.data else None})
+        g.execute(sql, {
+            'entity_id': entity.id,
+            'name': entity.name,
+            'website_url': form.website_url.data if form.website_url.data else None,
+            'resolver_url': form.resolver_url.data if form.resolver_url.data else None})
         return ReferenceSystem.get_all()[entity.id]

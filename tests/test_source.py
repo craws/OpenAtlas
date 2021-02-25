@@ -14,11 +14,11 @@ class SourceTest(TestBaseCase):
             assert b'+ Source' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                origin = Entity.insert('E21', 'David Duchovny', 'person')
-                actor = Entity.insert('E21', 'Gillian Anderson Gillian Anderson', 'person')
-                carrier = Entity.insert('E22', 'Artifact', 'artifact')
-                file = Entity.insert('E31', 'X-Files', 'file')
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
+                origin = Entity.insert('person', 'David Duchovny', 'person')
+                actor = Entity.insert('person', 'Gillian Anderson Gillian Anderson', 'person')
+                carrier = Entity.insert('artifact', 'Artifact')
+                file = Entity.insert('file', 'X-Files')
+                reference = Entity.insert('external_reference', 'https://openatlas.eu')
 
             rv = self.app.post(
                 url_for('insert', class_='source', origin_id=origin.id),

@@ -176,9 +176,9 @@ class Entity:
         for alias in new_aliases:  # Insert new aliases if not empty
             if alias.strip():
                 if self.class_.view == 'actor':
-                    self.link('P131', Entity.insert('E82', alias))
+                    self.link('P131', Entity.insert('actor_appellation', alias))
                 else:
-                    self.link('P1', Entity.insert('E41', alias))
+                    self.link('P1', Entity.insert('appellation', alias))
 
     def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import Node
@@ -303,10 +303,7 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(code: str,
-               name: str,
-               system_class: Optional[str] = None,
-               description: Optional[str] = None) -> Entity:
+    def insert(class_name: str, name: str, description: Optional[str] = None) -> Entity:
         from openatlas.util.display import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover
@@ -317,8 +314,8 @@ class Entity:
             VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
         params = {
             'name': str(name).strip(),
-            'code': code,
-            'system_class': system_class,
+            'code': g.classes[class_name].cidoc_class.code,
+            'system_class': class_name,
             'description': sanitize(description, 'text') if description else None}
         g.execute(sql, params)
         return Entity.get_by_id(g.cursor.fetchone()[0])

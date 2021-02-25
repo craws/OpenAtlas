@@ -23,9 +23,9 @@ class PlaceTest(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference = Entity.insert('E31', 'https://openatlas.eu', 'external_reference')
+                reference = Entity.insert('external_reference', 'https://openatlas.eu')
                 place_node = Node.get_hierarchy('Place')
-                source = Entity.insert('E33', 'Necronomicon')
+                source = Entity.insert('source', 'Necronomicon')
             geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
             precision = Node.get_hierarchy('External reference match').subs[0]
             data = {'name': 'Asgard',
@@ -75,7 +75,7 @@ class PlaceTest(TestBaseCase):
                 place = places[0]
                 place2 = places[1]
                 location = place2.get_linked_entity_safe('P53')
-                actor = Entity.insert('E21', 'Milla Jovovich')
+                actor = Entity.insert('person', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('index', view='place'))
@@ -108,7 +108,7 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = Entity.insert('E8', 'Valhalla rising')
+                event = Entity.insert('acquisition', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
             rv = self.app.get(url_for('entity_view', id_=place2.id))

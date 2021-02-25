@@ -68,35 +68,38 @@ def model_index() -> str:
 @required_group('readonly')
 def class_entities(code: str) -> str:
     table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class_code(code)])
-    return render_template('table.html',
-                           table=table,
-                           title=_('model'),
-                           crumbs=[[_('model'), url_for('model_index')],
-                                   [_('classes'), url_for('class_index')],
-                                   link(g.cidoc_classes[code]),
-                                   _('entities')])
+    return render_template(
+        'table.html',
+        table=table,
+        title=_('model'),
+        crumbs=[[_('model'), url_for('model_index')],
+                [_('classes'), url_for('class_index')],
+                link(g.cidoc_classes[code]),
+                _('entities')])
 
 
 @app.route('/overview/model/class')
 @required_group('readonly')
 def class_index() -> str:
-    table = Table(['code', 'name', 'count'],
-                  defs=[{'className': 'dt-body-right', 'targets': 2},
-                        {'orderDataType': 'cidoc-model', 'targets': [0]},
-                        {'sType': 'numeric', 'targets': [0]}])
+    table = Table(
+        ['code', 'name', 'count'],
+        defs=[{'className': 'dt-body-right', 'targets': 2},
+              {'orderDataType': 'cidoc-model', 'targets': [0]},
+              {'sType': 'numeric', 'targets': [0]}])
     for class_id, class_ in g.cidoc_classes.items():
         count = ''
         if class_.count:
             count = format_number(class_.count)
             if class_.code not in ['E53', 'E41', 'E82']:
-                count = link(format_number(class_.count),
-                             url_for('class_entities', code=class_.code))
+                count = link(
+                    format_number(class_.count),
+                    url_for('class_entities', code=class_.code))
         table.rows.append([link(class_), class_.name, count])
-    return render_template('table.html',
-                           table=table,
-                           title=_('model'),
-                           crumbs=[[_('model'), url_for('model_index')],
-                                   _('classes')])
+    return render_template(
+        'table.html',
+        table=table,
+        title=_('model'),
+        crumbs=[[_('model'), url_for('model_index')], _('classes')])
 
 
 @app.route('/overview/model/property')
@@ -110,19 +113,20 @@ def property_index() -> str:
               {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
               {'sType': 'numeric', 'targets': [0]}])
     for property_id, property_ in properties.items():
-        table.rows.append([link(property_),
-                           property_.name,
-                           property_.name_inverse,
-                           link(classes[property_.domain_class_code]),
-                           classes[property_.domain_class_code].name,
-                           link(classes[property_.range_class_code]),
-                           classes[property_.range_class_code].name,
-                           format_number(property_.count) if property_.count else ''])
-    return render_template('table.html',
-                           table=table,
-                           title=_('model'),
-                           crumbs=[[_('model'), url_for('model_index')],
-                                   _('properties')])
+        table.rows.append(
+            [link(property_),
+             property_.name,
+             property_.name_inverse,
+             link(classes[property_.domain_class_code]),
+             classes[property_.domain_class_code].name,
+             link(classes[property_.range_class_code]),
+             classes[property_.range_class_code].name,
+             format_number(property_.count) if property_.count else ''])
+    return render_template(
+        'table.html',
+        table=table,
+        title=_('model'),
+        crumbs=[[_('model'), url_for('model_index')], _('properties')])
 
 
 @app.route('/overview/model/class_view/<code>')
@@ -131,30 +135,32 @@ def class_view(code: str) -> str:
     class_ = g.cidoc_classes[code]
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(paging=False,
-                              defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                    {'sType': 'numeric', 'targets': [0]}])
+        tables[table] = Table(paging=False, defs=[
+            {'orderDataType': 'cidoc-model', 'targets': [0]},
+            {'sType': 'numeric', 'targets': [0]}])
         for code_ in getattr(class_, table):
             tables[table].rows.append([link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name])
-    tables['domains'] = Table(paging=False,
-                              defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                    {'sType': 'numeric', 'targets': [0]}])
-    tables['ranges'] = Table(paging=False,
-                             defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                   {'sType': 'numeric', 'targets': [0]}])
+    tables['domains'] = Table(paging=False, defs=[
+        {'orderDataType': 'cidoc-model', 'targets': [0]},
+        {'sType': 'numeric', 'targets': [0]}])
+    tables['ranges'] = Table(paging=False, defs=[
+        {'orderDataType': 'cidoc-model', 'targets': [0]},
+        {'sType': 'numeric', 'targets': [0]}])
     for key, property_ in g.properties.items():
         if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
         elif class_.code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
-    return render_template('model/class_view.html',
-                           class_=class_,
-                           tables=tables,
-                           info={'code': class_.code, 'name': class_.name},
-                           title=_('model'),
-                           crumbs=[[_('model'), url_for('model_index')],
-                                   [_('classes'), url_for('class_index')],
-                                   class_.code])
+    return render_template(
+        'model/class_view.html',
+        class_=class_,
+        tables=tables,
+        info={'code': class_.code, 'name': class_.name},
+        title=_('model'),
+        crumbs=[[_('model'),
+                 url_for('model_index')],
+                [_('classes'), url_for('class_index')],
+                class_.code])
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -163,16 +169,17 @@ def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.cidoc_classes[property_.domain_class_code]
     range_ = g.cidoc_classes[property_.range_class_code]
-    info = {'code': property_.code,
-            'name': property_.name,
-            'inverse': property_.name_inverse,
-            'domain': link(domain) + ' ' + domain.name,
-            'range': link(range_) + ' ' + range_.name}
+    info = {
+        'code': property_.code,
+        'name': property_.name,
+        'inverse': property_.name_inverse,
+        'domain': link(domain) + ' ' + domain.name,
+        'range': link(range_) + ' ' + range_.name}
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(paging=False,
-                              defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                    {'sType': 'numeric', 'targets': [0]}])
+        tables[table] = Table(paging=False, defs=[
+            {'orderDataType': 'cidoc-model', 'targets': [0]},
+            {'sType': 'numeric', 'targets': [0]}])
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html',

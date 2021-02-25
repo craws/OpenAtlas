@@ -229,7 +229,7 @@ def add_types(form: Any, name: str) -> None:
 
 def add_fields(form: Any,
                name: str,
-               code: Union[str, None],
+               class_: Union[str, None],
                item: Union[Entity, Node, Link, None],
                origin: Union[Entity, Node, None]) -> None:
     if name == 'actor_actor_relation':
@@ -240,12 +240,12 @@ def add_fields(form: Any,
     elif name == 'event':
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
-        if code == 'E7':
+        if class_ == 'activity':
             setattr(form, 'place', TableField(_('location')))
-        if code == 'E8':
+        if class_ == 'acquisition':
             setattr(form, 'place', TableField(_('location')))
             setattr(form, 'given_place', TableMultiField(_('given place')))
-        elif code == 'E9':
+        elif class_ == 'E9':
             setattr(form, 'place_from', TableField(_('from')))
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'artifact', TableMultiField())
@@ -257,7 +257,7 @@ def add_fields(form: Any,
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif name == 'hierarchy':
-        if (code and code == 'custom') or (item and not item.value_type):
+        if class_ == 'custom' or (item and not item.value_type):
             setattr(form, 'multiple', BooleanField(_('multiple'),
                                                    description=_('tooltip hierarchy multiple')))
         setattr(form, 'forms', SelectMultipleField(_('forms'),

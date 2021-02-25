@@ -13,8 +13,8 @@ class RelationTests(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'Connor MacLeod')
-                related = Entity.insert('E21', 'The Kurgan')
+                actor = Entity.insert('person', 'Connor MacLeod')
+                related = Entity.insert('person', 'The Kurgan')
 
             # Add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor.id))

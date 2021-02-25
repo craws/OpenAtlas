@@ -12,8 +12,8 @@ class MemberTests(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'Ripley')
-                group = Entity.insert('E74', 'Space Marines')
+                actor = Entity.insert('person', 'Ripley')
+                group = Entity.insert('group', 'Space Marines')
 
             # Add membership
             rv = self.app.get(url_for('member_insert', origin_id=group.id))

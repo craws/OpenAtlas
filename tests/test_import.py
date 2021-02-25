@@ -31,23 +31,26 @@ class ExportTest(TestBaseCase):
             assert b'Yup' in rv.data
 
             # Import data
-            rv = self.app.get(url_for('import_data', class_code='E21', project_id=project_id))
+            rv = self.app.get(url_for('import_data', class_='person', project_id=project_id))
             assert b'File *' in rv.data
             csv = pathlib.Path(app.root_path) / 'static' / 'import' / 'example.csv'
             with open(csv, 'rb') as file:
-                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
-                                   data={'file': file, 'duplicate': True},
-                                   follow_redirects=True)
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=project_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
             assert b'Vienna' in rv.data
             with open(csv, 'rb') as file:
-                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
-                                   data={'file': file, 'duplicate': True},
-                                   follow_redirects=True)
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=project_id),
+                    data={'file': file, 'duplicate': True},
+                    follow_redirects=True)
             assert b'IDs already in database' in rv.data
             with open(pathlib.Path(app.root_path) / 'static' / 'favicon.ico', 'rb') as file:
-                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
-                                   data={'file': file},
-                                   follow_redirects=True)
+                rv = self.app.post(
+                    url_for('import_data', class_='place', project_id=project_id),
+                    data={'file': file},
+                    follow_redirects=True)
             assert b'File type not allowed' in rv.data
             rv = self.app.get(url_for('import_project_view', id_=project_id))
             assert b'London' in rv.data

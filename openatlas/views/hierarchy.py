@@ -109,7 +109,7 @@ def save(form: FlaskForm,
         if node:
             Node.update_hierarchy(node, form)
         else:
-            node = Entity.insert('E55', sanitize(form.name.data, 'node'))
+            node = Entity.insert('node', sanitize(form.name.data, ))
             Node.insert_hierarchy(node, form, value_type)
         node.update(form)
         g.cursor.execute('COMMIT')

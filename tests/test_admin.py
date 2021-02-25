@@ -11,12 +11,13 @@ class ContentTests(TestBaseCase):
 
     def test_orphans_and_newsletter(self) -> None:
         with app.app_context():  # type: ignore
-            self.app.post(url_for('insert', class_='E21'), data={'name': 'Oliver Twist',
-                                                                 self.precision_geonames: '',
-                                                                 self.precision_wikidata: ''})
+            self.app.post( url_for('insert', class_='person'), data={
+                'name': 'Oliver Twist',
+                self.precision_geonames: '',
+                self.precision_wikidata: ''})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                Entity.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
+                Entity.insert('file', 'One forsaken file entity')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
             rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
@@ -44,8 +45,8 @@ class ContentTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 # Create invalid dates for an actor and a relation link
-                person = Entity.insert('E21', 'Person')
-                event = Entity.insert('E7', 'Event')
+                person = Entity.insert('person', 'Person')
+                event = Entity.insert('activity', 'Event')
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()
@@ -63,8 +64,8 @@ class ContentTests(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = Entity.insert('E8', 'Event Horizon')
-                source = Entity.insert('E33', 'Tha source')
+                event = Entity.insert('acquisition', 'Event Horizon')
+                source = Entity.insert('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_node = Node.get_hierarchy('Source')
@@ -85,8 +86,8 @@ class ContentTests(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                Entity.insert('E21', 'I have the same name!')
-                Entity.insert('E21', 'I have the same name!')
+                Entity.insert('person', 'I have the same name!')
+                Entity.insert('person', 'I have the same name!')
             rv = self.app.post(url_for('admin_check_similar'),
                                follow_redirects=True,
                                data={'classes': 'actor', 'ratio': 100})

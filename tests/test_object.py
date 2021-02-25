@@ -11,7 +11,7 @@ class ObjectTest(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                source = Entity.insert('E33', 'Necronomicon')
+                source = Entity.insert('source', 'Necronomicon')
 
             rv = self.app.get(url_for('insert', class_='E84'))
             assert b'+ Information Carrier' in rv.data
