@@ -376,11 +376,9 @@ class Entity:
 
     @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
-        # Todo: rewrite form to take multiple system classes
-        class_ = form.classes.data
-        entities = Entity.get_by_class(class_)
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
+        entities = Entity.get_by_class(form.classes.data)
         for sample in entities:
             if sample.id in already_added:
                 continue

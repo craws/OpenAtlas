@@ -212,12 +212,10 @@ def admin_settings(category: str) -> Union[str, Response]:
 @required_group('contributor')
 def admin_check_similar() -> str:
     form = SimilarForm()
-    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-               'reference', 'file']
-    form.classes.choices = [(x, uc_first(_(x))) for x in choices]
+    form.classes.choices = [(x.name, x.label) for name, x in g.classes.items() if x.label]
     table = None
     if form.validate_on_submit():
-        table = Table(['name', uc_first(_('count'))])
+        table = Table(['name', _('count')])
         for sample_id, sample in Entity.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
@@ -228,9 +226,7 @@ def admin_check_similar() -> str:
         table=table,
         form=form,
         title=_('admin'),
-        crumbs=[[_('admin'),
-                 url_for('admin_index') + '#tab-data'],
-                _('check similar names')])
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check similar names')])
 
 
 @app.route('/admin/orphans/delete/<parameter>')

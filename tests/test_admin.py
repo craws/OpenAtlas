@@ -11,7 +11,7 @@ class ContentTests(TestBaseCase):
 
     def test_orphans_and_newsletter(self) -> None:
         with app.app_context():  # type: ignore
-            self.app.post( url_for('insert', class_='person'), data={
+            self.app.post(url_for('insert', class_='person'), data={
                 'name': 'Oliver Twist',
                 self.precision_geonames: '',
                 self.precision_wikidata: ''})
@@ -73,13 +73,16 @@ class ContentTests(TestBaseCase):
                 source.link('P2', g.nodes[source_node.subs[1]])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'),
-                              follow_redirects=True)
+            rv = self.app.get(
+                url_for('admin_check_link_duplicates', delete='delete'),
+                follow_redirects=True)
             assert b'Remove' in rv.data
-            rv = self.app.get(url_for('admin_delete_single_type_duplicate',
-                                      entity_id=source.id,
-                                      node_id=source_node.subs[0]),
-                              follow_redirects=True)
+            rv = self.app.get(
+                url_for(
+                    'admin_delete_single_type_duplicate',
+                    entity_id=source.id,
+                    node_id=source_node.subs[0]),
+                follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
     def test_similar(self) -> None:
@@ -91,7 +94,7 @@ class ContentTests(TestBaseCase):
             rv = self.app.post(
                 url_for('admin_check_similar'),
                 follow_redirects=True,
-                data={'classes': 'actor', 'ratio': 100})
+                data={'classes': 'person', 'ratio': 100})
             assert b'I have the same name!' in rv.data
             rv = self.app.post(
                 url_for('admin_check_similar'),
@@ -107,33 +110,36 @@ class ContentTests(TestBaseCase):
             # Mail
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
-            data = {'mail': True,
+            rv = self.app.post(
+                url_for('admin_settings', category='mail'),
+                follow_redirects=True,
+                data={
+                    'mail': True,
                     'mail_transport_username': 'whatever',
                     'mail_transport_host': 'localhost',
                     'mail_transport_port': '23',
                     'mail_from_email': 'max@example.com',
                     'mail_from_name': 'Max Headroom',
-                    'mail_recipients_feedback': 'headroom@example.com'}
-            rv = self.app.post(url_for('admin_settings', category='mail'),
-                               data=data,
-                               follow_redirects=True)
+                    'mail_recipients_feedback': 'headroom@example.com'})
             assert b'Max Headroom' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data
 
             # Content
-            rv = self.app.post(url_for('admin_content', item='citation_example'),
-                               data={'en': 'citation as example', 'de': ''},
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('admin_content', item='citation_example'),
+                data={'en': 'citation as example', 'de': ''},
+                follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             rv = self.app.get(url_for('insert', class_='edition'))
             assert b'citation as example' in rv.data
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
-            rv = self.app.post(url_for('admin_content', item='legal_notice'),
-                               data={'en': 'My legal notice', 'de': 'German notice'},
-                               follow_redirects=True)
+            rv = self.app.post(
+                url_for('admin_content', item='legal_notice'),
+                data={'en': 'My legal notice', 'de': 'German notice'},
+                follow_redirects=True)
             assert b'My legal notice' in rv.data
             self.app.get('/index/setlocale/de')
             rv = self.app.get(url_for('index_content', item='legal_notice'))
