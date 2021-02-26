@@ -49,8 +49,9 @@ def display_citation_example(self: Any, code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
         return ''
-    return Markup('<h1>{title}</h1>{text}'.format(title=display.uc_first(_('citation_example')),
-                                                  text=text))
+    return Markup('<h1>{title}</h1>{text}'.format(
+        title=display.uc_first(_('citation_example')),
+        text=text))
 
 
 @jinja2.contextfilter
@@ -111,9 +112,10 @@ def note(self: Any, entity: Entity) -> str:
             label=display.uc_first(_('note')),
             note=entity.note.replace('\r\n', '<br>'),
             edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
-            delete=display.button(_('delete'),
-                                  url_for('note_delete', entity_id=entity.id),
-                                  onclick="return confirm('" + _('Delete note?') + "');"))
+            delete=display.button(
+                _('delete'),
+                url_for('note_delete', entity_id=entity.id),
+                onclick="return confirm('" + _('Delete note?') + "');"))
     return Markup(html)
 
 
@@ -168,16 +170,18 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     for field in form:
         if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
-    table = Table(header=['#', display.uc_first(_('selection'))],
-                  rows=[[item, item.label.text] for item in form.selection])
+    table = Table(
+        header=['#', display.uc_first(_('selection'))],
+        rows=[[item, item.label.text] for item in form.selection])
     return html + """
         <div class="toolbar">
             {select_all}
             {deselect_all}
         </div>
-        {table}""".format(select_all=display.button(_('select all'), id_="select-all"),
-                          deselect_all=display.button(_('deselect all'), id_="select-none"),
-                          table=table.display('move'))
+        {table}""".format(
+        select_all=display.button(_('select all'), id_="select-all"),
+        deselect_all=display.button(_('deselect all'), id_="select-none"),
+        table=table.display('move'))
 
 
 @jinja2.contextfilter
@@ -189,8 +193,9 @@ def table_select_model(self: Any,
         entities = g.cidoc_classes
     else:
         entities = g.properties
-    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                          {'sType': 'numeric', 'targets': [0]}])
+    table = Table(['code', 'name'], defs=[
+        {'orderDataType': 'cidoc-model', 'targets': [0]},
+        {'sType': 'numeric', 'targets': [0]}])
 
     for id_ in entities:
         table.rows.append([
@@ -231,19 +236,22 @@ def table_select_model(self: Any,
                         </div>
                     </div>
                 </div>
-            </div>""".format(name=name,
-                             value=value,
-                             close_label=display.uc_first(_('close')),
-                             table=table.display(name))
+            </div>""".format(
+        name=name,
+        value=value,
+        close_label=display.uc_first(_('close')),
+        table=table.display(name))
     return html
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def description(self: Any, entity: Entity) -> str:
+def description(self: Any, entity: Union[Entity, Project]) -> str:
     if not entity.description:
         return ''
-    label = _('content') if entity.class_.name == 'source' else _('description')
+    label = _('description')
+    if isinstance(entity, Entity) and entity.class_.name == 'source':
+        label = _('content')
     return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
         label=display.uc_first(label),
         description=entity.description.replace('\r\n', '<br>')))
@@ -274,17 +282,19 @@ def display_profile_image(self: Any, entity: Entity) -> str:
             html = '''
                 <a href="{url}" rel="noopener noreferrer" target="_blank">
                     <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>'''.format(url=url_for('display_file', filename=path.name),
-                               width=session['settings']['profile_image_width'])
+                </a>'''.format(
+                url=url_for('display_file', filename=path.name),
+                width=session['settings']['profile_image_width'])
         else:
             html = display.uc_first(_('no preview available'))  # pragma: no cover
     else:
         html = """
             <a href="{url}">
                 <img style="max-width:{width}px;" alt="image" src="{src}">
-            </a>""".format(url=url_for('entity_view', id_=entity.image_id),
-                           src=url_for('display_file', filename=path.name),
-                           width=session['settings']['profile_image_width'])
+            </a>""".format(
+            url=url_for('entity_view', id_=entity.image_id),
+            src=url_for('display_file', filename=path.name),
+            width=session['settings']['profile_image_width'])
     return Markup('<div id="profile_image_div">{html}</div>'.format(html=html))
 
 
@@ -427,18 +437,20 @@ def display_form(self: Any,
         if field.id.startswith('reference_system_id_'):
             precision_field = getattr(form, field.id.replace('id_', 'precision_'))
             class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
-            html += add_row(field, field.label, ' '.join([str(field(class_=class_)),
-                                                          str(precision_field.label),
-                                                          str(precision_field)]))
+            html += add_row(field, field.label, ' '.join([
+                str(field(class_=class_)),
+                str(precision_field.label),
+                str(precision_field)]))
             continue
         html += add_row(field, form_id=form_id)
 
     return Markup("""
         <form method="post" {id} {multi}>
             <div class="data-table">{html}</div>
-        </form>""".format(id=('id="' + form_id + '" ') if form_id else '',
-                          html=html,
-                          multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
+        </form>""".format(
+        id=('id="' + form_id + '" ') if form_id else '',
+        html=html,
+        multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
 
 
 @jinja2.contextfilter
@@ -464,9 +476,10 @@ def display_delete_link(self: Any, entity: Entity) -> str:
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
     confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return display.button(_('delete'),
-                          url,
-                          onclick="return confirm('{confirm}')").format(confirm=confirm)
+    return display.button(
+        _('delete'),
+        url,
+        onclick="return confirm('{confirm}')").format(confirm=confirm)
 
 
 @jinja2.contextfilter
