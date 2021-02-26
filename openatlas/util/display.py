@@ -233,7 +233,7 @@ def add_type_data(entity: 'Entity',
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
-        label = 'type' if root.standard else root.name
+        label = 'type' if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
         text = ''
@@ -399,10 +399,6 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
             link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
-
-
-
-
     return add_system_data(entity, data)
 
 

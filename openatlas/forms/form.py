@@ -178,32 +178,32 @@ def add_buttons(form: Any,
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
         setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('find')))
-        setattr(form,
-                'insert_continue_human_remains',
-                SubmitField(insert_and_add + _('human remains')))
+        setattr(
+            form,
+            'insert_continue_human_remains',
+            SubmitField(insert_and_add + _('human remains')))
     return form
 
 
-# TODO: this should probably go to a custom field in field.py
 def add_reference_systems(form: Any, form_name: str) -> None:
     precisions = [('', '')]
     for id_ in Node.get_hierarchy('External reference match').subs:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in g.reference_systems.values():
-        forms_ = [form_['name'] for form_ in system.get_forms().values()]
-        form_name = form_name.replace('_', ' ').title().replace('Node', 'Type')
-        if form_name not in forms_:
+        if form_name not in [form_['name'] for form_ in system.get_forms().values()]:
             continue
-        setattr(form, 'reference_system_id_{id}'.format(id=system.id), StringField(
-            system.name,
-            validators=[OptionalValidator()],
-            description=system.description,
-            render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
-
-        setattr(form, 'reference_system_precision_{id}'.format(id=system.id), SelectField(
-            _('precision'),
-            choices=precisions,
-            default=system.precision_default_id))
+        setattr(
+            form,
+            'reference_system_id_{id}'.format(id=system.id),
+            StringField(
+                system.name,
+                validators=[OptionalValidator()],
+                description=system.description,
+                render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
+        setattr(
+            form,
+            'reference_system_precision_{id}'.format(id=system.id),
+            SelectField(_('precision'), choices=precisions, default=system.precision_default_id))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
@@ -216,7 +216,7 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 def add_types(form: Any, class_: str) -> None:
     types = OrderedDict(Node.get_nodes_for_form(class_))
     for node in types.values():  # Move standard type to top
-        if node.standard:
+        if node.standard and node.class_.name == 'type':
             types.move_to_end(node.id, last=False)
             break
 
