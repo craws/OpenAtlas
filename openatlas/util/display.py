@@ -330,43 +330,16 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
 
     # Class specific information
     from openatlas.models.node import Node
+    from openatlas.models.reference_system import ReferenceSystem
     if isinstance(entity, Node):
         data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
-    elif entity.class_.view == 'file':
-        data[_('size')] = print_file_size(entity)
-        data[_('extension')] = get_file_extension(entity)
-    elif entity.class_.view == 'source':
-        data[_('information carrier')] = [link(recipient) for recipient in
-                                          entity.get_linked_entities(['P128'], inverse=True)]
-    elif entity.class_.view == 'event':
-        super_event = entity.get_linked_entity('P117')
-        if super_event:
-            data[_('sub event of')] = link(super_event)
-
-        if entity.class_.name == 'move':
-            person_data = []
-            artifact_data = []
-            for linked_entity in entity.get_linked_entities(['P25']):
-                if linked_entity.class_.name == 'person':
-                    person_data.append(linked_entity)
-                elif linked_entity.class_.name in ['artifact', 'find']:
-                    artifact_data.append(linked_entity)
-            data[_('person')] = [link(item) for item in person_data]
-            data[_('artifact')] = [link(item) for item in artifact_data]
-        else:
-            place = entity.get_linked_entity('P7')
-            if place:
-                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
-
-        if entity.class_.name == 'acquisition':
-            data[_('recipient')] = [link(recipient) for recipient in
-                                    entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
-
+    elif isinstance(entity, ReferenceSystem):
+        data[_('website URL')] = external_url(entity.website_url)
+        data[_('resolver URL')] = external_url(entity.resolver_url)
+        data[_('example ID')] = entity.placeholder
     elif entity.class_.view == 'actor':
         begin_place = entity.get_linked_entity('OA8')
         begin_object = None
@@ -394,10 +367,42 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
         data[_('appears first')] = appears_first
         data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
-    elif entity.class_.view == 'reference_system':
-        data[_('website URL')] = external_url(entity.website_url)
-        data[_('resolver URL')] = external_url(entity.resolver_url)
-        data[_('example ID')] = entity.placeholder
+    elif entity.class_.view == 'artifact':
+        data[_('source')] = [link(source) for source in entity.get_linked_entities(['P128'])]
+    elif entity.class_.view == 'event':
+        super_event = entity.get_linked_entity('P117')
+        if super_event:
+            data[_('sub event of')] = link(super_event)
+        if entity.class_.name == 'move':
+            person_data = []
+            artifact_data = []
+            for linked_entity in entity.get_linked_entities(['P25']):
+                if linked_entity.class_.name == 'person':
+                    person_data.append(linked_entity)
+                elif linked_entity.class_.name in ['artifact', 'find']:
+                    artifact_data.append(linked_entity)
+            data[_('person')] = [link(item) for item in person_data]
+            data[_('artifact')] = [link(item) for item in artifact_data]
+        else:
+            place = entity.get_linked_entity('P7')
+            if place:
+                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
+
+        if entity.class_.name == 'acquisition':
+            data[_('recipient')] = [
+                link(recipient) for recipient in entity.get_linked_entities(['P22'])]
+            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
+    elif entity.class_.view == 'file':
+        data[_('size')] = print_file_size(entity)
+        data[_('extension')] = get_file_extension(entity)
+    elif entity.class_.view == 'source':
+        data[_('artifact')] = [
+            link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
+
+
+
+
     return add_system_data(entity, data)
 
 

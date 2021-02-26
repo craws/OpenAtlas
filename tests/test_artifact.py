@@ -5,16 +5,16 @@ from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
-class ObjectTest(TestBaseCase):
+class ArtifactTest(TestBaseCase):
 
-    def test_object(self) -> None:
+    def test_artifact(self) -> None:
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 source = Entity.insert('source', 'Necronomicon')
 
             rv = self.app.get(url_for('insert', class_='artifact'))
-            assert b'+ Information Carrier' in rv.data
+            assert b'+ Artifact' in rv.data
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
                 data={'name': 'Love-letter'},
@@ -24,15 +24,16 @@ class ObjectTest(TestBaseCase):
             assert b'Love-letter' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                artifact = Entity.get_by_view('artifact')[0]
+                artifact = Entity.get_by_view('artifact')[1]
             rv = self.app.get(url_for('update', id_=artifact.id))
             assert b'Love-letter' in rv.data
-            rv = self.app.post(url_for('update', id_=artifact.id), follow_redirects=True, data={
-                'name': 'A little hate',
-                'description': 'makes nothing better'})
+            rv = self.app.post(
+                url_for('update', id_=artifact.id),
+                follow_redirects=True,
+                data={'name': 'A little hate', 'description': 'makes nothing better'})
             assert b'Changes have been saved' in rv.data
 
-            # Add to object
+            # Add to artifact
             rv = self.app.get(url_for('entity_add_source', id_=artifact.id))
             assert b'Link source' in rv.data
             rv = self.app.post(

@@ -82,6 +82,12 @@ class Tab:
                 buttons.append(button(
                     g.classes[item].label,
                     url_for('insert', class_=item, origin_id=id_)))
+        elif name == 'artifact':
+            buttons = [button('link', url_for('source_add', id_=id_, class_='artifact'))]
+            for item in g.view_class_mapping['artifact']:
+                buttons.append(button(
+                    g.classes[item].label,
+                    url_for('insert', class_=item, origin_id=id_)))
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
