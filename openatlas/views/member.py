@@ -43,11 +43,10 @@ def member_insert(origin_id: int, code: Optional[str] = 'member') -> Union[str, 
             return redirect(url_for('member_insert', origin_id=origin_id, code=code))
         tab = '#tab-member' if code == 'member' else '#tab-member-of'
         return redirect(url_for('entity_view', id_=origin.id) + tab)
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_('actor'), url_for('index', view='actor')],
-                                   origin,
-                                   _('member')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[[_('actor'), url_for('index', view='actor')], origin, _('member')])
 
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -75,9 +74,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     related = range_ if origin_id == domain.id else domain
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_('actor'), url_for('index', view='actor')],
-                                   origin,
-                                   related,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[[_('actor'), url_for('index', view='actor')], origin, related, _('edit')])

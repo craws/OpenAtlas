@@ -33,11 +33,6 @@ SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# External References
-REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-EXTERNAL_REFERENCES_FORMS = ['Artifact', 'Event', 'Feature', 'Find', 'Group', 'Human Remains',
-                             'Legal Body', 'Person', 'Place', 'Stratigraphic Unit', 'Type']
-
 # Modules
 MODULES = ['map_overlay', 'notes', 'sub_units']
 
@@ -53,17 +48,23 @@ TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 MIN_CHARS_JSTREE_SEARCH = 1
 
 # Log levels
-LOG_LEVELS = {0: 'emergency',
-              1: 'alert',
-              2: 'critical',
-              3: 'error',
-              4: 'warn',
-              5: 'notice',
-              6: 'info',
-              7: 'debug'}
+LOG_LEVELS = {
+    0: 'emergency',
+    1: 'alert',
+    2: 'critical',
+    3: 'error',
+    4: 'warn',
+    5: 'notice',
+    6: 'info',
+    7: 'debug'}
 
-# Todo: defining PROPERTY_TYPES below makes adaptions very fragile and has to go
-PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
+CSS = {
+    'button': {
+        'primary': 'btn btn-outline-primary btn-sm',
+        'secondary': 'btn btn-secondary btn-xsm'}}
 
-CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
-                  'secondary': 'btn btn-secondary btn-xsm'}}
+PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']  # Needed for type moves
+EXTERNAL_REFERENCES_FORMS = [
+    'acquisition', 'activity', 'artifact',  'feature',  'find',  'group', 'human_remains',  'move',
+    'person',  'place',  'type']
+

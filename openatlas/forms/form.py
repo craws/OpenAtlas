@@ -286,7 +286,7 @@ def add_fields(form: Any,
             form,
             'actor' if code == 'member' else 'group',
             TableMultiField(_('actor'), [InputRequired()]))
-    elif g.classes[class_].view == 'type':
+    elif class_ in g.classes and g.classes[class_].view == 'type':
         setattr(form, 'is_node_form', HiddenField())
         node = item if item else origin
         root = g.nodes[node.root[-1]] if node.root else node

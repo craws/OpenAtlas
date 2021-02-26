@@ -47,7 +47,7 @@ class ApiTests(TestBaseCase):
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Datei', 'file')

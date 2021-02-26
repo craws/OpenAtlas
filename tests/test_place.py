@@ -20,7 +20,7 @@ class PlaceTest(TestBaseCase):
             assert b'+ Place' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_node = Node.get_hierarchy('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
                 reference = Entity.insert('external_reference', 'https://openatlas.eu')

@@ -42,11 +42,12 @@ def model_index() -> str:
         property_ = g.properties[form.property.data]
         domain_is_valid = property_.find_object('domain_class_code', domain.code)
         range_is_valid = property_.find_object('range_class_code', range_.code)
-        test_result = {'domain': domain,
-                       'property': property_,
-                       'range': range_,
-                       'domain_error': False if domain_is_valid else True,
-                       'range_error': False if range_is_valid else True}
+        test_result = {
+            'domain': domain,
+            'property': property_,
+            'range': range_,
+            'domain_error': False if domain_is_valid else True,
+            'range_error': False if range_is_valid else True}
     else:
         domain = g.cidoc_classes['E1']
         property_ = g.properties['P1']
@@ -54,14 +55,15 @@ def model_index() -> str:
         form.domain.data = domain.code
         form.property.data = property_.code
         form.range.data = range_.code
-    return render_template('model/index.html',
-                           form=form,
-                           test_result=test_result,
-                           domain=domain,
-                           property=property_,
-                           range=range_,
-                           title=_('model'),
-                           crumbs=[_('model')])
+    return render_template(
+        'model/index.html',
+        form=form,
+        test_result=test_result,
+        domain=domain,
+        property=property_,
+        range=range_,
+        title=_('model'),
+        crumbs=[_('model')])
 
 
 @app.route('/overview/model/class/<code>')
@@ -72,10 +74,11 @@ def class_entities(code: str) -> str:
         'table.html',
         table=table,
         title=_('model'),
-        crumbs=[[_('model'), url_for('model_index')],
-                [_('classes'), url_for('class_index')],
-                link(g.cidoc_classes[code]),
-                _('entities')])
+        crumbs=[
+            [_('model'), url_for('model_index')],
+            [_('classes'), url_for('class_index')],
+            link(g.cidoc_classes[code]),
+            _('entities')])
 
 
 @app.route('/overview/model/class')
@@ -83,9 +86,10 @@ def class_entities(code: str) -> str:
 def class_index() -> str:
     table = Table(
         ['code', 'name', 'count'],
-        defs=[{'className': 'dt-body-right', 'targets': 2},
-              {'orderDataType': 'cidoc-model', 'targets': [0]},
-              {'sType': 'numeric', 'targets': [0]}])
+        defs=[
+            {'className': 'dt-body-right', 'targets': 2},
+            {'orderDataType': 'cidoc-model', 'targets': [0]},
+            {'sType': 'numeric', 'targets': [0]}])
     for class_id, class_ in g.cidoc_classes.items():
         count = ''
         if class_.count:
@@ -109,19 +113,20 @@ def property_index() -> str:
     properties = g.properties
     table = Table(
         ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name', 'count'],
-        defs=[{'className': 'dt-body-right', 'targets': 7},
-              {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
-              {'sType': 'numeric', 'targets': [0]}])
+        defs=[
+            {'className': 'dt-body-right', 'targets': 7},
+            {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
+            {'sType': 'numeric', 'targets': [0]}])
     for property_id, property_ in properties.items():
-        table.rows.append(
-            [link(property_),
-             property_.name,
-             property_.name_inverse,
-             link(classes[property_.domain_class_code]),
-             classes[property_.domain_class_code].name,
-             link(classes[property_.range_class_code]),
-             classes[property_.range_class_code].name,
-             format_number(property_.count) if property_.count else ''])
+        table.rows.append([
+            link(property_),
+            property_.name,
+            property_.name_inverse,
+            link(classes[property_.domain_class_code]),
+            classes[property_.domain_class_code].name,
+            link(classes[property_.range_class_code]),
+            classes[property_.range_class_code].name,
+            format_number(property_.count) if property_.count else ''])
     return render_template(
         'table.html',
         table=table,
@@ -157,10 +162,11 @@ def class_view(code: str) -> str:
         tables=tables,
         info={'code': class_.code, 'name': class_.name},
         title=_('model'),
-        crumbs=[[_('model'),
-                 url_for('model_index')],
-                [_('classes'), url_for('class_index')],
-                class_.code])
+        crumbs=[
+            [_('model'),
+             url_for('model_index')],
+            [_('classes'), url_for('class_index')],
+            class_.code])
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -182,14 +188,15 @@ def property_view(code: str) -> str:
             {'sType': 'numeric', 'targets': [0]}])
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
-    return render_template('model/property_view.html',
-                           tables=tables,
-                           property_=property_,
-                           info=info,
-                           title=_('model'),
-                           crumbs=[[_('model'), url_for('model_index')],
-                                   [_('properties'), url_for('property_index')],
-                                   property_.code])
+    return render_template(
+        'model/property_view.html',
+        tables=tables,
+        property_=property_,
+        info=info,
+        title=_('model'),
+        crumbs=[[_('model'), url_for('model_index')],
+                [_('properties'), url_for('property_index')],
+                property_.code])
 
 
 class NetworkForm(FlaskForm):  # type: ignore
@@ -222,19 +229,22 @@ class NetworkForm(FlaskForm):  # type: ignore
 def model_network(dimensions: Optional[int] = None) -> str:
     form = NetworkForm()
     form.classes.choices = []
-    params: Dict[str, Any] = {'classes': {},
-                              'options': {'orphans': form.orphans.data,
-                                          'width': form.width.data,
-                                          'height': form.height.data,
-                                          'charge': form.charge.data,
-                                          'distance': form.distance.data}}
+    params: Dict[str, Any] = {
+        'classes': {},
+        'options': {
+            'orphans': form.orphans.data,
+            'width': form.width.data,
+            'height': form.height.data,
+            'charge': form.charge.data,
+            'distance': form.distance.data}}
     for code in Network.classes:
-        form.cidoc_classes.choices.append((code, g.cidoc_classes[code].name))
+        form.classes.choices.append((code, g.cidoc_classes[code].name))
         params['classes'][code] = {'color': getattr(form, 'color_' + code).data}
-    return render_template('model/network2.html' if dimensions else 'model/network.html',
-                           form=form,
-                           dimensions=dimensions,
-                           network_params=params,
-                           json_data=Network.get_network_json(form, params, dimensions),
-                           title=_('model'),
-                           crumbs=[_('network visualization')])
+    return render_template(
+        'model/network2.html' if dimensions else 'model/network.html',
+        form=form,
+        dimensions=dimensions,
+        network_params=params,
+        json_data=Network.get_network_json(form, params, dimensions),
+        title=_('model'),
+        crumbs=[_('network visualization')])

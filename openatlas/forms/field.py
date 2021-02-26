@@ -36,14 +36,9 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         elif class_ in ['actor', 'group', 'feature', 'place']:
             table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
 
-        if class_ == 'place':
+        if class_ in ['group', 'person', 'place']:
             entities = Entity.get_by_class(
-                'place',
-                nodes=True,
-                aliases=current_user.settings['table_show_aliases'])
-        elif class_ == 'person':
-            entities = Entity.get_by_class(
-                'person',
+                class_,
                 nodes=True,
                 aliases=current_user.settings['table_show_aliases'])
         else:

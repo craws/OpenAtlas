@@ -20,7 +20,7 @@ app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
 
-if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
+if os.name == "posix":  # For non Linux systems we would need adaptions here, e.g. Windows
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 babel = Babel(app)
 debug_model: Dict[str, float] = {}
@@ -52,11 +52,12 @@ def get_locale() -> str:
 
 def connect() -> psycopg2.connect:
     try:
-        connection_ = psycopg2.connect(database=app.config['DATABASE_NAME'],
-                                       user=app.config['DATABASE_USER'],
-                                       password=app.config['DATABASE_PASS'],
-                                       port=app.config['DATABASE_PORT'],
-                                       host=app.config['DATABASE_HOST'])
+        connection_ = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'],
+            host=app.config['DATABASE_HOST'])
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover
