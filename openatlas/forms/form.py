@@ -29,6 +29,7 @@ forms = {
     'acquisition': ['name', 'date', 'description', 'continue'],
     'activity': ['name', 'date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
+    'administrative_unit': ['name', 'description', 'continue'],
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
     'bibliography': ['name', 'description', 'continue'],
     'edition': ['name', 'description', 'continue'],
@@ -37,11 +38,11 @@ forms = {
     'file': ['name', 'description'],
     'find': ['name', 'date', 'description', 'continue', 'map'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
+    'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
     'member': ['date', 'description', 'continue'],
     'move': ['name', 'date', 'description', 'continue'],
-    'node': ['name', 'description', 'continue'],
     'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
@@ -50,7 +51,7 @@ forms = {
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
-    'hierarchy': ['name', 'description'], }
+    'type': ['name', 'description', 'continue']}
 
 
 def build_form(class_: str,
@@ -58,7 +59,6 @@ def build_form(class_: str,
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
-
     # Builds a dynamic form regarding types, module settings and class specific fields
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
@@ -148,7 +148,7 @@ def customize_labels(name: str,
                      origin: Union[Entity, Node, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
-    if name == 'node':
+    if name in ('administrative_unit', 'type'):
         node = item if item else origin
         root = g.nodes[node.root[-1]] if node.root else node
         getattr(form, str(root.id)).label.text = 'super'
@@ -194,18 +194,16 @@ def add_reference_systems(form: Any, form_name: str) -> None:
         form_name = form_name.replace('_', ' ').title().replace('Node', 'Type')
         if form_name not in forms_:
             continue
-        setattr(form,
-                'reference_system_id_{id}'.format(id=system.id),
-                StringField(system.name,
-                            validators=[OptionalValidator()],
-                            description=system.description,
-                            render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
+        setattr(form, 'reference_system_id_{id}'.format(id=system.id), StringField(
+            system.name,
+            validators=[OptionalValidator()],
+            description=system.description,
+            render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
 
-        setattr(form,
-                'reference_system_precision_{id}'.format(id=system.id),
-                SelectField(uc_first(_('precision')),
-                            choices=precisions,
-                            default=system.precision_default_id))
+        setattr(form, 'reference_system_precision_{id}'.format(id=system.id), SelectField(
+            _('precision'),
+            choices=precisions,
+            default=system.precision_default_id))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
@@ -284,10 +282,11 @@ def add_fields(form: Any,
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
-        setattr(form,
-                'actor' if code == 'member' else 'group',
-                TableMultiField(_('actor'), [InputRequired()]))
-    elif class_ == 'node':
+        setattr(
+            form,
+            'actor' if code == 'member' else 'group',
+            TableMultiField(_('actor'), [InputRequired()]))
+    elif g.classes[class_].view == 'type':
         setattr(form, 'is_node_form', HiddenField())
         node = item if item else origin
         root = g.nodes[node.root[-1]] if node.root else node

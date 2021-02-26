@@ -360,11 +360,12 @@ def display_form(self: Any,
                     <div>{label}</div>
                     <div class="table-cell">{field} {unit}</div>
                 </div>
-                {value_fields}""".format(id=root.id,
-                                         label=sub.name,
-                                         unit=sub.description,
-                                         field=field_(class_='value-type'),
-                                         value_fields=display_value_type_fields(sub, root))
+                {value_fields}""".format(
+                id=root.id,
+                label=sub.name,
+                unit=sub.description,
+                field=field_(class_='value-type'),
+                value_fields=display_value_type_fields(sub, root))
         return html_
 
     html = ''
@@ -395,9 +396,10 @@ def display_form(self: Any,
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
                 onclick = 'switch_value_type({id})'.format(id=node.id)
-                html += add_row(field, label, display.button(_('show'),
-                                                             onclick=onclick,
-                                                             css='secondary'))
+                html += add_row(
+                    field,
+                    label,
+                    display.button(_('show'), onclick=onclick, css='secondary'))
                 html += display_value_type_fields(node)
                 continue
             tooltip = '' if 'is_node_form' in form else ' ' + display.tooltip(node.description)

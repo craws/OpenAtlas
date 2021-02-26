@@ -185,10 +185,11 @@ class Node(Entity):
         multiple = False
         if value_type or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
-        g.execute(sql, {'id': node.id,
-                        'name': node.name,
-                        'multiple': multiple,
-                        'value_type': value_type})
+        g.execute(sql, {
+            'id': node.id,
+            'name': node.name,
+            'multiple': multiple,
+            'value_type': value_type})
         Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
@@ -235,9 +236,10 @@ class Node(Entity):
                     sql = """
                         UPDATE model.link SET range_id = %(new_type_id)s
                         WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
-                g.execute(sql, {'old_type_id': old_node.id,
-                                'new_type_id': new_type_id,
-                                'entity_ids': tuple(entity_ids)})
+                g.execute(sql, {
+                    'old_type_id': old_node.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)})
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 

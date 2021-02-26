@@ -139,7 +139,8 @@ class Entity:
                     inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
                     self.name += ' (' + inverse + ')'
 
-        if self.class_ == 'node':
+        from openatlas.models.node import Node
+        if isinstance(self, Node):
             self.name = sanitize(self.name, 'node')
         elif self.class_ == 'object_location':
             self.name = 'Location of ' + self.name
@@ -304,7 +305,9 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(class_name: str, name: str, description: Optional[str] = None) -> Entity:
+    def insert(class_name: str,
+               name: str,
+               description: Optional[str] = None) -> Union[Entity, Node]:
         from openatlas.util.display import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover

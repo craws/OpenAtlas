@@ -25,15 +25,15 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         if Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('display_form.html', form=form)
-        save(form, value_type=True if param == 'value' else False)
+        save(form, param=param)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
-    return render_template('display_form.html',
-                           form=form,
-                           manual_page='entity/type',
-                           title=_('types'),
-                           crumbs=[[_('types'), url_for('node_index')],
-                                   '+ ' + uc_first(_(param))])
+    return render_template(
+        'display_form.html',
+        form=form,
+        manual_page='entity/type',
+        title=_('types'),
+        crumbs=[[_('types'), url_for('node_index')], '+ ' + uc_first(_(param))])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
@@ -60,20 +60,20 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     form.multiple = hierarchy.multiple
     table = Table(paging=False)
     for form_id, form_ in hierarchy.forms.items():
-        link_ = link(_('remove'),
-                     url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
+        link_ = link(
+            _('remove'),
+            url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
         count = Node.get_form_count(hierarchy, form_id)
         label = g.classes[form_['name']].label
         table.rows.append([label, format_number(count) if count else link_])
-    return render_template('display_form.html',
-                           form=form,
-                           table=table,
-                           forms=[form.id for form in form.forms],
-                           manual_page='entity/type',
-                           title=_('types'),
-                           crumbs=[[_('types'), url_for('node_index')],
-                                   hierarchy,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        table=table,
+        forms=[form.id for form in form.forms],
+        manual_page='entity/type',
+        title=_('types'),
+        crumbs=[[_('types'), url_for('node_index')], hierarchy, _('edit')])
 
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
@@ -104,14 +104,14 @@ def hierarchy_delete(id_: int) -> Response:
 
 def save(form: FlaskForm,
          node: Optional[Node] = None,
-         value_type: Optional[bool] = False) -> Node:  # type: ignore
+         param: Optional[str] = None) -> Node:
     g.cursor.execute('BEGIN')
     try:
         if node:
             Node.update_hierarchy(node, form)
         else:
-            node = Entity.insert('node', sanitize(form.name.data, ))
-            Node.insert_hierarchy(node, form, value_type)
+            node = Entity.insert('type', sanitize(form.name.data))
+            Node.insert_hierarchy(node, form, value_type=True if param == 'value' else False)
         node.update(form)
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover

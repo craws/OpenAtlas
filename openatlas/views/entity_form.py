@@ -109,7 +109,7 @@ def update(id_: int) -> Union[str, Response]:
 
     # Archaeological sub units
     geonames_module = False
-    if entity.class_.name == 'place' and  ReferenceSystem.get_by_name('GeoNames').forms:
+    if entity.class_.name == 'place' and ReferenceSystem.get_by_name('GeoNames').forms:
         geonames_module = True
     structure = None
     gis_data = None
@@ -297,9 +297,6 @@ def insert_entity(form: FlaskForm,
         entity = Entity.insert(class_, form.name.data)
         location = Entity.insert('object_location', 'Location of ' + form.name.data)
         entity.link('P53', location)
-    elif class_ == 'node':
-        root = g.nodes[origin.root[-1]] if origin.root else origin
-        entity = Entity.insert(root.class_.name, form.name.data)
     elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find', 'artifact']:
         if class_ == 'human_remains':
             entity = Entity.insert(class_, form.name.data)
@@ -334,7 +331,6 @@ def update_links(entity: Union[Entity, Node],
 
     if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'node']:
         ReferenceSystem.update_links(form, entity)
-
     if entity.class_.view == 'actor':
         if action == 'update':
             entity.delete_links(['P74', 'OA8', 'OA9'])
@@ -377,7 +373,7 @@ def update_links(entity: Union[Entity, Node],
             entity.delete_links(['P128'], inverse=True)
         if form.artifact.data:
             entity.link_string('P128', form.artifact.data, inverse=True)
-    elif isinstance(entity, Node) == 'node':
+    elif entity.class_.view == 'type':
         node = origin if origin else entity
         root = g.nodes[node.root[-1]] if node.root else node
         super_id = g.nodes[node.root[0]] if node.root else node
