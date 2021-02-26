@@ -289,8 +289,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity.linked_places = [location.get_linked_entity_safe('P53', True) for location
                                 in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
-    if entity.class_.view in ['actor', 'event', 'node', 'place', 'source', 'artifact']:
-        if entity.class_.view not in ['node', 'reference']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
+        if entity.class_.view != 'reference' and not isinstance(entity, Node):
             tabs['reference'] = Tab('reference', entity)
         if entity.class_.view in ['artifact', 'find']:
             tabs['event'] = Tab('event', entity)
