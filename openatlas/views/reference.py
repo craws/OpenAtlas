@@ -25,14 +25,14 @@ class AddReferenceForm(FlaskForm):  # type: ignore
 
 @app.route('/reference/add/<int:id_>/<class_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(id_: int, class_: str) -> Union[str, Response]:
+def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
-    form = build_add_reference_form(class_)
+    form = build_add_reference_form(view)
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.name in ['artifact', 'find'] else 'P67'
-        entity = Entity.get_by_id(getattr(form, class_).data)
+        entity = Entity.get_by_id(getattr(form, view).data)
         reference.link(property_code, entity, form.page.data)
-        return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_)
+        return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + view)
     if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template('display_form.html',

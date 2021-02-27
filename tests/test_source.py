@@ -16,7 +16,7 @@ class SourceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 origin = Entity.insert('person', 'David Duchovny', 'person')
                 actor = Entity.insert('person', 'Gillian Anderson Gillian Anderson', 'person')
-                carrier = Entity.insert('artifact', 'Artifact')
+                artifact = Entity.insert('artifact', 'I care for you')
                 file = Entity.insert('file', 'X-Files')
                 reference = Entity.insert('external_reference', 'https://openatlas.eu')
 
@@ -42,11 +42,11 @@ class SourceTest(TestBaseCase):
             rv = self.app.post(url_for('insert', class_='source'), data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(url_for('insert', class_='source', origin_id=carrier.id))
+            rv = self.app.get(url_for('insert', class_='source', origin_id=artifact.id))
             assert b'I care for you' in rv.data
             rv = self.app.post(
-                url_for('insert', class_='source', origin_id=carrier.id),
-                data={'name': 'Necronomicon', 'artifact': [carrier.id]},
+                url_for('insert', class_='source', origin_id=artifact.id),
+                data={'name': 'Necronomicon', 'artifact': [artifact.id]},
                 follow_redirects=True)
             assert b'I care for you' in rv.data
 
@@ -60,16 +60,16 @@ class SourceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Test source' in rv.data
 
-            self.app.get(url_for('source_add', id_=source.id, origin_id=actor.id, class_='actor'))
+            self.app.get(url_for('source_add', id_=source.id, origin_id=actor.id, view='actor'))
             rv = self.app.post(
-                url_for('source_add', id_=source.id, class_='actor'),
+                url_for('source_add', id_=source.id, view='actor'),
                 data={'checkbox_values': [actor.id]},
                 follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'Gillian Anderson' in rv.data
-            rv = self.app.get(url_for('source_add', id_=source.id, class_='place'))
-            assert b'Link place' in rv.data
+            rv = self.app.get(url_for('source_add', id_=source.id, view='place'))
+            assert b'Place' in rv.data
 
             # Update source
             rv = self.app.get(url_for('update', id_=source.id))

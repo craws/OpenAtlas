@@ -370,7 +370,7 @@ def update_links(entity: Union[Entity, Node],
         location = entity.get_linked_entity_safe('P53')
         location.update(form)
         Gis.insert(location, form)
-    elif entity.class_.view == 'source':
+    elif entity.class_.view == 'source' and not origin:
         if action == 'update':
             entity.delete_links(['P128'], inverse=True)
         if form.artifact.data:
@@ -408,7 +408,7 @@ def link_and_get_redirect_url(form: FlaskForm,
             origin.link('P46', entity)
         elif origin.class_.view in ['source', 'file']:
             origin.link('P67', entity)
-        elif entity.class_.view == 'source' and origin.class_.view != 'artifact':
+        elif entity.class_.view == 'source':
             entity.link('P67', origin)
         elif origin.class_.view == 'event':  # Involvement, coming from actor
             link_id = origin.link('P11', entity)[0]

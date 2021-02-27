@@ -81,26 +81,24 @@ def entity_view(id_: int) -> Union[str, Response]:
                     link(Entity.get_by_id(row.domain_id)),
                     link(Entity.get_by_id(row.range_id))])
     elif isinstance(entity, ReferenceSystem):
-        for form_id, form_ in entity.get_forms().items():
-            name = form_['name'].replace(' ', '-')
-            tabs[name] = Tab(name, origin=entity)
-            tabs[name].table = Table([_('entity'), 'id', _('precision')])
+        for form_id, form in entity.get_forms().items():
+            tabs[form['name']] = Tab(form['name'], origin=entity)
+            tabs[form['name']].table = Table([_('entity'), 'id', _('precision')])
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:
                 name = \
                     '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
                         url=entity.resolver_url + name, name=name)
-            tab_name = link_.range.class_.view.replace('_', '-')
+            tab_name = link_.range.class_.name
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
-
-        for form_id, form_ in entity.get_forms().items():
-            name = form_['name'].replace(' ', '-')
-            if not tabs[name].table.rows and is_authorized('manager'):
-                tabs[name].buttons = [button(_('remove'), url_for(
-                    'reference_system_remove_form',
-                    system_id=entity.id,
-                    form_id=form_id))]
+        for form_id, form in entity.get_forms().items():
+            if not tabs[form['name']].table.rows and is_authorized('manager'):
+                tabs[form['name']].buttons = [
+                    button(_('remove'),
+                           url_for('reference_system_remove_form',
+                                   system_id=entity.id,
+                                   form_id=form_id))]
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity)
         for link_ in entity.get_links(['P67']):

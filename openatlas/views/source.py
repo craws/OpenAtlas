@@ -15,21 +15,20 @@ from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
-@app.route('/source/add/<int:id_>/<class_>', methods=['POST', 'GET'])
+@app.route('/source/add/<int:id_>/<view>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(id_: int, class_: str) -> Union[str, Response]:
+def source_add(id_: int, view: str) -> Union[str, Response]:
     source = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=source.id) + '#tab-' + class_)
-    form = build_table_form(class_, source.get_linked_entities('P67'))
-    return render_template('form.html',
-                           form=form,
-                           title=_('source'),
-                           crumbs=[[_('source'), url_for('index', view='source')],
-                                   source,
-                                   _('link') + ' ' + g.classes[class_].label])
+        return redirect(url_for('entity_view', id_=source.id) + '#tab-' + view)
+    form = build_table_form(view, source.get_linked_entities('P67'))
+    return render_template(
+        'form.html',
+        form=form,
+        title=_('source'),
+        crumbs=[[_('source'), url_for('index', view='source')], source, _('link')])
 
 
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
@@ -86,7 +85,8 @@ def save(form: FlaskForm,
         if entity:
             logger.log_user(entity.id, 'update')
         elif source:
-            source.link('P73', Entity.insert('source_translation', form.name.data))
+            entity = Entity.insert('source_translation', form.name.data)
+            source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:
             abort(400)  # pragma: no cover, either entity or source has to be provided
