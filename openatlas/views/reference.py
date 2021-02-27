@@ -23,7 +23,7 @@ class AddReferenceForm(FlaskForm):  # type: ignore
     save = SubmitField(_('insert'))
 
 
-@app.route('/reference/add/<int:id_>/<class_>', methods=['POST', 'GET'])
+@app.route('/reference/add/<int:id_>/<view>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
@@ -35,12 +35,11 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + view)
     if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
-    return render_template('display_form.html',
-                           form=form,
-                           title=_('reference'),
-                           crumbs=[[_('reference'), url_for('index', view='reference')],
-                                   reference,
-                                   _('link')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        title=_('reference'),
+        crumbs=[[_('reference'), url_for('index', view='reference')], reference, _('link')])
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
@@ -65,7 +64,8 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     return render_template(
         'display_form.html',
         form=form,
-        crumbs=[[_(origin.class_.view), url_for('index', view=origin.class_.view)],
-                origin,
-                linked_object,
-                _('edit')])
+        crumbs=[
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            origin,
+            linked_object,
+            _('edit')])

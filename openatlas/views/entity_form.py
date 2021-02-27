@@ -392,7 +392,7 @@ def link_and_get_redirect_url(form: FlaskForm,
                               class_: str,
                               origin: Union[Entity, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
-    if origin and not isinstance(entity, Node):
+    if origin and class_ not in ('administrative_unit', 'type'):  # Can't be tested with isinstance
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.class_.view
         if origin.class_.view == 'reference':
             link_id = origin.link('P67', entity)[0]
