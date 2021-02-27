@@ -129,7 +129,7 @@ class TableSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_class('file')
         else:
             entities = Entity.get_by_view(class_)
-        table = Table(g.table_headers[class_])
+        table = Table([''] + g.table_headers[class_])
 
         selection = ''
         for entity in entities:
