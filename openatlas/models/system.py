@@ -61,6 +61,7 @@ def get_table_headers():
         'entities': ['name', 'class', 'info'],
         'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
         'feature': ['name', 'type', 'begin', 'end', 'description'],
+        'find': ['name', 'class', 'type', 'begin', 'end', 'description'],
         'file': ['name', 'license', 'size', 'extension', 'description'],
         'group': ['name', 'class', 'begin', 'end', 'description'],
         'human_remains': ['name', 'type', 'begin', 'end', 'description'],

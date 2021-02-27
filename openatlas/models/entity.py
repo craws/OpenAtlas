@@ -196,23 +196,27 @@ class Entity:
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
             self.begin_comment = form.begin_comment.data
-            self.begin_from = Date.form_to_datetime64(form.begin_year_from.data,
-                                                      form.begin_month_from.data,
-                                                      form.begin_day_from.data)
-            self.begin_to = Date.form_to_datetime64(form.begin_year_to.data,
-                                                    form.begin_month_to.data,
-                                                    form.begin_day_to.data,
-                                                    to_date=True)
+            self.begin_from = Date.form_to_datetime64(
+                form.begin_year_from.data,
+                form.begin_month_from.data,
+                form.begin_day_from.data)
+            self.begin_to = Date.form_to_datetime64(
+                form.begin_year_to.data,
+                form.begin_month_to.data,
+                form.begin_day_to.data,
+                to_date=True)
 
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
             self.end_comment = form.end_comment.data
-            self.end_from = Date.form_to_datetime64(form.end_year_from.data,
-                                                    form.end_month_from.data,
-                                                    form.end_day_from.data)
-            self.end_to = Date.form_to_datetime64(form.end_year_to.data,
-                                                  form.end_month_to.data,
-                                                  form.end_day_to.data,
-                                                  to_date=True)
+            self.end_from = Date.form_to_datetime64(
+                form.end_year_from.data,
+                form.end_month_from.data,
+                form.end_day_from.data)
+            self.end_to = Date.form_to_datetime64(
+                form.end_year_to.data,
+                form.end_month_to.data,
+                form.end_day_to.data,
+                to_date=True)
 
     def get_profile_image_id(self) -> Optional[int]:
         sql = 'SELECT i.image_id FROM web.entity_profile_image i WHERE i.entity_id = %(entity_id)s;'
@@ -459,18 +463,21 @@ class Entity:
                     OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
                 if form.desc.data else '',
                 user_clause2=' AND ul.user_id = %(user_id)s ' if form.own.data else '')
-        g.execute(sql, {'term': '%' + form.term.data + '%',
-                        'user_id': current_user.id,
-                        'classes': tuple(form.classes.data)})
+        g.execute(sql, {
+            'term': '%' + form.term.data + '%',
+            'user_id': current_user.id,
+            'classes': tuple(form.classes.data)})
 
         # Repopulate date fields with autocompleted values
-        from_date = Date.form_to_datetime64(form.begin_year.data,
-                                            form.begin_month.data,
-                                            form.begin_day.data)
-        to_date = Date.form_to_datetime64(form.end_year.data,
-                                          form.end_month.data,
-                                          form.end_day.data,
-                                          to_date=True)
+        from_date = Date.form_to_datetime64(
+            form.begin_year.data,
+            form.begin_month.data,
+            form.begin_day.data)
+        to_date = Date.form_to_datetime64(
+            form.end_year.data,
+            form.end_month.data,
+            form.end_day.data,
+            to_date=True)
         if from_date:
             string = str(from_date)
             if string.startswith('-') or string.startswith('0000'):

@@ -51,8 +51,6 @@ def entity_view(id_: int) -> Union[str, Response]:
             abort(400)
 
     event_links = None  # Needed for actor
-    structure = None  # Needed for place
-    gis_data = None  # Needed for place
     overlays = None  # Needed for place
     entity.note = User.get_note(entity)
     tabs = {'info': Tab('info')}
@@ -65,7 +63,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         for item in entity.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
             if item.class_.name in ['location', 'reference_system']:
                 continue  # pragma: no cover
-            if entity.class_.name == 'object_location':  # pragma: no cover
+            if item.class_.name == 'object_location':  # pragma: no cover
                 item = item.get_linked_entity('P53', inverse=True)
             data = [link(item)]
             if root and root.value_type:  # pragma: no cover
@@ -168,16 +166,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                     actor.first,
                     actor.last,
                     actor.description])
-        structure = get_structure(entity)
-        if structure:
-            for item in structure['subunits']:
-                tabs[item.class_.name].table.rows.append(get_base_table_data(item))
-        gis_data = Gis.get_all([entity], structure)
-        if gis_data['gisPointSelected'] == '[]' \
-                and gis_data['gisPolygonSelected'] == '[]' \
-                and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['super_id']):
-            gis_data = {}
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
             tabs[name] = Tab(name, entity)
@@ -319,6 +307,20 @@ def entity_view(id_: int) -> Union[str, Response]:
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
+    structure = None  # Needed for place
+    gis_data = None  # Needed for place
+    if entity.class_.view == 'place' or entity.class_.name in ['artifact', 'find', 'human_remains']:
+        structure = get_structure(entity)
+        if structure:
+            for item in structure['subunits']:
+                tabs[item.class_.name].table.rows.append(get_base_table_data(item))
+        gis_data = Gis.get_all([entity], structure)
+        if gis_data['gisPointSelected'] == '[]' \
+                and gis_data['gisPolygonSelected'] == '[]' \
+                and gis_data['gisLineSelected'] == '[]' \
+                and (not structure or not structure['super_id']):
+            gis_data = {}
+
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
         if entity.class_.view != 'reference' and not isinstance(entity, Node):
             tabs['reference'] = Tab('reference', entity)
@@ -382,12 +384,13 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
-    crumbs = [
-        [_(entity.class_.view.replace('_', ' ')), url_for('index', view=entity.class_.view)],
-        entity.name]
+    crumbs = [[entity.class_.label, url_for('index', view=entity.class_.view)], entity.name]
     if structure:
+        first_item = [g.classes['place'].label, url_for('index', view='place')]
+        if entity.class_.name == 'artifact':
+            first_item = [g.classes['artifact'].label, url_for('index', view='artifact')]
         crumbs = [
-            [_(entity.class_.view).replace('_', ' '), url_for('index', view=entity.class_.view)],
+            first_item,
             structure['place'],
             structure['feature'],
             structure['stratigraphic_unit'],

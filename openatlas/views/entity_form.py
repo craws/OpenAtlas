@@ -85,7 +85,7 @@ def add_crumbs(view_name: str,
             structure['feature'],
             structure['stratigraphic_unit'],
             link(origin)]
-    if view_name == 'node':
+    if view_name == 'type':
         crumbs = [[_('types'), url_for('node_index')]]
         if origin and origin.root:
             for node_id in reversed(origin.root):
@@ -154,18 +154,20 @@ def update(id_: int) -> Union[str, Response]:
                 modifier=link(logger.get_log_for_advanced_view(entity.id)['modifier']))
         return redirect(save(form, entity))
     populate_update_form(form, entity)
-    return render_template('entity/update.html',
-                           form=form,
-                           entity=entity,
-                           structure=structure,
-                           gis_data=gis_data,
-                           overlays=overlays,
-                           geonames_module=geonames_module,
-                           title=entity.name,
-                           crumbs=add_crumbs(view_name=entity.class_.view,
-                                             class_=entity.class_.name,
-                                             origin=entity,
-                                             structure=structure))
+    return render_template(
+        'entity/update.html',
+        form=form,
+        entity=entity,
+        structure=structure,
+        gis_data=gis_data,
+        overlays=overlays,
+        geonames_module=geonames_module,
+        title=entity.name,
+        crumbs=add_crumbs(
+            view_name=entity.class_.view,
+            class_=entity.class_.name,
+            origin=entity,
+            structure=structure))
 
 
 def populate_insert_form(form: FlaskForm,
@@ -390,7 +392,7 @@ def link_and_get_redirect_url(form: FlaskForm,
                               class_: str,
                               origin: Union[Entity, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
-    if origin and isinstance(entity, Node):
+    if origin and not isinstance(entity, Node):
         url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.class_.view
         if origin.class_.view == 'reference':
             link_id = origin.link('P67', entity)[0]
@@ -419,7 +421,7 @@ def link_and_get_redirect_url(form: FlaskForm,
             url = url_for('relation_update', id_=link_id, origin_id=origin.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         if isinstance(entity, Node):
-            root_id = origin.root[-1] if origin.root else origin.id
+            root_id = origin.root[-1] if isinstance(origin, Node) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
             url = url_for('insert', class_=class_, origin_id=str(super_id) if super_id else root_id)
         else:

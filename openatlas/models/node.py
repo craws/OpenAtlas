@@ -172,7 +172,7 @@ class Node(Entity):
                 except ValueError:  # Form value was a list string e.g. '[97,2798]'
                     range_ = [g.nodes[int(range_id)] for range_id in ast.literal_eval(field.data)]
                 if g.nodes[int(field.id)].class_.name == 'administrative_unit':
-                    if entity.class_.name == 'administrative_unit':
+                    if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
                 elif not isinstance(entity, Node):
                     entity.link('P2', range_)
