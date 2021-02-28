@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import (button, convert_size, external_url, format_date,
                                     get_base_table_data, get_file_path, link)
 from openatlas.util.table import Table
@@ -21,17 +22,18 @@ from openatlas.util.util import get_file_stats, is_authorized, required_group
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # To prevent additional redirects deletion is done before showing index
-        url = delete_entity(view, delete_id)
+        url = delete_entity(delete_id)
         if url:  # e.g. an error occurred and entry is shown again
             return redirect(url)
-    return render_template('entity/index.html',
-                           class_=view,
-                           table=get_table(view),
-                           buttons=get_buttons(view),
-                           gis_data=Gis.get_all() if view == 'place' else None,
-                           title=_(view.replace('_', ' ')),
-                           crumbs=[[_('admin'), url_for('admin_index')], _('file')]
-                           if view == 'file' else [_(view).replace('_', ' ')])
+    return render_template(
+        'entity/index.html',
+        class_=view,
+        table=get_table(view),
+        buttons=get_buttons(view),
+        gis_data=Gis.get_all() if view == 'place' else None,
+        title=_(view.replace('_', ' ')),
+        crumbs=[[_('admin'), url_for('admin_index')], _('file')]
+        if view == 'file' else [_(view).replace('_', ' ')])
 
 
 def get_buttons(view: str) -> List[str]:
@@ -77,21 +79,20 @@ def get_table(view: str) -> Table:
     return table
 
 
-def delete_entity(class_: str, id_: int) -> Optional[str]:
+def delete_entity(id_: int) -> Optional[str]:
     url = None
-    if class_ == 'reference_system':
-        entity = g.reference_systems[id_]
+    entity = Entity.get_by_id(id_)
+    if isinstance(entity, ReferenceSystem):
         if entity.system or not is_authorized('manager'):
             abort(403)
         if entity.forms:
             flash(_('Deletion not possible if forms are attached'), 'error')
             return url_for('entity_view', id_=id_)
-    if class_ == 'place':
-        entity = Entity.get_by_id(id_)
-        parent = None if entity.class_.name == 'place' else entity.get_linked_entity('P46', True)
+    if entity.class_.view in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('entity_view', id_=id_)
+        parent = None if entity.class_.name == 'place' else entity.get_linked_entity('P46', True)
         entity.delete()
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
@@ -102,7 +103,7 @@ def delete_entity(class_: str, id_: int) -> Optional[str]:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-        if class_ == 'file':
+        if entity.class_.name == 'file':
             try:
                 path = get_file_path(id_)
                 if path:  # Only delete file on disk if it exists to prevent a missing file error

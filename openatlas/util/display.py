@@ -379,7 +379,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.name == 'person':
                     person_data.append(linked_entity)
-                elif linked_entity.class_.name in ['artifact', 'find']:
+                elif linked_entity.class_.view == 'artifact':
                     artifact_data.append(linked_entity)
             data[_('person')] = [link(item) for item in person_data]
             data[_('artifact')] = [link(item) for item in artifact_data]

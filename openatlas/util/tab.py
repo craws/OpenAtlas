@@ -83,11 +83,11 @@ class Tab:
                     g.classes[item].label,
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            buttons = [button('link', url_for('source_add', id_=id_, view='artifact'))]
-            for item in g.view_class_mapping['artifact']:
-                buttons.append(button(
-                    g.classes[item].label,
-                    url_for('insert', class_=item, origin_id=id_)))
+            buttons = [
+                button('link', url_for('source_add', id_=id_, view='artifact')),
+                button(
+                    g.classes['artifact'].label,
+                    url_for('insert', class_='artifact', origin_id=id_))]
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
@@ -110,7 +110,8 @@ class Tab:
                     url_for('insert', class_='move', origin_id=id_))]
         elif name == 'feature':
             if current_user.settings['module_sub_units'] and class_.name == 'place':
-                buttons = [button(class_.label, url_for('insert', class_=name, origin_id=id_))]
+                buttons = [
+                    button(g.classes[name].label, url_for('insert', class_=name, origin_id=id_))]
         elif name == 'find':
             if current_user.settings['module_sub_units'] and class_.name == 'stratigraphic_unit':
                 buttons = [button(

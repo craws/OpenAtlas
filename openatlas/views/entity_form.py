@@ -49,7 +49,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     structure = None
     gis_data = None
     overlays = None
-    if view_name == 'place':
+    if view_name in ['artifact', 'place']:
         structure = get_structure(super_=origin)
         gis_data = Gis.get_all([origin] if origin else None, structure)
         overlays = Overlay.get_by_object(origin) \
@@ -116,7 +116,7 @@ def update(id_: int) -> Union[str, Response]:
     overlays = None
     location = None
 
-    if entity.class_.view == 'place':
+    if entity.class_.view in ['artifact', 'place']:
         structure = get_structure(entity)
         location = entity.get_linked_entity_safe('P53', nodes=True)
         gis_data = Gis.get_all([entity], structure)
@@ -129,7 +129,7 @@ def update(id_: int) -> Union[str, Response]:
     elif isinstance(entity, ReferenceSystem) and entity.system:
         form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
-        if entity.id in g.nodes:
+        if isinstance(entity, Node):
             valid = True
             root = g.nodes[entity.root[-1]]
             new_super_id = getattr(form, str(root.id)).data
@@ -186,7 +186,7 @@ def populate_insert_form(form: FlaskForm,
     elif view_name == 'event':
         if origin.class_.view == 'artifact':
             form.artifact.data = [origin.id]
-        elif origin.class_.view == 'place':
+        elif origin.class_.view in ['artifact', 'place']:
             if class_ == 'move':
                 form.place_from.data = origin.id
             else:
@@ -219,7 +219,7 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
             for entity in entity.get_linked_entities('P25'):
                 if entity.class_.name == 'person':
                     person_data.append(entity.id)
-                elif entity.class_.view in ['artifact']:
+                elif entity.class_.view == 'artifact':
                     object_data.append(entity.id)
             form.person.data = person_data
             form.artifact.data = object_data
@@ -364,10 +364,10 @@ def update_links(entity: Union[Entity, Node],
                 entity.link('P27', linked_place)
             if form.place_to.data:  # Link place for move to
                 entity.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
-    elif entity.class_.view == 'place':
-        if action == 'update':
-            Gis.delete_by_entity(entity)
+    elif entity.class_.view in ['artifact', 'place']:
         location = entity.get_linked_entity_safe('P53')
+        if action == 'update':
+            Gis.delete_by_entity(location)
         location.update(form)
         Gis.insert(location, form)
     elif entity.class_.view == 'source' and not origin:

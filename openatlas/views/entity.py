@@ -288,7 +288,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
         if entity.class_.view != 'reference' and not isinstance(entity, Node):
             tabs['reference'] = Tab('reference', entity)
-        if entity.class_.view in ['artifact', 'find']:
+        if entity.class_.view == 'artifact':
             tabs['event'] = Tab('event', entity)
             for link_ in entity.get_links('P25', True):
                 data = get_base_table_data(link_.domain)
@@ -335,7 +335,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
     structure = None  # Needed for place
     gis_data = None  # Needed for place
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact', 'find', 'human_remains']:
+    if entity.class_.view in ['artifact', 'place']:
         structure = get_structure(entity)
         if structure:
             for item in structure['subunits']:
