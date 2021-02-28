@@ -86,11 +86,10 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
-def api_access():  # type: ignore
+def api_access():
     def wrapper(f):  # type: ignore
         @wraps(f)
-        def wrapped(  # pragma cover
-            *args, **kwargs):  # type: ignore
+        def wrapped(*args, **kwargs):  # pragma: no cover  # type: ignore
             ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
             # Raise error if 1. User not logged in 2. API is NOT public 3. IP is not in whitelist
             if not current_user.is_authenticated and not session['settings']['api_public'] \

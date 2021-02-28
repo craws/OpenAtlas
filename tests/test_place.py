@@ -240,14 +240,15 @@ class PlaceTest(TestBaseCase):
             dimension_node_id = Node.get_hierarchy('Dimensions').subs[0]
             data = {
                 'name': 'You never find me',
-                dimension_node_id: '50',
+                dimension_node_id: 50,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
                 url_for('insert', class_='find', origin_id=stratigraphic_id),
                 data=data)
             find_id = rv.location.split('/')[-1]
-            self.app.post(url_for('update', id_=find_id), data=data)
+            rv = self.app.post(url_for('update', id_=find_id), data=data, follow_redirects=True)
+            assert b'50' in rv.data
             self.app.get(url_for('update', id_=find_id))
             data = {
                 'name': 'My human remains',

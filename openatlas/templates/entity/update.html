@@ -9,7 +9,6 @@
         </p>
     {% endif %}
     {% if entity.class_.view not in ['artifact', 'place'] %}
-        *here*
         {{ form|display_form(manual_page='entity/' + entity.class_.view) }}
         {{ entity.class_.view|display_citation_example }}
     {% else %}

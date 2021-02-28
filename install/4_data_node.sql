@@ -310,6 +310,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
     ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'),(SELECT id FROM web.form WHERE name='stratigraphic_unit')),
 
     ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='artifact')),
+    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='find')),
     ((SELECT id FROM web.hierarchy WHERE name='Sex'),(SELECT id FROM web.form WHERE name='person'));
 
 INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES

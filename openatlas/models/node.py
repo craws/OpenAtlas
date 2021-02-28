@@ -169,7 +169,9 @@ class Node(Entity):
             entity.delete_links(['P2', 'P89'])
         for field in form:
             if isinstance(field, ValueFloatField):
-                if not isinstance(entity, Node) and field.data is not None:  # Allow 0 (zero)
+                if entity.class_.name == 'object_location' or isinstance(entity, Node):
+                    continue  # pragma: no cover
+                if field.data is not None:  # Allow 0 (zero)
                     entity.link('P2', g.nodes[int(field.name)], field.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:
@@ -179,7 +181,7 @@ class Node(Entity):
                 if g.nodes[int(field.id)].class_.name == 'administrative_unit':
                     if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
-                elif not isinstance(entity, Node):
+                elif entity.class_.name != 'object_location' and not isinstance(entity, Node):
                     entity.link('P2', range_)
 
     @staticmethod

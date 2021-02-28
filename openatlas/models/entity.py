@@ -128,8 +128,9 @@ class Entity:
         from openatlas.util.display import sanitize
         if form:  # e.g. imports have no forms
             self.save_nodes(form)
-            self.set_dates(form)
-            self.update_aliases(form)
+            if self.class_.name != 'object_location':
+                self.set_dates(form)
+                self.update_aliases(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
                     setattr(self, field, getattr(form, field).data)
