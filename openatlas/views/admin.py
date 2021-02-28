@@ -43,24 +43,28 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         elif action == 'remove_logo':
             Settings.set_logo()
             return redirect(url_for('admin_index') + '#tab-file')
-    dirs = {'uploads': True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,
-            'export/sql': True if os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK) else False,
-            'export/csv': True if os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK) else False}
-    tables = {'user': Table(['username', 'name', 'group', 'email', 'newsletter', 'created',
-                             'last login', 'entities']),
-              'content':
-                  Table(['name'] + [language for language in app.config['LANGUAGES'].keys()])}
+    dirs = {
+        'uploads': True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,
+        'export/sql': True if os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK) else False,
+        'export/csv': True if os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK) else False}
+    tables = {
+        'user':
+            Table(['username', 'name', 'group', 'email', 'newsletter', 'created', 'last login',
+                   'entities']),
+        'content':
+            Table(['name'] + [language for language in app.config['LANGUAGES'].keys()])}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
-        tables['user'].rows.append([link(user),
-                                    user.real_name,
-                                    user.group,
-                                    email,
-                                    _('yes') if user.settings['newsletter'] else '',
-                                    format_date(user.created),
-                                    format_date(user.login_last_success),
-                                    format_number(count) if count else ''])
+        tables['user'].rows.append(
+            [link(user),
+             user.real_name,
+             user.group,
+             email,
+             _('yes') if user.settings['newsletter'] else '',
+             format_date(user.created),
+             format_date(user.login_last_success),
+             format_number(count) if count else ''])
     for item, languages in Content.get_content().items():
         content = [uc_first(_(item))]
         for language in app.config['LANGUAGES'].keys():
@@ -78,21 +82,23 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
         else:
             form.receiver.data = current_user.email
-    return render_template('admin/index.html',
-                           form=form,
-                           tables=tables,
-                           settings=session['settings'],
-                           writeable_dirs=dirs,
-                           disk_space_info=get_disk_space_info(),
-                           imports=Import.get_all_projects(),
-                           title=_('admin'),
-                           crumbs=[_('admin')],
-                           info={'file': get_form_settings(FilesForm()),
-                                 'general': get_form_settings(GeneralForm()),
-                                 'mail': get_form_settings(MailForm()),
-                                 'map': get_form_settings(MapForm()),
-                                 'api': get_form_settings(ApiForm()),
-                                 'modules': get_form_settings(ModulesForm())})
+    return render_template(
+        'admin/index.html',
+        form=form,
+        tables=tables,
+        settings=session['settings'],
+        writeable_dirs=dirs,
+        disk_space_info=get_disk_space_info(),
+        imports=Import.get_all_projects(),
+        title=_('admin'),
+        crumbs=[_('admin')],
+        info={
+            'file': get_form_settings(FilesForm()),
+            'general': get_form_settings(GeneralForm()),
+            'mail': get_form_settings(MailForm()),
+            'map': get_form_settings(MapForm()),
+            'api': get_form_settings(ApiForm()),
+            'modules': get_form_settings(ModulesForm())})
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
@@ -109,13 +115,13 @@ def admin_content(item: str) -> Union[str, Response]:
     content = Content.get_content()
     for language in languages:
         form.__getattribute__(language).data = content[item][language]
-    return render_template('admin/content.html',
-                           item=item,
-                           form=form,
-                           languages=languages,
-                           title=_('content'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-content'],
-                                   _(item)])
+    return render_template(
+        'admin/content.html',
+        item=item,
+        form=form,
+        languages=languages,
+        title=_('content'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-content'], _(item)])
 
 
 @app.route('/admin/check_links')
@@ -142,30 +148,32 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
     table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
                    'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
     for result in Link.check_link_duplicates():
-        table.rows.append([link(Entity.get_by_id(result.domain_id)),
-                           link(Entity.get_by_id(result.range_id)),
-                           link(g.properties[result.property_code]),
-                           result.description,
-                           link(g.nodes[result.type_id]) if result.type_id else '',
-                           format_date(result.begin_from),
-                           format_date(result.begin_to),
-                           result.begin_comment,
-                           format_date(result.end_from),
-                           format_date(result.end_to),
-                           result.end_comment,
-                           result.count])
+        table.rows.append([
+            link(Entity.get_by_id(result.domain_id)),
+            link(Entity.get_by_id(result.range_id)),
+            link(g.properties[result.property_code]),
+            result.description,
+            link(g.nodes[result.type_id]) if result.type_id else '',
+            format_date(result.begin_from),
+            format_date(result.begin_to),
+            result.begin_comment,
+            format_date(result.end_from),
+            format_date(result.end_to),
+            result.end_comment,
+            result.count])
     duplicates = False
     if table.rows:
         duplicates = True
     else:  # If no exact duplicates where found check if single types are used multiple times
-        table = Table(['entity', 'class', 'base type', 'incorrect multiple types'],
-                      rows=Link.check_single_type_duplicates())
-    return render_template('admin/check_link_duplicates.html',
-                           table=table,
-                           duplicates=duplicates,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('check link duplicates')])
+        table = Table(
+            ['entity', 'class', 'base type', 'incorrect multiple types'],
+            rows=Link.check_single_type_duplicates())
+    return render_template(
+        'admin/check_link_duplicates.html',
+        table=table,
+        duplicates=duplicates,
+        title=_('admin'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check link duplicates')])
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
@@ -181,8 +189,9 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
         abort(403)  # pragma: no cover
-    form = getattr(importlib.import_module('openatlas.forms.setting'),
-                   uc_first(category) + 'Form')()  # Get forms dynamically
+    form = getattr(
+        importlib.import_module('openatlas.forms.setting'),
+        uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
@@ -203,9 +212,10 @@ def admin_settings(category: str) -> Union[str, Response]:
         form=form,
         manual_page='admin/' + category,
         title=_('admin'),
-        crumbs=[[_('admin'),
-                 url_for('admin_index') + '#tab-' + ('data' if category == 'api' else category)],
-                _(category)])
+        crumbs=[
+            [_('admin'),
+             url_for('admin_index') + '#tab-' + ('data' if category == 'api' else category)],
+            _(category)])
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -276,35 +286,37 @@ def admin_check_dates() -> str:
             link_.description,
             link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
         tables['involvement_dates'].rows.append(data)
-    return render_template('admin/check_dates.html',
-                           tables=tables,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('check dates')])
+    return render_template(
+        'admin/check_dates.html',
+        tables=tables,
+        title=_('admin'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check dates')])
 
 
 @app.route('/admin/orphans')
 @required_group('contributor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {'orphans': Table(header),
-              'unlinked': Table(header),
-              'missing_files': Table(header),
-              'circular': Table(['entity']),
-              'nodes': Table(['name', 'root']),
-              'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
+    tables = {
+        'orphans': Table(header),
+        'unlinked': Table(header),
+        'missing_files': Table(header),
+        'circular': Table(['entity']),
+        'nodes': Table(['name', 'root']),
+        'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
     tables['circular'].rows = [[link(entity)] for entity in Entity.get_circular()]
     for entity in Entity.get_orphans():
         if isinstance(entity, ReferenceSystem):
             continue
         name = 'unlinked' if entity.class_.view else 'orphans'
-        tables[name].rows.append([link(entity),
-                                  link(entity.class_),
-                                  entity.print_standard_type(),
-                                  entity.class_.label,
-                                  format_date(entity.created),
-                                  format_date(entity.modified),
-                                  entity.description])
+        tables[name].rows.append([
+            link(entity),
+            link(entity.class_),
+            entity.print_standard_type(),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
     for node in Node.get_node_orphans():
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
@@ -313,13 +325,14 @@ def admin_orphans() -> str:
     for entity in Entity.get_by_class('file', nodes=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
-            tables['missing_files'].rows.append([link(entity),
-                                                 link(entity.class_),
-                                                 entity.print_standard_type(),
-                                                 entity.class_.label,
-                                                 format_date(entity.created),
-                                                 format_date(entity.modified),
-                                                 entity.description])
+            tables['missing_files'].rows.append([
+                link(entity),
+                link(entity.class_),
+                entity.print_standard_type(),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description])
 
     # Get orphaned files with no corresponding entity
     for file in app.config['UPLOAD_DIR'].iterdir():
@@ -331,11 +344,11 @@ def admin_orphans() -> str:
                 file.suffix,
                 link(_('download'), url_for('download_file', filename=file.name)),
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
-    return render_template('admin/check_orphans.html',
-                           tables=tables,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('orphans')])
+    return render_template(
+        'admin/check_orphans.html',
+        tables=tables,
+        title=_('admin'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('orphans')])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -385,11 +398,11 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,
             date])
-    return render_template('admin/logo.html',
-                           table=table,
-                           title=_('logo'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-files'],
-                                   _('logo')])
+    return render_template(
+        'admin/logo.html',
+        table=table,
+        title=_('logo'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-files'], _('logo')])
 
 
 @app.route('/admin/log', methods=['POST', 'GET'])
@@ -406,18 +419,19 @@ def admin_log() -> str:
                 user = link(User.get_by_id(row.user_id))
             except AttributeError:  # pragma: no cover - user already deleted
                 user = 'id ' + str(row.user_id)
-        table.rows.append([format_datetime(row.created),
-                           str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
-                           row.type,
-                           row.message,
-                           user,
-                           row.info])
-    return render_template('admin/log.html',
-                           table=table,
-                           form=form,
-                           title=_('admin'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-general'],
-                                   _('system log')])
+        table.rows.append([
+            format_datetime(row.created),
+            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
+            row.type,
+            row.message,
+            user,
+            row.info])
+    return render_template(
+        'admin/log.html',
+        table=table,
+        form=form,
+        title=_('admin'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-general'], _('system log')])
 
 
 @app.route('/admin/log/delete')
@@ -456,9 +470,9 @@ def admin_newsletter() -> Union[str, Response]:
                 user.email,
                 '<input value="{id}" name="recipient" type="checkbox" checked="checked">'.format(
                     id=user.id)])
-    return render_template('admin/newsletter.html',
-                           form=form,
-                           table=table,
-                           title=_('newsletter'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'],
-                                   _('newsletter')])
+    return render_template(
+        'admin/newsletter.html',
+        form=form,
+        table=table,
+        title=_('newsletter'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'], _('newsletter')])

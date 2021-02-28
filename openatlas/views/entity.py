@@ -99,71 +99,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                            url_for('reference_system_remove_form',
                                    system_id=entity.id,
                                    form_id=form_id))]
-    elif entity.class_.view == 'artifact':
-        tabs['source'] = Tab('source', entity)
-        for link_ in entity.get_links(['P67']):
-            range_ = link_.range
-            data = get_base_table_data(range_)
-            data.append(link_.description)
-            data = add_edit_link(
-                data,
-                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.view].table.rows.append(data)
-    elif entity.class_ == 'find':
-        tabs['source'] = Tab('source', entity)
-        tabs['event'] = Tab('event', entity)
-        for link_ in entity.get_links('P128'):
-            data = get_base_table_data(link_.range)
-            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.class_.name)
-            tabs['source'].table.rows.append(data)
-        for link_ in entity.get_links('P25', inverse=True):
-            data = get_base_table_data(link_.domain)
-            data = add_remove_link(data, link_.range.name, link_, entity, link_.range.class_.name)
-            tabs['event'].table.rows.append(data)
-    elif entity.class_.view == 'reference':
-        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
-                     'human_remains', 'artifact', 'file']:
-            tabs[name] = Tab(name, entity)
-        for link_ in entity.get_links(['P67', 'P128']):
-            range_ = link_.range
-            data = get_base_table_data(range_)
-            data.append(link_.description)
-            data = add_edit_link(
-                data,
-                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.view].table.rows.append(data)
-    elif entity.class_.view == 'place':
-        tabs['source'] = Tab('source', entity)
-        tabs['event'] = Tab('event', entity)
-        tabs['reference'] = Tab('reference', entity)
-        if entity.class_.name == 'place':
-            tabs['actor'] = Tab('actor', entity)
-            tabs['feature'] = Tab('feature', origin=entity)
-        elif entity.class_.name == 'feature':
-            tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=entity)
-        elif entity.class_.name == 'stratigraphic_unit':
-            tabs['find'] = Tab('find', origin=entity)
-            tabs['human_remains'] = Tab('human_remains', origin=entity)
-        entity.location = entity.get_linked_entity_safe('P53', nodes=True)
-        event_ids = []  # Keep track of already inserted events to prevent doubles
-        for event in entity.location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
-            tabs['event'].table.rows.append(get_base_table_data(event))
-            event_ids.append(event.id)
-        for event in entity.get_linked_entities('P24', inverse=True):
-            if event.id not in event_ids:  # Don't add again if already in table
-                tabs['event'].table.rows.append(get_base_table_data(event))
-        if 'actor' in tabs:
-            for link_ in entity.location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-                actor = Entity.get_by_id(link_.domain.id)
-                tabs['actor'].table.rows.append([
-                    link(actor),
-                    g.properties[link_.property.code].name,
-                    actor.class_.name,
-                    actor.first,
-                    actor.last,
-                    actor.description])
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
             tabs[name] = Tab(name, entity)
@@ -241,38 +176,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                         origin_id=entity.id)))
                 data = add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
-    elif entity.class_.view == 'file':
-        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
-                     'artifact', 'human_remains', 'reference', 'type']:
-            tabs[name] = Tab(name, entity)
-        entity.image_id = entity.id if get_file_path(entity.id) else None
-        for link_ in entity.get_links('P67'):
-            range_ = link_.range
-            data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links('P67', True):
-            data = get_base_table_data(link_.domain)
-            data.append(link_.description)
-            data = add_edit_link(
-                data,
-                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
-            tabs['reference'].table.rows.append(data)
-    elif entity.class_.view == 'source':
-        for name in ['actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
-                     'stratigraphic_unit', 'text']:
-            tabs[name] = Tab(name, entity)
-        for text in entity.get_linked_entities('P73', nodes=True):
-            tabs['text'].table.rows.append([
-                link(text),
-                next(iter(text.nodes)).name if text.nodes else '',
-                text.description])
-        for link_ in entity.get_links('P67'):
-            range_ = link_.range
-            data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
-            tabs[range_.class_.view].table.rows.append(data)
+    elif entity.class_.view == 'artifact':
+        tabs['source'] = Tab('source', entity)
     elif entity.class_.view == 'event':
         for name in ['subs', 'source', 'actor']:
             tabs[name] = Tab(name, entity)
@@ -304,20 +209,81 @@ def entity_view(id_: int) -> Union[str, Response]:
         entity.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-
-    structure = None  # Needed for place
-    gis_data = None  # Needed for place
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact', 'find', 'human_remains']:
-        structure = get_structure(entity)
-        if structure:
-            for item in structure['subunits']:
-                tabs[item.class_.name].table.rows.append(get_base_table_data(item))
-        gis_data = Gis.get_all([entity], structure)
-        if gis_data['gisPointSelected'] == '[]' \
-                and gis_data['gisPolygonSelected'] == '[]' \
-                and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['super_id']):
-            gis_data = {}
+    elif entity.class_.view == 'file':
+        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
+                     'artifact', 'human_remains', 'reference', 'type']:
+            tabs[name] = Tab(name, entity)
+        entity.image_id = entity.id if get_file_path(entity.id) else None
+        for link_ in entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.view].table.rows.append(data)
+        for link_ in entity.get_links('P67', True):
+            data = get_base_table_data(link_.domain)
+            data.append(link_.description)
+            data = add_edit_link(
+                data,
+                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
+            data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
+            tabs['reference'].table.rows.append(data)
+    elif entity.class_.view == 'place':
+        tabs['source'] = Tab('source', entity)
+        tabs['event'] = Tab('event', entity)
+        tabs['reference'] = Tab('reference', entity)
+        if entity.class_.name == 'place':
+            tabs['actor'] = Tab('actor', entity)
+            tabs['feature'] = Tab('feature', origin=entity)
+        elif entity.class_.name == 'feature':
+            tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=entity)
+        elif entity.class_.name == 'stratigraphic_unit':
+            tabs['find'] = Tab('find', origin=entity)
+            tabs['human_remains'] = Tab('human_remains', origin=entity)
+        entity.location = entity.get_linked_entity_safe('P53', nodes=True)
+        event_ids = []  # Keep track of already inserted events to prevent doubles
+        for event in entity.location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
+            tabs['event'].table.rows.append(get_base_table_data(event))
+            event_ids.append(event.id)
+        for event in entity.get_linked_entities('P24', inverse=True):
+            if event.id not in event_ids:  # Don't add again if already in table
+                tabs['event'].table.rows.append(get_base_table_data(event))
+        if 'actor' in tabs:
+            for link_ in entity.location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
+                actor = Entity.get_by_id(link_.domain.id)
+                tabs['actor'].table.rows.append([
+                    link(actor),
+                    g.properties[link_.property.code].name,
+                    actor.class_.name,
+                    actor.first,
+                    actor.last,
+                    actor.description])
+    elif entity.class_.view == 'reference':
+        for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
+                     'human_remains', 'artifact', 'file']:
+            tabs[name] = Tab(name, entity)
+        for link_ in entity.get_links(['P67', 'P128']):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data.append(link_.description)
+            data = add_edit_link(
+                data,
+                url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.view].table.rows.append(data)
+    elif entity.class_.view == 'source':
+        for name in ['actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
+                     'stratigraphic_unit', 'text']:
+            tabs[name] = Tab(name, entity)
+        for text in entity.get_linked_entities('P73', nodes=True):
+            tabs['text'].table.rows.append([
+                link(text),
+                next(iter(text.nodes)).name if text.nodes else '',
+                text.description])
+        for link_ in entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            tabs[range_.class_.view].table.rows.append(data)
 
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
         if entity.class_.view != 'reference' and not isinstance(entity, Node):
@@ -366,6 +332,21 @@ def entity_view(id_: int) -> Union[str, Response]:
                     continue
             data = add_remove_link(data, domain.name, link_, entity, domain.class_.view)
             tabs[domain.class_.view].table.rows.append(data)
+
+    structure = None  # Needed for place
+    gis_data = None  # Needed for place
+    if entity.class_.view == 'place' or entity.class_.name in ['artifact', 'find', 'human_remains']:
+        structure = get_structure(entity)
+        if structure:
+            for item in structure['subunits']:
+                tabs[item.class_.name].table.rows.append(get_base_table_data(item))
+        gis_data = Gis.get_all([entity], structure)
+        if gis_data['gisPointSelected'] == '[]' \
+                and gis_data['gisPolygonSelected'] == '[]' \
+                and gis_data['gisLineSelected'] == '[]' \
+                and (not structure or not structure['super_id']):
+            gis_data = {}
+
     if not gis_data:
         gis_data = Gis.get_all(entity.linked_places) if entity.linked_places else None
     entity.info_data = get_entity_data(entity, event_links=event_links)

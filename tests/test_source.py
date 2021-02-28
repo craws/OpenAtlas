@@ -17,6 +17,7 @@ class SourceTest(TestBaseCase):
                 origin = Entity.insert('person', 'David Duchovny', 'person')
                 actor = Entity.insert('person', 'Gillian Anderson Gillian Anderson', 'person')
                 artifact = Entity.insert('artifact', 'I care for you')
+                inscribed_artifact = Entity.insert('artifact', 'Artifact with text')
                 file = Entity.insert('file', 'X-Files')
                 reference = Entity.insert('external_reference', 'https://openatlas.eu')
 
@@ -74,9 +75,13 @@ class SourceTest(TestBaseCase):
             # Update source
             rv = self.app.get(url_for('update', id_=source.id))
             assert b'Test source' in rv.data
-            data = {'name': 'Source updated', 'description': 'some description'}
+            data = {
+                'name': 'Source updated',
+                'description': 'some description',
+                'artifact': str([inscribed_artifact.id])}
             rv = self.app.post(url_for('update', id_=source.id), data=data, follow_redirects=True)
             assert b'Source updated' in rv.data
+            assert b'Artifact with text' in rv.data
             rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'some description' in rv.data
 

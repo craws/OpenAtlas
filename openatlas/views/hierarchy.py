@@ -21,8 +21,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
     form = build_form('hierarchy', code=param)
     form.forms.choices = Node.get_form_choices()
     if form.validate_on_submit():
-        # Todo: duplicate check doesn't seem to work for empty hierarchies
-        if Node.get_nodes(form.name.data):
+        if Node.check_hierarchy_exists(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('display_form.html', form=form)
         save(form, param=param)

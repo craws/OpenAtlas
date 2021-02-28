@@ -57,7 +57,7 @@ def display_citation_example(self: Any, code: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
-    if entity.class_.view != 'place' or not structure or len(structure['siblings']) < 2:
+    if not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
     prev_id = None
@@ -496,7 +496,7 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
     html = ''
     for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
         css = ''
-        if (view_name.replace('node', 'types') == item) or \
+        if (view_name == item) or \
                 request.path.startswith('/index/' + item) or \
                 request.path.startswith('/insert/' + item):
             css = 'active'

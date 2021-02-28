@@ -21,11 +21,13 @@ from openatlas.util.util import required_group, send_mail
 
 
 class FeedbackForm(FlaskForm):  # type: ignore
-    subject = SelectField(_('subject'),
-                          render_kw={'autofocus': True},
-                          choices=(('suggestion', _('suggestion')),
-                                   ('question', _('question')),
-                                   ('problem', _('problem'))))
+    subject = SelectField(
+        _('subject'),
+        render_kw={'autofocus': True},
+        choices=(
+            ('suggestion', _('suggestion')),
+            ('question', _('question')),
+            ('problem', _('problem'))))
     description = TextAreaField(_('description'), [InputRequired()])
     save = SubmitField(_('send'))
 
@@ -33,10 +35,11 @@ class FeedbackForm(FlaskForm):  # type: ignore
 @app.route('/')
 @app.route('/overview')
 def overview() -> str:
-    tables = {'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-              'bookmarks': Table(['name', 'class', 'first', 'last']),
-              'notes': Table(['name', 'class', 'first', 'last', _('note')]),
-              'latest': Table(order=[[0, 'desc']])}
+    tables = {
+        'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
+        'bookmarks': Table(['name', 'class', 'first', 'last']),
+        'notes': Table(['name', 'class', 'first', 'last', _('note')]),
+        'latest': Table(order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
@@ -76,10 +79,11 @@ def overview() -> str:
                 entity.first,
                 entity.last,
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-    return render_template('index/index.html',
-                           intro=Content.get_translation('intro'),
-                           crumbs=['overview'],
-                           tables=tables)
+    return render_template(
+        'index/index.html',
+        intro=Content.get_translation('intro'),
+        crumbs=['overview'],
+        tables=tables)
 
 
 @app.route('/index/setlocale/<language>')
@@ -105,18 +109,20 @@ def index_feedback() -> Union[str, Response]:
         else:
             flash(_('error mail send'), 'error')
         return redirect(url_for('overview'))
-    return render_template('index/feedback.html',
-                           form=form,
-                           title=_('feedback'),
-                           crumbs=[_('feedback')])
+    return render_template(
+        'index/feedback.html',
+        form=form,
+        title=_('feedback'),
+        crumbs=[_('feedback')])
 
 
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
-    return render_template('index/content.html',
-                           text=Content.get_translation(item),
-                           title=_(_(item)),
-                           crumbs=[_(item)])
+    return render_template(
+        'index/content.html',
+        text=Content.get_translation(item),
+        title=_(_(item)),
+        crumbs=[_(item)])
 
 
 @app.errorhandler(400)
@@ -151,10 +157,11 @@ def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
 
 @app.route('/changelog')
 def index_changelog() -> str:
-    return render_template('index/changelog.html',
-                           title=_('changelog'),
-                           crumbs=[_('changelog')],
-                           versions=Changelog.versions)
+    return render_template(
+        'index/changelog.html',
+        title=_('changelog'),
+        crumbs=[_('changelog')],
+        versions=Changelog.versions)
 
 
 @app.route('/unsubscribe/<code>')
@@ -167,6 +174,7 @@ def index_unsubscribe(code: str) -> str:
         user.update()
         user.remove_newsletter()
         text = _('You have successfully unsubscribed. You can subscribe again in your Profile.')
-    return render_template('index/unsubscribe.html',
-                           text=text,
-                           crumbs=[_('unsubscribe newsletter')])
+    return render_template(
+        'index/unsubscribe.html',
+        text=text,
+        crumbs=[_('unsubscribe newsletter')])

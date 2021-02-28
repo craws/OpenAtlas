@@ -30,7 +30,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     if class_ == 'reference system' and not is_authorized('manager'):
         abort(403)  # pragma: no cover
-    elif class_ == 'node' and not is_authorized('editor'):
+    elif class_ in ['administrative_unit', 'type'] and not is_authorized('editor'):
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(class_, origin=origin)
@@ -180,7 +180,7 @@ def populate_insert_form(form: FlaskForm,
     elif view_name == 'actor':
         if origin.class_.name == 'place':
             form.residence.data = origin.id
-    elif view_name == 'node':
+    elif view_name == 'type':
         root_id = origin.root[-1] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id if origin.id != root_id else None
     elif view_name == 'event':
@@ -286,7 +286,7 @@ def save(form: FlaskForm,
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             url = url_for('index', view=g.classes[class_].view)
-            if class_ == 'node':
+            if class_ in ['administrative_unit', 'type']:
                 url = url_for('node_index')
     return url
 
@@ -331,7 +331,7 @@ def update_links(entity: Union[Entity, Node],
                  origin: Optional[Union[Entity, Node]]) -> None:
     # Todo: it would be better to only save changes and not delete/recreate all links
 
-    if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'node']:
+    if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'type']:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':
         if action == 'update':
@@ -419,13 +419,13 @@ def link_and_get_redirect_url(form: FlaskForm,
         elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
             link_id = origin.link('OA7', entity)[0]  # Actor with actor relation
             url = url_for('relation_update', id_=link_id, origin_id=origin.id)
+
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
-        if isinstance(entity, Node):
+        url = url_for('insert', class_=class_, origin_id=origin.id if origin else None)
+        if class_ in ('administrative_unit', 'type'):  # Can't be tested with isinstance
             root_id = origin.root[-1] if isinstance(origin, Node) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
             url = url_for('insert', class_=class_, origin_id=str(super_id) if super_id else root_id)
-        else:
-            url = url_for('insert', class_=class_, origin_id=origin.id if origin else None)
     elif hasattr(form, 'continue_') and form.continue_.data in ['sub', 'human_remains']:
         class_ = form.continue_.data
         if class_ == 'sub':

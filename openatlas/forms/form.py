@@ -43,7 +43,6 @@ forms = {
     'involvement': ['date', 'description', 'continue'],
     'member': ['date', 'description', 'continue'],
     'move': ['name', 'date', 'description', 'continue'],
-    'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
@@ -83,7 +82,7 @@ def build_form(class_: str,
     if 'description' in forms[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
-        if class_ == 'node':  # Change description field if value type
+        if class_ == 'type':  # Change description field if value type
             node = item if item else origin
             root = g.nodes[node.root[-1]] if node.root else node
             if root.value_type:
@@ -131,8 +130,9 @@ def populate_form(form: FlaskForm,
 
 
 def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
-    system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
-                    if isinstance(link_.domain, ReferenceSystem)}
+    system_links = {
+        link_.domain.id: link_ for link_ in item.get_links('P67', True)
+        if link_.domain.class_.name == 'reference_system'}  # Can't use isinstance here
     for field in form:
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
@@ -162,7 +162,7 @@ def add_buttons(form: Any,
     if entity:
         return form
     if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
+            name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -276,10 +276,6 @@ def add_fields(form: Any,
             involved_with = 'actor' if origin.class_.view == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
-    elif class_ == 'legal_body':
-        setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField(_('begins in')))
-        setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'member' and not item:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(

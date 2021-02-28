@@ -20,6 +20,11 @@ class HierarchyTest(TestBaseCase):
                 follow_redirects=True,
                 data=data)
             assert b'An entry has been created' in rv.data
+            rv = self.app.post(
+                url_for('hierarchy_insert', param='custom'),
+                follow_redirects=True,
+                data=data)
+            assert b'The name is already in use' in rv.data
             with app.test_request_context():
                 hierarchy = Node.get_hierarchy('Geronimo')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
