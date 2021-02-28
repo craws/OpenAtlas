@@ -142,7 +142,7 @@ class Entity:
         from openatlas.models.node import Node
         if isinstance(self, Node):
             self.name = sanitize(self.name, 'node')
-        elif self.class_ == 'object_location':
+        elif self.class_.name == 'object_location':
             self.name = 'Location of ' + self.name
             self.description = None
         sql = """
@@ -449,6 +449,11 @@ class Entity:
     def search(form: FlaskForm) -> ValuesView[Entity]:
         if not form.term.data:
             return {}.values()
+        classes = form.classes.data
+        if 'person' in classes:
+            classes.append('actor_appellation')
+        if 'place' in classes:
+            classes.append('appellation')
         sql = Entity.build_sql() + """
             {user_clause}
             WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
@@ -504,8 +509,6 @@ class Entity:
                 entity = Link.get_linked_entity(row.id, 'P131', True)
             elif row.system_class == 'appellation':  # If found in place alias
                 entity = Link.get_linked_entity(row.id, 'P1', True)
-            elif row.system_class not in form.classes.data:
-                entity = None
             else:
                 entity = Entity(row)
 
