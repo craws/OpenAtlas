@@ -64,7 +64,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if item.class_.name in ['location', 'reference_system']:
                 continue  # pragma: no cover
             if item.class_.name == 'object_location':  # pragma: no cover
-                item = item.get_linked_entity('P53', inverse=True)
+                item = item.get_linked_entity_safe('P53', inverse=True)
             data = [link(item)]
             if root and root.value_type:  # pragma: no cover
                 data.append(format_number(item.nodes[entity]))
@@ -374,7 +374,7 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
             structure['feature'],
             structure['stratigraphic_unit'],
             entity.name]
-    elif entity.class_.view == 'type':
+    elif isinstance(entity, Node):
         crumbs = [[_('types'), url_for('node_index')]]
         if entity.root:
             crumbs += [g.nodes[node_id] for node_id in reversed(entity.root)]
@@ -387,14 +387,14 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
     return crumbs
 
 
-def add_buttons(entity: Union[Entity, Node, ReferenceSystem]) -> List[str]:
+def add_buttons(entity: Entity) -> List[str]:
     buttons = []
     if isinstance(entity, Node):
         if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:
                 buttons.append(display_delete_link(None, entity))
-    elif entity.class_.view == 'reference_system':
+    elif isinstance(entity, ReferenceSystem):
         if is_authorized('manager'):
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.forms and not entity.system:

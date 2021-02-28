@@ -71,7 +71,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
 
 def add_crumbs(view_name: str,
                class_: str,
-               origin: Union[Entity, Node, None],
+               origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
     crumbs = [[
@@ -87,7 +87,7 @@ def add_crumbs(view_name: str,
             link(origin)]
     if view_name == 'type':
         crumbs = [[_('types'), url_for('node_index')]]
-        if origin and origin.root:
+        if isinstance(origin, Node) and origin.root:
             for node_id in reversed(origin.root):
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
@@ -274,7 +274,7 @@ def save(form: FlaskForm,
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        if action == 'update':
+        if action == 'update' and entity:
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             url = url_for('index', view=g.classes[class_].view)
@@ -282,7 +282,7 @@ def save(form: FlaskForm,
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update':
+        if action == 'update' and entity:
             url = url_for('update', id_=entity.id, origin_id=origin.id if origin else None)
         else:
             url = url_for('index', view=g.classes[class_].view)
@@ -325,12 +325,7 @@ def insert_entity(form: FlaskForm,
     return entity
 
 
-def update_links(entity: Union[Entity, Node],
-                 form: FlaskForm,
-                 action: str,
-                 origin: Optional[Union[Entity, Node]]) -> None:
-    # Todo: it would be better to only save changes and not delete/recreate all links
-
+def update_links(entity: Entity, form: FlaskForm, action: str, origin: Optional[Entity]) -> None:
     if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'type']:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':
@@ -376,7 +371,7 @@ def update_links(entity: Union[Entity, Node],
         if form.artifact.data:
             entity.link_string('P128', form.artifact.data, inverse=True)
     elif entity.class_.view == 'type':
-        node = origin if origin else entity
+        node = origin if isinstance(origin, Node) else entity
         root = g.nodes[node.root[-1]] if node.root else node
         super_id = g.nodes[node.root[0]] if node.root else node
         new_super_id = getattr(form, str(root.id)).data

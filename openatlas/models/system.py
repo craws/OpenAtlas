@@ -54,7 +54,7 @@ External reference match
 """
 
 
-def get_table_headers():
+def get_table_headers() -> Dict[str, List[str]]:
     return {
         'actor': ['name', 'class', 'begin', 'end', 'description'],
         'artifact': ['name', 'class', 'type', 'begin', 'end', 'description'],

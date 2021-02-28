@@ -63,15 +63,15 @@ def get_table(view: str) -> Table:
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
                 entity.description])
     elif view == 'reference_system':
-        for entity in g.reference_systems.values():
+        for system in g.reference_systems.values():
             table.rows.append([
-                link(entity),
-                entity.count if entity.count else '',
-                external_url(entity.website_url),
-                external_url(entity.resolver_url),
-                entity.placeholder,
-                link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
-                entity.description])
+                link(system),
+                system.count if system.count else '',
+                external_url(system.website_url),
+                external_url(system.resolver_url),
+                system.placeholder,
+                link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
+                system.description])
     else:
         classes = ['place'] if view == 'place' else g.view_class_mapping[view]
         entities = Entity.get_by_class(classes, nodes=True)

@@ -54,7 +54,7 @@ forms = {
 
 
 def build_form(class_: str,
-               item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
+               item: Optional[Union[Entity, Link]] = None,
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -144,7 +144,7 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
 
 def customize_labels(name: str,
                      form: FlaskForm,
-                     item: Optional[Entity, Link] = None,
+                     item: Optional[Union[Entity, Link]] = None,
                      origin: Union[Entity, Node, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')

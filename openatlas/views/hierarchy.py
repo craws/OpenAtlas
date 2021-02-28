@@ -103,7 +103,7 @@ def hierarchy_delete(id_: int) -> Response:
 
 def save(form: FlaskForm,
          node: Optional[Node] = None,
-         param: Optional[str] = None) -> Node:
+         param: Optional[str] = None) -> Optional[Node]:
     g.cursor.execute('BEGIN')
     try:
         if node:

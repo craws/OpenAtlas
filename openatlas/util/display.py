@@ -76,7 +76,7 @@ def tree_select(name: str) -> str:
                             tree_data=walk_tree(Node.get_nodes(name)))
 
 
-def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User'],
+def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
          url: Optional[str] = None,
          class_: Optional[str] = None,
          uc_first_: Optional[bool] = True,
@@ -130,7 +130,7 @@ def delete_link(name: str, url: str) -> str:
         js="return confirm('{x}')".format(x=_('Delete %(name)s?', name=name.replace("'", ''))))
 
 
-def uc_first(string: str) -> str:
+def uc_first(string: Optional[str] = '') -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
@@ -193,8 +193,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     return html
 
 
-def add_system_data(entity: 'Entity',
-                    data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
+def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     # Add additional information for entity views (if activated in profile)
     if not hasattr(current_user, 'settings'):
         return data  # pragma: no cover
@@ -226,8 +225,7 @@ def add_system_data(entity: 'Entity',
     return data
 
 
-def add_type_data(entity: 'Entity',
-                  data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
+def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
     type_data: OrderedDict[str, Any] = OrderedDict()
@@ -307,11 +305,9 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
            + '..' + '</span>'  # pragma: no cover
 
 
-def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
-                    event_links: Optional[List[Link]] = None  # Used for actor views
-                    ) -> Dict[str, Union[str, List[str]]]:
+def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
     """ Collect and return related information for entity views."""
-    data: Dict[str, Union[str, List[str]]] = {_('alias'): list(entity.aliases.values())}
+    data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
     from_link = ''

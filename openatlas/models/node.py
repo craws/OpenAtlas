@@ -117,7 +117,7 @@ class Node(Entity):
         return []  # pragma: no cover
 
     @staticmethod
-    def check_hierarchy_exists(name: str) -> list:
+    def check_hierarchy_exists(name: str) -> List[Node]:
         hierarchies = [root for root in g.nodes.values() if root.name == name and not root.root]
         return hierarchies
 
