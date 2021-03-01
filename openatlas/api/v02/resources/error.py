@@ -106,7 +106,7 @@ errors = {
         "status": 405
     },
     "QueryEmptyError": {
-        "message": "Query path needs one or more parameter: classes, items or entities.",
+        "message": "Query path needs one or more parameter: classes, codes or entities.",
         "status": 404
     },
     "ResourceGoneError": {

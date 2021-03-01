@@ -50,7 +50,7 @@ class ApiTests(TestBaseCase):
     #             strati = insert_entity('Strato', 'stratigraphic_unit', feature)
     #
     #             # Adding Administrative Unit Node
-    #             unit_node = Node.get_hierarchy('Administrative unit')
+    #             unit_node = Node.get_hierarchy('Administrative Unit')
     #
     #             # Adding File to place
     #             file = insert_entity('Datei', 'file')
@@ -63,7 +63,7 @@ class ApiTests(TestBaseCase):
     #
     #             # Adding Geonames
     #             geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
-    #             precision_id = Node.get_hierarchy('External reference match').subs[0]
+    #             precision_id = Node.get_hierarchy('External Reference Match').subs[0]
     #             geonames.link('P67', place, description='2761369', type_id=precision_id)
     #
     #         # Path Tests
@@ -83,7 +83,6 @@ class ApiTests(TestBaseCase):
     #         assert b'Austria' in rv.data
     #         rv = self.app.get(url_for('node_entities_all', id_=unit_node.id))
     #         assert b'Austria' in rv.data
-    #         # Todo: Expected Nostromos too, only get Asgard
     #         rv = self.app.get(
     #             url_for('query', entities=place.id, classes='E18', items='place'))
     #         assert b'Nostromos' in rv.data
