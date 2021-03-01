@@ -295,6 +295,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 tabs['event'].table.rows.append(data)
         tabs['file'] = Tab('file', entity)
         entity.image_id = entity.get_profile_image_id()
+        tabs['file'].table.header.append(uc_first(_('overlay')))
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
@@ -306,7 +307,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' and is_authorized('editor') and \
                         current_user.settings['module_map_overlay']:
-                    tabs['file'].table.header.append(uc_first(_('overlay')))
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         if domain.id in overlays:
