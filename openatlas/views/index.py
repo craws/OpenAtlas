@@ -66,7 +66,8 @@ def overview() -> str:
                     url = url_for('node_index')
                 elif name == 'find':
                     url = url_for('index', view='artifact')
-                elif name in ['feature', 'stratigraphic_unit', 'source_translation']:
+                elif name in ['feature', 'human_remains', 'stratigraphic_unit',
+                              'source_translation']:
                     url = ''
                 tables['overview'].rows.append([
                     link(g.classes[name].label, url) if url else g.classes[name].label,
