@@ -133,7 +133,6 @@ class TableSelect(HiddenInput):  # type: ignore
 
         selection = ''
         for entity in entities:
-            # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)

@@ -118,7 +118,6 @@ class Link:
                 VALUES (
                     %(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s)
                 RETURNING id;"""
-            # Todo: build only one sql and get execution out of loop
             g.execute(sql, {
                 'property_code': property_code,
                 'domain_id': domain.id,

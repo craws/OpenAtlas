@@ -94,7 +94,6 @@ class Export:
     @staticmethod
     def export_sql() -> bool:
         """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
-        # Todo: prevent exposing the database password to the process list
         if os.name == 'posix':
             command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
                 host=app.config['DATABASE_HOST'],
