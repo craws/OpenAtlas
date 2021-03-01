@@ -5,7 +5,7 @@ Object
 
 Physical objects can be entered here, these are:
 
-* Artificial objects like e.g. a coin
+* Artifact, e.g. a coin
 * Information carrier
 
 .. include:: navigation.rst
@@ -15,6 +15,7 @@ Form fields
 * :doc:`/form/name`
 * :doc:`type`
 * :doc:`/form/description`
+* :doc:`reference_system`
 
 Can be linked via tabs to
 -------------------------

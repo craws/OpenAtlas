@@ -57,10 +57,10 @@ class ObjectTest(TestBaseCase):
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            # Artificial object
-            rv = self.app.get(url_for('insert', class_='artificial_object'))
-            assert b'+ Artificial object' in rv.data
-            rv = self.app.post(url_for('insert', class_='artificial_object'),
+            # Artifact
+            rv = self.app.get(url_for('insert', class_='artifact'))
+            assert b'+ Artifact' in rv.data
+            rv = self.app.post(url_for('insert', class_='artifact'),
                                data={'name': 'Lucky coin'},
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data

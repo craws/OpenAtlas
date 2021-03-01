@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openatlas import app
 
-VERSION = '5.8.0'
+VERSION = '6.0.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 IS_UNIT_TEST = False
 
@@ -33,13 +33,10 @@ SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# Key for Thunderforest map layer
-THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
-
 # External References
 REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-EXTERNAL_REFERENCES_FORMS = ['Artificial Object', 'Event', 'Feature', 'Find', 'Group',
-                             'Human Remains', 'Legal Body', 'Person', 'Place', 'Stratigraphic Unit']
+EXTERNAL_REFERENCES_FORMS = ['Artifact', 'Event', 'Feature', 'Find', 'Group', 'Human Remains',
+                             'Legal Body', 'Person', 'Place', 'Stratigraphic Unit', 'Type']
 
 # Modules
 MODULES = ['map_overlay', 'notes', 'sub_units']

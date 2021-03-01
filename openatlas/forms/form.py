@@ -26,36 +26,35 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
 forms = {'actor_actor_relation': ['date', 'description', 'continue'],
-         'artificial_object':
-             ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'artifact': ['name', 'date', 'description', 'continue', 'map'],
          'bibliography': ['name', 'description', 'continue'],
          'edition': ['name', 'description', 'continue'],
          'external_reference': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'reference_systems', 'description', 'continue'],
-         'feature': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'event': ['name', 'date', 'description', 'continue'],
+         'feature': ['name', 'date', 'description', 'continue', 'map'],
          'file': ['name', 'description'],
-         'find': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
-         'group': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
+         'find': ['name', 'date', 'description', 'continue', 'map'],
+         'group': ['name', 'alias', 'date', 'description', 'continue'],
          'hierarchy': ['name', 'description'],
-         'human_remains': ['name', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'description', 'continue', 'map'],
          'information_carrier': ['name', 'description', 'continue'],
          'involvement': ['date', 'description', 'continue'],
          'member': ['date', 'description', 'continue'],
-         'legal_body': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
+         'node': ['name', 'description', 'continue'],
+         'legal_body': ['name', 'alias', 'date', 'description', 'continue'],
          'note': ['description'],
-         'person': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue'],
-         'place': ['name', 'alias', 'date', 'reference_systems', 'description', 'continue', 'map'],
+         'person': ['name', 'alias', 'date', 'description', 'continue'],
+         'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
          'reference_system': ['name', 'description'],
          'source': ['name', 'description', 'continue'],
          'source_translation': ['name', 'description', 'continue'],
-         'stratigraphic_unit':
-             ['name', 'date', 'reference_systems', 'description', 'continue', 'map']}
+         'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
 
 
 def build_form(name: str,
                item: Optional[Entity, Link] = None,  # The entity or link which is to be updated
                code: Optional[str] = None,
-               origin: Optional[Entity] = None,
+               origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
     # Builds a form for CIDOC CRM entities which has to be dynamic because of types,
     # module settings and class specific fields
@@ -64,7 +63,7 @@ def build_form(name: str,
         opened = HiddenField()
         validate = validate
 
-    if 'name' in forms[name]:
+    if 'name' in forms[name]:  # Set label and validators for name field
         label = _('URL') if name == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
         setattr(Form, 'name', StringField(label,
@@ -76,13 +75,18 @@ def build_form(name: str,
     code = item.class_.code if item and isinstance(item, Entity) else code
     add_types(Form, name, code)
     add_fields(Form, name, code, item, origin)
-    if 'reference_systems' in forms[name]:
-        add_reference_systems(Form, name)
+    add_reference_systems(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
+        if name == 'node':  # Change description field if value type
+            node = item if item else origin
+            root = g.nodes[node.root[-1]] if node.root else node
+            if root.value_type:
+                del Form.description
+                setattr(Form, 'description', StringField(_('unit')))
     if 'map' in forms[name]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -91,15 +95,14 @@ def build_form(name: str,
     if not item or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(name, Form(obj=item), item, location)
-    customize_labels(name, form)
+        form = populate_form(Form(obj=item), item, location)
+    customize_labels(name, form, item, origin)
     return form
 
 
-def populate_form(name: str,
-                  form: FlaskForm,
+def populate_form(form: FlaskForm,
                   item: Union[Entity, Link],
-                  location: Optional[Entity]) -> FlaskForm:
+                  location: Union[Entity, None]) -> FlaskForm:
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -120,25 +123,33 @@ def populate_form(name: str,
     for root_id, nodes_ in node_data.items():
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = nodes_
-
-    # Reference systems
-    if 'reference_systems' in forms[name]:
-        system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
-                        if link_.domain.view_name == 'reference_system'}
-        for field in form:
-            if field.id.startswith('reference_system_id_'):
-                system_id = int(field.id.replace('reference_system_id_', ''))
-                if system_id in system_links:
-                    field.data = system_links[system_id].description
-                    getattr(form, 'reference_system_precision_{id}'.format(
-                        id=system_id)).data = str(system_links[system_id].type.id)
-
+    if isinstance(item, Entity):
+        populate_reference_systems(form, item)
     return form
 
 
-def customize_labels(name: str, form: FlaskForm) -> None:
+def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
+    system_links = {link_.domain.id: link_ for link_ in item.get_links('P67', True)
+                    if link_.domain.view_name == 'reference_system'}
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            system_id = int(field.id.replace('reference_system_id_', ''))
+            if system_id in system_links:
+                field.data = system_links[system_id].description
+                getattr(form, 'reference_system_precision_{id}'.format(
+                    id=system_id)).data = str(system_links[system_id].type.id)
+
+
+def customize_labels(name: str,
+                     form: FlaskForm,
+                     item: Optional[Entity, Link] = None,
+                     origin: Union[Entity, Node, None] = None,) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
+    if name == 'node':
+        node = item if item else origin
+        root = g.nodes[node.root[-1]] if node.root else node
+        getattr(form, str(root.id)).label.text = 'super'
 
 
 def add_buttons(form: Any,
@@ -149,7 +160,7 @@ def add_buttons(form: Any,
     if entity:
         return form
     if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains'] or not origin):
+            name in ['involvement', 'find', 'human_remains', 'node'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -178,7 +189,8 @@ def add_reference_systems(form: Any, form_name: str) -> None:
         precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
     for system in g.reference_systems.values():
         forms_ = [form_['name'] for form_ in system.get_forms().values()]
-        if form_name.replace('_', ' ').title() not in forms_:
+        form_name = form_name.replace('_', ' ').title().replace('Node', 'Type')
+        if form_name not in forms_:
             continue
         setattr(form,
                 'reference_system_id_{id}'.format(id=system.id),
@@ -225,7 +237,7 @@ def add_fields(form: Any,
                name: str,
                code: Union[str, None],
                item: Union[Entity, Node, Link, None],
-               origin: Union[Entity, None]) -> None:
+               origin: Union[Entity, Node, None]) -> None:
     if name == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
@@ -275,6 +287,13 @@ def add_fields(form: Any,
         setattr(form,
                 'actor' if code == 'member' else 'group',
                 TableMultiField(_('actor'), [InputRequired()]))
+    elif name == 'node':
+        setattr(form, 'is_node_form', HiddenField())
+        node = item if item else origin
+        root = g.nodes[node.root[-1]] if node.root else node
+        setattr(form, str(root.id), TreeField(str(root.id)))
+        if root.directional:
+            setattr(form, 'name_inverse', StringField(_('inverse')))
     elif name == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
@@ -308,39 +327,6 @@ def build_add_reference_form(class_name: str) -> FlaskForm:
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
     return Form()
-
-
-def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) -> FlaskForm:
-    class Form(FlaskForm):  # type: ignore
-        name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-        is_node_form = HiddenField()
-
-    root = g.nodes[node.root[-1]] if node else root
-    setattr(Form, str(root.id), TreeField(str(root.id)))
-    if root.directional:
-        setattr(Form, 'name_inverse', StringField(_('inverse')))
-    if root.value_type:
-        setattr(Form, 'description', StringField(_('unit')))
-    else:
-        setattr(Form, 'description', TextAreaField(_('description')))
-    setattr(Form, 'save', SubmitField(uc_first(_('save') if node else _('insert'))))
-    if not node:
-        setattr(Form, 'continue_', HiddenField())
-        setattr(Form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
-    form = Form()
-    getattr(form, str(root.id)).label.text = 'super'
-
-    # Set field data if available and only if it's a GET request
-    if node and request and request.method == 'GET':
-        name_parts = node.name.split(' (')
-        form.name.data = name_parts[0]
-        form.description.data = node.description
-        if root.directional and len(name_parts) > 1:
-            form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
-        if root:  # Set super if exists and is not same as root
-            super_ = g.nodes[node.root[0]]
-            getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
-    return form
 
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
