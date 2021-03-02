@@ -168,7 +168,7 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     from openatlas.forms.field import TreeField
     html = ''
     for field in form:
-        if type(field) is TreeField:
+        if isinstance(field, TreeField):
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
     table = Table(
         header=['#', display.uc_first(_('selection'))],
@@ -333,9 +333,9 @@ def add_row(field: Field,
 
     # CSS
     css_class = 'required' if field.flags.required else ''
-    css_class += ' integer' if type(field) is IntegerField else ''
+    css_class += ' integer' if isinstance(field, IntegerField) else ''
     for validator in field.validators:
-        css_class += ' email' if type(validator) is Email else ''
+        css_class += ' email' if isinstance(validator, Email) else ''
     errors = ' <span class="error">{errors}</span>'.format(
         errors=' '.join(display.uc_first(error) for error in field.errors)) if field.errors else ''
     return """
@@ -380,13 +380,9 @@ def display_form(self: Any,
 
     html = ''
     for field in form:
-
-        # These fields will be added in combination with other fields
-        if type(field) is ValueFloatField or field.id.startswith('insert_'):
-            continue
-        if field.id.startswith('reference_system_precision'):
-            continue
-
+        if isinstance(field, ValueFloatField) or field.id.startswith(
+                ('insert_', 'reference_system_precision')):
+            continue  # These fields will be added in combination with other fields
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue

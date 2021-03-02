@@ -22,7 +22,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
     """ Table with checkboxes used in a popup for forms."""
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
-        if field.data and type(field.data) is str:
+        if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
 
@@ -339,7 +339,7 @@ class TreeSelect(HiddenInput):  # type: ignore
         selection = ''
         selected_ids = []
         if field.data:
-            field.data = field.data[0] if type(field.data) is list else field.data
+            field.data = field.data[0] if isinstance(field.data, list) else field.data
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
         html = """

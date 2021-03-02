@@ -81,7 +81,7 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
          class_: Optional[str] = None,
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
-    if type(object_) is str or type(object_) is LazyString:
+    if isinstance(object_, str):
         return '<a href="{url}" {class_} {js}>{label}</a>'.format(
             url=url,
             class_='class="' + class_ + '"' if class_ else '',
@@ -437,7 +437,6 @@ def get_base_table_data(entity: 'Entity',
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
-        # Todo: get information if date from forms
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     data.append(entity.description)

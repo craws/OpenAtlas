@@ -10,7 +10,6 @@ from openatlas.util.util import required_group
 @app.route('/reference_system/remove_form/<int:system_id>/<int:form_id>', methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_remove_form(system_id: int, form_id: int) -> Response:
-    # Todo: check if there are no form connections anymore
     try:
         g.reference_systems[system_id].remove_form(form_id)
         flash(_('info update'), 'info')
