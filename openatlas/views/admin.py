@@ -239,14 +239,6 @@ def admin_check_similar() -> str:
         crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check similar names')])
 
 
-@app.route('/admin/orphans/delete/<parameter>')
-@required_group('admin')
-def admin_orphans_delete(parameter: str) -> Response:
-    count = Entity.delete_orphans(parameter)
-    flash(_('info orphans deleted:') + ' ' + str(count), 'info')
-    return redirect(url_for('admin_orphans'))
-
-
 @app.route('/admin/check/dates')
 @required_group('contributor')
 def admin_check_dates() -> str:

@@ -11,20 +11,17 @@ class ContentTests(TestBaseCase):
 
     def test_orphans_and_newsletter(self) -> None:
         with app.app_context():  # type: ignore
-            self.app.post(url_for('insert', class_='person'), data={
-                'name': 'Oliver Twist',
-                self.precision_geonames: '',
-                self.precision_wikidata: ''})
+            self.app.post(
+                url_for('insert', class_='person'),
+                data={
+                    'name': 'Oliver Twist',
+                    self.precision_geonames: '',
+                    self.precision_wikidata: ''})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 Entity.insert('file', 'One forsaken file entity')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
-            rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
-            assert b'Oliver Twist' not in rv.data
-            self.app.get(url_for('admin_orphans_delete', parameter='unlinked'))
-            self.app.get(url_for('admin_orphans_delete', parameter='types'))
-            self.app.get(url_for('admin_orphans_delete', parameter='whatever bogus string'))
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 

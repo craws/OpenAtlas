@@ -422,29 +422,6 @@ class Entity:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def delete_orphans(parameter: str) -> int:
-        # Todo: do I really want to look into this? This function is very scary
-        return 0
-        # from openatlas.models.node import Node
-        # class_codes = tuple(app.config['CODE_CLASS'].keys()) + ('E32',)
-        # if parameter == 'orphans':
-        #     class_codes = class_codes + ('E55',)
-        #     sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
-        # elif parameter == 'unlinked':
-        #     sql_where = Entity.sql_orphan + " AND e.class_code IN %(class_codes)s"
-        # elif parameter == 'types':
-        #     count = 0
-        #     for node in Node.get_node_orphans():
-        #         node.delete()
-        #         count += 1
-        #     return count
-        # else:
-        #     return 0
-        # sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
-        # g.execute(sql, {'class_codes': class_codes})
-        # return g.cursor.rowcount
-
-    @staticmethod
     def search(form: FlaskForm) -> ValuesView[Entity]:
         if not form.term.data:
             return {}.values()
