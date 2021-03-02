@@ -97,6 +97,16 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES (
 DELETE FROM web.hierarchy_form a USING web.hierarchy_form b WHERE a.id < b.id AND a.hierarchy_id = b.hierarchy_id AND a.form_id = b.form_id;
 ALTER TABLE ONLY web.hierarchy_form ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
 
+-- Cleanup
+UPDATE model.entity SET
+    begin_from = Null,
+    begin_to = Null,
+    begin_comment = Null,
+    end_from = Null,
+    end_to = Null,
+    end_comment = Null
+WHERE system_class = 'object_location';
+
 -- ALTER TABLE model.entity DROP COLUMN system_type;
 
 END;
