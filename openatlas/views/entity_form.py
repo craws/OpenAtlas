@@ -409,9 +409,9 @@ def update_links(entity: Union[Entity, Node],
             if form.place_to.data:  # Link place for move to
                 entity.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
     elif entity.view_name == 'place':
-        if action == 'update':
-            Gis.delete_by_entity(entity)
         location = entity.get_linked_entity_safe('P53')
+        if action == 'update':
+            Gis.delete_by_entity(location)
         location.update(form)
         Gis.insert(location, form)
     elif entity.view_name == 'source':
