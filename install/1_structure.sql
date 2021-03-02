@@ -102,6 +102,7 @@ ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_form_id_key;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
@@ -1875,6 +1876,14 @@ ALTER TABLE ONLY web.form
 
 ALTER TABLE ONLY web."group"
     ADD CONSTRAINT group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hierarchy_form hierarchy_form_hierarchy_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_form
+    ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
 
 
 --

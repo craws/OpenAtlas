@@ -44,13 +44,9 @@ view_class_mapping = {
 
 """
 missing standard_types:
-
 Actor actor relation
 Actor function
 Involvement
-Administrative unit
-Historical place
-External reference match
 """
 
 

@@ -293,6 +293,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
     ((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'),(SELECT id FROM web.form WHERE name='actor_actor_relation')),
     ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'),(SELECT id FROM web.form WHERE name='place')),
     ((SELECT id FROM web.hierarchy WHERE name='Artifact'),(SELECT id FROM web.form WHERE name='artifact')),
+    ((SELECT id FROM web.hierarchy WHERE name='Artifact'),(SELECT id FROM web.form WHERE name='find')),
     ((SELECT id FROM web.hierarchy WHERE name='Bibliography'),(SELECT id FROM web.form WHERE name='bibliography')),
     ((SELECT id FROM web.hierarchy WHERE name='Edition'),(SELECT id FROM web.form WHERE name='edition')),
     ((SELECT id FROM web.hierarchy WHERE name='Event'),(SELECT id FROM web.form WHERE name='acquisition')),

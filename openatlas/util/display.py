@@ -81,7 +81,7 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
          class_: Optional[str] = None,
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
-    if isinstance(object_, str):
+    if isinstance(object_, (str, LazyString)):
         return '<a href="{url}" {class_} {js}>{label}</a>'.format(
             url=url,
             class_='class="' + class_ + '"' if class_ else '',

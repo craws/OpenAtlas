@@ -86,9 +86,16 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
     (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'move') FROM web.hierarchy_form hf
     JOIN web.form f ON hf.form_id = f.id AND f.name = 'event');
-DELETE FROM web.form WHERE name = 'event';
+DELETE FROM web.form WHERE name IN ('event', 'information_carrier', 'legal_body');
 
-DELETE FROM web.form WHERE name IN ('information_carrier', 'legal_body');
+-- Connect find with standard artifact type
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES (
+    (SELECT id FROM web.hierarchy WHERE name = 'Artifact'),
+    (SELECT id FROM web.form WHERE name = 'find'));
+
+-- Remove duplicates, set combined unique key (form_id, hierarchy_id) in web.hierarchy_form
+DELETE FROM web.hierarchy_form a USING web.hierarchy_form b WHERE a.id < b.id AND a.hierarchy_id = b.hierarchy_id AND a.form_id = b.form_id;
+ALTER TABLE ONLY web.hierarchy_form ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
 
 -- ALTER TABLE model.entity DROP COLUMN system_type;
 

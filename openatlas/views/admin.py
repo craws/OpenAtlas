@@ -145,8 +145,9 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
         flash(_('deleted links') + ': ' + delete_count, 'info')
         return redirect(url_for('admin_check_link_duplicates'))
-    table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
-                   'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
+    table = Table(
+        ['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from', 'begin_to',
+         'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
     for result in Link.check_link_duplicates():
         table.rows.append([
             link(Entity.get_by_id(result.domain_id)),
