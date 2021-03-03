@@ -39,6 +39,6 @@ class GetSubunit(Resource):  # type: ignore
             for n in structure['subunits']:
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('entity', id_=n.id, _external=True)})
-        else:  # pragma: no cover
-            raise InvalidSubunitError
+        else:
+            raise InvalidSubunitError  # pragma: no cover
         return data
