@@ -39,7 +39,7 @@ class Pagination:
         for r in entity_limit[:int(parser['limit'])]:
             entities_result.append(GeoJsonEntity.get_entity(r, parser))
         result = {"result": entities_result,
-                  "pagination": [
+                  "pagination":
                       {'entity_per_page': int(parser['limit']), 'entities': entities_count,
-                       'index': index, 'total_pages': len(index)}]}
+                       'index': index, 'total_pages': len(index)}}
         return result
