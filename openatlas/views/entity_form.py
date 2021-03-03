@@ -78,7 +78,7 @@ def add_crumbs(view_name: str,
         origin.class_.label if origin else _(view_name.replace('_', ' ')),
         url_for('index', view=origin.class_.view if origin else view_name)],
         link(origin)]
-    if structure:
+    if structure and (not origin or not origin.class_.name == 'artifact'):
         crumbs = [
             [_('place'), url_for('index', view='place')],
             structure['place'] if origin.class_.name != 'place' else '',

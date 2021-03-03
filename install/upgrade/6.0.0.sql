@@ -97,6 +97,14 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES (
 DELETE FROM web.hierarchy_form a USING web.hierarchy_form b WHERE a.id < b.id AND a.hierarchy_id = b.hierarchy_id AND a.form_id = b.form_id;
 ALTER TABLE ONLY web.hierarchy_form ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
 
+-- Add locations to former information carrier to be to use maps for them as artifacts
+-- If there are duplicate information carrier names they will have to be made unique before
+INSERT INTO model.entity (class_code, system_class, name)
+    (SELECT 'E53', 'object_location', 'Location of ' || name FROM model.entity WHERE system_type = 'information carrier');
+INSERT INTO model.link (property_code, domain_id, range_id)
+    (SELECT 'P53', i.id, l.id FROM model.entity i JOIN model.entity l ON 'Location of ' || i.name = l.name WHERE i.system_type = 'information carrier');
+
+
 -- Cleanup
 UPDATE model.entity SET
     begin_from = Null,
