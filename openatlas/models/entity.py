@@ -20,6 +20,7 @@ from openatlas.forms.date import format_date
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
+    from openatlas.models.reference_system import ReferenceSystem
 
 
 class Entity:
@@ -46,8 +47,8 @@ class Entity:
         self.reference_systems: List[Link] = []  # Links to external reference systems
         self.note: Optional[str] = None  # User specific, private note for an entity
         self.origin_id: Optional[int] = None  # For navigation when coming from another entity
-        self.image_id: Optional[int] = None  # Set in entity view and used for profile image
-        self.linked_places = []  # Set in entity view and used to show related places on map
+        self.image_id: Optional[int] = None  # Set in view and used for profile image
+        self.linked_places: List[Entity] = []  # Set in view and used to show related places on map
         self.location: Optional[Entity] = None  # The respective location if entity is a place
 
         # Dates
@@ -74,11 +75,13 @@ class Entity:
         self.view_name = ''
         if self.system_type == 'file':
             self.view_name = 'file'
+        elif self.system_type == 'artifact':
+            self.view_name = 'object'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
             self.view_name = 'translation'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
-        elif self.class_.code == 'E55':
+        elif self.class_.code == 'E55' or self.class_.code == 'E53' and not self.system_type:
             self.view_name = 'node'
         elif self.class_.code == 'E32':
             self.view_name = 'reference_system'
@@ -141,7 +144,7 @@ class Entity:
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
         from openatlas.util.display import sanitize
-        if form:
+        if form:  # e.g. imports have no forms
             self.save_nodes(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
@@ -151,6 +154,11 @@ class Entity:
             if hasattr(form, 'alias') and (self.system_type == 'place' or
                                            self.class_.code in app.config['CLASS_CODES']['actor']):
                 self.update_aliases(form)
+            if hasattr(form, 'name_inverse'):  # a directional node, e.g. actor actor relation
+                self.name = form.name.data.replace('(', '').replace(')', '').strip()
+                if form.name_inverse.data.strip():
+                    inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
+                    self.name += ' (' + inverse + ')'
 
         if self.class_.code == 'E53':
             self.name = sanitize(self.name, 'node')
@@ -235,12 +243,10 @@ class Entity:
         if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
             return ''
         root_name = self.view_name.title()
-        if self.view_name in ['reference', 'place']:
+        if self.view_name in ['reference', 'place', 'object']:
             root_name = self.system_type.title()
         elif self.view_name == 'file':
             root_name = 'License'
-        elif self.class_.code == 'E84':
-            root_name = 'Information Carrier'
         root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
@@ -332,7 +338,9 @@ class Entity:
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(id_: int, nodes: bool = False, aliases: bool = False) -> Entity:
+    def get_by_id(id_: int,
+                  nodes: bool = False,
+                  aliases: bool = False) -> Union[Entity, Node, 'ReferenceSystem']:
         if id_ in g.nodes:
             return g.nodes[id_]
         if id_ in g.reference_systems:
@@ -384,7 +392,6 @@ class Entity:
 
     @staticmethod
     def get_by_menu_item(menu_item: str) -> List[Entity]:
-        # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
@@ -392,6 +399,10 @@ class Entity:
         elif menu_item == 'reference':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
+        elif menu_item == 'object':
+            sql = Entity.build_sql(nodes=True) + """
+                WHERE e.class_code IN %(codes)s OR e.system_type = 'artifact'
+                GROUP BY e.id;"""
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
                               current_user.settings['table_show_aliases'] else False
@@ -489,7 +500,9 @@ class Entity:
             user_clause="""
                 LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
             description_clause="""
-                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s)) """
+                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
             if form.desc.data else '',
             user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []

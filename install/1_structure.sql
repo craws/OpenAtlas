@@ -818,7 +818,7 @@ ALTER TABLE model.property_id_seq OWNER TO openatlas;
 ALTER SEQUENCE model.property_id_seq OWNED BY model.property.id;
 
 
-SET default_with_oids = true;
+SET default_with_oids = false;
 
 --
 -- Name: property_inheritance; Type: TABLE; Schema: model; Owner: openatlas

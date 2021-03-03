@@ -332,7 +332,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     # Class specific information
     # Todo: like in views/entity this if/else is too long and error prone
     if entity.view_name == 'node':
-        data[_('super')] = link(g.nodes[entity.root[-1]])
+        data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
@@ -363,7 +363,7 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.code == 'E21':
                     person_data.append(linked_entity)
-                elif linked_entity.class_.code == 'E84':
+                elif linked_entity.class_.code in ['E22', 'E84']:
                     object_data.append(linked_entity)
             data[_('person')] = [link(object_) for object_ in person_data]
             data[_('object')] = [link(object_) for object_ in object_data]
@@ -542,7 +542,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = Date.datetime64_to_timestamp(value)
-        return date_ if date_ else ''
+        return date_.lstrip('0') if date_ else ''
     return value.date().isoformat()
 
 

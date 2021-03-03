@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openatlas import app
 
-VERSION = '5.7.0'
+VERSION = '6.0.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 IS_UNIT_TEST = False
 
@@ -38,14 +38,14 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # External References
 REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-EXTERNAL_REFERENCES_FORMS = ['Event', 'Feature', 'Find', 'Group', 'Human_Remains', 'Legal Body',
-                             'Person', 'Place', 'Stratigraphic Unit']
+EXTERNAL_REFERENCES_FORMS = ['Artifact', 'Event', 'Feature', 'Find', 'Group', 'Human Remains',
+                             'Legal Body', 'Person', 'Place', 'Stratigraphic Unit', 'Type']
 
 # Modules
 MODULES = ['map_overlay', 'notes', 'sub_units']
 
 # API
-API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
+API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS),  # Todo: move to backend config
 ALLOWED_IPS = ['127.0.0.1']  # Todo: move to backend config
 
