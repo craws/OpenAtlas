@@ -86,6 +86,15 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
     (SELECT hf.hierarchy_id, (SELECT id FROM web.form WHERE name = 'move') FROM web.hierarchy_form hf
     JOIN web.form f ON hf.form_id = f.id AND f.name = 'event');
+
+-- Split references systems for events to 3 sub forms
+INSERT INTO web.reference_system_form (reference_system_id, form_id)
+    (SELECT rsf.reference_system_id, (SELECT id FROM web.form WHERE name = 'activity') FROM web.reference_system_form rsf WHERE rsf.form_id = (SELECT id FROM web.form WHERE name = 'event'));
+INSERT INTO web.reference_system_form (reference_system_id, form_id)
+    (SELECT rsf.reference_system_id, (SELECT id FROM web.form WHERE name = 'acquisition') FROM web.reference_system_form rsf WHERE rsf.form_id = (SELECT id FROM web.form WHERE name = 'event'));
+INSERT INTO web.reference_system_form (reference_system_id, form_id)
+    (SELECT rsf.reference_system_id, (SELECT id FROM web.form WHERE name = 'move') FROM web.reference_system_form rsf WHERE rsf.form_id = (SELECT id FROM web.form WHERE name = 'event'));
+
 DELETE FROM web.form WHERE name IN ('event', 'information_carrier', 'legal_body');
 
 -- Connect find with standard artifact type

@@ -42,38 +42,31 @@ view_class_mapping = {
     'type': ['administrative_unit', 'type'],
     'source_translation': ['source_translation']}
 
-"""
-missing standard_types:
-Actor actor relation
-Actor function
-Involvement
-"""
-
 
 def get_table_headers() -> Dict[str, List[str]]:
-    return {
+    headers = {
         'actor': ['name', 'class', 'begin', 'end', 'description'],
         'artifact': ['name', 'class', 'type', 'begin', 'end', 'description'],
         'entities': ['name', 'class', 'info'],
         'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
-        'feature': ['name', 'type', 'begin', 'end', 'description'],
-        'find': ['name', 'class', 'type', 'begin', 'end', 'description'],
         'file': ['name', 'license', 'size', 'extension', 'description'],
-        'group': ['name', 'class', 'begin', 'end', 'description'],
-        'human_remains': ['name', 'type', 'begin', 'end', 'description'],
         'member': ['member', 'function', 'first', 'last', 'description'],
         'member_of': ['member of', 'function', 'first', 'last', 'description'],
         'type': ['name', 'description'],
-        'person': ['name', 'class', 'begin', 'end', 'description'],
         'place': ['name', 'type', 'begin', 'end', 'description'],
         'relation': ['relation', 'actor', 'first', 'last', 'description'],
         'reference': ['name', 'class', 'type', 'description'],
-        'reference_system': ['name', 'count', 'website URL', 'resolver URL', 'example ID',
-                             'default precision', 'description'],
+        'reference_system':
+            ['name', 'count', 'website URL', 'resolver URL', 'example ID', 'default precision',
+             'description'],
         'source': ['name', 'type', 'description'],
         'subs': ['name', 'count', 'info'],
-        'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
         'text': ['text', 'type', 'content']}
+
+    for view in ['actor', 'artifact', 'event', 'place']:
+        for class_ in view_class_mapping[view]:
+            headers[class_] = headers[view]
+    return headers
 
 
 def get_class_view_mapping() -> Dict['str', 'str']:
