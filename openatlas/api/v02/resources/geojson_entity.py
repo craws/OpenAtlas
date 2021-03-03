@@ -111,7 +111,7 @@ class GeoJsonEntity:
             return {'type': 'GeometryCollection', 'geometries': geom}
 
     @staticmethod
-    def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+    def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
         ref = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if link.domain.class_.code == 'E32':
@@ -172,7 +172,7 @@ class GeoJsonEntity:
         # Geometry
         if 'geometry' in parser['show'] and entity.class_.code == 'E53':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
-        elif 'geometry' in parser['show'] and entity.class_.code == 'E18':
+        if 'geometry' in parser['show'] and entity.class_.code == 'E18':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(
                 Link.get_linked_entity(entity.id, 'P53'))
 

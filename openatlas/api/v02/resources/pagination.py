@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Union
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
@@ -10,7 +10,7 @@ class Pagination:
 
     @staticmethod
     def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[
-        str, List[Dict[str, Any]]]:
+        str, object]:
         index = []
         total = []
         for e in entities:

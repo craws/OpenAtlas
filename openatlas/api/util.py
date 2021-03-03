@@ -26,10 +26,10 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
     if license_:
         if parser['download']:
             return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
-        if parser['thumbnail']:
-            return send_file(
-                ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
-                                                  parser['thumbnail']), mimetype='image/jpeg')
+        # if parser['thumbnail']:
+        #     return send_file(
+        #         ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
+        #                                           parser['thumbnail']), mimetype='image/jpeg')
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise AccessDeniedError
 

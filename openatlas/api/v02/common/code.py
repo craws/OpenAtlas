@@ -24,7 +24,7 @@ class GetByCode(Resource):  # type: ignore
             parser=parser)
         template = GeoJson.pagination(parser['show'])
         if parser['count']:
-            return jsonify(code_['pagination'][0]['entities'])
+            return jsonify(code_['pagination']['entities'])
         if parser['download']:
             return Download.download(data=code_, template=template, name=code)
         return marshal(code_, template), 200
