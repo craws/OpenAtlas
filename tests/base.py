@@ -52,7 +52,7 @@ class TestBaseCase(unittest.TestCase):
 def insert_entity(name: str,
                   class_: str,
                   origin: Optional[Entity] = None,
-                  description: Optional[str] = None) -> Optional[Entity]:
+                  description: Optional[str] = None) -> Entity:
     entity = None
     if class_ in ['place', 'feature', 'stratigraphic_unit']:
         if class_ == 'place':
