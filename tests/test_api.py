@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
@@ -16,6 +17,7 @@ from tests.base import TestBaseCase, insert_entity
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
+        pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()
@@ -29,11 +31,15 @@ class ApiTests(TestBaseCase):
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
 
+                location = place.get_linked_entity_safe('P53')
+                Gis.add_example_geom(location)
+                location = place.get_linked_entity_safe('P53')
+
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
 
                 # Adding Alias
-                alias = insert_entity('Cargo hauler', 'alias')
+                alias = insert_entity('Cargo hauler', 'appellation')
                 place.link('P1', alias)
 
                 # Adding External Reference
@@ -47,7 +53,7 @@ class ApiTests(TestBaseCase):
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
@@ -60,7 +66,7 @@ class ApiTests(TestBaseCase):
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy('External Reference Match').subs[0]
+                precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
             # Path Tests

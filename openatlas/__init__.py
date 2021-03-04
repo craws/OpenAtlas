@@ -20,7 +20,7 @@ app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
 
-if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
+if os.name == "posix":  # For non Linux systems we would need adaptions here, e.g. Windows
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 babel = Babel(app)
 debug_model: Dict[str, float] = {}
@@ -52,11 +52,12 @@ def get_locale() -> str:
 
 def connect() -> psycopg2.connect:
     try:
-        connection_ = psycopg2.connect(database=app.config['DATABASE_NAME'],
-                                       user=app.config['DATABASE_USER'],
-                                       password=app.config['DATABASE_PASS'],
-                                       port=app.config['DATABASE_PORT'],
-                                       host=app.config['DATABASE_HOST'])
+        connection_ = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'],
+            host=app.config['DATABASE_HOST'])
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover
@@ -82,12 +83,19 @@ def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
-    g.classes = CidocClass.get_all()
-    g.properties = CidocProperty.get_all()
-    g.nodes = Node.get_all_nodes()
-    g.reference_systems = ReferenceSystem.get_all()
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
+    g.cidoc_classes = CidocClass.get_all()
+    g.properties = CidocProperty.get_all()
+    from openatlas.models.system import (get_system_classes, get_class_view_mapping,
+                                         get_table_headers, view_class_mapping)
+    g.table_headers = get_table_headers()
+    g.classes = get_system_classes()
+    g.view_class_mapping = view_class_mapping
+    g.class_view_mapping = get_class_view_mapping()
+    g.nodes = Node.get_all_nodes()
+    g.reference_systems = ReferenceSystem.get_all()
+
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
 
@@ -101,9 +109,6 @@ def apply_caching(response: Response) -> Response:
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'
-
-    # Todo: activate Content-Security-Policy after removal of every inline CSS and JavaScript
-    # response.headers['Content-Security-Policy'] = "default-src 'self'"
     return response
 
 

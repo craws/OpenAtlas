@@ -25,7 +25,7 @@
                         {% if 'manager'|is_authorized %}
                             {{  _('edit')|button(url_for('admin_settings', category='files')) }}
                         {% endif %}
-                        {{ _('list')|button(url_for('index', class_='file')) }}
+                        {{ _('list')|button(url_for('index', view='file')) }}
                         {{ _('file')|button(url_for('insert', class_='file')) }}
                     </div>
                     <div style="float:left;">

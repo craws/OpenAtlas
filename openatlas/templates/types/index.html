@@ -37,7 +37,7 @@
                                                       style="width:8em;"
                                                       type="text">
                                                     {% if 'editor'|is_authorized and not node.locked %}
-                                                      {{ ''|button(url_for('insert', class_='node', origin_id=node.id)) }}
+                                                      {{ ''|button(url_for('insert', class_='type' if type_ != 'places' else 'administrative_unit', origin_id=node.id)) }}
                                                     {% endif %}
                                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                                                         {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}
@@ -60,7 +60,7 @@
                                                     <p style="margin-top:0;">
                                                         <strong>{{ _('forms')|uc_first }}</strong>:
                                                         {% for form in node.forms.values() %}
-                                                            {{ form.name }}{{ "," if not loop.last }}
+                                                            {{ form.label }}{{ "," if not loop.last }}
                                                         {% endfor %}
                                                     </p>
                                                 {% endif %}

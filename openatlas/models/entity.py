@@ -1,7 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-import itertools
 from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
 
 from flask import g, request
@@ -12,11 +11,11 @@ from psycopg2.extras import NamedTupleCursor
 from werkzeug.exceptions import abort
 
 from openatlas import app
+from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
 from openatlas.util.display import get_file_extension, link
 from openatlas.util.util import is_authorized
-from openatlas.forms.date import format_date
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -42,14 +41,15 @@ class Entity:
         self.description = row.description if row.description else ''
         self.created = row.created
         self.modified = row.modified
-        self.class_ = g.classes[row.class_code]  # The CIDOC class
-        self.system_type = row.system_type  # Internal type to differ between same CIDOC classes
+        self.cidoc_class = g.cidoc_classes[row.class_code]  # The CIDOC class
+        self.class_ = g.classes[row.system_class]  # Internal class
         self.reference_systems: List[Link] = []  # Links to external reference systems
         self.note: Optional[str] = None  # User specific, private note for an entity
         self.origin_id: Optional[int] = None  # For navigation when coming from another entity
         self.image_id: Optional[int] = None  # Set in view and used for profile image
         self.linked_places: List[Entity] = []  # Set in view and used to show related places on map
         self.location: Optional[Entity] = None  # The respective location if entity is a place
+        self.info_data: Dict[str, Union[str, List[str], None]]  # Used for detail views
 
         # Dates
         self.begin_from = None
@@ -70,24 +70,6 @@ class Entity:
             self.first = format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = format_date(self.end_from, 'year') if self.end_from else None
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
-
-        # view_name is used in views, e.g. person and group both have view_name actor
-        self.view_name = ''
-        if self.system_type == 'file':
-            self.view_name = 'file'
-        elif self.system_type == 'artifact':
-            self.view_name = 'object'
-        elif self.class_.code == 'E33' and self.system_type == 'source translation':
-            self.view_name = 'translation'
-        elif self.class_.code in app.config['CODE_CLASS']:
-            self.view_name = app.config['CODE_CLASS'][self.class_.code]
-        elif self.class_.code == 'E55' or self.class_.code == 'E53' and not self.system_type:
-            self.view_name = 'node'
-        elif self.class_.code == 'E32':
-            self.view_name = 'reference_system'
-        self.table_name = self.view_name  # Used to build tables
-        if self.view_name == 'place':
-            self.table_name = self.system_type.replace(' ', '_')
 
     sql_orphan = """
         SELECT e.id FROM model.entity e
@@ -127,7 +109,7 @@ class Entity:
                     range_: str,
                     description: Optional[str] = None,
                     inverse: bool = False) -> List[int]:
-        # range_ string from a form, can be empty, an int or an int list presentation
+        # range_ = string value from a form, can be empty, an int or an int list presentation
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
@@ -146,43 +128,44 @@ class Entity:
         from openatlas.util.display import sanitize
         if form:  # e.g. imports have no forms
             self.save_nodes(form)
+            if self.class_.name != 'object_location':
+                self.set_dates(form)
+                self.update_aliases(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
                     setattr(self, field, getattr(form, field).data)
-            if hasattr(form, 'begin_year_from'):
-                self.set_dates(form)
-            if hasattr(form, 'alias') and (self.system_type == 'place' or
-                                           self.class_.code in app.config['CLASS_CODES']['actor']):
-                self.update_aliases(form)
-            if hasattr(form, 'name_inverse'):  # a directional node, e.g. actor actor relation
+            if hasattr(form, 'name_inverse'):  # A directional node, e.g. actor actor relation
                 self.name = form.name.data.replace('(', '').replace(')', '').strip()
                 if form.name_inverse.data.strip():
                     inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
                     self.name += ' (' + inverse + ')'
 
-        if self.class_.code == 'E53':
+        from openatlas.models.node import Node
+        if isinstance(self, Node):
             self.name = sanitize(self.name, 'node')
-        if self.system_type == 'place location':
+        elif self.class_.name == 'object_location':
             self.name = 'Location of ' + self.name
             self.description = None
         sql = """
-            UPDATE model.entity SET
-            (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment)
-                = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s,
+            UPDATE model.entity SET (name, description, begin_from, begin_to, begin_comment, 
+                end_from, end_to, end_comment)
+            = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s,
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.execute(sql, {'id': self.id,
-                        'name': str(self.name).strip(),
-                        'begin_from': Date.datetime64_to_timestamp(self.begin_from),
-                        'begin_to': Date.datetime64_to_timestamp(self.begin_to),
-                        'end_from': Date.datetime64_to_timestamp(self.end_from),
-                        'end_to': Date.datetime64_to_timestamp(self.end_to),
-                        'begin_comment': str(self.begin_comment).strip() if
-                        self.begin_comment else None,
-                        'end_comment': str(self.end_comment).strip() if self.end_comment else None,
-                        'description': sanitize(self.description, 'text')})
+        g.execute(sql, {
+            'id': self.id,
+            'name': str(self.name).strip(),
+            'begin_from': Date.datetime64_to_timestamp(self.begin_from),
+            'begin_to': Date.datetime64_to_timestamp(self.begin_to),
+            'end_from': Date.datetime64_to_timestamp(self.end_from),
+            'end_to': Date.datetime64_to_timestamp(self.end_to),
+            'begin_comment': str(self.begin_comment).strip() if self.begin_comment else None,
+            'end_comment': str(self.end_comment).strip() if self.end_comment else None,
+            'description': sanitize(self.description, 'text')})
 
     def update_aliases(self, form: FlaskForm) -> None:
+        if not hasattr(form, 'alias'):
+            return
         old_aliases = self.aliases
         new_aliases = form.alias.data
         delete_ids = []
@@ -191,19 +174,21 @@ class Entity:
                 new_aliases.remove(alias)
             else:
                 delete_ids.append(id_)
-        for id_ in delete_ids:  # Delete obsolete aliases
-            Entity.delete_(id_)
+        Entity.delete_(delete_ids)  # Delete obsolete aliases
         for alias in new_aliases:  # Insert new aliases if not empty
-            if alias.strip() and self.class_.code == 'E18':
-                self.link('P1', Entity.insert('E41', alias))
-            elif alias.strip():
-                self.link('P131', Entity.insert('E82', alias))
+            if alias.strip():
+                if self.class_.view == 'actor':
+                    self.link('P131', Entity.insert('actor_appellation', alias))
+                else:
+                    self.link('P1', Entity.insert('appellation', alias))
 
     def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import Node
         Node.save_entity_nodes(self, form)
 
     def set_dates(self, form: FlaskForm) -> None:
+        if not hasattr(form, 'begin_year_from'):
+            return
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -212,23 +197,27 @@ class Entity:
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
             self.begin_comment = form.begin_comment.data
-            self.begin_from = Date.form_to_datetime64(form.begin_year_from.data,
-                                                      form.begin_month_from.data,
-                                                      form.begin_day_from.data)
-            self.begin_to = Date.form_to_datetime64(form.begin_year_to.data,
-                                                    form.begin_month_to.data,
-                                                    form.begin_day_to.data,
-                                                    to_date=True)
+            self.begin_from = Date.form_to_datetime64(
+                form.begin_year_from.data,
+                form.begin_month_from.data,
+                form.begin_day_from.data)
+            self.begin_to = Date.form_to_datetime64(
+                form.begin_year_to.data,
+                form.begin_month_to.data,
+                form.begin_day_to.data,
+                to_date=True)
 
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
             self.end_comment = form.end_comment.data
-            self.end_from = Date.form_to_datetime64(form.end_year_from.data,
-                                                    form.end_month_from.data,
-                                                    form.end_day_from.data)
-            self.end_to = Date.form_to_datetime64(form.end_year_to.data,
-                                                  form.end_month_to.data,
-                                                  form.end_day_to.data,
-                                                  to_date=True)
+            self.end_from = Date.form_to_datetime64(
+                form.end_year_from.data,
+                form.end_month_from.data,
+                form.end_day_from.data)
+            self.end_to = Date.form_to_datetime64(
+                form.end_year_to.data,
+                form.end_month_to.data,
+                form.end_day_to.data,
+                to_date=True)
 
     def get_profile_image_id(self) -> Optional[int]:
         sql = 'SELECT i.image_id FROM web.entity_profile_image i WHERE i.entity_id = %(entity_id)s;'
@@ -238,23 +227,18 @@ class Entity:
     def remove_profile_image(self) -> None:
         g.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': self.id})
 
-    def print_base_type(self) -> str:
+    def print_standard_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_name or self.view_name in ['actor', 'reference_system']:  # no base type
+        if not self.class_.standard_type:
             return ''
-        root_name = self.view_name.title()
-        if self.view_name in ['reference', 'place', 'object']:
-            root_name = self.system_type.title()
-        elif self.view_name == 'file':
-            root_name = 'License'
-        root_id = Node.get_hierarchy(root_name).id
+        root_id = Node.get_hierarchy(self.class_.standard_type).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
                 return link(node)
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
-        """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
+        """ Returns name part of a directed type e.g. actor actor relation: parent of (child of)"""
         from openatlas.util.display import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
@@ -262,18 +246,21 @@ class Entity:
         return name_parts[0]
 
     @staticmethod
-    def delete_(id_: int) -> None:
-        """ Triggers psql function model.delete_entity_related() for deleting related entities."""
+    def delete_(id_param: Union[int, List[int]]) -> None:
         if not is_authorized('contributor'):
             abort(403)  # pragma: no cover
-        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
+        if not id_param:
+            return
+        # Triggers psql function model.delete_entity_related() for deleting related entities."""
+        g.execute('DELETE FROM model.entity WHERE id IN %(ids)s;', {
+            'ids': tuple(id_param if isinstance(id_param, list) else [id_param])})
 
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
-                e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
+                e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_class,
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
                 COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
                 COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
@@ -300,17 +287,22 @@ class Entity:
         return sql
 
     @staticmethod
-    def get_by_system_type(system_type: str,
-                           nodes: bool = False,
-                           aliases: bool = False) -> List[Entity]:
-        sql = Entity.build_sql(nodes=nodes, aliases=aliases)
-        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
-        g.execute(sql, {'system_type': system_type})
+    def get_by_class(classes: Union[str, List[str]],
+                     nodes: bool = False,
+                     aliases: bool = False) -> List[Entity]:
+        sql = Entity.build_sql(
+            nodes=nodes,
+            aliases=aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
+        g.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_by_view(view: str, nodes: bool = False, aliases: bool = False) -> List[Entity]:
+        return Entity.get_by_class(g.view_class_mapping[view], nodes, aliases)
+
+    @staticmethod
     def get_display_files() -> List[Entity]:
-        g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
+        g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_class = 'file' GROUP BY e.id;")
         entities = []
         for row in g.cursor.fetchall():
             if get_file_extension(row.id) in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -318,22 +310,20 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(code: str,
-               name: str,
-               system_type: Optional[str] = None,
-               description: Optional[str] = None) -> Entity:
+    def insert(class_name: str, name: str, description: Optional[str] = None) -> Entity:
         from openatlas.util.display import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
             abort(422)
         sql = """
-            INSERT INTO model.entity (name, system_type, class_code, description)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s) RETURNING id;"""
-        params = {'name': str(name).strip(),
-                  'code': code,
-                  'system_type': system_type.strip() if system_type else None,
-                  'description': sanitize(description, 'text') if description else None}
+            INSERT INTO model.entity (name, system_class, class_code, description)
+            VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
+        params = {
+            'name': str(name).strip(),
+            'code': g.classes[class_name].cidoc_class.code,
+            'system_class': class_name,
+            'description': sanitize(description, 'text') if description else None}
         g.execute(sql, params)
         return Entity.get_by_id(g.cursor.fetchone()[0])
 
@@ -368,7 +358,7 @@ class Entity:
     def get_by_project_id(project_id: int) -> List[Entity]:
         sql = """
             SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
-                e.system_type,
+                e.system_class,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
             ) as nodes
@@ -391,36 +381,10 @@ class Entity:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_menu_item(menu_item: str) -> List[Entity]:
-        if menu_item == 'source':
-            sql = Entity.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
-                GROUP BY e.id;"""
-        elif menu_item == 'reference':
-            sql = Entity.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
-        elif menu_item == 'object':
-            sql = Entity.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s OR e.system_type = 'artifact'
-                GROUP BY e.id;"""
-        else:
-            aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
-                              current_user.settings['table_show_aliases'] else False
-            sql = Entity.build_sql(nodes=True if menu_item == 'event' else False,
-                                   aliases=aliases) + """
-                WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
-        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
-        return [Entity(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
-        class_ = form.classes.data
-        if class_ in ['source', 'event', 'actor']:
-            entities = Entity.get_by_menu_item(class_)
-        else:
-            entities = Entity.get_by_system_type(class_)
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
+        entities = Entity.get_by_class(form.classes.data)
         for sample in entities:
             if sample.id in already_added:
                 continue
@@ -437,108 +401,64 @@ class Entity:
     @staticmethod
     def get_overview_counts() -> Dict[str, int]:
         sql = """
-            SELECT
-            SUM(CASE WHEN
-                class_code = 'E33' AND system_type = 'source content' THEN 1 END) AS source,
-            SUM(CASE WHEN class_code IN ('E7', 'E8') THEN 1 END) AS event,
-            SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
-            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
-            SUM(CASE WHEN class_code IN ('E31', 'E84') AND system_type != 'file' THEN 1 END)
-                AS reference,
-            SUM(CASE WHEN class_code = 'E22' THEN 1 END) AS find,
-            SUM(CASE WHEN system_type = 'human remains' THEN 1 END) AS "human remains",
-            SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
-            FROM model.entity;"""
-        g.execute(sql)
-        row = g.cursor.fetchone()
-        return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
+            SELECT system_class, COUNT(system_class)
+            FROM model.entity
+            WHERE system_class IN %(classes)s
+            GROUP BY system_class;"""
+        g.execute(sql, {'classes': tuple(g.class_view_mapping.keys())})
+        return {row.system_class: row.count for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_orphans() -> List[Entity]:
-        """ Returns entities without links. """
         g.execute(Entity.sql_orphan)
         return [Entity.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_latest(limit: int) -> List[Entity]:
-        """ Returns the newest created entities"""
-        codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
         sql = Entity.build_sql() + """
-                WHERE e.class_code IN %(codes)s GROUP BY e.id
-                ORDER BY e.created DESC LIMIT %(limit)s;"""
-        g.execute(sql, {'codes': tuple(codes), 'limit': limit})
+            WHERE e.system_class IN %(codes)s GROUP BY e.id
+            ORDER BY e.created DESC LIMIT %(limit)s;"""
+        g.execute(sql, {'codes': tuple(g.class_view_mapping.keys()), 'limit': limit})
         return [Entity(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def delete_orphans(parameter: str) -> int:
-        from openatlas.models.node import Node
-        class_codes = tuple(app.config['CODE_CLASS'].keys()) + ('E32',)
-        if parameter == 'orphans':
-            class_codes = class_codes + ('E55',)
-            sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
-        elif parameter == 'unlinked':
-            sql_where = Entity.sql_orphan + " AND e.class_code IN %(class_codes)s"
-        elif parameter == 'types':
-            count = 0
-            for node in Node.get_node_orphans():
-                node.delete()
-                count += 1
-            return count
-        else:
-            return 0
-        sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
-        g.execute(sql, {'class_codes': class_codes})
-        return g.cursor.rowcount
 
     @staticmethod
     def search(form: FlaskForm) -> ValuesView[Entity]:
         if not form.term.data:
             return {}.values()
+        classes = form.classes.data
+        if 'person' in classes:
+            classes.append('actor_appellation')
+        if 'place' in classes:
+            classes.append('appellation')
         sql = Entity.build_sql() + """
-            {user_clause} WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
-            {description_clause}) AND {user_clause2} (""".format(
-            user_clause="""
-                LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
-            description_clause="""
-                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
-            if form.desc.data else '',
-            user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
-        sql_where = []
-        for name in form.classes.data:
-            if name in ['source', 'event']:
-                sql_where.append("e.class_code IN ({codes})".format(
-                    codes=str(app.config['CLASS_CODES'][name])[1:-1]))
-            elif name == 'actor':
-                codes = app.config['CLASS_CODES'][name] + ['E82']  # Add alias
-                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
-            elif name == 'place':
-                sql_where.append("(e.class_code = 'E41' OR e.system_type = 'place')")
-            elif name == 'feature':
-                sql_where.append("e.system_type = 'feature'")
-            elif name == 'stratigraphic unit':
-                sql_where.append("e.system_type = 'stratigraphic unit'")
-            elif name == 'find':
-                sql_where.append("e.class_code = 'E22'")
-            elif name == 'human remains':
-                sql_where.append("e.class_code = 'E20'")
-            elif name == 'reference':
-                sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
-                    codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))
-            elif name == 'file':
-                sql_where.append(" e.system_type = 'file'")
-        sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
-        g.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
+            {user_clause}
+            WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+            {description_clause})
+            {user_clause2}
+            AND e.system_class IN %(classes)s GROUP BY e.id ORDER BY e.name;""".format(
+                user_clause="""
+                    LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
+                description_clause="""
+                    OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
+                if form.desc.data else '',
+                user_clause2=' AND ul.user_id = %(user_id)s ' if form.own.data else '')
+        g.execute(sql, {
+            'term': '%' + form.term.data + '%',
+            'user_id': current_user.id,
+            'classes': tuple(form.classes.data)})
 
         # Repopulate date fields with autocompleted values
-        from_date = Date.form_to_datetime64(form.begin_year.data,
-                                            form.begin_month.data,
-                                            form.begin_day.data)
-        to_date = Date.form_to_datetime64(form.end_year.data,
-                                          form.end_month.data,
-                                          form.end_day.data,
-                                          to_date=True)
+        from_date = Date.form_to_datetime64(
+            form.begin_year.data,
+            form.begin_month.data,
+            form.begin_day.data)
+        to_date = Date.form_to_datetime64(
+            form.end_year.data,
+            form.end_month.data,
+            form.end_day.data,
+            to_date=True)
         if from_date:
             string = str(from_date)
             if string.startswith('-') or string.startswith('0000'):
@@ -561,14 +481,10 @@ class Entity:
         # Get search results
         entities = []
         for row in g.cursor.fetchall():
-            entity = None
-            if row.class_code == 'E82':  # If found in actor alias
+            if row.system_class == 'actor_appellation':  # If found in actor alias
                 entity = Link.get_linked_entity(row.id, 'P131', True)
-            elif row.class_code == 'E41':  # If found in place alias
+            elif row.system_class == 'appellation':  # If found in place alias
                 entity = Link.get_linked_entity(row.id, 'P1', True)
-            elif row.class_code == 'E18':
-                if row.system_type in form.classes.data:
-                    entity = Entity(row)
             else:
                 entity = Entity(row)
 

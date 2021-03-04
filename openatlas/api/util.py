@@ -23,15 +23,11 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
     for node in entity.nodes:
         if node.root and node.root[-1] == Node.get_hierarchy('License').id:
             license_ = node.name
-    if license_:
-        if parser['download']:
-            return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
-        # if parser['thumbnail']:
-        #     return send_file(
-        #         ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
-        #                                           parser['thumbnail']), mimetype='image/jpeg')
-        return send_from_directory(app.config['UPLOAD_DIR'], filename)
-    raise AccessDeniedError
+    if not license_:
+        raise AccessDeniedError
+    if parser['download']:
+        return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
+    return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/api/0.1/', strict_slashes=False)

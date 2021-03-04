@@ -49,14 +49,15 @@ def display_citation_example(self: Any, code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
         return ''
-    return Markup('<h1>{title}</h1>{text}'.format(title=display.uc_first(_('citation_example')),
-                                                  text=text))
+    return Markup('<h1>{title}</h1>{text}'.format(
+        title=display.uc_first(_('citation_example')),
+        text=text))
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
-    if entity.view_name != 'place' or not structure or len(structure['siblings']) < 2:
+    if not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
     prev_id = None
@@ -111,9 +112,10 @@ def note(self: Any, entity: Entity) -> str:
             label=display.uc_first(_('note')),
             note=entity.note.replace('\r\n', '<br>'),
             edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
-            delete=display.button(_('delete'),
-                                  url_for('note_delete', entity_id=entity.id),
-                                  onclick="return confirm('" + _('Delete note?') + "');"))
+            delete=display.button(
+                _('delete'),
+                url_for('note_delete', entity_id=entity.id),
+                onclick="return confirm('" + _('Delete note?') + "');"))
     return Markup(html)
 
 
@@ -166,18 +168,20 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     from openatlas.forms.field import TreeField
     html = ''
     for field in form:
-        if type(field) is TreeField:
+        if isinstance(field, TreeField):
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
-    table = Table(header=['#', display.uc_first(_('selection'))],
-                  rows=[[item, item.label.text] for item in form.selection])
+    table = Table(
+        header=['#', display.uc_first(_('selection'))],
+        rows=[[item, item.label.text] for item in form.selection])
     return html + """
         <div class="toolbar">
             {select_all}
             {deselect_all}
         </div>
-        {table}""".format(select_all=display.button(_('select all'), id_="select-all"),
-                          deselect_all=display.button(_('deselect all'), id_="select-none"),
-                          table=table.display('move'))
+        {table}""".format(
+        select_all=display.button(_('select all'), id_="select-all"),
+        deselect_all=display.button(_('deselect all'), id_="select-none"),
+        table=table.display('move'))
 
 
 @jinja2.contextfilter
@@ -186,11 +190,12 @@ def table_select_model(self: Any,
                        name: str,
                        selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     if name in ['domain', 'range']:
-        entities = g.classes
+        entities = g.cidoc_classes
     else:
         entities = g.properties
-    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                          {'sType': 'numeric', 'targets': [0]}])
+    table = Table(['code', 'name'], defs=[
+        {'orderDataType': 'cidoc-model', 'targets': [0]},
+        {'sType': 'numeric', 'targets': [0]}])
 
     for id_ in entities:
         table.rows.append([
@@ -231,36 +236,31 @@ def table_select_model(self: Any,
                         </div>
                     </div>
                 </div>
-            </div>""".format(name=name,
-                             value=value,
-                             close_label=display.uc_first(_('close')),
-                             table=table.display(name))
+            </div>""".format(
+        name=name,
+        value=value,
+        close_label=display.uc_first(_('close')),
+        table=table.display(name))
     return html
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_class_name(self: Any, code: str) -> str:
-    return g.classes[code].name
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def description(self: Any, entity: Entity) -> str:
+def description(self: Any, entity: Union[Entity, Project]) -> str:
     if not entity.description:
         return ''
-    label = display.uc_first(_('description'))
-    if hasattr(entity, 'system_type') and entity.system_type == 'source content':
-        label = display.uc_first(_('content'))
+    label = _('description')
+    if isinstance(entity, Entity) and entity.class_.name == 'source':
+        label = _('content')
     return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
-        label=label,
+        label=display.uc_first(label),
         description=entity.description.replace('\r\n', '<br>')))
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def download_button(self: Any, entity: Entity) -> str:
-    if entity.view_name != 'file':
+    if entity.class_.view != 'file':
         return ''
     html = '<span class="error">{msg}</span>'.format(msg=display.uc_first(_('missing file')))
     if entity.image_id:
@@ -277,22 +277,24 @@ def display_profile_image(self: Any, entity: Entity) -> str:
     path = display.get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    if entity.view_name == 'file':
+    if entity.class_.view == 'file':
         if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
             html = '''
                 <a href="{url}" rel="noopener noreferrer" target="_blank">
                     <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>'''.format(url=url_for('display_file', filename=path.name),
-                               width=session['settings']['profile_image_width'])
+                </a>'''.format(
+                url=url_for('display_file', filename=path.name),
+                width=session['settings']['profile_image_width'])
         else:
             html = display.uc_first(_('no preview available'))  # pragma: no cover
     else:
         html = """
             <a href="{url}">
                 <img style="max-width:{width}px;" alt="image" src="{src}">
-            </a>""".format(url=url_for('entity_view', id_=entity.image_id),
-                           src=url_for('display_file', filename=path.name),
-                           width=session['settings']['profile_image_width'])
+            </a>""".format(
+            url=url_for('entity_view', id_=entity.image_id),
+            src=url_for('display_file', filename=path.name),
+            width=session['settings']['profile_image_width'])
     return Markup('<div id="profile_image_div">{html}</div>'.format(html=html))
 
 
@@ -331,9 +333,9 @@ def add_row(field: Field,
 
     # CSS
     css_class = 'required' if field.flags.required else ''
-    css_class += ' integer' if type(field) is IntegerField else ''
+    css_class += ' integer' if isinstance(field, IntegerField) else ''
     for validator in field.validators:
-        css_class += ' email' if type(validator) is Email else ''
+        css_class += ' email' if isinstance(validator, Email) else ''
     errors = ' <span class="error">{errors}</span>'.format(
         errors=' '.join(display.uc_first(error) for error in field.errors)) if field.errors else ''
     return """
@@ -368,22 +370,19 @@ def display_form(self: Any,
                     <div>{label}</div>
                     <div class="table-cell">{field} {unit}</div>
                 </div>
-                {value_fields}""".format(id=root.id,
-                                         label=sub.name,
-                                         unit=sub.description,
-                                         field=field_(class_='value-type'),
-                                         value_fields=display_value_type_fields(sub, root))
+                {value_fields}""".format(
+                id=root.id,
+                label=sub.name,
+                unit=sub.description,
+                field=field_(class_='value-type'),
+                value_fields=display_value_type_fields(sub, root))
         return html_
 
     html = ''
     for field in form:
-
-        # These fields will be added in combination with other fields
-        if type(field) is ValueFloatField or field.id.startswith('insert_'):
-            continue
-        if field.id.startswith('reference_system_precision'):
-            continue
-
+        if isinstance(field, ValueFloatField) or field.id.startswith(
+                ('insert_', 'reference_system_precision')):
+            continue  # These fields will be added in combination with other fields
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
@@ -396,16 +395,17 @@ def display_form(self: Any,
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
-            if node.name in app.config['BASE_TYPES']:
+            if node.standard and node.class_.name == 'type':
                 label = display.uc_first(_('type'))
             if field.label.text == 'super':
                 label = display.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
                 onclick = 'switch_value_type({id})'.format(id=node.id)
-                html += add_row(field, label, display.button(_('show'),
-                                                             onclick=onclick,
-                                                             css='secondary'))
+                html += add_row(
+                    field,
+                    label,
+                    display.button(_('show'), onclick=onclick, css='secondary'))
                 html += display_value_type_fields(node)
                 continue
             tooltip = '' if 'is_node_form' in form else ' ' + display.tooltip(node.description)
@@ -433,18 +433,20 @@ def display_form(self: Any,
         if field.id.startswith('reference_system_id_'):
             precision_field = getattr(form, field.id.replace('id_', 'precision_'))
             class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
-            html += add_row(field, field.label, ' '.join([str(field(class_=class_)),
-                                                          str(precision_field.label),
-                                                          str(precision_field)]))
+            html += add_row(field, field.label, ' '.join([
+                str(field(class_=class_)),
+                str(precision_field.label),
+                str(precision_field)]))
             continue
         html += add_row(field, form_id=form_id)
 
     return Markup("""
         <form method="post" {id} {multi}>
             <div class="data-table">{html}</div>
-        </form>""".format(id=('id="' + form_id + '" ') if form_id else '',
-                          html=html,
-                          multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
+        </form>""".format(
+        id=('id="' + form_id + '" ') if form_id else '',
+        html=html,
+        multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
 
 
 @jinja2.contextfilter
@@ -463,45 +465,48 @@ def sanitize(self: Any, string: str) -> str:
 @blueprint.app_template_filter()
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
-    name = entity.name.replace('\'', '')
-    url = url_for('index', class_=entity.view_name, delete_id=entity.id)
-    if entity.system_type == 'source translation':
+    if entity.class_.name == 'source_translation':
         url = url_for('translation_delete', id_=entity.id)
     elif entity.id in g.nodes:
         url = url_for('node_delete', id_=entity.id)
-    return display.button(_('delete'),
-                          url,
-                          onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
+    else:
+        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
+    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return display.button(
+        _('delete'),
+        url,
+        onclick="return confirm('{confirm}')").format(confirm=confirm)
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) -> str:
-    """ Returns HTML with the menu and mark appropriate item as selected."""
+    """ Returns menu HTML with (bold) marked selected item."""
+    if not current_user.is_authenticated:
+        return ''
+    view_name = ''
+    if entity:
+        view_name = entity.class_.view
+    if origin:
+        view_name = origin.class_.view
     html = ''
-    if current_user.is_authenticated:
-        view_name = ''
-        if entity:
-            view_name = entity.view_name
-        if origin:
-            view_name = origin.view_name
-        for item in ['source', 'event', 'actor', 'place', 'reference', 'object']:
-            css = ''
-            if (view_name and view_name.replace('node', 'types') == item) or \
-                    request.path.startswith('/index/' + item) or\
-                    request.path.startswith('/insert/' + item):
-                css = 'active'
-            html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
-                css=css,
-                item=item,
-                label=display.uc_first(_(item)))
+    for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
         css = ''
-        if request.path.startswith('/types') or (entity and entity.class_.code == 'E55'):
+        if (view_name == item) or \
+                request.path.startswith('/index/' + item) or \
+                request.path.startswith('/insert/' + item):
             css = 'active'
-        html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+        html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
             css=css,
-            url=url_for('node_index'),
-            label=display.uc_first(_('types')))
+            item=item,
+            label=display.uc_first(_(item)))
+    css = ''
+    if request.path.startswith('/types') or (entity and entity.class_.view == 'type'):
+        css = 'active'
+    html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
+        css=css,
+        url=url_for('node_index'),
+        label=display.uc_first(_('types')))
     return html
 
 

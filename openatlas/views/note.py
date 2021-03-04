@@ -26,7 +26,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
         'display_form.html',
         form=form,
         entity=entity,
-        crumbs=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
+        crumbs=[[_(entity.class_.view), url_for('index', view=_(entity.class_.view))],
                 entity,
                 '+ ' + uc_first(_('note'))])
 
@@ -45,7 +45,7 @@ def note_update(entity_id: int) -> Union[str, Response]:
         'display_form.html',
         form=form,
         entity=entity,
-        crumbs=[[_(entity.view_name), url_for('index', class_=_(entity.view_name))],
+        crumbs=[[_(entity.class_.view), url_for('index', view=_(entity.class_.view))],
                 entity,
                 _('edit note')])
 

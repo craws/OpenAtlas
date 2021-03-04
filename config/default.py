@@ -33,18 +33,13 @@ SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# External References
-REFERENCE_PRECISION = [('', ''), ('close match', 'close match'), ('exact match', 'exact match')]
-EXTERNAL_REFERENCES_FORMS = ['Artifact', 'Event', 'Feature', 'Find', 'Group', 'Human Remains',
-                             'Legal Body', 'Person', 'Place', 'Stratigraphic Unit', 'Type']
-
 # Modules
 MODULES = ['map_overlay', 'notes', 'sub_units']
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
-CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS),  # Todo: move to backend config
-ALLOWED_IPS = ['127.0.0.1']  # Todo: move to backend config
+CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
+ALLOWED_IPS = ['127.0.0.1']
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
@@ -53,45 +48,23 @@ TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 MIN_CHARS_JSTREE_SEARCH = 1
 
 # Log levels
-LOG_LEVELS = {0: 'emergency',
-              1: 'alert',
-              2: 'critical',
-              3: 'error',
-              4: 'warn',
-              5: 'notice',
-              6: 'info',
-              7: 'debug'}
+LOG_LEVELS = {
+    0: 'emergency',
+    1: 'alert',
+    2: 'critical',
+    3: 'error',
+    4: 'warn',
+    5: 'notice',
+    6: 'info',
+    7: 'debug'}
 
-# Types
-PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
-BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Human Remains',
-              'Information Carrier', 'Place', 'Source', 'Stratigraphic Unit']
+CSS = {
+    'button': {
+        'primary': 'btn btn-outline-primary btn-sm',
+        'secondary': 'btn btn-secondary btn-xsm'}}
 
-# Mappings between model and user interface
-CODE_CLASS = {
-    'E21': 'actor',
-    'E40': 'actor',
-    'E74': 'actor',
-    'E7': 'event',
-    'E8': 'event',
-    'E9': 'event',
-    'E84': 'object',
-    'E18': 'place',
-    'E20': 'place',
-    'E22': 'place',
-    'E31': 'reference',
-    'E33': 'source'}
+PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']  # Needed for type moves
+EXTERNAL_REFERENCES_FORMS = [
+    'acquisition', 'activity', 'artifact',  'feature',  'find',  'group', 'human_remains',  'move',
+    'person',  'place',  'type']
 
-CLASS_CODES = {
-    'actor': ['E21', 'E74', 'E40'],
-    'event': ['E7', 'E8', 'E9'],
-    'group': ['E40', 'E74'],
-    'information_carrier': ['E84'],
-    'object': ['E84'],
-    'person': ['E21'],
-    'place': ['E18', 'E20', 'E22'],
-    'reference': ['E31'],
-    'source': ['E33']}
-
-CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
-                  'secondary': 'btn btn-secondary btn-xsm'}}
