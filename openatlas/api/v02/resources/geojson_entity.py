@@ -34,12 +34,12 @@ class GeoJsonEntity:
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if link.domain.class_.name == 'file':
                 path = get_file_path(link.domain.id)
-                files.append({'@id': url_for('entity', id_=link.domain.id, _external=True),
-                              'title': link.domain.name,
-                              'license': GeoJsonEntity.get_license(link.domain.id),
-                              'url': url_for('display_file_api',
-                                             filename=path.name,
-                                             _external=True) if path else "N/A"})
+                files.append({
+                    '@id': url_for('entity', id_=link.domain.id, _external=True),
+                    'title': link.domain.name,
+                    'license': GeoJsonEntity.get_license(link.domain.id),
+                    'url': url_for(
+                        'display_file_api', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
 
     @staticmethod
@@ -54,8 +54,9 @@ class GeoJsonEntity:
     def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         nodes = []
         for node in entity.nodes:
-            nodes_dict = {'identifier': url_for('entity', id_=node.id, _external=True),
-                          'label': node.name}
+            nodes_dict = {
+                'identifier': url_for('entity', id_=node.id, _external=True),
+                'label': node.name}
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:
                     nodes_dict['value'] = link.description
@@ -76,17 +77,21 @@ class GeoJsonEntity:
     @staticmethod
     def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
         time = {}
-        start = {'earliest': entity.begin_from, 'latest': entity.begin_to,
-                 'comment': entity.begin_comment}
+        start = {
+            'earliest': entity.begin_from, 'latest': entity.begin_to,
+            'comment': entity.begin_comment}
         time['start'] = start
-        end = {'earliest': entity.end_from, 'latest': entity.end_to, 'comment': entity.end_comment}
+        end = {
+            'earliest': entity.end_from,
+            'latest': entity.end_to,
+            'comment': entity.end_comment}
         time['end'] = end
         return time if time else None
 
     @staticmethod
     # Todo: API coverage, remove no cover below
     def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:  # pragma: nocover
-        if entity.class_.code != 'E53':  # pragma: nocover
+        if entity.cidoc_class.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -117,10 +122,11 @@ class GeoJsonEntity:
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if isinstance(link.domain, ReferenceSystem):
                 system = g.reference_systems[link.domain.id]
-                ref.append({'identifier': (system.resolver_url if system.resolver_url else '')
-                                          + link.description,
-                            'type': g.nodes[link.type.id].name,
-                            'reference_system': system.name})
+                ref.append({
+                    'identifier':
+                        (system.resolver_url if system.resolver_url else '') + link.description,
+                    'type': g.nodes[link.type.id].name,
+                    'reference_system': system.name})
         return ref if ref else None
 
     @staticmethod
@@ -136,11 +142,13 @@ class GeoJsonEntity:
     def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
-        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
-        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': 'Feature',
-                    'crmClass': "crm:" + class_code,
-                    'properties': {'title': entity.name}}
+        class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en']).replace(
+            " ", "_")
+        features = {
+            '@id': url_for('entity_view', id_=entity.id, _external=True),
+            'type': 'Feature',
+            'crmClass': "crm:" + class_code,
+            'properties': {'title': entity.name}}
 
         # Descriptions
         if entity.description:
