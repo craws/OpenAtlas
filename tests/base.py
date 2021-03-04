@@ -1,6 +1,6 @@
 import pathlib
 import unittest
-from typing import Dict, List, Optional
+from typing import Optional
 
 import psycopg2
 
@@ -61,4 +61,3 @@ def insert_entity(name: str,
         if origin:
             origin.link('P46', entity)
     return entity
-

@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
@@ -29,6 +30,10 @@ class ApiTests(TestBaseCase):
                 place.end_from = '2019-01-31'
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
+
+                location = place.get_linked_entity_safe('P53')
+                Gis.add_example_geom(location)
+                location = place.get_linked_entity_safe('P53')
 
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))

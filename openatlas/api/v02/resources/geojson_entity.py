@@ -6,6 +6,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_file_path
@@ -89,31 +90,13 @@ class GeoJsonEntity:
         return time if time else None
 
     @staticmethod
-    def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:  # pragma: nocover
+    def get_geoms_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
         if entity.cidoc_class.code != 'E53':  # pragma: nocover
             return 'Wrong class'
-        geom = []
-        for shape in ['point', 'polygon', 'linestring']:
-            sql = """
-                     SELECT
-                         {shape}.id,
-                         {shape}.name,
-                         {shape}.description,
-                         public.ST_AsGeoJSON({shape}.geom) AS geojson
-                     FROM model.entity e
-                     JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
-                     WHERE e.id = %(entity_id)s;""".format(shape=shape)
-            g.execute(sql, {'entity_id': entity.id})
-            for row in g.cursor.fetchall():
-                meta = ast.literal_eval(row.geojson)
-                meta['title'] = row.name.replace('"', '\"') if row.name else ''
-                meta['description'] = row.description.replace('"',
-                                                              '\"') if row.description else ''
-                geom.append(meta)
-        if len(geom) == 1:
-            return geom[0]
-        else:
-            return {'type': 'GeometryCollection', 'geometries': geom}
+        geoms = Gis.get_by_id(entity.id)
+        if len(geoms) == 1:
+            return geoms[0]
+        return {'type': 'GeometryCollection', 'geometries': geoms}
 
     @staticmethod
     def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
@@ -179,10 +162,10 @@ class GeoJsonEntity:
         # Geometry
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place':
-                features['geometry'] = GeoJsonEntity.get_geom_by_entity(
+                features['geometry'] = GeoJsonEntity.get_geoms_by_entity(
                     Link.get_linked_entity(entity.id, 'P53'))
             elif entity.class_.name == 'object_location':
-                features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
+                features['geometry'] = GeoJsonEntity.get_geoms_by_entity(entity)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
