@@ -129,15 +129,23 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
+                        <a onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name_clean}')"
                             href="#">{entity_name}</a>
-                    </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                    </p>""".format(
+                    name=field.id,
+                    entity_id=entity.id,
+                    entity_name=entity.name,
+                    entity_name_clean=entity.name.replace("'", ''))
             else:
                 data[0] = """
                     <a
-                        onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name}')"
+                        onclick="selectFromTable(this, '{name}', {entity_id}, '{entity_name_clean}')"
                         href="#">{entity_name}</a>
-                    """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                    """.format(
+                    name=field.id,
+                    entity_id=entity.id,
+                    entity_name=entity.name,
+                    entity_name_clean=entity.name.replace("'", ''))
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
@@ -148,14 +156,16 @@ class TableSelect(HiddenInput):  # type: ignore
                     <div
                         class="btn btn-outline-primary btn-xsm"
                         style="position: absolute; top: -22px;"
-                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')">
+                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name_clean}')">
                             {label}
                     </div>
                 </div>
-                """.format(name=field.id,
-                           entity_id=entity.id,
-                           entity_name=entity.name,
-                           label=uc_first(_('select'))))
+                """.format(
+                name=field.id,
+                entity_id=entity.id,
+                entity_name=entity.name,
+                entity_name_clean=entity.name.replace("'", ''),
+                label=uc_first(_('select'))))
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
