@@ -60,7 +60,7 @@ errors = {
         "status": 500
     },
     "EntityDoesNotExistError": {
-        "message": "Request entity does not exist",
+        "message": "Requested entity does not exist",
         "status": 404
     },
     "FilterOperatorError": {

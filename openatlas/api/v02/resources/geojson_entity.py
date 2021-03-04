@@ -89,7 +89,6 @@ class GeoJsonEntity:
         return time if time else None
 
     @staticmethod
-    # Todo: API coverage, remove no cover below
     def get_geom_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:  # pragma: nocover
         if entity.cidoc_class.code != 'E53':  # pragma: nocover
             return 'Wrong class'
@@ -133,8 +132,7 @@ class GeoJsonEntity:
     def get_entity_by_id(id_: int) -> Entity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        # Todo: get_by_id return an abort if id does not exist... I don't get to the exception
-        except EntityDoesNotExistError:  # pragma: nocover
+        except Exception:  # pragma: nocover
             raise EntityDoesNotExistError
         return entity
 
@@ -179,11 +177,12 @@ class GeoJsonEntity:
             'show'] else None
 
         # Geometry
-        if 'geometry' in parser['show'] and entity.class_.name == 'object_location':
-            features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
-        elif 'geometry' in parser['show'] and entity.class_.view == 'place':
-            features['geometry'] = GeoJsonEntity.get_geom_by_entity(
-                Link.get_linked_entity(entity.id, 'P53'))
+        if 'geometry' in parser['show']:
+            if entity.class_.view == 'place':
+                features['geometry'] = GeoJsonEntity.get_geom_by_entity(
+                    Link.get_linked_entity(entity.id, 'P53'))
+            elif entity.class_.name == 'object_location':
+                features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
