@@ -261,7 +261,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
                      'human_remains', 'artifact', 'file']:
             tabs[name] = Tab(name, entity)
-        for link_ in entity.get_links(['P67', 'P128']):
+        for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)

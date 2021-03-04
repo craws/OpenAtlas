@@ -29,9 +29,8 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
     form = build_add_reference_form(view)
     if form.validate_on_submit():
-        property_code = 'P128' if reference.class_.name in ['artifact', 'find'] else 'P67'
         entity = Entity.get_by_id(getattr(form, view).data)
-        reference.link(property_code, entity, form.page.data)
+        reference.link('P67', entity, form.page.data)
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + view)
     if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
