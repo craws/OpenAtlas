@@ -131,7 +131,7 @@ class Link:
     def get_linked_entity(id_: int,
                           code: str,
                           inverse: bool = False,
-                          nodes: bool = False) -> Optional['Entity']:
+                          nodes: bool = False) -> 'Entity':
         result = Link.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)

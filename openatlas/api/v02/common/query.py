@@ -35,7 +35,7 @@ class GetQuery(Resource):  # type: ignore
                 entities.extend(GetByClass.get_entities_by_class(class_code=class_, parser=parser))
         output = Pagination.pagination(entities=entities, parser=parser)
         if parser['count']:
-            return jsonify(output['pagination'][0]['entities'])
+            return jsonify(output['pagination']['entities'])
         if parser['download']:
             return Download.download(data=output, template=template, name='query')
         return marshal(output, template), 200

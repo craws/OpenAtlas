@@ -203,9 +203,23 @@
             }
           },
           "pagination": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaginationModel"
+            "type": "object",
+            "properties": {
+              "entities": {
+                "type": "number"
+              },
+              "entity_per_page": {
+                "type": "number"
+              },
+              "total_pages": {
+                "type": "number"
+              },
+              "index": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/PaginationIndexModel"
+                }
+              }
             }
           }
         }

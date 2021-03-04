@@ -90,7 +90,7 @@ class GeoJson:
                             }
 
         pagination = {"result": fields.List(fields.Nested(GeoJson.geojson_template(show))),
-                      "pagination": fields.List(fields.Nested(pagination_model))
+                      "pagination": fields.Nested(pagination_model)
                       }
 
         return pagination

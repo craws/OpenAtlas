@@ -14,7 +14,7 @@ from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 from openatlas.api.v02.common.usage import ShowUsage
-from openatlas.api.v02.resources.error import errors, ResourceGoneError
+from openatlas.api.v02.resources.error import errors
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
