@@ -66,6 +66,10 @@ class ReferenceSystem(Entity):
             g.execute(sql, {'entity_id': self.id, 'form_id': form_id})
 
     def remove_form(self, form_id: int) -> None:
+        forms = self.get_forms()
+        for link_ in self.get_links('P67'):
+            if link_.range.class_.name == forms[form_id]['name']:  # pragma: no cover
+                return  # Don't continue if entities are still attached
         sql = """
             DELETE FROM web.reference_system_form
             WHERE reference_system_id = %(reference_system_id)s AND form_id = %(form_id)s;"""
