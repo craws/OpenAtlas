@@ -12,6 +12,7 @@ class UsageTemplate:
             'entity': fields.String,
             'code': fields.String,
             'class': fields.String,
+            'system_class': fields.String,
             'query': fields.String,
             'latest': fields.String,
             'node_entities': fields.String,

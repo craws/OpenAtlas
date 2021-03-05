@@ -24,7 +24,7 @@ class GetBySystemClass(Resource):  # type: ignore
         'reference_system', 'stratigraphic_unit', 'source_translation', 'type']
 
     @api_access()  # type: ignore
-    # @swag_from("../swagger/code.yml", endpoint="code")
+    # @swag_from("../swagger/system_class.yml", endpoint="code")
     def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:  # pragma: no cover
         parser = entity_parser.parse_args()
         system_class_ = Pagination.pagination(
