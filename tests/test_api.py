@@ -161,6 +161,8 @@ class ApiTests(TestBaseCase):
             assert b'2' in rv.data
             rv = self.app.get(url_for('code', code='place', count=True))
             assert b'3' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation', count=True))
+            assert b'1' in rv.data
 
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', codes='place'))
@@ -172,6 +174,7 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
+
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover

@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Tuple, Union
 
 # from flasgger import swag_from
-from flask import Response, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.download import Download
@@ -14,18 +14,10 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import api_access
 
 
-# Todo: Make changes in Template, routes.py, parser.py. swagger/yml files, write tests, etc.
-
 class GetBySystemClass(Resource):  # type: ignore
-    system_class_validation = [
-        'acquisition', 'activity', 'actor_appellation', 'administrative_unit', 'appellation',
-        'artifact', 'bibliography', 'edition', 'external_reference', 'feature', 'file', 'find',
-        'group', 'human_remains', 'move', 'object_location', 'person', 'place', 'source',
-        'reference_system', 'stratigraphic_unit', 'source_translation', 'type']
-
     @api_access()  # type: ignore
     # @swag_from("../swagger/system_class.yml", endpoint="code")
-    def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:  # pragma: no cover
+    def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         system_class_ = Pagination.pagination(
             GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser),
@@ -40,7 +32,7 @@ class GetBySystemClass(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_system_class(system_class: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
-        if system_class not in GetBySystemClass.system_class_validation:
+        if system_class not in g.classes:
             raise InvalidCodeError  # pragma: no cover
         for entity in Query.get_by_system_class(system_class, parser):
             entities.append(entity)
