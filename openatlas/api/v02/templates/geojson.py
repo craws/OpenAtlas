@@ -60,6 +60,7 @@ class GeoJson:
             '@id': fields.String,
             'type': fields.String,
             'crmClass': fields.String,
+            'system_class': fields.String,
             'properties': fields.Nested(title),
             'description': fields.List(fields.Nested(description))
         }

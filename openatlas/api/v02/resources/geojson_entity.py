@@ -126,6 +126,7 @@ class GeoJsonEntity:
             '@id': url_for('entity_view', id_=entity.id, _external=True),
             'type': 'Feature',
             'crmClass': "crm:" + class_code,
+            'system_class': entity.class_.name,
             'properties': {'title': entity.name}}
 
         # Descriptions

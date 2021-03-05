@@ -293,7 +293,10 @@
           "@id": {
             "type": "string"
           },
-          "crmClass:": {
+          "crmClass": {
+            "type": "string"
+          },
+          "system_class": {
             "type": "string"
           },
           "type": {
