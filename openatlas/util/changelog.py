@@ -4,9 +4,15 @@ class Changelog:
             'feature': {
                 '1091': 'Reference systems for types',
                 '1109': 'Sustainable web map services',
-                '1187': 'Add files for objects',
                 '1456': 'Artifacts',
-                '1461': 'Also search in date comments'}}],
+                '1187': 'Add files for artifacts',
+                '1465': 'Merge legal body into group and information carrier into artifact',
+                '1461': 'Also search in date comments'},
+            'fix':
+                {'1477': 'Unable to select an entity with single quote in name',
+                 '1452': 'API: "type" is empty if more entities are requested',
+                 '1471': 'API: Url to linked places deprecated'
+                 }}],
         '5.7.2': ['2021-01-27', {
             'fix': {
                 '1455': 'Network graphic error'}}],
