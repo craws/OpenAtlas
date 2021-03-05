@@ -21,7 +21,7 @@ class Query(Entity):
         g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 
-    @staticmethod
+    @staticmethod  # Todo: Refactor to new Entity version
     def get_by_menu_item_api(menu_item: str,
                              parser: Dict[str, Any]) -> List[Entity]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
@@ -48,5 +48,18 @@ class Query(Entity):
                 ORDER BY {order} {sort};""".format(clause=clause,
                                                    order=', '.join(parser['column']),
                                                    sort=parser['sort'])
+        g.execute(sql, parameters)
+        return [Query(row) for row in g.cursor.fetchall()]
+
+    @staticmethod  #Todo: Test and complete function
+    def get_by_system_class(classes: str, parser: Dict[str, Any]) -> List[Entity]:  # pragma: no cover
+        parameters = {'class': tuple(classes if isinstance(classes, list) else [classes])}
+        clause = Filter.get_filter(parameters=parameters, parser=parser)
+        sql = Query.build_sql(
+            nodes=True,
+            aliases=True) + """ WHERE e.system_class IN %(class)s {clause} 
+             GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
+                                                              order=', '.join(parser['column']),
+                                                              sort=parser['sort'])
         g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]

@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Tuple, Union
 
 # from flasgger import swag_from
-from flask import Response, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.download import Download
@@ -32,8 +32,8 @@ class GetByCode(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
-        if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'artifact']:
+        if code_ not in g.view_class_mapping:
             raise InvalidCodeError  # pragma: no cover
-        for entity in Query.get_by_menu_item_api(code_, parser):
+        for entity in Entity.get_by_view(code_, parser):  # Todo: Refactor to API needs
             entities.append(entity)
         return entities

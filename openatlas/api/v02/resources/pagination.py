@@ -6,15 +6,15 @@ from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 
 
-def get_shown_entities(total: List[int], parser: Dict[str, Any]) -> List[Any]:
-    if parser['last'] and int(parser['last']) in total:
-        return list(itertools.islice(total, total.index(int(parser['last'])) + 1, None))
-    if parser['first'] and int(parser['first']) in total:
-        return list(itertools.islice(total, total.index(int(parser['first'])), None))
-    raise EntityDoesNotExistError  # pragma: no cover
-
-
 class Pagination:
+
+    @staticmethod
+    def get_shown_entities(total: List[int], parser: Dict[str, Any]) -> List[Any]:
+        if parser['last'] and int(parser['last']) in total:
+            return list(itertools.islice(total, total.index(int(parser['last'])) + 1, None))
+        if parser['first'] and int(parser['first']) in total:
+            return list(itertools.islice(total, total.index(int(parser['first'])), None))
+        raise EntityDoesNotExistError  # pragma: no cover
 
     @staticmethod
     def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[str, Any]:
@@ -23,12 +23,10 @@ class Pagination:
         for e in entities:
             total.append(e.id)
         entities_count = len(total)
-        for num, i in enumerate(
-                list(itertools.islice(total, 0, None, int(parser['limit'])))):
+        for num, i in enumerate(list(itertools.islice(total, 0, None, int(parser['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
         if parser['last'] or parser['first']:
-            total = get_shown_entities(total, parser)
-
+            total = Pagination.get_shown_entities(total, parser)
         # Finding the entity with the wanted id
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
         entity_limit = []
