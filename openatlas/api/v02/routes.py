@@ -18,8 +18,8 @@ from openatlas.api.v02.resources.error import errors
 
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
-    'uiversion': 3
-}
+    'uiversion': 3}
+#
 cors = CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 api = Api(app, catch_all_404s=False, errors=errors)  # Establish connection between API and APP
 # swagger = Swagger(app, parse=False, template_file="api/v02/swagger.json")

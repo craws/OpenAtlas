@@ -1,4 +1,3 @@
-import ast
 from typing import Any, Dict, List, Optional, Union
 
 from flask import g, url_for
@@ -18,15 +17,17 @@ class GeoJsonEntity:
     def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
         for link in Link.get_links(entity.id):
-            links.append({'label': link.range.name,
-                          'relationTo': url_for('entity', id_=link.range.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_'
-                                          + link.property.i18n['en'].replace(' ', '_')})
+            links.append({
+                'label': link.range.name,
+                'relationTo': url_for('entity', id_=link.range.id, _external=True),
+                'relationType': 'crm:' + link.property.code + '_'
+                                + link.property.i18n['en'].replace(' ', '_')})
         for link in Link.get_links(entity.id, inverse=True):
-            links.append({'label': link.domain.name,
-                          'relationTo': url_for('entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + 'i_'
-                                          + link.property.i18n['en'].replace(' ', '_')})
+            links.append({
+                'label': link.domain.name,
+                'relationTo': url_for('entity', id_=link.domain.id, _external=True),
+                'relationType': 'crm:' + link.property.code + 'i_'
+                                + link.property.i18n['en'].replace(' ', '_')})
         return links if links else None
 
     @staticmethod
@@ -63,10 +64,6 @@ class GeoJsonEntity:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
-            ##### If errors occure with value types, then add this line. Otherwise, delete it.
-            # if 'unit' not in nodes_dict and node.description:
-            #     nodes_dict['description'] = node.description
-
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)
@@ -79,7 +76,8 @@ class GeoJsonEntity:
     def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
         time = {}
         start = {
-            'earliest': entity.begin_from, 'latest': entity.begin_to,
+            'earliest': entity.begin_from,
+            'latest': entity.begin_to,
             'comment': entity.begin_comment}
         time['start'] = start
         end = {
@@ -122,7 +120,6 @@ class GeoJsonEntity:
     @staticmethod
     def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
-
         class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en']).replace(
             " ", "_")
         features = {
@@ -167,7 +164,8 @@ class GeoJsonEntity:
             elif entity.class_.name == 'object_location':
                 features['geometry'] = GeoJsonEntity.get_geoms_by_entity(entity)
 
-        data: Dict[str, Any] = {'type': type_,
-                                '@context': app.config['API_SCHEMA'],
-                                'features': [features]}
+        data: Dict[str, Any] = {
+            'type': type_,
+            '@context': app.config['API_SCHEMA'],
+            'features': [features]}
         return data

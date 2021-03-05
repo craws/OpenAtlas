@@ -34,6 +34,6 @@ class GetByCode(Resource):  # type: ignore
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'artifact']:
             raise InvalidCodeError  # pragma: no cover
-        for entity in Query.get_by_view(code_, parser):
+        for entity in Query.get_by_menu_item_api(code_, parser):
             entities.append(entity)
         return entities

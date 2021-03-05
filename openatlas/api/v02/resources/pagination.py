@@ -17,8 +17,7 @@ def get_shown_entities(total: List[int], parser: Dict[str, Any]) -> List[Any]:
 class Pagination:
 
     @staticmethod
-    def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[
-        str, Any]:
+    def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[str, Any]:
         index = []
         total = []
         for e in entities:
@@ -38,8 +37,9 @@ class Pagination:
         entities_result = []
         for r in entity_limit[:int(parser['limit'])]:
             entities_result.append(GeoJsonEntity.get_entity(r, parser))
-        result = {"result": entities_result,
-                  "pagination":
-                      {'entity_per_page': int(parser['limit']), 'entities': entities_count,
-                       'index': index, 'total_pages': len(index)}}
+        result = {
+            "result": entities_result,
+            "pagination": {
+                'entity_per_page': int(parser['limit']), 'entities': entities_count,
+                'index': index, 'total_pages': len(index)}}
         return result

@@ -35,10 +35,10 @@ class GetSubunit(Resource):  # type: ignore
             raise EntityDoesNotExistError
         structure = get_structure(entity)
         data = []
-        if structure and structure['subunits']:
-            for n in structure['subunits']:
-                data.append({'id': n.id, 'label': n.name,
-                             'url': url_for('entity', id_=n.id, _external=True)})
-        else:
+        if not structure or not structure['subunits']:
             raise InvalidSubunitError  # pragma: no cover
+        for n in structure['subunits']:
+            data.append({
+                'id': n.id, 'label': n.name,
+                'url': url_for('entity', id_=n.id, _external=True)})
         return data
