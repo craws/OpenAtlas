@@ -399,8 +399,9 @@ def link_and_get_redirect_url(form: FlaskForm,
             link_id = entity.link('P67', origin)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
         elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
-            url = url_for('entity_view', id_=entity.id)
-            origin.link('P46', entity)
+            if entity.class_.view == 'place' or entity.class_.name == 'find':
+                origin.link('P46', entity)
+                url = url_for('entity_view', id_=entity.id)
         elif origin.class_.view in ['source', 'file']:
             origin.link('P67', entity)
         elif entity.class_.view == 'source':
