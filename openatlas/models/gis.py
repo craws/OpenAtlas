@@ -49,7 +49,6 @@ class Gis:
                 geometry['title'] = row.name.replace('"', '\"') if row.name else ''
                 geometry['description'] = row.description.replace('"',
                                                               '\"') if row.description else ''
-                geometry['id'] = row.id
                 geometries.append(geometry)
         return geometries
 

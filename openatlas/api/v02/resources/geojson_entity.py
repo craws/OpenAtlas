@@ -92,7 +92,6 @@ class GeoJsonEntity:
         if entity.cidoc_class.code != 'E53':  # pragma: nocover
             return 'Wrong class'
         geoms = Gis.get_by_id(entity.id)
-        print(geoms)
         if len(geoms) == 1:
             return geoms[0]
         return {'type': 'GeometryCollection', 'geometries': geoms}
