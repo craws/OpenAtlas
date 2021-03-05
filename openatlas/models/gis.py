@@ -45,13 +45,12 @@ class Gis:
                 WHERE place.id = %(id_)s;""".format(shape=shape)
             g.execute(sql, {'id_': id_})
             for row in g.cursor.fetchall():
-                geometries.append({
-                    'id': row.id,
-                    'shape': shape,
-                    'geometry': json.loads(row.geojson),
-                    'name': row.name,
-                    'description': row.description,
-                    'type': row.type})
+                geometry = ast.literal_eval(row.geojson)
+                geometry['title'] = row.name.replace('"', '\"') if row.name else ''
+                geometry['description'] = row.description.replace('"',
+                                                              '\"') if row.description else ''
+                geometry['id'] = row.id
+                geometries.append(geometry)
         return geometries
 
     @staticmethod
