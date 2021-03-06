@@ -20,7 +20,7 @@ class GetByCode(Resource):  # type: ignore
     def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         code_ = Pagination.pagination(
-            GetByCode.get_entities_by_menu_item(code_=code, parser=parser),
+            GetByCode.get_entities_by_view(code_=code, parser=parser),
             parser=parser)
         template = GeoJson.pagination(parser['show'])
         if parser['count']:
@@ -30,10 +30,10 @@ class GetByCode(Resource):  # type: ignore
         return marshal(code_, template), 200
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, parser: Dict[str, Any]) -> List[Entity]:
+    def get_entities_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if code_ not in g.view_class_mapping:
             raise InvalidCodeError  # pragma: no cover
-        for entity in Entity.get_by_view(code_, parser):  # Todo: Refactor to API needs
+        for entity in Query.get_by_system_class(g.view_class_mapping[code_], parser):
             entities.append(entity)
         return entities
