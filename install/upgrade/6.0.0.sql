@@ -113,8 +113,11 @@ INSERT INTO model.entity (class_code, system_class, name)
 INSERT INTO model.link (property_code, domain_id, range_id)
     (SELECT 'P53', i.id, l.id FROM model.entity i JOIN model.entity l ON 'Location of ' || i.name = l.name WHERE i.system_type = 'information carrier');
 
+------------
+-- Cleanup--
+------------
 
--- Cleanup
+-- Delete dates from physical objects
 UPDATE model.entity SET
     begin_from = Null,
     begin_to = Null,
@@ -124,6 +127,29 @@ UPDATE model.entity SET
     end_comment = Null
 WHERE system_class = 'object_location';
 
--- ALTER TABLE model.entity DROP COLUMN system_type;
+-- Delete geom duplicates which could happened because of former bugs or imports
+DELETE FROM gis.point a USING gis.point b WHERE a.id < b.id
+AND a.entity_id = b.entity_id
+AND a.name = b.name
+AND a.geom = b.geom
+AND a.type = b.type
+AND a.description = b.description;
+
+DELETE FROM gis.linestring a USING gis.linestring b WHERE a.id < b.id
+AND a.entity_id = b.entity_id
+AND a.name = b.name
+AND a.geom = b.geom
+AND a.type = b.type
+AND a.description = b.description;
+
+DELETE FROM gis.polygon a USING gis.polygon b WHERE a.id < b.id
+AND a.entity_id = b.entity_id
+AND a.name = b.name
+AND a.geom = b.geom
+AND a.type = b.type
+AND a.description = b.description;
+
+
+ALTER TABLE model.entity DROP COLUMN system_type;
 
 END;
