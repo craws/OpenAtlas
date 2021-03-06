@@ -27,7 +27,7 @@ class Changelog:
                 '1386': 'API: Flask restful framework'},
             'fix': {
                 '1434': 'Errors with types if named like standard types',
-                '1427': 'API: Pageing is broken'}}],
+                '1427': 'API: Paging is broken'}}],
         '5.6.0': ['2020-11-30', {
             'feature': {
                 '930': 'Wikidata API',
