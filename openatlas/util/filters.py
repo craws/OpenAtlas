@@ -492,16 +492,21 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
     html = ''
     for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
         css = ''
-        if (view_name == item) or \
-                request.path.startswith('/index/' + item) or \
-                request.path.startswith('/insert/' + item):
+        request_parts = request.path.split('/')
+        if (view_name == item) or request.path.startswith('/index/' + item):
             css = 'active'
+        elif len(request_parts) > 2 and request.path.startswith('/insert/'):
+            name = request_parts[2]
+            if name in g.class_view_mapping and g.class_view_mapping[name] == item:
+                css = 'active'
+
         html += '<a href="/index/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
             css=css,
             item=item,
             label=display.uc_first(_(item)))
     css = ''
-    if request.path.startswith('/types') or (entity and entity.class_.view == 'type'):
+    if request.path.startswith('/types') or request.path.startswith('/insert/type') or (
+            entity and entity.class_.view == 'type'):
         css = 'active'
     html += '<a href="{url}" class="nav-item nav-link {css}">{label}</a>'.format(
         css=css,
