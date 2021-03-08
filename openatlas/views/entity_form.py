@@ -28,9 +28,8 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 @app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]:
-    if class_ == 'reference system' and not is_authorized('manager'):
-        abort(403)  # pragma: no cover
-    elif class_ in ['administrative_unit', 'type'] and not is_authorized('editor'):
+    if class_ not in g.classes or not g.classes[class_].view \
+            or not is_authorized(g.classes[class_].write_access):
         abort(403)  # pragma: no cover
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(class_, origin=origin)
@@ -98,14 +97,14 @@ def add_crumbs(view_name: str,
 @required_group('contributor')
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-    if isinstance(entity, ReferenceSystem) and not is_authorized('manager'):
+    if not entity.class_.view:
+        abort(422)  # pragma: no cover
+    elif not is_authorized(entity.class_.write_access):
         abort(403)  # pragma: no cover
     elif isinstance(entity, Node):
         root = g.nodes[entity.root[-1]] if entity.root else None
-        if not is_authorized('editor') or (not root and (entity.standard or entity.locked)):
+        if not root and (entity.standard or entity.locked):
             abort(403)  # pragma: no cover
-    if not entity.class_.view:
-        abort(422)  # pragma: no cover
 
     # Archaeological sub units
     geonames_module = False

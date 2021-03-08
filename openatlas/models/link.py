@@ -232,9 +232,6 @@ class Link:
 
     @staticmethod
     def delete_(id_: int) -> None:
-        from openatlas.util.util import is_authorized
-        if not is_authorized('contributor'):  # pragma: no cover
-            abort(403)
         g.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
     @staticmethod

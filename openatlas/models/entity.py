@@ -15,7 +15,6 @@ from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
 from openatlas.util.display import get_file_extension, link
-from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -247,8 +246,6 @@ class Entity:
 
     @staticmethod
     def delete_(id_param: Union[int, List[int]]) -> None:
-        if not is_authorized('contributor'):
-            abort(403)  # pragma: no cover
         if not id_param:
             return
         # Triggers psql function model.delete_entity_related() for deleting related entities."""

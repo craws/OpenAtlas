@@ -180,6 +180,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
             name='reference_system',
             cidoc_class='E32',
             label=_('reference system'),
+            write_access='manager',
             form_fields=[]),
         'source': SystemClass(
             name='source',

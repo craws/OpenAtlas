@@ -169,11 +169,9 @@ def entity_view(id_: int) -> Union[str, Response]:
                     link_.first,
                     link_.last,
                     link_.description]
-                if is_authorized('contributor'):
-                    data.append(link(_('edit'), url_for(
-                        'member_update',
-                        id_=link_.id,
-                        origin_id=entity.id)))
+                data = add_edit_link(
+                    data,
+                    url_for('member_update', id_=link_.id, origin_id=entity.id))
                 data = add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
     elif entity.class_.view == 'artifact':
@@ -199,11 +197,9 @@ def entity_view(id_: int) -> Union[str, Response]:
                 last,
                 g.properties[link_.property.code].name_inverse,
                 link_.description]
-            if is_authorized('contributor'):
-                data.append(link(_('edit'), url_for(
-                    'involvement_update',
-                    id_=link_.id,
-                    origin_id=entity.id)))
+            data = add_edit_link(
+                data,
+                url_for('involvement_update', id_=link_.id, origin_id=entity.id))
             data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [
@@ -388,21 +384,22 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
 
 
 def add_buttons(entity: Entity) -> List[str]:
+    if not is_authorized(entity.class_.write_access):
+        return []  # pragma: no cover
     buttons = []
     if isinstance(entity, Node):
-        if is_authorized('editor') and entity.root and not g.nodes[entity.root[0]].locked:
+        if entity.root and not g.nodes[entity.root[0]].locked:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:
                 buttons.append(display_delete_link(None, entity))
     elif isinstance(entity, ReferenceSystem):
-        if is_authorized('manager'):
-            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            if not entity.forms and not entity.system:
-                buttons.append(display_delete_link(None, entity))
+        buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
+        if not entity.forms and not entity.system:
+            buttons.append(display_delete_link(None, entity))
     elif entity.class_.name == 'source_translation':
         buttons.append(button(_('edit'), url_for('translation_update', id_=entity.id)))
         buttons.append(display_delete_link(None, entity))
-    elif is_authorized('contributor'):
+    else:
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         if entity.class_.view != 'place' or not entity.get_linked_entities('P46'):
             buttons.append(display_delete_link(None, entity))

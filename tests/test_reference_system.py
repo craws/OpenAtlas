@@ -40,6 +40,7 @@ class ReferenceSystemTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             rv = self.app.get(url_for('index', view='reference_system', delete_id=wikipedia_id))
+            print(rv.data)
             assert b'The entry has been deleted' in rv.data
 
             rv = self.app.post(url_for('update', id_=geonames.id))

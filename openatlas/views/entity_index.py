@@ -82,8 +82,10 @@ def get_table(view: str) -> Table:
 def delete_entity(id_: int) -> Optional[str]:
     url = None
     entity = Entity.get_by_id(id_)
+    if not is_authorized(entity.class_.write_access):
+        abort(403)  # pragma: no cover
     if isinstance(entity, ReferenceSystem):
-        if entity.system or not is_authorized('manager'):
+        if entity.system:
             abort(403)
         if entity.forms:
             flash(_('Deletion not possible if forms are attached'), 'error')

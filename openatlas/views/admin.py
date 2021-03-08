@@ -38,6 +38,9 @@ from openatlas.util.util import get_file_stats, is_authorized, required_group, s
 def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
+            user = User.get_by_id(id_)
+            if user.id == current_user.id or (user.group == 'admin' and not is_authorized('admin')):
+                abort(403)  # pragma: no cover
             User.delete(id_)
             flash(_('user deleted'), 'info')
         elif action == 'remove_logo':
