@@ -14,7 +14,7 @@ After clicking on the search button in the top right you will be redirected to a
 more options are available:
 
 * **Only entities edited by me** - show only entities which you have created or edited.
-* **Also search in description**
+* **Also search in description** - searches in description and date comments
 * **Classes** - search only in selected classes, e.g. Place
 
 * **Dates**

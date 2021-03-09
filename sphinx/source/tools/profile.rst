@@ -17,18 +17,6 @@ General
 * **Show email** - uncheck to hide your email for other users (except admins and managers).
 * **Newsletter** - check to receive newsletters including an unsubscribe link.
 
-Display
--------
-* **Language** - select your language for the user interface.
-* **Table rows** - amount of rows that are shown on one table page.
-* **Show aliases in tables** - show aliases of actors and places in tables and make them searchable.
-* **Show created and modified information** - in entity view: show when and by whom an entry was created and last updated
-* **Show import information** - in entity view: show the project name and original identifier in case the entity was imported from another project
-* **Show CIDOC class** - in entity view: show the CIDOC CRM class with a link to the :doc:`/tools/model`
-* **Show API links** - in entity view: show a button for the :doc:`/tools/api` view
-* **Default map zoom** - define the lowest zoom level to include all features on a :doc:`/tools/map` view.
-* **Max map zoom** - adjust how far you can zoom into a :doc:`/tools/map`.
-
 Modules
 -------
 Here you can adjust shown interface elements to your preferences. You still see e.g. existing sub
@@ -43,4 +31,18 @@ units even when you deactivate them but the interface elements to add them will 
    * Your notes are only visible to you (for public notes use the description field)
    * There is only one note per entity possible
    * Notes will get deleted if the entity is deleted by you or anybody else
+
+Display
+-------
+* **Language** - select your language for the user interface.
+* **Table rows** - amount of rows that are shown on one table page.
+* **Show aliases in tables** - show aliases of actors and places in tables and make them searchable.
+* **Show created and modified information** - in entity view: show when and by whom an entry was created and last updated
+* **Show import information** - in entity view: show the project name and original identifier in case the entity was imported from another project
+* **Show CIDOC class** - in entity view: show the CIDOC CRM class with a link to the :doc:`/tools/model`
+* **Show API links** - in entity view: show a button for the :doc:`/tools/api` view
+* **Default map zoom** - define the lowest zoom level to include all features on a :doc:`/tools/map` view.
+* **Max map zoom** - adjust how far you can zoom into a :doc:`/tools/map`.
+
+
 

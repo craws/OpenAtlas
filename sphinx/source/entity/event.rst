@@ -7,7 +7,7 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 * **Activity** - the most common, e.g. a battle, a meeting or a wedding
 * **Acquisition** - this is a special case where a change of property can be mapped, see below
-* **Move** - this event is for objects or person who moved
+* **Move** - this event is for artifacts or persons who moved
 
 .. include:: navigation.rst
 
@@ -25,7 +25,7 @@ Move
 ****
 * **From** - a :doc:`place` as a start point
 * **To** - a :doc:`place` as a destination point
-* :doc:`object` - to select objects that were moved
+* :doc:`artifact` - to select artifacts that were moved
 * :doc:`Person <actor>` - to select persons that were moved
 
 Acquisition

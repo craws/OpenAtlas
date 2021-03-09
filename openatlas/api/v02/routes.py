@@ -11,6 +11,7 @@ from openatlas.api.v02.common.entity import GetEntity
 from openatlas.api.v02.common.latest import GetLatest
 from openatlas.api.v02.common.node_entities import GetNodeEntities
 from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
+from openatlas.api.v02.common.node_overview import GetNodeOverview
 from openatlas.api.v02.common.overview_count import OverviewCount
 from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
@@ -41,6 +42,7 @@ api.add_resource(GetBySystemClass, '/api/0.2/system_class/<string:system_class>'
                  endpoint="system_class")
 api.add_resource(GetContent, '/api/0.2/content/', endpoint="content")
 api.add_resource(GetLatest, '/api/0.2/latest/<int:latest>', endpoint="latest")
+api.add_resource(GetNodeOverview, '/api/0.2/node_overview/', endpoint="node_overview")
 api.add_resource(GetNodeEntities, '/api/0.2/node_entities/<int:id_>', endpoint="node_entities")
 api.add_resource(GetNodeEntitiesAll, '/api/0.2/node_entities_all/<int:id_>',
                  endpoint="node_entities_all")

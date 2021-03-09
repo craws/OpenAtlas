@@ -97,6 +97,8 @@ class ApiTests(TestBaseCase):
             assert b'systemClass' in rv.data
             rv = self.app.get(url_for('class_mapping'))
             assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('node_overview'))
+            assert b'Actor' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))
@@ -117,6 +119,12 @@ class ApiTests(TestBaseCase):
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('content', lang='de', download=True))
             assert b'intro' in rv.data
+            rv = self.app.get(url_for('overview_count', download=True))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('class_mapping', download=True))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('node_overview', download=True))
+            assert b'Actor' in rv.data
 
             # Testing Subunit
             rv = self.app.get(url_for('subunit', id_=place.id))
