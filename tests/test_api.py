@@ -93,6 +93,10 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('content', lang='de'))
             assert b'intro' in rv.data
+            rv = self.app.get(url_for('overview_count'))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('class_mapping'))
+            assert b'systemClass' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))

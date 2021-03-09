@@ -168,6 +168,37 @@
           }
         }
       },
+      "OverviewCountModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      },
+      "ClassMappingModel": {
+        "type": "object",
+        "properties": {
+          'systemClass': {
+            "type": "string"
+          },
+          'crmClass': {
+            "type": "string"
+          },
+          'view': {
+            "type": "string"
+          },
+          'icon': {
+            "type": "string"
+          },
+          'en': {
+            "type": "string"
+          }
+        }
+      },
       "NodeModel": {
         "type": "object",
         "properties": {

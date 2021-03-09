@@ -4,12 +4,14 @@ from flask_restful import Api
 
 from openatlas import app
 from openatlas.api.v02.common.class_ import GetByClass
+from openatlas.api.v02.common.class_mapping import ClassMapping
 from openatlas.api.v02.common.code import GetByCode
 from openatlas.api.v02.common.content import GetContent
 from openatlas.api.v02.common.entity import GetEntity
 from openatlas.api.v02.common.latest import GetLatest
 from openatlas.api.v02.common.node_entities import GetNodeEntities
 from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
+from openatlas.api.v02.common.overview_count import OverviewCount
 from openatlas.api.v02.common.query import GetQuery
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
@@ -30,6 +32,8 @@ api.add_resource(ShowUsage, '/api/0.2/', '/api/0.2/entity/', '/api/0.2/class/', 
                  '/api/0.2/latest/', '/api/0.2/node_entities/', '/api/0.2/node_entities_all/',
                  '/api/0.2/subunit/', '/api/0.2/subunit_hierarchy/', '/api/0.2/system_class/',
                  endpoint='usage')
+api.add_resource(OverviewCount, '/api/0.2/overview_count/', endpoint='overview_count')
+api.add_resource(ClassMapping, '/api/0.2/classes/', endpoint='class_mapping')
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetByClass, '/api/0.2/class/<string:class_code>', endpoint="class")
 api.add_resource(GetByCode, '/api/0.2/code/<string:code>', endpoint="code")
