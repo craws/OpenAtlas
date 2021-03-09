@@ -18,6 +18,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/NodeOverviewModel'
+          $ref: '#/components/schemas/NodeAllModel'
   '404':
     description: Something went wrong. Please consult the error message.
