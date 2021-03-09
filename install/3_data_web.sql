@@ -47,9 +47,9 @@ INSERT INTO web.settings (name, value) VALUES
     ('site_name', 'OpenAtlas');
 
 -- External Reference Systems
-INSERT INTO model.entity (name, class_code, description) VALUES
-    ('GeoNames', 'E32', 'Geographical database covering all countries and many places.'),
-    ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.');
+INSERT INTO model.entity (name, class_code, description, system_class) VALUES
+    ('GeoNames', 'E32', 'Geographical database covering all countries and many places.', 'reference_system'),
+    ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
 VALUES (true,

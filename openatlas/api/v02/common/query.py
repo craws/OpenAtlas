@@ -6,6 +6,7 @@ from flask_restful import Resource, marshal
 
 from openatlas.api.v02.common.class_ import GetByClass
 from openatlas.api.v02.common.code import GetByCode
+from openatlas.api.v02.common.system_class import GetBySystemClass
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
@@ -28,14 +29,17 @@ class GetQuery(Resource):  # type: ignore
             for entity in parser['entities']:
                 entities.append(GeoJsonEntity.get_entity_by_id(entity))
         if parser['codes']:
-            for item in parser['codes']:
-                entities.extend(GetByCode.get_entities_by_menu_item(code_=item, parser=parser))
+            for code_ in parser['codes']:
+                entities.extend(GetByCode.get_entities_by_view(code_=code_, parser=parser))
+        if parser['system_classes']:
+            for system_class in parser['system_classes']:
+                entities.extend(GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser))
         if parser['classes']:
             for class_ in parser['classes']:
                 entities.extend(GetByClass.get_entities_by_class(class_code=class_, parser=parser))
         output = Pagination.pagination(entities=entities, parser=parser)
         if parser['count']:
-            return jsonify(output['pagination'][0]['entities'])
+            return jsonify(output['pagination']['entities'])
         if parser['download']:
             return Download.download(data=output, template=template, name='query')
         return marshal(output, template), 200

@@ -32,7 +32,7 @@ def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Res
         return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
     return render_template('overlay/insert.html',
                            form=form,
-                           crumbs=[[_('place'), url_for('index', class_='place')],
+                           crumbs=[[_('place'), url_for('index', view='place')],
                                    Entity.get_by_id(place_id),
                                    Entity.get_by_id(image_id),
                                    _('overlay')])
@@ -57,7 +57,7 @@ def overlay_update(id_: int) -> Union[str, Response]:
                            form=form,
                            overlay=overlay,
                            entity=entity,
-                           crumbs=[[_('place'), url_for('index', class_='place')],
+                           crumbs=[[_('place'), url_for('index', view='place')],
                                    entity,
                                    Entity.get_by_id(overlay.image_id),
                                    _('update overlay')])

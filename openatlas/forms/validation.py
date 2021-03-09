@@ -1,6 +1,6 @@
 import ast
 
-from flask import g, request, session
+from flask import request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
@@ -70,7 +70,6 @@ def validate(self: FlaskForm) -> bool:
     # Super event
     if hasattr(self, 'event') and hasattr(self, 'event_id'):
         """ Check if selected super event is allowed."""
-        # Todo: also check if super is not a sub event of itself (recursively)
         if self.event.data:
             if str(self.event.data) == str(self.event_id.data):
                 self.event.errors.append(_('error node self as super'))

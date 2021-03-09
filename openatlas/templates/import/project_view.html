@@ -18,11 +18,11 @@
                         </div>
                         <p>{{ _('new import')|uc_first }}:</p>
                         <div class="toolbar">
-                            {{ _('source')|button(url_for('import_data', project_id=project.id, class_code='E33')) }}
-                            {% for code in config.CLASS_CODES.event + config.CLASS_CODES.actor %}
-                                {{ code|get_class_name|button(url_for('import_data', project_id=project.id, class_code=code)) }}
+                            {{ _('source')|button(url_for('import_data', project_id=project.id, class_='source')) }}
+                            {% for class_ in g.view_class_mapping['event'] + g.view_class_mapping['actor'] %}
+                                {{ class_|button(url_for('import_data', project_id=project.id, class_=class_)) }}
                             {% endfor %}
-                            {{ _('place')|button(url_for('import_data', project_id=project.id, class_code='E18')) }}
+                            {{ _('place')|button(url_for('import_data', project_id=project.id, class_='place')) }}
                         </div>
                     {% endif %}
                     {{ project|description }}

@@ -37,7 +37,7 @@ Admins and manager can add, updated and delete external reference systems.
   e.g. the resolver URL **https://www.wikidata.org/wiki/** would create together with a **Q123**
   identifier the external link: https://www.wikidata.org/wiki/Q123
 * **Example ID** - an example id to show the desired format e.g. Q123 for Wikidata
-* **External Reference Match** - default precision selected in forms
+* **External reference match** - default precision selected in forms
 * **Description** - a short description, shown in forms when mouse over the **i** icon
 * **Forms** - a checkbox list of available forms, for GeoNames only place is available
 

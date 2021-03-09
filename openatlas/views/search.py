@@ -1,4 +1,4 @@
-from flask import render_template, request
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField,
@@ -56,16 +56,15 @@ class SearchForm(FlaskForm):  # type: ignore
 @app.route('/overview/search', methods=['POST', 'GET'])
 @required_group('readonly')
 def search_index() -> str:
-    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
-               'human remains', 'reference', 'file']
+    classes = [name for name, count in Entity.get_overview_counts().items() if count]
     form = SearchForm()
-    form.classes.choices = [(x, uc_first(_(x))) for x in choices]
-    form.classes.default = choices
+    form.classes.choices = [(name, g.classes[name].label) for name in classes]
+    form.classes.default = classes
     form.classes.process(request.form)
     table = Table()
     if request.method == 'POST' and 'global-term' in request.form:  # Coming from global search
         form.term.data = request.form['global-term']
-        form.classes.data = choices
+        form.classes.data = classes
         table = build_search_table(form)
     elif form.validate_on_submit():
         table = build_search_table(form)
@@ -77,11 +76,10 @@ def search_index() -> str:
 
 
 def build_search_table(form: FlaskForm) -> Table:
-    table = Table(['name', 'class', 'first', 'last', 'description'],
-                  defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
+    table = Table(['name', 'class', 'first', 'last', 'description'])
     for entity in Entity.search(form):
         table.rows.append([link(entity),
-                           entity.class_.name,
+                           g.classes[entity.class_.name].label,
                            entity.first,
                            entity.last,
                            entity.description])

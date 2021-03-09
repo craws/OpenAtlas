@@ -14,16 +14,17 @@ class ShowUsage(Resource):  # type: ignore
     def get(self) -> Union[Tuple[Resource, int], Response]:
         usage = {
             'message': 'The path you entered is not correct.',
-            'examples':
-                {'entity': url_for('entity', id_=23, _external=True),
-                 'code': url_for('code', code='actor', _external=True),
-                 'class': url_for('class', class_code='E18', _external=True),
-                 'query': url_for('query', classes='E18', items='actor', entities=23,
-                                  _external=True),
-                 'latest': url_for('latest', latest='30', _external=True),
-                 'node_entities': url_for('node_entities', id_=23, _external=True),
-                 'node_entities_all': url_for('node_entities_all', id_=23, _external=True),
-                 'subunit': url_for('subunit', id_=23, _external=True),
-                 'subunit_hierarchy': url_for('subunit_hierarchy', id_=23, _external=True)}}
+            'examples': {
+                'entity': url_for('entity', id_=23, _external=True),
+                'code': url_for('code', code='actor', _external=True),
+                'class': url_for('class', class_code='E18', _external=True),
+                'system_class': url_for('system_class', system_class='person', _external=True),
+                'query': url_for('query', classes='E18', view='actor', entities=23,
+                                 _external=True),
+                'latest': url_for('latest', latest='30', _external=True),
+                'node_entities': url_for('node_entities', id_=23, _external=True),
+                'node_entities_all': url_for('node_entities_all', id_=23, _external=True),
+                'subunit': url_for('subunit', id_=23, _external=True),
+                'subunit_hierarchy': url_for('subunit_hierarchy', id_=23, _external=True)}}
         template = UsageTemplate.usage_template()
         return marshal(usage, template), 200

@@ -4,11 +4,13 @@ import ast
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
+from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.display import uc_first
 
 
 class Node(Entity):
@@ -30,7 +32,7 @@ class Node(Entity):
     def get_all_nodes() -> Dict[int, Node]:
         """ Get and return all type and place nodes"""
         sql = """
-            SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
+            SELECT e.id, e.name, e.class_code, e.description, e.system_class, e.created, e.modified,
                 es.id AS super_id, COUNT(l2.id) AS count, COUNT(l3.id) AS count_property
             FROM model.entity e                
 
@@ -42,13 +44,12 @@ class Node(Entity):
             LEFT JOIN model.link l2 ON e.id = l2.range_id AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
             
-            WHERE e.class_code = %(class_code)s
-                AND (e.system_type IS NULL OR e.system_type != 'place location')
+            WHERE e.system_class = %(system_class)s
             GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
-        g.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})
+        g.execute(sql, {'system_class': 'type', 'property_code': 'P127'})
         types = g.cursor.fetchall()
-        g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
+        g.execute(sql, {'system_class': 'administrative_unit', 'property_code': 'P89'})
         places = g.cursor.fetchall()
         nodes = {}
         for row in types + places:
@@ -67,7 +68,12 @@ class Node(Entity):
         g.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         forms = {}
         for row in g.cursor.fetchall():
-            forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
+            forms[row.id] = {
+                'id': row.id,
+                'name': row.name,
+                'label': g.classes[row.name].label if row.name in g.classes
+                else uc_first(_(row.name.replace('_', ''))),
+                'extendable': row.extendable}
         sql = """
             SELECT h.id, h.name, h.multiple, h.standard, h.directional, h.value_type, h.locked,
                 (SELECT ARRAY(
@@ -108,12 +114,16 @@ class Node(Entity):
         for node in g.nodes.values():
             if node.name == name and not node.root:
                 return node.subs
-        return []
+        return []  # pragma: no cover
+
+    @staticmethod
+    def check_hierarchy_exists(name: str) -> List[Node]:
+        hierarchies = [root for root in g.nodes.values() if root.name == name and not root.root]
+        return hierarchies
 
     @staticmethod
     def get_hierarchy(name: str) -> Node:
-        return [root for root in g.nodes.values() if
-                root.name == name.replace('_', ' ') and not root.root][0]
+        return [root for root in g.nodes.values() if root.name == name and not root.root][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> List[Dict[str, Any]]:
@@ -124,10 +134,11 @@ class Node(Entity):
         items = []
         for id_ in nodes:
             item = g.nodes[id_]
-            items.append({'id': item.id,
-                          'text': item.name.replace("'", "&apos;"),
-                          'state': {'selected': 'true'} if item.id in selected_ids else '',
-                          'children': Node.walk_tree(item.subs, selected_ids)})
+            items.append({
+                'id': item.id,
+                'text': item.name.replace("'", "&apos;"),
+                'state': {'selected': 'true'} if item.id in selected_ids else '',
+                'children': Node.walk_tree(item.subs, selected_ids)})
         return items
 
     @staticmethod
@@ -143,7 +154,11 @@ class Node(Entity):
     @staticmethod
     def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         g.execute("SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
-        return [(r.id, r.name) for r in g.cursor.fetchall() if not root or r.id not in root.forms]
+        choices = []
+        for row in g.cursor.fetchall():
+            if g.classes[row.name].view != 'type' and (not root or row.id not in root.forms):
+                choices.append((row.id, g.classes[row.name].label))
+        return choices
 
     @staticmethod
     def save_entity_nodes(entity: Entity, form: Any) -> None:
@@ -153,19 +168,20 @@ class Node(Entity):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if type(field) is ValueFloatField and entity.class_.code != 'E53':
-                if field.data is not None:  # Allow to save 0 but not empty
+            if isinstance(field, ValueFloatField):
+                if entity.class_.name == 'object_location' or isinstance(entity, Node):
+                    continue  # pragma: no cover
+                if field.data is not None:  # Allow 0 (zero)
                     entity.link('P2', g.nodes[int(field.name)], field.data)
-            elif type(field) in (TreeField, TreeMultiField) and field.data:
-                root = g.nodes[int(field.id)]
+            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:
                     range_ = [g.nodes[int(field.data)]]
                 except ValueError:  # Form value was a list string e.g. '[97,2798]'
                     range_ = [g.nodes[int(range_id)] for range_id in ast.literal_eval(field.data)]
-                if root.name in ['Administrative Unit', 'Historical Place']:
-                    if entity.class_.code == 'E53':
+                if g.nodes[int(field.id)].class_.name == 'administrative_unit':
+                    if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
-                elif entity.class_.code != 'E53':
+                elif entity.class_.name != 'object_location' and not isinstance(entity, Node):
                     entity.link('P2', range_)
 
     @staticmethod
@@ -176,10 +192,11 @@ class Node(Entity):
         multiple = False
         if value_type or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
-        g.execute(sql, {'id': node.id,
-                        'name': node.name,
-                        'multiple': multiple,
-                        'value_type': value_type})
+        g.execute(sql, {
+            'id': node.id,
+            'name': node.name,
+            'multiple': multiple,
+            'value_type': value_type})
         Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
@@ -226,9 +243,10 @@ class Node(Entity):
                     sql = """
                         UPDATE model.link SET range_id = %(new_type_id)s
                         WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
-                g.execute(sql, {'old_type_id': old_node.id,
-                                'new_type_id': new_type_id,
-                                'entity_ids': tuple(entity_ids)})
+                g.execute(sql, {
+                    'old_type_id': old_node.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)})
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 
@@ -260,27 +278,11 @@ class Node(Entity):
             return
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
-        system_type = ''
-        class_code: List[str] = []
-        if form_name == 'Source':
-            system_type = 'source content'
-        elif form_name == 'Event':
-            class_code = app.config['CLASS_CODES']['event']
-        elif form_name == 'Person':
-            class_code = ['E21']
-        elif form_name == 'Group':
-            class_code = ['E74']
-        elif form_name == 'Legal Body':
-            class_code = ['E40']
-        else:
-            system_type = form_name.lower()
         sql = """
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
-            WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
-            sql_where='e.system_type =' if system_type else 'e.class_code IN')
-        g.execute(sql, {'node_ids': tuple(node_ids),
-                        'params': system_type if system_type else tuple(class_code)})
+            WHERE l.property_code = 'P2' AND e.system_class = %(form_name)s;"""
+        g.execute(sql, {'node_ids': tuple(node_ids), 'form_name': form_name})
         return g.cursor.fetchone()[0]
 
     @staticmethod

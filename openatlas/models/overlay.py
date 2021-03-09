@@ -27,28 +27,31 @@ class Overlay:
         sql = """
             INSERT INTO web.map_overlay (image_id, place_id, link_id, bounding_box)
             VALUES (%(image_id)s, %(place_id)s, %(link_id)s, %(bounding_box)s);"""
-        bounding_box = '[[{top_left_northing}, {top_left_easting}],' \
-                       '[{bottom_right_northing}, {bottom_right_easting}]]'.format(
-                        top_left_easting=form.top_left_easting.data,
-                        top_left_northing=form.top_left_northing.data,
-                        bottom_right_easting=form.bottom_right_easting.data,
-                        bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image_id,
-                        'place_id': place_id,
-                        'link_id': link_id,
-                        'bounding_box': bounding_box})
+        bounding_box = \
+            '[[{top_left_northing}, {top_left_easting}],' \
+            '[{bottom_right_northing}, {bottom_right_easting}]]'.format(
+                top_left_easting=form.top_left_easting.data,
+                top_left_northing=form.top_left_northing.data,
+                bottom_right_easting=form.bottom_right_easting.data,
+                bottom_right_northing=form.bottom_right_northing.data)
+        g.execute(sql, {
+            'image_id': image_id,
+            'place_id': place_id,
+            'link_id': link_id,
+            'bounding_box': bounding_box})
 
     @staticmethod
     def update(form: FlaskForm, image_id: int, place_id: int) -> None:
         sql = """
             UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
             WHERE image_id = %(image_id)s AND place_id = %(place_id)s;"""
-        bounding_box = '[[{top_left_northing}, {top_left_easting}],' \
-                       '[{bottom_right_northing}, {bottom_right_easting}]]'.format(
-                        top_left_easting=form.top_left_easting.data,
-                        top_left_northing=form.top_left_northing.data,
-                        bottom_right_easting=form.bottom_right_easting.data,
-                        bottom_right_northing=form.bottom_right_northing.data)
+        bounding_box = \
+            '[[{top_left_northing}, {top_left_easting}],' \
+            '[{bottom_right_northing}, {bottom_right_easting}]]'.format(
+                top_left_easting=form.top_left_easting.data,
+                top_left_northing=form.top_left_northing.data,
+                bottom_right_easting=form.bottom_right_easting.data,
+                bottom_right_northing=form.bottom_right_northing.data)
         g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
 
     @staticmethod
@@ -58,17 +61,17 @@ class Overlay:
 
         ids = [object_.id]
         # Get overlays of parents
-        if object_.system_type == 'find':
+        if object_.class_.name == 'find':
             stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
             ids.append(stratigraphic_unit.id)
             feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
             ids.append(feature.id)
             ids.append(feature.get_linked_entity_safe('P46', True).id)
-        elif object_.system_type == 'stratigraphic unit':
+        elif object_.class_.name == 'stratigraphic_unit':
             feature = object_.get_linked_entity_safe('P46', True)
             ids.append(feature.id)
             ids.append(feature.get_linked_entity_safe('P46', True).id)
-        elif object_.system_type == 'feature':
+        elif object_.class_.name == 'feature':
             ids.append(object_.get_linked_entity_safe('P46', True).id)
 
         sql = """

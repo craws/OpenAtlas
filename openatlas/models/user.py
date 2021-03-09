@@ -11,10 +11,8 @@ from flask_babel import lazy_gettext as _
 from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
-from werkzeug.exceptions import abort
 
 from openatlas.models.entity import Entity
-from openatlas.util.util import is_authorized
 
 
 class User(UserMixin):  # type: ignore
@@ -58,20 +56,21 @@ class User(UserMixin):  # type: ignore
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
                 %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
             WHERE id = %(id)s;"""
-        g.execute(sql, {'id': self.id,
-                        'username': self.username,
-                        'real_name': self.real_name,
-                        'password': self.password,
-                        'info': self.description,
-                        'email': self.email,
-                        'active': self.active,
-                        'group_name': self.group,
-                        'login_last_success': self.login_last_success,
-                        'login_last_failure': self.login_last_failure,
-                        'login_failed_count': self.login_failed_count,
-                        'unsubscribe_code': self.unsubscribe_code,
-                        'password_reset_code': self.password_reset_code,
-                        'password_reset_date': self.password_reset_date})
+        g.execute(sql, {
+            'id': self.id,
+            'username': self.username,
+            'real_name': self.real_name,
+            'password': self.password,
+            'info': self.description,
+            'email': self.email,
+            'active': self.active,
+            'group_name': self.group,
+            'login_last_success': self.login_last_success,
+            'login_last_failure': self.login_last_failure,
+            'login_failed_count': self.login_failed_count,
+            'unsubscribe_code': self.unsubscribe_code,
+            'password_reset_code': self.password_reset_code,
+            'password_reset_date': self.password_reset_date})
 
     def update_settings(self, form: Any) -> None:
         for field in form:
@@ -175,25 +174,22 @@ class User(UserMixin):  # type: ignore
             VALUES (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             RETURNING id;"""
-        password = bcrypt.hashpw(form.password.data.encode('utf-8'),
-                                 bcrypt.gensalt()).decode('utf-8')
-        g.execute(sql, {'username': form.username.data,
-                        'real_name': form.real_name.data,
-                        'info': form.description.data,
-                        'email': form.email.data,
-                        'active': form.active.data,
-                        'group_name': form.group.data,
-                        'password': password})
+        password = bcrypt.hashpw(
+            form.password.data.encode('utf-8'),
+            bcrypt.gensalt()).decode('utf-8')
+        g.execute(sql, {
+            'username': form.username.data,
+            'real_name': form.real_name.data,
+            'info': form.description.data,
+            'email': form.email.data,
+            'active': form.active.data,
+            'group_name': form.group.data,
+            'password': password})
         return g.cursor.fetchone()[0]
 
     @staticmethod
     def delete(id_: int) -> None:
-        user = User.get_by_id(id_)
-        if not is_authorized('manager') or user.id == current_user.id or (
-                (user.group == 'admin' and not is_authorized('admin'))):
-            abort(403)  # pragma: no cover
-        sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
-        g.execute(sql, {'user_id': id_})
+        g.execute('DELETE FROM web."user" WHERE id = %(user_id)s;', {'user_id': id_})
 
     @staticmethod
     def get_users() -> List[Tuple[int, str]]:
@@ -247,9 +243,10 @@ class User(UserMixin):  # type: ignore
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
-        g.execute(sql, {'user_id': current_user.id,
-                        'entity_id': entity.id,
-                        'text': sanitize(note, 'text')})
+        g.execute(sql, {
+            'user_id': current_user.id,
+            'entity_id': entity.id,
+            'text': sanitize(note, 'text')})
 
     @staticmethod
     def update_note(entity: Entity, note: str) -> None:
@@ -257,9 +254,10 @@ class User(UserMixin):  # type: ignore
         sql = """
             UPDATE web.user_notes SET text = %(text)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.execute(sql, {'user_id': current_user.id,
-                        'entity_id': entity.id,
-                        'text': sanitize(note, 'text')})
+        g.execute(sql, {
+            'user_id': current_user.id,
+            'entity_id': entity.id,
+            'text': sanitize(note, 'text')})
 
     @staticmethod
     def get_note(entity: Entity) -> Optional[str]:

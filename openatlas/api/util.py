@@ -4,7 +4,6 @@ from flask import send_file, send_from_directory
 from flask_cors import cross_origin
 
 from openatlas import app
-from openatlas.util.image_manipulation import ImageManipulation
 from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneError
 from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
@@ -20,19 +19,14 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
-    # If img has no license, it will not displayed
     for node in entity.nodes:
         if node.root and node.root[-1] == Node.get_hierarchy('License').id:
             license_ = node.name
-    if license_:
-        if parser['download']:
-            return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
-        if parser['thumbnail']:
-            return send_file(
-                ImageManipulation.image_thumbnail(str(app.config['UPLOAD_DIR']) + '/' + filename,
-                                                  parser['thumbnail']), mimetype='image/jpeg')
-        return send_from_directory(app.config['UPLOAD_DIR'], filename)
-    raise AccessDeniedError
+    if not license_:
+        raise AccessDeniedError
+    if parser['download']:
+        return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
+    return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/api/0.1/', strict_slashes=False)

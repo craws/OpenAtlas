@@ -15,8 +15,11 @@ INSERT INTO web.user_settings (user_id, name, value) VALUES
 UPDATE web.settings SET value = 'True' WHERE name = 'debug_mode';
 
 -- Citation example
-INSERT INTO web.i18n (name, language, text) VALUES ('citation_example', 'en', 'citation example');
+INSERT INTO web.i18n (name, language, text) VALUES
+    ('citation_example', 'en', 'citation example');
 
 -- Insert invalid link
-INSERT INTO model.entity (class_code, name) VALUES ('E13', 'Invalid linked entity');
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P86', (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'), (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'));
+INSERT INTO model.entity (class_code, system_class, name) VALUES
+    ('E13', 'artifact', 'Invalid linked entity');
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES
+    ('P86', (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'), (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'));

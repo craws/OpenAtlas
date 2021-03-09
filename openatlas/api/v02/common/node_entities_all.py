@@ -34,8 +34,9 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
     def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
         for e in entities:
-            data.append({'id': e.id, 'label': e.name,
-                         'url': url_for('entity', id_=e.id, _external=True)})
+            data.append({
+                'id': e.id, 'label': e.name,
+                'url': url_for('entity', id_=e.id, _external=True)})
         node = g.nodes[id_]
         for sub_id in node.subs:
             GetNodeEntitiesAll.get_recursive_node_entities(sub_id, data)

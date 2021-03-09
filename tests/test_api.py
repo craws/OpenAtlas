@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
@@ -16,6 +17,7 @@ from tests.base import TestBaseCase, insert_entity
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
+        pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()
@@ -29,11 +31,15 @@ class ApiTests(TestBaseCase):
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
 
+                location = place.get_linked_entity_safe('P53')
+                Gis.add_example_geom(location)
+                location = place.get_linked_entity_safe('P53')
+
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
 
                 # Adding Alias
-                alias = insert_entity('Cargo hauler', 'alias')
+                alias = insert_entity('Cargo hauler', 'appellation')
                 place.link('P1', alias)
 
                 # Adding External Reference
@@ -47,7 +53,7 @@ class ApiTests(TestBaseCase):
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
@@ -60,7 +66,7 @@ class ApiTests(TestBaseCase):
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy('External Reference Match').subs[0]
+                precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
             # Path Tests
@@ -74,13 +80,14 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation'))
+            assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('node_entities', id_=unit_node.id))
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
-            # Todo: Expected Nostromos too, only get Asgard
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
@@ -94,6 +101,8 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation', download=True))
+            assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('node_entities', id_=unit_node.id, download=True))
@@ -152,6 +161,8 @@ class ApiTests(TestBaseCase):
             assert b'2' in rv.data
             rv = self.app.get(url_for('code', code='place', count=True))
             assert b'3' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation', count=True))
+            assert b'1' in rv.data
 
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', codes='place'))
@@ -164,72 +175,73 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
 
+
     @raises(EntityDoesNotExistError)
-    def error_class_entity(self):  # pragma: nocover
+    def error_class_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
-    def error_query_query(self):  # pragma: nocover
+    def error_query_query(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('query'))
 
     @raises(InvalidSubunitError)
-    def error_node_invalid(self):  # pragma: nocover
+    def error_node_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('node_entities', id_=1234))
 
     @raises(InvalidSubunitError)
-    def error_node_all_invalid(self):  # pragma: nocover
+    def error_node_all_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('node_entities_all', id_=1234))
 
     @raises(InvalidCidocClassCode)
-    def error_class_invalid(self):  # pragma: nocover
+    def error_class_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
-    def error_code_invalid(self):  # pragma: nocover
+    def error_code_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='Invalid'))
 
     @raises(InvalidLimitError)
-    def error_latest_invalid(self):  # pragma: nocover
+    def error_latest_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('latest', latest='99999999'))
 
     @raises(EntityDoesNotExistError)
-    def error_subunit_entity(self):  # pragma: nocover
+    def error_subunit_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('subunit', id_='99999999'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_1(self):  # pragma: nocover
+    def error_filter_operator_1(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='Wrong|name|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_2(self):  # pragma: nocover
+    def error_filter_operator_2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|Wrong|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_3(self):  # pragma: nocover
+    def error_filter_operator_3(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|name|Wrong|Nostromos'))
 
     @raises(NoSearchStringError)
-    def error_filter_search(self):  # pragma: nocover
+    def error_filter_search(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|name|Wrong|'))
 
     @raises(InvalidSearchDateError)
-    def error_filter_date(self):  # pragma: nocover
+    def error_filter_date(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|begin_from|like|WRONG'))
 
     @raises(InvalidSearchNumberError)
-    def error_filter_date(self):  # pragma: nocover
+    def error_filter_date2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('code', code='place', filter='or|id|eq|WRONG'))

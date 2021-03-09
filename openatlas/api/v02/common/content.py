@@ -16,12 +16,11 @@ class GetContent(Resource):  # type: ignore
     # @swag_from("../swagger/content.yml", endpoint="content")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = language_parser.parse_args()
-        content = {'intro': Content.get_translation('intro_for_frontend', parser['lang']),
-                   'contact': Content.get_translation('contact_for_frontend', parser['lang']),
-                   'legal-notice': Content.get_translation('legal_notice_for_frontend',
-                                                           parser['lang'])}
+        content = {
+            'intro': Content.get_translation('intro_for_frontend', parser['lang']),
+            'contact': Content.get_translation('contact_for_frontend', parser['lang']),
+            'legal-notice': Content.get_translation('legal_notice_for_frontend', parser['lang'])}
         template = ContentTemplate.content_template()
         if parser['download']:
             return Download.download(data=content, template=template, name='content')
-
         return marshal(content, ContentTemplate.content_template()), 200

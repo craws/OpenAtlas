@@ -13,7 +13,7 @@
                         <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
                     </a>
                     {{ _('model')|button(url_for('model_index')) }}
-                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('index', class_='reference_system') }}">
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="{{ url_for('index', view='reference_system') }}">
                         {{ _('reference system')|uc_first }}
                     </a>
                 </p>
@@ -45,15 +45,15 @@
                     {{ _('first login') }}
                 {% endif %}
             </p>
+            {% if tables.latest.rows %}
+                <h1>{{ _('latest')|uc_first }}</h1>
+                {{ tables.latest.display('latest')|safe }}
+                <div class="toolbar">
+                    {{ _('Show all activity')|button(url_for('user_activity')) }}
+                </div>
+            {% endif %}
         </div>
         <div style="clear:both;"></div>
-        {% if tables.latest.rows %}
-            <h1>{{ _('latest')|uc_first }}</h1>
-            {{ tables.latest.display('latest')|safe }}
-            <div class="toolbar">
-                {{ _('Show all activity')|button(url_for('user_activity')) }}
-            </div>
-        {% endif %}
         {% if tables.bookmarks.rows %}
             <h1>{{ _('bookmarks')|uc_first }}</h1>
             {{ tables.bookmarks.display('bookmarks')|safe }}

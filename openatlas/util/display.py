@@ -30,7 +30,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.reference_system import ReferenceSystem
 
 
-# This file is used in combination with filters.py to centralize HTML display code
+# Functions that return HTML code but aren't called from templates (these are in filters.py)
 
 def external_url(url: Union[str, None]) -> str:
     return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'.format(
@@ -76,12 +76,12 @@ def tree_select(name: str) -> str:
                             tree_data=walk_tree(Node.get_nodes(name)))
 
 
-def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User'],
+def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
          url: Optional[str] = None,
          class_: Optional[str] = None,
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
-    if type(object_) is str or type(object_) is LazyString:
+    if isinstance(object_, (str, LazyString)):
         return '<a href="{url}" {class_} {js}>{label}</a>'.format(
             url=url,
             class_='class="' + class_ + '"' if class_ else '',
@@ -130,7 +130,7 @@ def delete_link(name: str, url: str) -> str:
         js="return confirm('{x}')".format(x=_('Delete %(name)s?', name=name.replace("'", ''))))
 
 
-def uc_first(string: str) -> str:
+def uc_first(string: Optional[str] = '') -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
@@ -193,14 +193,13 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     return html
 
 
-def add_system_data(entity: 'Entity',
-                    data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
+def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     # Add additional information for entity views (if activated in profile)
     if not hasattr(current_user, 'settings'):
         return data  # pragma: no cover
     info = openatlas.logger.get_log_for_advanced_view(entity.id)
     if 'entity_show_class' in current_user.settings and current_user.settings['entity_show_class']:
-        data[_('class')] = link(entity.class_)
+        data[_('class')] = link(entity.cidoc_class)
     if 'entity_show_dates' in current_user.settings and current_user.settings['entity_show_dates']:
         data[_('created')] = format_date(entity.created) + ' ' + link(info['creator'])
         if info['modified']:
@@ -226,14 +225,13 @@ def add_system_data(entity: 'Entity',
     return data
 
 
-def add_type_data(entity: 'Entity',
-                  data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
+def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
-        label = 'type' if root.name in app.config['BASE_TYPES'] else root.name
+        label = 'type' if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
         text = ''
@@ -307,16 +305,14 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
            + '..' + '</span>'  # pragma: no cover
 
 
-def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
-                    event_links: Optional[List[Link]] = None  # Used for actor views
-                    ) -> Dict[str, Union[str, List[str]]]:
+def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
     """ Collect and return related information for entity views."""
-    data: Dict[str, Union[str, List[str]]] = {_('alias'): list(entity.aliases.values())}
+    data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
     from_link = ''
     to_link = ''
-    if entity.class_.code == 'E9':  # Add places to dates if it's a move
+    if entity.class_.name == 'move':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
             from_link = link(place_from.get_linked_entity_safe('P53', True)) + ' '
@@ -326,48 +322,21 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
     data[_('begin')] = (from_link if from_link else '') + format_entry_begin(entity)
     data[_('end')] = (to_link if to_link else '') + format_entry_end(entity)
 
-    # Types
     add_type_data(entity, data)
 
     # Class specific information
-    # Todo: like in views/entity this if/else is too long and error prone
-    if entity.view_name == 'node':
-        data[_('super')] = link(g.nodes[entity.root[-1]])
+    from openatlas.models.node import Node
+    from openatlas.models.reference_system import ReferenceSystem
+    if isinstance(entity, Node):
+        data[_('super')] = link(g.nodes[entity.root[0]])
         if g.nodes[entity.root[0]].value_type:
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
-    elif entity.view_name == 'file':
-        data[_('size')] = print_file_size(entity)
-        data[_('extension')] = get_file_extension(entity)
-    elif entity.view_name == 'source':
-        data[_('information carrier')] = [link(recipient) for recipient in
-                                          entity.get_linked_entities(['P128'], inverse=True)]
-    elif entity.view_name == 'event':
-        super_event = entity.get_linked_entity('P117')
-        if super_event:
-            data[_('sub event of')] = link(super_event)
-        if not entity.class_.code == 'E9':
-            place = entity.get_linked_entity('P7')
-            if place:
-                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
-        # Acquisition
-        if entity.class_.code == 'E8':
-            data[_('recipient')] = [link(recipient) for recipient in
-                                    entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
-        # Move
-        if entity.class_.code == 'E9':
-            person_data = []
-            object_data = []
-            for linked_entity in entity.get_linked_entities(['P25']):
-                if linked_entity.class_.code == 'E21':
-                    person_data.append(linked_entity)
-                elif linked_entity.class_.code == 'E84':
-                    object_data.append(linked_entity)
-            data[_('person')] = [link(object_) for object_ in person_data]
-            data[_('object')] = [link(object_) for object_ in object_data]
-    elif entity.view_name == 'actor':
+    elif isinstance(entity, ReferenceSystem):
+        data[_('website URL')] = external_url(entity.website_url)
+        data[_('resolver URL')] = external_url(entity.resolver_url)
+        data[_('example ID')] = entity.placeholder
+    elif entity.class_.view == 'actor':
         begin_place = entity.get_linked_entity('OA8')
         begin_object = None
         if begin_place:
@@ -385,17 +354,47 @@ def get_entity_data(entity: Union['Entity', 'Node', 'ReferenceSystem'],
             entity.linked_places.append(residence_object)
         appears_first, appears_last = get_appearance(event_links)
         data[_('alias')] = list(entity.aliases.values())
-        data[_('born') if entity.class_.code == 'E21' else _('begin')] = format_entry_begin(
-            entity, begin_object)
-        data[_('died') if entity.class_.code == 'E21' else _('end')] = format_entry_end(
-            entity, end_object)
+        data[_('born') if entity.class_.name == 'person' else _('begin')] = format_entry_begin(
+            entity,
+            begin_object)
+        data[_('died') if entity.class_.name == 'person' else _('end')] = format_entry_end(
+            entity,
+            end_object)
         data[_('appears first')] = appears_first
         data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
-    elif entity.view_name == 'reference_system':
-        data[_('website URL')] = external_url(entity.website_url)
-        data[_('resolver URL')] = external_url(entity.resolver_url)
-        data[_('example ID')] = entity.placeholder
+    elif entity.class_.view == 'artifact':
+        data[_('source')] = [link(source) for source in entity.get_linked_entities(['P128'])]
+    elif entity.class_.view == 'event':
+        super_event = entity.get_linked_entity('P117')
+        if super_event:
+            data[_('sub event of')] = link(super_event)
+        if entity.class_.name == 'move':
+            person_data = []
+            artifact_data = []
+            for linked_entity in entity.get_linked_entities(['P25']):
+                if linked_entity.class_.name == 'person':
+                    person_data.append(linked_entity)
+                elif linked_entity.class_.view == 'artifact':
+                    artifact_data.append(linked_entity)
+            data[_('person')] = [link(item) for item in person_data]
+            data[_('artifact')] = [link(item) for item in artifact_data]
+        else:
+            place = entity.get_linked_entity('P7')
+            if place:
+                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
+
+        if entity.class_.name == 'acquisition':
+            data[_('recipient')] = [
+                link(recipient) for recipient in entity.get_linked_entities(['P22'])]
+            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
+    elif entity.class_.view == 'file':
+        data[_('size')] = print_file_size(entity)
+        data[_('extension')] = get_file_extension(entity)
+    elif entity.class_.view == 'source':
+        data[_('artifact')] = [
+            link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
     return add_system_data(entity, data)
 
 
@@ -423,13 +422,12 @@ def get_base_table_data(entity: 'Entity',
             data[0] = ''.join([data[0]] + [alias])
         else:
             data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
-    if entity.view_name in ['event', 'actor']:
-        data.append(g.classes[entity.class_.code].name)
-    if entity.view_name in ['reference'] and entity.system_type != 'file':
-        data.append(uc_first(_(entity.system_type)))
-    if entity.view_name in ['event', 'place', 'source', 'reference', 'file', 'object']:
-        data.append(entity.print_base_type())
-    if entity.system_type == 'file':
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
+            entity.class_.name == 'find':
+        data.append(entity.class_.label)
+    if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
+        data.append(entity.print_standard_type())
+    if entity.class_.name == 'file':
         if file_stats:
             data.append(convert_size(
                 file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
@@ -438,7 +436,7 @@ def get_base_table_data(entity: 'Entity',
         else:
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
-    if entity.view_name in ['event', 'actor', 'place']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     data.append(entity.description)
@@ -542,7 +540,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = Date.datetime64_to_timestamp(value)
-        return date_ if date_ else ''
+        return date_.lstrip('0') if date_ else ''
     return value.date().isoformat()
 
 

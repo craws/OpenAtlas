@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.9 (Debian 11.9-0+deb10u1)
--- Dumped by pg_dump version 11.9 (Debian 11.9-0+deb10u1)
+-- Dumped from database version 11.10 (Debian 11.10-0+deb10u1)
+-- Dumped by pg_dump version 11.10 (Debian 11.10-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -102,6 +102,7 @@ ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_form_id_key;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
@@ -668,7 +669,8 @@ CREATE TABLE model.entity (
     begin_comment text,
     end_from timestamp without time zone,
     end_to timestamp without time zone,
-    end_comment text
+    end_comment text,
+    system_class text NOT NULL
 );
 
 
@@ -818,8 +820,6 @@ ALTER TABLE model.property_id_seq OWNER TO openatlas;
 ALTER SEQUENCE model.property_id_seq OWNED BY model.property.id;
 
 
-SET default_with_oids = true;
-
 --
 -- Name: property_inheritance; Type: TABLE; Schema: model; Owner: openatlas
 --
@@ -855,8 +855,6 @@ ALTER TABLE model.property_inheritance_id_seq OWNER TO openatlas;
 
 ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inheritance.id;
 
-
-SET default_with_oids = false;
 
 --
 -- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
@@ -1878,6 +1876,14 @@ ALTER TABLE ONLY web.form
 
 ALTER TABLE ONLY web."group"
     ADD CONSTRAINT group_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: hierarchy_form hierarchy_form_hierarchy_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_form
+    ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
 
 
 --

@@ -24,7 +24,7 @@ class GetByClass(Resource):  # type: ignore
             parser=parser)
         template = GeoJson.pagination(parser['show'])
         if parser['count']:
-            return jsonify(class_['pagination'][0]['entities'])
+            return jsonify(class_['pagination']['entities'])
         if parser['download']:
             return Download.download(data=class_, template=template, name=class_code)
         return marshal(class_, template), 200
@@ -32,7 +32,7 @@ class GetByClass(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         entities = []
-        if class_code not in g.classes:
+        if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode  # pragma: no cover
         for entity in Query.get_by_class_code_api(class_code, parser):
             entities.append(entity)

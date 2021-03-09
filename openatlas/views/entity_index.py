@@ -3,7 +3,6 @@ from typing import List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -11,55 +10,47 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import (button, convert_size, external_url, format_date,
                                     get_base_table_data, get_file_path, link)
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group
 
 
-@app.route('/index/<class_>')
-@app.route('/index/<class_>/<int:delete_id>')
+@app.route('/index/<view>')
+@app.route('/index/<view>/<int:delete_id>')
 @required_group('readonly')
-def index(class_: str, delete_id: Optional[int] = None) -> Union[str, Response]:
+def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # To prevent additional redirects deletion is done before showing index
-        url = delete_entity(class_, delete_id)
+        url = delete_entity(delete_id)
         if url:  # e.g. an error occurred and entry is shown again
             return redirect(url)
-    return render_template('entity/index.html',
-                           class_=class_,
-                           table=get_table(class_),
-                           buttons=get_buttons(class_) if is_authorized('contributor') else [],
-                           gis_data=Gis.get_all() if class_ == 'place' else None,
-                           title=_(class_.replace('_', ' ')),
-                           crumbs=[[_('admin'), url_for('admin_index')], _('file')]
-                           if class_ == 'file' else [_(class_.replace('_', ' '))])
+    return render_template(
+        'entity/index.html',
+        class_=view,
+        table=get_table(view),
+        buttons=get_buttons(view),
+        gis_data=Gis.get_all() if view == 'place' else None,
+        title=_(view.replace('_', ' ')),
+        crumbs=[[_('admin'), url_for('admin_index')], _('file')]
+        if view == 'file' else [_(view).replace('_', ' ')])
 
 
-def get_buttons(class_: str) -> List[str]:
+def get_buttons(view: str) -> List[str]:
     buttons = []
-    if class_ in ['actor', 'event']:
-        for code in app.config['CLASS_CODES'][class_]:
-            buttons.append(button(g.classes[code].name, url_for('insert', class_=code)))
-    elif class_ == 'object':
-        buttons = [button(g.classes['E84'].name, url_for('insert', class_='E84'))]
-    elif class_ == 'reference':
-        buttons = [button(_('bibliography'), url_for('insert', class_='bibliography')),
-                   button(_('edition'), url_for('insert', class_='edition')),
-                   button(_('external reference'), url_for('insert', class_='external_reference'))]
-    elif class_ == 'reference_system':
-        if is_authorized('manager'):
-            buttons = [button(_('reference system'), url_for('insert', class_='reference_system'))]
-    else:
-        buttons = [button(_(class_), url_for('insert', class_=class_))]
+    names = [view] if view in ['artifact', 'place'] else g.view_class_mapping[view]
+    for name in names:
+        if is_authorized(g.classes[name].write_access):
+            buttons.append(button(g.classes[name].label, url_for('insert', class_=name)))
     return buttons
 
 
-def get_table(class_: str) -> Table:
-    table = Table(Table.HEADERS[class_])
-    if class_ == 'file':
-        table = Table(['date'] + Table.HEADERS['file'])
+def get_table(view: str) -> Table:
+    table = Table(g.table_headers[view])
+    if view == 'file':
+        table.header = ['date'] + table.header
         file_stats = get_file_stats()
-        for entity in Entity.get_by_system_type('file', nodes=True):
+        for entity in Entity.get_by_class('file', nodes=True):
             date = 'N/A'
             if entity.id in file_stats:
                 date = format_date(
@@ -67,58 +58,54 @@ def get_table(class_: str) -> Table:
             table.rows.append([
                 date,
                 link(entity),
-                entity.print_base_type(),
+                entity.print_standard_type(),
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
                 entity.description])
-    elif class_ == 'reference_system':
-        for entity in g.reference_systems.values():
+    elif view == 'reference_system':
+        for system in g.reference_systems.values():
             table.rows.append([
-                link(entity),
-                entity.count if entity.count else '',
-                external_url(entity.website_url),
-                external_url(entity.resolver_url),
-                entity.placeholder,
-                link(g.nodes[entity.precision_default_id]) if entity.precision_default_id else '',
-                entity.description])
+                link(system),
+                system.count if system.count else '',
+                external_url(system.website_url),
+                external_url(system.resolver_url),
+                system.placeholder,
+                link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
+                system.description])
     else:
-        if class_ == 'place':
-            entities = Entity.get_by_system_type(
-                'place',
-                nodes=True,
-                aliases=current_user.settings['table_show_aliases'])
-        else:
-            entities = Entity.get_by_menu_item(class_)
+        classes = ['place'] if view == 'place' else g.view_class_mapping[view]
+        entities = Entity.get_by_class(classes, nodes=True)
         table.rows = [get_base_table_data(item) for item in entities]
     return table
 
 
-def delete_entity(class_: str, id_: int) -> Optional[str]:
+def delete_entity(id_: int) -> Optional[str]:
     url = None
-    if class_ == 'reference_system':
-        entity = g.reference_systems[id_]
-        if entity.system or not is_authorized('manager'):
+    entity = Entity.get_by_id(id_)
+    if not is_authorized(entity.class_.write_access):
+        abort(403)  # pragma: no cover
+    if isinstance(entity, ReferenceSystem):
+        if entity.system:
             abort(403)
         if entity.forms:
             flash(_('Deletion not possible if forms are attached'), 'error')
             return url_for('entity_view', id_=id_)
-    if class_ == 'place':
-        entity = Entity.get_by_id(id_)
-        parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
+    if entity.class_.view in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('entity_view', id_=id_)
+        parent = None if entity.class_.name == 'place' else entity.get_linked_entity('P46', True)
         entity.delete()
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
         if parent:
-            tab = '#tab-' + entity.system_type.replace(' ', '-')
+            tab = '#tab-' + entity.class_.name.replace('_', '-')
             url = url_for('entity_view', id_=parent.id) + tab
     else:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-        if class_ == 'file':
+        if entity.class_.name == 'file':
             try:
                 path = get_file_path(id_)
                 if path:  # Only delete file on disk if it exists to prevent a missing file error
