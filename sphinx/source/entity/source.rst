@@ -12,7 +12,7 @@ Form fields
 -----------
 * :doc:`/form/name`
 * :doc:`type`
-* :doc:`Information carrier </entity/object>`
+* :doc:`/entity/artifact`
 * **Content** - a source content usually contains a summary or the whole text of the source
 
 Can be linked via tabs to

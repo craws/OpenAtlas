@@ -14,6 +14,7 @@ After login there is a **Model** button on the start page which leads to a graph
 the model (see below), a link checker and links to browse the classes and properties.
 
 .. image:: openatlas_schema.png
+.. image:: openatlas_schema2.png
 
 You can also active the **advanced Layout** in your :doc:`/tools/profile` which displays the CIDOC
 CRM class of an entity at the detail view.
