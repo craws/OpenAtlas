@@ -86,7 +86,7 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
-def api_access():
+def api_access():  # type: ignore
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore

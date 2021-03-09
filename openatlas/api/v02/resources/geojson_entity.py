@@ -97,7 +97,7 @@ class GeoJsonEntity:
         return {'type': 'GeometryCollection', 'geometries': geoms}
 
     @staticmethod
-    def get_reference_systems(entity: Entity) -> List[Dict[str, Union[str, Any]]]:
+    def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
         ref = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
             if isinstance(link.domain, ReferenceSystem):
