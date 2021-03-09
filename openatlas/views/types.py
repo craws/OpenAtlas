@@ -71,12 +71,10 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         flash(_('Entities were updated'), 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     getattr(form, str(root.id)).data = node.id
-    return render_template('types/move.html',
-                           node=node,
-                           root=root,
-                           form=form,
-                           title=_('types'),
-                           crumbs=[[_('types'), url_for('node_index')],
-                                   root,
-                                   node,
-                                   _('move')])
+    return render_template(
+        'types/move.html',
+        node=node,
+        root=root,
+        form=form,
+        title=_('types'),
+        crumbs=[[_('types'), url_for('node_index')], root, node, _('move entities')])

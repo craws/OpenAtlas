@@ -365,7 +365,7 @@ def build_move_form(node: Node) -> FlaskForm:
                                         coerce=int,
                                         option_widget=widgets.CheckboxInput(),
                                         widget=widgets.ListWidget(prefix_label=False))
-        save = SubmitField(uc_first(_('move')))
+        save = SubmitField(uc_first(_('move entities')))
 
     root = g.nodes[node.root[-1]]
     setattr(Form, str(root.id), TreeField(str(root.id)))

@@ -17,7 +17,7 @@ The menu structure reflects that workflow.
    actor
    place
    reference
-   object
+   artifact
    type
    file
    reference_system
