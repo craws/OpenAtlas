@@ -1,14 +1,14 @@
-Usage endpoint
+Overview Count endpoint
 ---
 tags:
   - Usage
-summary: Shows a summary of API options
+summary: Provides a count of all types
 responses:
   '200':
-    description: List of API Options
+    description: Count of all entities
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/UsageModel'
+          $ref: '#/components/schemas/OverviewCountModel'
   '404':
     description: Something went wrong. Please consult the error message.

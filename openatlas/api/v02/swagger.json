@@ -168,6 +168,17 @@
           }
         }
       },
+      "OverviewCountModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      },
       "NodeModel": {
         "type": "object",
         "properties": {
