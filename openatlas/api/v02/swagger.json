@@ -182,19 +182,19 @@
       "ClassMappingModel": {
         "type": "object",
         "properties": {
-          'systemClass': {
+          "systemClass": {
             "type": "string"
           },
-          'crmClass': {
+          "crmClass": {
             "type": "string"
           },
-          'view': {
+          "view": {
             "type": "string"
           },
-          'icon': {
+          "icon": {
             "type": "string"
           },
-          'en': {
+          "en": {
             "type": "string"
           }
         }
