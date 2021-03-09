@@ -23,24 +23,22 @@ class AddReferenceForm(FlaskForm):  # type: ignore
     save = SubmitField(_('insert'))
 
 
-@app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
+@app.route('/reference/add/<int:id_>/<view>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(id_: int, class_name: str) -> Union[str, Response]:
+def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
-    form = build_add_reference_form(class_name)
+    form = build_add_reference_form(view)
     if form.validate_on_submit():
-        property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
-        entity = Entity.get_by_id(getattr(form, class_name).data)
-        reference.link(property_code, entity, form.page.data)
-        return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_name)
-    if reference.system_type == 'external reference':
+        entity = Entity.get_by_id(getattr(form, view).data)
+        reference.link('P67', entity, form.page.data)
+        return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + view)
+    if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
-    return render_template('display_form.html',
-                           form=form,
-                           title=_('reference'),
-                           crumbs=[[_('reference'), url_for('index', class_='reference')],
-                                   reference,
-                                   _('link')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        title=_('reference'),
+        crumbs=[[_('reference'), url_for('index', view='reference')], reference, _('link')])
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
@@ -54,16 +52,19 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = '#tab-' + (link_.range.view_name if origin.view_name == 'reference' else 'reference')
+        tab = '#tab-' + (
+            link_.range.class_.view if origin.class_.view == 'reference' else 'reference')
         return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     form.page.data = link_.description
-    if link_.domain.system_type == 'external reference':
+    if link_.domain.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_(origin.view_name), url_for('index', class_=origin.view_name)],
-                                   origin,
-                                   linked_object,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            origin,
+            linked_object,
+            _('edit')])

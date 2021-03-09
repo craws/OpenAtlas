@@ -31,6 +31,7 @@ class GetNodeEntities(Resource):  # type: ignore
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
         data = []
         for e in entities:
-            data.append({'id': e.id, 'label': e.name,
-                         'url': url_for('entity', id_=e.id, _external=True)})
+            data.append({
+                'id': e.id, 'label': e.name,
+                'url': url_for('entity', id_=e.id, _external=True)})
         return data

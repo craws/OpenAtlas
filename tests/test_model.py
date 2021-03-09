@@ -29,12 +29,12 @@ class ModelTests(TestBaseCase):
 
             with app.test_request_context():  # Insert data to display in network view
                 app.preprocess_request()  # type: ignore
-                actor = Entity.insert('E21', 'King Arthur')
-                event = Entity.insert('E7',
-                                      'Battle of Camlann - a long name that has to be truncated ..')
-                source = Entity.insert('E33', 'Tha source')
+                actor = Entity.insert('person', 'King Arthur')
+                event = Entity.insert(
+                    'activity',
+                    'Battle of Camlann - a long name that has to be truncated ..')
+                source = Entity.insert('source', 'The source')
                 actor.link('P11', event)
-                actor.link('P67', Entity.insert('E89', 'Propositional Object'))
                 source.link('P67', event)
             self.app.get(url_for('model_network', dimensions=2))
             rv = self.app.get(url_for('model_network'))

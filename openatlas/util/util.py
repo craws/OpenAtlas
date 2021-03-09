@@ -86,15 +86,14 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
-def api_access():  # type: ignore
+def api_access():
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
             ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-            # Raise error if 1. User not logged in 2. API is NOT public 3. IP is not in whitelist
-            if not current_user.is_authenticated and not session['settings']['api_public'] \
+            if not current_user.is_authenticated \
+                    and not session['settings']['api_public'] \
                     and ip not in app.config['ALLOWED_IPS']:
-                # Todo: API coverage, remove no cover below
                 raise AccessDeniedError  # pragma: no cover
             return f(*args, **kwargs)
 

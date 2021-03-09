@@ -22,7 +22,7 @@ entity_parser.add_argument('sort', choices=('desc', 'asc'), type=str, default='a
 entity_parser.add_argument('column', type=str, default=['name'], action='append',
                            case_sensitive=False,
                            help='{error_msg}', choices=(
-        'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
+        'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_class',
         'begin_from', 'begin_to', 'end_from', 'end_to'))
 entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append')
 # Todo: Dismiss negative value
@@ -44,7 +44,16 @@ query_parser.add_argument('classes', type=str, action='append',
                           help="{error_msg}")
 query_parser.add_argument('codes', type=str, action='append', help="{error_msg}",
                           case_sensitive=False,
-                          choices=('actor', 'event', 'place', 'reference', 'source', 'object'))
+                          choices=('actor', 'event', 'place', 'reference', 'source', 'artifact'))
+query_parser.add_argument('system_classes', type=str, action='append', help="{error_msg}",
+                          case_sensitive=False,
+                          choices=(
+                              'acquisition', 'activity', 'actor_appellation', 'administrative_unit',
+                              'appellation', 'artifact', 'bibliography', 'edition',
+                              'external_reference', 'feature', 'file', 'find', 'group',
+                              'human_remains', 'move', 'object_location', 'person', 'place',
+                              'source', 'reference_system', 'stratigraphic_unit',
+                              'source_translation', 'type'))
 
 image_parser = default_parser.copy()
 image_parser.add_argument('thumbnail', type=int, help="Not a valid tuple")

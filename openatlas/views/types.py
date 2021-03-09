@@ -21,18 +21,19 @@ def node_index() -> str:
         if node.root:
             continue
         type_ = 'custom'
-        if node.class_.code == 'E53':
+        if node.class_.name == 'administrative_unit':
             type_ = 'places'
         elif node.standard:
             type_ = 'standard'
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html',
-                           nodes=nodes,
-                           placeholder=_('type to search'),
-                           title=_('types'),
-                           crumbs=[_('types')])
+    return render_template(
+        'types/index.html',
+        nodes=nodes,
+        placeholder=_('type to search'),
+        title=_('types'),
+        crumbs=[_('types')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -52,7 +53,7 @@ def node_delete(id_: int) -> Response:
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    if node.class_.code == 'E53':
+    if node.class_.name == 'administrative_unit':
         tab_hash = '#menu-tab-places_collapse-'
     elif root.standard:
         tab_hash = '#menu-tab-standard_collapse-'

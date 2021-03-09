@@ -15,21 +15,20 @@ from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
-@app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
+@app.route('/source/add/<int:id_>/<view>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(id_: int, class_name: str) -> Union[str, Response]:
+def source_add(id_: int, view: str) -> Union[str, Response]:
     source = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=source.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, source.get_linked_entities('P67'))
-    return render_template('form.html',
-                           form=form,
-                           title=_('source'),
-                           crumbs=[[_('source'), url_for('index', class_='source')],
-                                   source,
-                                   _('link') + ' ' + _(class_name)])
+        return redirect(url_for('entity_view', id_=source.id) + '#tab-' + view)
+    form = build_table_form(view, source.get_linked_entities('P67'))
+    return render_template(
+        'form.html',
+        form=form,
+        title=_('source'),
+        crumbs=[[_('source'), url_for('index', view='source')], source, _('link')])
 
 
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
@@ -45,7 +44,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=translation.id))
     return render_template('display_form.html',
                            form=form,
-                           crumbs=[[_('source'), url_for('index', class_='source')],
+                           crumbs=[[_('source'), url_for('index', view='source')],
                                    source,
                                    '+ ' + uc_first(_('text'))])
 
@@ -72,7 +71,7 @@ def translation_update(id_: int) -> Union[str, Response]:
     return render_template('display_form.html',
                            form=form,
                            title=translation.name,
-                           crumbs=[[_('source'), url_for('index', class_='source')],
+                           crumbs=[[_('source'), url_for('index', view='source')],
                                    source,
                                    translation,
                                    _('edit')])
@@ -86,7 +85,7 @@ def save(form: FlaskForm,
         if entity:
             logger.log_user(entity.id, 'update')
         elif source:
-            entity = Entity.insert('E33', form.name.data, 'source translation')
+            entity = Entity.insert('source_translation', form.name.data)
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:

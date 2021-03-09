@@ -8,7 +8,8 @@ class ContentTemplate:
 
     @staticmethod
     def content_template() -> Dict[str, Type[String]]:
-        content_json = {'intro': fields.String,
-                        'contact': fields.String,
-                        'legal-notice': fields.String}
+        content_json = {
+            'intro': fields.String,
+            'contact': fields.String,
+            'legal-notice': fields.String}
         return content_json

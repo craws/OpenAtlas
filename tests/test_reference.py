@@ -24,7 +24,7 @@ class ReferenceTest(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('index', class_='reference'))
+            rv = self.app.get(url_for('index', view='reference'))
             assert b'https://openatlas.eu' in rv.data
 
             # Reference update
@@ -39,10 +39,10 @@ class ReferenceTest(TestBaseCase):
             # Reference link
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                batman = Entity.insert('E21', 'Batman')
-            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='actor'))
+                batman = Entity.insert('person', 'Batman')
+            rv = self.app.get(url_for('reference_add', id_=reference.id, view='actor'))
             assert b'Batman' in rv.data
-            rv = self.app.post(url_for('reference_add', id_=reference.id, class_name='actor'),
+            rv = self.app.post(url_for('reference_add', id_=reference.id, view='actor'),
                                data={'actor': batman.id},
                                follow_redirects=True)
             assert b'http://updated.openatlas.eu' in rv.data
@@ -51,7 +51,7 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = batman.get_links('P67', True)[0].id
-                file = Entity.insert('E31', 'The X-Files', 'file')
+                file = Entity.insert('file', 'The X-Files')
                 file.link('P67', reference)
             rv = self.app.post(
                 url_for('reference_link_update', link_id=link_id, origin_id=reference.id),
@@ -59,5 +59,5 @@ class ReferenceTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Reference delete
-            rv = self.app.get(url_for('index', class_='reference', delete_id=reference.id))
+            rv = self.app.get(url_for('index', view='reference', delete_id=reference.id))
             assert b'The entry has been deleted.' in rv.data

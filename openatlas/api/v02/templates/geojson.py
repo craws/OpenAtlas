@@ -8,49 +8,62 @@ class GeoJson:
 
     @staticmethod
     def geojson_template(show: Dict[str, str]) -> Dict[str, Type[String]]:
-        title = {'title': fields.String}
+        title = {
+            'title': fields.String}
 
-        relations = {'label': fields.String,
-                     'relationTo': fields.String,
-                     'relationType': fields.String}
+        relations = {
+            'label': fields.String,
+            'relationTo': fields.String,
+            'relationType': fields.String}
 
-        depictions = {'@id': fields.String,
-                      'title': fields.String,
-                      'license': fields.String,
-                      'url': fields.String}
+        depictions = {
+            '@id': fields.String,
+            'title': fields.String,
+            'license': fields.String,
+            'url': fields.String}
 
-        links = {'type': fields.String,
-                 'identifier': fields.String,
-                 'reference_system': fields.String}
+        links = {
+            'type': fields.String,
+            'identifier': fields.String,
+            'reference_system': fields.String}
 
-        types = {'identifier': fields.String,
-                 'label': fields.String,
-                 'description': fields.String,
-                 'hierarchy': fields.String,
-                 'value': fields.Float,
-                 'unit': fields.String}
+        types = {
+            'identifier': fields.String,
+            'label': fields.String,
+            'description': fields.String,
+            'hierarchy': fields.String,
+            'value': fields.Float,
+            'unit': fields.String}
 
-        names = {'alias': fields.String}
+        names = {
+            'alias': fields.String}
 
-        start = {'earliest': fields.String,
-                 'latest': fields.String}
+        start = {
+            'earliest': fields.String,
+            'latest': fields.String}
 
-        end = {'earliest': fields.String,
-               'latest': fields.String}
+        end = {
+            'earliest': fields.String,
+            'latest': fields.String}
 
-        description = {'value': fields.String}
+        description = {
+            'value': fields.String}
 
-        timespans = {'start': fields.Nested(start),
-                     'end': fields.Nested(end)}
+        timespans = {
+            'start': fields.Nested(start),
+            'end': fields.Nested(end)}
 
-        when = {'timespans': fields.List(fields.Nested(timespans))}
+        when = {
+            'timespans': fields.List(fields.Nested(timespans))}
 
-        feature = {'@id': fields.String,
-                   'type': fields.String,
-                   'crmClass': fields.String,
-                   'properties': fields.Nested(title),
-                   'description': fields.List(fields.Nested(description))
-                   }
+        feature = {
+            '@id': fields.String,
+            'type': fields.String,
+            'crmClass': fields.String,
+            'system_class': fields.String,
+            'properties': fields.Nested(title),
+            'description': fields.List(fields.Nested(description))
+        }
 
         if 'when' in show:
             feature['when'] = fields.Nested(when)
@@ -73,24 +86,28 @@ class GeoJson:
         if 'depictions' in show:
             feature['depictions'] = fields.List(fields.Nested(depictions))
 
-        entity_json = {'@context': fields.String,
-                       'type': fields.String,
-                       'features': fields.List(fields.Nested(feature))}
+        entity_json = {
+            '@context': fields.String,
+            'type': fields.String,
+            'features': fields.List(fields.Nested(feature))}
         return entity_json
 
     @staticmethod
     def pagination(show: Dict[str, str]) -> Dict[str, List]:
-        page_index = {"page": fields.Integer,
-                      "start_id": fields.Integer
-                      }
-        pagination_model = {"entities": fields.Integer,
-                            "entity_per_page": fields.Integer,
-                            "index": fields.List(fields.Nested(page_index)),
-                            "total_pages": fields.Integer
-                            }
+        page_index = {
+            "page": fields.Integer,
+            "start_id": fields.Integer
+        }
+        pagination_model = {
+            "entities": fields.Integer,
+            "entity_per_page": fields.Integer,
+            "index": fields.List(fields.Nested(page_index)),
+            "total_pages": fields.Integer
+        }
 
-        pagination = {"result": fields.List(fields.Nested(GeoJson.geojson_template(show))),
-                      "pagination": fields.Nested(pagination_model)
-                      }
+        pagination = {
+            "result": fields.List(fields.Nested(GeoJson.geojson_template(show))),
+            "pagination": fields.Nested(pagination_model)
+        }
 
         return pagination

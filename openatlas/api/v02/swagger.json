@@ -51,7 +51,7 @@
             "description",
             "created",
             "modified",
-            "system_type",
+            "system_class",
             "begin_from",
             "begin_to",
             "end_from",
@@ -293,7 +293,10 @@
           "@id": {
             "type": "string"
           },
-          "crmClass:": {
+          "crmClass": {
+            "type": "string"
+          },
+          "system_class": {
             "type": "string"
           },
           "type": {

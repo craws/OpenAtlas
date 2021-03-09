@@ -15,7 +15,7 @@ from openatlas.util.display import uc_first
 def get_link_type(form: Any) -> Optional_Type[Entity]:
     """ Returns the base type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
-        if type(field) is TreeField and field.data:
+        if isinstance(field, TreeField) and field.data:
             return g.nodes[int(field.data)]
     return None
 
@@ -42,7 +42,7 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         if field.type == 'BooleanField':
             settings[label] = _('on') if value else _('off')
         if field.type == 'SelectField':
-            if type(value) is str and value.isdigit():
+            if isinstance(value, str) and value.isdigit():
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
         if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:

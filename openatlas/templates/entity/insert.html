@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-    {% if view_name != 'place' %}
+    {% if view_name not in ['artifact', 'place'] %}
         {% if view_name == 'file' %}
             <p>
                 {{ _('max size')|uc_first }}:

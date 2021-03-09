@@ -40,13 +40,13 @@ class CidocClass:
             FROM model.class c
             LEFT JOIN model.entity e ON c.code = e.class_code
             GROUP BY (c.id, c.name, c.comment);""")
-        classes = {row.code: CidocClass(_name=row.name,
-                                        code=row.code,
-                                        id=row.id,
-                                        comment=row.comment,
-                                        count=row.count,
-                                        i18n={}, sub=[], super=[]
-                                        ) for row in g.cursor.fetchall()}
+        classes = {row.code: CidocClass(
+            _name=row.name,
+            code=row.code,
+            id=row.id,
+            comment=row.comment,
+            count=row.count,
+            i18n={}, sub=[], super=[]) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)
@@ -99,13 +99,13 @@ class CidocProperty:
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True
-        return self.find_subs(attr, class_id, g.classes[valid_domain_id].sub)
+        return self.find_subs(attr, class_id, g.cidoc_classes[valid_domain_id].sub)
 
     def find_subs(self, attr: str, class_id: int, valid_subs: List[int]) -> bool:
         for sub_id in valid_subs:
             if sub_id == class_id:
                 return True
-            elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
+            elif self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
                 return True
         return False
 

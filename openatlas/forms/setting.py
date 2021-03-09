@@ -19,14 +19,17 @@ class ModulesForm(FlaskForm):  # type: ignore
 
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(_('site name'), [InputRequired()])
-    default_language = SelectField(_('default language'),
-                                   choices=list(app.config['LANGUAGES'].items()))
-    table_rows = SelectField(_('default table rows'),
-                             coerce=int,
-                             choices=list(app.config['TABLE_ROWS'].items()))
-    log_level = SelectField(_('log level'),
-                            coerce=int,
-                            choices=list(app.config['LOG_LEVELS'].items()))
+    default_language = SelectField(
+        _('default language'),
+        choices=list(app.config['LANGUAGES'].items()))
+    table_rows = SelectField(
+        _('default table rows'),
+        coerce=int,
+        choices=list(app.config['TABLE_ROWS'].items()))
+    log_level = SelectField(
+        _('log level'),
+        coerce=int,
+        choices=list(app.config['LOG_LEVELS'].items()))
     debug_mode = BooleanField(_('debug mode'))
     random_password_length = IntegerField(_('random password length'))
     minimum_password_length = IntegerField(_('minimum password length'))
@@ -54,18 +57,20 @@ class MailForm(FlaskForm):  # type: ignore
 
 
 class NewsLetterForm(FlaskForm):  # type: ignore
-    subject = StringField('',
-                          [InputRequired()],
-                          render_kw={'placeholder': _('subject'), 'autofocus': True})
+    subject = StringField(
+        '',
+        [InputRequired()],
+        render_kw={'placeholder': _('subject'), 'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     save = SubmitField(_('send'))
 
 
 class LogForm(FlaskForm):  # type: ignore
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'),
-                           choices=(list(app.config['LOG_LEVELS'].items())),
-                           default=6)
+    priority = SelectField(
+        _('priority'),
+        choices=(list(app.config['LOG_LEVELS'].items())),
+        default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     save = SubmitField(_('apply'))
 
@@ -107,10 +112,11 @@ class ProfileForm(FlaskForm):  # type: ignore
 
 class DisplayForm(FlaskForm):  # type: ignore
     language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
-    table_rows = SelectField(_('table rows'),
-                             description=_('tooltip table rows'),
-                             choices=list(app.config['TABLE_ROWS'].items()),
-                             coerce=int)
+    table_rows = SelectField(
+        _('table rows'),
+        description=_('tooltip table rows'),
+        choices=list(app.config['TABLE_ROWS'].items()),
+        coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
     entity_show_dates = BooleanField(_('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))

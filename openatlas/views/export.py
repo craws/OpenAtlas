@@ -22,9 +22,12 @@ class ExportSqlForm(FlaskForm):  # type: ignore
 class ExportCsvForm(FlaskForm):  # type: ignore
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
-    gis_format = SelectField(_('GIS format'), choices=[('coordinates', _('coordinates')),
-                                                       ('wkt', 'WKT'),
-                                                       ('postgis', 'PostGIS Geometry')])
+    gis_format = SelectField(
+        _('GIS format'),
+        choices=[
+            ('coordinates', _('coordinates')),
+            ('wkt', 'WKT'),
+            ('postgis', 'PostGIS Geometry')])
     model_class = BooleanField('model.class', default=True)
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
@@ -55,19 +58,20 @@ def export_sql() -> Union[str, Response]:
     for file in [f for f in path.iterdir() if (path / f).is_file()]:
         if file.name == '.gitignore':
             continue
-        data = [file.name,
-                convert_size(file.stat().st_size),
-                link(_('download'), url_for('download_sql', filename=file.name))]
+        data = [
+            file.name,
+            convert_size(file.stat().st_size),
+            link(_('download'), url_for('download_sql', filename=file.name))]
         if is_authorized('admin') and writeable:
             data.append(delete_link(file.name, url_for('delete_sql', filename=file.name)))
         table.rows.append(data)
-    return render_template('export/export_sql.html',
-                           form=form,
-                           table=table,
-                           writeable=writeable,
-                           title=_('export SQL'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('export SQL')])
+    return render_template(
+        'export/export_sql.html',
+        form=form,
+        table=table,
+        writeable=writeable,
+        title=_('export SQL'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('export SQL')])
 
 
 @app.route('/download/sql/<filename>')
@@ -110,19 +114,20 @@ def export_csv() -> Union[str, Response]:
     for file in [f for f in path.iterdir() if (path / f).is_file()]:
         if file.name == '.gitignore':
             continue
-        data = [file.name,
-                convert_size(file.stat().st_size),
-                link(_('download'), url_for('download_csv', filename=file.name))]
+        data = [
+            file.name,
+            convert_size(file.stat().st_size),
+            link(_('download'), url_for('download_csv', filename=file.name))]
         if is_authorized('admin') and writeable:
             data.append(delete_link(file.name, url_for('delete_csv', filename=file.name)))
         table.rows.append(data)
-    return render_template('export/export_csv.html',
-                           form=form,
-                           table=table,
-                           writeable=writeable,
-                           title=_('export CSV'),
-                           crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'],
-                                   _('export CSV')])
+    return render_template(
+        'export/export_csv.html',
+        form=form,
+        table=table,
+        writeable=writeable,
+        title=_('export CSV'),
+        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('export CSV')])
 
 
 @app.route('/delete/csv/<filename>')

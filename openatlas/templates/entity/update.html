@@ -8,14 +8,14 @@
             {{ _('reload')|button(url_for('update', id_=entity.id)) }}
         </p>
     {% endif %}
-    {% if entity.view_name != 'place' %}
-        {{ form|display_form(manual_page='entity/' + entity.view_name) }}
-        {{ entity.view_name|display_citation_example }}
+    {% if entity.class_.view not in ['artifact', 'place'] %}
+        {{ form|display_form(manual_page='entity/' + entity.class_.view) }}
+        {{ entity.class_.view|display_citation_example }}
     {% else %}
         <div class="row">
             <div class="col-4">
                 <div id='map-info-display' style="float:left;">
-                    {{ form|display_form(manual_page='entity/' + entity.view_name) }}
+                    {{ form|display_form(manual_page='entity/' + entity.class_.view) }}
                 </div>
             </div>
             <div class="col-8">

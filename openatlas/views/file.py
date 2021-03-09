@@ -8,6 +8,7 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
+from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 
@@ -41,18 +42,19 @@ def file_remove_profile_image(entity_id: int) -> Response:
     return redirect(url_for('entity_view', id_=entity.id))
 
 
-@app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
+@app.route('/file/add/<int:id_>/<view>', methods=['POST', 'GET'])
 @required_group('contributor')
-def file_add(id_: int, class_name: str) -> Union[str, Response]:
+def file_add(id_: int, view: str) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=entity.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, entity.get_linked_entities('P67'))
-    return render_template('form.html',
-                           form=form,
-                           title=entity.name,
-                           crumbs=[[_(entity.view_name), url_for('index', class_=entity.view_name)],
-                                   entity,
-                                   _('link') + ' ' + _(class_name)])
+        return redirect(url_for('entity_view', id_=entity.id) + '#tab-' + view)
+    form = build_table_form(view, entity.get_linked_entities('P67'))
+    return render_template(
+        'form.html',
+        form=form,
+        title=entity.name,
+        crumbs=[[_(entity.class_.view), url_for('index', view=entity.class_.view)],
+                entity,
+                _('link') + ' ' + _(view)])

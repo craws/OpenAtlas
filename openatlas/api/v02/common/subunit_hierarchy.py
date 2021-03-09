@@ -32,10 +32,10 @@ class GetSubunitHierarchy(Resource):  # type: ignore
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except EntityDoesNotExistError:  # pragma: no cover
             raise EntityDoesNotExistError
-        if entity.class_.code in ['E18']:
-            return GetSubunitHierarchy.get_subunits_recursive(entity, [])
-        else:
+        if not entity.class_.name == 'place' and not entity.class_.name == 'feature' \
+                and not entity.class_.name == 'stratigraphic_unit':
             raise InvalidSubunitError  # pragma: no cover
+        return GetSubunitHierarchy.get_subunits_recursive(entity, [])
 
     @staticmethod
     def get_subunits_recursive(entity: Optional[Entity], data: List[Dict[str, Any]]) \

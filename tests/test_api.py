@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
@@ -16,6 +17,7 @@ from tests.base import TestBaseCase, insert_entity
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
+        pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()
@@ -29,11 +31,15 @@ class ApiTests(TestBaseCase):
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
 
+                location = place.get_linked_entity_safe('P53')
+                Gis.add_example_geom(location)
+                location = place.get_linked_entity_safe('P53')
+
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
 
                 # Adding Alias
-                alias = insert_entity('Cargo hauler', 'alias')
+                alias = insert_entity('Cargo hauler', 'appellation')
                 place.link('P1', alias)
 
                 # Adding External Reference
@@ -47,7 +53,7 @@ class ApiTests(TestBaseCase):
                 strati = insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
@@ -60,7 +66,7 @@ class ApiTests(TestBaseCase):
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy('External Reference Match').subs[0]
+                precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
             # Path Tests
@@ -74,6 +80,8 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation'))
+            assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('node_entities', id_=unit_node.id))
@@ -93,6 +101,8 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation', download=True))
+            assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('node_entities', id_=unit_node.id, download=True))
@@ -151,6 +161,8 @@ class ApiTests(TestBaseCase):
             assert b'2' in rv.data
             rv = self.app.get(url_for('code', code='place', count=True))
             assert b'3' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='appellation', count=True))
+            assert b'1' in rv.data
 
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', codes='place'))
@@ -162,6 +174,7 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
+
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
