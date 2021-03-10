@@ -20,7 +20,7 @@ class Pagination:
     def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[str, Any]:
         index = []
         total = []
-        if not entities:
+        if not entities:  # pragma: no cover
             raise NoEntityAvailable
         for e in entities:
             total.append(e.id)
