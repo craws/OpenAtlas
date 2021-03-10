@@ -225,7 +225,7 @@
         }
       },
       "NodeCategoryModel": {
-        "type": "object":
+        "type": "object",
         "properties": {
           "standard": {
             "type": "array",
