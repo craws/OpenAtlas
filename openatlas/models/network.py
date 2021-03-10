@@ -11,8 +11,6 @@ class Network:
 
     properties = ['P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74', 'P107', 'OA7',
                   'OA8', 'OA9']
-    classes = ['E7', 'E8', 'E9', 'E18', 'E20', 'E21', 'E22',  'E31', 'E33', 'E40', 'E53', 'E74',
-               'E84']
     sql_where = """
         AND ((e.system_class IS NULL AND e.class_code != 'E53')
                 OR (e.system_class NOT IN ('feature', 'stratigraphic_unit', 'find', 'file',
@@ -38,7 +36,8 @@ class Network:
             SELECT e.id, e.class_code, e.name
             FROM model.entity e
             WHERE class_code IN %(classes)s """ + Network.sql_where
-        g.execute(sql, {'classes': tuple(Network.classes)})
+        g.execute(sql, {
+            'classes': tuple([class_.name for class_ in g.classes.values() if class_.color])})
         return g.cursor.fetchall()
 
     @staticmethod
@@ -75,9 +74,10 @@ class Network:
                 continue
             entities.add(row.id)
             name = truncate(row.name.replace("'", ""), span=False)
-            nodes.append({'id': row.id,
-                          'label' if dimensions else 'name': name,
-                          'color': params['classes'][row.class_code]['color']})
+            nodes.append({
+                'id': row.id,
+                'label' if dimensions else 'name': name,
+                'color': params['classes'][row.class_code]['color']})
         if not linked_entity_ids.issubset(entities):  # pragma: no cover
             flash('Missing nodes for links', 'error')
             return ''
