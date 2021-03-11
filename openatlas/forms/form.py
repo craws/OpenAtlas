@@ -350,21 +350,23 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
             <input id="checkbox_values" name="checkbox_values" type="hidden">
             {table}
             <input id="save" class="{class_}" name="save" type="submit" value="{link}">
-        </form>""".format(link=uc_first(_('link')),
-                          token=generate_csrf(),
-                          class_=app.config['CSS']['button']['primary'],
-                          table=table.display(class_))
+        </form>""".format(
+        link=uc_first(_('link')),
+        token=generate_csrf(),
+        class_=app.config['CSS']['button']['primary'],
+        table=table.display(class_))
 
 
 def build_move_form(node: Node) -> FlaskForm:
     class Form(FlaskForm):  # type: ignore
         is_node_form = HiddenField()
         checkbox_values = HiddenField()
-        selection = SelectMultipleField('',
-                                        [InputRequired()],
-                                        coerce=int,
-                                        option_widget=widgets.CheckboxInput(),
-                                        widget=widgets.ListWidget(prefix_label=False))
+        selection = SelectMultipleField(
+            '',
+            [InputRequired()],
+            coerce=int,
+            option_widget=widgets.CheckboxInput(),
+            widget=widgets.ListWidget(prefix_label=False))
         save = SubmitField(uc_first(_('move entities')))
 
     root = g.nodes[node.root[-1]]

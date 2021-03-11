@@ -16,12 +16,14 @@ class SystemClass:
                  cidoc_class: str,
                  label: Optional[str] = '',
                  standard_type: Optional[str] = None,
+                 color: Optional[str] = None,
                  write_access: Optional[str] = 'contributor',
                  form_fields: Optional[List[str]] = None) -> None:
         self.name = name
         self.label = uc_first(label)
         self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.standard_type = standard_type
+        self.color = color  # Specifies color of entity in network visualisation
         self.write_access = write_access
         self.form_fields = form_fields if form_fields else []
         self.view = None
@@ -62,7 +64,6 @@ def get_table_headers() -> Dict[str, List[str]]:
         'source': ['name', 'type', 'description'],
         'subs': ['name', 'count', 'info'],
         'text': ['text', 'type', 'content']}
-
     for view in ['actor', 'artifact', 'event', 'place']:
         for class_ in view_class_mapping[view]:
             headers[class_] = headers[view]
@@ -83,12 +84,14 @@ def get_system_classes() -> Dict[str, SystemClass]:
             name='acquisition',
             cidoc_class='E8',
             label=_('acquisition'),
+            color='#0000FF',
             standard_type='Event',
             form_fields=[]),
         'activity': SystemClass(
             name='activity',
             cidoc_class='E7',
             label=_('activity'),
+            color='#0000FF',
             standard_type='Event',
             form_fields=[]),
         'actor_appellation': SystemClass(
@@ -107,6 +110,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E22',
             standard_type='Artifact',
             label=_('artifact'),
+            color='#EE82EE',
             form_fields=[]),
         'bibliography': SystemClass(
             name='bibliography',
@@ -149,6 +153,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
             name='group',
             cidoc_class='E74',
             label=_('group'),
+            color='#34623C',
             form_fields=[]),
         'human_remains': SystemClass(
             name='human_remains',
@@ -161,19 +166,23 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E9',
             label=_('move'),
             standard_type='Event',
+            color='#0000FF',
             form_fields=[]),
         'object_location': SystemClass(
             name='object_location',
+            color='#00FF00',
             cidoc_class='E53'),
         'person': SystemClass(
             name='person',
             cidoc_class='E21',
             label=_('person'),
+            color='#34B522',
             form_fields=[]),
         'place': SystemClass(
             name='place',
             cidoc_class='E18',
             label=_('place'),
+            color='#FF0000',
             standard_type='Place',
             form_fields=[]),
         'reference_system': SystemClass(
@@ -187,6 +196,7 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E33',
             label=_('source'),
             standard_type='Source',
+            color='#FFA500',
             form_fields=[]),
         'stratigraphic_unit': SystemClass(
             name='stratigraphic_unit',

@@ -194,9 +194,10 @@ def property_view(code: str) -> str:
         property_=property_,
         info=info,
         title=_('model'),
-        crumbs=[[_('model'), url_for('model_index')],
-                [_('properties'), url_for('property_index')],
-                property_.code])
+        crumbs=[
+            [_('model'), url_for('model_index')],
+            [_('properties'), url_for('property_index')],
+            property_.code])
 
 
 class NetworkForm(FlaskForm):  # type: ignore
@@ -206,27 +207,18 @@ class NetworkForm(FlaskForm):  # type: ignore
     distance = IntegerField(default=80, validators=[InputRequired()])
     orphans = BooleanField(default=False)
     classes = SelectMultipleField(_('classes'), widget=widgets.ListWidget(prefix_label=False))
-    kw_params = {'data-huebee': True, 'class': 'data-huebee'}
-    color_E7 = StringField(default='#0000FF', render_kw=kw_params)
-    color_E8 = StringField(default='#0000FF', render_kw=kw_params)
-    color_E9 = StringField(default='#0000FF', render_kw=kw_params)
-    color_E18 = StringField(default='#FF0000', render_kw=kw_params)
-    color_E20 = StringField(default='#AAAA00', render_kw=kw_params)
-    color_E21 = StringField(default='#34B522', render_kw=kw_params)
-    color_E22 = StringField(default='#EE82EE', render_kw=kw_params)
-    color_E31 = StringField(default='#FFA500', render_kw=kw_params)
-    color_E33 = StringField(default='#FFA500', render_kw=kw_params)
-    color_E40 = StringField(default='#34623C', render_kw=kw_params)
-    color_E53 = StringField(default='#00FF00', render_kw=kw_params)
-    color_E74 = StringField(default='#34623C', render_kw=kw_params)
-    color_E84 = StringField(default='#EE82EE', render_kw=kw_params)
-    save = SubmitField(_('apply'))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network(dimensions: Optional[int] = None) -> str:
+    network_classes = [class_ for class_ in g.classes.values() if class_.color]
+    for class_ in network_classes:
+        setattr(NetworkForm, class_.name, StringField(
+            default='#0000FF',
+            render_kw={'data-huebee': True, 'class': 'data-huebee'}))
+    setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = []
     params: Dict[str, Any] = {
@@ -237,14 +229,14 @@ def model_network(dimensions: Optional[int] = None) -> str:
             'height': form.height.data,
             'charge': form.charge.data,
             'distance': form.distance.data}}
-    for code in Network.classes:
-        form.classes.choices.append((code, g.cidoc_classes[code].name))
-        params['classes'][code] = {'color': getattr(form, 'color_' + code).data}
+    for class_ in network_classes:
+        # getattr(form, class_.name).choices.append((code, g.cidoc_classes[code].name))
+        params['classes'][class_.name] = {'color': getattr(form, class_.name).data}
     return render_template(
         'model/network2.html' if dimensions else 'model/network.html',
         form=form,
         dimensions=dimensions,
         network_params=params,
-        json_data=Network.get_network_json(form, params, dimensions),
+        json_data=Network.get_network_json(form, dimensions),
         title=_('model'),
         crumbs=[_('network visualization')])

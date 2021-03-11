@@ -21,7 +21,7 @@ app.config.from_pyfile(instance_name + '.py')  # type: ignore
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
 
 if os.name == "posix":  # For non Linux systems we would need adaptions here, e.g. Windows
-    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
+    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 debug_model: Dict[str, float] = {}
 

@@ -53,6 +53,9 @@ class QueryEmptyError(Exception):
 class ResourceGoneError(Exception):
     pass
 
+class NoEntityAvailable(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -112,5 +115,9 @@ errors = {
     "ResourceGoneError": {
         "message": "This resource is gone.",
         "status": 410
+    },
+    "NoEntityAvailable": {
+        "message": "No entity exist for this category.",
+        "status": 404
     },
 }
