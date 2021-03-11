@@ -22,7 +22,8 @@ class GetQuery(Resource):  # type: ignore
     def get(self) -> Union[Tuple[Resource, int], Response]:
         entities = []
         parser = query_parser.parse_args()
-        if not parser['entities'] and not parser['codes'] and not parser['classes']:
+        if not parser['entities'] and not parser['codes'] \
+                and not parser['classes'] and not parser['system_classes']:
             raise QueryEmptyError  # pragma: no cover
         template = GeoJson.pagination(parser['show'])
         if parser['entities']:
@@ -33,7 +34,8 @@ class GetQuery(Resource):  # type: ignore
                 entities.extend(GetByCode.get_entities_by_view(code_=code_, parser=parser))
         if parser['system_classes']:
             for system_class in parser['system_classes']:
-                entities.extend(GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser))
+                entities.extend(GetBySystemClass.get_entities_by_system_class(
+                    system_class=system_class, parser=parser))
         if parser['classes']:
             for class_ in parser['classes']:
                 entities.extend(GetByClass.get_entities_by_class(class_code=class_, parser=parser))
