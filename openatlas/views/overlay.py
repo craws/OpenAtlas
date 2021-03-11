@@ -30,12 +30,13 @@ def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Res
     if form.validate_on_submit():
         Overlay.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
         return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
-    return render_template('overlay/insert.html',
-                           form=form,
-                           crumbs=[[_('place'), url_for('index', view='place')],
-                                   Entity.get_by_id(place_id),
-                                   Entity.get_by_id(image_id),
-                                   _('overlay')])
+    return render_template(
+        'overlay/insert.html',
+        form=form,
+        crumbs=[[_('place'), url_for('index', view='place')],
+                Entity.get_by_id(place_id),
+                Entity.get_by_id(image_id),
+                _('overlay')])
 
 
 @app.route('/overlay/update/<int:id_>', methods=['POST', 'GET'])
@@ -53,14 +54,15 @@ def overlay_update(id_: int) -> Union[str, Response]:
     form.bottom_right_easting.data = bounding[1][1]
     form.bottom_right_northing.data = bounding[1][0]
     entity = Entity.get_by_id(overlay.place_id)
-    return render_template('overlay/update.html',
-                           form=form,
-                           overlay=overlay,
-                           entity=entity,
-                           crumbs=[[_('place'), url_for('index', view='place')],
-                                   entity,
-                                   Entity.get_by_id(overlay.image_id),
-                                   _('update overlay')])
+    return render_template(
+        'overlay/update.html',
+        form=form,
+        overlay=overlay,
+        entity=entity,
+        crumbs=[[_('place'), url_for('index', view='place')],
+                entity,
+                Entity.get_by_id(overlay.image_id),
+                _('update overlay')])
 
 
 @app.route('/overlay/remove/<int:id_>/<int:place_id>')
