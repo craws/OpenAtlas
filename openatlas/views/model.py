@@ -220,8 +220,6 @@ def model_network(dimensions: Optional[int] = None) -> str:
             render_kw={'data-huebee': True, 'class': 'data-huebee'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
-
-
     form.classes.choices = []
     params: Dict[str, Any] = {
         'classes': {},
@@ -239,6 +237,6 @@ def model_network(dimensions: Optional[int] = None) -> str:
         form=form,
         dimensions=dimensions,
         network_params=params,
-        json_data=Network.get_network_json(form, params, dimensions),
+        json_data=Network.get_network_json(form, dimensions),
         title=_('model'),
         crumbs=[_('network visualization')])
