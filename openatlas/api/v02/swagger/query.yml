@@ -26,6 +26,35 @@ parameters:
         - reference
         - source
         - object
+  - in: query
+    name: system_classes
+    description: Need to be an OpenAtlas system class
+    schema:
+      type: string
+      enum:
+        - acquisition
+        - activity
+        - actor_appellation
+        - administrative_unit
+        - appellation
+        - artifact
+        - bibliography
+        - edition
+        - external_reference
+        - feature
+        - file
+        - find
+        - group
+        - human_remains
+        - move
+        - object_location
+        - person
+        - place
+        - source
+        - reference_system
+        - stratigraphic_unit
+        - source_translation
+        - type
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'
