@@ -56,7 +56,7 @@ class Network:
             nodes.append({
                 'id': row.id,
                 'label' if dimensions else 'name': name,
-                'color': g.classes[row.system_class].color})
+                'color': form[row.system_class].data})
             entities.add(row.id)
         linked_entity_ids = set()
         edges = []

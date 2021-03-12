@@ -27,13 +27,13 @@
         </div>
         <h2>{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
-    <form method="post" id="network-form" style="margin-right:1em;">
+    <form method="post" id="network-form">
         {{ form.csrf_token }}
         <h2>{{ _('classes')|uc_first }}</h2>
         <div>
             <div id="classes" style="float:left">
                 {% for item in form.classes %}
-                    {{ form['color_' + item.data] }} {{ item.label }}<br>
+                    {{ form[item.data] }} {{ item.label }}<br>
                 {% endfor %}
             </div>
         </div>
