@@ -94,20 +94,22 @@ class Export:
     @staticmethod
     def export_sql() -> bool:
         """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
+        file = app.config['EXPORT_DIR'] / 'sql' / (Date.current_date_for_filename() + '_dump.sql')
         if os.name == 'posix':
             command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
                 host=app.config['DATABASE_HOST'],
                 database=app.config['DATABASE_NAME'],
                 port=app.config['DATABASE_PORT'],
                 user=app.config['DATABASE_USER'],
-                file=app.config['EXPORT_DIR'] / 'sql' / (
-                    Date.current_date_for_filename() + '_dump.sql'))
+                file=file)
             try:
                 subprocess.Popen(
                     command,
                     shell=True,
                     stdin=subprocess.PIPE,
                     env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
+                subprocess.Popen(['7z', 'a', str(file) + '.7z', file]).wait()
+                file.unlink()
             except Exception:  # pragma: no cover
                 return False
         else:  # pragma: no cover
@@ -117,6 +119,5 @@ class Export:
                 port=app.config['DATABASE_PORT'],
                 user=app.config['DATABASE_USER'],
                 pg_dump='"' + shutil.which('pg_dump') + '"',
-                file=app.config['EXPORT_DIR'] / 'sql' / (
-                    Date.current_date_for_filename() + '_dump.sql')))
+                file=file))
         return True

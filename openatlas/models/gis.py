@@ -17,7 +17,7 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
-    def add_example_geom(location):
+    def add_example_geom(location: Entity) -> None:
         # Used for tests until model is decoupled from forms
         sql = """INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (
         (%(location_id)s),
@@ -25,7 +25,7 @@ class Gis:
         '',
         'centerpoint',
         public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9,17]}'),4326));
-                            """
+        """
         g.execute(sql, {'location_id': location.id})
 
     @staticmethod
@@ -48,7 +48,7 @@ class Gis:
                 geometry = ast.literal_eval(row.geojson)
                 geometry['title'] = row.name.replace('"', '\"') if row.name else ''
                 geometry['description'] = row.description.replace('"',
-                                                              '\"') if row.description else ''
+                                                                  '\"') if row.description else ''
                 geometries.append(geometry)
         return geometries
 

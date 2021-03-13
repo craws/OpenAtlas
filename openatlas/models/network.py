@@ -1,4 +1,4 @@
-from typing import Dict, Iterator, List, Optional
+from typing import Dict, Iterator, List, Optional, Set
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -47,7 +47,7 @@ class Network:
     def get_network_json(form: FlaskForm, dimensions: Optional[int]) -> Optional[str]:
         mapping = Network.get_object_mapping()
         classes = [class_.name for class_ in g.classes.values() if class_.color]
-        entities = set()
+        entities: Set[int] = set()
         nodes = []
         for row in Network.get_entities(classes):
             if row.id in mapping or row.id in entities:  # pragma: no cover
@@ -56,7 +56,7 @@ class Network:
             nodes.append({
                 'id': row.id,
                 'label' if dimensions else 'name': name,
-                'color': g.classes[row.system_class].color})
+                'color': form[row.system_class].data})
             entities.add(row.id)
         linked_entity_ids = set()
         edges = []

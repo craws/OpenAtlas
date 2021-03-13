@@ -20,8 +20,10 @@ class ApiTests(TestBaseCase):
         pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
+                if not place:
+                    return  # pragma: no cover
 
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
@@ -186,7 +188,6 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
-
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover

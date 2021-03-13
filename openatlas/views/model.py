@@ -216,7 +216,7 @@ def model_network(dimensions: Optional[int] = None) -> str:
     network_classes = [class_ for class_ in g.classes.values() if class_.color]
     for class_ in network_classes:
         setattr(NetworkForm, class_.name, StringField(
-            default='#0000FF',
+            default=class_.color,
             render_kw={'data-huebee': True, 'class': 'data-huebee'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
@@ -230,8 +230,9 @@ def model_network(dimensions: Optional[int] = None) -> str:
             'charge': form.charge.data,
             'distance': form.distance.data}}
     for class_ in network_classes:
-        # getattr(form, class_.name).choices.append((code, g.cidoc_classes[code].name))
-        params['classes'][class_.name] = {'color': getattr(form, class_.name).data}
+        if class_.name == 'object_location':
+            continue
+        form.classes.choices.append((class_.name, class_.label))
     return render_template(
         'model/network2.html' if dimensions else 'model/network.html',
         form=form,
