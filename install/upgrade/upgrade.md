@@ -14,6 +14,10 @@ After following the instructions restart Apache and test if the application is w
 ### 5.7.x to 6.0.0
 Execute **install/upgrade/6.0.0.sql** after making backups.
 
+Install package needed for backup compression:
+
+    #  apt install p7zip-full
+
 ### 5.6.0 to 5.7.0
 
 #### Software
