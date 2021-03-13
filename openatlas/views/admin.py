@@ -33,6 +33,7 @@ from openatlas.util.util import get_file_stats, is_authorized, required_group, s
 
 
 @app.route('/admin', methods=["GET", "POST"])
+@app.route('/admin/', methods=["GET", "POST"])
 @app.route('/admin/<action>/<int:id_>')
 @required_group('readonly')
 def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
