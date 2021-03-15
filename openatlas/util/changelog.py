@@ -1,6 +1,8 @@
 class Changelog:
 
     versions = {
+        '6.1.0': ['TBA', {
+            'feature': {}}],
         '6.0.0': ['2021-03-13', {
             'feature': {
                 '1091': 'Reference systems for types',
