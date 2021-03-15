@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '6.0.1': ['2021-03-15', {
+            'fix': {
+                '1485': 'Cannot choose multiple for custom type'}}],
         '6.0.0': ['2021-03-13', {
             'feature': {
                 '1091': 'Reference systems for types',
