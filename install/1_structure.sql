@@ -1410,7 +1410,8 @@ CREATE TABLE web.user_notes (
     entity_id integer NOT NULL,
     text text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    public boolean DEFAULT false NOT NULL
 );
 
 
