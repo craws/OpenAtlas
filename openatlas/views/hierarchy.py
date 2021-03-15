@@ -47,7 +47,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         abort(403)
     form = build_form('hierarchy', hierarchy)
     form.forms.choices = Node.get_form_choices(hierarchy)
-    if hasattr(form, 'multiple'):
+    if hasattr(form, 'multiple') and form.multiple.data:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
         if form.name.data != hierarchy.name and Node.get_nodes(form.name.data):
