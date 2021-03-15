@@ -259,7 +259,7 @@ def add_fields(form: Any,
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if class_ == 'custom' or (item and not item.value_type):
+        if code == 'custom' or (item and not item.value_type):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
