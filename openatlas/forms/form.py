@@ -63,6 +63,8 @@ def build_form(class_: str,
         opened = HiddenField()
         validate = validate
 
+    if class_ == 'note':
+        setattr(Form, 'public', BooleanField(_('public'), default=False))
     if 'name' in forms[class_]:  # Set label and validators for name field
         label = _('URL') if class_ == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if class_ == 'external_reference' else [

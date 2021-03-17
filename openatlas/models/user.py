@@ -238,25 +238,27 @@ class User(UserMixin):  # type: ignore
             secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
     @staticmethod
-    def insert_note(entity: Entity, note: str) -> None:
+    def insert_note(entity: Entity, note: str, public: bool) -> None:
         from openatlas.util.display import sanitize
         sql = """
-            INSERT INTO web.user_notes (user_id, entity_id, text)
-            VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
+            INSERT INTO web.user_notes (user_id, entity_id, text, public)
+            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s);"""
         g.execute(sql, {
             'user_id': current_user.id,
             'entity_id': entity.id,
+            'public': public,
             'text': sanitize(note, 'text')})
 
     @staticmethod
-    def update_note(entity: Entity, note: str) -> None:
+    def update_note(entity: Entity, note: str, public: bool) -> None:
         from openatlas.util.display import sanitize
         sql = """
-            UPDATE web.user_notes SET text = %(text)s
+            UPDATE web.user_notes SET text = %(text)s, public = %(public)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
         g.execute(sql, {
             'user_id': current_user.id,
             'entity_id': entity.id,
+            'public': public,
             'text': sanitize(note, 'text')})
 
     @staticmethod
