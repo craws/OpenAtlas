@@ -483,6 +483,15 @@
           },
           "relationType": {
             "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "when": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WhenModel"
+            }
           }
         }
       },

@@ -21,13 +21,17 @@ class GeoJsonEntity:
                 'label': link.range.name,
                 'relationTo': url_for('entity', id_=link.range.id, _external=True),
                 'relationType': 'crm:' + link.property.code + '_'
-                                + link.property.i18n['en'].replace(' ', '_')})
+                                + link.property.i18n['en'].replace(' ', '_'),
+                'type': link.type.name if link.type else None,
+                'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
         for link in Link.get_links(entity.id, inverse=True):
             links.append({
                 'label': link.domain.name,
                 'relationTo': url_for('entity', id_=link.domain.id, _external=True),
                 'relationType': 'crm:' + link.property.code + 'i_'
-                                + link.property.i18n['en'].replace(' ', '_')})
+                                + link.property.i18n['en'].replace(' ', '_'),
+                'type': link.type.name if link.type else None,
+                'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
         return links if links else None
 
     @staticmethod
@@ -73,7 +77,7 @@ class GeoJsonEntity:
         return nodes if nodes else None
 
     @staticmethod
-    def get_time(entity: Entity) -> Optional[Dict[str, Any]]:
+    def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
         time = {}
         start = {
             'earliest': entity.begin_from,
