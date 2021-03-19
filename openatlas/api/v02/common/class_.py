@@ -16,7 +16,7 @@ from openatlas.util.util import api_access
 
 class GetByClass(Resource):  # type: ignore
     @api_access()  # type: ignore
-    @swag_from("../swagger/class.yml", endpoint="class")
+    # @swag_from("../swagger/class.yml", endpoint="class")
     def get(self, class_code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         class_ = Pagination.pagination(
