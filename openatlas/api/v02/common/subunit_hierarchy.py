@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
-from flasgger import swag_from
 from flask import Response, jsonify, url_for
 from flask_restful import Resource, marshal
 

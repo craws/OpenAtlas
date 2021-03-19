@@ -1,6 +1,5 @@
 from typing import Tuple, Union
 
-from flasgger import swag_from
 from flask import Response, url_for
 from flask_restful import Resource, marshal
 
