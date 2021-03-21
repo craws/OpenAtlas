@@ -101,6 +101,8 @@ class ApiTests(TestBaseCase):
             assert b'systemClass' in rv.data
             rv = self.app.get(url_for('node_overview'))
             assert b'Actor' in rv.data
+            rv = self.app.get(url_for('type_tree'))
+            assert b'type_tree' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))

@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Tuple, Union
 
-# from flasgger import swag_from
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
@@ -16,7 +15,7 @@ from openatlas.util.util import api_access
 
 class GetBySystemClass(Resource):  # type: ignore
     @api_access()  # type: ignore
-    # @swag_from("../swagger/system_class.yml", endpoint="code")
+    # @swag_from("../swagger/system_class.yml", endpoint="system_class")
     def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         system_class_ = Pagination.pagination(
