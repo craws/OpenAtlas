@@ -2,7 +2,7 @@ Query endpoint
 ---
 tags:
   - Entities
-summary: Retrieves a list of Geojson representations by entity id, CIDOC CRM code or menu item
+description: Retrieves a list of Geojson representations by entity id, CIDOC CRM code or menu item
 parameters:
   - in: query
     name: entities

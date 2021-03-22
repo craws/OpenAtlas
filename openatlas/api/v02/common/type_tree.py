@@ -1,5 +1,6 @@
 from typing import Dict, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
@@ -12,7 +13,7 @@ from openatlas.util.util import api_access
 
 class GetTypeTree(Resource):  # type: ignore
     @api_access()  # type: ignore
-    # @swag_from("../swagger/type_tree.yml", endpoint="type_tree")
+    @swag_from("../swagger/type_tree.yml", endpoint="type_tree")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         template = TypeTreeTemplate.type_tree_template()

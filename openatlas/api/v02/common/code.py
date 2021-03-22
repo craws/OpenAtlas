@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
@@ -15,7 +16,7 @@ from openatlas.util.util import api_access
 
 class GetByCode(Resource):  # type: ignore
     @api_access()  # type: ignore
-    # @swag_from("../swagger/code.yml", endpoint="code")
+    @swag_from("../swagger/code.yml", endpoint="code")
     def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         code_ = Pagination.pagination(

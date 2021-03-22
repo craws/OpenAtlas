@@ -13,7 +13,6 @@
       "email": "bernhard.koschicek@oeaw.ac.at"
     }
   },
-  "servers": [],
   "tags": [
     {
       "name": "Entities",
@@ -239,7 +238,7 @@
               "type": "string"
             }
           },
-          "cusxtom": {
+          "custom": {
             "type": "array",
             "items": {
               "type": "string"
@@ -538,6 +537,72 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TimespansModel"
+            }
+          }
+        }
+      },
+      "TypeModel": {
+        "type": "object",
+        "properties": {
+          "Type_IDs": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "origin_id": {
+                "type": "integer"
+              },
+              "first": {
+                "type": "integer"
+              },
+              "last": {
+                "type": "integer"
+              },
+              "root": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "subs": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "count": {
+                "type": "integer"
+              },
+              "count_subs": {
+                "type": "integer"
+              },
+              "locked": {
+                "type": "boolean"
+              },
+              "standard": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "TypeTreeModel": {
+        "type": "object",
+        "properties": {
+          "type_tree": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeModel"
             }
           }
         }
