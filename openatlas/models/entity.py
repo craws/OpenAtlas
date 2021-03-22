@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union
 
 from flask import g, request
 from flask_wtf import FlaskForm
@@ -280,7 +280,7 @@ class Entity:
         return Entity(data)
 
     @staticmethod
-    def get_by_ids(ids: List[int], nodes: bool = False) -> List[Entity]:
+    def get_by_ids(ids: Iterable[int], nodes: bool = False) -> List[Entity]:
         return [Entity(row) for row in Db.get_by_ids(ids, nodes)]
 
     @staticmethod

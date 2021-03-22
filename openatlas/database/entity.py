@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 from flask import g
 
@@ -12,7 +12,7 @@ class Entity:
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_ids(ids: List[int], nodes: bool = False) -> List[Dict[str, Any]]:
+    def get_by_ids(ids: Iterable[int], nodes: bool = False) -> List[Dict[str, Any]]:
         if not ids:
             return []
         sql = Entity.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'

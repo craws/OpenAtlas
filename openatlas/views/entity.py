@@ -78,8 +78,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['entities'].table.header = [_('domain'), _('range')]
             for row in Link.get_entities_by_node(entity):
                 tabs['entities'].table.rows.append([
-                    link(Entity.get_by_id(row.domain_id)),
-                    link(Entity.get_by_id(row.range_id))])
+                    link(Entity.get_by_id(row['domain_id'])),
+                    link(Entity.get_by_id(row['range_id']))])
     elif isinstance(entity, ReferenceSystem):
         for form_id, form in entity.get_forms().items():
             tabs[form['name']] = Tab(form['name'], origin=entity)
