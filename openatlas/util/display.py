@@ -71,9 +71,10 @@ def tree_select(name: str) -> str:
                     }}
                 }});
             }});
-        </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
-                            name=sanitize(name),
-                            tree_data=walk_tree(Node.get_nodes(name)))
+        </script>""".format(
+        min_chars=session['settings']['minimum_jstree_search'],
+        name=sanitize(name),
+        tree_data=walk_tree(Node.get_nodes(name)))
 
 
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
@@ -207,20 +208,18 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             data[_('modified')] = html
     if 'entity_show_import' in current_user.settings:
         if current_user.settings['entity_show_import']:
-            if info['import_project']:
-                data[_('imported from')] = link(info['import_project'])
-            if info['import_user']:
-                data[_('imported by')] = link(info['import_user'])
-            if info['import_origin_id']:
-                data['origin ID'] = info['import_origin_id']
+            data[_('imported from')] = link(info['project'])
+            data[_('imported by')] = link(info['importer'])
+            data['origin ID'] = info['origin_id']
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
         data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
             url=url_for('entity', id_=entity.id))
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
-            </a>'''.format(url=url_for('entity', id_=entity.id, download=True),
-                           label=uc_first('download'))
+            </a>'''.format(
+            url=url_for('entity', id_=entity.id, download=True),
+            label=uc_first('download'))
         data['API'] = data_api
     return data
 
