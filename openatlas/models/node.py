@@ -47,9 +47,9 @@ class Node(Entity):
             WHERE e.system_class = %(system_class)s
             GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
-        g.execute(sql, {'system_class': 'type', 'property_code': 'P127'})
+        g.cursor.execute(sql, {'system_class': 'type', 'property_code': 'P127'})
         types = g.cursor.fetchall()
-        g.execute(sql, {'system_class': 'administrative_unit', 'property_code': 'P89'})
+        g.cursor.execute(sql, {'system_class': 'administrative_unit', 'property_code': 'P89'})
         places = g.cursor.fetchall()
         nodes = {}
         for row in types + places:
@@ -65,7 +65,7 @@ class Node(Entity):
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
-        g.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
+        g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         forms = {}
         for row in g.cursor.fetchall():
             forms[row.id] = {
@@ -80,7 +80,7 @@ class Node(Entity):
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
             FROM web.hierarchy h;"""
-        g.execute(sql)
+        g.cursor.execute(sql)
         hierarchies = {row.id: row for row in g.cursor.fetchall()}
         for node in nodes.values():
             if node.root:
@@ -148,12 +148,12 @@ class Node(Entity):
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
-        g.execute(sql, {'form_name': form_name})
+        g.cursor.execute(sql, {'form_name': form_name})
         return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
-        g.execute("SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
+        g.cursor.execute("SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
         choices = []
         for row in g.cursor.fetchall():
             if g.classes[row.name].view != 'type' and (not root or row.id not in root.forms):
@@ -192,7 +192,7 @@ class Node(Entity):
         multiple = False
         if value_type or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'id': node.id,
             'name': node.name,
             'multiple': multiple,
@@ -205,7 +205,7 @@ class Node(Entity):
         multiple = False
         if node.multiple or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
-        g.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})
+        g.cursor.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})
         Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
@@ -214,7 +214,7 @@ class Node(Entity):
             sql = """
                 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
                 VALUES (%(node_id)s, %(form_id)s);"""
-            g.execute(sql, {'node_id': node.id, 'form_id': form_id})
+            g.cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
 
     @staticmethod
     def get_node_orphans() -> List[Node]:
@@ -243,7 +243,7 @@ class Node(Entity):
                     sql = """
                         UPDATE model.link SET range_id = %(new_type_id)s
                         WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
-                g.execute(sql, {
+                g.cursor.execute(sql, {
                     'old_type_id': old_node.id,
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)})
@@ -259,7 +259,7 @@ class Node(Entity):
                 sql = """
                     DELETE FROM model.link
                     WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;"""
-            g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
+            g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
     def get_all_sub_ids(node: Node, subs: Optional[List[int]] = None) -> List[int]:
@@ -276,13 +276,13 @@ class Node(Entity):
         node_ids = Node.get_all_sub_ids(root_node)
         if not node_ids:  # There are no sub nodes so skipping test
             return
-        g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
+        g.cursor.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
         sql = """
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2' AND e.system_class = %(form_name)s;"""
-        g.execute(sql, {'node_ids': tuple(node_ids), 'form_name': form_name})
+        g.cursor.execute(sql, {'node_ids': tuple(node_ids), 'form_name': form_name})
         return g.cursor.fetchone()[0]
 
     @staticmethod
@@ -290,11 +290,11 @@ class Node(Entity):
         sql = """
             DELETE FROM web.hierarchy_form
             WHERE hierarchy_id = %(hierarchy_id)s AND form_id = %(form_id)s;"""
-        g.execute(sql, {'hierarchy_id': root_node.id, 'form_id': form_id})
+        g.cursor.execute(sql, {'hierarchy_id': root_node.id, 'form_id': form_id})
 
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
         sql = """
             DELETE FROM model.link
             WHERE domain_id = %(entity_id)s AND range_id = %(node_id)s AND property_code = 'P2';"""
-        g.execute(sql, {'entity_id': entity_id, 'node_id': node_id})
+        g.cursor.execute(sql, {'entity_id': entity_id, 'node_id': node_id})

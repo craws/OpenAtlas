@@ -29,7 +29,7 @@ class Logger:
                   'message': message,
                   'user_id': current_user.id if hasattr(current_user, 'id') else None,
                   'info': info}
-        g.execute(sql, params)
+        g.cursor.execute(sql, params)
 
     @staticmethod
     def get_system_logs(limit: str, priority: str, user_id: str) -> NamedTupleCursor.Record:
@@ -39,19 +39,19 @@ class Logger:
         sql += ' AND user_id = %(user_id)s' if int(user_id) > 0 else ''
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) > 0 else ''
-        g.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
+        g.cursor.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
         return g.cursor.fetchall()
 
     @staticmethod
     def delete_all_system_logs() -> None:
-        g.execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
+        g.cursor.execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
 
     @staticmethod
     def log_user(entity_id: int, action: str) -> None:
         sql = """
             INSERT INTO web.user_log (user_id, entity_id, action)
             VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
     def get_log_for_advanced_view(entity_id: str) -> Dict[str, Any]:
@@ -62,12 +62,12 @@ class Logger:
             JOIN web.user u ON ul.user_id = u.id
             WHERE ul.entity_id = %(entity_id)s AND ul.action = %(action)s
             ORDER BY ul.created DESC LIMIT 1;"""
-        g.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
+        g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
         row_insert = g.cursor.fetchone()
-        g.execute(sql, {'entity_id': entity_id, 'action': 'update'})
+        g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
         row_update = g.cursor.fetchone()
         sql = 'SELECT project_id, origin_id, user_id FROM import.entity WHERE entity_id = %(id)s;'
-        g.execute(sql, {'id': entity_id})
+        g.cursor.execute(sql, {'id': entity_id})
         row_import = g.cursor.fetchone()
         project = Import.get_project_by_id(row_import.project_id) if row_import else None
         log = {'creator': User.get_by_id(row_insert.user_id) if row_insert else None,

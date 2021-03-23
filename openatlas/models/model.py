@@ -35,7 +35,7 @@ class CidocClass:
 
     @staticmethod
     def get_all() -> Dict[str, CidocClass]:
-        g.execute("""
+        g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
             FROM model.class c
             LEFT JOIN model.entity e ON c.code = e.class_code
@@ -47,14 +47,14 @@ class CidocClass:
             comment=row.comment,
             count=row.count,
             i18n={}, sub=[], super=[]) for row in g.cursor.fetchall()}
-        g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
+        g.cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)
             classes[row.sub_code].super.append(row.super_code)
         sql = """
             SELECT class_code, language_code, text FROM model.class_i18n
             WHERE language_code IN %(language_codes)s;"""
-        g.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in g.cursor.fetchall():
             classes[row.class_code].i18n[row.language_code] = row.text
         return classes
@@ -118,7 +118,7 @@ class CidocProperty:
             LEFT JOIN model.link l ON p.code = l.property_code
             GROUP BY (p.id, p.code, p.comment, p.domain_class_code, p.range_class_code, p.name,
                 p.name_inverse);"""
-        g.execute(sql)
+        g.cursor.execute(sql)
         properties = {row.code: CidocProperty(id=row.id,
                                               _name=row.name,
                                               _name_inverse=row.name_inverse,
@@ -129,14 +129,14 @@ class CidocProperty:
                                               count=row.count,
                                               sub=[], super=[], i18n={}, i18n_inverse={}
                                               ) for row in g.cursor.fetchall()}
-        g.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
+        g.cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
         for row in g.cursor.fetchall():
             properties[row.super_code].sub.append(row.sub_code)
             properties[row.sub_code].super.append(row.super_code)
         sql = """
             SELECT property_code, language_code, text, text_inverse FROM model.property_i18n
             WHERE language_code IN %(language_codes)s;"""
-        g.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in g.cursor.fetchall():
             properties[row.property_code].i18n[row.language_code] = row.text
             properties[row.property_code].i18n_inverse[row.language_code] = row.text_inverse

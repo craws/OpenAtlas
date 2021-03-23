@@ -8,7 +8,7 @@ class Entity:
     @staticmethod
     def get_by_id(id_: int, nodes: bool = False, aliases: bool = False) -> Optional[Dict[str, Any]]:
         sql = Entity.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-        g.execute(sql, {'id': id_})
+        g.cursor.execute(sql, {'id': id_})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
@@ -16,7 +16,7 @@ class Entity:
         if not ids:
             return []
         sql = Entity.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
-        g.execute(sql, {'ids': tuple(ids)})
+        g.cursor.execute(sql, {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -31,7 +31,7 @@ class Entity:
             LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
             JOIN import.entity ie ON e.id = ie.entity_id
             WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
-        g.execute(sql, {'id': project_id})
+        g.cursor.execute(sql, {'id': project_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -41,13 +41,13 @@ class Entity:
         sql = Entity.build_sql(
             nodes=nodes,
             aliases=aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
-        g.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
+        g.cursor.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_cidoc_class(code: Union[str, List[str]]) -> List[Dict[str, Any]]:
         codes = code if isinstance(code, list) else [code]
-        g.execute(Entity.build_sql() + 'WHERE class_code IN %(codes)s;', {'codes': tuple(codes)})
+        g.cursor.execute(Entity.build_sql() + 'WHERE class_code IN %(codes)s;', {'codes': tuple(codes)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -57,12 +57,12 @@ class Entity:
             FROM model.entity
             WHERE system_class IN %(classes)s
             GROUP BY system_class;"""
-        g.execute(sql, {'classes': tuple(classes)})
+        g.cursor.execute(sql, {'classes': tuple(classes)})
         return {row.system_class: row.count for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_orphans() -> List[Dict[str, Any]]:
-        g.execute("""
+        g.cursor.execute("""
             SELECT e.id FROM model.entity e
             LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
                 (SELECT id FROM model.entity WHERE class_code = 'E55')
@@ -75,12 +75,12 @@ class Entity:
         sql = Entity.build_sql() + """
             WHERE e.system_class IN %(codes)s GROUP BY e.id
             ORDER BY e.created DESC LIMIT %(limit)s;"""
-        g.execute(sql, {'codes': tuple(classes), 'limit': limit})
+        g.cursor.execute(sql, {'codes': tuple(classes), 'limit': limit})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_circular() -> List[Dict[str, Any]]:
-        g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
+        g.cursor.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -88,7 +88,7 @@ class Entity:
         sql = """
             INSERT INTO model.entity (name, system_class, class_code, description)
             VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
-        g.execute(sql, data)
+        g.cursor.execute(sql, data)
         return g.cursor.fetchone()[0]
 
     @staticmethod
@@ -99,12 +99,12 @@ class Entity:
             = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s,
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.execute(sql, {data})
+        g.cursor.execute(sql, {data})
 
     @staticmethod
     def get_profile_image_id(id_: int) -> Optional[int]:
         sql = 'SELECT i.image_id FROM web.entity_profile_image i WHERE i.entity_id = %(id_)s;'
-        g.execute(sql, {'entity_id': id_})
+        g.cursor.execute(sql, {'entity_id': id_})
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     @staticmethod
@@ -113,16 +113,16 @@ class Entity:
             INSERT INTO web.entity_profile_image (entity_id, image_id)
             VALUES (%(entity_id)s, %(image_id)s)
             ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;"""
-        g.execute(sql, {'entity_id': origin_id, 'image_id': id_})
+        g.cursor.execute(sql, {'entity_id': origin_id, 'image_id': id_})
 
     @staticmethod
     def remove_profile_image(id_: int) -> None:
-        g.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': id_})
 
     @staticmethod
     def delete(ids: List[int]) -> None:
         # Triggers psql function model.delete_entity_related() for deleting related entities."""
-        g.execute('DELETE FROM model.entity WHERE id IN %(ids)s;', {'ids': tuple(ids)})
+        g.cursor.execute('DELETE FROM model.entity WHERE id IN %(ids)s;', {'ids': tuple(ids)})
 
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:

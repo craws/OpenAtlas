@@ -19,7 +19,7 @@ class Network:
             JOIN model.entity e ON l.domain_id = e.id AND e.system_class IN %(classes)s
             JOIN model.entity e2 ON l.range_id = e2.id AND e2.system_class IN %(classes)s
             WHERE property_code IN %(properties)s """
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'classes': tuple(classes),
             'properties': tuple(properties), })
         return g.cursor.fetchall()
@@ -30,7 +30,7 @@ class Network:
             SELECT e.id, e.name, e.system_class
             FROM model.entity e
             WHERE system_class IN %(classes)s """
-        g.execute(sql, {'classes': tuple(classes)})
+        g.cursor.execute(sql, {'classes': tuple(classes)})
         return g.cursor.fetchall()
 
     @staticmethod
@@ -40,7 +40,7 @@ class Network:
             SELECT e.id, l.range_id
             FROM model.entity e
             JOIN model.link l ON e.id = domain_id AND l.property_code = 'P53';"""
-        g.execute(sql)
+        g.cursor.execute(sql)
         return {row.range_id: row.id for row in g.cursor.fetchall()}
 
     @staticmethod

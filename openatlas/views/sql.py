@@ -32,15 +32,15 @@ def sql_execute() -> str:
     response = ''
     form = SqlForm()
     if form.validate_on_submit() and not file_data['backup_too_old']:
-        g.execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
-            g.execute(form.statement.data)
+            g.cursor.execute(form.statement.data)
             response = '<p>Rows affected: {count}</p>'.format(count=g.cursor.rowcount)
             try:
                 response += '<p>{rows}</p>'.format(rows=g.cursor.fetchall())
             except Exception:  # pragma: no cover
                 pass  # Assuming it was no SELECT statement so returning just the rowcount
-            g.execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('SQL executed'), 'info')
         except Exception as e:
             g.cursor.execute('ROLLBACK')

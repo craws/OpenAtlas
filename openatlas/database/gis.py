@@ -19,7 +19,7 @@ class Gis:
         'centerpoint',
         public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9,17]}'),4326));
         """
-        g.execute(sql, {'location_id': id_})
+        g.cursor.execute(sql, {'location_id': id_})
 
     @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:
@@ -35,7 +35,7 @@ class Gis:
                 FROM model.entity place
                 JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
                 WHERE place.id = %(id_)s;""".format(shape=shape)
-            g.execute(sql, {'id_': id_})
+            g.cursor.execute(sql, {'id_': id_})
             for row in g.cursor.fetchall():
                 geometry = ast.literal_eval(row.geojson)
                 geometry['title'] = row.name.replace('"', '\"') if row.name else ''
@@ -68,13 +68,13 @@ class Gis:
                 AND l.property_code = 'P53'
                 AND (object.system_class = 'place' OR object.id IN %(extra_ids)s)
             GROUP BY object.id, {shape}.id;""".format(shape=shape, polygon_sql=polygon_sql)
-        g.execute(sql, {'extra_ids': tuple(extra_ids)})
+        g.cursor.execute(sql, {'extra_ids': tuple(extra_ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def test_geom(geometry: str) -> None:
         sql = "SELECT st_isvalid(public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"
-        g.execute(sql, {'geojson': json.dumps(geometry)})
+        g.cursor.execute(sql, {'geojson': json.dumps(geometry)})
         if not g.cursor.fetchone()[0]:
             raise InvalidGeomException
         return
@@ -89,7 +89,7 @@ class Gis:
                 %(type)s,
                 public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
             """.format(shape=shape)
-        g.execute(sql, data)
+        g.cursor.execute(sql, data)
 
     @staticmethod
     def insert_import(data: Dict[str, Any]) -> None:
@@ -100,10 +100,10 @@ class Gis:
                 %(description)s,
                 'centerpoint',
                 public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
-        g.execute(sql, data)
+        g.cursor.execute(sql, data)
 
     @staticmethod
     def delete_by_entity_id(id_: int) -> None:
-        g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': id_})
-        g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': id_})
-        g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': id_})

@@ -56,7 +56,7 @@ class User(UserMixin):  # type: ignore
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
                 %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
             WHERE id = %(id)s;"""
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'id': self.id,
             'username': self.username,
             'real_name': self.real_name,
@@ -86,18 +86,18 @@ class User(UserMixin):  # type: ignore
                 INSERT INTO web.user_settings (user_id, "name", "value")
                 VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-            g.execute(sql, {'user_id': self.id, 'name': field.name, 'value': value})
+            g.cursor.execute(sql, {'user_id': self.id, 'name': field.name, 'value': value})
 
     def remove_newsletter(self) -> None:  # pragma: no cover
         sql = "DELETE FROM web.user_settings WHERE name = 'newsletter' AND user_id = %(user_id)s;"
-        g.execute(sql, {'user_id': self.id})
+        g.cursor.execute(sql, {'user_id': self.id})
 
     def update_language(self) -> None:
         sql = """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, 'language', %(value)s)
             ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-        g.execute(sql, {'user_id': self.id, 'value': current_user.settings['language']})
+        g.cursor.execute(sql, {'user_id': self.id, 'value': current_user.settings['language']})
 
     def login_attempts_exceeded(self) -> bool:
         failed_login_tries = int(session['settings']['failed_login_tries'])
@@ -112,7 +112,7 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def get_all() -> List[User]:
-        g.execute(User.sql + ' ORDER BY username;')
+        g.cursor.execute(User.sql + ' ORDER BY username;')
         return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -120,32 +120,32 @@ class User(UserMixin):  # type: ignore
         bookmarks = None
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
-            g.execute(sql, {'user_id': user_id})
+            g.cursor.execute(sql, {'user_id': user_id})
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
-        g.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        g.cursor.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         if not g.cursor.rowcount:
             return None  # pragma no cover - something went wrong, e.g. obsolete session values
         return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
-        g.execute(User.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
+        g.cursor.execute(User.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_email(email: str) -> Optional[User]:
-        g.execute(User.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);', {'email': email})
+        g.cursor.execute(User.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);', {'email': email})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_username(username: str) -> Optional[User]:
         sql = User.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
-        g.execute(sql, {'username': username})
+        g.cursor.execute(sql, {'username': username})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_unsubscribe_code(code: str) -> Optional[User]:
-        g.execute(User.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
+        g.cursor.execute(User.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -158,13 +158,13 @@ class User(UserMixin):  # type: ignore
         sql += ' AND action = %(action)s' if action != 'all' else ''
         sql += ' ORDER BY created DESC'  # Order is important because of limit filter
         sql += ' LIMIT %(limit)s' if int(limit) else ''
-        g.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
+        g.cursor.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
         return g.cursor.fetchall()
 
     @staticmethod
     def get_created_entities_count(user_id: int) -> int:
         sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
-        g.execute(sql, {'user_id': user_id})
+        g.cursor.execute(sql, {'user_id': user_id})
         return g.cursor.fetchone()[0]
 
     @staticmethod
@@ -177,7 +177,7 @@ class User(UserMixin):  # type: ignore
         password = bcrypt.hashpw(
             form.password.data.encode('utf-8'),
             bcrypt.gensalt()).decode('utf-8')
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'username': form.username.data,
             'real_name': form.real_name.data,
             'info': form.description.data,
@@ -189,11 +189,11 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def delete(id_: int) -> None:
-        g.execute('DELETE FROM web."user" WHERE id = %(user_id)s;', {'user_id': id_})
+        g.cursor.execute('DELETE FROM web."user" WHERE id = %(user_id)s;', {'user_id': id_})
 
     @staticmethod
     def get_users() -> List[Tuple[int, str]]:
-        g.execute('SELECT id, username FROM web.user ORDER BY username;')
+        g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -207,7 +207,7 @@ class User(UserMixin):  # type: ignore
                 DELETE FROM web.user_bookmarks
                 WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
             label = _('bookmark')
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
         return label
 
     @staticmethod
@@ -224,7 +224,7 @@ class User(UserMixin):  # type: ignore
                 settings[setting] = session['settings'][setting]
 
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
-        g.execute(sql, {'user_id': user_id})
+        g.cursor.execute(sql, {'user_id': user_id})
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in ['table_rows']:
@@ -243,7 +243,7 @@ class User(UserMixin):  # type: ignore
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'user_id': current_user.id,
             'entity_id': entity.id,
             'text': sanitize(note, 'text')})
@@ -254,7 +254,7 @@ class User(UserMixin):  # type: ignore
         sql = """
             UPDATE web.user_notes SET text = %(text)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'user_id': current_user.id,
             'entity_id': entity.id,
             'text': sanitize(note, 'text')})
@@ -266,7 +266,7 @@ class User(UserMixin):  # type: ignore
         sql = """
             SELECT text FROM web.user_notes
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
         return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -274,10 +274,10 @@ class User(UserMixin):  # type: ignore
         if not current_user.settings['module_notes']:  # pragma no cover
             return {}
         sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"
-        g.execute(sql, {'user_id': current_user.id})
+        g.cursor.execute(sql, {'user_id': current_user.id})
         return {row.entity_id: row.text for row in g.cursor.fetchall()}
 
     @staticmethod
     def delete_note(entity_id: int) -> None:
         sql = "DELETE FROM web.user_notes WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s"
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})

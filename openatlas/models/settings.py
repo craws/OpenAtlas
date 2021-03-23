@@ -9,7 +9,7 @@ class Settings:
 
     @staticmethod
     def get_settings() -> Dict[str, Any]:
-        g.execute("SELECT name, value FROM web.settings;")
+        g.cursor.execute("SELECT name, value FROM web.settings;")
         settings: Dict[str, Union[str, bool, int]] = {}
         for name in app.config['MODULES']:  # Set default if doesn't exist (e.g. after an upgrade)
             settings['module_' + name] = False
@@ -39,9 +39,9 @@ class Settings:
             value = field.data
             if field.type == 'BooleanField':
                 value = 'True' if field.data else ''
-            g.execute(sql, {'name': field.name, 'value': value})
+            g.cursor.execute(sql, {'name': field.name, 'value': value})
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:
         sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
-        g.execute(sql, {'file_id': file_id if file_id else ''})
+        g.cursor.execute(sql, {'file_id': file_id if file_id else ''})

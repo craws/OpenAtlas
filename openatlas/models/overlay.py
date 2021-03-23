@@ -34,7 +34,7 @@ class Overlay:
                 top_left_northing=form.top_left_northing.data,
                 bottom_right_easting=form.bottom_right_easting.data,
                 bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'image_id': image_id,
             'place_id': place_id,
             'link_id': link_id,
@@ -52,7 +52,7 @@ class Overlay:
                 top_left_northing=form.top_left_northing.data,
                 bottom_right_easting=form.bottom_right_easting.data,
                 bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
+        g.cursor.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:
@@ -79,15 +79,15 @@ class Overlay:
             FROM web.map_overlay o
             JOIN model.entity i ON o.image_id = i.id
             WHERE o.place_id IN %(place_ids)s;"""
-        g.execute(sql, {'place_ids': tuple(ids)})
+        g.cursor.execute(sql, {'place_ids': tuple(ids)})
         return {row.image_id: Overlay(row) for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_by_id(id_: int) -> Overlay:
         sql = 'SELECT id, place_id, image_id, bounding_box FROM web.map_overlay WHERE id = %(id)s;'
-        g.execute(sql, {'id': id_})
+        g.cursor.execute(sql, {'id': id_})
         return Overlay(g.cursor.fetchone())
 
     @staticmethod
     def remove(id_: int) -> None:
-        g.execute('DELETE FROM web.map_overlay WHERE id = %(id)s;', {'id': id_})
+        g.cursor.execute('DELETE FROM web.map_overlay WHERE id = %(id)s;', {'id': id_})

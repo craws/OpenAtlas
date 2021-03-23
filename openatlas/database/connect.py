@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 
 import psycopg2
 import psycopg2.extras
@@ -17,12 +17,7 @@ def initialize_database(config: Dict[str, Any]) -> None:
     except Exception as e:  # pragma: no cover
         print("Database connection failed")
         raise Exception(e)
-    g.execute = execute
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
-
-def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> Any:
-    return g.cursor.execute(query, vars_)
 
 
 def close_connection() -> None:

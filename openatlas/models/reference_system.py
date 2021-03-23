@@ -49,7 +49,7 @@ class ReferenceSystem(Entity):
                 e.id, e.name, e.class_code, e.description, e.system_class, e.created,
                 e.modified, rs.website_url, rs.resolver_url, rs.identifier_example, rs.system,
                 rs.precision_default_id, rs.entity_id;"""
-        g.execute(sql)
+        g.cursor.execute(sql)
         return {row.id: ReferenceSystem(row) for row in g.cursor.fetchall()}
 
     @staticmethod
@@ -63,7 +63,7 @@ class ReferenceSystem(Entity):
             sql = """
                 INSERT INTO web.reference_system_form (reference_system_id, form_id)
                 VALUES (%(entity_id)s, %(form_id)s);"""
-            g.execute(sql, {'entity_id': self.id, 'form_id': form_id})
+            g.cursor.execute(sql, {'entity_id': self.id, 'form_id': form_id})
 
     def remove_form(self, form_id: int) -> None:
         forms = self.get_forms()
@@ -73,14 +73,14 @@ class ReferenceSystem(Entity):
         sql = """
             DELETE FROM web.reference_system_form
             WHERE reference_system_id = %(reference_system_id)s AND form_id = %(form_id)s;"""
-        g.execute(sql, {'reference_system_id': self.id, 'form_id': form_id})
+        g.cursor.execute(sql, {'reference_system_id': self.id, 'form_id': form_id})
 
     def get_forms(self) -> Dict[int, Dict[str, str]]:
         sql = """
             SELECT f.id, f.name FROM web.form f
             JOIN web.reference_system_form rsf ON f.id = rsf.form_id
                 AND rsf.reference_system_id = %(id)s;"""
-        g.execute(sql, {'id': self.id})
+        g.cursor.execute(sql, {'id': self.id})
         return {row.id: {'name': row.name} for row in g.cursor.fetchall()}
 
     def update_system(self, form: FlaskForm) -> None:
@@ -95,7 +95,7 @@ class ReferenceSystem(Entity):
             = (%(name)s, %(website_url)s, %(resolver_url)s, %(identifier_example)s,
                 %(precision_default_id)s)
             WHERE entity_id = %(entity_id)s;'''
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'entity_id': self.id,
             'name': self.name,
             'website_url': self.website_url,
@@ -112,13 +112,13 @@ class ReferenceSystem(Entity):
                 sql = """
                     DELETE FROM model.link WHERE property_code = 'P67'
                     AND domain_id = %(system_id)s AND range_id = %(entity_id)s;"""
-                g.execute(sql, {'system_id': system.id, 'entity_id': entity.id})
+                g.cursor.execute(sql, {'system_id': system.id, 'entity_id': entity.id})
                 if field.data:
                     system.link('P67', entity, field.data, type_id=precision_field.data)
 
     @staticmethod
     def get_form_choices(entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
-        g.execute(
+        g.cursor.execute(
             "SELECT f.id, f.name FROM web.form f WHERE f.name IN %(forms)s ORDER BY name ASC",
             {'forms': tuple(app.config['EXTERNAL_REFERENCES_FORMS'])})
         choices = []
@@ -135,7 +135,7 @@ class ReferenceSystem(Entity):
         sql = '''
             INSERT INTO web.reference_system (entity_id, name, website_url, resolver_url)
             VALUES (%(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);'''
-        g.execute(sql, {
+        g.cursor.execute(sql, {
             'entity_id': entity.id,
             'name': entity.name,
             'website_url': form.website_url.data if form.website_url.data else None,

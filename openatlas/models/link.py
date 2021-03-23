@@ -182,7 +182,7 @@ class Link:
 
     @staticmethod
     def delete_(id_: int) -> None:
-        g.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+        g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
     @staticmethod
     def check_links() -> List[Dict[str, str]]:
