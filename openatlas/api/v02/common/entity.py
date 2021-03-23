@@ -1,8 +1,9 @@
 from typing import Tuple, Union
 
-from flask import Response
+from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
+from openatlas.api.export.export import ApiExport
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.parser import entity_parser
@@ -15,6 +16,8 @@ class GetEntity(Resource):  # type: ignore
     # @swag_from("../swagger/entity.yml", endpoint="entity")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
+        if parser['export']:
+            return ApiExport.api_export(GeoJsonEntity.get_entity_by_id(id_))
         entity = GeoJsonEntity.get_entity(GeoJsonEntity.get_entity_by_id(id_), parser)
         template = GeoJson.geojson_template(parser['show'])
         if parser['download']:

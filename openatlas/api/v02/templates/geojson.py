@@ -55,6 +55,7 @@ class GeoJson:
             'label': fields.String,
             'relationTo': fields.String,
             'relationType': fields.String,
+            'relationSystemClass': fields.String,
             'type': fields.String,
             'when': fields.Nested(when)
         }
