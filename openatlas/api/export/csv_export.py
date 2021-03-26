@@ -4,6 +4,7 @@ from typing import Any, Dict
 import pandas as pd
 from flask import Response
 
+from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -12,6 +13,8 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
+        geom = GeoJsonEntity.get_geoms_by_entity(Link.get_linked_entity(entity.id, 'P53'))\
+            if entity.class_.view == 'place' or entity.class_.name == 'object_location' else None
         data = {
             'id': [str(entity.id)],
             'name': [entity.name],
@@ -24,7 +27,9 @@ class ApiExportCSV:
             'end_comment': [entity.end_comment],
             'cidoc_class': [entity.cidoc_class.name],
             'system_class': [entity.class_.name],
-            'note': [entity.note]}
+            'note': [entity.note],
+            'geom_type': [geom['type']],
+            'coordinates': [geom['coordinates']]}
         for k, v in ApiExportCSV.get_links(entity).items():
             data[k] = [' | '.join(list(map(str, v)))]
         df = pd.DataFrame.from_dict(data=data, orient='index').T
