@@ -529,7 +529,7 @@ def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     if not string:
         return ''
     if mode == 'node':  # Only keep letters, numbers and spaces
-        return re.sub(r'([^\s\w]|_)+', '', string).strip()
+        return re.sub(r'([^\s\w()]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         s = MLStripper()
         s.feed(string)
