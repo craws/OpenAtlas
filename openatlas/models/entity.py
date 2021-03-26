@@ -138,9 +138,7 @@ class Entity:
                 if form.name_inverse.data.strip():
                     inverse = form.name_inverse.data.replace('(', '').replace(')', '').strip()
                     self.name += ' (' + inverse + ')'
-
-        from openatlas.models.node import Node
-        if isinstance(self, Node):
+        if self.class_.name == 'type':
             self.name = sanitize(self.name, 'node')
         elif self.class_.name == 'object_location':
             self.name = 'Location of ' + self.name
