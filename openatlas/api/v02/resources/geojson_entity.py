@@ -26,11 +26,13 @@ class GeoJsonEntity:
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
         for link in Link.get_links(entity.id, inverse=True):
+            link_property = link.property.i18n_inverse['en'] if link.property.i18n_inverse[
+                'en'] else link.property.i18n['en']
             links.append({
                 'label': link.domain.name,
                 'relationTo': url_for('entity', id_=link.domain.id, _external=True),
                 'relationType': 'crm:' + link.property.code + 'i_'
-                                + link.property.i18n_inverse['en'].replace(' ', '_'),
+                                + link_property.replace(' ', '_'),
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
