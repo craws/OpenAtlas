@@ -221,6 +221,12 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
                 <i class="fas fa-download"></i> {label}
             </a>'''.format(url=url_for('entity', id_=entity.id, download=True),
                            label=uc_first('download'))
+        data_api += '''
+            <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="CSV">
+                <i class="fas fa-download"></i> {label}
+            </a>'''.format(url=url_for('entity', id_=entity.id, export='csv'),
+                           label=uc_first('csv'))
+
         data['API'] = data_api
     return data
 

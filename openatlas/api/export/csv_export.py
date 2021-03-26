@@ -1,7 +1,8 @@
-from collections import Counter, defaultdict
-from typing import List
+from collections import defaultdict
+from typing import Any, Dict
 
 import pandas as pd
+from flask import Response
 
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -10,7 +11,7 @@ from openatlas.models.link import Link
 class ApiExportCSV:
 
     @staticmethod
-    def export_entity(entity: Entity):
+    def export_entity(entity: Entity) -> Response:
         data = {
             'id': [str(entity.id)],
             'name': [entity.name],
@@ -24,15 +25,18 @@ class ApiExportCSV:
             'cidoc_class': [entity.cidoc_class.name],
             'system_class': [entity.class_.name],
             'note': [entity.note]}
-
         for k, v in ApiExportCSV.get_links(entity).items():
             data[k] = [' | '.join(list(map(str, v)))]
         df = pd.DataFrame.from_dict(data=data, orient='index').T
-        df.to_csv('test.csv')
-        return data
+        return Response(df.to_csv(),
+                        mimetype='text/csv',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=' + str(
+                                entity.name) + '.csv'
+                        })
 
     @staticmethod
-    def get_links(entity: Entity):
+    def get_links(entity: Entity) -> Dict[Any, list]:
         d = defaultdict(list)
         for link in Link.get_links(entity.id):
             d[link.property.i18n['en'].replace(' ', '_')].append(link.range.name)
