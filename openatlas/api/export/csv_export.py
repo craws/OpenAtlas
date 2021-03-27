@@ -4,7 +4,6 @@ from typing import Any, Dict, List, Union
 import pandas as pd
 from flask import Response
 
-from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -20,7 +19,7 @@ class ApiExportCSV:
         index = []
         for d in data:
             for k in d.keys():
-                if not k in index:
+                if k not in index:
                     index.append(k)
         return Response(pd.DataFrame(data=data).to_csv(),
                         mimetype='text/csv',
@@ -79,8 +78,11 @@ class ApiExportCSV:
             geom = ApiExportCSV.get_geometry(entity)
         return geom
 
-
     @staticmethod
     def get_geometry(entity: Entity):
-        print()
-
+        if entity.cidoc_class.code != 'E53':  # pragma: nocover
+            return 'Wrong class'
+        geoms = Gis.get_by_id(entity.id)
+        if geoms:
+            return {key: [d[key] for d in geoms] for key in geoms[0]}
+        return {'type': None, 'coordinates': None}
