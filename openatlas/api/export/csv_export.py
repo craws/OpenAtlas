@@ -12,7 +12,7 @@ from openatlas.models.link import Link
 class ApiExportCSV:
 
     @staticmethod
-    def export_entities(entities: List[Entity]) -> Response:
+    def export_entities(entities: List[Entity], name: str) -> Response:
         data = []
         for entity in entities:
             data.append(ApiExportCSV.build_dataframe(entity))
@@ -24,7 +24,7 @@ class ApiExportCSV:
         return Response(pd.DataFrame(data=data).to_csv(),
                         mimetype='text/csv',
                         headers={
-                            'Content-Disposition': 'attachment;filename=' + 'collection' + '.csv'
+                            'Content-Disposition': 'attachment;filename=' + name + '.csv'
                         })
 
     @staticmethod

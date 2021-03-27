@@ -22,7 +22,7 @@ class GetBySystemClass(Resource):  # type: ignore
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(
                 GetBySystemClass.get_entities_by_system_class(system_class=system_class,
-                                                              parser=parser))
+                                                              parser=parser), system_class)
         system_class_ = Pagination.pagination(
             GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser),
             parser=parser)

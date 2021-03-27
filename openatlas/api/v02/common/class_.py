@@ -21,7 +21,7 @@ class GetByClass(Resource):  # type: ignore
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(
-                GetByClass.get_entities_by_class(class_code=class_code, parser=parser))
+                GetByClass.get_entities_by_class(class_code=class_code, parser=parser), class_code)
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, parser=parser),
             parser=parser)
