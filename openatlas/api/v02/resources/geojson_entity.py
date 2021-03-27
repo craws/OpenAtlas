@@ -167,7 +167,7 @@ class GeoJsonEntity:
 
         # Geometry
         if 'geometry' in parser['show']:
-            if entity.class_.view == 'place':
+            if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 features['geometry'] = GeoJsonEntity.get_geoms_by_entity(
                     Link.get_linked_entity(entity.id, 'P53'))
             elif entity.class_.name == 'object_location':
