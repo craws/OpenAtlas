@@ -13,8 +13,9 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
-        geom = GeoJsonEntity.get_geoms_by_entity(Link.get_linked_entity(entity.id, 'P53'))\
-            if entity.class_.view == 'place' or entity.class_.name == 'object_location' else None
+        geom = GeoJsonEntity.get_geoms_by_entity(Link.get_linked_entity(entity.id, 'P53')) \
+            if entity.class_.view == 'place' or entity.class_.name == 'object_location' \
+            else {'type': None, 'coordinates': None}
         data = {
             'id': [str(entity.id)],
             'name': [entity.name],
@@ -33,6 +34,7 @@ class ApiExportCSV:
         for k, v in ApiExportCSV.get_links(entity).items():
             data[k] = [' | '.join(list(map(str, v)))]
         df = pd.DataFrame.from_dict(data=data, orient='index').T
+        print(df)
         return Response(df.to_csv(),
                         mimetype='text/csv',
                         headers={
