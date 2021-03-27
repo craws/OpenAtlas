@@ -12,7 +12,7 @@ from openatlas.models.link import Link
 class ApiExportCSV:
 
     @staticmethod
-    def export_entities(entities: List[Entity]):
+    def export_entities(entities: List[Entity]) -> Response:
         data = []
         for entity in entities:
             data.append(ApiExportCSV.build_dataframe(entity))
@@ -70,7 +70,7 @@ class ApiExportCSV:
         return d
 
     @staticmethod
-    def get_geom_entry(entity: Entity):
+    def get_geom_entry(entity: Entity) -> Dict[str, None]:
         geom = {'type': None, 'coordinates': None}
         if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
             geom = ApiExportCSV.get_geometry(Link.get_linked_entity(entity.id, 'P53'))
@@ -79,9 +79,9 @@ class ApiExportCSV:
         return geom
 
     @staticmethod
-    def get_geometry(entity: Entity):
+    def get_geometry(entity: Entity) -> Dict[str, None]:
         if entity.cidoc_class.code != 'E53':  # pragma: nocover
-            return 'Wrong class'
+            return {'type': None, 'coordinates': None}
         geoms = Gis.get_by_id(entity.id)
         if geoms:
             return {key: [d[key] for d in geoms] for key in geoms[0]}
