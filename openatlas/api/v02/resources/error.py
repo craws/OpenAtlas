@@ -53,6 +53,7 @@ class QueryEmptyError(Exception):
 class ResourceGoneError(Exception):
     pass
 
+
 class NoEntityAvailable(Exception):
     pass
 
