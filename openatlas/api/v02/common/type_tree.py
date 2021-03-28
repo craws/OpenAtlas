@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
@@ -24,13 +24,13 @@ class GetTypeTree(Resource):  # type: ignore
         return marshal(type_tree, template), 200
 
     @staticmethod
-    def get_type_tree():
+    def get_type_tree() -> List[Dict[int, Dict[str, Union[str, int]]]]:
         return [
             {id_: GetTypeTree.serialize_to_json(node)}
             for id_, node in Node.get_all_nodes().items()]
 
     @staticmethod
-    def serialize_to_json(node: Node) -> Dict[str, Union[str, int]]:
+    def serialize_to_json(node: Node) -> Dict[str, Union[Any]]:
         return {
             'id': node.id,
             'name': node.name,

@@ -130,6 +130,16 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('node_overview', download=True))
             assert b'Actor' in rv.data
 
+            # Path with export
+            rv = self.app.get(url_for('entity', id_=place.id, export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('class', class_code='E18', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='place', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='reference', export='csv'))
+            assert b'https://openatlas.eu' in rv.data
+
             # Testing Subunit
             rv = self.app.get(url_for('subunit', id_=place.id))
             assert b'Feature' in rv.data and b'Strato' not in rv.data
