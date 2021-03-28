@@ -2,7 +2,7 @@ from collections import defaultdict
 from typing import Any, Dict, List, Union
 
 import pandas as pd
-from flask import Response
+from flask import Response, g
 
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -47,26 +47,51 @@ class ApiExportCSV:
             'coordinates': geom['coordinates']}
         for k, v in ApiExportCSV.get_links(entity).items():
             data[k] = ' | '.join(list(map(str, v)))
+        for k, v in ApiExportCSV.get_node(entity).items():
+            data[k] = ' | '.join(list(map(str, v)))
         return data
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
         return Response(pd.DataFrame.from_dict(data=ApiExportCSV.build_dataframe(entity),
-                                               orient='index').T.to_csv(),
+                                               orient='index').T.to_csv(encoding="utf-8"),
                         mimetype='text/csv',
                         headers={
                             'Content-Disposition': 'attachment;filename=' + str(
-                                entity.name) + '.csv'
+                                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'
                         })
+
+    @staticmethod
+    def get_node(entity: Entity) -> Dict[Any, List[Any]]:
+        d = defaultdict(list)
+        for node in entity.nodes:
+            hierarchy = []
+            for root in node.root:
+                hierarchy.append(g.nodes[root].name)
+            hierarchy.reverse()
+            h = ' > '.join(map(str, hierarchy))
+            value = ''
+            for link in Link.get_links(entity.id):
+                if link.range.id == node.id and link.description:
+                    value += link.description
+                    if link.range.id == node.id and node.description:
+                        value += node.description
+            d[h].append(node.name + (': ' + value if value else ''))
+        return d
 
     @staticmethod
     def get_links(entity: Entity) -> Dict[Any, list]:
         d = defaultdict(list)
         for link in Link.get_links(entity.id):
-            d[link.property.i18n['en'].replace(' ', '_')].append(link.range.name)
+            d[link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name].append(
+                link.range.name)
         for link in Link.get_links(entity.id, inverse=True):
-            d[link.property.i18n_inverse['en'].replace(' ', '_') if link.property.i18n_inverse[
-                'en'] else link.property.i18n['en'].replace(' ', '_')].append(link.domain.name)
+            d[link.property.i18n_inverse['en'].replace(' ', '_') + '_' + link.domain.class_.name if
+            link.property.i18n_inverse[
+                'en'] else link.property.i18n['en'].replace(' ',
+                                                            '_') + '_' + link.domain.class_.name].append(
+                link.domain.name)
+        d.pop('has_type_type', None)
         return d
 
     @staticmethod
