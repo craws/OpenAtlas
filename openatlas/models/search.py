@@ -5,7 +5,7 @@ from typing import ValuesView
 from flask_login import current_user
 from flask_wtf import FlaskForm
 
-from openatlas.database.search import Search as Db
+from openatlas.database.entity import Entity as Db
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link

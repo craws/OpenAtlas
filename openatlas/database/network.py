@@ -12,9 +12,7 @@ class Network:
             JOIN model.entity e ON l.domain_id = e.id AND e.system_class IN %(classes)s
             JOIN model.entity e2 ON l.range_id = e2.id AND e2.system_class IN %(classes)s
             WHERE property_code IN %(properties)s """
-        g.cursor.execute(sql, {
-            'classes': tuple(classes),
-            'properties': tuple(properties)})
+        g.cursor.execute(sql, {'classes': tuple(classes), 'properties': tuple(properties)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

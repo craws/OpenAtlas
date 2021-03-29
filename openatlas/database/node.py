@@ -33,13 +33,12 @@ class Node:
 
     @staticmethod
     def get_hierarchies() -> List[Dict[str, Any]]:
-        sql = """
+        g.cursor.execute("""
             SELECT h.id, h.name, h.multiple, h.standard, h.directional, h.value_type, h.locked,
                 (SELECT ARRAY(
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
-            FROM web.hierarchy h;"""
-        g.cursor.execute(sql)
+            FROM web.hierarchy h;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

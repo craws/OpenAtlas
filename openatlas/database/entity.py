@@ -46,8 +46,8 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(code: Union[str, List[str]]) -> List[Dict[str, Any]]:
-        codes = code if isinstance(code, list) else [code]
-        g.cursor.execute(Entity.build_sql() + 'WHERE class_code IN %(codes)s;', {'codes': tuple(codes)})
+        sql = Entity.build_sql() + 'WHERE class_code IN %(codes)s;'
+        g.cursor.execute(sql, {'codes': tuple(code if isinstance(code, list) else [code])})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -117,7 +117,8 @@ class Entity:
 
     @staticmethod
     def remove_profile_image(id_: int) -> None:
-        g.cursor.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': id_})
+        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;'
+        g.cursor.execute(sql, {'id': id_})
 
     @staticmethod
     def delete(ids: List[int]) -> None:
@@ -154,3 +155,29 @@ class Entity:
                     ON e.id = la.domain_id AND la.property_code IN ('P1', 'P131')
                 LEFT JOIN model.entity alias ON la.range_id = alias.id """
         return sql
+
+    @staticmethod
+    def search(term: str,
+               classes: List[str],
+               desc: bool = False,
+               own: bool = False,
+               user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+        sql = Entity.build_sql() + """
+            {user_clause}
+            WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
+            {description_clause})
+            {user_clause2}
+            AND e.system_class IN %(classes)s GROUP BY e.id ORDER BY e.name;""".format(
+            user_clause="""
+                LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if own else '',
+            description_clause="""
+                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
+            if desc else '',
+            user_clause2=' AND ul.user_id = %(user_id)s ' if own else '')
+        g.cursor.execute(sql, {
+            'term': '%' + term + '%',
+            'user_id': user_id,
+            'classes': tuple(classes)})
+        return [dict(row) for row in g.cursor.fetchall()]
