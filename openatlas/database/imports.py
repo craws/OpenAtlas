@@ -14,7 +14,7 @@ class Import:
             INSERT INTO import.project (name, description) VALUES (%(name)s, %(description)s)
             RETURNING id;"""
         g.cursor.execute(sql, {'name': name, 'description': description})
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['id']
 
     @staticmethod
     def get_all_projects() -> List[Dict[str, Any]]:
@@ -41,7 +41,7 @@ class Import:
             SELECT origin_id FROM import.entity
             WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
         g.cursor.execute(sql, {'project_id': project_id, 'ids': tuple(set(origin_ids))})
-        return [row.origin_id for row in g.cursor.fetchall()]
+        return [row['origin_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_duplicates(class_: str, names: List[str]) -> List[str]:
@@ -49,7 +49,7 @@ class Import:
             SELECT DISTINCT name FROM model.entity
             WHERE system_class = %(class_)s AND LOWER(name) IN %(names)s;"""
         g.cursor.execute(sql, {'class_': class_, 'names': tuple(names)})
-        return [row.name for row in g.cursor.fetchall()]
+        return [row['name'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def update_project(id_: int, name: str, description: str) -> None:

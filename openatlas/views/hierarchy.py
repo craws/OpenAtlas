@@ -82,7 +82,7 @@ def hierarchy_remove_form(id_: int, form_id: int) -> Response:
     if Node.get_form_count(root, form_id):
         abort(403)  # pragma: no cover
     try:
-        Node.remove_form_from_hierarchy(root, form_id)
+        Node.remove_form_from_hierarchy(form_id, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
         logger.log('error', 'database', 'remove form from hierarchy failed', e)

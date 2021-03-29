@@ -4,10 +4,6 @@ from typing import Any, Dict, List
 from flask import g, json
 
 
-class InvalidGeomException(Exception):
-    pass
-
-
 class Gis:
 
     @staticmethod
@@ -37,16 +33,16 @@ class Gis:
                 WHERE place.id = %(id_)s;""".format(shape=shape)
             g.cursor.execute(sql, {'id_': id_})
             for row in g.cursor.fetchall():
-                geometry = ast.literal_eval(row.geojson)
-                geometry['title'] = row.name.replace('"', '\"') if row.name else ''
-                geometry['description'] = row.description.replace('"',
-                                                                  '\"') if row.description else ''
+                geometry = ast.literal_eval(row['geojson'])
+                geometry['title'] = row['name'].replace('"', '\"') if row['name'] else ''
+                geometry['description'] = \
+                    row['description'].replace('"', '\"') if row['description'] else ''
                 geometries.append(geometry)
         return geometries
 
     @staticmethod
     def get_by_shape(shape, extra_ids: List[int]) -> List[Dict[str, Any]]:
-        polygon_sql = '' if shape == 'polygon' else \
+        polygon_sql = '' if shape != 'polygon' else \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         sql = """
             SELECT
@@ -73,9 +69,10 @@ class Gis:
 
     @staticmethod
     def test_geom(geometry: str) -> None:
+        from openatlas.models.gis import InvalidGeomException
         sql = "SELECT st_isvalid(public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"
-        g.cursor.execute(sql, {'geojson': json.dumps(geometry)})
-        if not g.cursor.fetchone()[0]:
+        g.cursor.execute(sql, {'geojson': geometry})
+        if not g.cursor.fetchone()['st_isvalid']:
             raise InvalidGeomException
         return
 

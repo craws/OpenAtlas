@@ -23,7 +23,7 @@ class Link:
             VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s)
             RETURNING id;"""
         g.cursor.execute(sql, data)
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['id']
 
     @staticmethod
     def get_linked_entities(id_: int, codes: List[str], inverse: bool) -> List[int]:
@@ -35,7 +35,7 @@ class Link:
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(id_)s AND property_code IN %(codes)s;"""
         g.cursor.execute(sql, {'id_': id_, 'codes': tuple(codes)})
-        return [row[0] for row in g.cursor.all()]
+        return [row['result_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_links(entity_id: int,
@@ -105,7 +105,7 @@ class Link:
 
     @staticmethod
     def get_invalid_links(data: Dict[str, Any]) -> List[Dict[str, int]]:
-        g.cursor.execute("""
+        sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, 
                 l.created, l.modified
             FROM model.link l
@@ -113,8 +113,9 @@ class Link:
             JOIN model.entity r ON l.range_id = r.id
             WHERE l.property_code = %(property)s
                 AND d.class_code = %(domain)s
-                AND r.class_code = %(range)s;""")
-        return [dict(row) for row in g.cursor.fetchall(data)]
+                AND r.class_code = %(range)s;"""
+        g.cursor.execute(sql, data)
+        return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_link_duplicates() -> List[Dict[str, int]]:

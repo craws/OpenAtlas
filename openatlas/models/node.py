@@ -228,8 +228,8 @@ class Node(Entity):
         return Db.get_form_count(form_id, node_ids)
 
     @staticmethod
-    def remove_form_from_hierarchy(form_id: int, hierarchy: Node) -> None:
-        Db.remove_form_from_hierarchy(form_id, hierarchy.id)
+    def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:
+        Db.remove_form_from_hierarchy(form_id, hierarchy_id)
 
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:

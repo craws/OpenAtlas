@@ -144,10 +144,10 @@ class User(UserMixin):  # type: ignore
     @staticmethod
     def toggle_bookmark(entity_id: int) -> str:
         if int(entity_id) in current_user.bookmarks:
-            Db.insert_bookmark(current_user.id, entity_id)
+            Db.delete_bookmark(current_user.id, entity_id)
             label = _('bookmark')
         else:
-            Db.delete_bookmark(current_user.id, entity_id)
+            Db.insert_bookmark(current_user.id, entity_id)
             label = _('bookmark remove')
         return label
 
@@ -166,7 +166,7 @@ class User(UserMixin):  # type: ignore
         for row in Db.get_settings(user_id):
             settings[row['name']] = row['value']
             if row['name'] in ['table_rows']:
-                settings[row['name']] = int(row['value)'])
+                settings[row['name']] = int(row['value'])
         return settings
 
     @staticmethod

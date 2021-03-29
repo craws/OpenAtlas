@@ -135,8 +135,9 @@ class Link:
                             nodes: bool = False) -> List['Entity']:
         from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
-        ids = [element for (element,) in Db.get_linked_entities(id_, codes, inverse)]
-        return Entity.get_by_ids(ids, nodes=nodes)
+        return Entity.get_by_ids(
+            Db.get_linked_entities(id_, codes, inverse),
+            nodes=nodes)
 
     @staticmethod
     def get_linked_entity_safe(id_: int, code: str,
@@ -182,7 +183,7 @@ class Link:
 
     @staticmethod
     def delete_(id_: int) -> None:
-        g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+        Db.delete_(id_)
 
     @staticmethod
     def check_links() -> List[Dict[str, str]]:

@@ -38,7 +38,7 @@ class CidocClass:
     def get_all() -> Dict[str, CidocClass]:
         classes = {}
         for row in Db.get_classes():
-            classes[row['code']]: CidocClass(
+            classes[row['code']] = CidocClass(
                 _name=row['name'],
                 code=row['code'],
                 id=row['id'],

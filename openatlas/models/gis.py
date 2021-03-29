@@ -11,6 +11,10 @@ from openatlas.models.node import Node
 from openatlas.util.display import sanitize
 
 
+class InvalidGeomException(Exception):
+    pass
+
+
 class Gis:
 
     @staticmethod
@@ -78,9 +82,9 @@ class Gis:
                     extra['siblings'].append(item)
                 else:
                     all_[shape].append(item)
-                if hasattr(row, 'polygon_point'):
+                if 'polygon_point' in row:
                     polygon_point_item = dict(item)  # Make a copy to prevent overriding geometry
-                    polygon_point_item['geometry'] = json.loads(row.polygon_point)
+                    polygon_point_item['geometry'] = json.loads(row['polygon_point'])
                     if row['object_id'] in object_ids:
                         selected['polygon_point'].append(polygon_point_item)
                     elif row['object_id'] and structure and \
@@ -118,7 +122,7 @@ class Gis:
                 if item['properties']['shapeType'] != 'centerpoint':
                     Db.test_geom(json.dumps(item['geometry']))
                 Db.insert(
-                    shape=shape if shape != 'line' else 'linestring',
+                    shape='linestring' if shape == 'line' else shape,
                     data={
                         'entity_id': entity.id,
                         'name': sanitize(item['properties']['name'], 'text'),

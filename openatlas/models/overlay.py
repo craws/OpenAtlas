@@ -15,7 +15,7 @@ class Overlay:
 
     def __init__(self, row: Dict[str, Any]) -> None:
         self.id = row['id']
-        self.name = row.name if hasattr(row, 'name') else ''
+        self.name = row['name'] if 'name' in row else ''
         self.image_id = row['image_id']
         self.place_id = row['place_id']
         self.bounding_box = row['bounding_box']

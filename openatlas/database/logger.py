@@ -51,10 +51,10 @@ class Logger:
         g.cursor.execute(sql, {'id': entity_id})
         row_import = g.cursor.fetchone()
         return {
-            'creator_id': row_insert.user_id if row_insert else None,
-            'created': row_insert.created if row_insert else None,
-            'modifier_id': row_update.user_id if row_update else None,
-            'modified': row_update.created if row_update else None,
-            'project_id': row_import.project_id if row_import else None,
-            'importer_id': row_import.user_id if row_import else None,
-            'origin_id': row_import.origin_id if row_import else None}
+            'creator_id': row_insert['user_id'] if row_insert else None,
+            'created': row_insert['created'] if row_insert else None,
+            'modifier_id': row_update['user_id'] if row_update else None,
+            'modified': row_update['created'] if row_update else None,
+            'project_id': row_import['project_id'] if row_import else None,
+            'importer_id': row_import['user_id'] if row_import else None,
+            'origin_id': row_import['origin_id'] if row_import else None}

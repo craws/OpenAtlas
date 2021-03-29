@@ -26,7 +26,7 @@ class User:
         g.cursor.execute(sql, data)
 
     @staticmethod
-    def update_settings(user_id: int, name: str, value: Optional[str, int]) -> None:
+    def update_settings(user_id: int, name: str, value: Union[int, str]) -> None:
         sql = """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, %(name)s, %(value)s)
@@ -55,7 +55,7 @@ class User:
     def get_bookmarks(user_id: int) -> List[int]:
         sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
         g.cursor.execute(sql, {'user_id': user_id})
-        return [row.entity_id for row in g.cursor.fetchall()]
+        return [row['entity_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_id(user_id: int) -> Optional[Dict[str, Any]]:
@@ -99,7 +99,7 @@ class User:
     def get_created_entities_count(user_id: int) -> int:
         sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
         g.cursor.execute(sql, {'user_id': user_id})
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['count']
 
     @staticmethod
     def insert(data) -> int:
@@ -109,7 +109,7 @@ class User:
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             RETURNING id;"""
         g.cursor.execute(sql, data)
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['id']
 
     @staticmethod
     def delete(id_: int) -> None:
@@ -118,7 +118,7 @@ class User:
     @staticmethod
     def get_users_for_form() -> List[Tuple[int, str]]:
         g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
-        return [(row.id, row.username) for row in g.cursor.fetchall()]
+        return [(row['id'], row['username']) for row in g.cursor.fetchall()]
 
     @staticmethod
     def insert_bookmark(user_id: int, entity_id: int) -> None:
@@ -160,7 +160,7 @@ class User:
             SELECT text FROM web.user_notes
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
         g.cursor.execute(sql, {'user_id': user_id, 'entity_id': entity_id})
-        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
+        return g.cursor.fetchone()['text'] if g.cursor.rowcount else None
 
     @staticmethod
     def get_notes(user_id: int) -> List[Dict[str, Union[str, int]]]:

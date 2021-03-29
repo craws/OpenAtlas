@@ -30,4 +30,4 @@ class Network:
             SELECT e.id, l.range_id
             FROM model.entity e
             JOIN model.link l ON e.id = domain_id AND l.property_code = 'P53';""")
-        return {row.range_id: row.id for row in g.cursor.fetchall()}
+        return {row['range_id']: row['id'] for row in g.cursor.fetchall()}

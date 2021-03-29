@@ -42,11 +42,10 @@ def translation_insert(source_id: int) -> Union[str, Response]:
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))
         return redirect(url_for('entity_view', id_=translation.id))
-    return render_template('display_form.html',
-                           form=form,
-                           crumbs=[[_('source'), url_for('index', view='source')],
-                                   source,
-                                   '+ ' + uc_first(_('text'))])
+    return render_template(
+        'display_form.html',
+        form=form,
+        crumbs=[[_('source'), url_for('index', view='source')], source, '+ ' + uc_first(_('text'))])
 
 
 @app.route('/source/translation/delete/<int:id_>')
@@ -68,13 +67,11 @@ def translation_update(id_: int) -> Union[str, Response]:
         save(form, translation)
         flash(_('info update'), 'info')
         return redirect(url_for('entity_view', id_=translation.id))
-    return render_template('display_form.html',
-                           form=form,
-                           title=translation.name,
-                           crumbs=[[_('source'), url_for('index', view='source')],
-                                   source,
-                                   translation,
-                                   _('edit')])
+    return render_template(
+        'display_form.html',
+        form=form,
+        title=translation.name,
+        crumbs=[[_('source'), url_for('index', view='source')], source, translation, _('edit')])
 
 
 def save(form: FlaskForm,

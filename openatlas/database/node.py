@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Union
 
 from flask import g
 
@@ -52,7 +52,7 @@ class Node:
         return [row['id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_form_choices() -> List[Dict[str, Optional[int, str]]]:
+    def get_form_choices() -> List[Dict[str, Union[int, str]]]:
         g.cursor.execute(
             "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
         return [dict(row) for row in g.cursor.fetchall()]
@@ -108,13 +108,13 @@ class Node:
     @staticmethod
     def get_form_count(form_id: int, node_ids: List[int]) -> int:
         g.cursor.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
-        form_name = g.cursor.fetchone()[0]
+        form_name = g.cursor.fetchone()['name']
         sql = """
-            SELECT count(*) FROM model.link l
+            SELECT COUNT(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2' AND e.system_class = %(form_name)s;"""
         g.cursor.execute(sql, {'node_ids': tuple(node_ids), 'form_name': form_name})
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['count']
 
     @staticmethod
     def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:

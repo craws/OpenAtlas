@@ -58,7 +58,7 @@ class Entity:
             WHERE system_class IN %(classes)s
             GROUP BY system_class;"""
         g.cursor.execute(sql, {'classes': tuple(classes)})
-        return {row.system_class: row.count for row in g.cursor.fetchall()}
+        return {row['system_class']: row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_orphans() -> List[Dict[str, Any]]:
@@ -89,7 +89,7 @@ class Entity:
             INSERT INTO model.entity (name, system_class, class_code, description)
             VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
         g.cursor.execute(sql, data)
-        return g.cursor.fetchone()[0]
+        return g.cursor.fetchone()['id']
 
     @staticmethod
     def update(data: Dict[str, Any]) -> None:
@@ -99,13 +99,13 @@ class Entity:
             = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s,
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {data})
+        g.cursor.execute(sql, data)
 
     @staticmethod
     def get_profile_image_id(id_: int) -> Optional[int]:
         sql = 'SELECT i.image_id FROM web.entity_profile_image i WHERE i.entity_id = %(id_)s;'
-        g.cursor.execute(sql, {'entity_id': id_})
-        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
+        g.cursor.execute(sql, {'id_': id_})
+        return g.cursor.fetchone()['image_id'] if g.cursor.rowcount else None
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
