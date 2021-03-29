@@ -9,24 +9,26 @@ from tests.base import TestBaseCase
 class UserTests(TestBaseCase):
 
     def test_user(self) -> None:
-        data = {'active': '',
-                'username': 'Ripley',
-                'email': 'ripley@nostromo.org',
-                'password': 'you_never_guess_this',
-                'password2': 'you_never_guess_this',
-                'group': 'admin',
-                'name': 'Ripley Weaver',
-                'description': '',
-                'send_info': ''}
-        data2 = {'active': '',
-                 'username': 'Newt',
-                 'email': 'newt@nostromo.org',
-                 'password': 'you_never_guess_this',
-                 'password2': 'you_never_guess_this',
-                 'group': 'admin',
-                 'name': 'Newt',
-                 'continue_': 'yes',
-                 'send_info': ''}
+        data = {
+            'active': '',
+            'username': 'Ripley',
+            'email': 'ripley@nostromo.org',
+            'password': 'you_never_guess_this',
+            'password2': 'you_never_guess_this',
+            'group': 'admin',
+            'name': 'Ripley Weaver',
+            'description': '',
+            'send_info': ''}
+        data2 = {
+            'active': '',
+            'username': 'Newt',
+            'email': 'newt@nostromo.org',
+            'password': 'you_never_guess_this',
+            'password2': 'you_never_guess_this',
+            'group': 'admin',
+            'name': 'Newt',
+            'continue_': 'yes',
+            'send_info': ''}
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

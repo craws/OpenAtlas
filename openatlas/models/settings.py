@@ -8,9 +8,9 @@ class Settings:
 
     @staticmethod
     def get_settings() -> Dict[str, Any]:
-        settings: Dict[str, Union[str, bool, int, List[str]]] = {}
-        for name in app.config['MODULES']:  # Set default if doesn't exist (e.g. after an upgrade)
-            settings['module_' + name] = False
+        settings: Dict[str, Union[int, str, List[str]]] = {}
+        for name in app.config['MODULES']:  # Set empty in case it doesn't exist, e.g. after upgrade
+            settings['module_' + name] = ''
         for row in Db.get_settings():
             settings[row['name']] = row['value']
             if row['name'] in [

@@ -12,7 +12,6 @@ class Settings:
 
     @staticmethod
     def update(field_name: str, value: Any) -> None:
-        # Update, or insert setting if not exist, e.g. after an upgrade
         sql = """
             INSERT INTO web.settings (name, value) VALUES (%(name)s, %(value)s)
             ON CONFLICT (name) DO UPDATE SET "value" = %(value)s;"""

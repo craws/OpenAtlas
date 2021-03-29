@@ -406,7 +406,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
 @required_group('admin')
 def admin_log() -> str:
     form = LogForm()
-    form.user.choices = [(0, _('all'))] + User.get_users()
+    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order=[[0, 'desc']])
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
