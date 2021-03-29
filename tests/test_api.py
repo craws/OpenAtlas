@@ -35,7 +35,6 @@ class ApiTests(TestBaseCase):
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
-                location = place.get_linked_entity_safe('P53')
 
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -74,7 +73,7 @@ class ApiTests(TestBaseCase):
             # Path Tests
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
-            rv = self.app.get(url_for('latest', latest=10))
+            rv = self.app.get(url_for('latest', latest=1))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
             assert b'1' in rv.data
@@ -107,7 +106,7 @@ class ApiTests(TestBaseCase):
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('latest', latest=10, download=True))
+            rv = self.app.get(url_for('latest', latest=1, download=True))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
