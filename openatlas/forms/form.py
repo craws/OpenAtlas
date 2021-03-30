@@ -54,7 +54,7 @@ forms = {
 
 
 def build_form(class_: str,
-               item: Optional[Union[Entity, Link]] = None,
+               item: Optional[Union[Entity, Link, Node]] = None,
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:

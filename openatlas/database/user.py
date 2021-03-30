@@ -102,7 +102,7 @@ class User:
         return g.cursor.fetchone()['count']
 
     @staticmethod
-    def insert(data) -> int:
+    def insert(data: Dict[str, Any]) -> int:
         sql = """
             INSERT INTO web.user (username, real_name, info, email, active, password, group_id)
             VALUES (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,

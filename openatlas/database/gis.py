@@ -41,7 +41,7 @@ class Gis:
         return geometries
 
     @staticmethod
-    def get_by_shape(shape, extra_ids: List[int]) -> List[Dict[str, Any]]:
+    def get_by_shape(shape: str, extra_ids: List[int]) -> List[Dict[str, Any]]:
         polygon_sql = '' if shape != 'polygon' else \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         sql = """

@@ -1,6 +1,5 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from dataclasses import dataclass
 from typing import Dict, List, Union
 
 from flask import g, session
@@ -10,7 +9,6 @@ from openatlas import app
 from openatlas.database.model import Model as Db
 
 
-@dataclass
 class CidocClass:
 
     def __init__(self, data: Dict[str, Union[int, str]]) -> None:
@@ -47,7 +45,6 @@ class CidocClass:
         return classes
 
 
-@dataclass
 class CidocProperty:
 
     def __init__(self, data: Dict[str, Union[int, str]]) -> None:

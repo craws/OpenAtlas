@@ -84,7 +84,7 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def insert(data) -> int:
+    def insert(data: Dict[str, Any]) -> int:
         sql = """
             INSERT INTO model.entity (name, system_class, class_code, description)
             VALUES (%(name)s, %(system_class)s, %(code)s, %(description)s) RETURNING id;"""
