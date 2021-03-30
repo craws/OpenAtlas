@@ -73,6 +73,7 @@ class ApiTests(TestBaseCase):
             # Path Tests
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
+            # Todo: Check out, that also letest=10 works.
             rv = self.app.get(url_for('latest', latest=1))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
