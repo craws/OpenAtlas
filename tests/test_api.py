@@ -201,6 +201,8 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
 
+
+
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
