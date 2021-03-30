@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import Dict, List, Union
 
 from flask import g, session
 
@@ -12,14 +12,16 @@ from openatlas.database.model import Model as Db
 
 @dataclass
 class CidocClass:
-    _name: str
-    comment: str
-    code: str
-    id: int
-    i18n: Dict[str, str]
-    sub: List[CidocClass]
-    super: List[CidocClass]
-    count: int
+
+    def __init__(self, data: Dict[str, Union[int, str]]) -> None:
+        self._name = data['name']
+        self.code = data['code']
+        self.id = data['id']
+        self.comment = data['comment']
+        self.count = data['count']
+        self.i18n: Dict[str, str] = {}
+        self.sub: List[CidocClass] = []
+        self.super: List[CidocClass] = []
 
     @property
     def name(self) -> str:
@@ -36,17 +38,7 @@ class CidocClass:
 
     @staticmethod
     def get_all() -> Dict[str, CidocClass]:
-        classes = {}
-        for row in Db.get_classes():
-            classes[row['code']] = CidocClass(
-                _name=row['name'],
-                code=row['code'],
-                id=row['id'],
-                comment=row['comment'],
-                count=row['count'],
-                i18n={},
-                sub=[],
-                super=[])
+        classes = {row['code']: CidocClass(row) for row in Db.get_classes()}
         for row in Db.get_class_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])
             classes[row['sub_code']].super.append(row['super_code'])
@@ -57,18 +49,20 @@ class CidocClass:
 
 @dataclass
 class CidocProperty:
-    _name: str
-    _name_inverse: str
-    comment: str
-    code: str
-    id: int
-    i18n: Dict[str, str]
-    i18n_inverse: Dict[str, str]
-    sub: List[int]
-    super: List[int]
-    domain_class_code: str
-    range_class_code: str
-    count: int
+
+    def __init__(self, data: Dict[str, Union[int, str]]) -> None:
+        self.id = data['id']
+        self._name = data['name']
+        self._name_inverse = data['name_inverse']
+        self.code = data['code']
+        self.comment = data['comment'],
+        self.domain_class_code = data['domain_class_code']
+        self.range_class_code = data['range_class_code']
+        self.count = data['count']
+        self.sub: List[int] = []
+        self.super: List[int] = []
+        self.i18n: Dict[str, str] = {}
+        self.i18n_inverse: Dict[str, str] = {}
 
     @property
     def name(self) -> str:
@@ -106,21 +100,7 @@ class CidocProperty:
 
     @staticmethod
     def get_all() -> Dict[str, CidocProperty]:
-        properties = {}
-        for row in Db.get_properties():
-            properties[row['code']] = CidocProperty(
-                id=row['id'],
-                _name=row['name'],
-                _name_inverse=row['name_inverse'],
-                code=row['code'],
-                comment=row['comment'],
-                domain_class_code=row['domain_class_code'],
-                range_class_code=row['range_class_code'],
-                count=row['count'],
-                sub=[],
-                super=[],
-                i18n={},
-                i18n_inverse={})
+        properties = {row['code']: CidocProperty(row) for row in Db.get_properties()}
         for row in Db.get_property_hierarchy():
             properties[row['super_code']].sub.append(row['sub_code'])
             properties[row['sub_code']].super.append(row['super_code'])
