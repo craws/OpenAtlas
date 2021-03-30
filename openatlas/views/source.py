@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -8,6 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -77,7 +78,7 @@ def translation_update(id_: int) -> Union[str, Response]:
 def save(form: FlaskForm,
          entity: Optional[Entity] = None,
          source: Optional[Entity] = None) -> Entity:
-    g.cursor.execute('BEGIN')
+    Transaction.begin()
     try:
         if entity:
             logger.log_user(entity.id, 'update')
@@ -88,9 +89,9 @@ def save(form: FlaskForm,
         else:
             abort(400)  # pragma: no cover, either entity or source has to be provided
         entity.update(form)
-        g.cursor.execute('COMMIT')
+        Transaction.commit()
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
+        Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return entity  # type: ignore

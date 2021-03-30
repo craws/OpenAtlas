@@ -12,6 +12,7 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
@@ -258,15 +259,15 @@ def import_data(project_id: int, class_: str) -> str:
 
         if not form.preview.data and checked_data:
             if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
-                g.cursor.execute('BEGIN')
+                Transaction.begin()
                 try:
                     Import.import_data(project, class_, checked_data)
-                    g.cursor.execute('COMMIT')
+                    Transaction.commit()
                     logger.log('info', 'import', 'import: ' + str(len(checked_data)))
                     flash(_('import of') + ': ' + str(len(checked_data)), 'info')
                     imported = True
                 except Exception as e:  # pragma: no cover
-                    g.cursor.execute('ROLLBACK')
+                    Transaction.rollback()
                     logger.log('error', 'import', 'import failed', e)
                     flash(_('error transaction'), 'error')
     return render_template(

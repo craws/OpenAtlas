@@ -12,6 +12,7 @@ from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
                                      MailForm, MapForm, ModulesForm, NewsLetterForm,
                                      SimilarForm, TestMailForm)
@@ -198,14 +199,14 @@ def admin_settings(category: str) -> Union[str, Response]:
         importlib.import_module('openatlas.forms.setting'),
         uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
+        Transaction.begin()
         try:
             Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
-            g.cursor.execute('COMMIT')
+            Transaction.commit()
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
+            Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'data' if category == 'api' else category

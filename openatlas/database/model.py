@@ -12,8 +12,6 @@ class Model:
             FROM model.class c
             LEFT JOIN model.entity e ON c.code = e.class_code
             GROUP BY (c.id, c.name, c.comment);""")
-        # result = g.cursor.fetchall()
-
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
