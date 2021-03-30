@@ -1,12 +1,13 @@
 from typing import Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -51,16 +52,16 @@ def note_update(entity_id: int) -> Union[str, Response]:
 
 
 def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
-    g.cursor.execute('BEGIN')
+    Transaction.begin()
     try:
         if insert:
             User.insert_note(entity, form.description.data)
         else:
             User.update_note(entity, form.description.data)
-        g.cursor.execute('COMMIT')
+        Transaction.commit()
         flash(_('note added') if insert else _('note updated'), 'info')
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
+        Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
 

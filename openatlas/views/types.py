@@ -6,6 +6,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -65,9 +66,9 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         abort(403)
     form = build_move_form(node)
     if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
+        Transaction.begin()
         Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
-        g.cursor.execute('COMMIT')
+        Transaction.commit()
         flash(_('Entities were updated'), 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     getattr(form, str(root.id)).data = node.id

@@ -75,7 +75,7 @@ class ApiTests(TestBaseCase):
             assert b'message' in rv.data
             # Todo: Check out, that also letest=10 works.
             rv = self.app.get(url_for('latest', latest=1))
-            assert b'Nostromos' in rv.data
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
             assert b'1' in rv.data
             rv = self.app.get(url_for('entity', id_=place.id))
@@ -108,7 +108,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('latest', latest=1, download=True))
-            assert b'Nostromos' in rv.data
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('system_class', system_class='appellation', download=True))

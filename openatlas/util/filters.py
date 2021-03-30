@@ -517,29 +517,6 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str:
-    """ Returns HTML with debug information about database queries and form errors."""
-    html = ''
-    for name, value in debug_model.items():
-        if name in ['current']:
-            continue  # Don't display current time counter
-        if name not in ['sql']:
-            value = '{:10.2f}'.format(value)
-        html += """
-            <div>
-                <div>{name}</div>
-                <div class="table-cell" style="text-align:right;">
-                    {value}
-                </div>
-            </div>""".format(name=name, value=value)
-    if form and hasattr(form, 'errors'):
-        for fieldName, errorMessages in form.errors.items():
-            html += fieldName + ' - ' + errorMessages[0] + '<br>'
-    return html
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_external_references(self: Any, entity: Entity) -> str:
     system_links = []
     for link_ in entity.reference_systems:
