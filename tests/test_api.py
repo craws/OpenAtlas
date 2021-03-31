@@ -73,6 +73,7 @@ class ApiTests(TestBaseCase):
             # Path Tests
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
+            # Todo: Check out, that also letest=10 works.
             rv = self.app.get(url_for('latest', latest=1))
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
@@ -199,6 +200,8 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
+
+
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
