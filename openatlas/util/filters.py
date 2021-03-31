@@ -80,7 +80,7 @@ def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
+def breadcrumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:

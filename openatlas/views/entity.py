@@ -359,7 +359,10 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
-    crumbs = [[entity.class_.label, url_for('index', view=entity.class_.view)], entity.name]
+    label = entity.class_.label
+    if entity.class_.name in g.class_view_mapping:
+        label = g.class_view_mapping[entity.class_.name]
+    crumbs = [[label, url_for('index', view=entity.class_.view)], entity.name]
     if structure:
         first_item = [g.classes['place'].label, url_for('index', view='place')]
         if entity.class_.name == 'artifact':
