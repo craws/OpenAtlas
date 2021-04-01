@@ -9,7 +9,11 @@ class Node:
     def get_nodes(system_class: str, property_: str) -> List[Dict[str, Any]]:
         sql = """
             SELECT e.id, e.name, e.class_code, e.description, e.system_class, e.created, e.modified,
-                es.id AS super_id, COUNT(l2.id) AS count, COUNT(l3.id) AS count_property
+                es.id AS super_id, COUNT(l2.id) AS count, COUNT(l3.id) AS count_property,
+                COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
+                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
+                COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.entity e
 
             -- Get super
