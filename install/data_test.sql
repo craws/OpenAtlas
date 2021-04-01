@@ -17,6 +17,6 @@ INSERT INTO web.i18n (name, language, text) VALUES
 
 -- Insert invalid link
 INSERT INTO model.entity (class_code, system_class, name) VALUES
-    ('E13', 'artifact', 'Invalid linked entity');
+    ('E13', 'person', 'Invalid linked entity');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P86', (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'), (SELECT id FROM model.entity WHERE name = 'Invalid linked entity'));

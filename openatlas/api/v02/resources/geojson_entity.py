@@ -97,8 +97,6 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_geoms_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
-        if entity.cidoc_class.code != 'E53':  # pragma: nocover
-            return 'Wrong class'
         geoms = Gis.get_by_id(entity.id)
         if len(geoms) == 1:
             return geoms[0]
