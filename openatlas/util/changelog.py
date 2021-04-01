@@ -2,7 +2,12 @@ class Changelog:
 
     versions = {
         '6.1.0': ['TBA', {
-            'feature': {}}],
+            'feature': {
+                '1215': 'Time spans for types',
+                '963': 'API: Add type of places to export',
+                '1402': 'API: CSV export in API',
+                '1487': 'API: Endpoint for type hierarchies',
+                '1489': 'API: Geometry for artifacts',}}],
         '6.0.1': ['2021-03-15', {
             'fix': {
                 '1485': 'Cannot choose multiple for custom type'}}],
