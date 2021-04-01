@@ -50,7 +50,7 @@ forms = {
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
-    'type': ['name', 'description', 'continue']}
+    'type': ['name', 'date', 'description', 'continue']}
 
 
 def build_form(class_: str,

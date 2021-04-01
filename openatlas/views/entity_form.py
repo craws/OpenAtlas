@@ -74,9 +74,12 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    crumbs = [[
-        origin.class_.label if origin else _(view_name.replace('_', ' ')),
-        url_for('index', view=origin.class_.view if origin else view_name)],
+    label = origin.class_.name if origin else view_name
+    if label in g.class_view_mapping:
+        label = g.class_view_mapping[label]
+    label = _(label.replace('_', ' '))
+    crumbs = [
+        [label, url_for('index', view=origin.class_.view if origin else view_name)],
         link(origin)]
     if structure and (not origin or not origin.class_.name == 'artifact'):
         crumbs = [
