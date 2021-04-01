@@ -362,6 +362,7 @@ def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]])
     label = entity.class_.label
     if entity.class_.name in g.class_view_mapping:
         label = g.class_view_mapping[entity.class_.name]
+    label = _(label.replace('_', ' '))
     crumbs = [[_(label), url_for('index', view=entity.class_.view)], entity.name]
     if structure:
         first_item = [g.classes['place'].label, url_for('index', view='place')]
