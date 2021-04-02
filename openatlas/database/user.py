@@ -141,18 +141,26 @@ class User:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def insert_note(user_id: int, entity_id: int, note: str) -> None:
+    def insert_note(user_id: int, entity_id: int, note: str, public: bool) -> None:
         sql = """
-            INSERT INTO web.user_notes (user_id, entity_id, text)
-            VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
-        g.cursor.execute(sql, {'user_id': user_id, 'entity_id': entity_id, 'text': note})
+            INSERT INTO web.user_notes (user_id, entity_id, text, public)
+            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s);"""
+        g.cursor.execute(sql, {
+            'user_id': user_id,
+            'entity_id': entity_id,
+            'text': note,
+            'public': public})
 
     @staticmethod
-    def update_note(user_id: int, entity_id: int, note: str) -> None:
+    def update_note(user_id: int, entity_id: int, note: str, public: bool) -> None:
         sql = """
-            UPDATE web.user_notes SET text = %(text)s
+            UPDATE web.user_notes SET text = %(text)s, public = %(public)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.cursor.execute(sql, {'user_id': user_id, 'entity_id': entity_id, 'text': note})
+        g.cursor.execute(sql, {
+            'user_id': user_id,
+            'entity_id': entity_id,
+            'text': note,
+            'public': public})
 
     @staticmethod
     def get_note(user_id: int, entity_id: int) -> Optional[str]:

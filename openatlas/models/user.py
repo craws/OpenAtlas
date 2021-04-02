@@ -10,7 +10,6 @@ from flask import session
 from flask_babel import lazy_gettext as _
 from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
-from psycopg2.extras import NamedTupleCursor
 
 from openatlas.database.user import User as Db
 from openatlas.models.entity import Entity
@@ -177,14 +176,14 @@ class User(UserMixin):  # type: ignore
             secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
     @staticmethod
-    def insert_note(entity: Entity, note: str) -> None:
+    def insert_note(entity_id: int, note: str, public: bool) -> None:
         from openatlas.util.display import sanitize
-        Db.insert_note(current_user.id, entity.id, sanitize(note, 'text'))
+        Db.insert_note(current_user.id, entity_id, sanitize(note, 'text'), public)
 
     @staticmethod
-    def update_note(entity: Entity, note: str) -> None:
+    def update_note(entity_id: int, note: str, public: bool) -> None:
         from openatlas.util.display import sanitize
-        Db.update_note(current_user.id, entity.id, sanitize(note, 'text'))
+        Db.update_note(current_user.id, entity_id, sanitize(note, 'text'), public)
 
     @staticmethod
     def get_note(entity: Entity) -> Optional[str]:

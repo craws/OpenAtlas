@@ -47,18 +47,19 @@ def note_update(entity_id: int) -> Union[str, Response]:
         'display_form.html',
         form=form,
         entity=entity,
-        crumbs=[[_(entity.class_.view), url_for('index', view=_(entity.class_.view))],
-                entity,
-                _('edit note')])
+        crumbs=[
+            [_(entity.class_.view), url_for('index', view=_(entity.class_.view))],
+            entity,
+            _('edit note')])
 
 
 def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
     Transaction.begin()
     try:
         if insert:
-            User.insert_note(entity, form.description.data)
+            User.insert_note(entity.id, form.description.data, form.public.data)
         else:
-            User.update_note(entity, form.description.data)
+            User.update_note(entity.id, form.description.data, form.public.data)
         Transaction.commit()
         flash(_('note added') if insert else _('note updated'), 'info')
     except Exception as e:  # pragma: no cover
