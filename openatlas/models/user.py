@@ -181,15 +181,16 @@ class User(UserMixin):  # type: ignore
         Db.insert_note(current_user.id, entity_id, sanitize(note, 'text'), public)
 
     @staticmethod
-    def update_note(entity_id: int, note: str, public: bool) -> None:
+    def update_note(id_: int, note: str, public: bool) -> None:
         from openatlas.util.display import sanitize
-        Db.update_note(current_user.id, entity_id, sanitize(note, 'text'), public)
+        Db.update_note(id_, sanitize(note, 'text'), public)
+
+    def get_notes_by_entity_id(self, entity_id: int) -> List[Dict[str, Any]]:
+        return Db.get_notes_by_entity_id(self.id, entity_id)
 
     @staticmethod
-    def get_note(entity: Entity) -> Optional[str]:
-        if not current_user.settings['module_notes']:  # pragma no cover
-            return None
-        return Db.get_note(current_user.id, entity.id)
+    def get_note_by_id(id_):
+        return Db.get_note_by_id(id_)
 
     @staticmethod
     def get_notes() -> Dict[int, str]:

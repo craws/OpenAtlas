@@ -98,29 +98,6 @@ def breadcrumb(self: Any, crumbs: List[Any]) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def note(self: Any, entity: Entity) -> str:
-    if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
-        return ''  # pragma no cover
-    if not isinstance(entity.note, str):
-        html = '<div class="toolbar">{insert}</div>'.format(
-            insert=display.button(_('add note'), url_for('note_insert', entity_id=entity.id)))
-    else:
-        html = '''
-            <h2>{label}</h2>
-            <div class="note">{note}</div>
-            <div class="toolbar">{edit} {delete}</div>'''.format(
-            label=display.uc_first(_('note')),
-            note=entity.note.replace('\r\n', '<br>'),
-            edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
-            delete=display.button(
-                _('delete'),
-                url_for('note_delete', entity_id=entity.id),
-                onclick="return confirm('" + _('Delete note?') + "');"))
-    return Markup(html)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def is_authorized(self: Any, group: str) -> bool:
     return util.is_authorized(group)
 

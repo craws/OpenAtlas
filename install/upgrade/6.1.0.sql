@@ -5,6 +5,7 @@ BEGIN;
 
 -- #1457: Public notes
 ALTER TABLE web.user_notes ADD COLUMN "public" boolean DEFAULT false NOT NULL;
+ALTER TABLE web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_entity_id_key;
 
 -- Remove obsolete debug_mode
 DELETE FROM web.settings WHERE name = 'debug_mode';

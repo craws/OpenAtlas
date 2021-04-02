@@ -17,7 +17,8 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, button, get_base_table_data,
+from openatlas.util.display import (add_edit_link, add_remove_link, button, format_date,
+                                    get_base_table_data,
                                     get_entity_data, get_file_path, get_profile_image_table_link,
                                     link, uc_first)
 from openatlas.util.filters import display_delete_link
@@ -52,7 +53,6 @@ def entity_view(id_: int) -> Union[str, Response]:
 
     event_links = None  # Needed for actor
     overlays = None  # Needed for place
-    entity.note = User.get_note(entity)
     tabs = {'info': Tab('info')}
     if isinstance(entity, Node):
         tabs['subs'] = Tab('subs', entity)
@@ -311,11 +311,12 @@ def entity_view(id_: int) -> Union[str, Response]:
                                 url_for('overlay_update', id_=overlays[domain.id].id))
                         else:
                             data.append(
-                                link(_('link'), url_for(
-                                    'overlay_insert',
-                                    image_id=domain.id,
-                                    place_id=entity.id,
-                                    link_id=link_.id)))
+                                link(_('link'),
+                                     url_for(
+                                         'overlay_insert',
+                                         image_id=domain.id,
+                                         place_id=entity.id,
+                                         link_id=link_.id)))
                     else:  # pragma: no cover
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
@@ -346,6 +347,16 @@ def entity_view(id_: int) -> Union[str, Response]:
     if not gis_data:
         gis_data = Gis.get_all(entity.linked_places) if entity.linked_places else None
     entity.info_data = get_entity_data(entity, event_links=event_links)
+    tabs['note'] = Tab('note', entity)
+    for note in current_user.get_notes_by_entity_id(entity.id):
+        data = [
+            format_date(note['created']),
+            uc_first(_('public')) if note['public'] else uc_first(_('private')),
+            link(User.get_by_id(note['user_id'])),
+            note['text']]
+        if note['user_id'] == current_user.id:
+            add_edit_link(data, url_for('note_update', id_=note['id']))
+        tabs['note'].table.rows.append(data)
     return render_template(
         'entity/view.html',
         entity=entity,
