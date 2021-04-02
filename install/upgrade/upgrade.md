@@ -10,7 +10,7 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
-### 6.0.0 to 6.1.0
+### 6.0.x to 6.1.0
 Execute **install/upgrade/6.1.0.sql** after making backups.
 
 ### 5.7.x to 6.0.0

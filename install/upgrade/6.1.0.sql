@@ -6,4 +6,7 @@ BEGIN;
 -- #1457: Public notes
 ALTER TABLE web.user_notes ADD COLUMN "public" boolean DEFAULT false NOT NULL;
 
+-- Remove obsolete debug_mode
+DELETE FROM web.settings WHERE name = 'debug_mode';
+
 END;

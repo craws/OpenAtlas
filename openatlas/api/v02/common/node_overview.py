@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Tuple, Union
 
-# from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
@@ -47,7 +46,7 @@ class GetNodeOverview(Resource):  # type: ignore
             item = g.nodes[id_]
             items.append({
                 'id': item.id,
-                'url': url_for('entity_view', id_=item.id, _external=True),
+                'url': url_for('entity', id_=item.id, _external=True),
                 'label': item.name.replace("'", "&apos;"),
                 'children': GetNodeOverview.walk_tree(item.subs)})
         return items

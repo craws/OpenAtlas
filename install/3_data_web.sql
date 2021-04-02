@@ -15,7 +15,6 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
 
 INSERT INTO web.settings (name, value) VALUES
     ('api_public', ''),
-    ('debug_mode', ''),
     ('default_language', 'en'),
     ('table_rows', '25'),
     ('failed_login_forget_minutes', '1'),

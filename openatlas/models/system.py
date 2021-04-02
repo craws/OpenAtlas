@@ -1,5 +1,3 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
-
 from typing import Dict, List, Optional
 
 from flask import g

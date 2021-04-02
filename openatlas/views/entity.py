@@ -78,8 +78,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['entities'].table.header = [_('domain'), _('range')]
             for row in Link.get_entities_by_node(entity):
                 tabs['entities'].table.rows.append([
-                    link(Entity.get_by_id(row.domain_id)),
-                    link(Entity.get_by_id(row.range_id))])
+                    link(Entity.get_by_id(row['domain_id'])),
+                    link(Entity.get_by_id(row['range_id']))])
     elif isinstance(entity, ReferenceSystem):
         for form_id, form in entity.get_forms().items():
             tabs[form['name']] = Tab(form['name'], origin=entity)
@@ -359,7 +359,11 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
-    crumbs = [[entity.class_.label, url_for('index', view=entity.class_.view)], entity.name]
+    label = entity.class_.label
+    if entity.class_.name in g.class_view_mapping:
+        label = g.class_view_mapping[entity.class_.name]
+    label = _(label.replace('_', ' '))
+    crumbs = [[_(label), url_for('index', view=entity.class_.view)], entity.name]
     if structure:
         first_item = [g.classes['place'].label, url_for('index', view='place')]
         if entity.class_.name == 'artifact':

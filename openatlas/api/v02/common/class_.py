@@ -1,9 +1,9 @@
 from typing import Any, Dict, List, Tuple, Union
 
-# from flasgger import swag_from
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
+from openatlas.api.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCidocClassCode
 from openatlas.api.v02.resources.pagination import Pagination
@@ -19,6 +19,9 @@ class GetByClass(Resource):  # type: ignore
     # @swag_from("../swagger/class.yml", endpoint="class")
     def get(self, class_code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
+        if parser['export'] == 'csv':
+            return ApiExportCSV.export_entities(
+                GetByClass.get_entities_by_class(class_code=class_code, parser=parser), class_code)
         class_ = Pagination.pagination(
             GetByClass.get_entities_by_class(class_code=class_code, parser=parser),
             parser=parser)

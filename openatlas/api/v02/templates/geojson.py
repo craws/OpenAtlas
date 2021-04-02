@@ -11,11 +11,6 @@ class GeoJson:
         title = {
             'title': fields.String}
 
-        relations = {
-            'label': fields.String,
-            'relationTo': fields.String,
-            'relationType': fields.String}
-
         depictions = {
             '@id': fields.String,
             'title': fields.String,
@@ -55,6 +50,15 @@ class GeoJson:
 
         when = {
             'timespans': fields.List(fields.Nested(timespans))}
+
+        relations = {
+            'label': fields.String,
+            'relationTo': fields.String,
+            'relationType': fields.String,
+            'relationSystemClass': fields.String,
+            'type': fields.String,
+            'when': fields.Nested(when)
+        }
 
         feature = {
             '@id': fields.String,

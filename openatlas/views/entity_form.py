@@ -9,6 +9,7 @@ from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -73,9 +74,12 @@ def add_crumbs(view_name: str,
                origin: Union[Entity, None],
                structure: Optional[Dict[str, Any]],
                insert_: Optional[bool] = False) -> List[Any]:
-    crumbs = [[
-        origin.class_.label if origin else _(view_name.replace('_', ' ')),
-        url_for('index', view=origin.class_.view if origin else view_name)],
+    label = origin.class_.name if origin else view_name
+    if label in g.class_view_mapping:
+        label = g.class_view_mapping[label]
+    label = _(label.replace('_', ' '))
+    crumbs = [
+        [label, url_for('index', view=origin.class_.view if origin else view_name)],
         link(origin)]
     if structure and (not origin or not origin.class_.name == 'artifact'):
         crumbs = [
@@ -245,7 +249,7 @@ def save(form: FlaskForm,
          entity: Optional[Entity] = None,
          class_: Optional[str] = None,
          origin: Optional[Entity] = None) -> Union[str, Response]:
-    g.cursor.execute('BEGIN')
+    Transaction.begin()
     action = 'update'
     try:
         if not entity:
@@ -267,10 +271,10 @@ def save(form: FlaskForm,
         update_links(entity, form, action, origin)
         url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
-        g.cursor.execute('COMMIT')
+        Transaction.commit()
         flash(_('entity created') if action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
+        Transaction.rollback()
         logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
         if action == 'update' and entity:
@@ -278,7 +282,7 @@ def save(form: FlaskForm,
         else:
             url = url_for('index', view=g.classes[class_].view)
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
+        Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         if action == 'update' and entity:
