@@ -145,8 +145,17 @@ class User:
         sql = """
             SELECT id, created, public, text, user_id
             FROM web.user_notes
-            WHERE entity_id = %(entity_id)s AND public IS TRUE or user_id = %(user_id)s;"""
+            WHERE entity_id = %(entity_id)s AND (public IS TRUE or user_id = %(user_id)s);"""
         g.cursor.execute(sql, {'entity_id': entity_id, 'user_id': user_id})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_notes_by_user_id(user_id: int) -> List[Dict[str, Any]]:
+        sql = """
+            SELECT id, created, public, text, user_id, entity_id
+            FROM web.user_notes
+            WHERE user_id = %(user_id)s;"""
+        g.cursor.execute(sql, {'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -174,13 +183,8 @@ class User:
         sql = "UPDATE web.user_notes SET text = %(text)s, public = %(public)s WHERE id = %(id)s;"
         g.cursor.execute(sql, {'id': id_, 'text': note, 'public': public})
 
-    @staticmethod
-    def get_notes(user_id: int) -> List[Dict[str, Union[str, int]]]:
-        sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"
-        g.cursor.execute(sql, {'user_id': user_id})
-        return [dict(row) for row in g.cursor.fetchall()]
+
 
     @staticmethod
-    def delete_note(user_id: int, entity_id: int) -> None:
-        sql = "DELETE FROM web.user_notes WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s"
-        g.cursor.execute(sql, {'user_id': user_id, 'entity_id': entity_id})
+    def delete_note(id_: int) -> None:
+        g.cursor.execute("DELETE FROM web.user_notes WHERE id = %(id)s;", {'id': id_})

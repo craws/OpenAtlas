@@ -440,23 +440,6 @@ def sanitize(self: Any, string: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_delete_link(self: Any, entity: Entity) -> str:
-    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
-    if entity.class_.name == 'source_translation':
-        url = url_for('translation_delete', id_=entity.id)
-    elif entity.id in g.nodes:
-        url = url_for('node_delete', id_=entity.id)
-    else:
-        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return display.button(
-        _('delete'),
-        url,
-        onclick="return confirm('{confirm}')").format(confirm=confirm)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) -> str:
     """ Returns menu HTML with (bold) marked selected item."""
     if not current_user.is_authenticated:

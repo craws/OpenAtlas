@@ -17,11 +17,9 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_remove_link, button, format_date,
-                                    get_base_table_data,
-                                    get_entity_data, get_file_path, get_profile_image_table_link,
-                                    link, uc_first)
-from openatlas.util.filters import display_delete_link
+from openatlas.util.display import (add_edit_link, add_remove_link, button, display_delete_link,
+                                    format_date, get_base_table_data, get_entity_data,
+                                    get_file_path,  get_profile_image_table_link, link, uc_first)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
@@ -353,9 +351,10 @@ def entity_view(id_: int) -> Union[str, Response]:
             format_date(note['created']),
             uc_first(_('public')) if note['public'] else uc_first(_('private')),
             link(User.get_by_id(note['user_id'])),
-            note['text']]
-        if note['user_id'] == current_user.id:
-            add_edit_link(data, url_for('note_update', id_=note['id']))
+            note['text'],
+            '<a href="{url}">{label}</a>'.format(
+                url=url_for('note_view', id_=note['id']),
+                label=uc_first(_('view')))]
         tabs['note'].table.rows.append(data)
     return render_template(
         'entity/view.html',
@@ -370,11 +369,9 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
-    label = entity.class_.label
-    if entity.class_.name in g.class_view_mapping:
-        label = g.class_view_mapping[entity.class_.name]
-    label = _(label.replace('_', ' '))
-    crumbs = [[_(label), url_for('index', view=entity.class_.view)], entity.name]
+    crumbs = [
+        [_(entity.class_.view.replace('_', ' ')), url_for('index', view=entity.class_.view)],
+        entity.name]
     if structure:
         first_item = [g.classes['place'].label, url_for('index', view='place')]
         if entity.class_.name == 'artifact':
@@ -406,18 +403,18 @@ def add_buttons(entity: Entity) -> List[str]:
         if entity.root and not g.nodes[entity.root[0]].locked:
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.locked and entity.count < 1 and not entity.subs:
-                buttons.append(display_delete_link(None, entity))
+                buttons.append(display_delete_link(entity))
     elif isinstance(entity, ReferenceSystem):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         if not entity.forms and not entity.system:
-            buttons.append(display_delete_link(None, entity))
+            buttons.append(display_delete_link(entity))
     elif entity.class_.name == 'source_translation':
         buttons.append(button(_('edit'), url_for('translation_update', id_=entity.id)))
-        buttons.append(display_delete_link(None, entity))
+        buttons.append(display_delete_link(entity))
     else:
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         if entity.class_.view != 'place' or not entity.get_linked_entities('P46'):
-            buttons.append(display_delete_link(None, entity))
+            buttons.append(display_delete_link(entity))
     return buttons
 
 

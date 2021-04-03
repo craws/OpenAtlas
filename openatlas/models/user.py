@@ -12,7 +12,6 @@ from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.user import User as Db
-from openatlas.models.entity import Entity
 
 
 class User(UserMixin):  # type: ignore
@@ -80,6 +79,9 @@ class User(UserMixin):  # type: ignore
         if last_failure_date > datetime.datetime.now():
             return True
         return False  # pragma no cover - not waiting in tests for forget_minutes to pass
+
+    def get_notes_by_entity_id(self, entity_id: int) -> List[Dict[str, Any]]:
+        return Db.get_notes_by_entity_id(self.id, entity_id)
 
     @staticmethod
     def get_all() -> List[User]:
@@ -185,19 +187,16 @@ class User(UserMixin):  # type: ignore
         from openatlas.util.display import sanitize
         Db.update_note(id_, sanitize(note, 'text'), public)
 
-    def get_notes_by_entity_id(self, entity_id: int) -> List[Dict[str, Any]]:
-        return Db.get_notes_by_entity_id(self.id, entity_id)
-
     @staticmethod
     def get_note_by_id(id_):
         return Db.get_note_by_id(id_)
 
     @staticmethod
-    def get_notes() -> Dict[int, str]:
+    def get_notes() -> List[Dict[str, Any]]:
         if not current_user.settings['module_notes']:  # pragma no cover
-            return {}
-        return {row['entity_id']: row['text'] for row in Db.get_notes(current_user.id)}
+            return []
+        return Db.get_notes_by_user_id(current_user.id)
 
     @staticmethod
-    def delete_note(entity_id: int) -> None:
-        Db.delete_note(current_user.id, entity_id)
+    def delete_note(id_: int) -> None:
+        Db.delete_note(id_)

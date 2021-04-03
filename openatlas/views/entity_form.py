@@ -21,7 +21,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import link
 from openatlas.util.util import is_authorized, required_group, was_modified
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
 

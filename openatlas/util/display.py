@@ -96,10 +96,11 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     if isinstance(object_, Project):
         return link(object_.name, url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
-        return link(object_.username,
-                    url_for('user_view', id_=object_.id),
-                    class_='' if object_.active else 'inactive',
-                    uc_first_=False)
+        return link(
+            object_.username,
+            url_for('user_view', id_=object_.id),
+            class_='' if object_.active else 'inactive',
+            uc_first_=False)
     if isinstance(object_, CidocClass):
         return link(object_.code, url_for('class_view', code=object_.code))
     if isinstance(object_, CidocProperty):
@@ -107,6 +108,18 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     if isinstance(object_, Entity):
         return link(object_.name, url_for('entity_view', id_=object_.id), uc_first_=False)
     return ''
+
+
+def display_delete_link(entity: Entity) -> str:
+    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
+    if entity.class_.name == 'source_translation':
+        url = url_for('translation_delete', id_=entity.id)
+    elif entity.id in g.nodes:
+        url = url_for('node_delete', id_=entity.id)
+    else:
+        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
+    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return button(_('delete'), url, onclick="return confirm('{confirm}')").format(confirm=confirm)
 
 
 def add_remove_link(data: List[Any], name: str, link_: Link, origin: Entity, tab: str) -> List[Any]:

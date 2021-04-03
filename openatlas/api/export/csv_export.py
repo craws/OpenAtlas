@@ -42,7 +42,6 @@ class ApiExportCSV:
             'end_comment': entity.end_comment,
             'cidoc_class': entity.cidoc_class.name,
             'system_class': entity.class_.name,
-            'note': entity.note,
             'geom_type': geom['type'],
             'coordinates': geom['coordinates']}
         for k, v in ApiExportCSV.get_links(entity).items():
