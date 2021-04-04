@@ -266,7 +266,7 @@ def add_fields(form: Any,
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
         setattr(form, 'forms', SelectMultipleField(
-            _('forms'),
+            _('classes'),
             render_kw={'disabled': True},
             description=_('tooltip hierarchy forms'),
             choices=[],

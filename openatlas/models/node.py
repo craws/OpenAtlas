@@ -234,3 +234,17 @@ class Node(Entity):
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
         Db.remove_by_entity_and_node(entity_id, node_id)
+
+    @staticmethod
+    def get_untyped(hierarchy_id: int) -> List[Entity]:
+        classes = [class_['name'] for class_ in g.nodes[hierarchy_id].forms.values()]
+        untyped = []
+        for entity in Entity.get_by_class(classes, nodes=True):
+            linked = False
+            for node in entity.nodes:
+                if node.root[-1] == hierarchy_id:
+                    linked = True
+                    break
+            if not linked:
+                untyped.append(entity)
+        return untyped
