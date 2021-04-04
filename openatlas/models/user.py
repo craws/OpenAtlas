@@ -193,8 +193,6 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def get_notes() -> List[Dict[str, Any]]:
-        if not current_user.settings['module_notes']:  # pragma no cover
-            return []
         return Db.get_notes_by_user_id(current_user.id)
 
     @staticmethod

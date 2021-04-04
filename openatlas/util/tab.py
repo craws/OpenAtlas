@@ -137,7 +137,7 @@ class Tab:
         elif name == 'member_of':
             buttons = [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'note':
-            if current_user.settings['module_notes'] and util.is_authorized('contributor'):
+            if util.is_authorized('contributor'):
                 buttons = [button(_('note'),  url_for('note_insert', entity_id=id_))]
         elif name == 'place':
             if class_.name == 'file':
