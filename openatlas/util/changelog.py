@@ -4,6 +4,7 @@ class Changelog:
         '6.1.0': ['TBA', {
             'feature': {
                 '1215': 'Time spans for types',
+                '1457': 'Public notes',
                 '963': 'API: Add type of places to export',
                 '1402': 'API: CSV export in API',
                 '1487': 'API: Endpoint for type hierarchies',
