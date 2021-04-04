@@ -41,4 +41,5 @@ Form fields
 * :doc:`/form/name`
 * :doc:`/form/description`
 * :doc:`reference_system`
+* :doc:`/form/date`
 * A super (type) if it is a sub type of another type
