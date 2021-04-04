@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.10 (Debian 11.10-0+deb10u1)
--- Dumped by pg_dump version 11.10 (Debian 11.10-0+deb10u1)
+-- Dumped from database version 11.11 (Debian 11.11-0+deb10u1)
+-- Dumped by pg_dump version 11.11 (Debian 11.11-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -81,7 +81,6 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_ke
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_pkey;
-ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_log DROP CONSTRAINT IF EXISTS user_log_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_email_key;
@@ -2045,14 +2044,6 @@ ALTER TABLE ONLY web.user_log
 
 ALTER TABLE ONLY web.user_notes
     ADD CONSTRAINT user_notes_pkey PRIMARY KEY (id);
-
-
---
--- Name: user_notes user_notes_user_id_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.user_notes
-    ADD CONSTRAINT user_notes_user_id_entity_id_key UNIQUE (user_id, entity_id);
 
 
 --
