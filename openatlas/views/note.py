@@ -27,7 +27,7 @@ def note_view(id_: int) -> str:
         buttons = [
             button(_('edit'), url_for('note_update', id_=note['id'])),
             button(_('delete'), url_for('note_delete', id_=note['id']))]
-    elif is_authorized('manager'):
+    elif is_authorized('manager'):  # pragma: no cover
         buttons = [button(_('set private'), url_for('note_set_private', id_=note['id']))]
     return render_template(
         'user/note.html',

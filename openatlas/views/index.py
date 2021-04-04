@@ -49,7 +49,7 @@ def overview() -> str:
                 entity.first,
                 entity.last,
                 bookmark_toggle(entity.id, True)])
-        for note in User.get_notes():
+        for note in User.get_notes_by_user_id(current_user.id):
             entity = Entity.get_by_id(note['entity_id'])
             tables['notes'].rows.append([
                 format_date(note['created']),

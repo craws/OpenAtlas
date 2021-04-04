@@ -192,8 +192,8 @@ class User(UserMixin):  # type: ignore
         return Db.get_note_by_id(id_)
 
     @staticmethod
-    def get_notes() -> List[Dict[str, Any]]:
-        return Db.get_notes_by_user_id(current_user.id)
+    def get_notes_by_user_id(user_id: int) -> List[Dict[str, Any]]:
+        return Db.get_notes_by_user_id(user_id)
 
     @staticmethod
     def delete_note(id_: int) -> None:
