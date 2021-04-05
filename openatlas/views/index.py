@@ -37,8 +37,8 @@ class FeedbackForm(FlaskForm):  # type: ignore
 def overview() -> str:
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'bookmarks': Table(['name', 'class', 'first', 'last']),
-        'notes': Table(['date', 'public', 'entity', 'class', _('note')]),
+        'bookmarks': Table(['name', 'class', _('first'), _('last')]),
+        'notes': Table(['date', _('visibility'), 'entity', 'class', _('note')]),
         'latest': Table(order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
