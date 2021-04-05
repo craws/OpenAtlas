@@ -84,7 +84,7 @@ def add_crumbs(view_name: str,
     if structure and (not origin or not origin.class_.name == 'artifact'):
         crumbs = [
             [_('place'), url_for('index', view='place')],
-            structure['place'] if origin.class_.name != 'place' else '',
+            structure['place'] if origin and origin.class_.name != 'place' else '',
             structure['feature'],
             structure['stratigraphic_unit'],
             link(origin)]

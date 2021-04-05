@@ -41,7 +41,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             user = User.get_by_id(id_)
-            if user.id == current_user.id or (user.group == 'admin' and not is_authorized('admin')):
+            if not user \
+                    or user.id == current_user.id \
+                    or (user.group == 'admin' and not is_authorized('admin')):
                 abort(403)  # pragma: no cover
             User.delete(id_)
             flash(_('user deleted'), 'info')

@@ -188,7 +188,7 @@ class User(UserMixin):  # type: ignore
         Db.update_note(id_, sanitize(note, 'text'), public)
 
     @staticmethod
-    def get_note_by_id(id_):
+    def get_note_by_id(id_: int) -> Dict[str, Any]:
         return Db.get_note_by_id(id_)
 
     @staticmethod

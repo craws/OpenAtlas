@@ -183,8 +183,6 @@ class User:
         sql = "UPDATE web.user_notes SET text = %(text)s, public = %(public)s WHERE id = %(id)s;"
         g.cursor.execute(sql, {'id': id_, 'text': note, 'public': public})
 
-
-
     @staticmethod
     def delete_note(id_: int) -> None:
         g.cursor.execute("DELETE FROM web.user_notes WHERE id = %(id)s;", {'id': id_})

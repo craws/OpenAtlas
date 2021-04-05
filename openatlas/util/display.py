@@ -370,7 +370,6 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
         if residence_place:
             residence_object = residence_place.get_linked_entity_safe('P53', True)
             entity.linked_places.append(residence_object)
-        appears_first, appears_last = get_appearance(event_links)
         data[_('alias')] = list(entity.aliases.values())
         data[_('born') if entity.class_.name == 'person' else _('begin')] = format_entry_begin(
             entity,
@@ -378,8 +377,10 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
         data[_('died') if entity.class_.name == 'person' else _('end')] = format_entry_end(
             entity,
             end_object)
-        data[_('appears first')] = appears_first
-        data[_('appears last')] = appears_last
+        if event_links:
+            appears_first, appears_last = get_appearance(event_links)
+            data[_('appears first')] = appears_first
+            data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
         data[_('source')] = [link(source) for source in entity.get_linked_entities(['P128'])]
