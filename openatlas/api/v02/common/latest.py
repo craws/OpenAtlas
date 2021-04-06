@@ -18,19 +18,15 @@ class GetLatest(Resource):  # type: ignore
     def get(self, latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         entities = {"result": GetLatest.get_entities_get_latest(latest, parser)}
-        template = GeoJson.pagination(parser['show'])
         if parser['count']:
             return jsonify(len(entities))
+        template = GeoJson.pagination(parser['show'])
         if parser['download']:
             return Download.download(data=entities, template=template, name=latest)
         return marshal(entities, template), 200
 
     @staticmethod
     def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        entities = []
-        if 0 < limit_ < 101:
-            for entity in Entity.get_latest(limit_):
-                entities.append(GeoJsonEntity.get_entity(entity, parser))
-            return entities
-        else:
+        if not (0 < limit_ < 101):
             raise InvalidLimitError  # pragma: no cover
+        return [GeoJsonEntity.get_entity(e, parser) for e in Entity.get_latest(limit_)]

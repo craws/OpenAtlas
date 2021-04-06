@@ -22,4 +22,4 @@ class GetContent(Resource):  # type: ignore
         template = ContentTemplate.content_template()
         if parser['download']:
             return Download.download(data=content, template=template, name='content')
-        return marshal(content, ContentTemplate.content_template()), 200
+        return marshal(content, template), 200

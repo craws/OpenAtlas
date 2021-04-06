@@ -15,22 +15,22 @@ class GetTypeTree(Resource):  # type: ignore
     # @swag_from("../swagger/type_tree.yml", endpoint="type_tree")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
-        template = TypeTreeTemplate.type_tree_template()
         type_tree = {'type_tree': GetTypeTree.get_type_tree()}
         if parser['count']:
             return jsonify(len(type_tree['type_tree']))
+        template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
             return Download.download(data=type_tree, template=template, name='type_tree')
         return marshal(type_tree, template), 200
 
     @staticmethod
-    def get_type_tree() -> List[Dict[int, Dict[str, Union[str, int]]]]:
+    def get_type_tree() -> List[Dict[int, Dict[str, Any]]]:
         return [
             {id_: GetTypeTree.serialize_to_json(node)}
             for id_, node in Node.get_all_nodes().items()]
 
     @staticmethod
-    def serialize_to_json(node: Node) -> Dict[str, Union[Any]]:
+    def serialize_to_json(node: Node) -> Dict[str, Any]:
         return {
             'id': node.id,
             'name': node.name,

@@ -26,13 +26,13 @@ class GeoJsonEntity:
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
         for link in Link.get_links(entity.id, inverse=True):
-            link_property = link.property.i18n_inverse['en'] if link.property.i18n_inverse[
-                'en'] else link.property.i18n['en']
+            property_ = link.property.i18n['en'].replace(' ', '_')
+            if link.property.i18n_inverse['en']:
+                property_ = link.property.i18n_inverse['en'].replace(' ', '_')
             links.append({
                 'label': link.domain.name,
                 'relationTo': url_for('entity', id_=link.domain.id, _external=True),
-                'relationType': 'crm:' + link.property.code + 'i_'
-                                + link_property.replace(' ', '_'),
+                'relationType': 'crm:' + link.property.code + 'i_' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
@@ -42,18 +42,20 @@ class GeoJsonEntity:
     def get_file(entity: Entity) -> Optional[List[Dict[str, str]]]:
         files = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
-            if link.domain.class_.name == 'file':
-                path = get_file_path(link.domain.id)
-                files.append({
-                    '@id': url_for('entity', id_=link.domain.id, _external=True),
-                    'title': link.domain.name,
-                    'license': GeoJsonEntity.get_license(link.domain.id),
-                    'url': url_for(
-                        'display_file_api', filename=path.name, _external=True) if path else "N/A"})
+            if link.domain.class_.name != 'file':
+                continue
+            path = get_file_path(link.domain.id)
+            files.append({
+                '@id': url_for('entity', id_=link.domain.id, _external=True),
+                'title': link.domain.name,
+                'license': GeoJsonEntity.get_license(link.domain.id),
+                'url': url_for(
+                    'display_file_api', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
 
     @staticmethod
     def get_license(entity_id: int) -> str:
+        # Todo: Make it work again and also check if P2 is really a license
         file_license = ""
         for link in Link.get_links(entity_id):
             if link.property.code == "P2":
@@ -72,9 +74,7 @@ class GeoJsonEntity:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
-            hierarchy = []
-            for root in node.root:
-                hierarchy.append(g.nodes[root].name)
+            hierarchy = [g.nodes[root].name for root in node.root]
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
@@ -82,18 +82,15 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
-        time = {}
-        start = {
-            'earliest': entity.begin_from,
-            'latest': entity.begin_to,
-            'comment': entity.begin_comment}
-        time['start'] = start
-        end = {
-            'earliest': entity.end_from,
-            'latest': entity.end_to,
-            'comment': entity.end_comment}
-        time['end'] = end
-        return time if time else None
+        return {
+            'start': {
+                'earliest': entity.begin_from,
+                'latest': entity.begin_to,
+                'comment': entity.begin_comment},
+            'end': {
+                'earliest': entity.end_from,
+                'latest': entity.end_to,
+                'comment': entity.end_comment}}
 
     @staticmethod
     def get_geoms_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
@@ -103,16 +100,17 @@ class GeoJsonEntity:
         return {'type': 'GeometryCollection', 'geometries': geoms}
 
     @staticmethod
-    def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Union[str, Any]]]]:
+    def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         ref = []
         for link in Link.get_links(entity.id, codes="P67", inverse=True):
-            if isinstance(link.domain, ReferenceSystem):
-                system = g.reference_systems[link.domain.id]
-                ref.append({
-                    'identifier':
-                        (system.resolver_url if system.resolver_url else '') + link.description,
-                    'type': g.nodes[link.type.id].name,
-                    'reference_system': system.name})
+            if not isinstance(link.domain, ReferenceSystem):
+                continue
+            system = g.reference_systems[link.domain.id]
+            ref.append({
+                'identifier':
+                    (system.resolver_url if system.resolver_url else '') + link.description,
+                'type': g.nodes[link.type.id].name,
+                'reference_system': system.name})
         return ref if ref else None
 
     @staticmethod
@@ -134,45 +132,28 @@ class GeoJsonEntity:
             'crmClass': "crm:" + class_code,
             'system_class': entity.class_.name,
             'properties': {'title': entity.name}}
-
-        # Descriptions
         if entity.description:
             features['description'] = [{'value': entity.description}]
-
-        # Alias
         if entity.aliases and 'names' in parser['show']:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
-
-        # Relations
         features['relations'] = GeoJsonEntity.get_links(entity) if 'relations' in parser[
             'show'] else None
-
-        # Types
         features['types'] = GeoJsonEntity.get_node(entity) if 'types' in parser['show'] else None
-
-        # Depictions
         features['depictions'] = GeoJsonEntity.get_file(entity) if 'depictions' in parser[
             'show'] else None
-
-        # Time spans
         features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
             'show'] else None
-
         features['links'] = GeoJsonEntity.get_reference_systems(entity) if 'links' in parser[
             'show'] else None
-
-        # Geometry
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 features['geometry'] = GeoJsonEntity.get_geoms_by_entity(
                     Link.get_linked_entity(entity.id, 'P53'))
             elif entity.class_.name == 'object_location':
                 features['geometry'] = GeoJsonEntity.get_geoms_by_entity(entity)
-
-        data: Dict[str, Any] = {
+        return {
             'type': type_,
             '@context': app.config['API_SCHEMA'],
             'features': [features]}
-        return data
