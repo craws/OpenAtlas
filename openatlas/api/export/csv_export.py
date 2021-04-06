@@ -13,9 +13,7 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entities(entities: List[Entity], name: str) -> Response:
-        data: List = []
-        for entity in entities:
-            data.append(ApiExportCSV.build_dataframe(entity))
+        data = [ApiExportCSV.build_dataframe(entity) for entity in entities]
         index: List = []
         for d in data:
             for k in d.keys():
