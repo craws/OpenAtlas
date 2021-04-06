@@ -8,7 +8,6 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCidocClassCode
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.resources.validation import Validation
 from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.models.entity import Entity
 from openatlas.util.util import api_access

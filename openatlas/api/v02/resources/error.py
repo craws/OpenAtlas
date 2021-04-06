@@ -58,6 +58,18 @@ class NoEntityAvailable(Exception):
     pass
 
 
+class FilterColumnError(Exception):
+    pass
+
+
+class FilterDelimiterError(Exception):
+    pass
+
+
+class FilterLogicalOperatorError(Exception):
+    pass
+
+
 errors = {
     "InternalServerError": {
         "message": "Something went wrong",
@@ -69,6 +81,10 @@ errors = {
     },
     "FilterOperatorError": {
         "message": "Filter operator is wrong.",
+        "status": 404
+    },
+    "FilterLogicalOperatorError": {
+        "message": "Filter logical operator is wrong.",
         "status": 404
     },
     "InvalidSearchDateError": {
@@ -119,6 +135,14 @@ errors = {
     },
     "NoEntityAvailable": {
         "message": "No entity exist for this category.",
+        "status": 404
+    },
+    "FilterColumnError": {
+        "message": "Column name doesn't exist.",
+        "status": 404
+    },
+    "FilterDelimiterError": {
+        "message": "Filter delimiter are wrong.",
         "status": 404
     },
 }

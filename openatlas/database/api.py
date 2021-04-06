@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 from flask import g
 
-from openatlas.database.entity import Entity as Db
+from openatlas.database.entity import Entity
 
 
 class Api:
@@ -10,28 +10,32 @@ class Api:
     @staticmethod
     def get_by_class_code(code: Union[str, List[str]],
                           parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
-        sql = Db.build_sql(nodes=True) + """
+        sql_parts = Filter.get_filter(
+            parameters={'codes': tuple(code if isinstance(code, list) else [code])},
+            parser=parser)
+        sql = Entity.build_sql(nodes=True) + """
             WHERE class_code IN %(codes)s {clause} 
             GROUP BY e.id
             ORDER BY {order} {sort};""".format(
-            clause=Filter.get_filter(parameters=parameters, parser=parser),
+            clause=sql_parts['clause'],
             order=', '.join(parser['column']),
             sort=parser['sort'])
-        g.cursor.execute(sql, parameters)
+        g.cursor.execute(sql, sql_parts['parameters'])
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_system_class(classes: str, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        parameters = {'class': tuple(classes if isinstance(classes, list) else [classes])}
-        sql = Db.build_sql(nodes=True, aliases=True) + """
-            WHERE e.system_class
-            IN %(class)s {clause}
-            GROUP BY e.id ORDER BY {order} {sort};""".format(
-            clause=Filter.get_filter(parameters=parameters, parser=parser),
+        sql_parts = Filter.get_filter(
+            parameters={'class': tuple(classes if isinstance(classes, list) else [classes])},
+            parser=parser)
+        sql = Entity.build_sql(nodes=True, aliases=True) + """
+            WHERE e.system_class IN %(class)s {clause}
+            GROUP BY e.id
+            ORDER BY {order} {sort};""".format(
+            clause=sql_parts['clause'],
             order=', '.join(parser['column']),
             sort=parser['sort'])
-        g.cursor.execute(sql, parameters)
+        g.cursor.execute(sql, sql_parts['parameters'])
         return [dict(row) for row in g.cursor.fetchall()]
 
 
@@ -53,8 +57,7 @@ class Filter:
 
     @staticmethod
     def get_filter(parameters: Dict[str, Tuple[Union[str, Any]]],
-                   parser: Dict[str, Any]) -> str:
-
+                   parser: Dict[str, Any]) -> Dict[str, Any]:
         filters = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
         if parser['filter']:
             filters = Filter.prepare_sql(parser['filter'])
@@ -65,7 +68,7 @@ class Filter:
             else:
                 clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
             parameters[str(filter_['idx'])] = filter_['term']
-        return clause
+        return {'clause': clause, 'parameters': parameters}
 
     @staticmethod
     def prepare_sql(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:
@@ -73,9 +76,9 @@ class Filter:
         filter_clean = Validation.get_filter_from_url_parameter(filter_)
         out = []
         for idx, filter_ in enumerate(filter_clean):
-            column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')' if \
-                Filter.compare_operators[filter_[2]] == 'LIKE' else Filter.valid_columns[
-                filter_[1]]
+            column = Filter.valid_columns[filter_[1]]
+            if Filter.compare_operators[filter_[2]] == 'LIKE':
+                column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')'
             out.append({
                 'idx': idx,
                 'term': Filter.validate_term(filter_),

@@ -165,6 +165,8 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            assert b'Nostromos' in rv.data
 
             # Parameter: last
             rv = self.app.get(url_for('class', class_code='E18', last=place.id))

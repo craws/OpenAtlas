@@ -1,8 +1,8 @@
 import datetime
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
-from openatlas.api.v02.resources.error import FilterOperatorError, InvalidSearchDateError, \
-    InvalidSearchNumberError, NoSearchStringError
+from openatlas.api.v02.resources.error import FilterColumnError, FilterLogicalOperatorError, \
+    FilterOperatorError, InvalidSearchDateError, InvalidSearchNumberError, NoSearchStringError
 
 
 class Validation:
@@ -22,20 +22,23 @@ class Validation:
         'modified': 'e.modified', 'end_to': 'e.end_to', 'end_from': 'e.end_from'}
 
     @staticmethod
-    def get_filter_from_url_parameter(filter_: List[str]) -> List[List[str]]:
+    def get_filter_from_url_parameter(filters: List[str]) -> List[List[str]]:
         checked_filter = []
-        for f in filter_:
-            values = f.split('|')
-            for value in values:
-                if not value:
-                    raise FilterOperatorError  # pragma: no cover
-            if not values[3]:
-                raise NoSearchStringError  # pragma: no cover
-            if values[0] in Validation.logical_operators.keys() \
-                    and values[1] in Validation.valid_columns \
-                    and values[2] in Validation.compare_operators.keys():
-                checked_filter.append([word for word in f.split('|')])
+        for item in filters:
+            Validation.check_filter_input(item.split('|'))
+            checked_filter.append([word for word in item.split('|')])
         return checked_filter
+
+    @staticmethod
+    def check_filter_input(values: List[str]) -> None:  # pragma: no cover
+        if values[0] not in Validation.logical_operators.keys():
+            raise FilterLogicalOperatorError
+        if values[1] not in Validation.valid_columns:
+            raise FilterColumnError
+        if values[2] not in Validation.compare_operators.keys():
+            raise FilterOperatorError
+        if len(values) < 4 or values[3] == '':
+            raise NoSearchStringError
 
     @staticmethod
     def test_date(term):
