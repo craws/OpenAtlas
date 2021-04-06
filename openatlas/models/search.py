@@ -53,7 +53,7 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
     entities = []
     for row in Db.search(
             form.term.data,
-            tuple(form.classes.data),
+            form.classes.data,
             form.desc.data,
             form.own.data,
             current_user.id):
