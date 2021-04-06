@@ -1,15 +1,16 @@
 from typing import Any, Dict, List, Optional, Union
 
-from openatlas import app
 from openatlas.database.settings import Settings as Db
 
 
 class Settings:
 
+    MODULES = ['map_overlay', 'sub_units']
+
     @staticmethod
     def get_settings() -> Dict[str, Any]:
         settings: Dict[str, Union[int, str, List[str]]] = {}
-        for name in app.config['MODULES']:  # Set empty in case it doesn't exist, e.g. after upgrade
+        for name in Settings.MODULES:  # Set empty in case it doesn't exist, e.g. after an upgrade
             settings['module_' + name] = ''
         for row in Db.get_settings():
             settings[row['name']] = row['value']
