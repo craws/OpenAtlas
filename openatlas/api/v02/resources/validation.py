@@ -41,14 +41,14 @@ class Validation:
             raise NoSearchStringError
 
     @staticmethod
-    def test_date(term):
+    def test_date(term: str) -> None:
         try:
             datetime.datetime.strptime(term, "%Y-%m-%d")
         except InvalidSearchDateError:  # pragma: no cover
             raise InvalidSearchDateError
 
     @staticmethod
-    def test_id(term):
+    def test_id(term: str) -> None:
         try:
             int(term)
         except InvalidSearchNumberError:  # pragma: no cover

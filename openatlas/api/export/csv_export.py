@@ -13,10 +13,10 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entities(entities: List[Entity], name: str) -> Response:
-        data = []
+        data: List = []
         for entity in entities:
             data.append(ApiExportCSV.build_dataframe(entity))
-        index = []
+        index: List = []
         for d in data:
             for k in d.keys():
                 if k not in index:

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
 from flask import g
 
@@ -56,9 +56,8 @@ class Filter:
         'modified': 'e.modified', 'end_to': 'e.end_to', 'end_from': 'e.end_from'}
 
     @staticmethod
-    def get_filter(parameters: Dict[str, Tuple[Union[str, Any]]],
-                   parser: Dict[str, Any]) -> Dict[str, Any]:
-        filters = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
+    def get_filter(parameters: Dict[str, Any], parser: Dict[str, Any]) -> Dict[str, Any]:
+        filters: List[Dict[str, Any]] = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
         if parser['filter']:
             filters = Filter.prepare_sql(parser['filter'])
         clause = ''
@@ -71,7 +70,7 @@ class Filter:
         return {'clause': clause, 'parameters': parameters}
 
     @staticmethod
-    def prepare_sql(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:
+    def prepare_sql(filter_: List[str]) -> List[Dict[str, Any]]:
         from openatlas.api.v02.resources.validation import Validation
         filter_clean = Validation.get_filter_from_url_parameter(filter_)
         out = []
