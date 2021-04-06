@@ -51,7 +51,7 @@ class Table:
                     $('#{name}_table').on( 'page.dt', () => overflow());
                     $('#{name}_table').on( 'search.dt', () => overflow());
                 }});                
-            </script>""".format(name=name, data_table=json.dumps(data_table), )
+            </script>""".format(name=name, data_table=json.dumps(data_table))
 
         # Toggle header and footer HTML
         css_header = '#{name}_table_wrapper .row:first-of-type {{ display:none; }}'.format(

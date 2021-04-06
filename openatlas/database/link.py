@@ -39,7 +39,7 @@ class Link:
 
     @staticmethod
     def get_links(entity_id: int,
-                  codes: Union[List[str], None],
+                  codes: Union[str, List[str], None],
                   inverse: bool = False) -> List[Dict[str, Any]]:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,

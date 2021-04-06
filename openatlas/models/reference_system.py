@@ -47,7 +47,7 @@ class ReferenceSystem(Entity):
                 return  # Abort if there are linked entities
         Db.remove_form(self.id, form_id)
 
-    def get_forms(self) -> Dict[int, Dict[str, str]]:
+    def get_forms(self) -> Dict[int, Dict[str, Any]]:
         return {row['id']: {'name': row['name']} for row in Db.get_forms(self.id)}
 
     def update_system(self, form: FlaskForm) -> None:

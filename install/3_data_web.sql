@@ -38,7 +38,6 @@ INSERT INTO web.settings (name, value) VALUES
     ('minimum_jstree_search', '1'),
     ('minimum_password_length', '12'),
     ('module_map_overlay', 'True'),
-    ('module_notes', 'True'),
     ('module_sub_units', 'True'),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),

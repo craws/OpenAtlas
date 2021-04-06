@@ -21,7 +21,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import link
 from openatlas.util.util import is_authorized, required_group, was_modified
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
 
 
@@ -84,7 +84,7 @@ def add_crumbs(view_name: str,
     if structure and (not origin or not origin.class_.name == 'artifact'):
         crumbs = [
             [_('place'), url_for('index', view='place')],
-            structure['place'] if origin.class_.name != 'place' else '',
+            structure['place'] if origin and origin.class_.name != 'place' else '',
             structure['feature'],
             structure['stratigraphic_unit'],
             link(origin)]

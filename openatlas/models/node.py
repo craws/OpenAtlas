@@ -234,3 +234,25 @@ class Node(Entity):
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
         Db.remove_by_entity_and_node(entity_id, node_id)
+
+    @staticmethod
+    def get_untyped(hierarchy_id: int) -> List[Entity]:
+        hierarchy = g.nodes[hierarchy_id]
+        classes = [class_['name'] for class_ in g.nodes[hierarchy_id].forms.values()]
+        if hierarchy.name in ('Administrative unit', 'Historical place'):
+            classes = 'object_location'  # pragma: no cover
+        untyped = []
+        for entity in Entity.get_by_class(classes, nodes=True):
+            linked = False
+            for node in entity.nodes:
+                if node.root[-1] == hierarchy_id:
+                    linked = True
+                    break
+            if not linked:
+                if classes == 'object_location':  # pragma: no cover
+                    entity = entity.get_linked_entity('P53', True)
+                    if entity:
+                        untyped.append(entity)
+                else:
+                    untyped.append(entity)
+        return untyped

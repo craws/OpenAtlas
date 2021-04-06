@@ -42,7 +42,6 @@ class Entity:
         self.cidoc_class = g.cidoc_classes[data['class_code']]
         self.class_ = g.classes[data['system_class']]
         self.reference_systems: List[Link] = []  # Links to external reference systems
-        self.note: Optional[str] = None
         self.origin_id: Optional[int] = None  # For navigation when coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.linked_places: List[Entity] = []  # Related places for map

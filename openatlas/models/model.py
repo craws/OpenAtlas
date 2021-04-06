@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g, session
 
@@ -11,7 +11,7 @@ from openatlas.database.model import Model as Db
 
 class CidocClass:
 
-    def __init__(self, data: Dict[str, Union[int, str]]) -> None:
+    def __init__(self, data: Dict[str, Any]) -> None:
         self._name = data['name']
         self.code = data['code']
         self.id = data['id']
@@ -47,7 +47,7 @@ class CidocClass:
 
 class CidocProperty:
 
-    def __init__(self, data: Dict[str, Union[int, str]]) -> None:
+    def __init__(self, data: Dict[str, Any]) -> None:
         self.id = data['id']
         self._name = data['name']
         self._name_inverse = data['name_inverse']

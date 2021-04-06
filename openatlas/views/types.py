@@ -10,7 +10,8 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import (tree_select)
+from openatlas.util.display import link, tree_select
+from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
@@ -79,3 +80,22 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         form=form,
         title=_('types'),
         crumbs=[[_('types'), url_for('node_index')], root, node, _('move entities')])
+
+
+@app.route('/types/untyped/<int:id_>')
+@required_group('editor')
+def show_untyped_entities(id_: int) -> str:
+    hierarchy = g.nodes[id_]
+    table = Table(['name', 'class', 'first', 'last', 'description'])
+    for entity in Node.get_untyped(hierarchy.id):
+        table.rows.append([
+            link(entity),
+            entity.class_.label,
+            entity.first,
+            entity.last,
+            entity.description])
+    return render_template(
+        'table.html',
+        entity=hierarchy,
+        table=table,
+        crumbs=[[_('types'), url_for('node_index')], link(hierarchy), _('untyped entities')])

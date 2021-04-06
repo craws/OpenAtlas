@@ -5,6 +5,7 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
 from openatlas.models.entity import Entity
+from openatlas.util import util
 from openatlas.util.display import button, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized
@@ -135,6 +136,9 @@ class Tab:
             buttons = [button('link', url_for('member_insert', origin_id=id_))]
         elif name == 'member_of':
             buttons = [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
+        elif name == 'note':
+            if util.is_authorized('contributor'):
+                buttons = [button(_('note'),  url_for('note_insert', entity_id=id_))]
         elif name == 'place':
             if class_.name == 'file':
                 buttons = [button('link', url_for('file_add', id_=id_, view=name))]
@@ -178,7 +182,6 @@ class Tab:
                     url_for('insert', class_=name, origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
-
         self.table = table
         if is_authorized('contributor'):
             self.buttons = buttons

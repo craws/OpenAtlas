@@ -35,7 +35,6 @@ class GetTypeTree(Resource):  # type: ignore
             'id': node.id,
             'name': node.name,
             'description': node.description,
-            'note': node.note,
             'origin_id': node.origin_id,
             'first': node.first,
             'last': node.last,
@@ -44,5 +43,4 @@ class GetTypeTree(Resource):  # type: ignore
             'count': node.count,
             'count_subs': node.count_subs,
             'locked': node.locked,
-            'standard': node.standard
-        }
+            'standard': node.standard}
