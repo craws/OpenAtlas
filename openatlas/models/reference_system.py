@@ -5,12 +5,16 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import g
 from flask_wtf import FlaskForm
 
-from openatlas import app
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
 
 
 class ReferenceSystem(Entity):
+
+    EXTERNAL_REFERENCES_FORMS = [
+        'acquisition', 'activity', 'artifact', 'feature', 'find', 'group', 'human_remains', 'move',
+        'person', 'place', 'type']
+
     website_url = None
     resolver_url = None
     placeholder = None
@@ -77,7 +81,7 @@ class ReferenceSystem(Entity):
     @staticmethod
     def get_form_choices(entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices(app.config['EXTERNAL_REFERENCES_FORMS']):
+        for row in Db.get_form_choices(ReferenceSystem.EXTERNAL_REFERENCES_FORMS):
             if not entity or row['id'] not in entity.forms:
                 if entity and entity.name == 'GeoNames' and row['name'] != 'Place':
                     continue
