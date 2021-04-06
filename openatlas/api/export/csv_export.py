@@ -44,31 +44,29 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
-        return Response(pd.DataFrame.from_dict(data=ApiExportCSV.build_dataframe(entity),
-                                               orient='index').T.to_csv(encoding="utf-8"),
-                        mimetype='text/csv',
-                        headers={
-                            'Content-Disposition': 'attachment;filename=' + str(
-                                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'
-                        })
+        return Response(
+            pd.DataFrame.from_dict(
+                data=ApiExportCSV.build_dataframe(entity),
+                orient='index').T.to_csv(encoding="utf-8"),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment;filename=' + str(
+                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'})
 
     @staticmethod
     def get_node(entity: Entity) -> Dict[Any, List[Any]]:
-        d: Dict[str, Any] = defaultdict(list)
+        nodes: Dict[str, Any] = defaultdict(list)
         for node in entity.nodes:
-            hierarchy = []
-            for root in node.root:
-                hierarchy.append(g.nodes[root].name)
+            hierarchy = [g.nodes[root].name for root in node.root]
             hierarchy.reverse()
-            h = ' > '.join(map(str, hierarchy))
             value = ''
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:
                     value += link.description
                     if link.range.id == node.id and node.description:
                         value += node.description
-            d[h].append(node.name + (': ' + value if value else ''))
-        return d
+            key = ' > '.join(map(str, hierarchy))
+            nodes[key].append(node.name + (': ' + value if value else ''))
+        return nodes
 
     @staticmethod
     def get_links(entity: Entity) -> Dict[str, Any]:

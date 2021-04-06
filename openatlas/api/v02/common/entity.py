@@ -22,4 +22,4 @@ class GetEntity(Resource):  # type: ignore
         template = GeoJson.geojson_template(parser['show'])
         if parser['download']:
             return Download.download(data=entity, template=template, name=id_)
-        return marshal(entity, GeoJson.geojson_template(parser['show'])), 200
+        return marshal(entity, template), 200

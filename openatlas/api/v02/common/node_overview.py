@@ -24,8 +24,7 @@ class GetNodeOverview(Resource):  # type: ignore
 
     @staticmethod
     def get_node_overview() -> Dict[str, Dict[Entity, str]]:
-        nodes: Dict[str, Dict[Entity, str]] = {'standard': {}, 'custom': {}, 'places': {},
-                                               'value': {}}
+        nodes: Dict[str, Any] = {'standard': {}, 'custom': {}, 'places': {}, 'value': {}}
         for id_, node in g.nodes.items():
             if node.root:
                 continue
