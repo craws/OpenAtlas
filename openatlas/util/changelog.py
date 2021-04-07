@@ -2,7 +2,8 @@ class Changelog:
 
     versions = {
         '6.2.0': ['TBA', {
-            'feature': {}}],
+            'feature': {
+                '1284': 'Show image when editing a place or artifact'}}],
         '6.1.0': ['2021-04-05', {
             'feature': {
                 '1215': 'Time spans for types',
