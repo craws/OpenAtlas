@@ -16,7 +16,7 @@ class GeoJsonEntity:
     @staticmethod
     def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
-        for link in Link.get_links(entity.id):
+        for link in Link.get_links(entity.id, list(g.properties)):
             links.append({
                 'label': link.range.name,
                 'relationTo': url_for('entity', id_=link.range.id, _external=True),
@@ -24,8 +24,8 @@ class GeoJsonEntity:
                                 + link.property.i18n['en'].replace(' ', '_'),
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
-                'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
-        for link in Link.get_links(entity.id, inverse=True):
+                'when': {'timespans': [GeoJsonEntity.get_time(link.range)]}})
+        for link in Link.get_links(entity.id, list(g.properties), inverse=True):
             property_ = link.property.i18n['en'].replace(' ', '_')
             if link.property.i18n_inverse['en']:
                 property_ = link.property.i18n_inverse['en'].replace(' ', '_')
@@ -35,7 +35,7 @@ class GeoJsonEntity:
                 'relationType': 'crm:' + link.property.code + 'i_' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
-                'when': {'timespans': [GeoJsonEntity.get_time(link)]}})
+                'when': {'timespans': [GeoJsonEntity.get_time(link.domain)]}})
         return links if links else None
 
     @staticmethod
@@ -54,12 +54,11 @@ class GeoJsonEntity:
         return files if files else None
 
     @staticmethod
-    def get_license(entity_id: int) -> str:
-        # Todo: Make it work again and also check if P2 is really a license
-        file_license = ""
-        for link in Link.get_links(entity_id):
-            if link.property.code == "P2":
-                file_license = link.range.name
+    def get_license(entity_id: int) -> Optional[str]:
+        # It works because the standard Type is always the last type. But this is not stable
+        file_license = None
+        for link in Link.get_links(entity_id, 'P2'):
+            file_license = link.range.name
         return file_license
 
     @staticmethod
@@ -69,7 +68,7 @@ class GeoJsonEntity:
             nodes_dict = {
                 'identifier': url_for('entity', id_=node.id, _external=True),
                 'label': node.name}
-            for link in Link.get_links(entity.id):
+            for link in Link.get_links(entity.id, 'P2'):
                 if link.range.id == node.id and link.description:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
