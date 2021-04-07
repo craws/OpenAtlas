@@ -7,7 +7,6 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.model import CidocProperty
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_file_path
 
@@ -17,8 +16,7 @@ class GeoJsonEntity:
     @staticmethod
     def get_links(entity: Entity) -> Optional[List[Dict[str, str]]]:
         links = []
-        codes = list(CidocProperty.get_all().keys())  # Performance reasons
-        for link in Link.get_links(entity.id, codes):
+        for link in Link.get_links(entity.id, list(g.properties)):
             links.append({
                 'label': link.range.name,
                 'relationTo': url_for('entity', id_=link.range.id, _external=True),
@@ -27,7 +25,7 @@ class GeoJsonEntity:
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [GeoJsonEntity.get_time(link.range)]}})
-        for link in Link.get_links(entity.id, codes, inverse=True):
+        for link in Link.get_links(entity.id, list(g.properties), inverse=True):
             property_ = link.property.i18n['en'].replace(' ', '_')
             if link.property.i18n_inverse['en']:
                 property_ = link.property.i18n_inverse['en'].replace(' ', '_')
