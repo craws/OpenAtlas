@@ -25,9 +25,7 @@ entity_parser.add_argument('column', type=str, default=['name'], action='append'
         'id', 'class_code', 'name', 'description', 'created', 'modified', 'system_class',
         'begin_from', 'begin_to', 'end_from', 'end_to'))
 entity_parser.add_argument('filter', type=str, help='{error_msg}', action='append')
-# Todo: Dismiss negative value
 entity_parser.add_argument('limit', type=int, default=20, help="Invalid number for limit")
-# Todo: Either first or last
 entity_parser.add_argument('first', type=int, help="Not a valid ID")
 entity_parser.add_argument('last', type=int, help="Not a valid ID")
 entity_parser.add_argument('show', type=str, help='{error_msg}.', action='append',
