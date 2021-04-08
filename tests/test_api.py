@@ -7,6 +7,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidCodeError, InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, \
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
+from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -17,7 +18,6 @@ from tests.base import TestBaseCase, insert_entity
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
-        pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -25,6 +25,7 @@ class ApiTests(TestBaseCase):
                 if not place:
                     return  # pragma: no cover
 
+                # Todo: time not working in tests
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
                 place.begin_to = '2018-03-01'
@@ -70,6 +71,40 @@ class ApiTests(TestBaseCase):
                 precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
+            # Test GeoJson output
+            rv = self.app.get(url_for('entity', id_=place.id))
+            print(rv.data)
+            assert b'"@id": "http://local.host/entity/' in rv.data
+            assert b'"crmClass": "crm:E18_Physical_Thing"' in rv.data
+            assert b'"title": "Nostromos"' in rv.data
+            assert b'"value": "That is the Nostromos"' in rv.data
+            # types
+            assert b'"identifier": "http://local.host/api/0.2/entity/102"' in rv.data
+            assert b'"label": "Height"' in rv.data
+            assert b'"hierarchy": "Dimensions"' in rv.data
+            assert b'"value": 23.0' in rv.data
+            # relations
+            assert b'"label": "Cargo hauler"' in rv.data
+            assert b'"relationTo": "http://local.host/api/0.2/entity/106"' in rv.data
+            assert b'"relationType": "crm:P1_is_identified_by"' in rv.data
+            assert b'"relationSystemClass": "appellation"' in rv.data
+            assert b'"relationSystemClass": "feature"' in rv.data
+            assert b'"relationSystemClass": "type"' in rv.data
+            assert b'"relationSystemClass": "object_location"' in rv.data
+            assert b'"relationSystemClass": "file"' in rv.data
+            assert b'"relationSystemClass": "reference_system"' in rv.data
+            assert b'"type": "close match"' in rv.data
+            # alias
+            assert b'"alias": "Cargo hauler"' in rv.data
+            # geometry
+            assert b'"type": "Point"' in rv.data
+            assert b'"coordinates": [' in rv.data
+            # depictions
+            assert b'"title": "Datei"' in rv.data
+            assert b'"license": "License"' in rv.data
+            # links
+            # assert b'"identifier": "http://www.geonames.org/' in rv.data
+
             # Path Tests
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
@@ -77,8 +112,7 @@ class ApiTests(TestBaseCase):
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
             assert b'1' in rv.data
-            rv = self.app.get(url_for('entity', id_=place.id))
-            assert b'Nostromos' in rv.data
+
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data
             rv = self.app.get(url_for('system_class', system_class='appellation'))
@@ -201,8 +235,6 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
-
-
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
