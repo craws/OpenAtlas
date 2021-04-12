@@ -43,9 +43,10 @@ def display_citation_example(code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
         return ''
-    return Markup('<h1>{title}</h1>{text}'.format(
-        title=display.uc_first(_('citation_example')),
-        text=text))
+    return Markup(
+        '<h1>{title}</h1>{text}'.format(
+            title=display.uc_first(_('citation_example')),
+            text=text))
 
 
 @app.template_filter()
@@ -63,12 +64,13 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
             next_id = sibling.id
             position = counter
             break
-    return Markup('{previous} {next} {position} {of_label} {count}'.format(
-        previous=display.button('<', url_for('entity_view', id_=prev_id)) if prev_id else '',
-        next=display.button('>', url_for('entity_view', id_=next_id)) if next_id else '',
-        position=position,
-        of_label=_('of'),
-        count=len(structure['siblings'])))
+    return Markup(
+        '{previous} {next} {position} {of_label} {count}'.format(
+            previous=display.button('<', url_for('entity_view', id_=prev_id)) if prev_id else '',
+            next=display.button('>', url_for('entity_view', id_=next_id)) if next_id else '',
+            position=position,
+            of_label=_('of'),
+            count=len(structure['siblings'])))
 
 
 @app.template_filter()
