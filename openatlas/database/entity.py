@@ -38,9 +38,7 @@ class Entity:
     def get_by_class(classes: Union[str, List[str]],
                      nodes: bool = False,
                      aliases: bool = False) -> List[Dict[str, Any]]:
-        sql = Entity.build_sql(
-            nodes=nodes,
-            aliases=aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
+        sql = Entity.build_sql(nodes, aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
         g.cursor.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -127,7 +125,6 @@ class Entity:
 
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:
-        # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
                 e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_class,
