@@ -80,7 +80,7 @@ def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
+def breadcrumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
@@ -94,29 +94,6 @@ def lay_breadcrumbs(self: Any, crumbs: List[Any]) -> str:
         else:
             items.append(display.uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def note(self: Any, entity: Entity) -> str:
-    if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
-        return ''  # pragma no cover
-    if not isinstance(entity.note, str):
-        html = '<div class="toolbar">{insert}</div>'.format(
-            insert=display.button(_('add note'), url_for('note_insert', entity_id=entity.id)))
-    else:
-        html = '''
-            <h2>{label}</h2>
-            <div class="note">{note}</div>
-            <div class="toolbar">{edit} {delete}</div>'''.format(
-            label=display.uc_first(_('note')),
-            note=entity.note.replace('\r\n', '<br>'),
-            edit=display.button(_('edit note'), url_for('note_update', entity_id=entity.id)),
-            delete=display.button(
-                _('delete'),
-                url_for('note_delete', entity_id=entity.id),
-                onclick="return confirm('" + _('Delete note?') + "');"))
-    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -463,23 +440,6 @@ def sanitize(self: Any, string: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_delete_link(self: Any, entity: Entity) -> str:
-    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
-    if entity.class_.name == 'source_translation':
-        url = url_for('translation_delete', id_=entity.id)
-    elif entity.id in g.nodes:
-        url = url_for('node_delete', id_=entity.id)
-    else:
-        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return display.button(
-        _('delete'),
-        url,
-        onclick="return confirm('{confirm}')").format(confirm=confirm)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) -> str:
     """ Returns menu HTML with (bold) marked selected item."""
     if not current_user.is_authenticated:
@@ -512,29 +472,6 @@ def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) 
         css=css,
         url=url_for('node_index'),
         label=display.uc_first(_('types')))
-    return html
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str:
-    """ Returns HTML with debug information about database queries and form errors."""
-    html = ''
-    for name, value in debug_model.items():
-        if name in ['current']:
-            continue  # Don't display current time counter
-        if name not in ['sql']:
-            value = '{:10.2f}'.format(value)
-        html += """
-            <div>
-                <div>{name}</div>
-                <div class="table-cell" style="text-align:right;">
-                    {value}
-                </div>
-            </div>""".format(name=name, value=value)
-    if form and hasattr(form, 'errors'):
-        for fieldName, errorMessages in form.errors.items():
-            html += fieldName + ' - ' + errorMessages[0] + '<br>'
     return html
 
 

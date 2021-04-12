@@ -139,6 +139,17 @@
             "de"
           ]
         }
+      },
+      "exportParam": {
+        "name": "export",
+        "in": "query",
+        "description": "Select to which format the output is downloaded",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "csv"
+          ]
+        }
       }
     },
     "schemas": {

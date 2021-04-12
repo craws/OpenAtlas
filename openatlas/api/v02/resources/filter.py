@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Union
 
 from openatlas.api.v02.resources.error import FilterOperatorError, InvalidSearchDateError, \
     InvalidSearchNumberError, NoSearchStringError
@@ -22,9 +22,8 @@ class Filter:
         'modified': 'e.modified', 'end_to': 'e.end_to', 'end_from': 'e.end_from'}
 
     @staticmethod
-    def get_filter(parameters: Dict[str, Tuple[Union[str, Any], ...]],
-                   parser: Dict[str, Any]) -> str:
-        clause = ""
+    def get_filter(parameters: Dict[str, Any], parser: Dict[str, Any]) -> str:
+        clause = ''
         filters = Filter.validate_filter(parser['filter'])
         for filter_ in filters:
             if 'LIKE' in filter_['clause']:

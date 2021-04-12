@@ -35,7 +35,6 @@ class ApiTests(TestBaseCase):
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
-                location = place.get_linked_entity_safe('P53')
 
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -75,7 +74,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
             rv = self.app.get(url_for('latest', latest=10))
-            assert b'Nostromos' in rv.data
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
             assert b'1' in rv.data
             rv = self.app.get(url_for('entity', id_=place.id))
@@ -107,8 +106,8 @@ class ApiTests(TestBaseCase):
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('latest', latest=10, download=True))
-            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('latest', latest=1, download=True))
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('system_class', system_class='appellation', download=True))
@@ -129,6 +128,16 @@ class ApiTests(TestBaseCase):
             assert b'systemClass' in rv.data
             rv = self.app.get(url_for('node_overview', download=True))
             assert b'Actor' in rv.data
+
+            # Path with export
+            rv = self.app.get(url_for('entity', id_=place.id, export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('class', class_code='E18', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='place', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='reference', export='csv'))
+            assert b'https://openatlas.eu' in rv.data
 
             # Testing Subunit
             rv = self.app.get(url_for('subunit', id_=place.id))
@@ -190,6 +199,8 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
+
+
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover

@@ -50,11 +50,11 @@ forms = {
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
-    'type': ['name', 'description', 'continue']}
+    'type': ['name', 'date', 'description', 'continue']}
 
 
 def build_form(class_: str,
-               item: Optional[Union[Entity, Link]] = None,
+               item: Optional[Union[Entity, Link, Node]] = None,
                code: Optional[str] = None,
                origin: Union[Entity, Node, None] = None,
                location: Optional[Entity] = None) -> FlaskForm:
@@ -63,6 +63,8 @@ def build_form(class_: str,
         opened = HiddenField()
         validate = validate
 
+    if class_ == 'note':
+        setattr(Form, 'public', BooleanField(_('public'), default=False))
     if 'name' in forms[class_]:  # Set label and validators for name field
         label = _('URL') if class_ == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if class_ == 'external_reference' else [
@@ -264,7 +266,7 @@ def add_fields(form: Any,
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
         setattr(form, 'forms', SelectMultipleField(
-            _('forms'),
+            _('classes'),
             render_kw={'disabled': True},
             description=_('tooltip hierarchy forms'),
             choices=[],
@@ -380,9 +382,9 @@ def build_move_form(node: Node) -> FlaskForm:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_entities_by_node(node):
-            domain = Entity.get_by_id(row.domain_id)
-            range_ = Entity.get_by_id(row.range_id)
-            choices.append((row.id, domain.name + ' - ' + range_.name))
+            domain = Entity.get_by_id(row['domain_id'])
+            range_ = Entity.get_by_id(row['range_id'])
+            choices.append((row['id'], domain.name + ' - ' + range_.name))
     else:
         for entity in node.get_linked_entities('P2', True):
             choices.append((entity.id, entity.name))

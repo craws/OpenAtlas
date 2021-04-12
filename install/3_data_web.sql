@@ -15,7 +15,6 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
 
 INSERT INTO web.settings (name, value) VALUES
     ('api_public', ''),
-    ('debug_mode', ''),
     ('default_language', 'en'),
     ('table_rows', '25'),
     ('failed_login_forget_minutes', '1'),
@@ -39,7 +38,6 @@ INSERT INTO web.settings (name, value) VALUES
     ('minimum_jstree_search', '1'),
     ('minimum_password_length', '12'),
     ('module_map_overlay', 'True'),
-    ('module_notes', 'True'),
     ('module_sub_units', 'True'),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),

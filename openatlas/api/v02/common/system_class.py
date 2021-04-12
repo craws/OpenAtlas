@@ -4,6 +4,7 @@ from flasgger import swag_from
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
+from openatlas.api.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCodeError
 from openatlas.api.v02.resources.pagination import Pagination
@@ -19,6 +20,10 @@ class GetBySystemClass(Resource):  # type: ignore
     @swag_from("../swagger/system_class.yml", endpoint="system_class")
     def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
+        if parser['export'] == 'csv':
+            return ApiExportCSV.export_entities(
+                GetBySystemClass.get_entities_by_system_class(system_class=system_class,
+                                                              parser=parser), system_class)
         system_class_ = Pagination.pagination(
             GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser),
             parser=parser)

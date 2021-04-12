@@ -47,7 +47,7 @@ class GetNodeOverview(Resource):  # type: ignore
             item = g.nodes[id_]
             items.append({
                 'id': item.id,
-                'url': url_for('entity_view', id_=item.id, _external=True),
+                'url': url_for('entity', id_=item.id, _external=True),
                 'label': item.name.replace("'", "&apos;"),
                 'children': GetNodeOverview.walk_tree(item.subs)})
         return items

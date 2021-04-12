@@ -36,6 +36,8 @@ entity_parser.add_argument('show', type=str, help='{error_msg}.', action='append
                                     'depictions', 'geonames'],
                            choices=('when', 'types', 'relations', 'names', 'links', 'geometry',
                                     'depictions', 'geonames', 'none'))
+entity_parser.add_argument('export', type=str, help='{error_msg}',
+                           choices='csv')
 
 query_parser = entity_parser.copy()
 query_parser.add_argument('entities', type=int, action='append',

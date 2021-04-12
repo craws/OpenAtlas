@@ -12,6 +12,7 @@ from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
                                      MailForm, MapForm, ModulesForm, NewsLetterForm,
                                      SimilarForm, TestMailForm)
@@ -40,7 +41,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             user = User.get_by_id(id_)
-            if user.id == current_user.id or (user.group == 'admin' and not is_authorized('admin')):
+            if not user \
+                    or user.id == current_user.id \
+                    or (user.group == 'admin' and not is_authorized('admin')):
                 abort(403)  # pragma: no cover
             User.delete(id_)
             flash(_('user deleted'), 'info')
@@ -152,20 +155,20 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
     table = Table(
         ['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from', 'begin_to',
          'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
-    for result in Link.check_link_duplicates():
+    for row in Link.check_link_duplicates():
         table.rows.append([
-            link(Entity.get_by_id(result.domain_id)),
-            link(Entity.get_by_id(result.range_id)),
-            link(g.properties[result.property_code]),
-            result.description,
-            link(g.nodes[result.type_id]) if result.type_id else '',
-            format_date(result.begin_from),
-            format_date(result.begin_to),
-            result.begin_comment,
-            format_date(result.end_from),
-            format_date(result.end_to),
-            result.end_comment,
-            result.count])
+            link(Entity.get_by_id(row['domain_id'])),
+            link(Entity.get_by_id(row['range_id'])),
+            link(g.properties[row['property_code']]),
+            row['description'],
+            link(g.nodes[row['type_id']]) if row['type_id'] else '',
+            format_date(row['begin_from']),
+            format_date(row['begin_to']),
+            row['begin_comment'],
+            format_date(row['end_from']),
+            format_date(row['end_to']),
+            row['end_comment'],
+            row['count']])
     duplicates = False
     if table.rows:
         duplicates = True
@@ -198,14 +201,14 @@ def admin_settings(category: str) -> Union[str, Response]:
         importlib.import_module('openatlas.forms.setting'),
         uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
+        Transaction.begin()
         try:
             Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
-            g.cursor.execute('COMMIT')
+            Transaction.commit()
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
+            Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'data' if category == 'api' else category
@@ -406,23 +409,23 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
 @required_group('admin')
 def admin_log() -> str:
     form = LogForm()
-    form.user.choices = [(0, _('all'))] + User.get_users()
+    form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order=[[0, 'desc']])
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = None
-        if row.user_id:
+        if row['user_id']:
             try:
-                user = link(User.get_by_id(row.user_id))
+                user = link(User.get_by_id(row['user_id']))
             except AttributeError:  # pragma: no cover - user already deleted
-                user = 'id ' + str(row.user_id)
+                user = 'id ' + str(row['user_id'])
         table.rows.append([
-            format_datetime(row.created),
-            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
-            row.type,
-            row.message,
+            format_datetime(row['created']),
+            str(row['priority']) + ' ' + app.config['LOG_LEVELS'][row['priority']],
+            row['type'],
+            row['message'],
             user,
-            row.info])
+            row['info']])
     return render_template(
         'admin/log.html',
         table=table,
