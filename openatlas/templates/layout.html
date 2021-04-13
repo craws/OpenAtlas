@@ -65,7 +65,9 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                {{ entity|display_menu(origin=origin)|safe }}
+                {% if current_user.is_authenticated %}
+                    {{ entity|display_menu(origin=origin) }}
+                {% endif %}
             </div>
         </div>
         <div style="float: right;">
