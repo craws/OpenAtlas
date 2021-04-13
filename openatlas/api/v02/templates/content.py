@@ -11,5 +11,6 @@ class ContentTemplate:
         content_json = {
             'intro': fields.String,
             'contact': fields.String,
-            'legal-notice': fields.String}
+            'legal-notice': fields.String,
+            'site-name': fields.String}
         return content_json
