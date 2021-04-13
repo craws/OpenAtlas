@@ -8,7 +8,6 @@ from openatlas.api.v02.resources.error import FilterColumnError, FilterLogicalOp
 class Validation:
     logical_operators: Dict[str, Any] = {
         'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT'}
-
     valid_columns: Dict[str, str] = {
         'id': 'e.id', 'class_code': 'e.class_code', 'name': 'e.name',
         'description': 'e.description', 'system_class': 'e.system_class',
@@ -17,9 +16,6 @@ class Validation:
         'end_from': 'e.end_from'}
     compare_operators: Dict[str, Any] = {
         'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>', 'ge': '>=', 'like': 'LIKE'}
-    valid_date_column: Dict[str, str] = {
-        'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to', 'created': 'e.created',
-        'modified': 'e.modified', 'end_to': 'e.end_to', 'end_from': 'e.end_from'}
 
     @staticmethod
     def get_filter_from_url_parameter(filters: List[str]) -> List[List[str]]:

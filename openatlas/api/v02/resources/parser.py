@@ -2,9 +2,8 @@ from flask_restful import reqparse
 
 from openatlas import app
 
-app.config['BUNDLE_ERRORS'] = True  # Every parser shows bundled errors
+app.config['BUNDLE_ERRORS'] = True
 
-# Parser
 default_parser = reqparse.RequestParser()
 default_parser.add_argument('download', type=bool, help='{error_msg}', default=False)
 default_parser.add_argument('count', type=bool, help='{error_msg}', default=False)
