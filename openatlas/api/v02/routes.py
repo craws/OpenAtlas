@@ -19,21 +19,16 @@ from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 from openatlas.api.v02.common.system_class import GetBySystemClass
 from openatlas.api.v02.common.type_tree import GetTypeTree
 from openatlas.api.v02.common.usage import ShowUsage
-from openatlas.api.v02.resources.error import ResourceGoneError, errors
+from openatlas.api.v02.resources.error import errors
 
-app.config['SWAGGER'] = {
-    'openapi': '3.0.2',
-    'uiversion': 3}
-#
+app.config['SWAGGER'] = {'openapi': '3.0.2', 'uiversion': 3}
+
 cors = CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
-api = Api(app, catch_all_404s=False, errors=errors)  # Establish connection between API and APP
+api = Api(app, catch_all_404s=False, errors=errors)
 # swagger = Swagger(app, parse=False, template_file="api/v02/swagger.json")
 # swagger = Swagger(app, parse=False, template=template)
 
-api.add_resource(ShowUsage, '/api/0.2/', '/api/0.2/entity/', '/api/0.2/class/', '/api/0.2/code/',
-                 '/api/0.2/latest/', '/api/0.2/node_entities/', '/api/0.2/node_entities_all/',
-                 '/api/0.2/subunit/', '/api/0.2/subunit_hierarchy/', '/api/0.2/system_class/',
-                 endpoint='usage')
+
 api.add_resource(OverviewCount, '/api/0.2/overview_count/', endpoint='overview_count')
 api.add_resource(ClassMapping, '/api/0.2/classes/', endpoint='class_mapping')
 api.add_resource(GetEntity, '/api/0.2/entity/<int:id_>', endpoint='entity')
@@ -52,10 +47,14 @@ api.add_resource(GetSubunitHierarchy, '/api/0.2/subunit_hierarchy/<int:id_>',
                  endpoint="subunit_hierarchy")
 api.add_resource(GetQuery, '/api/0.2/query/', endpoint="query")
 api.add_resource(GetTypeTree, '/api/0.2/type_tree/', endpoint="type_tree")
+api.add_resource(
+    ShowUsage, '/api/0.2/', '/api/0.2/entity/', '/api/0.2/class/', '/api/0.2/code/',
+    '/api/0.2/latest/', '/api/0.2/node_entities/', '/api/0.2/node_entities_all/',
+    '/api/0.2/subunit/', '/api/0.2/subunit_hierarchy/', '/api/0.2/system_class/', endpoint='usage')
 
-api.add_resource(ResourceGone, '/api/0.1/', '/api/0.1/entity/', '/api/0.1/class/',
-                 '/api/0.1/code/', '/api/0.1/latest/', '/api/0.1/node_entities/',
-                 '/api/0.1/node_entities_all/', '/api/0.1/subunit/', '/api/0.1/subunit_hierarchy/',
-                 '/api/0.1/system_class/', '/api/0.1/entity/<int:id_>', '/api/0.1/query/',
-                 '/api/0.1/class/<string:class_code>', '/api/0.1/code/<string:code>',
-                 '/api/0.1/content/', endpoint="gone")
+api.add_resource(
+    ResourceGone, '/api/0.1/', '/api/0.1/entity/', '/api/0.1/class/', '/api/0.1/code/',
+    '/api/0.1/latest/', '/api/0.1/node_entities/', '/api/0.1/node_entities_all/',
+    '/api/0.1/subunit/', '/api/0.1/subunit_hierarchy/', '/api/0.1/system_class/',
+    '/api/0.1/entity/<int:id_>', '/api/0.1/query/', '/api/0.1/class/<string:class_code>',
+    '/api/0.1/code/<string:code>', '/api/0.1/content/', endpoint="gone")

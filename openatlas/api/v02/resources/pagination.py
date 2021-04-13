@@ -26,7 +26,6 @@ class Pagination:
             index.append(({'page': num + 1, 'start_id': i}))
         if parser['last'] or parser['first']:
             total = Pagination.get_shown_entities(total, parser)
-        # Finding the entity with the wanted id
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
         entity_limit = [e for idx, e in enumerate(entities[h[0]:])]
         entities_result = [GeoJsonEntity.get_entity(r, parser)

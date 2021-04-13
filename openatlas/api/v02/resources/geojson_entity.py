@@ -123,8 +123,7 @@ class GeoJsonEntity:
     @staticmethod
     def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
-        class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en']).replace(
-            " ", "_")
+        class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en'])
         features = {
             '@id': url_for('entity_view', id_=entity.id, _external=True),
             'type': 'Feature',

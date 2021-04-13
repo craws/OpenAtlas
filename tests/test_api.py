@@ -87,7 +87,7 @@ class ApiTests(TestBaseCase):
             # Test GeoJson output
             rv = self.app.get(url_for('entity', id_=place.id))
             assert b'"@id": "http://local.host/entity/' in rv.data
-            assert b'"crmClass": "crm:E18_Physical_Thing"' in rv.data
+            assert b'"crmClass": "crm:E18 Physical Thing"' in rv.data
             assert b'"title": "Nostromos"' in rv.data
             assert b'"value": "That is the Nostromos"' in rv.data
             # types
