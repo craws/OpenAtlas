@@ -29,11 +29,11 @@ class GetSubunit(Resource):  # type: ignore
     def get_subunits(id_: int) -> List[Dict[str, Any]]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:  # pragma: no cover
+        except Exception:
             raise EntityDoesNotExistError
         structure = get_structure(entity)
         if not structure or not structure['subunits']:
-            raise InvalidSubunitError  # pragma: no cover
+            raise InvalidSubunitError
         subunits = []
         for subunit in structure['subunits']:
             subunits.append({

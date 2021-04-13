@@ -55,6 +55,7 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_license(entity_id: int) -> Optional[str]:
+        # Todo: Redo it with Alex
         # It works because the standard Type is always the last type. But this is not stable
         file_license = None
         for link in Link.get_links(entity_id, 'P2'):
@@ -100,6 +101,7 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Any]]]:
+        # Todo: Fix with Alex
         ref = []
         for link_ in Link.get_links(entity.id, codes="P67", inverse=True):
             if not isinstance(link_.domain, ReferenceSystem):

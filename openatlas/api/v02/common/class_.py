@@ -35,5 +35,5 @@ class GetByClass(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         if class_code not in g.cidoc_classes:
-            raise InvalidCidocClassCode  # pragma: no cover
+            raise InvalidCidocClassCode
         return [Entity(row) for row in Db.get_by_class_code(class_code, parser)]

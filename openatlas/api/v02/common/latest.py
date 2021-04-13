@@ -28,5 +28,5 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         if not (0 < limit_ < 101):
-            raise InvalidLimitError  # pragma: no cover
+            raise InvalidLimitError
         return [GeoJsonEntity.get_entity(e, parser) for e in Entity.get_latest(limit_)]

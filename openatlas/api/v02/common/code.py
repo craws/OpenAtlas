@@ -35,5 +35,5 @@ class GetByCode(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         if code_ not in g.view_class_mapping:
-            raise InvalidCodeError  # pragma: no cover
+            raise InvalidCodeError
         return [Entity(row) for row in Db.get_by_system_class(g.view_class_mapping[code_], parser)]

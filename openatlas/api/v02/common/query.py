@@ -24,7 +24,7 @@ class GetQuery(Resource):  # type: ignore
                 and not parser['codes'] \
                 and not parser['classes'] \
                 and not parser['system_classes']:
-            raise QueryEmptyError  # pragma: no cover
+            raise QueryEmptyError
         entities = []
         if parser['entities']:
             for entity in parser['entities']:

@@ -14,7 +14,7 @@ from openatlas.util.util import api_access
 @app.route('/api/display/<path:filename>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def display_file_api(filename: str) -> Any:  # pragma: no cover
+def display_file_api(filename: str) -> Any:
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
@@ -32,5 +32,5 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
 @app.route('/api/0.1/', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def path_error() -> Any:  # pragma: no cover
+def path_error() -> Any:
     raise ResourceGoneError

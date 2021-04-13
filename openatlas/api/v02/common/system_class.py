@@ -38,5 +38,5 @@ class GetBySystemClass(Resource):  # type: ignore
     @staticmethod
     def get_entities_by_system_class(system_class: str, parser: Dict[str, Any]) -> List[Entity]:
         if system_class not in g.classes:
-            raise InvalidCodeError  # pragma: no cover
+            raise InvalidCodeError
         return [Entity(row) for row in Db.get_by_system_class(system_class, parser)]

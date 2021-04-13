@@ -14,11 +14,11 @@ class Pagination:
             return list(itertools.islice(total, total.index(int(parser['last'])) + 1, None))
         if parser['first'] and int(parser['first']) in total:
             return list(itertools.islice(total, total.index(int(parser['first'])), None))
-        raise EntityDoesNotExistError  # pragma: no cover
+        raise EntityDoesNotExistError
 
     @staticmethod
     def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[str, Any]:
-        if not entities:  # pragma: no cover
+        if not entities:
             raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]

@@ -7,7 +7,6 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidCodeError, InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, \
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
-from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
