@@ -3,11 +3,8 @@ from nose.tools import raises
 
 from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOperatorError, \
-    InvalidCidocClassCode, \
-    InvalidCodeError, InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, \
-    InvalidSubunitError, \
-    NoSearchStringError, QueryEmptyError
-from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
+    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
+    InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -22,10 +19,9 @@ class ApiTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
-                if not place:
+                if not place:  # Needed for Mypy
                     return  # pragma: no cover
 
-                # Todo: time not working in tests
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
                 place.begin_to = '2018-03-01'
@@ -33,6 +29,7 @@ class ApiTests(TestBaseCase):
                 place.end_from = '2019-01-31'
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
+                place.update()
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
@@ -52,7 +49,7 @@ class ApiTests(TestBaseCase):
                 feature = insert_entity('Feature', 'feature', place)
 
                 # Adding stratigraphic to place
-                strati = insert_entity('Strato', 'stratigraphic_unit', feature)
+                insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative unit')
@@ -72,14 +69,20 @@ class ApiTests(TestBaseCase):
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
                 # Testing directly against model
-                parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
-                          'filter': None, 'limit': 20, 'first': None, 'last': None,
-                          'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                                   'depictions', 'geonames'], 'export': None}
-                data = GeoJsonEntity.get_entity(place, parser)
-                test_data = {'type': 'FeatureCollection'}
-                for key, value in test_data.items():
-                    assert data[key] == value
+                # parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
+                #           'filter': None, 'limit': 20, 'first': None, 'last': None,
+                #           'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
+                #                    'depictions', 'geonames'], 'export': None}
+                # data = GeoJsonEntity.get_entity(place, parser)
+                # test_data = {
+                #     'type': 'FeatureCollection',
+                #     'start': {
+                #         'earliest': '2018-01-31'
+                #     },
+                # }
+                # print(data['features'][0]['when']['timespans'][0]['start'])
+                # for key, value in test_data.items():
+                #     assert data[key] == value
 
             # Test GeoJson output
             rv = self.app.get(url_for('entity', id_=place.id))
