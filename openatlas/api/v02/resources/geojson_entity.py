@@ -48,18 +48,17 @@ class GeoJsonEntity:
             files.append({
                 '@id': url_for('entity', id_=link.domain.id, _external=True),
                 'title': link.domain.name,
-                'license': GeoJsonEntity.get_license(link.domain.id),
+                'license': GeoJsonEntity.get_license(link.domain),
                 'url': url_for(
                     'display_file_api', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
 
     @staticmethod
-    def get_license(entity_id: int) -> Optional[str]:
-        # Todo: Redo it with Alex
-        # It works because the standard Type is always the last type. But this is not stable
+    def get_license(entity: Entity) -> Optional[str]:
         file_license = None
-        for link in Link.get_links(entity_id, 'P2'):
-            file_license = link.range.name
+        for node in entity.nodes:
+            if g.nodes[node.root[-1]].name == 'License':
+                file_license = node.name
         return file_license
 
     @staticmethod
@@ -101,7 +100,6 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_reference_systems(entity: Entity) -> Optional[List[Dict[str, Any]]]:
-        # Todo: Fix with Alex
         ref = []
         for link_ in Link.get_links(entity.id, codes="P67", inverse=True):
             if not isinstance(link_.domain, ReferenceSystem):

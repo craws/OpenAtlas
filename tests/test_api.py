@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
@@ -7,6 +7,7 @@ from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOpe
     InvalidCodeError, InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, \
     InvalidSubunitError, \
     NoSearchStringError, QueryEmptyError
+from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -59,7 +60,7 @@ class ApiTests(TestBaseCase):
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
                 file.link('P67', place)
-                file.link('P2', Node.get_hierarchy('License'))
+                file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
 
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
@@ -69,6 +70,16 @@ class ApiTests(TestBaseCase):
                 geonames = Entity.get_by_id(ReferenceSystem.get_by_name('GeoNames').id)
                 precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
+
+                # Testing directly against model
+                parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
+                          'filter': None, 'limit': 20, 'first': None, 'last': None,
+                          'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
+                                   'depictions', 'geonames'], 'export': None}
+                data = GeoJsonEntity.get_entity(place, parser)
+                test_data = {'type': 'FeatureCollection'}
+                for key, value in test_data.items():
+                    assert data[key] == value
 
             # Test GeoJson output
             rv = self.app.get(url_for('entity', id_=place.id))
@@ -99,9 +110,9 @@ class ApiTests(TestBaseCase):
             assert b'"coordinates": [' in rv.data
             # depictions
             assert b'"title": "Datei"' in rv.data
-            assert b'"license": "License"' in rv.data
+            assert b'"license": "Open license"' in rv.data
             # links
-            # assert b'"identifier": "http://www.geonames.org/' in rv.data
+            assert b'"identifier": "https://www.geonames.org/' in rv.data
 
             # Path Tests
             rv = self.app.get(url_for('usage'))
