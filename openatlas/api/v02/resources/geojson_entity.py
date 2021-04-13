@@ -118,7 +118,7 @@ class GeoJsonEntity:
     def get_entity_by_id(id_: int) -> Entity:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:  # pragma: nocover
+        except Exception:
             raise EntityDoesNotExistError
         return entity
 
