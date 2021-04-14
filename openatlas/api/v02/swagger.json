@@ -168,7 +168,7 @@
           },
           "site-name": {
             "type": "string"
-          },
+          }
         }
       },
       "UsageModel": {

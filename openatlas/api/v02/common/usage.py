@@ -25,4 +25,3 @@ class ShowUsage(Resource):  # type: ignore
                 'subunit': url_for('subunit', id_=23, _external=True),
                 'subunit_hierarchy': url_for('subunit_hierarchy', id_=23, _external=True)}}
         return marshal(usage, UsageTemplate.usage_template()), 200
-
