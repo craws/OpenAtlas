@@ -136,7 +136,6 @@ class GeoJsonEntity:
 
     @staticmethod
     def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
-
         type_ = 'FeatureCollection'
         class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en'])
         features = {
@@ -152,15 +151,20 @@ class GeoJsonEntity:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        links = GeoJsonEntity.get_all_links(entity)
-        links_inverse = GeoJsonEntity.get_all_links_inverse(entity)
-        features['relations'] = GeoJsonEntity.get_links(links, links_inverse) if 'relations' in parser[
-            'show'] else None
-        features['types'] = GeoJsonEntity.get_node(entity, links) if 'types' in parser['show'] else None
-        features['depictions'] = GeoJsonEntity.get_file(links_inverse) if 'depictions' in parser[
-            'show'] else None
-        features['when'] = {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser[
-            'show'] else None
+        links = []
+        links_inverse = []
+        if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
+            links = GeoJsonEntity.get_all_links(entity)
+            links_inverse = GeoJsonEntity.get_all_links_inverse(entity)
+
+        features['relations'] = \
+            GeoJsonEntity.get_links(links, links_inverse) if 'relations' in parser['show'] else None
+        features['types'] = \
+            GeoJsonEntity.get_node(entity, links) if 'types' in parser['show'] else None
+        features['depictions'] = \
+            GeoJsonEntity.get_file(links_inverse) if 'depictions' in parser['show'] else None
+        features['when'] = \
+            {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser['show'] else None
         features['links'] = GeoJsonEntity.get_reference_systems(links_inverse) if 'links' in parser[
             'show'] else None
         if 'geometry' in parser['show']:
