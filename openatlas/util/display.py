@@ -148,13 +148,28 @@ def uc_first(string: Optional[str] = '') -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
+def add_reference_systems_to_form(form: Any) -> str:
+    from openatlas.util.filters import add_row
+    html = ''
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            precision_field = getattr(form, field.id.replace('id_', 'precision_'))
+            class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
+            html += add_row(field, field.label, ' '.join([
+                str(field(class_=class_)),
+                str(precision_field.label),
+                str(precision_field)]))
+    return html
+
+
 def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     errors = {}
     valid_dates = True
-    for field_name in ['begin_year_from', 'begin_month_from', 'begin_day_from',
-                       'begin_year_to', 'begin_month_to', 'begin_day_to',
-                       'end_year_from', 'end_month_from', 'end_day_from',
-                       'end_year_to', 'end_month_to', 'end_day_to']:
+    for field_name in [
+            'begin_year_from', 'begin_month_from', 'begin_day_from',
+            'begin_year_to', 'begin_month_to', 'begin_day_to',
+            'end_year_from', 'end_month_from', 'end_day_from',
+            'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -162,8 +177,6 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
             for error in getattr(form, field_name).errors:
                 errors[field_name] += uc_first(error)
             errors[field_name] += ' </label>'
-    style = '' if valid_dates else ' style="display:table-row" '
-    switch_label = _('hide') if form.begin_year_from.data or form.end_year_from.data else _('show')
     html = """
         <div class="table-row">
             <div>
@@ -172,10 +185,14 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
             <div class="table-cell date-switcher">
                 <span id="date-switcher" class="{button_class}">{show}</span>
             </div>
-        </div>""".format(date=uc_first(_('date')),
-                         button_class=app.config['CSS']['button']['secondary'],
-                         tooltip=tooltip(_('tooltip date')),
-                         show=uc_first(switch_label))
+        </div>""".format(
+        date=uc_first(_('date')),
+        button_class=app.config['CSS']['button']['secondary'],
+        tooltip=tooltip(_('tooltip date')),
+        show=uc_first(
+            _('hide') if form.begin_year_from.data or form.end_year_from.data else _('show')))
+
+    style = '' if valid_dates else ' style="display:table-row" '
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
     html += '<div class="table-cell">'
@@ -236,8 +253,9 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="CSV">
                 <i class="fas fa-download"></i> {label}
-            </a>'''.format(url=url_for('entity', id_=entity.id, export='csv'),
-                           label=uc_first('csv'))
+            </a>'''.format(
+            url=url_for('entity', id_=entity.id, export='csv'),
+            label=uc_first('csv'))
 
         data['API'] = data_api
     return data
@@ -278,16 +296,18 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     if for_table:
         return """<a href='#' id="bookmark{id}" onclick="ajaxBookmark('{id}');">{label}
             </a>""".format(id=entity_id, label=label)
-    return button(label,
-                  id_='bookmark' + str(entity_id),
-                  onclick="ajaxBookmark('" + str(entity_id) + "');")
+    return button(
+        label,
+        id_='bookmark' + str(entity_id),
+        onclick="ajaxBookmark('" + str(entity_id) + "');")
 
 
-def button(label: str,
-           url: Optional[str] = None,
-           css: Optional[str] = 'primary',
-           id_: Optional[str] = None,
-           onclick: Optional[str] = '') -> str:
+def button(
+        label: str,
+        url: Optional[str] = None,
+        css: Optional[str] = 'primary',
+        id_: Optional[str] = None,
+        onclick: Optional[str] = '') -> str:
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = '+ ' + label
@@ -308,23 +328,7 @@ def tooltip(text: str) -> str:
         title=text.replace('"', "'"))
 
 
-def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
-    """
-    Returns a truncates string with '..' at the end if it was longer than length
-    Also adds a span title (for mouse over) with the original string if parameter "span" is True
-    """
-    if string is None:
-        return ''  # pragma: no cover
-    if len(string) < length + 1:
-        return string
-    if not span:
-        return string[:length] + '..'
-    return '<span title="' + string.replace('"', '') + '">' + string[:length] \
-           + '..' + '</span>'  # pragma: no cover
-
-
 def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    """ Collect and return related information for entity views."""
     data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
@@ -417,10 +421,11 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
     return add_system_data(entity, data)
 
 
-def get_profile_image_table_link(file: 'Entity',
-                                 entity: 'Entity',
-                                 extension: str,
-                                 profile_image_id: Optional[int] = None) -> str:
+def get_profile_image_table_link(
+        file: 'Entity',
+        entity: 'Entity',
+        extension: str,
+        profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -428,8 +433,9 @@ def get_profile_image_table_link(file: 'Entity',
     return ''  # pragma: no cover - only happens for non image files
 
 
-def get_base_table_data(entity: 'Entity',
-                        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
+def get_base_table_data(
+        entity: 'Entity',
+        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
     """ Returns standard table data for an entity"""
     if len(entity.aliases) > 0:
         data: List[str] = ['<p>' + link(entity) + '</p>']
@@ -467,8 +473,10 @@ def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity
     if entry.begin_from:
         html += ', ' if html else ''
         if entry.begin_to:
-            html += _('between %(begin)s and %(end)s',
-                      begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(entry.begin_from),
+                end=format_date(entry.begin_to))
         else:
             html += format_date(entry.begin_from)
     html += (' (' + entry.begin_comment + ')') if entry.begin_comment else ''
@@ -480,8 +488,10 @@ def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str
     if entry.end_from:
         html += ', ' if html else ''
         if entry.end_to:
-            html += _('between %(begin)s and %(end)s',
-                      begin=format_date(entry.end_from), end=format_date(entry.end_to))
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(entry.end_from),
+                end=format_date(entry.end_to))
         else:
             html += format_date(entry.end_from)
     html += (' (' + entry.end_comment + ')') if entry.end_comment else ''
@@ -603,9 +613,10 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
     statvfs = os.statvfs(app.config['UPLOAD_DIR'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
-    return {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-            'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-            'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+    return {
+        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
 
 
 def get_file_extension(entity: Union[int, 'Entity']) -> str:

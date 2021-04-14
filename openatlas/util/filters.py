@@ -30,11 +30,12 @@ def link(entity: Entity) -> str:
 
 
 @app.template_filter()
-def button(label: str,
-           url: Optional[str] = '#',
-           css: Optional[str] = 'primary',
-           id_: Optional[str] = None,
-           onclick: Optional[str] = '') -> str:
+def button(
+        label: str,
+        url: Optional[str] = '#',
+        css: Optional[str] = 'primary',
+        id_: Optional[str] = None,
+        onclick: Optional[str] = '') -> str:
     return display.button(label, url, css, id_, onclick)
 
 
@@ -84,7 +85,7 @@ def breadcrumb(crumbs: List[Any]) -> str:
         elif isinstance(item, list):
             items.append('<a href="{url}">{label}</a>'.format(
                 url=item[1],
-                label=display.truncate(display.uc_first(str(item[0])))))
+                label=display.uc_first(str(item[0]))))
         else:
             items.append(display.uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
@@ -112,11 +113,11 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
         if value or value == 0:
             if isinstance(value, list):
                 value = '<br>'.join(value)
-            html += '''
+            html += """
                 <div class="table-row">
                     <div>{label}</div>
                     <div class="table-cell">{value}</div>
-                </div>'''.format(label=display.uc_first(label), value=value)
+                </div>""".format(label=display.uc_first(label), value=value)
     return Markup(html + '</div>')
 
 
@@ -235,10 +236,10 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     if entity.class_.view == 'file':
         if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-            html = '''
+            html = """
                 <a href="{url}" rel="noopener noreferrer" target="_blank">
                     <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>'''.format(
+                </a>""".format(
                 url=url_for('display_file', filename=path.name),
                 width=session['settings']['profile_image_width'])
         else:
@@ -276,10 +277,11 @@ def manual(site: str) -> str:  # Creates a link to a manual page
             <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
 
 
-def add_row(field: Field,
-            label: Optional[str] = None,
-            value: Optional[str] = None,
-            form_id: Optional[str] = None) -> str:
+def add_row(
+        field: Field,
+        label: Optional[str] = None,
+        value: Optional[str] = None,
+        form_id: Optional[str] = None) -> str:
     field.label.text = display.uc_first(field.label.text)
     if field.flags.required and form_id != 'login-form' and field.label.text:
         field.label.text += ' *'
@@ -304,10 +306,11 @@ def add_row(field: Field,
 
 
 @app.template_filter()
-def display_form(form: Any,
-                 form_id: Optional[str] = None,
-                 for_persons: bool = False,
-                 manual_page: Optional[str] = None) -> str:
+def display_form(
+        form: Any,
+        form_id: Optional[str] = None,
+        for_persons: bool = False,
+        manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
     def display_value_type_fields(node_: Node, root: Optional[Node] = None) -> str:
@@ -329,6 +332,7 @@ def display_form(form: Any,
                 value_fields=display_value_type_fields(sub, root))
         return html_
 
+    reference_systems_added = False
     html = ''
     for field in form:
         if isinstance(field, ValueFloatField) or field.id.startswith(
@@ -382,12 +386,9 @@ def display_form(form: Any,
 
         # External reference system
         if field.id.startswith('reference_system_id_'):
-            precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-            class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
-            html += add_row(field, field.label, ' '.join([
-                str(field(class_=class_)),
-                str(precision_field.label),
-                str(precision_field)]))
+            if not reference_systems_added:
+                html += display.add_reference_systems_to_form(form)
+                reference_systems_added = True
             continue
         html += add_row(field, form_id=form_id)
 

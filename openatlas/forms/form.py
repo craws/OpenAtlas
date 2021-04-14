@@ -53,11 +53,12 @@ forms = {
     'type': ['name', 'date', 'description', 'continue']}
 
 
-def build_form(class_: str,
-               item: Optional[Union[Entity, Link, Node]] = None,
-               code: Optional[str] = None,
-               origin: Union[Entity, Node, None] = None,
-               location: Optional[Entity] = None) -> FlaskForm:
+def build_form(
+        class_: str,
+        item: Optional[Union[Entity, Link, Node]] = None,
+        code: Optional[str] = None,
+        origin: Union[Entity, Node, None] = None,
+        location: Optional[Entity] = None) -> FlaskForm:
     # Builds a dynamic form regarding types, module settings and class specific fields
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
@@ -103,9 +104,10 @@ def build_form(class_: str,
     return form
 
 
-def populate_form(form: FlaskForm,
-                  item: Union[Entity, Link],
-                  location: Union[Entity, None]) -> FlaskForm:
+def populate_form(
+        form: FlaskForm,
+        item: Union[Entity, Link],
+        location: Union[Entity, None]) -> FlaskForm:
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -144,10 +146,11 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
                     id=system_id)).data = str(system_links[system_id].type.id)
 
 
-def customize_labels(name: str,
-                     form: FlaskForm,
-                     item: Optional[Union[Entity, Link]] = None,
-                     origin: Union[Entity, Node, None] = None, ) -> None:
+def customize_labels(
+        name: str,
+        form: FlaskForm,
+        item: Optional[Union[Entity, Link]] = None,
+        origin: Union[Entity, Node, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
@@ -156,10 +159,11 @@ def customize_labels(name: str,
         getattr(form, str(root.id)).label.text = 'super'
 
 
-def add_buttons(form: Any,
-                name: str,
-                entity: Union[Entity, None],
-                origin: Optional[Entity] = None) -> FlaskForm:
+def add_buttons(
+        form: Any,
+        name: str,
+        entity: Union[Entity, None],
+        origin: Optional[Entity] = None) -> FlaskForm:
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
@@ -231,11 +235,12 @@ def add_types(form: Any, class_: str) -> None:
             add_value_type_fields(form, node.subs)
 
 
-def add_fields(form: Any,
-               class_: str,
-               code: Union[str, None],
-               item: Union[Entity, Node, Link, None],
-               origin: Union[Entity, Node, None]) -> None:
+def add_fields(
+        form: Any,
+        class_: str,
+        code: Union[str, None],
+        item: Union[Entity, Node, Link, None],
+        origin: Union[Entity, Node, None]) -> None:
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
@@ -296,10 +301,14 @@ def add_fields(form: Any,
         setattr(form, 'begins_in', TableField(_('born in')))
         setattr(form, 'ends_in', TableField(_('died in')))
     elif class_ == 'reference_system':
-        setattr(form, 'website_url', StringField(_('website URL'),
-                                                 validators=[OptionalValidator(), URL()]))
-        setattr(form, 'resolver_url', StringField(_('resolver URL'),
-                                                  validators=[OptionalValidator(), URL()]))
+        setattr(
+            form,
+            'website_url',
+            StringField(_('website URL'), validators=[OptionalValidator(), URL()]))
+        setattr(
+            form,
+            'resolver_url',
+            StringField(_('resolver URL'), validators=[OptionalValidator(), URL()]))
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_node_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
