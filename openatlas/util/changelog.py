@@ -3,7 +3,8 @@ class Changelog:
     versions = {
         '6.2.0': ['TBA', {
             'feature': {
-                '1284': 'Show image when editing a place or artifact'}}],
+                '1284': 'Show image when editing a place or artifact',
+                '1496': 'API: Endpoints for entities of type'}}],
         '6.1.0': ['2021-04-05', {
             'feature': {
                 '1215': 'Time spans for types',
