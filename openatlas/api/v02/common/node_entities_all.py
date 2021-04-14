@@ -17,9 +17,9 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetNodeEntitiesAll.get_node_all(id_)}
-        template = NodeTemplate.node_template()
         if parser['count']:
             return jsonify(len(node['nodes']))
+        template = NodeTemplate.node_template()
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
         return marshal(node, template), 200
@@ -27,17 +27,16 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
-            raise InvalidSubunitError  # pragma: no cover
+            raise InvalidSubunitError
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])
 
     @staticmethod
     def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
-        for e in entities:
+        for entity in g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True):
             data.append({
-                'id': e.id, 'label': e.name,
-                'url': url_for('entity', id_=e.id, _external=True)})
-        node = g.nodes[id_]
-        for sub_id in node.subs:
+                'id': entity.id,
+                'label': entity.name,
+                'url': url_for('entity', id_=entity.id, _external=True)})
+        for sub_id in g.nodes[id_].subs:
             GetNodeEntitiesAll.get_recursive_node_entities(sub_id, data)
         return data

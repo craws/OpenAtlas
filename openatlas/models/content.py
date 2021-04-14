@@ -12,8 +12,15 @@ class Content:
     @staticmethod
     def get_content() -> Dict[str, Dict[str, str]]:
         content: Dict[str, Dict[str, str]] = {}
-        for name in ['intro', 'legal_notice', 'contact', 'citation_example', 'intro_for_frontend',
-                     'legal_notice_for_frontend', 'contact_for_frontend']:
+        for name in [
+                'intro',
+                'legal_notice',
+                'contact',
+                'citation_example',
+                'intro_for_frontend',
+                'legal_notice_for_frontend',
+                'contact_for_frontend',
+                'site_name_for_frontend']:
             content[name] = {language: '' for language in app.config['LANGUAGES'].keys()}
         for row in Db.get_content():
             content[row['name']][row['language']] = row['text']

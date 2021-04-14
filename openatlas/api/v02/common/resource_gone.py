@@ -8,5 +8,5 @@ from openatlas.util.util import api_access
 
 class ResourceGone(Resource):  # type: ignore
     @api_access()  # type: ignore
-    def get(self, *args, **kwargs) -> Tuple[Type[ResourceGoneError], int]:
+    def get(self, *args: str, **kwargs: str) -> Tuple[Type[ResourceGoneError], int]:
         raise ResourceGoneError

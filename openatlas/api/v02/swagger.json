@@ -164,6 +164,9 @@
           },
           "legal-notice": {
             "type": "string"
+          },
+          "site-name": {
+            "type": "string"
           }
         }
       },

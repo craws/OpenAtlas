@@ -19,26 +19,26 @@ class GetSubunit(Resource):  # type: ignore
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetSubunit.get_subunits(id_)}
-        template = NodeTemplate.node_template()
         if parser['count']:
             return jsonify(len(node['nodes']))
+        template = NodeTemplate.node_template()
         if parser['download']:
             return Download.download(data=node, template=template, name=id_)
         return marshal(node, template), 200
 
     @staticmethod
     def get_subunits(id_: int) -> List[Dict[str, Any]]:
-        # Get first level of subunits
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:  # pragma: no cover
+        except Exception:
             raise EntityDoesNotExistError
         structure = get_structure(entity)
-        data = []
         if not structure or not structure['subunits']:
-            raise InvalidSubunitError  # pragma: no cover
-        for n in structure['subunits']:
-            data.append({
-                'id': n.id, 'label': n.name,
-                'url': url_for('entity', id_=n.id, _external=True)})
-        return data
+            raise InvalidSubunitError
+        subunits = []
+        for subunit in structure['subunits']:
+            subunits.append({
+                'id': subunit.id,
+                'label': subunit.name,
+                'url': url_for('entity', id_=subunit.id, _external=True)})
+        return subunits

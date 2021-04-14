@@ -25,6 +25,7 @@ _('circular dependencies')
 _('intro_for_frontend')
 _('legal_notice_for_frontend')
 _('contact_for_frontend')
+_('site_name_for_frontend')
 
 
 def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:

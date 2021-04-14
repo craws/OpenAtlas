@@ -57,8 +57,7 @@ class GeoJson:
             'relationType': fields.String,
             'relationSystemClass': fields.String,
             'type': fields.String,
-            'when': fields.Nested(when)
-        }
+            'when': fields.Nested(when)}
 
         feature = {
             '@id': fields.String,
@@ -66,8 +65,7 @@ class GeoJson:
             'crmClass': fields.String,
             'system_class': fields.String,
             'properties': fields.Nested(title),
-            'description': fields.List(fields.Nested(description))
-        }
+            'description': fields.List(fields.Nested(description))}
 
         if 'when' in show:
             feature['when'] = fields.Nested(when)
@@ -84,34 +82,28 @@ class GeoJson:
         if 'links' in show:
             feature['links'] = fields.List(fields.Nested(links))
 
-        # if 'geometry' in show:
         feature['geometry'] = fields.Raw
 
         if 'depictions' in show:
             feature['depictions'] = fields.List(fields.Nested(depictions))
 
-        entity_json = {
+        return {
             '@context': fields.String,
             'type': fields.String,
             'features': fields.List(fields.Nested(feature))}
-        return entity_json
 
     @staticmethod
     def pagination(show: Dict[str, str]) -> Dict[str, List]:
         page_index = {
             "page": fields.Integer,
-            "start_id": fields.Integer
-        }
+            "start_id": fields.Integer}
+
         pagination_model = {
             "entities": fields.Integer,
             "entity_per_page": fields.Integer,
             "index": fields.List(fields.Nested(page_index)),
-            "total_pages": fields.Integer
-        }
+            "total_pages": fields.Integer}
 
-        pagination = {
+        return {
             "result": fields.List(fields.Nested(GeoJson.geojson_template(show))),
-            "pagination": fields.Nested(pagination_model)
-        }
-
-        return pagination
+            "pagination": fields.Nested(pagination_model)}

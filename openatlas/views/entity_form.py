@@ -18,7 +18,7 @@ from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import link
+from openatlas.util.display import get_base_table_data, link
 from openatlas.util.util import is_authorized, required_group, was_modified
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -124,9 +124,16 @@ def update(id_: int) -> Union[str, Response]:
         location = entity.get_linked_entity_safe('P53', nodes=True)
         gis_data = Gis.get_all([entity], structure)
         overlays = Overlay.get_by_object(entity)
-
+        entity.image_id = entity.get_profile_image_id()
+        if not entity.image_id:
+            for link_ in entity.get_links('P67', inverse=True):
+                domain = link_.domain
+                if domain.class_.view == 'file':  # pragma: no cover
+                    data = get_base_table_data(domain)
+                    if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
+                        entity.image_id = domain.id
+                        break
     form = build_form(entity.class_.name, entity, location=location)
-
     if entity.class_.view == 'event':
         form.event_id.data = entity.id
     elif isinstance(entity, ReferenceSystem) and entity.system:

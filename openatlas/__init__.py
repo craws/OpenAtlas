@@ -20,12 +20,11 @@ app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
 
-if os.name == "posix":  # For non Linux systems we would need adaptions here
+if os.name == "posix":
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
 from openatlas.models.logger import Logger
-
 logger = Logger()
 
 from openatlas.util import filters, processor
@@ -87,8 +86,6 @@ def apply_caching(response: Response) -> Response:
 def teardown_request(exception: Any) -> None:
     close_connection()
 
-
-app.register_blueprint(filters.blueprint)
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()

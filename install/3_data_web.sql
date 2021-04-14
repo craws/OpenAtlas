@@ -50,15 +50,17 @@ INSERT INTO model.entity (name, class_code, description, system_class) VALUES
     ('Wikidata', 'E32', 'A free and open knowledge base and common source of open data providing persistent identifier and links to other sources.', 'reference_system');
 
 INSERT INTO web.reference_system (system, name, entity_id, resolver_url, website_url, identifier_example)
-VALUES (true,
-        'GeoNames',
-        (SELECT id FROM model.entity WHERE name = 'GeoNames' AND class_code = 'E32'),
-        'https://www.geonames.org/',
-        'https://www.geonames.org/',
-        '1234567'),
-       (true,
-        'Wikidata',
-        (SELECT id FROM model.entity WHERE name = 'Wikidata' AND class_code = 'E32'),
-        'https://www.wikidata.org/entity/',
-        'https://www.wikidata.org',
-        'Q123');
+VALUES (
+            true,
+            'GeoNames',
+            (SELECT id FROM model.entity WHERE name = 'GeoNames' AND class_code = 'E32'),
+            'https://www.geonames.org/',
+            'https://www.geonames.org/',
+            '1234567'),
+       (
+            true,
+            'Wikidata',
+            (SELECT id FROM model.entity WHERE name = 'Wikidata' AND class_code = 'E32'),
+            'https://www.wikidata.org/entity/',
+            'https://www.wikidata.org',
+            'Q123');

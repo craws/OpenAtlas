@@ -13,19 +13,11 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entities(entities: List[Entity], name: str) -> Response:
-        data = []
-        for entity in entities:
-            data.append(ApiExportCSV.build_dataframe(entity))
-        index = []
-        for d in data:
-            for k in d.keys():
-                if k not in index:
-                    index.append(k)
-        return Response(pd.DataFrame(data=data).to_csv(),
-                        mimetype='text/csv',
-                        headers={
-                            'Content-Disposition': 'attachment;filename=' + name + '.csv'
-                        })
+        frames = [ApiExportCSV.build_dataframe(entity) for entity in entities]
+        return Response(
+            pd.DataFrame(data=frames).to_csv(),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment;filename=' + name + '.csv'})
 
     @staticmethod
     def build_dataframe(entity: Entity) -> Dict[str, List[Union[str, int]]]:
@@ -52,46 +44,44 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
-        return Response(pd.DataFrame.from_dict(data=ApiExportCSV.build_dataframe(entity),
-                                               orient='index').T.to_csv(encoding="utf-8"),
-                        mimetype='text/csv',
-                        headers={
-                            'Content-Disposition': 'attachment;filename=' + str(
-                                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'
-                        })
+        return Response(
+            pd.DataFrame.from_dict(
+                data=ApiExportCSV.build_dataframe(entity),
+                orient='index').T.to_csv(encoding="utf-8"),
+            mimetype='text/csv',
+            headers={'Content-Disposition': 'attachment;filename=' + str(
+                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'})
 
     @staticmethod
     def get_node(entity: Entity) -> Dict[Any, List[Any]]:
-        d = defaultdict(list)
+        nodes: Dict[str, Any] = defaultdict(list)
         for node in entity.nodes:
-            hierarchy = []
-            for root in node.root:
-                hierarchy.append(g.nodes[root].name)
+            hierarchy = [g.nodes[root].name for root in node.root]
             hierarchy.reverse()
-            h = ' > '.join(map(str, hierarchy))
             value = ''
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:
                     value += link.description
                     if link.range.id == node.id and node.description:
                         value += node.description
-            d[h].append(node.name + (': ' + value if value else ''))
-        return d
+            key = ' > '.join(map(str, hierarchy))
+            nodes[key].append(node.name + (': ' + value if value else ''))
+        return nodes
 
     @staticmethod
-    def get_links(entity: Entity) -> Dict[Any, list]:
-        d = defaultdict(list)
+    def get_links(entity: Entity) -> Dict[str, Any]:
+        links: Dict[str, Any] = defaultdict(list)
         for link in Link.get_links(entity.id):
-            d[link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name].append(
-                link.range.name)
+            key = link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name
+            links[key].append(link.range.name)
         for link in Link.get_links(entity.id, inverse=True):
-            d[link.property.i18n_inverse['en'].replace(' ', '_') + '_' + link.domain.class_.name if
-            link.property.i18n_inverse[
-                'en'] else link.property.i18n['en'].replace(' ',
-                                                            '_') + '_' + link.domain.class_.name].append(
-                link.domain.name)
-        d.pop('has_type_type', None)
-        return d
+            key = link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name
+            if link.property.i18n_inverse['en']:
+                key = link.property.i18n_inverse['en'].replace(' ', '_')
+                key += '_' + link.domain.class_.name
+            links[key].append(link.domain.name)
+        links.pop('has_type_type', None)
+        return links
 
     @staticmethod
     def get_geom_entry(entity: Entity) -> Dict[str, None]:
@@ -103,10 +93,10 @@ class ApiExportCSV:
         return geom
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, None]:
+    def get_geometry(entity: Entity) -> Dict[str, Any]:
         if entity.cidoc_class.code != 'E53':  # pragma: nocover
             return {'type': None, 'coordinates': None}
         geoms = Gis.get_by_id(entity.id)
         if geoms:
-            return {key: [d[key] for d in geoms] for key in geoms[0]}
+            return {key: [geom[key] for geom in geoms] for key in geoms[0]}
         return {'type': None, 'coordinates': None}
