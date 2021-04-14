@@ -12,10 +12,15 @@ class Entity:
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_ids(ids: Iterable[int], nodes: bool = False) -> List[Dict[str, Any]]:
+    def get_by_ids(
+            ids: Iterable[int],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Dict[str, Any]]:
         if not ids:
             return []
-        sql = Entity.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
+        sql = Entity.build_sql(
+            nodes,
+            aliases) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
         g.cursor.execute(sql, {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -35,9 +40,10 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_class(classes: Union[str, List[str]],
-                     nodes: bool = False,
-                     aliases: bool = False) -> List[Dict[str, Any]]:
+    def get_by_class(
+            classes: Union[str, List[str]],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Dict[str, Any]]:
         sql = Entity.build_sql(nodes, aliases) + ' WHERE e.system_class IN %(class)s GROUP BY e.id;'
         g.cursor.execute(sql, {'class': tuple(classes if isinstance(classes, list) else [classes])})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -154,11 +160,12 @@ class Entity:
         return sql
 
     @staticmethod
-    def search(term: str,
-               classes: List[str],
-               desc: bool = False,
-               own: bool = False,
-               user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+    def search(
+            term: str,
+            classes: List[str],
+            desc: bool = False,
+            own: bool = False,
+            user_id: Optional[int] = None) -> List[Dict[str, Any]]:
         sql = Entity.build_sql() + """
             {user_clause}
             WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
