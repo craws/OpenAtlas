@@ -336,7 +336,7 @@ def build_add_reference_form(class_: str) -> FlaskForm:
 
 
 def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes."""
+    """Returns a form with a list of entities with checkboxes."""
     if class_ == 'file':
         entities = Entity.get_by_class('file', nodes=True)
     elif class_ == 'place':

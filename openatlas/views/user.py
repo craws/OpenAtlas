@@ -169,8 +169,9 @@ def user_insert() -> Union[str, Response]:
         user_id = User.insert(form)
         flash(_('user created'), 'info')
         if session['settings']['mail'] and form.send_info.data:  # pragma: no cover
-            subject = _('Your account information for %(sitename)s',
-                        sitename=session['settings']['site_name'])
+            subject = _(
+                'Your account information for %(sitename)s',
+                sitename=session['settings']['site_name'])
             body = _('Account information for %(username)s', username=form.username.data) + ' '
             body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
             body += uc_first(_('username')) + ': ' + form.username.data + '\n'
@@ -191,7 +192,7 @@ def user_insert() -> Union[str, Response]:
 
 
 def get_groups() -> List[Tuple[str, str]]:
-    """ Returns groups, hardcoded because order (weakest permissions to strongest) is relevant"""
+    """Returns groups hardcoded because the order (weakest permissions to strongest) is relevant"""
     choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))

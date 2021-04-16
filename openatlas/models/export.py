@@ -14,7 +14,7 @@ class Export:
 
     @staticmethod
     def export_csv(form: FlaskForm) -> None:
-        """ Creates CSV file(s) in export/csv folder, filename begins with current date_time."""
+        """Create CSV file(s) in export/csv folder, filename begins with current date_time."""
         import pandas.io.sql as psql
         date_string = Date.current_date_for_filename()
         path = app.config['EXPORT_DIR'] / 'csv'
@@ -93,7 +93,7 @@ class Export:
 
     @staticmethod
     def export_sql() -> bool:
-        """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
+        """Creates pg_dump file in export/sql folder, filename begins with current date_time."""
         file = app.config['EXPORT_DIR'] / 'sql' / (Date.current_date_for_filename() + '_dump.sql')
         if os.name == 'posix':
             command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(

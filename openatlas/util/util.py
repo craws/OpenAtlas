@@ -27,7 +27,7 @@ def send_mail(
         text: str,
         recipients: Union[str, List[str]],
         log_body: bool = True) -> bool:  # pragma: no cover
-    """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
     if not settings['mail'] or len(recipients) < 1:
@@ -61,8 +61,7 @@ def send_mail(
 
 
 def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
-    """ Build a dict with file ids and stats from files in given directory.
-        It's much faster to do this in one call for every file."""
+    """For performance: Build a dict with file ids and stats from files in given directory."""
     file_stats: Dict[Union[int, str], Any] = {}
     for file in path.iterdir():
         if file.stem.isdigit():
@@ -118,7 +117,6 @@ def is_authorized(group: str) -> bool:
 
 
 def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
-    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

@@ -111,7 +111,6 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
 
 
 def display_delete_link(entity: Entity) -> str:
-    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     if entity.class_.name == 'source_translation':
         url = url_for('translation_delete', id_=entity.id)
     elif entity.id in g.nodes:
@@ -459,12 +458,10 @@ def get_profile_image_table_link(
 def get_base_table_data(
         entity: 'Entity',
         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
-    """ Returns standard table data for an entity"""
     if len(entity.aliases) > 0:
         data: List[str] = ['<p>' + link(entity) + '</p>']
     else:
         data = [link(entity)]
-    # Aliases
     for i, (id_, alias) in enumerate(entity.aliases.items()):
         if i == len(entity.aliases) - 1:
             data[0] = ''.join([data[0]] + [alias])

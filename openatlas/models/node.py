@@ -30,7 +30,6 @@ class Node(Entity):
 
     @staticmethod
     def get_all_nodes() -> Dict[int, Node]:
-        """ Get and return all type and place nodes"""
         nodes = {}
         for row in Db.get_nodes('type', 'P127') + Db.get_nodes('administrative_unit', 'P89'):
             node = Node(row)

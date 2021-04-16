@@ -119,10 +119,11 @@ class Link:
         return new_link_ids
 
     @staticmethod
-    def get_linked_entity(id_: int,
-                          code: str,
-                          inverse: bool = False,
-                          nodes: bool = False) -> 'Entity':
+    def get_linked_entity(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            nodes: bool = False) -> 'Entity':
         result = Link.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
@@ -192,7 +193,7 @@ class Link:
 
     @staticmethod
     def check_links() -> List[Dict[str, str]]:
-        """ Check all existing links for CIDOC CRM validity and return the invalid ones."""
+        """Check links for CIDOC CRM validity and return the invalid ones."""
         from openatlas.util.display import link
         from openatlas.models.entity import Entity
         invalid_links = []

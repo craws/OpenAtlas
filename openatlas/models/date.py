@@ -48,20 +48,16 @@ class Date:
 
     @staticmethod
     def get_invalid_dates() -> List['Entity']:
-        """ Search for entities with invalid date combinations, e.g. begin after end"""
         from openatlas.models.entity import Entity
         return [Entity.get_by_id(row['id'], nodes=True) for row in Db.get_invalid_dates()]
 
     @staticmethod
     def invalid_involvement_dates() -> List['Link']:
-        """ Search invalid event participation dates and return the actors
-            e.g. attending person was born after the event ended"""
         from openatlas.models.link import Link
         return [Link.get_by_id(row['id']) for row in Db.invalid_involvement_dates()]
 
     @staticmethod
     def get_invalid_link_dates() -> List['Link']:
-        """ Search for links with invalid date combinations, e.g. begin after end"""
         from openatlas.models.link import Link
         return [Link.get_by_id(row['id']) for row in Db.get_invalid_link_dates()]
 
@@ -71,7 +67,6 @@ class Date:
             month: Any,
             day: Any,
             to_date: bool = False) -> Optional[numpy.datetime64]:
-        """ Converts form fields (year, month, day) to a numpy.datetime64."""
         if not year:
             return None
         year = format(year, '03d') if year > 0 else format(year + 1, '04d')

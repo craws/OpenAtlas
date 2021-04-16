@@ -19,7 +19,7 @@ from openatlas.util.table import Table
 
 
 class TableMultiSelect(HiddenInput):  # type: ignore
-    """ Table with checkboxes used in a popup for forms."""
+    """Table with checkboxes displayed in a popup"""
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and isinstance(field.data, str):
