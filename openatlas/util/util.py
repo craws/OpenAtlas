@@ -22,10 +22,11 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
 
 
-def send_mail(subject: str,
-              text: str,
-              recipients: Union[str, List[str]],
-              log_body: bool = True) -> bool:  # pragma: no cover
+def send_mail(
+        subject: str,
+        text: str,
+        recipients: Union[str, List[str]],
+        log_body: bool = True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']

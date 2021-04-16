@@ -71,10 +71,11 @@ class Node(Entity):
                 node.forms = {form_id: forms[form_id] for form_id in hierarchy['form_ids']}
 
     @staticmethod
-    def get_root_path(nodes: Dict[int, Node],
-                      node: Node,
-                      super_id: int,
-                      root: List[int]) -> List[int]:
+    def get_root_path(
+            nodes: Dict[int, Node],
+            node: Node,
+            super_id: int,
+            root: List[int]) -> List[int]:
         super_ = nodes[super_id]
         super_.count_subs += node.count
         if not super_.root:

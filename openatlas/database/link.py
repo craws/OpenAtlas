@@ -38,9 +38,10 @@ class Link:
         return [row['result_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_links(entity_id: int,
-                  codes: Union[str, List[str], None],
-                  inverse: bool = False) -> List[Dict[str, Any]]:
+    def get_links(
+            entity_id: int,
+            codes: Union[str, List[str], None],
+            inverse: bool = False) -> List[Dict[str, Any]]:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
@@ -66,7 +67,7 @@ class Link:
         sql = """
             DELETE FROM model.link
             WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(
-                field='range_id' if inverse else 'domain_id')
+            field='range_id' if inverse else 'domain_id')
         g.cursor.execute(sql, {'id': entity_id, 'codes': tuple(codes)})
 
     @staticmethod
