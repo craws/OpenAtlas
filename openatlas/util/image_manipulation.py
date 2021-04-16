@@ -1,31 +1,43 @@
-from __future__ import print_function
-
-import tempfile
-from io import BytesIO
-from tempfile import NamedTemporaryFile
-
 from wand.image import Image
-from wand.display import display
+
+from openatlas import app
 
 
 class ImageManipulation:
 
+    multi_image = ['pdf', 'mp4', 'gif', 'psd', 'ai', 'xcf']
+    single_image = ['jpeg', 'jpg', 'png', 'tiff', 'tif', 'raw', 'eps']
+
     @staticmethod
-    def image_thumbnail(path: str, thumb_size: int) -> BytesIO:
+    def upload_image(filename: str) -> None:
+        name = filename.rsplit('.', 1)[0].lower()
+        file_format = filename.rsplit('.', 1)[1].lower()
+        if file_format in ImageManipulation.single_image + ImageManipulation.multi_image:
+            ImageManipulation.safe_as_thumbnail(name, file_format)
+
+    @staticmethod
+    def safe_as_thumbnail(filename: str, file_format: str) -> None:
+        path = str(app.config['UPLOAD_DIR']) + '/' + filename + '.' + file_format
+        if file_format in ImageManipulation.multi_image:
+            path += '[0]'
         with Image(filename=path) as src:
-            with src.clone() as img:
-
-                w, h = int(thumb_size), int(thumb_size),
-                img.resize(w, h)
-                tf = tempfile.NamedTemporaryFile()
-                img.save(file=tf)
-
-        return img
+            with src.convert('png') as img:
+                # https://docs.wand-py.org/en/0.6.6/guide/resizecrop.html?highlight=down%20scale#transform-images
+                img.transform(resize='400x400>')
+                #img.compression_quality = 75
+                img.save(filename=str(app.config['UPLOAD_DIR']) + '/thumbnails/' + filename + '.png')
 
 
-        # img_io = BytesIO()
-        # img = Image.open(path)
-        # img.thumbnail((thumb_size, thumb_size))
-        # img.save(img_io, 'JPEG')
-        # img_io.seek(0)
-        # return img_io
+    # @staticmethod
+    # def image_resize(filename: str, thumb_size: int) -> Image:
+    #     path = str(app.config['UPLOAD_DIR']) + '/' + filename
+    #     with Image(filename=path) as src:
+    #         print(src.size)
+    #         print(path)
+    #         with src.clone() as img:
+    #             size = str(thumb_size)
+    #             # https://docs.wand-py.org/en/0.6.6/guide/resizecrop.html?highlight=down%20scale#transform-images
+    #             img.transform(resize=size+'x'+size+'>')
+    #             print(type(img))
+    #             return img
+    #

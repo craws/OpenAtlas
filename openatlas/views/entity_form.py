@@ -19,6 +19,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_base_table_data, link
+from openatlas.util.image_manipulation import ImageManipulation
 from openatlas.util.util import is_authorized, required_group, was_modified
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -332,6 +333,8 @@ def insert_entity(form: FlaskForm,
         filename = secure_filename('a' + file_.filename)  # type: ignore
         new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
         file_.save(str(app.config['UPLOAD_DIR'] / new_name))
+        print("hi there ")
+        ImageManipulation.upload_image(new_name)
     return entity
 
 
