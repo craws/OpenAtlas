@@ -281,7 +281,8 @@ def add_row(
         field: Field,
         label: Optional[str] = None,
         value: Optional[str] = None,
-        form_id: Optional[str] = None) -> str:
+        form_id: Optional[str] = None,
+        row_css_class: Optional[str] = '') -> str:
     field.label.text = display.uc_first(field.label.text)
     if field.flags.required and form_id != 'login-form' and field.label.text:
         field.label.text += ' *'
@@ -301,7 +302,7 @@ def add_row(
         label=label if isinstance(label, str) else field.label,
         tooltip=display.tooltip(field.description),
         value=value if value else field(class_=css_class).replace('> ', '>'),
-        css_row='external-reference' if field.id.startswith('reference_system_') else '',
+        css_row=row_css_class,
         errors=errors)
 
 

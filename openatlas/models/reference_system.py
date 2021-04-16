@@ -7,6 +7,7 @@ from flask_wtf import FlaskForm
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 
 
 class ReferenceSystem(Entity):
@@ -56,17 +57,14 @@ class ReferenceSystem(Entity):
 
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
-        precision_default_id = None
-        entity_with_updated_nodes = Entity.get_by_id(self.id, nodes=True)
-        if entity_with_updated_nodes.nodes:  # Get default precision id if it was set
-            precision_default_id = list(entity_with_updated_nodes.nodes.keys())[0].id
+        precision_id = getattr(form, str(Node.get_hierarchy('External reference match').id)).data
         Db.update_system({
             'entity_id': self.id,
             'name': self.name,
             'website_url': self.website_url,
             'resolver_url': self.resolver_url,
             'identifier_example': self.placeholder,
-            'precision_default_id': precision_default_id})
+            'precision_default_id': int(precision_id) if precision_id else None})
 
     @staticmethod
     def update_links(form: FlaskForm, entity: Entity) -> None:
@@ -85,7 +83,7 @@ class ReferenceSystem(Entity):
             if not entity or row['id'] not in entity.forms:
                 if entity and entity.name == 'GeoNames' and row['name'] != 'Place':
                     continue
-                choices.append((row['id'], row['name']))
+                choices.append((row['id'], g.classes[row['name']].label))
         return choices
 
     @staticmethod

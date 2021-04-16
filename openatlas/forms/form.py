@@ -202,7 +202,7 @@ def add_reference_systems(form: Any, form_name: str) -> None:
             form,
             'reference_system_id_{id}'.format(id=system.id),
             StringField(
-                system.name,
+                uc_first(system.name),
                 validators=[OptionalValidator()],
                 description=system.description,
                 render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
@@ -315,7 +315,7 @@ def add_fields(
         choices = ReferenceSystem.get_form_choices(item)
         if choices:
             setattr(form, 'forms', SelectMultipleField(
-                _('forms'),
+                _('classes'),
                 render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
