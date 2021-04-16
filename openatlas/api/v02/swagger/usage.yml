@@ -9,6 +9,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/ContentModel'
+          $ref: '#/components/schemas/UsageModel'
   '404':
     description: Something went wrong. Please consult the error message.

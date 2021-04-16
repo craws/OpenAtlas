@@ -149,7 +149,6 @@ AND a.geom = b.geom
 AND a.type = b.type
 AND a.description = b.description;
 
-
 ALTER TABLE model.entity DROP COLUMN system_type;
 
 END;

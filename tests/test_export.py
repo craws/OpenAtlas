@@ -26,11 +26,10 @@ class ExportTest(TestBaseCase):
             rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM web.user'})
             assert b'Alice' in rv.data
             rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM fail;'})
-            if os.name == 'posix':
-                assert b'relation "fail" does not exist' in rv.data
+            assert b'relation "fail" does not exist' in rv.data
 
             # Delete SQL dump
-            rv = self.app.get(url_for('delete_sql', filename=date_string + '_dump.sql'),
+            rv = self.app.get(url_for('delete_sql', filename=date_string + '_dump.sql.7z'),
                               follow_redirects=True)
             if os.name == 'posix':
                 assert b'File deleted' in rv.data

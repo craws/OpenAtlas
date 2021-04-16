@@ -1,19 +1,38 @@
 class Changelog:
+
     versions = {
-        '6.0.0': ['TBA', {
+        '6.2.0': ['TBA', {
+            'feature': {
+                '1284': 'Show image when editing a place or artifact'}}],
+        '6.1.0': ['2021-04-05', {
+            'feature': {
+                '1215': 'Time spans for types',
+                '1443': 'List view for untyped entities',
+                '1457': 'Public notes',
+                '963': 'API: Add type of places to export',
+                '1402': 'API: CSV export in API',
+                '1487': 'API: Endpoint for type hierarchies',
+                '1489': 'API: Geometry for artifacts'}}],
+        '6.0.1': ['2021-03-15', {
+            'fix': {
+                '1485': 'Cannot choose multiple for custom type'}}],
+        '6.0.0': ['2021-03-13', {
             'feature': {
                 '1091': 'Reference systems for types',
                 '1109': 'Sustainable web map services',
                 '1456': 'Artifacts',
                 '1187': 'Add files for artifacts',
-                '1465': 'Merge legal body into group and information carrier into artifact',
+                '1465': 'Merge legal body to group, information carrier to artifact',
                 '1461': 'Also search in date comments',
+                '1398': 'Compress SQL export files',
                 '1274': 'API: Automatic documentation for code',
-                '1390': 'API: Swagger file in OpenAtlas repository'},
-            'fix':
-                {'1477': 'Unable to select an entity with single quote in name',
-                 '1452': 'API: "type" is empty if more entities are requested',
-                 '1471': 'API: Url to linked places deprecated'}}],
+                '1390': 'API: Swagger file in OpenAtlas repository',
+                '1479': 'API: get by view name and system class',
+                '1484': 'API: Add new functions'},
+            'fix': {
+                '1477': 'Unable to select an entity with single quote in name',
+                '1452': 'API: "type" is empty if more entities are requested',
+                '1471': 'API: Url to linked places deprecated'}}],
         '5.7.2': ['2021-01-27', {
             'fix': {
                 '1455': 'Network graphic error'}}],
@@ -452,4 +471,4 @@ class Changelog:
         '0.0.1': ['2014-11-05', {
             'feature': {
                 '': 'Initial version based on the "Zend Base" project from '
-                    '<a target="_blank" rel="noopener noreferrer" href="https://craws.net">craws.net</a>'}}]}
+                    '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}

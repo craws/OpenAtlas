@@ -1,27 +1,27 @@
-from flask import url_for
+from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOperatorError, \
-    InvalidCidocClassCode, \
-    InvalidCodeError, InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, \
-    InvalidSubunitError, \
-    NoSearchStringError, QueryEmptyError
+    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
+    InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
+from tests import api_data
 from tests.base import TestBaseCase, insert_entity
 
 
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
-        pass
         with app.app_context():  # type: ignore
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
+                if not place:  # Needed for Mypy
+                    return  # pragma: no cover
 
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
@@ -30,10 +30,10 @@ class ApiTests(TestBaseCase):
                 place.end_from = '2019-01-31'
                 place.end_to = '2019-03-01'
                 place.end_comment = 'Destruction of the Nostromos'
+                place.update()
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
-                location = place.get_linked_entity_safe('P53')
 
                 # Adding Type Settlement
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -50,7 +50,7 @@ class ApiTests(TestBaseCase):
                 feature = insert_entity('Feature', 'feature', place)
 
                 # Adding stratigraphic to place
-                strati = insert_entity('Strato', 'stratigraphic_unit', feature)
+                insert_entity('Strato', 'stratigraphic_unit', feature)
 
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative unit')
@@ -58,7 +58,7 @@ class ApiTests(TestBaseCase):
                 # Adding File to place
                 file = insert_entity('Datei', 'file')
                 file.link('P67', place)
-                file.link('P2', Node.get_hierarchy('License'))
+                file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
 
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
@@ -69,15 +69,34 @@ class ApiTests(TestBaseCase):
                 precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
+                # Testing directly against model
+                # parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
+                #           'filter': None, 'limit': 20, 'first': None, 'last': None,
+                #           'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
+                #                    'depictions', 'geonames'], 'export': None}
+                # data = GeoJsonEntity.get_entity(place, parser)
+                # test_data = {
+                #     'type': 'FeatureCollection',
+                #     'start': {
+                #         'earliest': '2018-01-31'
+                #     },
+                # }
+                # print(data['features'][0]['when']['timespans'][0]['start'])
+                # for key, value in test_data.items():
+                #     assert data[key] == value
+
+            # Test GeoJson output
+            rv = self.app.get(url_for('entity', id_=place.id))
+            self.assertEqual(rv.get_json(), api_data.api_place_entity)
+
             # Path Tests
             rv = self.app.get(url_for('usage'))
             assert b'message' in rv.data
             rv = self.app.get(url_for('latest', latest=10))
-            assert b'Nostromos' in rv.data
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
             assert b'1' in rv.data
-            rv = self.app.get(url_for('entity', id_=place.id))
-            assert b'Nostromos' in rv.data
+
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data
             rv = self.app.get(url_for('system_class', system_class='appellation'))
@@ -88,17 +107,29 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
+            rv = self.app.get(url_for('type_entities', id_=unit_node.id))
+            assert b'Austria' in rv.data
+            rv = self.app.get(url_for('type_entities_all', id_=unit_node.id))
+            assert b'Austria' in rv.data
             rv = self.app.get(
                 url_for('query', entities=place.id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('content', lang='de'))
             assert b'intro' in rv.data
+            rv = self.app.get(url_for('overview_count'))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('class_mapping'))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('node_overview'))
+            assert b'Actor' in rv.data
+            rv = self.app.get(url_for('type_tree'))
+            assert b'type_tree' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('latest', latest=10, download=True))
-            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('latest', latest=1, download=True))
+            assert b'Datei' in rv.data
             rv = self.app.get(url_for('code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('system_class', system_class='appellation', download=True))
@@ -113,6 +144,22 @@ class ApiTests(TestBaseCase):
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('content', lang='de', download=True))
             assert b'intro' in rv.data
+            rv = self.app.get(url_for('overview_count', download=True))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('class_mapping', download=True))
+            assert b'systemClass' in rv.data
+            rv = self.app.get(url_for('node_overview', download=True))
+            assert b'Actor' in rv.data
+
+            # Path with export
+            rv = self.app.get(url_for('entity', id_=place.id, export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('class', class_code='E18', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('system_class', system_class='place', export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='reference', export='csv'))
+            assert b'https://openatlas.eu' in rv.data
 
             # Testing Subunit
             rv = self.app.get(url_for('subunit', id_=place.id))
@@ -137,6 +184,8 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('class', class_code='E18', filter='or|name|like|Nostr'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='place', filter='or|id|eq|' + str(place.id)))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
@@ -174,7 +223,6 @@ class ApiTests(TestBaseCase):
             assert b'6' in rv.data
             rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
-
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover

@@ -2,7 +2,7 @@ import importlib
 from typing import Union
 
 import bcrypt
-from flask import flash, g, render_template, session, url_for
+from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
@@ -13,6 +13,7 @@ from wtforms import BooleanField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.database.connect import Transaction
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.util.display import uc_first
@@ -28,8 +29,9 @@ class PasswordForm(FlaskForm):  # type: ignore
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        hash_ = bcrypt.hashpw(self.password_old.data.encode('utf-8'),
-                              current_user.password.encode('utf-8'))
+        hash_ = bcrypt.hashpw(
+            self.password_old.data.encode('utf-8'),
+            current_user.password.encode('utf-8'))
         if hash_ != current_user.password.encode('utf-8'):
             self.password_old.errors.append(_('error wrong password'))
             valid = False
@@ -49,12 +51,14 @@ class PasswordForm(FlaskForm):  # type: ignore
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index() -> str:
-    return render_template('profile/index.html',
-                           info={'profile': get_form_settings(ProfileForm(), True),
-                                 'modules': get_form_settings(ModulesForm(), True),
-                                 'display': get_form_settings(DisplayForm(), True)},
-                           title=_('profile'),
-                           crumbs=[_('profile')])
+    return render_template(
+        'profile/index.html',
+        info={
+            'profile': get_form_settings(ProfileForm(), True),
+            'modules': get_form_settings(ModulesForm(), True),
+            'display': get_form_settings(DisplayForm(), True)},
+        title=_('profile'),
+        crumbs=[_('profile')])
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
@@ -62,8 +66,9 @@ def profile_index() -> str:
 def profile_settings(category: str) -> Union[str, Response]:
     if category not in ['profile', 'display'] and not is_authorized('contributor'):
         abort(403)  # pragma: no cover
-    form = getattr(importlib.import_module('openatlas.forms.setting'),
-                   uc_first(category) + 'Form')()  # Get forms dynamically
+    form = getattr(
+        importlib.import_module('openatlas.forms.setting'),
+        uc_first(category) + 'Form')()
     if form.validate_on_submit():
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
@@ -74,25 +79,25 @@ def profile_settings(category: str) -> Union[str, Response]:
                 current_user.email = field.data
             else:
                 current_user.settings[field.name] = field.data
-        g.cursor.execute('BEGIN')
+        Transaction.begin()
         try:
             current_user.update()
             current_user.update_settings(form)
-            g.cursor.execute('COMMIT')
+            Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
+            Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index') + '#tab-' + category)
     set_form_settings(form, True)
-    return render_template('display_form.html',
-                           form=form,
-                           manual_page='profile/' + category,
-                           title=_('profile'),
-                           crumbs=[[_('profile'), url_for('profile_index') + '#tab-' + category],
-                                   _(category)])
+    return render_template(
+        'display_form.html',
+        form=form,
+        manual_page='profile',
+        title=_('profile'),
+        crumbs=[[_('profile'), url_for('profile_index') + '#tab-' + category], _(category)])
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])
@@ -100,13 +105,14 @@ def profile_settings(category: str) -> Union[str, Response]:
 def profile_password() -> Union[str, Response]:
     form = PasswordForm()
     if form.validate_on_submit():
-        current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'),
-                                              bcrypt.gensalt()).decode('utf-8')
+        current_user.password = bcrypt.hashpw(
+            form.password.data.encode('utf-8'),
+            bcrypt.gensalt()).decode('utf-8')
         current_user.update()
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))
-    return render_template('profile/password.html',
-                           form=form,
-                           title=_('profile'),
-                           crumbs=[[_('profile'), url_for('profile_index')],
-                                   _('change password')])
+    return render_template(
+        'profile/password.html',
+        form=form,
+        title=_('profile'),
+        crumbs=[[_('profile'), url_for('profile_index')], _('change password')])

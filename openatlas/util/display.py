@@ -71,9 +71,10 @@ def tree_select(name: str) -> str:
                     }}
                 }});
             }});
-        </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
-                            name=sanitize(name),
-                            tree_data=walk_tree(Node.get_nodes(name)))
+        </script>""".format(
+        min_chars=session['settings']['minimum_jstree_search'],
+        name=sanitize(name),
+        tree_data=walk_tree(Node.get_nodes(name)))
 
 
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
@@ -95,10 +96,11 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     if isinstance(object_, Project):
         return link(object_.name, url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
-        return link(object_.username,
-                    url_for('user_view', id_=object_.id),
-                    class_='' if object_.active else 'inactive',
-                    uc_first_=False)
+        return link(
+            object_.username,
+            url_for('user_view', id_=object_.id),
+            class_='' if object_.active else 'inactive',
+            uc_first_=False)
     if isinstance(object_, CidocClass):
         return link(object_.code, url_for('class_view', code=object_.code))
     if isinstance(object_, CidocProperty):
@@ -106,6 +108,18 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     if isinstance(object_, Entity):
         return link(object_.name, url_for('entity_view', id_=object_.id), uc_first_=False)
     return ''
+
+
+def display_delete_link(entity: Entity) -> str:
+    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
+    if entity.class_.name == 'source_translation':
+        url = url_for('translation_delete', id_=entity.id)
+    elif entity.id in g.nodes:
+        url = url_for('node_delete', id_=entity.id)
+    else:
+        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
+    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return button(_('delete'), url, onclick="return confirm('{confirm}')").format(confirm=confirm)
 
 
 def add_remove_link(data: List[Any], name: str, link_: Link, origin: Entity, tab: str) -> List[Any]:
@@ -207,20 +221,24 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             data[_('modified')] = html
     if 'entity_show_import' in current_user.settings:
         if current_user.settings['entity_show_import']:
-            if info['import_project']:
-                data[_('imported from')] = link(info['import_project'])
-            if info['import_user']:
-                data[_('imported by')] = link(info['import_user'])
-            if info['import_origin_id']:
-                data['origin ID'] = info['import_origin_id']
+            data[_('imported from')] = link(info['project'])
+            data[_('imported by')] = link(info['importer'])
+            data['origin ID'] = info['origin_id']
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
         data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
             url=url_for('entity', id_=entity.id))
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
-            </a>'''.format(url=url_for('entity', id_=entity.id, download=True),
-                           label=uc_first('download'))
+            </a>'''.format(
+            url=url_for('entity', id_=entity.id, download=True),
+            label=uc_first('download'))
+        data_api += '''
+            <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="CSV">
+                <i class="fas fa-download"></i> {label}
+            </a>'''.format(url=url_for('entity', id_=entity.id, export='csv'),
+                           label=uc_first('csv'))
+
         data['API'] = data_api
     return data
 
@@ -352,7 +370,6 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
         if residence_place:
             residence_object = residence_place.get_linked_entity_safe('P53', True)
             entity.linked_places.append(residence_object)
-        appears_first, appears_last = get_appearance(event_links)
         data[_('alias')] = list(entity.aliases.values())
         data[_('born') if entity.class_.name == 'person' else _('begin')] = format_entry_begin(
             entity,
@@ -360,8 +377,10 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
         data[_('died') if entity.class_.name == 'person' else _('end')] = format_entry_end(
             entity,
             end_object)
-        data[_('appears first')] = appears_first
-        data[_('appears last')] = appears_last
+        if event_links:
+            appears_first, appears_last = get_appearance(event_links)
+            data[_('appears first')] = appears_first
+            data[_('appears last')] = appears_last
         data[_('residence')] = link(residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
         data[_('source')] = [link(source) for source in entity.get_linked_entities(['P128'])]
@@ -523,7 +542,7 @@ def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     if not string:
         return ''
     if mode == 'node':  # Only keep letters, numbers and spaces
-        return re.sub(r'([^\s\w]|_)+', '', string).strip()
+        return re.sub(r'([^\s\w()]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         s = MLStripper()
         s.feed(string)

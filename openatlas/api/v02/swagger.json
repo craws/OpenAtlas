@@ -140,6 +140,17 @@
             "de"
           ]
         }
+      },
+      "exportParam": {
+        "name": "export",
+        "in": "query",
+        "description": "Select to which format the output is downloaded",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "csv"
+          ]
+        }
       }
     },
     "schemas": {
@@ -154,6 +165,9 @@
           },
           "legal-notice": {
             "type": "string"
+          },
+          "site-name": {
+            "type": "string"
           }
         }
       },
@@ -164,6 +178,37 @@
             "type": "string"
           },
           "examples": {
+            "type": "string"
+          }
+        }
+      },
+      "OverviewCountModel": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        }
+      },
+      "ClassMappingModel": {
+        "type": "object",
+        "properties": {
+          "systemClass": {
+            "type": "string"
+          },
+          "crmClass": {
+            "type": "string"
+          },
+          "view": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "en": {
             "type": "string"
           }
         }
@@ -182,13 +227,53 @@
           }
         }
       },
-      "NodeOverviewModel": {
+      "NodeAllModel": {
         "type": "object",
         "properties": {
           "nodes": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/NodeModel"
+            }
+          }
+        }
+      },
+      "NodeCategoryModel": {
+        "type": "object",
+        "properties": {
+          "standard": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "places": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cusxtom": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "value": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "NodeOverviewModel": {
+        "type": "object",
+        "properties": {
+          "types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NodeCategoryModel"
             }
           }
         }
@@ -412,6 +497,15 @@
           },
           "relationType": {
             "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "when": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WhenModel"
+            }
           }
         }
       },
