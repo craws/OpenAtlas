@@ -142,8 +142,8 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
                 field.data = system_links[system_id].description
-                getattr(form, 'reference_system_precision_{id}'.format(
-                    id=system_id)).data = str(system_links[system_id].type.id)
+                precision_field = getattr(form, f'reference_system_precision_{system_id}')
+                precision_field.data = str(system_links[system_id].type.id)
 
 
 def customize_labels(
@@ -201,7 +201,7 @@ def add_reference_systems(form: Any, form_name: str) -> None:
             continue
         setattr(
             form,
-            'reference_system_id_{id}'.format(id=system.id),
+            f'reference_system_id_{system.id}',
             StringField(
                 uc_first(system.name),
                 validators=[OptionalValidator()],
@@ -209,7 +209,7 @@ def add_reference_systems(form: Any, form_name: str) -> None:
                 render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
         setattr(
             form,
-            'reference_system_precision_{id}'.format(id=system.id),
+            f'reference_system_precision_{system.id}',
             SelectField(_('precision'), choices=precisions, default=system.precision_default_id))
 
 
@@ -351,8 +351,8 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
-        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
-            id=entity.id)
+        input_ = f"""
+            <input id="selection-{entity.id}" name="values" type="checkbox" value="{entity.id}">"""
         table.rows.append([input_] + get_base_table_data(entity, file_stats))
     if not table.rows:
         return uc_first(_('no entries'))

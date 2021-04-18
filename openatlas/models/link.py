@@ -239,13 +239,12 @@ class Link:
                 for entity_node in entity.nodes:
                     if g.nodes[entity_node.root[-1]].id != node.id:
                         continue  # pragma: no cover
-                    offending_nodes.append('<a href="{url}">{label}</a> {name}'.format(
-                        label=uc_first(_('remove')),
-                        name=entity_node.name,
-                        url=url_for(
-                            'admin_delete_single_type_duplicate',
-                            entity_id=entity.id,
-                            node_id=entity_node.id)))
+                    url = url_for(
+                        'admin_delete_single_type_duplicate',
+                        entity_id=entity.id,
+                        node_id=entity_node.id)
+                    offending_nodes.append(
+                        f'<a href="{url}">{uc_first(_("remove"))}</a> {entity_node.name}')
                 data.append([
                     link(entity),
                     entity.class_.name,

@@ -30,11 +30,8 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.reference_system import ReferenceSystem
 
 
-# Functions that return HTML code but aren't called from templates (these are in filters.py)
-
 def external_url(url: Union[str, None]) -> str:
-    return '<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>'.format(
-        url=url) if url else ''
+    return f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' if url else ''
 
 
 def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
@@ -118,7 +115,7 @@ def display_delete_link(entity: Entity) -> str:
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
     confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(_('delete'), url, onclick="return confirm('{confirm}')").format(confirm=confirm)
+    return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
 
 
 def add_remove_link(data: List[Any], name: str, link_: Link, origin: Entity, tab: str) -> List[Any]:
@@ -264,8 +261,7 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             data[_('imported by')] = link(info['importer'])
             data['origin ID'] = info['origin_id']
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
-        data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('entity', id_=entity.id))
+        data_api = f'<a href="{url_for("entity", id_=entity.id)}" target="_blank">GeoJSON</a>'
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
@@ -278,7 +274,6 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             </a>'''.format(
             url=url_for('entity', id_=entity.id, export='csv'),
             label=uc_first('csv'))
-
         data['API'] = data_api
     return data
 
@@ -315,13 +310,10 @@ def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
+    onclick = f"ajaxBookmark('{entity_id}');"
     if for_table:
-        return """<a href='#' id="bookmark{id}" onclick="ajaxBookmark('{id}');">{label}
-            </a>""".format(id=entity_id, label=label)
-    return button(
-        label,
-        id_='bookmark' + str(entity_id),
-        onclick="ajaxBookmark('" + str(entity_id) + "');")
+        return f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">{label}</a>'
+    return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
 def button(

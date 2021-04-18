@@ -74,9 +74,7 @@ class Export:
                                 ST_Y(public.ST_PointOnSurface(geom)) AS polygon_center_point""")
                     else:
                         fields.append('geom')
-                sql = "SELECT {fields} FROM {table};".format(
-                    fields=','.join(fields),
-                    table=table.replace('_', '.', 1))
+                sql = f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};"
                 data_frame = psql.read_sql(sql, g.db)
                 data_frame.to_csv(path / (date_string + '_' + table + '.csv'), index=False)
         if form.zip.data:

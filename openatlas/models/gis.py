@@ -142,8 +142,7 @@ class Gis:
             'description': 'Imported centerpoint of {name} from the {project} project'.format(
                 name=sanitize(entity.name, 'text'),
                 project=sanitize(project.name, 'text')),
-            'geojson': '''{{"type":"Point", "coordinates": [{easting},{northing}]}}'''.format(
-                easting=easting, northing=northing)})
+            'geojson': f'{{"type":"Point", "coordinates": [{easting},{northing}]}}'})
 
     @staticmethod
     def delete_by_entity(entity: Entity) -> None:
