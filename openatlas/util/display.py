@@ -155,7 +155,7 @@ def add_reference_systems_to_form(form: Any) -> str:
             fields.append(field)
     html = ''
     switch_class = ''
-    if len(fields) > 2:  # pragma: no cover
+    if len(fields) > 3:  # pragma: no cover
         switch_class = 'reference-systems-switch'
         html = f"""
             <div class="table-row">
