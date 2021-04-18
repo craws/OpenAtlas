@@ -7,7 +7,6 @@ from flask_wtf import FlaskForm
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
 
 
 class ReferenceSystem(Entity):
@@ -28,7 +27,7 @@ class ReferenceSystem(Entity):
         self.resolver_url = row['resolver_url']
         self.forms = row['form_ids']
         self.placeholder = row['identifier_example']
-        self.precision_default_id = row['precision_default_id']
+        self.precision_default_id = list(self.nodes.keys())[0].id if self.nodes else None
         self.count = row['count']
         self.system = row['system']
 
@@ -57,14 +56,12 @@ class ReferenceSystem(Entity):
 
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
-        precision_id = getattr(form, str(Node.get_hierarchy('External reference match').id)).data
         Db.update_system({
             'entity_id': self.id,
             'name': self.name,
             'website_url': self.website_url,
             'resolver_url': self.resolver_url,
-            'identifier_example': self.placeholder,
-            'precision_default_id': int(precision_id) if precision_id else None})
+            'identifier_example': self.placeholder})
 
     @staticmethod
     def update_links(form: FlaskForm, entity: Entity) -> None:

@@ -167,8 +167,8 @@ def add_buttons(
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
+    if 'continue' in forms[name] \
+            and (name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -192,10 +192,11 @@ def add_buttons(
 
 
 def add_reference_systems(form: Any, form_name: str) -> None:
-    precisions = [('', '')]
-    for id_ in Node.get_hierarchy('External reference match').subs:
-        precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
-    for system in g.reference_systems.values():
+    precision_nodes = Node.get_hierarchy('External reference match').subs
+    precisions = [('', '')] + [(str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
+    systems = list(g.reference_systems.values())
+    systems.sort(key=lambda x: x.name.casefold())
+    for system in systems:
         if form_name not in [form_['name'] for form_ in system.get_forms().values()]:
             continue
         setattr(

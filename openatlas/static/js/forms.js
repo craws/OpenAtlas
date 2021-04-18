@@ -30,7 +30,7 @@ $(document).ready(function () {
         }
     });
 
-    /* Show and hide function for external reference systems */
+    /* Show and hide function for reference systems */
     $("#reference-systems-switcher").click(function () {
         $(".reference-systems-switch").toggleClass('display-none');
         $(this).text(function (i, text) {

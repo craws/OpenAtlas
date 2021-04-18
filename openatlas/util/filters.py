@@ -385,7 +385,6 @@ def display_form(
             html += add_row(field, '', text)
             continue
 
-        # External reference system
         if field.id.startswith('reference_system_id_'):
             if not reference_systems_added:
                 html += display.add_reference_systems_to_form(form)
