@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 from wand.image import Image
 
 from openatlas import app
@@ -27,5 +29,12 @@ class Thumbnails:
                 img.transform(resize=size + 'x' + size + '>')
                 # img.compression_quality = 75
                 img.save(
-                    filename=str(app.config['UPLOAD_DIR']) + '/thumbnails/' + size + '/' + filename + '.png')
+                    filename=str(
+                        app.config['UPLOAD_DIR']) + '/thumbnails/' + size + '/' + filename + '.png')
 
+    @staticmethod
+    def display_as_thumbnail(filename: str, size: str) -> None:
+        path = str(app.config['UPLOAD_DIR']) + '/' + filename
+        with Image(filename=path) as img:
+            img.transform(resize=size + 'x' + size + '>')
+            img.save(filename=str(app.config['TMP_DIR']) + '/' + filename)

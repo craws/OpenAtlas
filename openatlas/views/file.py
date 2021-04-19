@@ -8,7 +8,6 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.display import uc_first
 from openatlas.util.util import required_group
 
 

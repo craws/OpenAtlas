@@ -71,4 +71,4 @@ query_parser.add_argument(
         'reference_system', 'stratigraphic_unit', 'source_translation', 'type'))
 
 image_parser = default_parser.copy()
-image_parser.add_argument('thumbnail', type=int, help="Not a valid tuple")
+image_parser.add_argument('image_size', type=str, help="Not a valid size")
