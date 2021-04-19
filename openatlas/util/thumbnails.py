@@ -12,7 +12,7 @@ class Thumbnails:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = filename.rsplit('.', 1)[1].lower()
         if file_format in Thumbnails.single_image + Thumbnails.multi_image:
-            sizes = ['400x400>']
+            sizes = ['400', '200', '100', '50']
             for size in sizes:
                 Thumbnails.safe_as_thumbnail(name, file_format, size)
 
@@ -24,8 +24,8 @@ class Thumbnails:
         with Image(filename=path) as src:
             with src.convert('png') as img:
                 # https://docs.wand-py.org/en/0.6.6/guide/resizecrop.html?highlight=down%20scale#transform-images
-                img.transform(resize=size)
+                img.transform(resize=size + 'x' + size + '>')
                 # img.compression_quality = 75
                 img.save(
-                    filename=str(app.config['UPLOAD_DIR']) + '/thumbnails/' + filename + '.png')
+                    filename=str(app.config['UPLOAD_DIR']) + '/thumbnails/' + size + '/' + filename + '.png')
 

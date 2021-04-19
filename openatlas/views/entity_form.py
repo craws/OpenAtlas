@@ -258,7 +258,7 @@ def insert_file(form: FlaskForm,
                 origin: Optional[Entity] = None) -> Union[str, Response]:
     try:
         action = 'insert'
-        for file in request.files.getlist('file'):
+        for file in form.file.data:
             Transaction.begin()
             entity = Entity.insert(class_, file.filename)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
@@ -277,7 +277,6 @@ def insert_file(form: FlaskForm,
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('index', view=g.classes[class_].view)
-
     return url
 
 

@@ -8,7 +8,8 @@ from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm, widgets
 from flask_wtf.csrf import generate_csrf
-from wtforms import (BooleanField, FieldList, FileField, HiddenField, SelectField,
+from wtforms import (BooleanField, FieldList, HiddenField, MultipleFileField,
+                     SelectField,
                      SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -255,7 +256,7 @@ def add_fields(form: Any,
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
     elif class_ == 'file' and not item:
-        setattr(form, 'file', FileField(_('file'), [InputRequired()]))
+        setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
     elif class_ == 'group':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
