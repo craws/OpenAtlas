@@ -253,10 +253,42 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         form.artifact.data = [item.id for item in entity.get_linked_entities('P128', inverse=True)]
 
 
+def insert_file(form: FlaskForm,
+                entity: Optional[Entity] = None,
+                class_: Optional[str] = None,
+                origin: Optional[Entity] = None) -> Union[str, Response]:
+    try:
+        action = 'insert'
+        list = []
+        for i in request.files.getlist('file'):
+            Transaction.begin()
+            print(i)
+            print(type(i.filename))
+            entity = Entity.insert(class_, i.filename)
+            # Add an 'a' to prevent emtpy filename, this won't affect stored information
+            filename = secure_filename('a' + i.filename)  # type: ignore
+            new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
+            i.save(str(app.config['UPLOAD_DIR'] / new_name))
+            Thumbnails.upload_to_thumbnail(new_name)
+
+            list.append(entity)
+            update_links(entity, form, action, origin)
+            url = link_and_get_redirect_url(form, entity, class_, origin)
+            logger.log_user(entity.id, action)
+            Transaction.commit()
+
+    except Exception as e:  # pragma: no cover
+        Transaction.rollback()
+        url = url_for('index', view=g.classes[class_].view)
+    return url
+
+
 def save(form: FlaskForm,
          entity: Optional[Entity] = None,
          class_: Optional[str] = None,
          origin: Optional[Entity] = None) -> Union[str, Response]:
+    if class_ == 'file' and not entity:
+        return insert_file(form, entity, class_, origin)
     Transaction.begin()
     action = 'update'
     try:
@@ -327,13 +359,13 @@ def insert_entity(form: FlaskForm,
         entity = ReferenceSystem.insert_system(form)
     else:
         entity = Entity.insert(class_, form.name.data)
-    if entity.class_.name == 'file':
-        file_ = request.files['file']
-        # Add an 'a' to prevent emtpy filename, this won't affect stored information
-        filename = secure_filename('a' + file_.filename)  # type: ignore
-        new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-        file_.save(str(app.config['UPLOAD_DIR'] / new_name))
-        Thumbnails.upload_to_thumbnail(new_name)
+    # if entity.class_.name == 'file':
+    #     file_ = request.files['file']
+    #     # Add an 'a' to prevent emtpy filename, this won't affect stored information
+    #     filename = secure_filename('a' + file_.filename)  # type: ignore
+    #     new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
+    #     file_.save(str(app.config['UPLOAD_DIR'] / new_name))
+    #     Thumbnails.upload_to_thumbnail(new_name)
     return entity
 
 
