@@ -254,32 +254,30 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
 
 
 def insert_file(form: FlaskForm,
-                entity: Optional[Entity] = None,
                 class_: Optional[str] = None,
                 origin: Optional[Entity] = None) -> Union[str, Response]:
     try:
         action = 'insert'
-        list = []
-        for i in request.files.getlist('file'):
+        for file in request.files.getlist('file'):
             Transaction.begin()
-            print(i)
-            print(type(i.filename))
-            entity = Entity.insert(class_, i.filename)
+            entity = Entity.insert(class_, file.filename)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
-            filename = secure_filename('a' + i.filename)  # type: ignore
+            filename = secure_filename('a' + file.filename)  # type: ignore
             new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-            i.save(str(app.config['UPLOAD_DIR'] / new_name))
+            file.save(str(app.config['UPLOAD_DIR'] / new_name))
             Thumbnails.upload_to_thumbnail(new_name)
-
-            list.append(entity)
+            entity.update(form)
+            class_ = entity.class_.name
             update_links(entity, form, action, origin)
             url = link_and_get_redirect_url(form, entity, class_, origin)
             logger.log_user(entity.id, action)
             Transaction.commit()
-
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
         url = url_for('index', view=g.classes[class_].view)
+
     return url
 
 
@@ -288,7 +286,7 @@ def save(form: FlaskForm,
          class_: Optional[str] = None,
          origin: Optional[Entity] = None) -> Union[str, Response]:
     if class_ == 'file' and not entity:
-        return insert_file(form, entity, class_, origin)
+        return insert_file(form, class_, origin)
     Transaction.begin()
     action = 'update'
     try:
