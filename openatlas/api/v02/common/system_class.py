@@ -8,7 +8,7 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCodeError
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.templates.geojson import GeoJson
+from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 from openatlas.util.util import api_access
@@ -30,7 +30,7 @@ class GetBySystemClass(Resource):  # type: ignore
             parser=parser)
         if parser['count']:
             return jsonify(system_class_['pagination']['entities'])
-        template = GeoJson.pagination(parser['show'])
+        template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
             return Download.download(data=system_class_, template=template, name=system_class)
         return marshal(system_class_, template), 200

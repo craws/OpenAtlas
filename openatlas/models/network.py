@@ -4,7 +4,6 @@ from flask import g
 from flask_wtf import FlaskForm
 
 from openatlas.database.network import Network as Db
-from openatlas.util.display import truncate
 
 
 class Network:
@@ -13,18 +12,16 @@ class Network:
     def get_network_json(form: FlaskForm, dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
         classes = [class_.name for class_ in g.classes.values() if class_.color]
-        properties = [
-            'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74', 'P107', 'OA7', 'OA8',
-            'OA9']
+        properties = ['P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74', 'P107', 'OA7',
+                      'OA8', 'OA9']
         entities: Set[int] = set()
         nodes = []
         for row in Db.get_entities(classes):
             if row['id'] in mapping or row['id'] in entities:  # pragma: no cover
                 continue  # Locations will be mapped to objects
-            name = truncate(row['name'].replace("'", ""), span=False)
             nodes.append({
                 'id': row['id'],
-                'label' if dimensions else 'name': name,
+                'label' if dimensions else 'name': Network.truncate(row['name'].replace("'", "")),
                 'color': form[row['system_class']].data})
             entities.add(row['id'])
         linked_entity_ids = set()
@@ -42,3 +39,7 @@ class Network:
         if not form.orphans.data:
             nodes[:] = [d for d in nodes if int(d['id']) in edge_entity_ids]
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None
+
+    @staticmethod
+    def truncate(string: Optional[str] = '', length: int = 40) -> str:
+        return string if len(string) < length + 1 else string[:length] + '..'

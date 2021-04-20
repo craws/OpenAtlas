@@ -54,11 +54,12 @@ forms = {
     'type': ['name', 'date', 'description', 'continue']}
 
 
-def build_form(class_: str,
-               item: Optional[Union[Entity, Link, Node]] = None,
-               code: Optional[str] = None,
-               origin: Union[Entity, Node, None] = None,
-               location: Optional[Entity] = None) -> FlaskForm:
+def build_form(
+        class_: str,
+        item: Optional[Union[Entity, Link, Node]] = None,
+        code: Optional[str] = None,
+        origin: Union[Entity, Node, None] = None,
+        location: Optional[Entity] = None) -> FlaskForm:
     # Builds a dynamic form regarding types, module settings and class specific fields
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
@@ -104,9 +105,10 @@ def build_form(class_: str,
     return form
 
 
-def populate_form(form: FlaskForm,
-                  item: Union[Entity, Link],
-                  location: Union[Entity, None]) -> FlaskForm:
+def populate_form(
+        form: FlaskForm,
+        item: Union[Entity, Link],
+        location: Union[Entity, None]) -> FlaskForm:
     # Dates
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
@@ -141,14 +143,15 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
                 field.data = system_links[system_id].description
-                getattr(form, 'reference_system_precision_{id}'.format(
-                    id=system_id)).data = str(system_links[system_id].type.id)
+                precision_field = getattr(form, f'reference_system_precision_{system_id}')
+                precision_field.data = str(system_links[system_id].type.id)
 
 
-def customize_labels(name: str,
-                     form: FlaskForm,
-                     item: Optional[Union[Entity, Link]] = None,
-                     origin: Union[Entity, Node, None] = None, ) -> None:
+def customize_labels(
+        name: str,
+        form: FlaskForm,
+        item: Optional[Union[Entity, Link]] = None,
+        origin: Union[Entity, Node, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
@@ -157,15 +160,16 @@ def customize_labels(name: str,
         getattr(form, str(root.id)).label.text = 'super'
 
 
-def add_buttons(form: Any,
-                name: str,
-                entity: Union[Entity, None],
-                origin: Optional[Entity] = None) -> FlaskForm:
+def add_buttons(
+        form: Any,
+        name: str,
+        entity: Union[Entity, None],
+        origin: Optional[Entity] = None) -> FlaskForm:
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in forms[name] and (
-            name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
+    if 'continue' in forms[name] \
+            and (name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
@@ -189,23 +193,24 @@ def add_buttons(form: Any,
 
 
 def add_reference_systems(form: Any, form_name: str) -> None:
-    precisions = [('', '')]
-    for id_ in Node.get_hierarchy('External reference match').subs:
-        precisions.append((str(g.nodes[id_].id), g.nodes[id_].name))
-    for system in g.reference_systems.values():
+    precision_nodes = Node.get_hierarchy('External reference match').subs
+    precisions = [('', '')] + [(str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
+    systems = list(g.reference_systems.values())
+    systems.sort(key=lambda x: x.name.casefold())
+    for system in systems:
         if form_name not in [form_['name'] for form_ in system.get_forms().values()]:
             continue
         setattr(
             form,
-            'reference_system_id_{id}'.format(id=system.id),
+            f'reference_system_id_{system.id}',
             StringField(
-                system.name,
+                uc_first(system.name),
                 validators=[OptionalValidator()],
                 description=system.description,
                 render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
         setattr(
             form,
-            'reference_system_precision_{id}'.format(id=system.id),
+            f'reference_system_precision_{system.id}',
             SelectField(_('precision'), choices=precisions, default=system.precision_default_id))
 
 
@@ -232,11 +237,12 @@ def add_types(form: Any, class_: str) -> None:
             add_value_type_fields(form, node.subs)
 
 
-def add_fields(form: Any,
-               class_: str,
-               code: Union[str, None],
-               item: Union[Entity, Node, Link, None],
-               origin: Union[Entity, Node, None]) -> None:
+def add_fields(
+        form: Any,
+        class_: str,
+        code: Union[str, None],
+        item: Union[Entity, Node, Link, None],
+        origin: Union[Entity, Node, None]) -> None:
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not item:
@@ -297,17 +303,21 @@ def add_fields(form: Any,
         setattr(form, 'begins_in', TableField(_('born in')))
         setattr(form, 'ends_in', TableField(_('died in')))
     elif class_ == 'reference_system':
-        setattr(form, 'website_url', StringField(_('website URL'),
-                                                 validators=[OptionalValidator(), URL()]))
-        setattr(form, 'resolver_url', StringField(_('resolver URL'),
-                                                  validators=[OptionalValidator(), URL()]))
+        setattr(
+            form,
+            'website_url',
+            StringField(_('website URL'), validators=[OptionalValidator(), URL()]))
+        setattr(
+            form,
+            'resolver_url',
+            StringField(_('resolver URL'), validators=[OptionalValidator(), URL()]))
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_node_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
         choices = ReferenceSystem.get_form_choices(item)
         if choices:
             setattr(form, 'forms', SelectMultipleField(
-                _('forms'),
+                _('classes'),
                 render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
@@ -328,7 +338,7 @@ def build_add_reference_form(class_: str) -> FlaskForm:
 
 
 def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes."""
+    """Returns a form with a list of entities with checkboxes."""
     if class_ == 'file':
         entities = Entity.get_by_class('file', nodes=True)
     elif class_ == 'place':
@@ -342,8 +352,8 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
-        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
-            id=entity.id)
+        input_ = f"""
+            <input id="selection-{entity.id}" name="values" type="checkbox" value="{entity.id}">"""
         table.rows.append([input_] + get_base_table_data(entity, file_stats))
     if not table.rows:
         return uc_first(_('no entries'))

@@ -41,7 +41,7 @@ class Entity:
         self.modified = data['modified']
         self.cidoc_class = g.cidoc_classes[data['class_code']]
         self.class_ = g.classes[data['system_class']]
-        self.reference_systems: List[Link] = []  # Links to external reference systems
+        self.reference_systems: List[Link] = []
         self.origin_id: Optional[int] = None  # For navigation when coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.linked_places: List[Entity] = []  # Related places for map
@@ -68,22 +68,25 @@ class Entity:
             self.last = format_date(self.end_from, 'year') if self.end_from else None
             self.last = format_date(self.end_to, 'year') if self.end_to else self.last
 
-    def get_linked_entity(self,
-                          code: str,
-                          inverse: bool = False,
-                          nodes: bool = False) -> Optional[Entity]:
+    def get_linked_entity(
+            self,
+            code: str,
+            inverse: bool = False,
+            nodes: bool = False) -> Optional[Entity]:
         return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entity_safe(self,
-                               code: str,
-                               inverse: bool = False,
-                               nodes: bool = False) -> Entity:
+    def get_linked_entity_safe(
+            self,
+            code: str,
+            inverse: bool = False,
+            nodes: bool = False) -> Entity:
         return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
 
-    def get_linked_entities(self,
-                            code: Union[str, List[str]],
-                            inverse: bool = False,
-                            nodes: bool = False) -> List[Entity]:
+    def get_linked_entities(
+            self,
+            code: Union[str, List[str]],
+            inverse: bool = False,
+            nodes: bool = False) -> List[Entity]:
         return Link.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
     def link(self,
@@ -94,11 +97,12 @@ class Entity:
              type_id: Optional[int] = None) -> List[int]:
         return Link.insert(self, code, range_, description, inverse, type_id)
 
-    def link_string(self,
-                    code: str,
-                    range_: str,
-                    description: Optional[str] = None,
-                    inverse: bool = False) -> List[int]:
+    def link_string(
+            self,
+            code: str,
+            range_: str,
+            description: Optional[str] = None,
+            inverse: bool = False) -> List[int]:
         # range_ = string value from a form, can be empty, an int or an int list presentation
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
@@ -218,7 +222,7 @@ class Entity:
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
-        """ Returns name part of a directed type e.g. actor actor relation: parent of (child of)"""
+        """Returns name part of a directed type e.g. actor actor relation: parent of (child of)"""
         from openatlas.util.display import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
@@ -232,9 +236,10 @@ class Entity:
         Db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
-    def get_by_class(classes: Union[str, List[str]],
-                     nodes: bool = False,
-                     aliases: bool = False) -> List[Entity]:
+    def get_by_class(
+            classes: Union[str, List[str]],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Entity]:
         return [Entity(row) for row in Db.get_by_class(classes, nodes, aliases)]
 
     @staticmethod
@@ -264,9 +269,10 @@ class Entity:
         return Entity.get_by_id(id_)
 
     @staticmethod
-    def get_by_id(id_: int,
-                  nodes: bool = False,
-                  aliases: bool = False) -> Union[Entity, Node, 'ReferenceSystem']:
+    def get_by_id(
+            id_: int,
+            nodes: bool = False,
+            aliases: bool = False) -> Union[Entity, Node, 'ReferenceSystem']:
         if id_ in g.nodes:
             return g.nodes[id_]
         if id_ in g.reference_systems:
@@ -279,9 +285,12 @@ class Entity:
         return Entity(data)
 
     @staticmethod
-    def get_by_ids(ids: Iterable[int], nodes: bool = False) -> List[Entity, Type, ReferenceSystem]:
+    def get_by_ids(
+            ids: Iterable[int],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Entity, Type, ReferenceSystem]:
         entities = []
-        for row in Db.get_by_ids(ids, nodes):
+        for row in Db.get_by_ids(ids, nodes, aliases):
             if row['id'] in g.nodes:
                 entities.append(g.nodes[row['id']])
             elif row['id'] in g.reference_systems:
