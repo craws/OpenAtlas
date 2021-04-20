@@ -9,14 +9,15 @@ from openatlas.util.display import uc_first
 
 class SystemClass:
 
-    def __init__(self,
-                 name: str,
-                 cidoc_class: str,
-                 label: Optional[str] = '',
-                 standard_type: Optional[str] = None,
-                 color: Optional[str] = None,
-                 write_access: Optional[str] = 'contributor',
-                 form_fields: Optional[List[str]] = None) -> None:
+    def __init__(
+            self,
+            name: str,
+            cidoc_class: str,
+            label: Optional[str] = '',
+            standard_type: Optional[str] = None,
+            color: Optional[str] = None,
+            write_access: Optional[str] = 'contributor',
+            form_fields: Optional[List[str]] = None) -> None:
         self.name = name
         self.label = uc_first(label)
         self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]

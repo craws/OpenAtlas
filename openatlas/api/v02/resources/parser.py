@@ -16,7 +16,7 @@ language_parser.add_argument(
     case_sensitive=False,
     choices=app.config['LANGUAGES'].keys())
 
-entity_parser = default_parser.copy()  # inherit the default parser
+entity_parser = default_parser.copy()
 entity_parser.add_argument(
     'sort',
     choices=('desc', 'asc'),
