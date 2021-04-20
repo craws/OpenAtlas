@@ -11,7 +11,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_file_path
 
 
-class GeoJsonEntity:
+class LinkedPlacesEntity:
 
     @staticmethod
     def get_all_links(entity: Entity) -> List[Link]:
@@ -38,7 +38,7 @@ class GeoJsonEntity:
                                 + link.property.i18n['en'].replace(' ', '_'),
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
-                'when': {'timespans': [GeoJsonEntity.get_time(link.range)]}})
+                'when': {'timespans': [LinkedPlacesEntity.get_time(link.range)]}})
         for link in links_inverse:
             property_ = link.property.i18n['en'].replace(' ', '_')
             if link.property.i18n_inverse['en']:
@@ -49,7 +49,7 @@ class GeoJsonEntity:
                 'relationType': 'crm:' + link.property.code + 'i_' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
-                'when': {'timespans': [GeoJsonEntity.get_time(link.domain)]}})
+                'when': {'timespans': [LinkedPlacesEntity.get_time(link.domain)]}})
         return out if out else None
 
     @staticmethod
@@ -62,7 +62,7 @@ class GeoJsonEntity:
             files.append({
                 '@id': url_for('entity', id_=link.domain.id, _external=True),
                 'title': link.domain.name,
-                'license': GeoJsonEntity.get_license(link.domain),
+                'license': LinkedPlacesEntity.get_license(link.domain),
                 'url': url_for(
                     'display_file_api', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
@@ -154,25 +154,25 @@ class GeoJsonEntity:
         links = []
         links_inverse = []
         if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
-            links = GeoJsonEntity.get_all_links(entity)
-            links_inverse = GeoJsonEntity.get_all_links_inverse(entity)
+            links = LinkedPlacesEntity.get_all_links(entity)
+            links_inverse = LinkedPlacesEntity.get_all_links_inverse(entity)
 
         features['relations'] = \
-            GeoJsonEntity.get_links(links, links_inverse) if 'relations' in parser['show'] else None
+            LinkedPlacesEntity.get_links(links, links_inverse) if 'relations' in parser['show'] else None
         features['types'] = \
-            GeoJsonEntity.get_node(entity, links) if 'types' in parser['show'] else None
+            LinkedPlacesEntity.get_node(entity, links) if 'types' in parser['show'] else None
         features['depictions'] = \
-            GeoJsonEntity.get_file(links_inverse) if 'depictions' in parser['show'] else None
+            LinkedPlacesEntity.get_file(links_inverse) if 'depictions' in parser['show'] else None
         features['when'] = \
-            {'timespans': [GeoJsonEntity.get_time(entity)]} if 'when' in parser['show'] else None
-        features['links'] = GeoJsonEntity.get_reference_systems(links_inverse) if 'links' in parser[
+            {'timespans': [LinkedPlacesEntity.get_time(entity)]} if 'when' in parser['show'] else None
+        features['links'] = LinkedPlacesEntity.get_reference_systems(links_inverse) if 'links' in parser[
             'show'] else None
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
-                features['geometry'] = GeoJsonEntity.get_geoms_by_entity(
+                features['geometry'] = LinkedPlacesEntity.get_geoms_by_entity(
                     Link.get_linked_entity(entity.id, 'P53'))
             elif entity.class_.name == 'object_location':
-                features['geometry'] = GeoJsonEntity.get_geoms_by_entity(entity)
+                features['geometry'] = LinkedPlacesEntity.get_geoms_by_entity(entity)
         return {
             'type': type_,
             '@context': app.config['API_SCHEMA'],

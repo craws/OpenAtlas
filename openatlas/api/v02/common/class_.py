@@ -8,7 +8,7 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCidocClassCode
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.templates.geojson import GeoJson
+from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 from openatlas.util.util import api_access
@@ -27,7 +27,7 @@ class GetByClass(Resource):  # type: ignore
             parser=parser)
         if parser['count']:
             return jsonify(class_['pagination']['entities'])
-        template = GeoJson.pagination(parser['show'])
+        template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
             return Download.download(data=class_, template=template, name=class_code)
         return marshal(class_, template), 200
