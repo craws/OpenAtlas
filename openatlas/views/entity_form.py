@@ -263,17 +263,20 @@ def insert_file(
         action = 'insert'
         for file in form.file.data:
             Transaction.begin()
+            print(file.filename)
             entity = Entity.insert(class_, file.filename)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
             filename = secure_filename('a' + file.filename)  # type: ignore
             new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
             file.save(str(app.config['UPLOAD_DIR'] / new_name))
             Thumbnails.upload_to_thumbnail(new_name)
+            # Todo: I think with update, multiple pics get the same filename.
             entity.update(form)
             class_ = entity.class_.name
             update_links(entity, form, action, origin)
             url = link_and_get_redirect_url(form, entity, class_, origin)
             logger.log_user(entity.id, action)
+            print(entity.id)
             Transaction.commit()
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
