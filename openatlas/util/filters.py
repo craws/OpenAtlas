@@ -30,11 +30,12 @@ def link(entity: Entity) -> str:
 
 
 @app.template_filter()
-def button(label: str,
-           url: Optional[str] = '#',
-           css: Optional[str] = 'primary',
-           id_: Optional[str] = None,
-           onclick: Optional[str] = '') -> str:
+def button(
+        label: str,
+        url: Optional[str] = '#',
+        css: Optional[str] = 'primary',
+        id_: Optional[str] = None,
+        onclick: Optional[str] = '') -> str:
     return display.button(label, url, css, id_, onclick)
 
 
@@ -43,10 +44,7 @@ def display_citation_example(code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
         return ''
-    return Markup(
-        '<h1>{title}</h1>{text}'.format(
-            title=display.uc_first(_('citation_example')),
-            text=text))
+    return Markup(f'<h1>{display.uc_first(_("citation_example"))}</h1>{text}')
 
 
 @app.template_filter()
@@ -82,9 +80,7 @@ def breadcrumb(crumbs: List[Any]) -> str:
         elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
             items.append(display.link(item))
         elif isinstance(item, list):
-            items.append('<a href="{url}">{label}</a>'.format(
-                url=item[1],
-                label=display.truncate(display.uc_first(str(item[0])))))
+            items.append(f'<a href="{item[1]}">{display.uc_first(str(item[0]))}</a>')
         else:
             items.append(display.uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
@@ -112,11 +108,11 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
         if value or value == 0:
             if isinstance(value, list):
                 value = '<br>'.join(value)
-            html += '''
+            html += f"""
                 <div class="table-row">
-                    <div>{label}</div>
+                    <div>{display.uc_first(label)}</div>
                     <div class="table-cell">{value}</div>
-                </div>'''.format(label=display.uc_first(label), value=value)
+                </div>"""
     return Markup(html + '</div>')
 
 
@@ -135,15 +131,12 @@ def display_move_form(form: Any, root_name: str) -> str:
     table = Table(
         header=['#', display.uc_first(_('selection'))],
         rows=[[item, item.label.text] for item in form.selection])
-    return html + """
+    return html + f"""
         <div class="toolbar">
-            {select_all}
-            {deselect_all}
+            {display.button(_('select all'), id_='select-all')}
+            {display.button(_('deselect all'), id_='select-none')}
         </div>
-        {table}""".format(
-        select_all=display.button(_('select all'), id_="select-all"),
-        deselect_all=display.button(_('deselect all'), id_="select-none"),
-        table=table.display('move'))
+        {table.display('move')}"""
 
 
 @app.template_filter()
@@ -210,7 +203,9 @@ def description(entity: Union[Entity, Project]) -> str:
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
+    return Markup("""
+        <h2>{label}</h2>
+        <div class="description more">{description}</div>""".format(
         label=display.uc_first(label),
         description=entity.description.replace('\r\n', '<br>')))
 
@@ -219,7 +214,7 @@ def description(entity: Union[Entity, Project]) -> str:
 def download_button(entity: Entity) -> str:
     if entity.class_.view != 'file':
         return ''
-    html = '<span class="error">{msg}</span>'.format(msg=display.uc_first(_('missing file')))
+    html = f'<span class="error">{display.uc_first(_("missing file"))}</span>'
     if entity.image_id:
         path = display.get_file_path(entity.image_id)
         html = display.button(_('download'), url_for('download_file', filename=path.name))
@@ -235,10 +230,10 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     if entity.class_.view == 'file':
         if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-            html = '''
+            html = """
                 <a href="{url}" rel="noopener noreferrer" target="_blank">
                     <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>'''.format(
+                </a>""".format(
                 url=url_for('display_file', filename=path.name),
                 width=session['settings']['profile_image_width'])
         else:
@@ -251,7 +246,7 @@ def display_profile_image(entity: Entity) -> str:
             url=url_for('entity_view', id_=entity.image_id),
             src=url_for('display_file', filename=path.name),
             width=session['settings']['profile_image_width'])
-    return Markup('<div id="profile_image_div">{html}</div>'.format(html=html))
+    return Markup(f'<div id="profile_image_div">{html}</div>')
 
 
 @app.template_filter()
@@ -271,15 +266,22 @@ def manual(site: str) -> str:  # Creates a link to a manual page
     if not path.exists():
         # print('Missing manual link: ' + str(path))
         return ''
-    return Markup("""
-        <a class="manual" href="/static/manual/{site}.html" target="_blank" title="{label}">
-            <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
+    return Markup(f"""
+        <a
+            class="manual"
+            href="/static/manual/{site}.html"
+            target="_blank"
+            title="{display.uc_first('manual')}">
+                <i class="fas fa-book"></i>
+        </a>""")
 
 
-def add_row(field: Field,
-            label: Optional[str] = None,
-            value: Optional[str] = None,
-            form_id: Optional[str] = None) -> str:
+def add_row(
+        field: Field,
+        label: Optional[str] = None,
+        value: Optional[str] = None,
+        form_id: Optional[str] = None,
+        row_css_class: Optional[str] = '') -> str:
     field.label.text = display.uc_first(field.label.text)
     if field.flags.required and form_id != 'login-form' and field.label.text:
         field.label.text += ' *'
@@ -299,15 +301,16 @@ def add_row(field: Field,
         label=label if isinstance(label, str) else field.label,
         tooltip=display.tooltip(field.description),
         value=value if value else field(class_=css_class).replace('> ', '>'),
-        css_row='external-reference' if field.id.startswith('reference_system_') else '',
+        css_row=row_css_class,
         errors=errors)
 
 
 @app.template_filter()
-def display_form(form: Any,
-                 form_id: Optional[str] = None,
-                 for_persons: bool = False,
-                 manual_page: Optional[str] = None) -> str:
+def display_form(
+        form: Any,
+        form_id: Optional[str] = None,
+        for_persons: bool = False,
+        manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
     def display_value_type_fields(node_: Node, root: Optional[Node] = None) -> str:
@@ -316,19 +319,15 @@ def display_form(form: Any,
         for sub_id in node_.subs:
             sub = g.nodes[sub_id]
             field_ = getattr(form, str(sub_id))
-            html_ += """
-                <div class="table-row value-type-switch{id}">
-                    <div>{label}</div>
-                    <div class="table-cell">{field} {unit}</div>
+            html_ += f"""
+                <div class="table-row value-type-switch{root.id}">
+                    <div>{sub.name}</div>
+                    <div class="table-cell">{field_(class_='value-type')} {sub.description}</div>
                 </div>
-                {value_fields}""".format(
-                id=root.id,
-                label=sub.name,
-                unit=sub.description,
-                field=field_(class_='value-type'),
-                value_fields=display_value_type_fields(sub, root))
+                {display_value_type_fields(sub, root)}"""
         return html_
 
+    reference_systems_added = False
     html = ''
     for field in form:
         if isinstance(field, ValueFloatField) or field.id.startswith(
@@ -352,7 +351,7 @@ def display_form(form: Any,
                 label = display.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
-                onclick = 'switch_value_type({id})'.format(id=node.id)
+                onclick = f'switch_value_type({node.id})'
                 html += add_row(
                     field,
                     label,
@@ -376,18 +375,13 @@ def display_form(form: Any,
                 buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
                 buttons.append(form.insert_continue_human_remains(class_=class_))
-            text = '<div class ="toolbar">{buttons}</div>'.format(buttons=' '.join(buttons))
-            html += add_row(field, '', text)
+            html += add_row(field, '', f'<div class ="toolbar">{" ".join(buttons)}</div>')
             continue
 
-        # External reference system
         if field.id.startswith('reference_system_id_'):
-            precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-            class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
-            html += add_row(field, field.label, ' '.join([
-                str(field(class_=class_)),
-                str(precision_field.label),
-                str(precision_field)]))
+            if not reference_systems_added:
+                html += display.add_reference_systems_to_form(form)
+                reference_systems_added = True
             continue
         html += add_row(field, form_id=form_id)
 
@@ -461,4 +455,4 @@ def display_external_references(entity: Entity) -> str:
     html = '<br>'.join(system_links)
     if not html:
         return ''
-    return Markup('<h2>' + display.uc_first(_('external reference systems')) + '</h2>' + html)
+    return Markup(f'<h2>{display.uc_first(_("external reference systems"))}</h2>{html}')

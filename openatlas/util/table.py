@@ -8,12 +8,13 @@ from markupsafe import Markup
 
 class Table:
 
-    def __init__(self,
-                 header: Optional[List[str]] = None,  # A list of column header labels
-                 rows: Optional[List[List[Any]]] = None,  # Rows containing the data
-                 order: Optional[List[List[Union[int, str]]]] = None,  # Column order option
-                 defs: Optional[List[Any]] = None,  # Definitions
-                 paging: bool = True) -> None:  # Whether to show pager
+    def __init__(
+            self,
+            header: Optional[List[str]] = None,  # A list of column header labels
+            rows: Optional[List[List[Any]]] = None,  # Rows containing the data
+            order: Optional[List[List[Union[int, str]]]] = None,  # Column order option
+            defs: Optional[List[Any]] = None,  # Definitions
+            paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []
         self.paging = paging
