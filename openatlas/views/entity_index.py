@@ -74,8 +74,8 @@ def get_table(view: str) -> Table:
                 system.description])
     else:
         classes = ['place'] if view == 'place' else g.view_class_mapping[view]
-        entities = Entity.get_by_class(classes, nodes=True)
-        table.rows = [get_base_table_data(item) for item in entities]
+        entities = Entity.get_by_class(classes, nodes=True, aliases=True)
+        table.rows = [get_base_table_data(entity) for entity in entities]
     return table
 
 

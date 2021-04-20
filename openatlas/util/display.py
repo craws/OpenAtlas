@@ -450,15 +450,14 @@ def get_profile_image_table_link(
 def get_base_table_data(
         entity: 'Entity',
         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
-    if len(entity.aliases) > 0:
-        data: List[str] = ['<p>' + link(entity) + '</p>']
-    else:
-        data = [link(entity)]
-    for i, (id_, alias) in enumerate(entity.aliases.items()):
-        if i == len(entity.aliases) - 1:
-            data[0] = ''.join([data[0]] + [alias])
-        else:
-            data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
+    data = [link(entity)]
+    if current_user.settings['table_show_aliases'] and len(entity.aliases) > 0:
+        data = [f'<p>{link(entity)}</p>']
+        for i, (id_, alias) in enumerate(entity.aliases.items()):
+            if i == len(entity.aliases) - 1:
+                data[0] = ''.join([data[0]] + [alias])
+            else:
+                data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
         data.append(entity.class_.label)
@@ -474,8 +473,8 @@ def get_base_table_data(
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
-        data.append(entity.first if entity.first else '')
-        data.append(entity.last if entity.last else '')
+        data.append(entity.first)
+        data.append(entity.last)
     data.append(entity.description)
     return data
 
