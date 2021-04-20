@@ -13,7 +13,6 @@ from openatlas.util.util import api_access
 
 class GetEntity(Resource):  # type: ignore
     @api_access()  # type: ignore
-    # @swag_from("../swagger/entity.yml", endpoint="entity")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
