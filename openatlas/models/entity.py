@@ -240,6 +240,13 @@ class Entity:
             classes: Union[str, List[str]],
             nodes: bool = False,
             aliases: bool = False) -> List[Entity]:
+        if aliases:  # For performance: check classes if they can have an alias, set False otherwise
+            aliases_needed = False
+            for system_class in classes if isinstance(classes, list) else [classes]:
+                if g.classes[system_class].alias_possible:
+                    aliases_needed = True
+                    break
+            aliases = aliases_needed
         return [Entity(row) for row in Db.get_by_class(classes, nodes, aliases)]
 
     @staticmethod

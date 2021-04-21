@@ -5,50 +5,37 @@ import re
 from typing import Any
 
 from flask import g, render_template
-from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from wtforms import FloatField, HiddenField
 from wtforms.widgets import HiddenInput
 
-from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import get_base_table_data, uc_first
+from openatlas.util.display import get_base_table_data
 from openatlas.util.table import Table
 
 
 class TableMultiSelect(HiddenInput):  # type: ignore
-    """Table with checkboxes displayed in a popup"""
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
+        aliases = current_user.settings['table_show_aliases']
+        if class_ in ['group', 'person', 'place']:
+            entities = Entity.get_by_class(class_, nodes=True, aliases=aliases)
+        else:
+            entities = Entity.get_by_view(class_, nodes=True, aliases=aliases)
         table = Table(
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        if class_ in ['group', 'person', 'place']:
-            entities = Entity.get_by_class(
-                class_,
-                nodes=True,
-                aliases=current_user.settings['table_show_aliases'])
-        else:
-            entities = Entity.get_by_view(class_)
-
         for entity in entities:
             data = get_base_table_data(entity)
             for i, item in enumerate(data):  # Remove links
                 if isinstance(item, str):
                     data[i] = re.sub(re.compile('<a.*?>'), '', item)
-            html = f"""
-                <input
-                    type="checkbox"
-                    id="{entity.id}"
-                    {"checked" if field.data and entity.id in field.data else ''}
-                    value="{entity.name}"
-                    class="multi-table-select">"""
-            data.insert(0, html)
+            data.insert(0, render_template('forms/checkbox_table.html', entity=entity, field=field))
             table.rows.append(data)
         html = render_template(
             'forms/table_multi_select.html',
@@ -98,24 +85,9 @@ class TableSelect(HiddenInput):  # type: ignore
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
                 else:
-                    data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
+                    data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
 
-            data.insert(0, """
-                <div style="position: relative; top: 10px;">
-                    <div
-                        class="{button_class}"
-                        style="position: absolute; top: -22px;"
-                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name_clean}')"
-                    >
-                        {label}
-                    </div>
-                </div>""".format(
-                name=field.id,
-                button_class=app.config['CSS']['button']['primary'],
-                entity_id=entity.id,
-                entity_name=entity.name,
-                entity_name_clean=entity.name.replace("'", ''),
-                label=uc_first(_('select'))))
+            data.insert(0, render_template('forms/select_button.html', entity=entity, field=field))
             table.rows.append(data)
         html = render_template(
             'forms/table_select.html',

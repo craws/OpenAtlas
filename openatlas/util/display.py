@@ -343,6 +343,7 @@ def tooltip(text: str) -> str:
 
 
 def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
+
     data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
