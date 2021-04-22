@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
-from flask import g, session, url_for
+from flask import g, url_for
 from flask_babel import LazyString, format_number, lazy_gettext as _
 from flask_login import current_user
 from markupsafe import Markup
@@ -32,46 +32,6 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 def external_url(url: Union[str, None]) -> str:
     return f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' if url else ''
-
-
-def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
-    items = []
-    for id_ in nodes:
-        item = g.nodes[id_]
-        count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
-        items.append({
-            'id': item.id,
-            'href': url_for('entity_view', id_=item.id),
-            'a_attr': {'href': url_for('entity_view', id_=item.id)},
-            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
-            'children': walk_tree(item.subs)})
-    return items
-
-
-def tree_select(name: str) -> str:
-    from openatlas.models.node import Node
-    return """
-        <div id="{name}-tree"></div>
-        <script>
-            $(document).ready(function () {{
-                $("#{name}-tree").jstree({{
-                    "search": {{ "case_insensitive": true, "show_only_matches": true }},
-                    "plugins" : ["core", "html_data", "search"],
-                    "core": {{ "data": {tree_data} }}
-                }});
-                $("#{name}-tree").on("select_node.jstree", function (e, data) {{
-                    document.location.href = data.node.original.href;
-                }});
-                $("#{name}-tree-search").keyup(function() {{
-                    if (this.value.length >= {min_chars}) {{
-                        $("#{name}-tree").jstree("search", $(this).val());
-                    }}
-                }});
-            }});
-        </script>""".format(
-        min_chars=session['settings']['minimum_jstree_search'],
-        name=sanitize(name),
-        tree_data=walk_tree(Node.get_nodes(name)))
 
 
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],

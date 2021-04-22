@@ -69,15 +69,11 @@ class TableSelect(HiddenInput):  # type: ignore
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             data = get_base_table_data(entity)
-            html = """
-                <a href="#", onclick="selectFromTable(this, '{field_name}', {id_}, '{name_clean}')">
-                    {name}
-                </a>
-                """.format(
-                field_name=field.id,
-                id_=entity.id,
-                name=entity.name,
-                name_clean=entity.name.replace("'", ''))
+            name = entity.name.replace("'", '')
+            html = f"""
+                <a href="#", onclick="selectFromTable(this, '{field.id}', {entity.id}, '{name}')">
+                    {entity.name}
+                </a>"""
 
             # Workaround to show aliases
             data[0] = f'<p>{html}</p>' if len(entity.aliases) > 0 else html
@@ -86,7 +82,6 @@ class TableSelect(HiddenInput):  # type: ignore
                     data[0] = ''.join([data[0]] + [alias])
                 else:
                     data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
-
             data.insert(0, render_template('forms/select_button.html', entity=entity, field=field))
             table.rows.append(data)
         html = render_template(
