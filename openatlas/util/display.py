@@ -36,14 +36,14 @@ def external_url(url: Union[str, None]) -> str:
 
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
          url: Optional[str] = None,
-         class_: Optional[str] = None,
+         class_: Optional[str] = '',
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" {class_} {js}>{label}</a>'.format(
+        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
-            class_='class="' + class_ + '"' if class_ else '',
-            js='onclick="{js}"'.format(js=js) if js else '',
+            class_=class_,
+            js=f'onclick="{js}"' if js else '',
             label=(uc_first(str(object_))) if uc_first_ else object_)
 
     # Builds an HTML link to a detail view of an object
