@@ -7,7 +7,7 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import g, url_for
@@ -238,13 +238,14 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
+def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
-    type_data: OrderedDict[str, Any] = OrderedDict()
-    for node, node_value in entity.nodes.items():
+    type_data: OrderedD[str, Any] = OrderedDict()
+    sorted_nodes = sorted(entity.nodes.items(), key=lambda x: x[0].name)
+    for node, node_value in sorted_nodes:
         root = g.nodes[node.root[-1]]
-        label = 'type' if root.standard and root.class_.name == 'type' else root.name
+        label = _('type') if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
         text = ''
@@ -256,15 +257,16 @@ def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             path=' > '.join([g.nodes[id_].name for id_ in node.root]),
             text=text))
 
-    # Sort types by name
-    for root_type in type_data:
-        type_data[root_type].sort()
+    # Sort root types and move standard type to top
+    type_data = OrderedDict(sorted(type_data.items()))
+    for item in type_data.keys():
+        if item == _('type'):
+            type_data.move_to_end(item, last=False)
+            break
 
-    # Move the standard type to the top
-    if 'type' in type_data:
-        type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data[root_name] = nodes
+
     return data
 
 
@@ -304,7 +306,7 @@ def tooltip(text: str) -> str:
 
 def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
 
-    data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
+    data: OrderedD[str, Any] = OrderedDict({_('alias'): list(entity.aliases.values())})
 
     # Dates
     from_link = ''

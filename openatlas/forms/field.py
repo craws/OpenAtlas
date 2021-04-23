@@ -95,20 +95,15 @@ class TableField(HiddenField):  # type: ignore
 class TreeMultiSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
-        selection = []
-        selected_ids = []
-        root = g.nodes[int(field.id)]
+        data = []
         if field.data:
-            field.data = ast.literal_eval(field.data) if isinstance(field.data, str) else field.data
-            for entity_id in field.data:
-                selected_ids.append(entity_id)
-                selection.append(g.nodes[entity_id].name)
+            data = ast.literal_eval(field.data) if isinstance(field.data, str) else field.data
         html = render_template(
             'forms/tree_multi_select.html',
             field=field,
-            root=root,
-            selection=selection,
-            data=Node.get_tree_data(int(field.id), selected_ids))
+            root=g.nodes[int(field.id)],
+            selection=sorted([g.nodes[id_].name for id_ in data]) ,
+            data=Node.get_tree_data(int(field.id), data))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
