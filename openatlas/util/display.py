@@ -408,18 +408,21 @@ def get_profile_image_table_link(
     return ''  # pragma: no cover - only happens for non image files
 
 
+def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
+    name = link(entity) if show_links else entity.name
+    if not len(entity.aliases) or not current_user.settings['table_show_aliases']:
+        return name
+    html = f'<p>{name}</p>'
+    for i, alias in enumerate(entity.aliases.values()):
+        html += alias if i else f'<p>{alias}</p>'
+    return html
+
+
 def get_base_table_data(
         entity: 'Entity',
         file_stats: Optional[Dict[Union[int, str], Any]] = None,
         show_links: Optional[bool] = True) -> List[Any]:
-    data = [link(entity) if show_links else entity.name]
-    if current_user.settings['table_show_aliases'] and len(entity.aliases) > 0:
-        data = [f'<p>{link(entity) if show_links else entity.name}</p>']
-        for i, (id_, alias) in enumerate(entity.aliases.items()):
-            if i == len(entity.aliases) - 1:
-                data[0] = ''.join([data[0]] + [alias])
-            else:
-                data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
+    data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
         data.append(entity.class_.label)

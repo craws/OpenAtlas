@@ -1,7 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-import re
 from typing import Any
 
 from flask import g, render_template
@@ -66,16 +65,7 @@ class TableSelect(HiddenInput):  # type: ignore
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             data = get_base_table_data(entity, show_links=False)
-            html = f"""
-                <a href='#' onclick="selectFromTable(this, '{field.id}', {entity.id})">
-                    {entity.name}
-                </a>"""
-            data[0] = f'<p>{html}</p>' if len(entity.aliases) > 0 else html
-            for i, (id_, alias) in enumerate(entity.aliases.items()):
-                if i == len(entity.aliases) - 1:
-                    data[0] = ''.join([data[0]] + [alias])
-                else:
-                    data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
+            data[0] = self.format_name_and_aliases(entity, field.id)
             table.rows.append(data)
         html = render_template(
             'forms/table_select.html',
@@ -83,6 +73,19 @@ class TableSelect(HiddenInput):  # type: ignore
             table=table.display(field.id),
             selection=selection)
         return super(TableSelect, self).__call__(field, **kwargs) + html
+
+    @staticmethod
+    def format_name_and_aliases(entity: Entity, field_id: str) -> str:
+        link = f"""
+            <a href='#' onclick="selectFromTable(this, '{field_id}', {entity.id})">
+                {entity.name}
+            </a>"""
+        if not len(entity.aliases):
+            return link
+        html = f'<p>{link}</p>'
+        for i, alias in enumerate(entity.aliases.values()):
+            html += alias if i else f'<p>{alias}</p>'
+        return html
 
 
 class TableField(HiddenField):  # type: ignore
