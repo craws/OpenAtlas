@@ -410,10 +410,11 @@ def get_profile_image_table_link(
 
 def get_base_table_data(
         entity: 'Entity',
-        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
-    data = [link(entity)]
+        file_stats: Optional[Dict[Union[int, str], Any]] = None,
+        show_links: Optional[bool] = True) -> List[Any]:
+    data = [link(entity) if show_links else entity.name]
     if current_user.settings['table_show_aliases'] and len(entity.aliases) > 0:
-        data = [f'<p>{link(entity)}</p>']
+        data = [f'<p>{link(entity) if show_links else entity.name}</p>']
         for i, (id_, alias) in enumerate(entity.aliases.items()):
             if i == len(entity.aliases) - 1:
                 data[0] = ''.join([data[0]] + [alias])
@@ -423,7 +424,7 @@ def get_base_table_data(
             entity.class_.name == 'find':
         data.append(entity.class_.label)
     if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
-        data.append(entity.print_standard_type())
+        data.append(entity.print_standard_type(show_links=False))
     if entity.class_.name == 'file':
         if file_stats:
             data.append(convert_size(

@@ -31,10 +31,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
         for entity in entities:
-            data = get_base_table_data(entity)
-            for i, item in enumerate(data):  # Remove links
-                if isinstance(item, str):
-                    data[i] = re.sub(re.compile('<a.*?>'), '', item)
+            data = get_base_table_data(entity, show_links=False)
             data.insert(0, render_template('forms/checkbox_table.html', entity=entity, field=field))
             table.rows.append(data)
         html = render_template(
@@ -63,26 +60,22 @@ class TableSelect(HiddenInput):  # type: ignore
         else:
             class_ = field.id
             entities = Entity.get_by_view(class_, nodes=True, aliases=aliases)
-        table = Table([''] + g.table_headers[class_])
+        table = Table(g.table_headers[class_])
         selection = ''
         for entity in entities:
             if field.data and entity.id == int(field.data):
                 selection = entity.name
-            data = get_base_table_data(entity)
-            name = entity.name.replace("'", '')
+            data = get_base_table_data(entity, show_links=False)
             html = f"""
-                <a href="#", onclick="selectFromTable(this, '{field.id}', {entity.id}, '{name}')">
+                <a href='#' onclick="selectFromTable(this, '{field.id}', {entity.id})">
                     {entity.name}
                 </a>"""
-
-            # Workaround to show aliases
             data[0] = f'<p>{html}</p>' if len(entity.aliases) > 0 else html
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
                 else:
                     data[0] = ''.join([data[0]] + [f'<p>{alias}</p>'])
-            data.insert(0, render_template('forms/select_button.html', entity=entity, field=field))
             table.rows.append(data)
         html = render_template(
             'forms/table_select.html',
