@@ -203,11 +203,9 @@ def description(entity: Union[Entity, Project]) -> str:
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return Markup("""
-        <h2>{label}</h2>
-        <div class="description more">{description}</div>""".format(
-        label=display.uc_first(label),
-        description=entity.description.replace('\r\n', '<br>')))
+    return Markup(f"""
+        <h2>{display.uc_first(label)}</h2>
+        <div class="description more">{'<br>'.join(entity.description.splitlines())}</div>""")
 
 
 @app.template_filter()
