@@ -13,7 +13,7 @@ from wtforms.validators import Email, InputRequired
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.display import format_date, link, uc_first
+from openatlas.util.filters import format_date, link, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, send_mail
 

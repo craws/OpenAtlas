@@ -8,9 +8,9 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas import app
-from openatlas.models.entity import Entity
-from openatlas.util.display import uc_first
 from openatlas.database.node import Node as Db
+from openatlas.models.entity import Entity
+from openatlas.util.filters import uc_first
 
 
 class Node(Entity):

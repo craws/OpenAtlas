@@ -11,9 +11,9 @@ from openatlas import app
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.display import button, link, uc_first
-from openatlas.util.tab import Tab
+from openatlas.util.filters import button, link, uc_first
 from openatlas.util.util import is_authorized, required_group
+from openatlas.util.tab import Tab
 
 
 @app.route('/note/view/<int:id_>')
