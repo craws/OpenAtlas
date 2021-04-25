@@ -223,15 +223,17 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
         data_api = f'<a href="{url_for("entity", id_=entity.id)}" target="_blank">GeoJSON</a>'
         data_api += '''
-            <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
+            <a class="{css}" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
             </a>'''.format(
+            css=app.config['CSS']['button']['primary'],
             url=url_for('entity', id_=entity.id, download=True),
             label=uc_first('download'))
         data_api += '''
-            <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="CSV">
+            <a class="{css}" href="{url}" target="_blank" title="CSV">
                 <i class="fas fa-download"></i> {label}
             </a>'''.format(
+            css=app.config['CSS']['button']['primary'],
             url=url_for('entity', id_=entity.id, export='csv'),
             label=uc_first('csv'))
         data['API'] = data_api

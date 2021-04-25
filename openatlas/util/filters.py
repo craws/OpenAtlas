@@ -176,19 +176,21 @@ def table_select_model(name: str, selected: Union[CidocClass, CidocProperty, Non
                     <div class="modal-content">
                         <div class="modal-header">
                             <h5 class="modal-title">{name}</h5>
-                            <button type="button" class="btn btn-outline-primary btn-sm"
+                            <button type="button" class="{css}"
                                 data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">&times;</span>
                             </button>
                         </div>
                         <div class="modal-body">{table}</div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                                data-dismiss="modal">{close_label}</button>
+                            <button type="button" class="{css}" data-dismiss="modal">
+                                {close_label}
+                            </button>
                         </div>
                     </div>
                 </div>
             </div>""".format(
+        css=app.config['CSS']['button']['primary'],
         name=name,
         value=value,
         close_label=display.uc_first(_('close')),
