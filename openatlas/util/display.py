@@ -7,10 +7,10 @@ from collections import OrderedDict
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHECKING, Tuple, Union
 
 import numpy
-from flask import g, session, url_for
+from flask import g, url_for
 from flask_babel import LazyString, format_number, lazy_gettext as _
 from flask_login import current_user
 from markupsafe import Markup
@@ -34,56 +34,16 @@ def external_url(url: Union[str, None]) -> str:
     return f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' if url else ''
 
 
-def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
-    items = []
-    for id_ in nodes:
-        item = g.nodes[id_]
-        count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
-        items.append({
-            'id': item.id,
-            'href': url_for('entity_view', id_=item.id),
-            'a_attr': {'href': url_for('entity_view', id_=item.id)},
-            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
-            'children': walk_tree(item.subs)})
-    return items
-
-
-def tree_select(name: str) -> str:
-    from openatlas.models.node import Node
-    return """
-        <div id="{name}-tree"></div>
-        <script>
-            $(document).ready(function () {{
-                $("#{name}-tree").jstree({{
-                    "search": {{ "case_insensitive": true, "show_only_matches": true }},
-                    "plugins" : ["core", "html_data", "search"],
-                    "core": {{ "data": {tree_data} }}
-                }});
-                $("#{name}-tree").on("select_node.jstree", function (e, data) {{
-                    document.location.href = data.node.original.href;
-                }});
-                $("#{name}-tree-search").keyup(function() {{
-                    if (this.value.length >= {min_chars}) {{
-                        $("#{name}-tree").jstree("search", $(this).val());
-                    }}
-                }});
-            }});
-        </script>""".format(
-        min_chars=session['settings']['minimum_jstree_search'],
-        name=sanitize(name),
-        tree_data=walk_tree(Node.get_nodes(name)))
-
-
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User', None],
          url: Optional[str] = None,
-         class_: Optional[str] = None,
+         class_: Optional[str] = '',
          uc_first_: Optional[bool] = True,
          js: Optional[str] = None) -> str:
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" {class_} {js}>{label}</a>'.format(
+        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
-            class_='class="' + class_ + '"' if class_ else '',
-            js='onclick="{js}"'.format(js=js) if js else '',
+            class_=class_,
+            js=f'onclick="{js}"' if js else '',
             label=(uc_first(str(object_))) if uc_first_ else object_)
 
     # Builds an HTML link to a detail view of an object
@@ -278,13 +238,14 @@ def add_system_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
+def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
-    type_data: OrderedDict[str, Any] = OrderedDict()
-    for node, node_value in entity.nodes.items():
+    type_data: OrderedD[str, Any] = OrderedDict()
+    sorted_nodes = sorted(entity.nodes.items(), key=lambda x: x[0].name)
+    for node, node_value in sorted_nodes:
         root = g.nodes[node.root[-1]]
-        label = 'type' if root.standard and root.class_.name == 'type' else root.name
+        label = _('type') if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
         text = ''
@@ -296,15 +257,16 @@ def add_type_data(entity: 'Entity', data: Dict[str, Any]) -> Dict[str, Any]:
             path=' > '.join([g.nodes[id_].name for id_ in node.root]),
             text=text))
 
-    # Sort types by name
-    for root_type in type_data:
-        type_data[root_type].sort()
+    # Sort root types and move standard type to top
+    type_data = OrderedDict(sorted(type_data.items()))
+    for item in type_data.keys():
+        if item == _('type'):
+            type_data.move_to_end(item, last=False)
+            break
 
-    # Move the standard type to the top
-    if 'type' in type_data:
-        type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data[root_name] = nodes
+
     return data
 
 
@@ -343,7 +305,8 @@ def tooltip(text: str) -> str:
 
 
 def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: Dict[str, Union[str, List[str], None]] = {_('alias'): list(entity.aliases.values())}
+
+    data: OrderedD[str, Any] = OrderedDict({_('alias'): list(entity.aliases.values())})
 
     # Dates
     from_link = ''
@@ -447,23 +410,26 @@ def get_profile_image_table_link(
     return ''  # pragma: no cover - only happens for non image files
 
 
+def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
+    name = link(entity) if show_links else entity.name
+    if not len(entity.aliases) or not current_user.settings['table_show_aliases']:
+        return name
+    html = f'<p>{name}</p>'
+    for i, alias in enumerate(entity.aliases.values()):
+        html += alias if i else f'<p>{alias}</p>'
+    return html
+
+
 def get_base_table_data(
         entity: 'Entity',
-        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
-    if len(entity.aliases) > 0:
-        data: List[str] = ['<p>' + link(entity) + '</p>']
-    else:
-        data = [link(entity)]
-    for i, (id_, alias) in enumerate(entity.aliases.items()):
-        if i == len(entity.aliases) - 1:
-            data[0] = ''.join([data[0]] + [alias])
-        else:
-            data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
+        file_stats: Optional[Dict[Union[int, str], Any]] = None,
+        show_links: Optional[bool] = True) -> List[Any]:
+    data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
         data.append(entity.class_.label)
     if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
-        data.append(entity.print_standard_type())
+        data.append(entity.print_standard_type(show_links=False))
     if entity.class_.name == 'file':
         if file_stats:
             data.append(convert_size(
@@ -474,8 +440,8 @@ def get_base_table_data(
             data.append(print_file_size(entity))
             data.append(get_file_extension(entity))
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
-        data.append(entity.first if entity.first else '')
-        data.append(entity.last if entity.last else '')
+        data.append(entity.first)
+        data.append(entity.last)
     data.append(entity.description)
     return data
 
