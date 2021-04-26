@@ -4,19 +4,18 @@ import time
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
-from flask import g, request
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm, widgets
-from flask_wtf.csrf import generate_csrf
-from wtforms import (BooleanField, FieldList, HiddenField, MultipleFileField,
-                     SelectField,
-                     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
+from wtforms import (
+    BooleanField, FieldList, FileField, HiddenField, SelectField, SelectMultipleField,
+    StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
 from openatlas import app
 from openatlas.forms import date
-from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeMultiField,
-                                   ValueFloatField)
+from openatlas.forms.field import (
+    TableField, TableMultiField, TreeField, TreeMultiField, ValueFloatField)
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -262,7 +261,7 @@ def add_fields(
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
     elif class_ == 'file' and not item:
-        setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
+        setattr(form, 'file', FileField(_('file'), [InputRequired()]))
     elif class_ == 'group':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
@@ -339,12 +338,10 @@ def build_add_reference_form(class_: str) -> FlaskForm:
 
 def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     """Returns a form with a list of entities with checkboxes."""
-    if class_ == 'file':
-        entities = Entity.get_by_class('file', nodes=True)
-    elif class_ == 'place':
+    if class_ == 'place':
         entities = Entity.get_by_class('place', nodes=True, aliases=True)
     else:
-        entities = Entity.get_by_view(class_)
+        entities = Entity.get_by_view(class_, nodes=True, aliases=True)
 
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
@@ -357,17 +354,7 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
         table.rows.append([input_] + get_base_table_data(entity, file_stats))
     if not table.rows:
         return uc_first(_('no entries'))
-    return """
-        <form class="table" id="checkbox-form" method="post">
-            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
-            <input id="checkbox_values" name="checkbox_values" type="hidden">
-            {table}
-            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
-        </form>""".format(
-        link=uc_first(_('link')),
-        token=generate_csrf(),
-        class_=app.config['CSS']['button']['primary'],
-        table=table.display(class_))
+    return render_template('forms/form_table.html', table=table.display(class_))
 
 
 def build_move_form(node: Node) -> FlaskForm:

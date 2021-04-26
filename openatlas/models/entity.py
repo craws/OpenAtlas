@@ -211,14 +211,14 @@ class Entity:
     def remove_profile_image(self) -> None:
         Db.remove_profile_image(self.id)
 
-    def print_standard_type(self) -> str:
+    def print_standard_type(self, show_links: Optional[bool] = True) -> str:
         from openatlas.models.node import Node
         if not self.class_.standard_type:
             return ''
         root_id = Node.get_hierarchy(self.class_.standard_type).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
-                return link(node)
+                return link(node) if show_links else node.name
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
@@ -240,6 +240,13 @@ class Entity:
             classes: Union[str, List[str]],
             nodes: bool = False,
             aliases: bool = False) -> List[Entity]:
+        if aliases:  # For performance: check classes if they can have an alias, set False otherwise
+            aliases_needed = False
+            for system_class in classes if isinstance(classes, list) else [classes]:
+                if g.classes[system_class].alias_possible:
+                    aliases_needed = True
+                    break
+            aliases = aliases_needed
         return [Entity(row) for row in Db.get_by_class(classes, nodes, aliases)]
 
     @staticmethod

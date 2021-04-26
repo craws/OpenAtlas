@@ -34,19 +34,18 @@ class LinkedPlacesEntity:
             out.append({
                 'label': link.range.name,
                 'relationTo': url_for('entity', id_=link.range.id, _external=True),
-                'relationType': 'crm:' + link.property.code + '_'
-                                + link.property.i18n['en'].replace(' ', '_'),
+                'relationType': 'crm:' + link.property.code + ' ' + link.property.i18n['en'],
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [LinkedPlacesEntity.get_time(link.range)]}})
         for link in links_inverse:
-            property_ = link.property.i18n['en'].replace(' ', '_')
+            property_ = link.property.i18n['en']
             if link.property.i18n_inverse['en']:
-                property_ = link.property.i18n_inverse['en'].replace(' ', '_')
+                property_ = link.property.i18n_inverse['en']
             out.append({
                 'label': link.domain.name,
                 'relationTo': url_for('entity', id_=link.domain.id, _external=True),
-                'relationType': 'crm:' + link.property.code + 'i_' + property_,
+                'relationType': 'crm:' + link.property.code + 'i ' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [LinkedPlacesEntity.get_time(link.domain)]}})
