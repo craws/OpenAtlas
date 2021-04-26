@@ -28,7 +28,7 @@ class GetSubunitHierarchy(Resource):  # type: ignore
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+            entity = Entity.get_by_id(id_, nodes=True)
         except EntityDoesNotExistError:
             raise EntityDoesNotExistError
         if not entity.class_.name == 'place' \

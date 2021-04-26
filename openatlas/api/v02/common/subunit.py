@@ -28,7 +28,7 @@ class GetSubunit(Resource):  # type: ignore
     @staticmethod
     def get_subunits(id_: int) -> List[Dict[str, Any]]:
         try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+            entity = Entity.get_by_id(id_, nodes=True)
         except Exception:
             raise EntityDoesNotExistError
         structure = get_structure(entity)
