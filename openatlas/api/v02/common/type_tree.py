@@ -10,8 +10,8 @@ from openatlas.models.node import Node
 
 
 class GetTypeTree(Resource):  # type: ignore
-    # @swag_from("../swagger/type_tree.yml", endpoint="type_tree")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         type_tree = {'type_tree': GetTypeTree.get_type_tree()}
         if parser['count']:

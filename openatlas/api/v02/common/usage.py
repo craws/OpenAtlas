@@ -7,8 +7,8 @@ from openatlas.api.v02.templates.usage import UsageTemplate
 
 
 class ShowUsage(Resource):  # type: ignore
-    # @swag_from("../swagger/usage.yml", endpoint="usage")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         usage = {
             'message': 'The path you entered is not correct.',
             'examples': {

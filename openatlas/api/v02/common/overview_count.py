@@ -8,8 +8,8 @@ from openatlas.models.entity import Entity
 
 
 class OverviewCount(Resource):  # type: ignore
-    # @swag_from("../swagger/overview_count.yml", endpoint="overview_count")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         overview = []
         for name, count in Entity.get_overview_counts().items():
             overview.append({'systemClass': name, 'count': count})

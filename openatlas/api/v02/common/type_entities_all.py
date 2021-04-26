@@ -12,8 +12,8 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
-    # @swag_from("../swagger/type_entities_all.yml", endpoint="node_entities_all")
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         entities = []
         for entity in GetTypeEntitiesAll.get_node_all(id_):

@@ -44,8 +44,9 @@ entity_parser.add_argument(
     action='append',
     case_sensitive=False,
     default=['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'geonames'],
-    choices=('when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'geonames',
-             'none'))
+    choices=(
+        'when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'geonames',
+        'none'))
 entity_parser.add_argument('export', type=str, help='{error_msg}', choices='csv')
 
 query_parser = entity_parser.copy()

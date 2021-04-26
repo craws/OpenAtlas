@@ -10,8 +10,8 @@ from openatlas.models.content import Content
 
 
 class GetContent(Resource):  # type: ignore
-    # @swag_from("../swagger/content.yml", endpoint="content")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = language_parser.parse_args()
         content = {
             'intro': Content.get_translation('intro_for_frontend', parser['lang']),

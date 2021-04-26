@@ -14,8 +14,8 @@ from openatlas.models.entity import Entity
 
 
 class GetByCode(Resource):  # type: ignore
-    # @swag_from("../swagger/code.yml", endpoint="code")
-    def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(

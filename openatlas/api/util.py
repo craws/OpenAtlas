@@ -23,7 +23,7 @@ def display_file_api(filename: str) -> Any:
         raise AccessDeniedError
     parser = image_parser.parse_args()
     if parser['download']:
-        return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
+        return send_file(f"{app.config['UPLOAD_DIR']}/{filename}", as_attachment=True)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 

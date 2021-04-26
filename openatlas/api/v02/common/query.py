@@ -15,8 +15,8 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetQuery(Resource):  # type: ignore
-    # @swag_from("../swagger/query.yml", endpoint="query")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = query_parser.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \

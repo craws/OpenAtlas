@@ -12,8 +12,8 @@ from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):  # type: ignore
-    # @swag_from("../swagger/latest.yml", endpoint="latest")
-    def get(self, latest: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         entities = {"result": GetLatest.get_entities_get_latest(latest, parser)}
         if parser['count']:

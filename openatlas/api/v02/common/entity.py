@@ -11,8 +11,8 @@ from openatlas.api.v02.templates.geojson import GeoJson
 
 
 class GetEntity(Resource):  # type: ignore
-    # @swag_from("../swagger/entity.yml", endpoint="entity")
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(GeoJsonEntity.get_entity_by_id(id_))
