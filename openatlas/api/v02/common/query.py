@@ -12,11 +12,9 @@ from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import query_parser
 from openatlas.api.v02.templates.geojson import GeoJson
-from openatlas.util.util import api_access
 
 
 class GetQuery(Resource):  # type: ignore
-    @api_access()  # type: ignore
     # @swag_from("../swagger/query.yml", endpoint="query")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = query_parser.parse_args()

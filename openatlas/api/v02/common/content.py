@@ -7,11 +7,9 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.parser import language_parser
 from openatlas.api.v02.templates.content import ContentTemplate
 from openatlas.models.content import Content
-from openatlas.util.util import api_access
 
 
 class GetContent(Resource):  # type: ignore
-    @api_access()  # type: ignore
     # @swag_from("../swagger/content.yml", endpoint="content")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = language_parser.parse_args()

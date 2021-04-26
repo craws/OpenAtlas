@@ -11,11 +11,9 @@ from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.geojson import GeoJson
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
-from openatlas.util.util import api_access
 
 
 class GetByCode(Resource):  # type: ignore
-    @api_access()  # type: ignore
     # @swag_from("../swagger/code.yml", endpoint="code")
     def get(self, code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()

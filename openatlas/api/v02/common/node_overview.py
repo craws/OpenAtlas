@@ -8,11 +8,9 @@ from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.util import api_access
 
 
 class GetNodeOverview(Resource):  # type: ignore
-    @api_access()  # type: ignore#
     # @swag_from("../swagger/nodes_overview.yml", endpoint="node_overview")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()

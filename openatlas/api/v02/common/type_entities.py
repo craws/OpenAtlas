@@ -9,11 +9,9 @@ from openatlas.api.v02.resources.geojson_entity import GeoJsonEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.geojson import GeoJson
-from openatlas.util.util import api_access
 
 
 class GetTypeEntities(Resource):  # type: ignore
-    @api_access()  # type: ignore
     # @swag_from("../swagger/type_entities.yml", endpoint="node_entities")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
