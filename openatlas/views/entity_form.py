@@ -336,6 +336,8 @@ def insert_entity(
         filename = secure_filename('a' + file_.filename)  # type: ignore
         new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
         file_.save(str(app.config['UPLOAD_DIR'] / new_name))
+        if app.config['IMAGE_PROCESSING']:
+            Thumbnails.upload_to_thumbnail(new_name)
     return entity
 
 

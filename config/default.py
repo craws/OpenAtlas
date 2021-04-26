@@ -21,12 +21,18 @@ SECRET_KEY = 'CHANGE ME'
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
+
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
 EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
+
+# Image processing
+IMAGE_PROCESSING = False
+PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
+PROCESSED_IMAGE_SIZES = ['400', '200', '100', '50']
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
