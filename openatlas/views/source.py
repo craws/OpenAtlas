@@ -12,7 +12,7 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.display import uc_first
+from openatlas.util.filters import uc_first
 from openatlas.util.util import required_group
 
 

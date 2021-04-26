@@ -21,7 +21,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import get_base_table_data, uc_first
+from openatlas.util.filters import get_base_table_data, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats
 
