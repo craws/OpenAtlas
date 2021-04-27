@@ -157,15 +157,18 @@ class LinkedPlacesEntity:
             links_inverse = LinkedPlacesEntity.get_all_links_inverse(entity)
 
         features['relations'] = \
-            LinkedPlacesEntity.get_links(links, links_inverse) if 'relations' in parser['show'] else None
+            LinkedPlacesEntity.get_links(links, links_inverse) if 'relations' in parser[
+                'show'] else None
         features['types'] = \
             LinkedPlacesEntity.get_node(entity, links) if 'types' in parser['show'] else None
         features['depictions'] = \
             LinkedPlacesEntity.get_file(links_inverse) if 'depictions' in parser['show'] else None
         features['when'] = \
-            {'timespans': [LinkedPlacesEntity.get_time(entity)]} if 'when' in parser['show'] else None
-        features['links'] = LinkedPlacesEntity.get_reference_systems(links_inverse) if 'links' in parser[
-            'show'] else None
+            {'timespans': [LinkedPlacesEntity.get_time(entity)]} if 'when' in parser[
+                'show'] else None
+        features['links'] = LinkedPlacesEntity.get_reference_systems(links_inverse) if 'links' in \
+                                                                                       parser[
+                                                                                           'show'] else None
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 features['geometry'] = LinkedPlacesEntity.get_geoms_by_entity(

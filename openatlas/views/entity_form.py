@@ -366,13 +366,6 @@ def insert_entity(
         entity = ReferenceSystem.insert_system(form)
     else:
         entity = Entity.insert(class_, form.name.data)
-    # if entity.class_.name == 'file':
-    #     file_ = request.files['file']
-    #     # Add an 'a' to prevent emtpy filename, this won't affect stored information
-    #     filename = secure_filename('a' + file_.filename)  # type: ignore
-    #     new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-    #     file_.save(str(app.config['UPLOAD_DIR'] / new_name))
-    #     Thumbnails.upload_to_thumbnail(new_name)
     return entity
 
 

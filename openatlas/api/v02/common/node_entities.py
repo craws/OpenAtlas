@@ -7,7 +7,6 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidSubunitError
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
-from openatlas.util.util import api_access
 
 
 class GetNodeEntities(Resource):  # type: ignore

@@ -8,7 +8,6 @@ from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.util import api_access
 
 
 class GetNodeOverview(Resource):  # type: ignore

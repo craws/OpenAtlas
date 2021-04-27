@@ -11,7 +11,6 @@ from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
-
 class GetTypeEntities(Resource):  # type: ignore
     @staticmethod
     def get(id_: int) -> Union[Tuple[Resource, int], Response]:
