@@ -8,7 +8,6 @@ from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneErr
 from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.thumbnails import Thumbnails
 from openatlas.util.util import api_access
 
 
@@ -25,12 +24,6 @@ def display_file_api(filename: str) -> Any:
     if not license_:
         raise AccessDeniedError
     parser = image_parser.parse_args()
-    if parser['image_size'] and parser['download']:
-        Thumbnails.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['TMP_DIR'], filename, as_attachment=True)
-    if parser['image_size']:
-        Thumbnails.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['TMP_DIR'], filename)
     if parser['download']:
         return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)

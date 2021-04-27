@@ -19,7 +19,6 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.display import get_base_table_data, link
-from openatlas.util.thumbnails import Thumbnails
 from openatlas.util.util import is_authorized, required_group, was_modified
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -259,23 +258,22 @@ def insert_file(
         form: FlaskForm,
         class_: Optional[str] = None,
         origin: Optional[Entity] = None) -> Union[str, Response]:
-    files = []
+    filenames = []
     entity = None
     url = url_for('index', view=g.classes[class_].view)
+    entity_name = form.name.data
     try:
         Transaction.begin()
-        for i, file in enumerate(form.file.data):
-            if i == 1:
+        for count, file in enumerate(form.file.data):
+            if count == 1:
                 url = link_and_get_redirect_url(form, entity, class_, origin)
-            files.append(file)
             entity = Entity.insert(class_, file.filename)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
             filename = secure_filename('a' + file.filename)  # type: ignore
-            new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-            file.save(str(app.config['UPLOAD_DIR'] / new_name))
-            # Todo: Switch to create thumbnails only if image processing true
-            # Thumbnails.upload_to_thumbnail(new_name)
-            # Todo: I think with update, multiple pics get the same filename.
+            new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
+            file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
+            filenames.append(new_name)
+            form.name.data = f'{entity_name}_{count}'
             entity.update(form)
             class_ = entity.class_.name
             update_links(entity, form, 'insert', origin)
@@ -283,9 +281,8 @@ def insert_file(
         Transaction.commit()
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
-        # Todo: check if the file is really deleted if error occurs
-        for file in files:
-            file.unlink()
+        for filename in filenames:
+            (app.config['UPLOAD_DIR'] / filename).unlink()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('index', view=g.classes[class_].view)
