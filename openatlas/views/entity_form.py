@@ -259,25 +259,26 @@ def insert_file(
         class_: Optional[str] = None,
         origin: Optional[Entity] = None) -> Union[str, Response]:
     filenames = []
-    entity = None
     url = url_for('index', view=g.classes[class_].view)
     entity_name = form.name.data
     try:
         Transaction.begin()
         for count, file in enumerate(form.file.data):
-            if count == 1:
-                url = link_and_get_redirect_url(form, entity, class_, origin)
             entity = Entity.insert(class_, file.filename)
+            if count == 0:
+                url = link_and_get_redirect_url(form, entity, class_, origin)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
             filename = secure_filename('a' + file.filename)  # type: ignore
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
-            form.name.data = f'{entity_name}_{count}'
+            if count > 0:
+                form.name.data = f'{entity_name}_{count + 1}'
             entity.update(form)
             class_ = entity.class_.name
             update_links(entity, form, 'insert', origin)
             logger.log_user(entity.id, 'insert')
+        flash(_('entity created'), 'insert')
         Transaction.commit()
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
