@@ -13,8 +13,8 @@ from openatlas.util.util import api_access
 
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         entities = []
         for entity in GetTypeEntitiesAll.get_node_all(id_):

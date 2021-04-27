@@ -16,8 +16,8 @@ from openatlas.util.util import api_access
 
 
 class GetQuery(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = query_parser.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \

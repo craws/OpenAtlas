@@ -5,8 +5,10 @@ from typing import Any
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
+from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 
+from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
 
 app: Flask = Flask(__name__, instance_relative_config=True)
@@ -27,16 +29,15 @@ babel = Babel(app)
 from openatlas.models.logger import Logger
 logger = Logger()
 
-from openatlas.util import filters, processor
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy, index, involvement,
     imports, link, login, member, model, note, overlay, profile, reference, relation,
     reference_system, search, source, sql, types, user)
+from openatlas.util import processor
 
 #  Restful API import
 from openatlas.api import util  # contains routes for each version
 from openatlas.api.v02 import routes  # New routes
-from openatlas.api.v02.resources import parser
 
 
 @babel.localeselector
@@ -71,6 +72,13 @@ def before_request() -> None:
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
+
+    if request.path.startswith('/api/'):
+        ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+        if not current_user.is_authenticated \
+                and not session['settings']['api_public'] \
+                and ip not in app.config['ALLOWED_IPS']:
+            raise AccessDeniedError  # pragma: no cover
 
 
 @app.after_request

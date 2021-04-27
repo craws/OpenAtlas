@@ -11,12 +11,11 @@ from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
-from openatlas.util.util import api_access
 
 
 class GetBySystemClass(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(system_class: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(

@@ -9,12 +9,12 @@ from openatlas.api.v02.resources.linked_places import LinkedPlacesEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
-from openatlas.util.util import api_access
+
 
 
 class GetTypeEntities(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         entities = []
         for entity in GetTypeEntities.get_node(id_):

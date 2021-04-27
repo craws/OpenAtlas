@@ -10,10 +10,10 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import link
+from openatlas.util.filters import link
+from openatlas.util.util import required_group
 from openatlas.util.filters import sanitize
 from openatlas.util.table import Table
-from openatlas.util.util import required_group
 from flask_babel import format_number
 
 

@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import get_file_path
+from openatlas.util.filters import get_file_path
 
 
 class LinkedPlacesEntity:

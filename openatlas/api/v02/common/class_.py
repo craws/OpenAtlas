@@ -15,8 +15,8 @@ from openatlas.util.util import api_access
 
 
 class GetByClass(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self, class_code: str) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(class_code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(

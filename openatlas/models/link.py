@@ -9,7 +9,7 @@ from flask_wtf import FlaskForm
 from openatlas import logger
 from openatlas.database.link import Link as Db
 from openatlas.models.date import Date
-from openatlas.util.display import link, uc_first
+
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -194,8 +194,8 @@ class Link:
     @staticmethod
     def check_links() -> List[Dict[str, str]]:
         """Check links for CIDOC CRM validity and return the invalid ones."""
-        from openatlas.util.display import link
         from openatlas.models.entity import Entity
+        from openatlas.util.filters import link
         invalid_links = []
         for row in Db.get_cidoc_links():
             property_ = g.properties[row['property']]
@@ -226,6 +226,7 @@ class Link:
     def check_single_type_duplicates() -> List[List[str]]:
         from openatlas.models.node import Node
         from openatlas.models.entity import Entity
+        from openatlas.util.filters import link, uc_first
         data = []
         for node in g.nodes.values():
             if node.root or node.multiple or node.value_type:

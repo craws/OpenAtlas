@@ -11,8 +11,8 @@ from openatlas.util.util import api_access
 
 
 class GetNodeEntitiesAll(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()
         node = {"nodes": GetNodeEntitiesAll.get_node_all(id_)}
         if parser['count']:
