@@ -78,7 +78,7 @@ def insert_artifacts():
     for source in sources.values():
         sql = """
             INSERT INTO model.entity (name, description, system_class, class_code)
-            VALUES (%(name)s, %(description)s, 'artifact', 'E33') RETURNING id;"""
+            VALUES (%(name)s, %(description)s, 'artifact', 'E22') RETURNING id;"""
         g.connec_cursor.execute(sql, {'name': source.name, 'description': source.description})
         source_artifact[source.id] = g.connec_cursor.fetchone()['id']
 
