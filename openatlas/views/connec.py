@@ -63,7 +63,7 @@ def update_links():
                 sql += f"""
                     UPDATE model.link
                     SET
-                        domain_id = range_id,
+                        domain_id = {link_.range.id},
                         range_id = {source_artifact[link_.domain.id]},
                         property_code = 'P25'
                     WHERE
