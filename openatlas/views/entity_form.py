@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -267,6 +267,8 @@ def insert_file(
             entity = Entity.insert(class_, file.filename)
             if count == 0:
                 url = link_and_get_redirect_url(form, entity, class_, origin)
+            else:
+                link_and_get_redirect_url(form, entity, class_, origin)
             # Add an 'a' to prevent emtpy filename, this won't affect stored information
             filename = secure_filename('a' + file.filename)  # type: ignore
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
@@ -278,8 +280,8 @@ def insert_file(
             class_ = entity.class_.name
             update_links(entity, form, 'insert', origin)
             logger.log_user(entity.id, 'insert')
-        flash(_('entity created'), 'insert')
         Transaction.commit()
+        flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         for filename in filenames:
