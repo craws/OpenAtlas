@@ -138,7 +138,7 @@ def admin_check_links() -> str:
         'admin/check_links.html',
         table=Table(
             ['domain', 'property', 'range'],
-            rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
+            rows=[[x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
         title=_('admin'),
         crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check links')])
 
