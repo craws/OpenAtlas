@@ -260,9 +260,10 @@ def insert_file(
         origin: Optional[Entity] = None) -> Union[str, Response]:
     filenames = []
     url = url_for('index', view=g.classes[class_].view)
-    entity_name = form.name.data
     try:
         Transaction.begin()
+        # Needed for static name.
+        entity_name = form.name.data
         for count, file in enumerate(form.file.data):
             entity = Entity.insert(class_, file.filename)
             if count == 0:
@@ -274,8 +275,9 @@ def insert_file(
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
-            if count > 0:
-                form.name.data = f'{entity_name}_{count + 1}'
+            if len(form.file.data) > 1:
+                count = str(count + 1).zfill(2)
+                form.name.data = f'{entity_name}_{count}'
             entity.update(form)
             class_ = entity.class_.name
             update_links(entity, form, 'insert', origin)
