@@ -5,9 +5,8 @@ from typing import Any, Dict, List, Optional
 from flask import g
 from flask_login import current_user
 
-from openatlas.util.display import sanitize
-from openatlas.util.util import is_float
 from openatlas.database.imports import Import as Db
+from openatlas.util.util import is_float
 
 
 class Project:
@@ -54,6 +53,7 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
+        from openatlas.util.filters import sanitize
         Db.update_project(project.id, project.name, sanitize(project.description, 'text'))
 
     @staticmethod

@@ -10,7 +10,7 @@ from wtforms.widgets import HiddenInput
 
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import get_base_table_data
+from openatlas.util.filters import get_base_table_data
 from openatlas.util.table import Table
 
 
