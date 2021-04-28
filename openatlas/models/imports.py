@@ -6,7 +6,6 @@ from flask import g
 from flask_login import current_user
 
 from openatlas.database.imports import Import as Db
-from openatlas.util.util import is_float
 
 
 class Project:
@@ -53,7 +52,7 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.util.filters import sanitize
+        from openatlas.util.util import sanitize
         Db.update_project(project.id, project.name, sanitize(project.description, 'text'))
 
     @staticmethod
@@ -77,6 +76,7 @@ class Import:
     def import_data(project: 'Project', class_: str, data: List[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
+        from openatlas.util.util import is_float
         for row in data:
             entity = Entity.insert(
                 class_,

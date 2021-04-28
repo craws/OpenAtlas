@@ -28,7 +28,7 @@ class Table:
 
     def display(self, name: Optional[str] = 'default') -> str:
         if not self.rows:
-            from openatlas.util.filters import uc_first
+            from openatlas.util.util import uc_first
             return Markup(f"<p>{uc_first(_('no entries'))}</p>")
         columns: List[Dict[str, str]] = [
             {'title': _(item).capitalize() if item else ''} for item in self.header]

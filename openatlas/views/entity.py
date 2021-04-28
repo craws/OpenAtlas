@@ -17,12 +17,11 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.filters import (
-    add_edit_link, add_remove_link, button, display_delete_link, format_date,
-    get_base_table_data, get_entity_data, get_file_path, link, uc_first)
-from openatlas.util.util import is_authorized, required_group
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
+from openatlas.util.util import (
+    add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
+    get_entity_data, get_file_path, is_authorized, link, required_group, uc_first)
 from openatlas.views.reference import AddReferenceForm
 
 

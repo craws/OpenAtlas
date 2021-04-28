@@ -4,9 +4,8 @@ from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.util.filters import button, uc_first
-from openatlas.util.util import is_authorized
 from openatlas.util.table import Table
+from openatlas.util.util import button, is_authorized, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity

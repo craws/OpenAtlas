@@ -10,7 +10,6 @@ from flask_wtf import FlaskForm
 from openatlas import app
 from openatlas.database.node import Node as Db
 from openatlas.models.entity import Entity
-from openatlas.util.filters import uc_first
 
 
 class Node(Entity):
@@ -44,6 +43,7 @@ class Node(Entity):
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
+        from openatlas.util.util import uc_first
         forms = {}
         for row in Db.get_web_forms():
             forms[row['id']] = {

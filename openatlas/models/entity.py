@@ -13,9 +13,9 @@ from openatlas.database.entity import Entity as Db
 from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.filters import get_file_extension, link, sanitize
+from openatlas.util.util import get_file_extension, link, sanitize
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.node import Node
     from openatlas.models.reference_system import ReferenceSystem
 

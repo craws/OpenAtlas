@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Union
 
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -10,11 +10,8 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.filters import link
-from openatlas.util.util import required_group
-from openatlas.util.filters import sanitize
 from openatlas.util.table import Table
-from flask_babel import format_number
+from openatlas.util.util import link, required_group, sanitize
 
 
 def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:

@@ -16,9 +16,9 @@ from openatlas.database.connect import Transaction
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
-from openatlas.util.filters import format_date, link, uc_first
 from openatlas.util.table import Table
-from openatlas.util.util import (get_backup_file_data, is_float, required_group)
+from openatlas.util.util import (
+    format_date, get_backup_file_data, is_float, link, required_group, uc_first)
 
 
 class ProjectForm(FlaskForm):  # type: ignore

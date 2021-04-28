@@ -8,8 +8,7 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm, widgets
 from wtforms import (
-    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField,
-    SelectMultipleField,
+    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField, SelectMultipleField,
     StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -22,9 +21,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.filters import get_base_table_data, uc_first
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats
+from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
 
 forms = {
     'acquisition': ['name', 'date', 'description', 'continue'],

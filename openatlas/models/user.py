@@ -12,7 +12,7 @@ from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.user import User as Db
-from openatlas.util.filters import sanitize
+from openatlas.util.util import sanitize
 
 
 class User(UserMixin):  # type: ignore
