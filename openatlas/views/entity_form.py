@@ -19,7 +19,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.filters import get_base_table_data, link
-from openatlas.util.thumbnails import Thumbnails
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import is_authorized, required_group, was_modified
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -277,7 +277,7 @@ def insert_file(
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
             if app.config['IMAGE_PROCESSING']:
-                Thumbnails.upload_to_thumbnail(new_name)
+                ImageProcessing.upload_to_thumbnail(new_name)
             if len(form.file.data) > 1:
                 count = str(count + 1).zfill(2)
                 form.name.data = f'{entity_name.strip()}_{count}'
