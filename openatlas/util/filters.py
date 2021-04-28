@@ -444,8 +444,8 @@ def test_file(file_name: str) -> Optional[str]:
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'node':  # Only keep letters, numbers and spaces
-        return re.sub(r'([^\s\w()]|_)+', '', string).strip()
+    if mode == 'node':  # Only keep letters, numbers, minus, brackets and spaces
+        return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         s = MLStripper()
         s.feed(string)
