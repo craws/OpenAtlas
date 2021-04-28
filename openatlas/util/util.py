@@ -38,154 +38,6 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
 
 
-def send_mail(
-        subject: str,
-        text: str,
-        recipients: Union[str, List[str]],
-        log_body: bool = True) -> bool:  # pragma: no cover
-    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
-    recipients = recipients if isinstance(recipients, list) else [recipients]
-    settings = session['settings']
-    if not settings['mail'] or len(recipients) < 1:
-        return False
-    mail_user = settings['mail_transport_username']
-    from_ = settings['mail_from_name'] + ' <' + settings['mail_from_email'] + '>'
-    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
-    server.ehlo()
-    server.starttls()
-    try:
-        if settings['mail_transport_username']:
-            server.login(mail_user, app.config['MAIL_PASSWORD'])
-        for recipient in recipients:
-            msg = MIMEText(text, _charset='utf-8')
-            msg['From'] = from_
-            msg['To'] = recipient.strip()
-            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
-            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
-        log_text = 'Mail from ' + from_ + ' to ' + ', '.join(recipients) + ' Subject: ' + subject
-        log_text += ' Content: ' + text if log_body else ''
-        logger.log('info', 'mail', 'Mail send from ' + from_, log_text)
-    except smtplib.SMTPAuthenticationError as e:
-        logger.log('error', 'mail', 'Error mail login for ' + mail_user, e)
-        flash(_('error mail login'), 'error')
-        return False
-    except Exception as e:
-        logger.log('error', 'mail', 'Error send mail for ' + mail_user, e)
-        flash(_('error mail send'), 'error')
-        return False
-    return True
-
-
-def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
-    """For performance: Build a dict with file ids and stats from files in given directory."""
-    file_stats: Dict[Union[int, str], Any] = {}
-    for file in path.iterdir():
-        if file.stem.isdigit():
-            file_stats[int(file.stem)] = {
-                'ext': file.suffix,
-                'size': file.stat().st_size,
-                'date': file.stat().st_ctime}
-    return file_stats
-
-
-def get_disk_space_info() -> Optional[Dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover - e.g. Windows has no statvfs
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
-    return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
-
-
-def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
-        return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
-
-
-def is_float(value: Union[int, float]) -> bool:
-    try:
-        float(value)
-        return True
-    except ValueError:
-        return False
-
-
-@app.template_filter()
-def is_authorized(group: str) -> bool:
-    if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False  # pragma: no cover - needed because AnonymousUserMixin has no group
-    if current_user.group == 'admin' or (
-            current_user.group == 'manager' and group in
-            ['manager', 'editor', 'contributor', 'readonly']) or (
-            current_user.group == 'editor' and group in ['editor', 'contributor',
-                                                         'readonly']) or (
-            current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
-            current_user.group == 'readonly' and group == 'readonly'):
-        return True
-    return False
-
-
-def required_group(group: str):  # type: ignore
-    def wrapper(f):  # type: ignore
-        @wraps(f)
-        def wrapped(*args, **kwargs):  # type: ignore
-            if not current_user.is_authenticated:
-                return redirect(url_for('login', next=request.path))
-            if not is_authorized(group):
-                abort(403)
-            return f(*args, **kwargs)
-
-        return wrapped
-
-    return wrapper
-
-
-def get_backup_file_data() -> Dict[str, Any]:
-    path = app.config['EXPORT_DIR'] / 'sql'
-    latest_file = None
-    latest_file_date = None
-    for file in [f for f in path.iterdir() if (path / f).is_file()]:
-        if file.name == '.gitignore':
-            continue
-        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
-        if not latest_file_date or file_date > latest_file_date:
-            latest_file = file
-            latest_file_date = file_date
-    file_data: Dict[str, Any] = {'backup_too_old': True}
-    if latest_file and latest_file_date:
-        yesterday = datetime.today() - timedelta(days=1)
-        file_data['file'] = latest_file.name
-        file_data['backup_too_old'] = True if yesterday > latest_file_date else False
-        file_data['size'] = convert_size(latest_file.stat().st_size)
-        file_data['date'] = format_date(latest_file_date)
-    return file_data
-
-
-@app.template_filter()
-def test_file(file_name: str) -> Optional[str]:
-    return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
-
-
-@app.template_filter()
-def sanitize(string: str, mode: Optional[str] = None) -> str:
-    if not string:
-        return ''
-    if mode == 'node':  # Only keep letters, numbers, minus, brackets and spaces
-        return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
-    if mode == 'text':  # Remove HTML tags, keep linebreaks
-        s = MLStripper()
-        s.feed(string)
-        return s.get_data().strip()
-    return re.sub('[^A-Za-z0-9]+', '', string)  # Only keep ASCII letters and numbers
-
-
 @app.template_filter()
 def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
@@ -203,21 +55,160 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             name = request_parts[2]
             if name in g.class_view_mapping and g.class_view_mapping[name] == item:
                 active = 'active'
-        html += '<a href="/index/{item}" class="nav-item nav-link {active}">{label}</a>'.format(
-            active=active,
-            item=item,
-            label=uc_first(_(item)))
+        html += f"""
+            <a href="{url_for('index', view=item)}" class="nav-item nav-link {active}">
+                {uc_first(_(item))}
+            </a>"""
     active = ''
     if request.path.startswith('/types') \
             or request.path.startswith('/insert/type') \
             or (entity and entity.class_.view == 'type'):
         active = 'active'
-    html += '<a href="{url}" class="nav-item nav-link {active}">{label}</a>'.format(
-        active=active,
-        url=url_for('node_index'),
-        label=uc_first(_('types')))
+    html += f"""
+        <a href="{url_for('node_index')}" class="nav-item nav-link {active}">
+            {uc_first(_('types'))}
+        </a>"""
     return Markup(html)
 
+
+@app.template_filter()
+def is_authorized(group: str) -> bool:
+    if not current_user.is_authenticated or not hasattr(current_user, 'group'):
+        return False  # pragma: no cover - needed because AnonymousUserMixin has no group
+    if current_user.group == 'admin' \
+            or current_user.group == group \
+            or (current_user.group == 'manager'
+                and group in ['editor', 'contributor', 'readonly']) \
+            or (current_user.group == 'editor' and group in ['contributor', 'readonly']) \
+            or (current_user.group == 'contributor' and group in ['readonly']):
+        return True
+    return False
+
+
+@app.template_filter()
+def sanitize(string: str, mode: Optional[str] = None) -> str:
+    if not string:
+        return ''
+    if mode == 'node':  # Only keep letters, numbers, minus, brackets and spaces
+        return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
+    if mode == 'text':  # Remove HTML tags, keep linebreaks
+        s = MLStripper()
+        s.feed(string)
+        return s.get_data().strip()
+    return re.sub('[^A-Za-z0-9]+', '', string)  # Only keep ASCII letters and numbers
+
+
+@app.template_filter()
+def test_file(file_name: str) -> Optional[str]:
+    return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
+
+
+def get_backup_file_data() -> Dict[str, Any]:
+    path = app.config['EXPORT_DIR'] / 'sql'
+    latest_file = None
+    latest_file_date = None
+    for file in [f for f in path.iterdir() if (path / f).is_file() and f.name != '.gitignore']:
+        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
+        if not latest_file_date or file_date > latest_file_date:
+            latest_file = file
+            latest_file_date = file_date
+    file_data: Dict[str, Any] = {'backup_too_old': True}
+    if latest_file and latest_file_date:
+        yesterday = datetime.today() - timedelta(days=1)
+        file_data['file'] = latest_file.name
+        file_data['backup_too_old'] = True if yesterday > latest_file_date else False
+        file_data['size'] = convert_size(latest_file.stat().st_size)
+        file_data['date'] = format_date(latest_file_date)
+    return file_data
+
+
+def get_disk_space_info() -> Optional[Dict[str, Any]]:
+    if os.name != "posix":  # pragma: no cover
+        return None
+    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
+    disk_space = statvfs.f_frsize * statvfs.f_blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
+    return {
+        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+
+
+def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
+    """For performance: Build a dict with file ids and stats from files in given directory."""
+    file_stats: Dict[Union[int, str], Any] = {}
+    for file in path.iterdir():
+        if file.stem.isdigit():
+            file_stats[int(file.stem)] = {
+                'ext': file.suffix,
+                'size': file.stat().st_size,
+                'date': file.stat().st_ctime}
+    return file_stats
+
+
+def required_group(group: str):  # type: ignore
+    def wrapper(f):  # type: ignore
+        @wraps(f)
+        def wrapped(*args, **kwargs):  # type: ignore
+            if not current_user.is_authenticated:
+                return redirect(url_for('login', next=request.path))
+            if not is_authorized(group):
+                abort(403)
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
+def send_mail(
+        subject: str,
+        text: str,
+        recipients: Union[str, List[str]],
+        log_body: bool = True) -> bool:  # pragma: no cover
+    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    recipients = recipients if isinstance(recipients, list) else [recipients]
+    settings = session['settings']
+    if not settings['mail'] or len(recipients) < 1:
+        return False
+    mail_user = settings['mail_transport_username']
+    from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
+    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
+    server.ehlo()
+    server.starttls()
+    try:
+        if settings['mail_transport_username']:
+            server.login(mail_user, app.config['MAIL_PASSWORD'])
+        for recipient in recipients:
+            msg = MIMEText(text, _charset='utf-8')
+            msg['From'] = from_
+            msg['To'] = recipient.strip()
+            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
+            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
+        log_text = f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
+        log_text += f' Content: {text}' if log_body else ''
+        logger.log('info', 'mail', f'Mail send from {from_}', log_text)
+    except smtplib.SMTPAuthenticationError as e:
+        logger.log('error', 'mail', f'Error mail login for {mail_user}', e)
+        flash(_('error mail login'), 'error')
+        return False
+    except Exception as e:
+        logger.log('error', 'mail', f'Error send mail for {mail_user}', e)
+        flash(_('error mail send'), 'error')
+        return False
+    return True
+
+
+def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
+    if not entity.modified or not form.opened.data:
+        return False
+    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+        return False
+    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
+    return True
+
+
+# Todo: continue checks below
 
 @app.template_filter()
 def display_external_references(entity: Entity) -> str:

@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 from flask_login import current_user
@@ -76,7 +76,6 @@ class Import:
     def import_data(project: 'Project', class_: str, data: List[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
-        from openatlas.util.util import is_float
         for row in data:
             entity = Entity.insert(
                 class_,
@@ -122,3 +121,11 @@ class Import:
                             project=project,
                             easting=row['easting'],
                             northing=row['northing'])
+
+
+def is_float(value: Union[int, float]) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
