@@ -277,7 +277,7 @@ def insert_file(
             filenames.append(new_name)
             if len(form.file.data) > 1:
                 count = str(count + 1).zfill(2)
-                form.name.data = f'{entity_name}_{count}'
+                form.name.data = f'{entity_name.strip()}_{count}'
             entity.update(form)
             class_ = entity.class_.name
             update_links(entity, form, 'insert', origin)
