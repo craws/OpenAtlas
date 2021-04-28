@@ -277,7 +277,7 @@ def insert_file(
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
             if app.config['IMAGE_PROCESSING']:
-                ImageProcessing.upload_to_thumbnail(new_name)
+                ImageProcessing.resize_image(new_name)
             if len(form.file.data) > 1:
                 count = str(count + 1).zfill(2)
                 form.name.data = f'{entity_name.strip()}_{count}'
