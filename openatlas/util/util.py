@@ -18,7 +18,6 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
 from openatlas import app, logger
-from openatlas.api.v02.resources.error import AccessDeniedError
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -85,22 +84,6 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
         'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
         'percent': 100 - math.ceil(free_space / (disk_space / 100))}
-
-
-def api_access():  # type: ignore
-    def wrapper(f):  # type: ignore
-        @wraps(f)
-        def wrapped(*args, **kwargs):  # type: ignore
-            ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-            if not current_user.is_authenticated \
-                    and not session['settings']['api_public'] \
-                    and ip not in app.config['ALLOWED_IPS']:
-                raise AccessDeniedError  # pragma: no cover
-            return f(*args, **kwargs)
-
-        return wrapped
-
-    return wrapper
 
 
 def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover

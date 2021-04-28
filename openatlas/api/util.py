@@ -8,12 +8,9 @@ from openatlas.api.v02.resources.error import AccessDeniedError, ResourceGoneErr
 from openatlas.api.v02.resources.parser import image_parser
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.thumbnails import Thumbnails
-from openatlas.util.util import api_access
 
 
 @app.route('/api/display/<path:filename>', strict_slashes=False)
-@api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def display_file_api(filename: str) -> Any:
     from pathlib import Path as Pathlib_path
@@ -25,19 +22,12 @@ def display_file_api(filename: str) -> Any:
     if not license_:
         raise AccessDeniedError
     parser = image_parser.parse_args()
-    if parser['image_size'] and parser['download']:
-        Thumbnails.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['TMP_DIR'], filename, as_attachment=True)
-    if parser['image_size']:
-        Thumbnails.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['TMP_DIR'], filename)
     if parser['download']:
-        return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
+        return send_file(f"{app.config['UPLOAD_DIR']}/{filename}", as_attachment=True)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/api/0.1/', strict_slashes=False)
-@api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def path_error() -> Any:
     raise ResourceGoneError

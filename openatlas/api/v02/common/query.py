@@ -12,12 +12,11 @@ from openatlas.api.v02.resources.linked_places import LinkedPlacesEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import query_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
-from openatlas.util.util import api_access
 
 
 class GetQuery(Resource):  # type: ignore
-    @api_access()  # type: ignore
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = query_parser.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \
