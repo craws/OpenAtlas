@@ -377,6 +377,7 @@ def get_profile_image_table_link(
         profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
+    # Todo: If ImageProcessing is True, more files can be previewed as profile image
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover

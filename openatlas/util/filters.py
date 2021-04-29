@@ -271,47 +271,26 @@ def display_profile_image(entity: Entity) -> str:
     if not entity.image_id:
         return ''
     path = get_file_path(entity.image_id)
-    if app.config['IMAGE_PROCESSING']:
-        if not ImageProcessing.check_processed_image(path.name):
-            html = uc_first(_('no preview available'))
-            return Markup(f'<div id="profile_image_div">{html}</div>')
-        resized_path = get_thumbnail_path(entity.image_id)
-        if entity.class_.view == 'file':
-            html = """ <a href="{url}" rel="noopener noreferrer" target="_blank">
-                  <img style="max-width:{width}px;" alt="image" src="{url}">
-                  </a>""".format(
-            url=url_for('display_thumbnail', filename=resized_path.name),
-            width=session['settings']['profile_image_width'])
-        else:
-            html = """
-                <a href="{url}">
-                    <img style="max-width:{width}px;" alt="image" src="{src}">
-                </a>""".format(
-                url=url_for('entity_view', id_=entity.image_id),
-                src=url_for('display_thumbnail', filename=resized_path.name),
-                width=session['settings']['profile_image_width'])
-        return Markup(f'<div id="profile_image_div">{html}</div>')
-
     if not path:
         return ''  # pragma: no cover
-    if entity.class_.view == 'file':
-        if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-            html = """
-                <a href="{url}" rel="noopener noreferrer" target="_blank">
-                    <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>""".format(
-                url=url_for('display_file', filename=path.name),
-                width=session['settings']['profile_image_width'])
-        else:
-            html = uc_first(_('no preview available'))  # pragma: no cover
+    if entity.class_.view == 'file' and not path.suffix.lower() in app.config[
+        'DISPLAY_FILE_EXTENSIONS']:
+        html = uc_first(_('no preview available'))  # pragma: no cover
+    elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
+        html = uc_first(_('no preview available'))  # pragma: no cover
     else:
-        html = """
-            <a href="{url}">
-                <img style="max-width:{width}px;" alt="image" src="{src}">
-            </a>""".format(
-            url=url_for('entity_view', id_=entity.image_id),
-            src=url_for('display_file', filename=path.name),
-            width=session['settings']['profile_image_width'])
+        resized_path = get_thumbnail_path(entity.image_id)
+        width = session['settings']['profile_image_width']
+        filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
+        display = 'display_thumbnail' if app.config['IMAGE_PROCESSING'] else 'display_file'
+        src = url_for(display, filename=filename)
+        if entity.class_.view == 'file':
+            url = url_for('display_file', filename=path.name)
+        else:
+            url = url_for('entity_view', id_=entity.image_id)
+        rel = 'noopener noreferrer' if entity.class_.view == 'file' else ''
+        html = (f'<a href="{url}" rel="{rel}" target="_blank">'
+                f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
     return Markup(f'<div id="profile_image_div">{html}</div>')
 
 
