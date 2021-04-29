@@ -270,16 +270,17 @@ def download_button(entity: Entity) -> str:
 def display_profile_image(entity: Entity) -> str:
     if not entity.image_id:
         return ''
-    # Todo: Work in Progress, first display function needs redo
+    path = get_file_path(entity.image_id)
     if app.config['IMAGE_PROCESSING']:
-        if not ImageProcessing.check_if_thumbnail_exist(entity.image_id):
+        if not ImageProcessing.check_processed_image(path.name):
             html = uc_first(_('no preview available'))
-        path = get_thumbnail_path(entity.image_id)
+            return Markup(f'<div id="profile_image_div">{html}</div>')
+        resized_path = get_thumbnail_path(entity.image_id)
         if entity.class_.view == 'file':
             html = """ <a href="{url}" rel="noopener noreferrer" target="_blank">
                   <img style="max-width:{width}px;" alt="image" src="{url}">
                   </a>""".format(
-            url=url_for('display_thumbnail', filename=path.name),
+            url=url_for('display_thumbnail', filename=resized_path.name),
             width=session['settings']['profile_image_width'])
         else:
             html = """
@@ -287,11 +288,10 @@ def display_profile_image(entity: Entity) -> str:
                     <img style="max-width:{width}px;" alt="image" src="{src}">
                 </a>""".format(
                 url=url_for('entity_view', id_=entity.image_id),
-                src=url_for('display_thumbnail', filename=path.name),
+                src=url_for('display_thumbnail', filename=resized_path.name),
                 width=session['settings']['profile_image_width'])
         return Markup(f'<div id="profile_image_div">{html}</div>')
 
-    path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
     if entity.class_.view == 'file':

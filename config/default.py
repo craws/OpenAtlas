@@ -31,7 +31,7 @@ UPLOAD_DIR = Path(app.root_path) / 'uploads'
 # Image processing
 IMAGE_PROCESSING = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
-THUMBNAIL_DIR = Path(PROCESSED_IMAGE_DIR) / 'thumbnails'
+THUMBNAIL_DIR = Path(PROCESSED_IMAGE_DIR) / 'thumbnails'  # Todo: name it resized
 # Todo: Explain Alex, we need one fix value, because we need to know, which size we want for thumbnails
 IMAGE_OVERVIEW_SIZE = '400'
 THUMBNAIL_SIZE = '200'
