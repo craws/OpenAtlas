@@ -39,6 +39,15 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 
 @app.template_filter()
+def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
+    label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
+    onclick = f"ajaxBookmark('{entity_id}');"
+    if for_table:
+        return f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">{label}</a>'
+    return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
+
+
+@app.template_filter()
 def display_external_references(entity: Entity) -> str:
     return Markup(render_template('util/external_references.html', entity=entity))
 
@@ -104,6 +113,42 @@ def test_file(file_name: str) -> Optional[str]:
     return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
 
 
+# Todo: join begin and end function, fix double shown at person: http://127.0.0.1:5000/entity/4370
+def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity'] = None) -> str:
+    html = link(object_) if object_ else ''
+    if entry.begin_from:
+        html += ', ' if html else ''
+        if entry.begin_to:
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(entry.begin_from),
+                end=format_date(entry.begin_to))
+        else:
+            html += format_date(entry.begin_from)
+    return html + f' ({entry.begin_comment})' if entry.begin_comment else ''
+
+
+def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
+    html = link(object_) if object_ else ''
+    if entry.end_from:
+        html += ', ' if html else ''
+        if entry.end_to:
+            html += _(
+                'between %(begin)s and %(end)s',
+                begin=format_date(entry.end_from),
+                end=format_date(entry.end_to))
+        else:
+            html += format_date(entry.end_from)
+    return html + f' ({entry.end_comment})' if entry.end_comment else ''
+
+
+def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
+    name = link(entity) if show_links else entity.name
+    if not len(entity.aliases) or not current_user.settings['table_show_aliases']:
+        return name
+    return f'<p>{name}</p>{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
+
+
 def get_backup_file_data() -> Dict[str, Any]:
     path = app.config['EXPORT_DIR'] / 'sql'
     latest_file = None
@@ -123,6 +168,32 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
+def get_base_table_data(
+        entity: 'Entity',
+        file_stats: Optional[Dict[Union[int, str], Any]] = None,
+        show_links: Optional[bool] = True) -> List[Any]:
+    data = [format_name_and_aliases(entity, show_links)]
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
+            entity.class_.name == 'find':
+        data.append(entity.class_.label)
+    if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
+        data.append(entity.print_standard_type(show_links=False))
+    if entity.class_.name == 'file':
+        if file_stats:
+            data.append(convert_size(
+                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
+            data.append(
+                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
+        else:
+            data.append(print_file_size(entity))
+            data.append(get_file_extension(entity))
+    if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
+        data.append(entity.first)
+        data.append(entity.last)
+    data.append(entity.description)
+    return data
+
+
 def get_disk_space_info() -> Optional[Dict[str, Any]]:
     if os.name != "posix":  # pragma: no cover
         return None
@@ -136,94 +207,10 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 
 def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
-    """For performance: Build a dict with file ids and stats from files in given directory."""
-    file_stats: Dict[Union[int, str], Any] = {}
-    for file in path.iterdir():
-        if file.stem.isdigit():
-            file_stats[int(file.stem)] = {
-                'ext': file.suffix,
-                'size': file.stat().st_size,
-                'date': file.stat().st_ctime}
-    return file_stats
-
-
-def required_group(group: str):  # type: ignore
-    def wrapper(f):  # type: ignore
-        @wraps(f)
-        def wrapped(*args, **kwargs):  # type: ignore
-            if not current_user.is_authenticated:
-                return redirect(url_for('login', next=request.path))
-            if not is_authorized(group):
-                abort(403)
-            return f(*args, **kwargs)
-
-        return wrapped
-
-    return wrapper
-
-
-def send_mail(
-        subject: str,
-        text: str,
-        recipients: Union[str, List[str]],
-        log_body: bool = True) -> bool:  # pragma: no cover
-    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
-    recipients = recipients if isinstance(recipients, list) else [recipients]
-    settings = session['settings']
-    if not settings['mail'] or len(recipients) < 1:
-        return False
-    mail_user = settings['mail_transport_username']
-    from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
-    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
-    server.ehlo()
-    server.starttls()
-    try:
-        if settings['mail_transport_username']:
-            server.login(mail_user, app.config['MAIL_PASSWORD'])
-        for recipient in recipients:
-            msg = MIMEText(text, _charset='utf-8')
-            msg['From'] = from_
-            msg['To'] = recipient.strip()
-            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
-            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
-        log_text = f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
-        log_text += f' Content: {text}' if log_body else ''
-        logger.log('info', 'mail', f'Mail send from {from_}', log_text)
-    except smtplib.SMTPAuthenticationError as e:
-        logger.log('error', 'mail', f'Error mail login for {mail_user}', e)
-        flash(_('error mail login'), 'error')
-        return False
-    except Exception as e:
-        logger.log('error', 'mail', f'Error send mail for {mail_user}', e)
-        flash(_('error mail send'), 'error')
-        return False
-    return True
-
-
-def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
-        return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
-
-
-# Todo: continue checks below
-@app.template_filter()
-def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
-    label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
-    onclick = f"ajaxBookmark('{entity_id}');"
-    if for_table:
-        return f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">{label}</a>'
-    return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
-
-
-def tooltip(text: str) -> str:
-    if not text:
-        return ''
-    return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
-        title=text.replace('"', "'"))
+    stats: Dict[int, Dict[str, Any]] = {}
+    for f in filter(lambda x: x.stem.isdigit(), path.iterdir()):
+        stats[int(f.stem)] = {'ext': f.suffix, 'size': f.stat().st_size, 'date': f.stat().st_ctime}
+    return stats
 
 
 def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
@@ -319,72 +306,76 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
     return add_system_data(entity, data)
 
 
-def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
-    name = link(entity) if show_links else entity.name
-    if not len(entity.aliases) or not current_user.settings['table_show_aliases']:
-        return name
-    html = f'<p>{name}</p>'
-    for i, alias in enumerate(entity.aliases.values()):
-        html += alias if i else f'<p>{alias}</p>'
-    return html
+def required_group(group: str):  # type: ignore
+    def wrapper(f):  # type: ignore
+        @wraps(f)
+        def wrapped(*args, **kwargs):  # type: ignore
+            if not current_user.is_authenticated:
+                return redirect(url_for('login', next=request.path))
+            if not is_authorized(group):
+                abort(403)
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
 
 
-def get_base_table_data(
-        entity: 'Entity',
-        file_stats: Optional[Dict[Union[int, str], Any]] = None,
-        show_links: Optional[bool] = True) -> List[Any]:
-    data = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
-            entity.class_.name == 'find':
-        data.append(entity.class_.label)
-    if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
-        data.append(entity.print_standard_type(show_links=False))
-    if entity.class_.name == 'file':
-        if file_stats:
-            data.append(convert_size(
-                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
-            data.append(
-                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
-        else:
-            data.append(print_file_size(entity))
-            data.append(get_file_extension(entity))
-    if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
-        data.append(entity.first)
-        data.append(entity.last)
-    data.append(entity.description)
-    return data
+def send_mail(
+        subject: str,
+        text: str,
+        recipients: Union[str, List[str]],
+        log_body: bool = True) -> bool:  # pragma: no cover
+    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    recipients = recipients if isinstance(recipients, list) else [recipients]
+    settings = session['settings']
+    if not settings['mail'] or len(recipients) < 1:
+        return False
+    mail_user = settings['mail_transport_username']
+    from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
+    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
+    server.ehlo()
+    server.starttls()
+    try:
+        if settings['mail_transport_username']:
+            server.login(mail_user, app.config['MAIL_PASSWORD'])
+        for recipient in recipients:
+            msg = MIMEText(text, _charset='utf-8')
+            msg['From'] = from_
+            msg['To'] = recipient.strip()
+            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
+            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
+        log_text = f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
+        log_text += f' Content: {text}' if log_body else ''
+        logger.log('info', 'mail', f'Mail send from {from_}', log_text)
+    except smtplib.SMTPAuthenticationError as e:
+        logger.log('error', 'mail', f'Error mail login for {mail_user}', e)
+        flash(_('error mail login'), 'error')
+        return False
+    except Exception as e:
+        logger.log('error', 'mail', f'Error send mail for {mail_user}', e)
+        flash(_('error mail send'), 'error')
+        return False
+    return True
 
 
-def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity'] = None) -> str:
-    html = link(object_) if object_ else ''
-    if entry.begin_from:
-        html += ', ' if html else ''
-        if entry.begin_to:
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(entry.begin_from),
-                end=format_date(entry.begin_to))
-        else:
-            html += format_date(entry.begin_from)
-    html += (' (' + entry.begin_comment + ')') if entry.begin_comment else ''
-    return html
+def tooltip(text: str) -> str:
+    if not text:
+        return ''
+    return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
+        title=text.replace('"', "'"))
 
 
-def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
-    html = link(object_) if object_ else ''
-    if entry.end_from:
-        html += ', ' if html else ''
-        if entry.end_to:
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(entry.end_from),
-                end=format_date(entry.end_to))
-        else:
-            html += format_date(entry.end_from)
-    html += (' (' + entry.end_comment + ')') if entry.end_comment else ''
-    return html
+def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
+    if not entity.modified or not form.opened.data:
+        return False
+    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+        return False
+    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
+    return True
 
 
+# Todo: continue checks below
 def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
