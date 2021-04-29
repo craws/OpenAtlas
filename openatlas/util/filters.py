@@ -24,6 +24,7 @@ from openatlas.models.content import Content
 from openatlas.models.date import Date
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized
 
@@ -31,7 +32,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.node import Node
     from openatlas.models.entity import Entity
     from openatlas.models.link import Link
-
 
 blueprint: flask.Blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -270,6 +270,27 @@ def download_button(entity: Entity) -> str:
 def display_profile_image(entity: Entity) -> str:
     if not entity.image_id:
         return ''
+    # Todo: Work in Progress, first display function needs redo
+    if app.config['IMAGE_PROCESSING']:
+        if not ImageProcessing.check_if_thumbnail_exist(entity.image_id):
+            html = uc_first(_('no preview available'))
+        path = get_thumbnail_path(entity.image_id)
+        if entity.class_.view == 'file':
+            html = """ <a href="{url}" rel="noopener noreferrer" target="_blank">
+                  <img style="max-width:{width}px;" alt="image" src="{url}">
+                  </a>""".format(
+            url=url_for('display_thumbnail', filename=path.name),
+            width=session['settings']['profile_image_width'])
+        else:
+            html = """
+                <a href="{url}">
+                    <img style="max-width:{width}px;" alt="image" src="{src}">
+                </a>""".format(
+                url=url_for('entity_view', id_=entity.image_id),
+                src=url_for('display_thumbnail', filename=path.name),
+                width=session['settings']['profile_image_width'])
+        return Markup(f'<div id="profile_image_div">{html}</div>')
+
     path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
@@ -747,6 +768,13 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
     return path if path else None
 
 
+def get_thumbnail_path(entity: Union[int, 'Entity']) -> Optional[Path]:
+    entity_id = entity if isinstance(entity, int) else entity.id
+    p = app.config['THUMBNAIL_DIR'] / app.config['THUMBNAIL_SIZE']
+    path = next(p.glob(str(entity_id) + '.*'), None)
+    return path if path else None
+
+
 def add_reference_systems_to_form(form: Any) -> str:
     fields = []
     for field in form:
@@ -787,10 +815,10 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False

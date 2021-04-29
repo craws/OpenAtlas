@@ -21,7 +21,6 @@ SECRET_KEY = 'CHANGE ME'
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
-
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
@@ -33,7 +32,12 @@ UPLOAD_DIR = Path(app.root_path) / 'uploads'
 IMAGE_PROCESSING = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 THUMBNAIL_DIR = Path(PROCESSED_IMAGE_DIR) / 'thumbnails'
-PROCESSED_IMAGE_SIZES = ['400', '200', '100', '50']
+# Todo: Explain Alex, we need one fix value, because we need to know, which size we want for thumbnails
+IMAGE_OVERVIEW_SIZE = '400'
+THUMBNAIL_SIZE = '200'
+TABLE_IMAGE_SIZE = '100'
+ICON_IMAGE_SIZE = '30'
+PROCESSED_IMAGE_SIZES = [THUMBNAIL_SIZE, IMAGE_OVERVIEW_SIZE, TABLE_IMAGE_SIZE, ICON_IMAGE_SIZE]
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only

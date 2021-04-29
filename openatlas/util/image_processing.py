@@ -7,7 +7,7 @@ from openatlas import app
 
 class ImageProcessing:
     multi_image = ['pdf', 'mp4', 'gif', 'psd', 'ai', 'xcf']
-    single_image = ['jpeg', 'jpg', 'png', 'tiff', 'tif', 'raw', 'eps']
+    single_image = ['jpeg', 'jpg', 'png', 'tiff', 'tif', 'raw', 'eps', 'ico', 'svg', 'bmp']
     image_validation = single_image + multi_image
 
     @staticmethod
@@ -15,8 +15,7 @@ class ImageProcessing:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = filename.rsplit('.', 1)[1].lower()
         if file_format in ImageProcessing.image_validation:
-            sizes = app.config['PROCESSED_IMAGE_SIZES']
-            for size in sizes:
+            for size in app.config['PROCESSED_IMAGE_SIZES']:
                 ImageProcessing.create_thumbnail(name, file_format, size)
 
     @staticmethod
@@ -33,6 +32,10 @@ class ImageProcessing:
                 img.transform(resize=size + 'x' + size + '>')
                 img.save(
                     filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (filename + '.png')))
+
+    @staticmethod
+    def check_if_thumbnail_exist(image_id: int) -> None:
+        return True
 
     @staticmethod
     def validate_folder(folder: str, path: str) -> bool:

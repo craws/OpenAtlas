@@ -23,6 +23,12 @@ def display_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
+@app.route('/display_thumbnail/<path:filename>')
+@required_group('readonly')
+def display_thumbnail(filename: str) -> Any:
+    return send_from_directory(app.config['THUMBNAIL_DIR'] / app.config['THUMBNAIL_SIZE'], filename)
+
+
 @app.route('/display_logo/<path:filename>')
 def display_logo(filename: str) -> Any:  # File display function for public
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
