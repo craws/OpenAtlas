@@ -113,33 +113,22 @@ def test_file(file_name: str) -> Optional[str]:
     return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
 
 
-# Todo: join begin and end function, fix double shown at person: http://127.0.0.1:5000/entity/4370
-def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity'] = None) -> str:
+def format_entity_date(
+        entity: Union['Entity', 'Link'],
+        type_: str,  # begin or end
+        object_: Optional['Entity'] = None) -> str:
     html = link(object_) if object_ else ''
-    if entry.begin_from:
+    if getattr(entity, f'{type_}_from'):
         html += ', ' if html else ''
-        if entry.begin_to:
+        if getattr(entity, f'{type_}_to'):
             html += _(
                 'between %(begin)s and %(end)s',
-                begin=format_date(entry.begin_from),
-                end=format_date(entry.begin_to))
+                begin=format_date(getattr(entity, f'{type_}_from')),
+                end=format_date(getattr(entity, f'{type_}_to')))
         else:
-            html += format_date(entry.begin_from)
-    return html + f' ({entry.begin_comment})' if entry.begin_comment else ''
-
-
-def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
-    html = link(object_) if object_ else ''
-    if entry.end_from:
-        html += ', ' if html else ''
-        if entry.end_to:
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(entry.end_from),
-                end=format_date(entry.end_to))
-        else:
-            html += format_date(entry.end_from)
-    return html + f' ({entry.end_comment})' if entry.end_comment else ''
+            html += format_date(entity.begin_from)
+    comment = getattr(entity, f'{type_}_comment')
+    return html + (f" ({comment})" if comment else '')
 
 
 def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
@@ -226,8 +215,8 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
-    data[_('begin')] = (from_link if from_link else '') + format_entry_begin(entity)
-    data[_('end')] = (to_link if to_link else '') + format_entry_end(entity)
+    data[_('begin')] = (from_link if from_link else '') + format_entity_date(entity, 'begin')
+    data[_('end')] = (to_link if to_link else '') + format_entity_date(entity, 'end')
 
     add_type_data(entity, data)
 
@@ -260,12 +249,8 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
             residence_object = residence_place.get_linked_entity_safe('P53', True)
             entity.linked_places.append(residence_object)
         data[_('alias')] = list(entity.aliases.values())
-        data[_('born') if entity.class_.name == 'person' else _('begin')] = format_entry_begin(
-            entity,
-            begin_object)
-        data[_('died') if entity.class_.name == 'person' else _('end')] = format_entry_end(
-            entity,
-            end_object)
+        data[_('begin')] = format_entity_date(entity, 'begin', begin_object)
+        data[_('end')] = format_entity_date(entity, 'end', end_object)
         if event_links:
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
@@ -375,7 +360,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-# Todo: continue checks below
+# Todo: fix first appearance date comparison, continue with rest of util
 def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
@@ -389,21 +374,17 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
-                first_string = format_entry_begin(link_) + ' ' + _('at an') + ' ' + event_link
-                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+                first_string = f"{format_entity_date(link_, 'begin', link_.object_)} {_('*at an')} {event_link}"
             elif event.first and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
-                first_string = format_entry_begin(event) + ' ' + _('at an') + ' ' + event_link
-                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+                first_string = f"{format_entity_date(event, 'begin', link_.object_)} {_('at an')} {event_link}"
         if not actor.last:
             if link_.last and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
-                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
-                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+                last_string = f"{format_entity_date(event, 'end', link_.object_)} {_('at an')} {event_link}"
             elif event.last and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
-                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
-                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+                last_string = f"{format_entity_date(event, 'end', link_.object_)} {_('at an')} {event_link}"
     return first_string, last_string
 
 
