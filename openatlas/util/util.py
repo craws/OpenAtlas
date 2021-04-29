@@ -15,7 +15,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHECKING, Tuple, Union
 
 import numpy
-from flask import flash, g, request, session, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import LazyString, format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -39,6 +39,11 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 
 @app.template_filter()
+def display_external_references(entity: Entity) -> str:
+    return Markup(render_template('util/external_references.html', entity=entity))
+
+
+@app.template_filter()
 def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
     if entity:
@@ -55,19 +60,15 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             name = request_parts[2]
             if name in g.class_view_mapping and g.class_view_mapping[name] == item:
                 active = 'active'
-        html += f"""
-            <a href="{url_for('index', view=item)}" class="nav-item nav-link {active}">
-                {uc_first(_(item))}
-            </a>"""
+        url = url_for('index', view=item)
+        html += f'<a href="{url}" class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
     active = ''
     if request.path.startswith('/types') \
             or request.path.startswith('/insert/type') \
             or (entity and entity.class_.view == 'type'):
         active = 'active'
-    html += f"""
-        <a href="{url_for('node_index')}" class="nav-item nav-link {active}">
-            {uc_first(_('types'))}
-        </a>"""
+    url = url_for('node_index')
+    html += f'<a href="{url}" class="nav-item nav-link {active}"> {uc_first(_("types"))}</a>'
     return Markup(html)
 
 
@@ -209,28 +210,6 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
 
 
 # Todo: continue checks below
-
-@app.template_filter()
-def display_external_references(entity: Entity) -> str:
-    system_links = []
-    for link_ in entity.reference_systems:
-        system = g.reference_systems[link_.domain.id]
-        name = link_.description
-        if system.resolver_url:
-            name = '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
-                url=system.resolver_url + name,
-                name=name)
-        system_links.append('''{name} ({match} {at} {system_name})'''.format(
-            name=name,
-            match=g.nodes[link_.type.id].name,
-            at=_('at'),
-            system_name=link(link_.domain)))
-    html = '<br>'.join(system_links)
-    if not html:
-        return ''
-    return Markup(f'<h2>{uc_first(_("external reference systems"))}</h2>{html}')
-
-
 @app.template_filter()
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
