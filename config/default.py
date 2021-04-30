@@ -31,6 +31,7 @@ OA_TMP_DIR = Path(app.root_path) / 'tmp'
 
 # Image processing
 IMAGE_PROCESSING = False
+IMAGE_PREVIEW = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 THUMBNAIL_DIR = Path(PROCESSED_IMAGE_DIR) / 'thumbnails'  # Todo: name it resized
 # Todo: Explain Alex, we need one fix value, because we need to know, which size we want for thumbnails

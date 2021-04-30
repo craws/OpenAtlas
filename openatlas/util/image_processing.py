@@ -26,7 +26,7 @@ class ImageProcessing:
                     img.save(
                         filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (filename + '.png')))
         except Exception as e:
-            logger.log('error', 'thumbnail creation', 'failed to save', e)
+            logger.log('debug', 'thumbnail creation', 'failed to save', e)
 
     @staticmethod
     def check_processed_image(filename: str) -> bool:
@@ -36,9 +36,11 @@ class ImageProcessing:
             for size in app.config['PROCESSED_IMAGE_SIZES']:
                 p = Path(app.config['THUMBNAIL_DIR']) / size / f'{name}.png'
                 if not p.is_file():
-                    ImageProcessing.create_thumbnail(name, file_format, size)
+                    if not ImageProcessing.create_thumbnail(name, file_format, size):
+                        return False
             return True
-        except Exception:
+        except Exception as e:
+            logger.log('debug', 'image check failed', 'fail to validate file as image', e)
             return False
 
     @staticmethod
@@ -52,6 +54,7 @@ class ImageProcessing:
 
     @staticmethod
     def display_as_thumbnail(filename: str, size: str) -> None:
+        # Todo: Check if image!!!
         path = str(app.config['UPLOAD_DIR']) + '/' + filename
         with Image(filename=path) as img:
             img.transform(resize=size + 'x' + size + '>')

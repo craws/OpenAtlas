@@ -280,7 +280,7 @@ def display_profile_image(entity: Entity) -> str:
     elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
         html = uc_first(_('no preview available'))  # pragma: no cover
     else:
-        resized_path = get_thumbnail_path(entity.image_id)
+        resized_path = get_image_path(entity.image_id, app.config['THUMBNAIL_SIZE'])
         width = session['settings']['profile_image_width']
         filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
         display = 'display_thumbnail' if app.config['IMAGE_PROCESSING'] else 'display_file'
@@ -748,9 +748,9 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
     return path if path else None
 
 
-def get_thumbnail_path(entity: Union[int, 'Entity']) -> Optional[Path]:
+def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
-    p = app.config['THUMBNAIL_DIR'] / app.config['THUMBNAIL_SIZE']
+    p = app.config['THUMBNAIL_DIR'] / size
     path = next(p.glob(str(entity_id) + '.*'), None)
     return path if path else None
 

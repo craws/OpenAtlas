@@ -13,7 +13,8 @@ from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.filters import (
     button, convert_size, external_url, format_date, get_base_table_data, get_file_path,
-    link)
+    get_image_path, link)
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_stats, is_authorized, required_group
 
@@ -62,7 +63,8 @@ def get_table(view: str) -> Table:
                 entity.print_standard_type(),
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
-                entity.description])
+                entity.description,
+                file_preview(entity.id) if app.config['IMAGE_PREVIEW'] else ''])
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
@@ -78,6 +80,20 @@ def get_table(view: str) -> Table:
         entities = Entity.get_by_class(classes, nodes=True, aliases=True)
         table.rows = [get_base_table_data(entity) for entity in entities]
     return table
+
+
+def file_preview(entity_id):
+    icon_path = get_image_path(entity_id, app.config['ICON_IMAGE_SIZE'])
+    if not icon_path:
+        path = get_file_path(entity_id)
+        if not path:
+            return ''
+        if ImageProcessing.check_processed_image(path.name):
+            src = url_for('display_icon', filename=f'{entity_id}.png')
+            return f"<img src='{src}'>"
+        else:
+            return ''
+    return f"<img src='{url_for('display_icon', filename=icon_path.name)}'>"
 
 
 def delete_entity(id_: int) -> Optional[str]:
