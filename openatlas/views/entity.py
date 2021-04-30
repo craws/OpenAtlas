@@ -299,6 +299,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 extension = data[3]
                 data.append(
                     get_profile_image_table_link(domain, entity, extension, entity.image_id))
+                # Todo: Ask Alex, what this if statement does!
                 if not entity.image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' and is_authorized('editor') and \
@@ -377,7 +378,9 @@ def get_profile_image_table_link(
         profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
-    # Todo: If ImageProcessing is True, more files can be previewed as profile image
+    elif app.config['IMAGE_PROCESSING']:
+        if extension in app.config['PROCESSED_IMAGE_EXT']:
+            return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover

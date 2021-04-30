@@ -273,8 +273,9 @@ def display_profile_image(entity: Entity) -> str:
     path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    if entity.class_.view == 'file' and not path.suffix.lower() in app.config[
-        'DISPLAY_FILE_EXTENSIONS']:
+    ext = app.config['PROCESSED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
+        'DISPLAY_FILE_EXTENSIONS']
+    if entity.class_.view == 'file' and not path.suffix.lower() in ext:
         html = uc_first(_('no preview available'))  # pragma: no cover
     elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
         html = uc_first(_('no preview available'))  # pragma: no cover
