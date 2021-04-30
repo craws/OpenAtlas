@@ -360,9 +360,8 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-# Todo: fix first appearance date comparison, continue with rest of util
 def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
-    # Get first/last appearance from events for actors without begin/end
+    # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
     first_string = ''
@@ -374,17 +373,21 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
-                first_string = f"{format_entity_date(link_, 'begin', link_.object_)} {_('*at an')} {event_link}"
+                first_string = f"{format_entity_date(link_, 'begin', link_.object_)}"
+                first_string += f" {_('at an')} {event_link}"
             elif event.first and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
-                first_string = f"{format_entity_date(event, 'begin', link_.object_)} {_('at an')} {event_link}"
+                first_string = f"{format_entity_date(event, 'begin', link_.object_)}"
+                first_string += f" {_('at an')} {event_link}"
         if not actor.last:
             if link_.last and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
-                last_string = f"{format_entity_date(event, 'end', link_.object_)} {_('at an')} {event_link}"
+                last_string = f"{format_entity_date(link_, 'end', link_.object_)}"
+                last_string += f" {_('at an')} {event_link}"
             elif event.last and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
-                last_string = f"{format_entity_date(event, 'end', link_.object_)} {_('at an')} {event_link}"
+                last_string = f"{format_entity_date(event, 'end', link_.object_)}"
+                last_string += f" {_('at an')} {event_link}"
     return first_string, last_string
 
 
@@ -404,10 +407,7 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
 
 
 def add_reference_systems_to_form(form: Any) -> str:
-    fields = []
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            fields.append(field)
+    fields = [field for field in form if field.id.startswith('reference_system_id_')]
     html = ''
     switch_class = ''
     if len(fields) > 3:  # pragma: no cover
