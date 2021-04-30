@@ -153,3 +153,12 @@ def get_backup_file_data() -> Dict[str, Any]:
         file_data['size'] = convert_size(latest_file.stat().st_size)
         file_data['date'] = format_date(latest_file_date)
     return file_data
+
+
+def delete_tmp_files():
+    for file_ in [f for f in Path(app.config['OA_TMP_DIR']).glob('**/*') if f.is_file()]:
+        try:
+            file_.unlink()
+        except Exception as e:
+            logger.log('error', 'tmp', 'failed deletion', e)
+            continue

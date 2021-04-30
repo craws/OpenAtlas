@@ -27,6 +27,7 @@ DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.sv
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
 EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
+OA_TMP_DIR = Path(app.root_path) / 'tmp'
 
 # Image processing
 IMAGE_PROCESSING = False

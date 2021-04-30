@@ -1,6 +1,7 @@
 import locale
 import os
 import sys
+from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, g, request, session
@@ -10,6 +11,7 @@ from flask_wtf.csrf import CSRFProtect
 
 from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
+
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -27,6 +29,7 @@ if os.name == "posix":
 babel = Babel(app)
 
 from openatlas.models.logger import Logger
+
 logger = Logger()
 
 from openatlas.views import (
@@ -94,6 +97,11 @@ def apply_caching(response: Response) -> Response:
 def teardown_request(exception: Any) -> None:
     close_connection()
 
+
+@app.teardown_request
+def clear_tmp_folder(exception: Any) -> None:
+    from openatlas.util.util import delete_tmp_files
+    delete_tmp_files()
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()

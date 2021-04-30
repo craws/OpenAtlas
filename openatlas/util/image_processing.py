@@ -2,7 +2,7 @@ from pathlib import Path
 
 from wand.image import Image
 
-from openatlas import app
+from openatlas import app, logger
 
 
 class ImageProcessing:
@@ -25,8 +25,8 @@ class ImageProcessing:
                     img.transform(resize=size + 'x' + size + '>')
                     img.save(
                         filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (filename + '.png')))
-        except Exception:
-            print("Problem with folder checking or creation")
+        except Exception as e:
+            logger.log('error', 'thumbnail creation', 'failed to save', e)
 
     @staticmethod
     def check_processed_image(filename: str) -> bool:
@@ -55,4 +55,4 @@ class ImageProcessing:
         path = str(app.config['UPLOAD_DIR']) + '/' + filename
         with Image(filename=path) as img:
             img.transform(resize=size + 'x' + size + '>')
-            img.save(filename=f"{app.config['TMP_DIR']}/{filename}")
+            img.save(filename=f"{app.config['OA_TMP_DIR']}/{filename}")
