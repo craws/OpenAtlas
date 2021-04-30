@@ -448,7 +448,6 @@ def add_dates_to_form(form: Any) -> str:
         label=_('hide') if form.begin_year_from.data or form.end_year_from.data else _('show'))
 
 
-#  Todo
 def print_file_size(entity: 'Entity') -> str:
     path = get_file_path(entity.id)
     return convert_size(path.stat().st_size) if path else 'N/A'
@@ -468,43 +467,27 @@ def external_url(url: Union[str, None]) -> str:
 
 
 def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
-    from openatlas import logger
-    # Add additional information for entity views (if activated in profile)
+    """Add additional information for entity views if activated in profile"""
     if not hasattr(current_user, 'settings'):
         return data  # pragma: no cover
-    info = logger.get_log_for_advanced_view(entity.id)
     if 'entity_show_class' in current_user.settings and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
+    info = logger.get_log_for_advanced_view(entity.id)
     if 'entity_show_dates' in current_user.settings and current_user.settings['entity_show_dates']:
-        data[_('created')] = format_date(entity.created) + ' ' + link(info['creator'])
+        data[_('created')] = f"{format_date(entity.created)} {link(info['creator'])}"
         if info['modified']:
-            html = format_date(info['modified']) + ' ' + link(info['modifier'])
-            data[_('modified')] = html
+            data[_('modified')] = f"{format_date(info['modified'])} {link(info['modifier'])}"
     if 'entity_show_import' in current_user.settings:
         if current_user.settings['entity_show_import']:
             data[_('imported from')] = link(info['project'])
             data[_('imported by')] = link(info['importer'])
             data['origin ID'] = info['origin_id']
     if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
-        data_api = f'<a href="{url_for("entity", id_=entity.id)}" target="_blank">GeoJSON</a>'
-        data_api += '''
-            <a class="{css}" href="{url}" target="_blank" title="Download">
-                <i class="fas fa-download"></i> {label}
-            </a>'''.format(
-            css=app.config['CSS']['button']['primary'],
-            url=url_for('entity', id_=entity.id, download=True),
-            label=uc_first('download'))
-        data_api += '''
-            <a class="{css}" href="{url}" target="_blank" title="CSV">
-                <i class="fas fa-download"></i> {label}
-            </a>'''.format(
-            css=app.config['CSS']['button']['primary'],
-            url=url_for('entity', id_=entity.id, export='csv'),
-            label=uc_first('csv'))
-        data['API'] = data_api
+        data['API'] = render_template('util/api_links.html', entity=entity)
     return data
 
 
+# Todo
 def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
