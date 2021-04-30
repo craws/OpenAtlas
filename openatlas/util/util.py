@@ -31,6 +31,7 @@ from openatlas.models.date import Date
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.models.user import User
 from openatlas.util.table import Table
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -555,7 +556,6 @@ def display_delete_link(entity: Entity) -> str:
     return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
 
 
-# Todo
 @app.template_filter()
 def link(object_: Any,
          url: Optional[str] = None,
@@ -571,7 +571,6 @@ def link(object_: Any,
 
     # Builds an HTML link to a detail view of an object
     from openatlas.models.entity import Entity
-    from openatlas.models.user import User
     if isinstance(object_, Project):
         return link(object_.name, url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
@@ -589,6 +588,7 @@ def link(object_: Any,
     return ''
 
 
+# Todo
 @app.template_filter()
 def button(
         label: str,

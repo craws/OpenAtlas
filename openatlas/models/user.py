@@ -12,7 +12,6 @@ from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.user import User as Db
-from openatlas.util.util import sanitize
 
 
 class User(UserMixin):  # type: ignore
@@ -180,11 +179,11 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def insert_note(entity_id: int, note: str, public: bool) -> None:
-        Db.insert_note(current_user.id, entity_id, sanitize(note, 'text'), public)
+        Db.insert_note(current_user.id, entity_id, note, public)
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:
-        Db.update_note(id_, sanitize(note, 'text'), public)
+        Db.update_note(id_, note, public)
 
     @staticmethod
     def get_note_by_id(id_: int) -> Dict[str, Any]:
