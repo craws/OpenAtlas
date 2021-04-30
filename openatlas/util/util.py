@@ -31,7 +31,6 @@ from openatlas.models.date import Date
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
-from openatlas.models.user import User
 from openatlas.util.table import Table
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -571,6 +570,7 @@ def link(object_: Any,
 
     # Builds an HTML link to a detail view of an object
     from openatlas.models.entity import Entity
+    from openatlas.models.user import User
     if isinstance(object_, Project):
         return link(object_.name, url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
@@ -588,7 +588,6 @@ def link(object_: Any,
     return ''
 
 
-# Todo
 @app.template_filter()
 def button(
         label: str,
@@ -598,15 +597,9 @@ def button(
         onclick: Optional[str] = '') -> str:
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
-        label = '+ ' + label
-    html = '<{tag} class="{class_}" {url} {id} {onclick}>{label}</{tag}>'.format(
-        tag='a' if url else 'span',
-        class_=app.config['CSS']['button'][css],
-        url='href="{url}"'.format(url=url) if url else '',
-        label=label,
-        id='id="' + id_ + '"' if id_ else '',
-        onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
-    return Markup(html)
+        label = f'+ {label}'
+    return Markup(
+        render_template('util/button.html', label=label, url=url, css=css, id_=id_, js=onclick))
 
 
 @app.template_filter()
@@ -617,6 +610,7 @@ def display_citation_example(code: str) -> str:
     return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
 
 
+#  Todo
 @app.template_filter()
 def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:

@@ -12,7 +12,7 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
-from openatlas.util.util import button, is_authorized, link, required_group, sanitize, uc_first
+from openatlas.util.util import button, is_authorized, link, required_group, uc_first
 
 
 @app.route('/note/view/<int:id_>')
@@ -57,7 +57,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
     form = build_form('note')
     if form.validate_on_submit():
-        User.insert_note(entity_id, sanitize(form.description.data, 'text'), form.public.data)
+        User.insert_note(entity_id, form.description.data, form.public.data)
         flash(_('note added'), 'info')
         return redirect(url_for('entity_view', id_=entity.id) + '#tab-note')
     return render_template(
@@ -79,7 +79,7 @@ def note_update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(note['entity_id'])
     form = build_form('note')
     if form.validate_on_submit():
-        User.update_note(note['id'], sanitize(form.description.data, 'text'), form.public.data)
+        User.update_note(note['id'], form.description.data, form.public.data)
         flash(_('note updated'), 'info')
         return redirect(url_for('entity_view', id_=note['entity_id']) + '#tab-note')
     form.save.label.text = _('save')

@@ -1,0 +1,9 @@
+{% if url %}
+    <a href="{{ url }}" class="{{ config['CSS']['button'][css] }}" id="{{ id_ }}" onclick="{{ js }}">
+        {{ label }}
+    </a>
+{% else %}
+    <span class="{{ config['CSS']['button'][css] }}" id="{{ id_ }}" onclick="{{ js }}">
+        {{ label }}
+    </span>
+{% endif %}

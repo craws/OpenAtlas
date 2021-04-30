@@ -146,7 +146,7 @@ class Entity:
             'end_to': Date.datetime64_to_timestamp(self.end_to),
             'begin_comment': str(self.begin_comment).strip() if self.begin_comment else None,
             'end_comment': str(self.end_comment).strip() if self.end_comment else None,
-            'description': sanitize(self.description, 'text')})
+            'description': sanitize(self.description, 'text') if self.description else None})
 
     def update_aliases(self, form: FlaskForm) -> None:
         if not hasattr(form, 'alias'):
