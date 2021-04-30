@@ -407,35 +407,20 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
 
 
 def add_reference_systems_to_form(form: Any) -> str:
-    fields = [field for field in form if field.id.startswith('reference_system_id_')]
     html = ''
     switch_class = ''
+    fields = [field for field in form if field.id.startswith('reference_system_id_')]
     if len(fields) > 3:  # pragma: no cover
-        switch_class = 'reference-systems-switch'
-        html = f"""
-            <div class="table-row">
-                <div>
-                    <label>{uc_first(_('reference systems'))}</label>
-                </div>
-                <div class="table-cell reference-systems-switcher">
-                    <span
-                        id="reference-systems-switcher"
-                        class="{app.config['CSS']['button']['secondary']}">
-                            {uc_first(_('show'))}
-                    </span>
-                </div>
-            </div>"""
+        switch_class = 'reference-system-switch'
+        html = render_template('util/reference_system_switch.html')
     for field in fields:
         precision_field = getattr(form, field.id.replace('id_', 'precision_'))
         class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
         html += add_row(
             field,
             field.label,
-            ' '.join([
-                str(field(class_=class_)),
-                str(precision_field.label),
-                str(precision_field)]),
-            row_css_class='external-reference ' + switch_class)
+            ' '.join([str(field(class_=class_)), str(precision_field.label), str(precision_field)]),
+            row_css_class=f'external-reference {switch_class}')
     return html
 
 
