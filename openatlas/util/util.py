@@ -487,29 +487,24 @@ def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-# Todo
-def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> Dict[str, Any]:
+def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
+
     type_data: OrderedD[str, Any] = OrderedDict()
-    sorted_nodes = sorted(entity.nodes.items(), key=lambda x: x[0].name)
-    for node, node_value in sorted_nodes:
+    for node, node_value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         root = g.nodes[node.root[-1]]
         label = _('type') if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
-        text = ''
-        if root.value_type:  # Text for value types
-            text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
-                value=format_number(node_value), description=description)
-        type_data[label].append('<span title="{path}">{link}</span>{text}'.format(
-            link=link(node),
-            path=' > '.join([g.nodes[id_].name for id_ in node.root]),
-            text=text))
+        type_data[label].append(f"""
+            <span title="{' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))}">
+                {link(node)}
+            </span>
+            {f': {format_number(node_value)} {node.description}' if root.value_type else ''}""")
 
-    # Sort root types and move standard type to top
     type_data = OrderedDict(sorted(type_data.items()))
-    for item in type_data.keys():
+    for item in type_data.keys():  # Sort root types and move standard type to top
         if item == _('type'):
             type_data.move_to_end(item, last=False)
             break
@@ -517,28 +512,36 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> Dict[str, An
     for root_name, nodes in type_data.items():
         data[root_name] = nodes
 
-    return data
-
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0B"  # pragma: no cover
+        return "0 B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
-    return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
+    return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
 
 
 def delete_link(name: str, url: str) -> str:
-    return link(
-        _('delete'),
-        url=url,
-        js="return confirm('{x}')".format(x=_('Delete %(name)s?', name=name.replace("'", ''))))
+    confirm = _('Delete %(name)s?', name=name.replace("'", ''))
+    return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def add_edit_link(data: List[Any], url: str) -> List[Any]:
+def add_edit_link(data: List[Any], url: str) -> None:
     if is_authorized('contributor'):
         data.append(link(_('edit'), url))
-    return data
+
+
+def add_remove_link(
+        data: List[Any],
+        name: str,
+        link_: Link,
+        origin: Entity,
+        tab_: str) -> None:
+    if is_authorized('contributor'):
+        data.append(link(
+            _('remove'),
+            url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab_,
+            js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
 
 
 def display_delete_link(entity: Entity) -> str:
@@ -552,23 +555,7 @@ def display_delete_link(entity: Entity) -> str:
     return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
 
 
-def add_remove_link(
-        data: List[Any],
-        name: str,
-        link_: Link,
-        origin: Entity,
-        tab_: str) -> List[Any]:
-    if is_authorized('contributor'):
-        data.append(link(
-            _('remove'),
-            url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab_,
-            js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
-    return data
-
-
-paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
-
-
+# Todo
 @app.template_filter()
 def link(object_: Any,
          url: Optional[str] = None,
