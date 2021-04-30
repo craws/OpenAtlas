@@ -53,7 +53,7 @@ class TableSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
         aliases = current_user.settings['table_show_aliases']
-        if field.id in ['residence', 'begins_in', 'ends_in', 'place_to', 'place_from']:
+        if 'place' in field.id or field.id in ['begins_in', 'ends_in', 'residence']:
             class_ = 'place'
             entities = Entity.get_by_class('place', nodes=True, aliases=aliases)
         else:
