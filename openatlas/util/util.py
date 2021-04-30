@@ -344,6 +344,7 @@ def send_mail(
     return True
 
 
+@app.template_filter()
 def tooltip(text: str) -> str:
     if not text:
         return ''
@@ -424,7 +425,7 @@ def add_reference_systems_to_form(form: Any) -> str:
     return html
 
 
-def add_dates_to_form(form: Any, for_person: bool = False) -> str:
+def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
@@ -435,57 +436,19 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
-            errors[field_name] = '<label class="error">'
+            errors[field_name] = ''
             for error in getattr(form, field_name).errors:
                 errors[field_name] += uc_first(error)
-            errors[field_name] += ' </label>'
-    html = """
-        <div class="table-row">
-            <div>
-                <label>{date}</label> {tooltip}
-            </div>
-            <div class="table-cell date-switcher">
-                <span id="date-switcher" class="{button_class}">{show}</span>
-            </div>
-        </div>""".format(
-        date=uc_first(_('date')),
-        button_class=app.config['CSS']['button']['secondary'],
-        tooltip=tooltip(_('tooltip date')),
-        show=uc_first(
-            _('hide') if form.begin_year_from.data or form.end_year_from.data else _('show')))
-
-    style = '' if valid_dates else ' style="display:table-row" '
-    html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
-    html += '<div class="table-cell">'
-    html += str(form.begin_year_from(class_='year')) + ' ' + errors['begin_year_from'] + ' '
-    html += str(form.begin_month_from(class_='month')) + ' ' + errors['begin_month_from'] + ' '
-    html += str(form.begin_day_from(class_='day')) + ' ' + errors['begin_day_from'] + ' '
-    html += str(form.begin_comment)
-    html += '</div></div>'
-    html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div></div><div class="table-cell">'
-    html += str(form.begin_year_to(class_='year')) + ' ' + errors['begin_year_to'] + ' '
-    html += str(form.begin_month_to(class_='month')) + ' ' + errors['begin_month_to'] + ' '
-    html += str(form.begin_day_to(class_='day')) + ' ' + errors['begin_day_to'] + ' '
-    html += '</div></div>'
-    html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + uc_first(_('death') if for_person else _('end')) + '</div>'
-    html += '<div class="table-cell">'
-    html += str(form.end_year_from(class_='year')) + ' ' + errors['end_year_from'] + ' '
-    html += str(form.end_month_from(class_='month')) + ' ' + errors['end_month_from'] + ' '
-    html += str(form.end_day_from(class_='day')) + ' ' + errors['end_day_from'] + ' '
-    html += str(form.end_comment)
-    html += '</div></div>'
-    html += '<div class="table-row date-switch"' + style + '>'
-    html += '<div></div><div class="table-cell">'
-    html += str(form.end_year_to(class_='year')) + ' ' + errors['end_year_to'] + ' '
-    html += str(form.end_month_to(class_='month')) + ' ' + errors['end_month_to'] + ' '
-    html += str(form.end_day_to(class_='day')) + ' ' + errors['end_day_to'] + ' '
-    html += '</div></div>'
-    return html
+            errors[field_name] = f'<label class="error">{errors[field_name]}</label>'
+    return render_template(
+        'util/dates.html',
+        form=form,
+        errors=errors,
+        style='' if valid_dates else 'display:table-row',
+        label=_('hide') if form.begin_year_from.data or form.end_year_from.data else _('show'))
 
 
+#  Todo
 def print_file_size(entity: 'Entity') -> str:
     path = get_file_path(entity.id)
     return convert_size(path.stat().st_size) if path else 'N/A'
@@ -939,7 +902,6 @@ def add_row(
 def display_form(
         form: Any,
         form_id: Optional[str] = None,
-        for_persons: bool = False,
         manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
@@ -968,7 +930,7 @@ def display_form(
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
-                html += add_dates_to_form(form, for_persons)
+                html += add_dates_to_form(form)
             continue
 
         if field.type in ['TreeField', 'TreeMultiField']:
@@ -1002,7 +964,7 @@ def display_form(
                 buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
                 buttons.append(form.insert_continue_human_remains(class_=class_))
-            html += add_row(field, '', f'<div class ="toolbar">{" ".join(buttons)}</div>')
+            html += add_row(field, value=f'<div class ="toolbar">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):
