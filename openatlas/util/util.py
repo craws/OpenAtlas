@@ -487,32 +487,6 @@ def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
     return data
 
 
-def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
-    if entity.location:
-        entity.nodes.update(entity.location.nodes)  # Add location types
-
-    type_data: OrderedD[str, Any] = OrderedDict()
-    for node, node_value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
-        root = g.nodes[node.root[-1]]
-        label = _('type') if root.standard and root.class_.name == 'type' else root.name
-        if root.name not in type_data:
-            type_data[label] = []
-        type_data[label].append(f"""
-            <span title="{' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))}">
-                {link(node)}
-            </span>
-            {f': {format_number(node_value)} {node.description}' if root.value_type else ''}""")
-
-    type_data = OrderedDict(sorted(type_data.items()))
-    for item in type_data.keys():  # Sort root types and move standard type to top
-        if item == _('type'):
-            type_data.move_to_end(item, last=False)
-            break
-
-    for root_name, nodes in type_data.items():
-        data[root_name] = nodes
-
-
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0 B"  # pragma: no cover
@@ -610,7 +584,6 @@ def display_citation_example(code: str) -> str:
     return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
 
 
-#  Todo
 @app.template_filter()
 def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:
@@ -626,13 +599,12 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
             next_id = sibling.id
             position = counter
             break
-    return Markup(
-        '{previous} {next} {position} {of_label} {count}'.format(
-            previous=button('<', url_for('entity_view', id_=prev_id)) if prev_id else '',
-            next=button('>', url_for('entity_view', id_=next_id)) if next_id else '',
-            position=position,
-            of_label=_('of'),
-            count=len(structure['siblings'])))
+    return Markup(render_template(
+        'util/siblings_pager.html',
+        prev_id=prev_id,
+        next_id=next_id,
+        position=position,
+        structure=structure))
 
 
 @app.template_filter()
@@ -665,17 +637,34 @@ def uc_first(string: str) -> str:
 
 @app.template_filter()
 def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
-    html = '<div class="data-table">'
-    for label, value in data.items():
-        if value or value == 0:
-            if isinstance(value, list):
-                value = '<br>'.join(value)
-            html += f"""
-                <div class="table-row">
-                    <div>{uc_first(label)}</div>
-                    <div class="table-cell">{value}</div>
-                </div>"""
-    return Markup(html + '</div>')
+    return Markup(render_template('util/info_data.html', data=data))
+
+
+#  Todo
+def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
+    if entity.location:
+        entity.nodes.update(entity.location.nodes)  # Add location types
+
+    type_data: OrderedD[str, Any] = OrderedDict()
+    for node, node_value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
+        root = g.nodes[node.root[-1]]
+        label = _('type') if root.standard and root.class_.name == 'type' else root.name
+        if root.name not in type_data:
+            type_data[label] = []
+        type_data[label].append(f"""<span 
+            title="{
+                ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
+            }">{link(node)}</span>{    
+            f': {format_number(node_value)} {node.description}' if root.value_type else ''}""")
+
+    type_data = OrderedDict(sorted(type_data.items()))
+    for item in type_data.keys():  # Sort root types and move standard type to top
+        if item == _('type'):
+            type_data.move_to_end(item, last=False)
+            break
+
+    for root_name, nodes in type_data.items():
+        data[root_name] = nodes
 
 
 @app.template_filter()
@@ -804,7 +793,7 @@ def display_profile_image(entity: Entity) -> str:
             url=url_for('entity_view', id_=entity.image_id),
             src=url_for('display_file', filename=path.name),
             width=session['settings']['profile_image_width'])
-    return Markup(f'<div id="profile_image_div">{html}</div>')
+    return Markup(f'<div id="profile-image-div">{html}</div>')
 
 
 @app.template_filter()
