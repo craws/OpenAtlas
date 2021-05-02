@@ -646,16 +646,16 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
         entity.nodes.update(entity.location.nodes)  # Add location types
 
     type_data: OrderedD[str, Any] = OrderedDict()
-    for node, node_value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
+    for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         root = g.nodes[node.root[-1]]
         label = _('type') if root.standard and root.class_.name == 'type' else root.name
         if root.name not in type_data:
             type_data[label] = []
-        type_data[label].append(f"""<span 
-            title="{
-                ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
-            }">{link(node)}</span>{    
-            f': {format_number(node_value)} {node.description}' if root.value_type else ''}""")
+        type_data[label].append(render_template(
+            'util/type_data_entry.html',
+            node=node,
+            value=format_number(value) if root.value_type else None,
+            title=' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))))
 
     type_data = OrderedDict(sorted(type_data.items()))
     for item in type_data.keys():  # Sort root types and move standard type to top
