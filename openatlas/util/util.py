@@ -640,7 +640,6 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-#  Todo
 def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
@@ -667,24 +666,7 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
         data[root_name] = nodes
 
 
-@app.template_filter()
-def display_move_form(form: Any, root_name: str) -> str:
-    from openatlas.forms.field import TreeField
-    html = ''
-    for field in form:
-        if isinstance(field, TreeField):
-            html += '<p>' + root_name + ' ' + str(field) + '</p>'
-    table = Table(
-        header=['#', uc_first(_('selection'))],
-        rows=[[item, item.label.text] for item in form.selection])
-    return html + f"""
-        <div class="toolbar">
-            {button(_('select all'), id_='select-all')}
-            {button(_('deselect all'), id_='select-none')}
-        </div>
-        {table.display('move')}"""
-
-
+# Todo
 @app.template_filter()
 def table_select_model(name: str, selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     if name in ['domain', 'range']:
