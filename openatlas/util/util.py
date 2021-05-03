@@ -668,65 +668,6 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
 
 # Todo
 @app.template_filter()
-def table_select_model(name: str, selected: Union[CidocClass, CidocProperty, None] = None) -> str:
-    if name in ['domain', 'range']:
-        entities = g.cidoc_classes
-    else:
-        entities = g.properties
-    table = Table(['code', 'name'], defs=[
-        {'orderDataType': 'cidoc-model', 'targets': [0]},
-        {'sType': 'numeric', 'targets': [0]}])
-
-    for id_ in entities:
-        table.rows.append([
-            """
-                <a onclick="selectFromTable(this, '{name}', '{entity_id}', '{value}')"
-                    href="#">{label}</a>""".format(
-                name=name,
-                entity_id=id_,
-                value=entities[id_].code + ' ' + entities[id_].name,
-                label=entities[id_].code),
-            """
-                <a onclick="selectFromTable(this, '{name}', '{entity_id}', '{value}')"
-                    href="#">{label}</a>""".format(
-                name=name,
-                entity_id=id_,
-                value=entities[id_].code + ' ' + entities[id_].name,
-                label=entities[id_].name)])
-    value = selected.code + ' ' + selected.name if selected else ''
-    html = """
-        <input id="{name}-button" name="{name}-button" class="table-select" type="text"
-            onfocus="this.blur()" readonly="readonly" value="{value}"
-            onclick="$('#{name}-modal').modal('show')">
-            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
-                aria-hidden="true">
-                <div class="modal-dialog" role="document" style="max-width: 100%!important;">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title">{name}</h5>
-                            <button type="button" class="{css}"
-                                data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">{table}</div>
-                        <div class="modal-footer">
-                            <button type="button" class="{css}" data-dismiss="modal">
-                                {close_label}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>""".format(
-        css=app.config['CSS']['button']['primary'],
-        name=name,
-        value=value,
-        close_label=uc_first(_('close')),
-        table=table.display(name))
-    return html
-
-
-@app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
     if not entity.description:
@@ -899,7 +840,7 @@ def display_form(
                 buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
                 buttons.append(form.insert_continue_human_remains(class_=class_))
-            html += add_row(field, value=f'<div class ="toolbar">{" ".join(buttons)}</div>')
+            html += add_row(field, '', value=f'<div class ="toolbar">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):
