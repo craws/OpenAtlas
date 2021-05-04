@@ -19,10 +19,9 @@ csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 # Use test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 
-# Load config/default.py and instance/INSTANCE_NAME.py
 app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
-app.config['WTF_CSRF_TIME_LIMIT'] = None  # Make CSRF token valid for the life of the session.
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for the life of the session.
 
 if os.name == "posix":
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
@@ -32,15 +31,13 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
+from openatlas.api import util  # contains routes for each version
+from openatlas.api.v02 import routes  # New routes
+from openatlas.util import processor
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy, index, involvement,
     imports, link, login, member, model, note, overlay, profile, reference, relation,
     reference_system, search, source, sql, types, user)
-from openatlas.util import processor
-
-#  Restful API import
-from openatlas.api import util  # contains routes for each version
-from openatlas.api.v02 import routes  # New routes
 
 
 @babel.localeselector
@@ -58,7 +55,7 @@ def before_request() -> None:
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Only needed if not running with Apache and static alias
+        return  # Avoid overhead for static files, only needed if not using Apache with static alias
     open_connection(app.config)
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()

@@ -31,13 +31,13 @@ $(document).ready(function () {
     });
 
     /* Show and hide function for reference systems */
-    $("#reference-systems-switcher").click(function () {
-        $(".reference-systems-switch").toggleClass('display-none');
+    $("#reference-system-switcher").click(function () {
+        $(".reference-system-switch").toggleClass('display-none');
         $(this).text(function (i, text) {
             return text === show ? hide : show;
         })
     });
-    $('.reference-systems-switch').addClass('display-none');
+    $('.reference-system-switch').addClass('display-none');
 
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {

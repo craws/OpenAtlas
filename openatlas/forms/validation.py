@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas.models.date import Date
-from openatlas.util.filters import uc_first
+from openatlas.util.util import uc_first
 
 
 def validate(self: FlaskForm) -> bool:

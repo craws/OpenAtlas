@@ -9,7 +9,7 @@ from flask_login import current_user
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
-from openatlas.util.filters import uc_first
+from openatlas.util.util import uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
@@ -41,7 +41,7 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
-            settings[label] = _('on') if value else _('off')
+            settings[label] = str(_('on')) if value else str(_('off'))  # str() needed for templates
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)

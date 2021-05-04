@@ -14,10 +14,11 @@
                 {{ entity|display_profile_image }}
                 <div style="float:left;">
                     {{ entity.info_data|display_info }}
-                    {{ entity|display_external_references }}
-                    {{ entity|description }}
                 </div>
             </div>
+            <div style="clear:both;"></div>
+            {{ entity|display_external_references }}
+            {{ entity|description }}
         </div>
         {% if gis_data %}
             <div class="col-6">

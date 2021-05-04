@@ -1,12 +1,11 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 from flask_login import current_user
 
 from openatlas.database.imports import Import as Db
-from openatlas.util.util import is_float
 
 
 class Project:
@@ -53,7 +52,7 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.util.filters import sanitize
+        from openatlas.util.util import sanitize
         Db.update_project(project.id, project.name, sanitize(project.description, 'text'))
 
     @staticmethod
@@ -122,3 +121,11 @@ class Import:
                             project=project,
                             easting=row['easting'],
                             northing=row['northing'])
+
+
+def is_float(value: Union[int, float]) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False
