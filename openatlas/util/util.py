@@ -686,35 +686,15 @@ def download_button(entity: Entity) -> str:
         url_for('download_file', filename=get_file_path(entity.image_id).name)))
 
 
-# Todo
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
     path = get_file_path(entity.image_id)
-    if not path:
-        return ''  # pragma: no cover
-    if entity.class_.view == 'file':
-        if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-            html = """
-                <a href="{url}" rel="noopener noreferrer" target="_blank">
-                    <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>""".format(
-                url=url_for('display_file', filename=path.name),
-                width=session['settings']['profile_image_width'])
-        else:
-            html = uc_first(_('no preview available'))  # pragma: no cover
-    else:
-        html = """
-            <a href="{url}">
-                <img style="max-width:{width}px;" alt="image" src="{src}">
-            </a>""".format(
-            url=url_for('entity_view', id_=entity.image_id),
-            src=url_for('display_file', filename=path.name),
-            width=session['settings']['profile_image_width'])
-    return Markup(f'<div id="profile-image-div">{html}</div>')
+    if path:
+        return Markup(render_template('util/profile_image.html', entity=entity, path=path))
+    return ''  # pragma: no cover
 
 
+# Todo
 @app.template_filter()
 def display_content_translation(text: str) -> str:
     from openatlas.models.content import Content

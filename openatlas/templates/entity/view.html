@@ -17,7 +17,9 @@
             </div>
             <h1>{{ entity.name }}</h1>
             <div>
-                {{ entity|display_profile_image }}
+                {% if entity.image_id %}
+                    {{ entity|display_profile_image }}
+                {% endif %}
                 <div style="float:left;">
                     {{ entity.info_data|display_info }}
                 </div>
