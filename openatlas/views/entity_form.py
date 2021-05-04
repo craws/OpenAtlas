@@ -18,9 +18,9 @@ from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import (
     get_base_table_data, is_authorized, link, required_group, was_modified)
-from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
