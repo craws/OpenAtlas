@@ -26,13 +26,13 @@ def display_file(filename: str) -> Any:
 @app.route('/display_thumbnail/<path:filename>')
 @required_group('readonly')
 def display_thumbnail(filename: str) -> Any:
-    return send_from_directory(app.config['THUMBNAIL_DIR'] / app.config['THUMBNAIL_SIZE'], filename)
+    return send_from_directory(app.config['RESIZED_IMAGES'] / app.config['THUMBNAIL_SIZE'], filename)
 
 
 @app.route('/display_icon/<path:filename>')
 @required_group('readonly')
 def display_icon(filename: str) -> Any:
-    return send_from_directory(app.config['THUMBNAIL_DIR'] / app.config['ICON_IMAGE_SIZE'],
+    return send_from_directory(app.config['RESIZED_IMAGES'] / app.config['ICON_IMAGE_SIZE'],
                                filename)
 
 

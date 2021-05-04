@@ -18,13 +18,13 @@ class ImageProcessing:
     @staticmethod
     def create_thumbnail(name: str, file_format: str, size: str) -> None:
         try:
-            ImageProcessing.validate_folder(size, app.config['THUMBNAIL_DIR'])
+            ImageProcessing.validate_folder(size, app.config['RESIZED_IMAGES'])
             path = str(Path(app.config['UPLOAD_DIR']) / f"{name}.{file_format}[0]")
             with Image(filename=path) as src:
                 with src.convert('png') as img:
                     img.transform(resize=size + 'x' + size + '>')
                     img.save(
-                        filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (name + '.png')))
+                        filename=str(Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
         except Exception as e:
             logger.log('debug', 'thumbnail creation', 'failed to save', e)
 
@@ -34,7 +34,7 @@ class ImageProcessing:
         file_format = filename.rsplit('.', 1)[1].lower()
         try:
             for size in app.config['PROCESSED_IMAGE_SIZES']:
-                p = Path(app.config['THUMBNAIL_DIR']) / size / f'{name}.png'
+                p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
                 if not p.is_file():
                     ImageProcessing.create_thumbnail(name, file_format, size)
             return True

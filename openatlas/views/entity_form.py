@@ -127,7 +127,6 @@ def update(id_: int) -> Union[str, Response]:
         gis_data = Gis.get_all([entity], structure)
         overlays = Overlay.get_by_object(entity)
         entity.image_id = entity.get_profile_image_id()
-        # Todo: Ask Alex, what this does
         if not entity.image_id:
             for link_ in entity.get_links('P67', inverse=True):
                 domain = link_.domain

@@ -410,7 +410,7 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
 
 def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
-    p = app.config['THUMBNAIL_DIR'] / size
+    p = app.config['RESIZED_IMAGES'] / size
     path = next(p.glob(str(entity_id) + '.*'), None)
     return path if path else None
 
@@ -674,7 +674,6 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
         data[root_name] = nodes
 
 
-# Todo
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
