@@ -666,7 +666,6 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
         data[root_name] = nodes
 
 
-# Todo
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
@@ -682,15 +681,12 @@ def description(entity: Union[Entity, Project]) -> str:
 
 @app.template_filter()
 def download_button(entity: Entity) -> str:
-    if entity.class_.view != 'file':
-        return ''
-    html = f'<span class="error">{uc_first(_("missing file"))}</span>'
-    if entity.image_id:
-        path = get_file_path(entity.image_id)
-        html = button(_('download'), url_for('download_file', filename=path.name))
-    return Markup(html)
+    return Markup(button(
+        _('download'),
+        url_for('download_file', filename=get_file_path(entity.image_id).name)))
 
 
+# Todo
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
     if not entity.image_id:

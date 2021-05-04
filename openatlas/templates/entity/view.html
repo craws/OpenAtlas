@@ -6,7 +6,13 @@
                 {{ ('entity/' + entity.class_.view)|manual }}
                 {{ buttons|join(' ') }}
                 {{ entity.id|bookmark_toggle }}
-                {{ entity|download_button }}
+                {% if entity.class_.view == 'file' %}
+                    {% if entity.image_id %}
+                        {{ entity|download_button }}
+                    {% else %}
+                        <span class="error">{{ _("missing file")|uc_first }}</span>
+                    {% endif %}
+                {% endif %}
                 {{ entity|siblings_pager(structure) }}
             </div>
             <h1>{{ entity.name }}</h1>
