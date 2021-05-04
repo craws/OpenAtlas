@@ -745,20 +745,6 @@ def display_form(
         manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
-    def display_value_type_fields(node_: 'Node', root: Optional['Node'] = None) -> str:
-        root = root if root else node_
-        html_ = ''
-        for sub_id in node_.subs:
-            sub = g.nodes[sub_id]
-            field_ = getattr(form, str(sub_id))
-            html_ += f"""
-                <div class="table-row value-type-switch{root.id}">
-                    <div>{sub.name}</div>
-                    <div class="table-cell">{field_(class_='value-type')} {sub.description}</div>
-                </div>
-                {display_value_type_fields(sub, root)}"""
-        return html_
-
     reference_systems_added = False
     html = ''
     for field in form:
@@ -788,7 +774,7 @@ def display_form(
                     field,
                     label,
                     button(_('show'), onclick=onclick, css='secondary'))
-                html += display_value_type_fields(node)
+                html += display_value_type_fields(form, node)
                 continue
             tooltip_ = '' if 'is_node_form' in form else ' ' + tooltip(node.description)
             html += add_form_row(field, label + tooltip_)
@@ -809,8 +795,8 @@ def display_form(
                 buttons.append(form.insert_continue_human_remains(class_=class_))
             html += add_form_row(
                 field,
-                label='',
-                value=f'<div class ="toolbar">{" ".join(buttons)}</div>')
+                label='',  # Setting this to '' keeps the button row label empty
+                value=f'<div class="toolbar">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):
@@ -819,14 +805,22 @@ def display_form(
                 reference_systems_added = True
             continue
         html += add_form_row(field, form_id=form_id)
+    return Markup(render_template('forms/form.html', form_id=form_id, form=form, html=html))
 
-    return Markup("""
-        <form method="post" {id} {multi}>
-            <div class="data-table">{html}</div>
-        </form>""".format(
-        id=('id="' + form_id + '" ') if form_id else '',
-        html=html,
-        multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
+
+def display_value_type_fields(form: Any, node_: 'Node', root: Optional['Node'] = None) -> str:
+    root = root if root else node_
+    html = ''
+    for sub_id in node_.subs:
+        sub = g.nodes[sub_id]
+        field = getattr(form, str(sub_id))
+        html += f"""
+            <div class="table-row value-type-switch{root.id}">
+                <div>{sub.name}</div>
+                <div class="table-cell">{field(class_='value-type')} {sub.description}</div>
+            </div>
+            {display_value_type_fields(form, sub, root)}"""
+    return html
 
 
 class MLStripper(HTMLParser):
