@@ -290,7 +290,6 @@ def entity_view(id_: int) -> Union[str, Response]:
                 extension = data[3]
                 data.append(
                     get_profile_image_table_link(domain, entity, extension, entity.image_id))
-                # Todo: Ask Alex, what this if statement does!
                 if not entity.image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
                 if entity.class_.view == 'place' and is_authorized('editor') and \

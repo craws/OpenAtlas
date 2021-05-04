@@ -69,21 +69,7 @@ class ApiTests(TestBaseCase):
                 precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
-                # Testing directly against model
-                # parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
-                #           'filter': None, 'limit': 20, 'first': None, 'last': None,
-                #           'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                #                    'depictions', 'geonames'], 'export': None}
-                # data = GeoJsonEntity.get_entity(place, parser)
-                # test_data = {
-                #     'type': 'FeatureCollection',
-                #     'start': {
-                #         'earliest': '2018-01-31'
-                #     },
-                # }
-                # print(data['features'][0]['when']['timespans'][0]['start'])
-                # for key, value in test_data.items():
-                #     assert data[key] == value
+
 
             # Test GeoJson output
             self.maxDiff = None

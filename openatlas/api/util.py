@@ -23,12 +23,12 @@ def display_file_api(filename: str) -> Any:
     if not license_:
         raise AccessDeniedError
     parser = image_parser.parse_args()
-    if parser['image_size'] and parser['download']:
-        ImageProcessing.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['OA_TMP_DIR'], filename, as_attachment=True)
     if parser['image_size']:
-        ImageProcessing.display_as_thumbnail(filename, parser['image_size'])
-        return send_from_directory(app.config['OA_TMP_DIR'], filename)
+        if '.' + filename.split('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
+            ImageProcessing.display_as_thumbnail(filename, parser['image_size'])
+            if parser['download']:
+                return send_from_directory(app.config['OA_TMP_DIR'], filename, as_attachment=True)
+            return send_from_directory(app.config['OA_TMP_DIR'], filename)
     parser = image_parser.parse_args()
     if parser['download']:
         return send_file(f"{app.config['UPLOAD_DIR']}/{filename}", as_attachment=True)

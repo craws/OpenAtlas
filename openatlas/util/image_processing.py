@@ -10,21 +10,21 @@ class ImageProcessing:
     @staticmethod
     def resize_image(filename: str) -> None:
         name = filename.rsplit('.', 1)[0].lower()
-        file_format = filename.rsplit('.', 1)[1].lower()
+        file_format = '.' + filename.split('.', 1)[1].lower()
         if file_format in app.config['PROCESSED_IMAGE_EXT']:
             for size in app.config['PROCESSED_IMAGE_SIZES']:
                 ImageProcessing.create_thumbnail(name, file_format, size)
 
     @staticmethod
-    def create_thumbnail(filename: str, file_format: str, size: str) -> None:
+    def create_thumbnail(name: str, file_format: str, size: str) -> None:
         try:
             ImageProcessing.validate_folder(size, app.config['THUMBNAIL_DIR'])
-            path = str(Path(app.config['UPLOAD_DIR']) / f"{filename}.{file_format}[0]")
+            path = str(Path(app.config['UPLOAD_DIR']) / f"{name}.{file_format}[0]")
             with Image(filename=path) as src:
                 with src.convert('png') as img:
                     img.transform(resize=size + 'x' + size + '>')
                     img.save(
-                        filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (filename + '.png')))
+                        filename=str(Path(app.config['THUMBNAIL_DIR']) / size / (name + '.png')))
         except Exception as e:
             logger.log('debug', 'thumbnail creation', 'failed to save', e)
 
@@ -36,8 +36,7 @@ class ImageProcessing:
             for size in app.config['PROCESSED_IMAGE_SIZES']:
                 p = Path(app.config['THUMBNAIL_DIR']) / size / f'{name}.png'
                 if not p.is_file():
-                    if not ImageProcessing.create_thumbnail(name, file_format, size):
-                        return False
+                    ImageProcessing.create_thumbnail(name, file_format, size)
             return True
         except Exception as e:
             logger.log('debug', 'image check failed', 'fail to validate file as image', e)
@@ -54,7 +53,6 @@ class ImageProcessing:
 
     @staticmethod
     def display_as_thumbnail(filename: str, size: str) -> None:
-        # Todo: Check if image!!!
         path = str(app.config['UPLOAD_DIR']) + '/' + filename
         with Image(filename=path) as img:
             img.transform(resize=size + 'x' + size + '>')

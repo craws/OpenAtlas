@@ -31,6 +31,7 @@ from openatlas.models.date import Date
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -407,6 +408,13 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
     return path if path else None
 
 
+def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
+    entity_id = entity if isinstance(entity, int) else entity.id
+    p = app.config['THUMBNAIL_DIR'] / size
+    path = next(p.glob(str(entity_id) + '.*'), None)
+    return path if path else None
+
+
 def add_reference_systems_to_form(form: Any) -> str:
     html = ''
     switch_class = ''
@@ -429,10 +437,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -698,25 +706,26 @@ def display_profile_image(entity: Entity) -> str:
     path = get_file_path(entity.image_id)
     if not path:
         return ''  # pragma: no cover
-    if entity.class_.view == 'file':
-        if path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
-            html = """
-                <a href="{url}" rel="noopener noreferrer" target="_blank">
-                    <img style="max-width:{width}px;" alt="image" src="{url}">
-                </a>""".format(
-                url=url_for('display_file', filename=path.name),
-                width=session['settings']['profile_image_width'])
-        else:
-            html = uc_first(_('no preview available'))  # pragma: no cover
+    ext = app.config['PROCESSED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
+        'DISPLAY_FILE_EXTENSIONS']
+    if entity.class_.view == 'file' and not path.suffix.lower() in ext:
+        html = uc_first(_('no preview available'))  # pragma: no cover
+    elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
+        html = uc_first(_('no preview available'))  # pragma: no cover
     else:
-        html = """
-            <a href="{url}">
-                <img style="max-width:{width}px;" alt="image" src="{src}">
-            </a>""".format(
-            url=url_for('entity_view', id_=entity.image_id),
-            src=url_for('display_file', filename=path.name),
-            width=session['settings']['profile_image_width'])
-    return Markup(f'<div id="profile-image-div">{html}</div>')
+        resized_path = get_image_path(entity.image_id, app.config['THUMBNAIL_SIZE'])
+        width = session['settings']['profile_image_width']
+        filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
+        display = 'display_thumbnail' if app.config['IMAGE_PROCESSING'] else 'display_file'
+        src = url_for(display, filename=filename)
+        if entity.class_.view == 'file':
+            url = url_for('display_file', filename=path.name)
+        else:
+            url = url_for('entity_view', id_=entity.image_id)
+        rel = 'noopener noreferrer' if entity.class_.view == 'file' else ''
+        html = (f'<a href="{url}" rel="{rel}" target="_blank">'
+                f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
+    return Markup(f'<div id="profile_image_div">{html}</div>')
 
 
 @app.template_filter()

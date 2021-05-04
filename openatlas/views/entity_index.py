@@ -14,7 +14,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, external_url, format_date, get_base_table_data, get_file_path,
-    get_file_stats, is_authorized, link, required_group)
+    get_file_stats, get_image_path, is_authorized, link, required_group)
 from openatlas.util.image_processing import ImageProcessing
 
 @app.route('/index/<view>')
