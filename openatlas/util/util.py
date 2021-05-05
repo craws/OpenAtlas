@@ -625,9 +625,8 @@ def breadcrumb(crumbs: List[Any]) -> str:
 
 
 @app.template_filter()
-def tab_header(item: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
-    from openatlas.util import tab
-    return Markup(tab.tab_header(item, table, active))
+def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    return Markup(render_template('util/tab_header.html', active=active, id=id_, table=table))
 
 
 @app.template_filter()
