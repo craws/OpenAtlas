@@ -565,10 +565,10 @@ def link(object_: Any,
 @app.template_filter()
 def button(
         label: str,
-        url: Optional[str] = '',
+        url: Optional[str] = None,
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
-        onclick: Optional[str] = '') -> str:
+        onclick: Optional[str] = None) -> str:
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
