@@ -565,7 +565,7 @@ def link(object_: Any,
 @app.template_filter()
 def button(
         label: str,
-        url: Optional[str] = '#',
+        url: Optional[str] = '',
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
         onclick: Optional[str] = '') -> str:
@@ -769,11 +769,14 @@ def display_form(
                 label = uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
-                onclick = f'switch_value_type({node.id})'
                 html += add_form_row(
                     field,
                     label,
-                    button(_('show'), onclick=onclick, css='secondary'))
+                    button(
+                        _('show'),
+                        onclick=f'switch_value_type({node.id})',
+                        css='secondary',
+                        id_=f'value-type-switcher-{node.id}'))
                 html += display_value_type_fields(form, node)
                 continue
             tooltip_ = '' if 'is_node_form' in form else ' ' + tooltip(node.description)
