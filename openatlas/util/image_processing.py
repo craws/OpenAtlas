@@ -12,7 +12,7 @@ class ImageProcessing:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = '.' + filename.split('.', 1)[1].lower()
         if file_format in app.config['PROCESSED_IMAGE_EXT']:
-            for size in app.config['PROCESSED_IMAGE_SIZES']:
+            for size in app.config['IMAGE_SIZE'].values():
                 ImageProcessing.create_thumbnail(name, file_format, size)
 
     @staticmethod
@@ -20,12 +20,16 @@ class ImageProcessing:
         try:
             ImageProcessing.validate_folder(size, app.config['RESIZED_IMAGES'])
             path = str(Path(app.config['UPLOAD_DIR']) / f"{name}.{file_format}[0]")
+            print("before")
             with Image(filename=path) as src:
+                print("middle")
                 with src.convert('png') as img:
+                    print("after")
                     img.transform(resize=size + 'x' + size + '>')
                     img.save(
                         filename=str(Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
         except Exception as e:
+            print(e)
             logger.log('debug', 'thumbnail creation', 'failed to save', e)
 
     @staticmethod
@@ -33,7 +37,7 @@ class ImageProcessing:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = filename.rsplit('.', 1)[1].lower()
         try:
-            for size in app.config['PROCESSED_IMAGE_SIZES']:
+            for size in app.config['IMAGE_SIZE'].values():
                 p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
                 if not p.is_file():
                     ImageProcessing.create_thumbnail(name, file_format, size)

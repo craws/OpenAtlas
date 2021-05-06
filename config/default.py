@@ -33,13 +33,12 @@ OA_TMP_DIR = Path(app.root_path) / 'tmp'
 IMAGE_PROCESSING = False
 IMAGE_PREVIEW = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
-RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized_images'
-# Todo: Explain Alex, we need one fix value, because we need to know, which size we want for thumbnails
-OVERVIEW_SIZE = '400'
-THUMBNAIL_SIZE = '200'
-TABLE_SIZE = '100'
-ICON_SIZE = '30'
-PROCESSED_IMAGE_SIZES = [THUMBNAIL_SIZE, OVERVIEW_SIZE, TABLE_SIZE, ICON_SIZE]
+RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
+IMAGE_SIZE = {
+    'overview': '400',
+    'thumbnail': '200',
+    'table': '100',
+    'icon': '30'}
 PROCESSED_IMAGE_EXT = ['.jpeg', '.jpg', '.png', '.tiff', '.tif', '.raw', '.eps', '.ico', '.svg',
                        '.bmp', '.pdf', '.mp4', '.gif', '.psd', '.ai', '.xcf']
 
