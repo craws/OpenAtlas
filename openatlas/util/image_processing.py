@@ -13,33 +13,35 @@ class ImageProcessing:
         file_format = '.' + filename.split('.', 1)[1].lower()
         if file_format in app.config['PROCESSED_IMAGE_EXT']:
             for size in app.config['IMAGE_SIZE'].values():
-                ImageProcessing.create_thumbnail(name, file_format, size)
+                ImageProcessing.safe_resized_image(name, file_format, size)
 
     @staticmethod
-    def create_thumbnail(name: str, file_format: str, size: str) -> None:
+    def safe_resized_image(name: str, file_format: str, size: str) -> None:
         try:
             ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
-            path = str(Path(app.config['UPLOAD_DIR']) / f"{name}.{file_format}[0]")
+            path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
             with Image(filename=path) as src:
                 with src.convert('png') as img:
                     img.transform(resize=size + 'x' + size + '>')
                     img.save(
                         filename=str(Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
         except Exception as e:
-            logger.log('debug', 'thumbnail creation', 'failed to save', e)
+            logger.log('debug', 'image resizing', 'failed to save', e)
 
     @staticmethod
     def check_processed_image(filename: str) -> bool:
         name = filename.rsplit('.', 1)[0].lower()
-        file_format = filename.rsplit('.', 1)[1].lower()
+        file_format = '.' + filename.split('.', 1)[1].lower()
         try:
-            for size in app.config['IMAGE_SIZE'].values():
-                p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
-                if not p.is_file():
-                    ImageProcessing.create_thumbnail(name, file_format, size)
-            return True
+            if file_format in app.config['PROCESSED_IMAGE_EXT']:
+                for size in app.config['IMAGE_SIZE'].values():
+                    p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
+                    if not p.is_file():
+                        ImageProcessing.safe_resized_image(name, file_format, size)
+                return True
+            return False
         except Exception as e:
-            logger.log('debug', 'image check failed', 'fail to validate file as image', e)
+            logger.log('debug', 'image validation failed', 'fail to validate file as image', e)
             return False
 
     @staticmethod

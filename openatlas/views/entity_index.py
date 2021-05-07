@@ -85,9 +85,7 @@ def file_preview(entity_id):
     icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['icon'])
     if not icon_path:
         path = get_file_path(entity_id)
-        print(path)
         if not path:
-            print("aha")
             return ''
         if ImageProcessing.check_processed_image(path.name):
             return f"<img src='{url_for('display_icon', filename=f'{entity_id}.png')}'>"
