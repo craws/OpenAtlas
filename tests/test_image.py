@@ -18,6 +18,7 @@ class ImageTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 file = insert_entity('Test_File', 'file')
+                file_without_path = insert_entity('Pathless_File', 'file')
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.png'
                 src = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
@@ -27,15 +28,15 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
             rv = self.app.get(url_for('entity_view', id_=file.id))
-            print(rv.data)
             assert b'Test_File' in rv.data
 
             # Display file
             rv = self.app.get(url_for('display_file_api', filename=file_name, image_size=200))
             assert b'PNG' in rv.data
-
-            for dir_ in app.config['IMAGE_SIZE'].values():
-                pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file_name).unlink()
+            rv = self.app.get(url_for('display_thumbnail', filename=file_name))
+            assert b'PNG' in rv.data
+            rv = self.app.get(url_for('display_icon', filename=file_name))
+            assert b'PNG' in rv.data
 
             # Make directory if not exist
             app.config['IMAGE_SIZE']['tmp'] = '1'
