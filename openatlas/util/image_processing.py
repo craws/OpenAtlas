@@ -18,7 +18,7 @@ class ImageProcessing:
     @staticmethod
     def create_thumbnail(name: str, file_format: str, size: str) -> None:
         try:
-            ImageProcessing.validate_folder(size, app.config['RESIZED_IMAGES'])
+            ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
             path = str(Path(app.config['UPLOAD_DIR']) / f"{name}.{file_format}[0]")
             with Image(filename=path) as src:
                 with src.convert('png') as img:
@@ -44,13 +44,13 @@ class ImageProcessing:
             return False
 
     @staticmethod
-    def validate_folder(folder: str, path: str) -> bool:
+    def check_if_folder_exist(folder: str, path: str) -> bool:
         folder_to_check = Path(path) / folder
-        if folder_to_check.is_dir():
-            return True
-        if folder_to_check.mkdir():
-            return True
-        return False
+        return True if folder_to_check.is_dir() else ImageProcessing.create_folder(folder_to_check)
+
+    @staticmethod
+    def create_folder(folder: Path) -> bool:
+        return True if folder.mkdir() else False
 
     @staticmethod
     def display_as_thumbnail(filename: str, size: str) -> None:
