@@ -123,8 +123,14 @@ def delete_entity(id_: int) -> Optional[str]:
             try:
                 path = get_file_path(id_)
                 if path:  # Only delete file on disk if it exists to prevent a missing file error
+                    delete_processed_image(id_)
                     path.unlink()
             except Exception as e:  # pragma: no cover
                 logger.log('error', 'file', 'file deletion failed', e)
                 flash(_('error file delete'), 'error')
     return url
+
+
+def delete_processed_image(id_: int) -> None:
+    for path in app.config['RESIZED_IMAGES'].glob('**/' + str(id_) + '.png'):
+        path.unlink()

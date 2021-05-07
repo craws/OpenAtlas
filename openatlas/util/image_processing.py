@@ -26,7 +26,6 @@ class ImageProcessing:
                     img.save(
                         filename=str(Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
         except Exception as e:
-            print(e)
             logger.log('debug', 'thumbnail creation', 'failed to save', e)
 
     @staticmethod
@@ -40,6 +39,7 @@ class ImageProcessing:
                     ImageProcessing.create_thumbnail(name, file_format, size)
             return True
         except Exception as e:
+            print(e)
             logger.log('debug', 'image check failed', 'fail to validate file as image', e)
             return False
 
