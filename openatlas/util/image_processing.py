@@ -39,7 +39,6 @@ class ImageProcessing:
                     ImageProcessing.create_thumbnail(name, file_format, size)
             return True
         except Exception as e:
-            print(e)
             logger.log('debug', 'image check failed', 'fail to validate file as image', e)
             return False
 

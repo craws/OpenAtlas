@@ -63,11 +63,12 @@ class ImageTest(TestBaseCase):
                 dst_py = pathlib.Path(app.config['UPLOAD_DIR'] / file_name_py)
                 copyfile(src_py, dst_py)
 
+
             rv = self.app.get(url_for('entity_view', id_=file.id))
             assert b'Test_File' in rv.data
-
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
+
 
             # Display file
             rv = self.app.get(url_for('display_file_api', filename=file_name, image_size=200))
@@ -83,6 +84,11 @@ class ImageTest(TestBaseCase):
             # Make directory if not exist
             rv = self.app.get(url_for('entity_view', id_=file.id))
             assert b'Test_File' in rv.data
+
+            app.config['IMAGE_SIZE']['tmp'] = '?'
+            rv = self.app.get(url_for('entity_view', id_=file.id))
+            assert b'Test_File' in rv.data
+            app.config['IMAGE_SIZE']['tmp'] = '1'
 
             # Cleanup
             for dir_ in app.config['IMAGE_SIZE'].values():
