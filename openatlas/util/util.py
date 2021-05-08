@@ -874,9 +874,11 @@ class MLStripper(HTMLParser):
 
 
 def delete_tmp_files() -> None:
-    for file_ in [f for f in Path(app.config['OA_TMP_DIR']).glob('**/*') if f.is_file()]:
+    path = Path(app.config['RESIZED_IMAGES']) / app.config['OA_TMP_DIR']
+    for file_ in [f for f in path.glob('**/*') if f.is_file()]:
         try:
             file_.unlink()
+            path.rmdir()
         except Exception as e:
             logger.log('error', 'tmp', 'failed deletion', e)
             continue

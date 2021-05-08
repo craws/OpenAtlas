@@ -61,6 +61,11 @@ class ImageProcessing:
     @staticmethod
     def display_as_thumbnail(filename: str, size: str) -> None:
         path = str(app.config['UPLOAD_DIR']) + '/' + filename
-        with Image(filename=path) as img:
-            img.transform(resize=size + 'x' + size + '>')
-            img.save(filename=f"{app.config['OA_TMP_DIR']}/{filename}")
+        if ImageProcessing.check_if_folder_exist(
+                app.config['OA_TMP_DIR'],
+                Path(app.config['RESIZED_IMAGES'])):
+            with Image(filename=path) as img:
+                img.transform(resize=size + 'x' + size + '>')
+                img.save(
+                    filename=str(Path(
+                        app.config['RESIZED_IMAGES']) / app.config['OA_TMP_DIR'] / filename))

@@ -27,13 +27,14 @@ DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.sv
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
 EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
-OA_TMP_DIR = Path(app.root_path) / 'tmp'
+
 
 # Image processing
 IMAGE_PROCESSING = False
 IMAGE_PREVIEW = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
+OA_TMP_DIR = 'tmp'
 IMAGE_SIZE = {
     'overview': '400',
     'thumbnail': '200',

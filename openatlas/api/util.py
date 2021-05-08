@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Any
 
 from flask import send_file, send_from_directory
@@ -26,9 +27,10 @@ def display_file_api(filename: str) -> Any:
     if parser['image_size']:
         if '.' + filename.split('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
             ImageProcessing.display_as_thumbnail(filename, parser['image_size'])
+            path = Path(app.config['RESIZED_IMAGES']) / app.config['OA_TMP_DIR']
             if parser['download']:
-                return send_from_directory(app.config['OA_TMP_DIR'], filename, as_attachment=True)
-            return send_from_directory(app.config['OA_TMP_DIR'], filename)
+                return send_from_directory(path, filename, as_attachment=True)
+            return send_from_directory(path, filename)
     parser = image_parser.parse_args()
     if parser['download']:
         return send_file(f"{app.config['UPLOAD_DIR']}/{filename}", as_attachment=True)
