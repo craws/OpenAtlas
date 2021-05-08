@@ -873,7 +873,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def delete_tmp_files():
+def delete_tmp_files() -> None:
     for file_ in [f for f in Path(app.config['OA_TMP_DIR']).glob('**/*') if f.is_file()]:
         try:
             file_.unlink()

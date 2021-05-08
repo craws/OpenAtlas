@@ -51,7 +51,12 @@ class ImageProcessing:
 
     @staticmethod
     def create_folder(folder: Path) -> bool:
-        return True if folder.mkdir() else False
+        try:
+            folder.mkdir()
+            return True
+        except Exception as e:
+            logger.log('debug', 'folder creation failed', 'failed to create a folder', e)
+            return False
 
     @staticmethod
     def display_as_thumbnail(filename: str, size: str) -> None:

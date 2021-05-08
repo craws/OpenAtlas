@@ -72,7 +72,9 @@ class ImageTest(TestBaseCase):
                 copyfile(src_py, dst_py)
 
                 # Exception
-                ImageProcessing.safe_resized_image(file2.id, '.png', size="????")
+                ImageProcessing.safe_resized_image(file2.id, '.png', size="???")
+                ImageProcessing.create_folder(pathlib.Path(app.root_path) / '???')
+
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('entity_view', id_=file.id))

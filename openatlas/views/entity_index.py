@@ -81,7 +81,7 @@ def get_table(view: str) -> Table:
     return table
 
 
-def file_preview(entity_id):
+def file_preview(entity_id: int) -> str:
     icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['icon'])
     if not icon_path:
         path = get_file_path(entity_id)
