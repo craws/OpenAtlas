@@ -425,11 +425,11 @@ def add_reference_systems_to_form(form: Any) -> str:
     for field in fields:
         precision_field = getattr(form, field.id.replace('id_', 'precision_'))
         class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
-        html += add_row(
+        html += add_form_row(
             field,
             field.label,
             ' '.join([str(field(class_=class_)), str(precision_field.label), str(precision_field)]),
-            row_css_class=f'external-reference {switch_class}')
+            row_css=f'external-reference {switch_class}')
     return html
 
 
@@ -573,10 +573,10 @@ def link(object_: Any,
 @app.template_filter()
 def button(
         label: str,
-        url: Optional[str] = '#',
+        url: Optional[str] = None,
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
-        onclick: Optional[str] = '') -> str:
+        onclick: Optional[str] = None) -> str:
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
@@ -633,9 +633,8 @@ def breadcrumb(crumbs: List[Any]) -> str:
 
 
 @app.template_filter()
-def tab_header(item: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
-    from openatlas.util import tab
-    return Markup(tab.tab_header(item, table, active))
+def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    return Markup(render_template('util/tab_header.html', active=active, id=id_, table=table))
 
 
 @app.template_filter()
@@ -689,13 +688,9 @@ def description(entity: Union[Entity, Project]) -> str:
 
 @app.template_filter()
 def download_button(entity: Entity) -> str:
-    if entity.class_.view != 'file':
-        return ''
-    html = f'<span class="error">{uc_first(_("missing file"))}</span>'
-    if entity.image_id:
-        path = get_file_path(entity.image_id)
-        html = button(_('download'), url_for('download_file', filename=path.name))
-    return Markup(html)
+    return Markup(button(
+        _('download'),
+        url_for('download_file', filename=get_file_path(entity.image_id).name)))
 
 
 @app.template_filter()
@@ -729,12 +724,12 @@ def display_profile_image(entity: Entity) -> str:
 
 @app.template_filter()
 def display_content_translation(text: str) -> str:
-    from openatlas.models.content import Content
     return Content.get_translation(text)
 
 
 @app.template_filter()
-def manual(site: str) -> str:  # Creates a link to a manual page
+def manual(site: str) -> str:
+    """If the manual page exists, return the link to it"""
     parts = site.split('/')
     if len(parts) < 2:
         return ''
@@ -745,41 +740,30 @@ def manual(site: str) -> str:  # Creates a link to a manual page
         # print('Missing manual link: ' + str(path))
         return ''
     return Markup(f"""
-        <a class="manual"
-            href="/static/manual/{site}.html"
-            target="_blank"
-            title="{uc_first('manual')}">
-                <i class="fas fa-book"></i>
-        </a>""")
+        <a class="manual" href="/static/manual/{site}.html" target="_blank"
+            title="{uc_first('manual')}"><i class="fas fa-book"></i></a>""")
 
 
-def add_row(
+def add_form_row(
         field: Field,
         label: Optional[str] = None,
         value: Optional[str] = None,
         form_id: Optional[str] = None,
-        row_css_class: Optional[str] = '') -> str:
+        row_css: Optional[str] = '') -> str:
     field.label.text = uc_first(field.label.text)
-    if field.flags.required and form_id != 'login-form' and field.label.text:
+    if field.flags.required and field.label.text and form_id != 'login-form':
         field.label.text += ' *'
-
-    # CSS
-    css_class = 'required' if field.flags.required else ''
-    css_class += ' integer' if isinstance(field, IntegerField) else ''
+    field_css = 'required' if field.flags.required else ''
+    field_css += ' integer' if isinstance(field, IntegerField) else ''
     for validator in field.validators:
-        css_class += ' email' if isinstance(validator, Email) else ''
-    errors = ' <span class="error">{errors}</span>'.format(
-        errors=' '.join(uc_first(error) for error in field.errors)) if field.errors else ''
-    return """
-        <div class="table-row {css_row}">
-            <div>{label} {tooltip}</div>
-            <div class="table-cell">{value} {errors}</div>
-        </div>""".format(
-        label=label if isinstance(label, str) else field.label,
-        tooltip=tooltip(field.description),
-        value=value if value else field(class_=css_class).replace('> ', '>'),
-        css_row=row_css_class,
-        errors=errors)
+        field_css += ' email' if isinstance(validator, Email) else ''
+    return render_template(
+        'forms/form_row.html',
+        field=field,
+        label=label,
+        value=value,
+        field_css=field_css,
+        row_css=row_css)
 
 
 @app.template_filter()
@@ -788,20 +772,6 @@ def display_form(
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
-
-    def display_value_type_fields(node_: 'Node', root: Optional['Node'] = None) -> str:
-        root = root if root else node_
-        html_ = ''
-        for sub_id in node_.subs:
-            sub = g.nodes[sub_id]
-            field_ = getattr(form, str(sub_id))
-            html_ += f"""
-                <div class="table-row value-type-switch{root.id}">
-                    <div>{sub.name}</div>
-                    <div class="table-cell">{field_(class_='value-type')} {sub.description}</div>
-                </div>
-                {display_value_type_fields(sub, root)}"""
-        return html_
 
     reference_systems_added = False
     html = ''
@@ -827,12 +797,18 @@ def display_form(
                 label = uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 field.description = node.description
-                onclick = f'switch_value_type({node.id})'
-                html += add_row(field, label, button(_('show'), onclick=onclick, css='secondary'))
-                html += display_value_type_fields(node)
+                html += add_form_row(
+                    field,
+                    label,
+                    button(
+                        _('show'),
+                        onclick=f'switch_value_type({node.id})',
+                        css='secondary',
+                        id_=f'value-type-switcher-{node.id}'))
+                html += display_value_type_fields(form, node)
                 continue
             tooltip_ = '' if 'is_node_form' in form else ' ' + tooltip(node.description)
-            html += add_row(field, label + tooltip_)
+            html += add_form_row(field, label + tooltip_)
             continue
 
         if field.id == 'save':
@@ -848,7 +824,10 @@ def display_form(
                 buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
                 buttons.append(form.insert_continue_human_remains(class_=class_))
-            html += add_row(field, '', value=f'<div class ="toolbar">{" ".join(buttons)}</div>')
+            html += add_form_row(
+                field,
+                label='',  # Setting this to '' keeps the button row label empty
+                value=f'<div class="toolbar">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):
@@ -856,15 +835,23 @@ def display_form(
                 html += add_reference_systems_to_form(form)
                 reference_systems_added = True
             continue
-        html += add_row(field, form_id=form_id)
+        html += add_form_row(field, form_id=form_id)
+    return Markup(render_template('forms/form.html', form_id=form_id, form=form, html=html))
 
-    return Markup("""
-        <form method="post" {id} {multi}>
-            <div class="data-table">{html}</div>
-        </form>""".format(
-        id=('id="' + form_id + '" ') if form_id else '',
-        html=html,
-        multi='enctype="multipart/form-data"' if hasattr(form, 'file') else ''))
+
+def display_value_type_fields(form: Any, node_: 'Node', root: Optional['Node'] = None) -> str:
+    root = root if root else node_
+    html = ''
+    for sub_id in node_.subs:
+        sub = g.nodes[sub_id]
+        field = getattr(form, str(sub_id))
+        html += f"""
+            <div class="table-row value-type-switch{root.id}">
+                <div>{sub.name}</div>
+                <div class="table-cell">{field(class_='value-type')} {sub.description}</div>
+            </div>
+            {display_value_type_fields(form, sub, root)}"""
+    return html
 
 
 class MLStripper(HTMLParser):

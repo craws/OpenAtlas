@@ -2,8 +2,8 @@
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id) {
     $(".value-type-switch" + id).toggleClass('display-none');
-    $(this).text(function (i, text) {
-        return text === show ? hide : show;
+    $("#value-type-switcher-" + id).text(function (i, text) {
+        return $.trim($("#value-type-switcher-" + id).text()) == show ? hide : show;
     })
 }
 
@@ -34,7 +34,7 @@ $(document).ready(function () {
     $("#reference-system-switcher").click(function () {
         $(".reference-system-switch").toggleClass('display-none');
         $(this).text(function (i, text) {
-            return text === show ? hide : show;
+            return $.trim(text) === show ? hide : show;
         })
     });
     $('.reference-system-switch').addClass('display-none');
@@ -43,7 +43,7 @@ $(document).ready(function () {
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
         $(this).text(function (i, text) {
-            return text === show ? hide : show;
+            return $.trim(text) === show ? hide : show;
         })
     });
 
