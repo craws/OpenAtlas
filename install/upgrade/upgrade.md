@@ -14,6 +14,11 @@ After following the instructions restart Apache and test if the application is w
 ### 6.1.0 to 6.2.0
 Execute **install/upgrade/6.2.0.sql** after making backups.
 
+Install package needed for image processing:
+    
+    
+    #   apt install python3-wand
+
 ### 6.0.x to 6.1.0
 Execute **install/upgrade/6.1.0.sql** after making backups.
 
