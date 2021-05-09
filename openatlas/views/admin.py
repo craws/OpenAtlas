@@ -6,16 +6,18 @@ from typing import Optional, Union
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import TextAreaField
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm, ModulesForm,
-    NewsLetterForm, SimilarForm, TestMailForm)
+    SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
@@ -136,7 +138,8 @@ def admin_check_links() -> str:
         'admin/check_links.html',
         table=Table(
             ['domain', 'property', 'range'],
-            rows=[[x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
+            rows=[
+                [x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
         title=_('admin'),
         crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check links')])
 
@@ -443,6 +446,17 @@ def admin_log_delete() -> Response:
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
+    class NewsLetterForm(FlaskForm):  # type: ignore
+        subject = StringField(
+            '',
+            [InputRequired()],
+            render_kw={'placeholder': uc_first(_('subject')), 'autofocus': True})
+        body = TextAreaField(
+            '',
+            [InputRequired()],
+            render_kw={'placeholder': uc_first(_('content'))})
+        save = SubmitField(_('send'))
+
     form = NewsLetterForm()
     form.save.label.text = uc_first(_('send'))
     if form.validate_on_submit():  # pragma: no cover
