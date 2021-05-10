@@ -10,7 +10,6 @@ from openatlas.api.v02.resources.linked_places import LinkedPlacesEntity
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.models.entity import Entity
-from openatlas.util.util import api_access
 
 
 class GetLatest(Resource):  # type: ignore

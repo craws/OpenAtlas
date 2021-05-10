@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Type, Union
+from typing import Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union
 
 from flask import g, request
 from flask_wtf import FlaskForm
@@ -13,9 +13,9 @@ from openatlas.database.entity import Entity as Db
 from openatlas.forms.date import format_date
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.display import get_file_extension, link
+from openatlas.util.util import get_file_extension, link, sanitize
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.node import Node
     from openatlas.models.reference_system import ReferenceSystem
 
@@ -119,7 +119,6 @@ class Entity:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
-        from openatlas.util.display import sanitize
         if form:  # e.g. imports have no forms
             self.save_nodes(form)
             if self.class_.name != 'object_location':
@@ -147,7 +146,7 @@ class Entity:
             'end_to': Date.datetime64_to_timestamp(self.end_to),
             'begin_comment': str(self.begin_comment).strip() if self.begin_comment else None,
             'end_comment': str(self.end_comment).strip() if self.end_comment else None,
-            'description': sanitize(self.description, 'text')})
+            'description': sanitize(self.description, 'text') if self.description else None})
 
     def update_aliases(self, form: FlaskForm) -> None:
         if not hasattr(form, 'alias'):
@@ -211,19 +210,18 @@ class Entity:
     def remove_profile_image(self) -> None:
         Db.remove_profile_image(self.id)
 
-    def print_standard_type(self) -> str:
+    def print_standard_type(self, show_links: Optional[bool] = True) -> str:
         from openatlas.models.node import Node
         if not self.class_.standard_type:
             return ''
         root_id = Node.get_hierarchy(self.class_.standard_type).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
-                return link(node)
+                return link(node) if show_links else node.name
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. actor actor relation: parent of (child of)"""
-        from openatlas.util.display import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
             return sanitize(name_parts[1], 'node')
@@ -240,6 +238,13 @@ class Entity:
             classes: Union[str, List[str]],
             nodes: bool = False,
             aliases: bool = False) -> List[Entity]:
+        if aliases:  # For performance: check classes if they can have an alias, set False otherwise
+            aliases_needed = False
+            for system_class in classes if isinstance(classes, list) else [classes]:
+                if g.classes[system_class].alias_possible:
+                    aliases_needed = True
+                    break
+            aliases = aliases_needed
         return [Entity(row) for row in Db.get_by_class(classes, nodes, aliases)]
 
     @staticmethod
@@ -256,7 +261,6 @@ class Entity:
 
     @staticmethod
     def insert(class_name: str, name: str, description: Optional[str] = None) -> Entity:
-        from openatlas.util.display import sanitize
         if not name:  # pragma: no cover
             from openatlas import logger
             logger.log('error', 'model', 'Insert entity without name')
@@ -288,7 +292,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             nodes: bool = False,
-            aliases: bool = False) -> List[Entity, Type, ReferenceSystem]:
+            aliases: bool = False) -> List[Entity]:
         entities = []
         for row in Db.get_by_ids(ids, nodes, aliases):
             if row['id'] in g.nodes:
@@ -304,7 +308,7 @@ class Entity:
         entities = []
         for row in Db.get_by_project_id(project_id):
             entity = Entity(row)
-            entity.origin_id = ['origin_id']
+            entity.origin_id = row['origin_id']
             entities.append(entity)
         return entities
 
@@ -317,13 +321,9 @@ class Entity:
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
         entities = Entity.get_by_class(form.classes.data)
-        for sample in entities:
-            if sample.id in already_added:
-                continue
+        for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in entities:
-                if sample.id == entity.id:
-                    continue
+            for entity in filter(lambda x: x.id != sample.id, entities):
                 if fuzz.ratio(sample.name, entity.name) >= form.ratio.data:
                     already_added.add(sample.id)
                     already_added.add(entity.id)
@@ -347,5 +347,5 @@ class Entity:
         Db.set_profile_image(id_, origin_id)
 
     @staticmethod
-    def get_circular() -> List[Entity]:  # Get entities that are linked to itself.
+    def get_entities_linked_to_itself() -> List[Entity]:
         return [Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]

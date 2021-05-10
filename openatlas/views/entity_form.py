@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -18,8 +18,8 @@ from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import get_base_table_data, link
-from openatlas.util.util import is_authorized, required_group, was_modified
+from openatlas.util.util import (
+    get_base_table_data, is_authorized, link, required_group, was_modified)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -254,11 +254,46 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         form.artifact.data = [item.id for item in entity.get_linked_entities('P128', inverse=True)]
 
 
-def save(
-        form: FlaskForm,
-        entity: Optional[Entity] = None,
-        class_: Optional[str] = None,
-        origin: Optional[Entity] = None) -> Union[str, Response]:
+def insert_file(form: FlaskForm, origin: Optional[Entity] = None) -> Union[str, Response]:
+    filenames = []
+    url = url_for('index', view=g.classes['file'].view)
+    try:
+        Transaction.begin()
+        entity_name = form.name.data.strip()
+        for count, file in enumerate(form.file.data):
+            entity = Entity.insert('file', file.filename)
+            url = link_and_get_redirect_url(form, entity, 'file', origin)
+            # Add an 'a' to prevent emtpy temporary filename, this doesn't affect stored information
+            filename = secure_filename('a' + file.filename)  # type: ignore
+            new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
+            file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
+            filenames.append(new_name)
+            if len(form.file.data) > 1:
+                count = str(count + 1).zfill(2)
+                form.name.data = f'{entity_name}_{count}'
+                if origin:
+                    url = f"{url_for('entity_view', id_=origin.id)}#tab-file"
+            entity.update(form)
+            update_links(entity, form, 'insert', origin)
+            logger.log_user(entity.id, 'insert')
+        Transaction.commit()
+        flash(_('entity created'), 'info')
+    except Exception as e:  # pragma: no cover
+        Transaction.rollback()
+        for filename in filenames:
+            (app.config['UPLOAD_DIR'] / filename).unlink()
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+        url = url_for('index', view=g.classes['file'].view)
+    return url
+
+
+def save(form: FlaskForm,
+         entity: Optional[Entity] = None,
+         class_: Optional[str] = None,
+         origin: Optional[Entity] = None) -> Union[str, Response]:
+    if class_ == 'file' and not entity:
+        return insert_file(form, origin)
     Transaction.begin()
     action = 'update'
     try:
@@ -329,16 +364,10 @@ def insert_entity(
         entity = ReferenceSystem.insert_system(form)
     else:
         entity = Entity.insert(class_, form.name.data)
-    if entity.class_.name == 'file':
-        file_ = request.files['file']
-        # Add an 'a' to prevent emtpy filename, this won't affect stored information
-        filename = secure_filename('a' + file_.filename)  # type: ignore
-        new_name = '{id}.{ext}'.format(id=entity.id, ext=filename.rsplit('.', 1)[1].lower())
-        file_.save(str(app.config['UPLOAD_DIR'] / new_name))
     return entity
 
 
-def update_links(entity: Entity, form: FlaskForm, action: str, origin: Optional[Entity]) -> None:
+def update_links(entity: Entity, form: FlaskForm, action: str, origin: Union[Entity, None]) -> None:
     if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'type']:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':

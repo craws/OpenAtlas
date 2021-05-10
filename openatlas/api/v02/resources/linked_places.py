@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.display import get_file_path
+from openatlas.util.util import get_file_path
 
 
 class LinkedPlacesEntity:
@@ -34,19 +34,18 @@ class LinkedPlacesEntity:
             out.append({
                 'label': link.range.name,
                 'relationTo': url_for('entity', id_=link.range.id, _external=True),
-                'relationType': 'crm:' + link.property.code + '_'
-                                + link.property.i18n['en'].replace(' ', '_'),
+                'relationType': 'crm:' + link.property.code + ' ' + link.property.i18n['en'],
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [LinkedPlacesEntity.get_time(link.range)]}})
         for link in links_inverse:
-            property_ = link.property.i18n['en'].replace(' ', '_')
+            property_ = link.property.i18n['en']
             if link.property.i18n_inverse['en']:
-                property_ = link.property.i18n_inverse['en'].replace(' ', '_')
+                property_ = link.property.i18n_inverse['en']
             out.append({
                 'label': link.domain.name,
                 'relationTo': url_for('entity', id_=link.domain.id, _external=True),
-                'relationType': 'crm:' + link.property.code + 'i_' + property_,
+                'relationType': 'crm:' + link.property.code + 'i ' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
                 'when': {'timespans': [LinkedPlacesEntity.get_time(link.domain)]}})
@@ -151,22 +150,25 @@ class LinkedPlacesEntity:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        links = []
-        links_inverse = []
+        links: List[Link] = []
+        links_inverse: List[Link] = []
         if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
             links = LinkedPlacesEntity.get_all_links(entity)
             links_inverse = LinkedPlacesEntity.get_all_links_inverse(entity)
 
         features['relations'] = \
-            LinkedPlacesEntity.get_links(links, links_inverse) if 'relations' in parser['show'] else None
+            LinkedPlacesEntity.get_links(links, links_inverse) if 'relations' in parser[
+                'show'] else None
         features['types'] = \
             LinkedPlacesEntity.get_node(entity, links) if 'types' in parser['show'] else None
         features['depictions'] = \
             LinkedPlacesEntity.get_file(links_inverse) if 'depictions' in parser['show'] else None
-        features['when'] = \
-            {'timespans': [LinkedPlacesEntity.get_time(entity)]} if 'when' in parser['show'] else None
-        features['links'] = LinkedPlacesEntity.get_reference_systems(links_inverse) if 'links' in parser[
-            'show'] else None
+        features['when'] = {
+            'timespans': [LinkedPlacesEntity.get_time(entity)]} if 'when' in parser[
+                'show'] else None
+        features['links'] = LinkedPlacesEntity.get_reference_systems(links_inverse) \
+            if 'links' in parser['show'] else None
+
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 features['geometry'] = LinkedPlacesEntity.get_geoms_by_entity(

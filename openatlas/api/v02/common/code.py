@@ -12,7 +12,6 @@ from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
-from openatlas.util.util import api_access
 
 
 class GetByCode(Resource):  # type: ignore

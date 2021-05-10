@@ -5,7 +5,6 @@ from flask import Response, url_for
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.templates.usage import UsageTemplate
-from openatlas.util.util import api_access
 
 
 class ShowUsage(Resource):  # type: ignore

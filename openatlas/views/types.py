@@ -1,7 +1,7 @@
-from typing import Dict, Union
+from typing import Any, Dict, List, Union
 
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -10,9 +10,22 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.display import link, tree_select
 from openatlas.util.table import Table
-from openatlas.util.util import required_group
+from openatlas.util.util import link, required_group, sanitize, uc_first
+
+
+def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
+    items = []
+    for id_ in nodes:
+        item = g.nodes[id_]
+        count_subs = f' ({format_number(item.count_subs)})' if item.count_subs else ''
+        items.append({
+            'id': item.id,
+            'href': url_for('entity_view', id_=item.id),
+            'a_attr': {'href': url_for('entity_view', id_=item.id)},
+            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
+            'children': walk_tree(item.subs)})
+    return items
 
 
 @app.route('/types')
@@ -29,7 +42,10 @@ def node_index() -> str:
             type_ = 'standard'
         elif node.value_type:
             type_ = 'value'
-        nodes[type_][node] = tree_select(node.name)
+        nodes[type_][node] = render_template(
+            'forms/tree_select_item.html',
+            name=sanitize(node.name),
+            data=walk_tree(Node.get_nodes(node.name)))
     return render_template(
         'types/index.html',
         nodes=nodes,
@@ -75,10 +91,12 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     getattr(form, str(root.id)).data = node.id
     return render_template(
         'types/move.html',
-        node=node,
+        table=Table(
+            header=['#', uc_first(_('selection'))],
+            rows=[[item, item.label.text] for item in form.selection]),
         root=root,
         form=form,
-        title=_('types'),
+        entity=node,
         crumbs=[[_('types'), url_for('node_index')], root, node, _('move entities')])
 
 

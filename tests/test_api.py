@@ -86,6 +86,7 @@ class ApiTests(TestBaseCase):
                 #     assert data[key] == value
 
             # Test GeoJson output
+            self.maxDiff = None
             rv = self.app.get(url_for('entity', id_=place.id))
             self.assertEqual(rv.get_json(), api_data.api_place_entity)
 

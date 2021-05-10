@@ -6,16 +6,18 @@ from typing import Optional, Union
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import TextAreaField
+from wtforms import StringField, SubmitField, TextAreaField
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm, ModulesForm,
-    NewsLetterForm, SimilarForm, TestMailForm)
+    SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
@@ -26,11 +28,10 @@ from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
-from openatlas.util.display import (
-    convert_size, delete_link, format_date, format_datetime, get_disk_space_info, get_file_path,
-    link, sanitize, uc_first)
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats, is_authorized, required_group, send_mail
+from openatlas.util.util import (
+    convert_size, delete_link, format_date, format_datetime, get_disk_space_info, get_file_path,
+    get_file_stats, is_authorized, link, required_group, sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -137,7 +138,8 @@ def admin_check_links() -> str:
         'admin/check_links.html',
         table=Table(
             ['domain', 'property', 'range'],
-            rows=[[x['domain'], x['property'], x['range']] for x in Link.check_links()]),
+            rows=[
+                [x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
         title=_('admin'),
         crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check links')])
 
@@ -303,7 +305,7 @@ def admin_orphans() -> str:
         'circular': Table(['entity']),
         'nodes': Table(['name', 'root']),
         'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
-    tables['circular'].rows = [[link(entity)] for entity in Entity.get_circular()]
+    tables['circular'].rows = [[link(entity)] for entity in Entity.get_entities_linked_to_itself()]
     for entity in Entity.get_orphans():
         if isinstance(entity, ReferenceSystem):
             continue
@@ -444,6 +446,17 @@ def admin_log_delete() -> Response:
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
+    class NewsLetterForm(FlaskForm):  # type: ignore
+        subject = StringField(
+            '',
+            [InputRequired()],
+            render_kw={'placeholder': uc_first(_('subject')), 'autofocus': True})
+        body = TextAreaField(
+            '',
+            [InputRequired()],
+            render_kw={'placeholder': uc_first(_('content'))})
+        save = SubmitField(_('send'))
+
     form = NewsLetterForm()
     form.save.label.text = uc_first(_('send'))
     if form.validate_on_submit():  # pragma: no cover

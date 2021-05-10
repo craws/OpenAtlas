@@ -10,7 +10,6 @@ from openatlas.api.v02.resources.linked_places import LinkedPlacesEntity
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
-from openatlas.util.util import api_access
 
 
 class GetTypeEntitiesAll(Resource):  # type: ignore

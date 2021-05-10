@@ -10,7 +10,6 @@ from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
-from openatlas.util.util import api_access
 
 
 class GetSubunitHierarchy(Resource):  # type: ignore
@@ -29,7 +28,7 @@ class GetSubunitHierarchy(Resource):  # type: ignore
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+            entity = Entity.get_by_id(id_, nodes=True)
         except EntityDoesNotExistError:
             raise EntityDoesNotExistError
         if not entity.class_.name == 'place' \

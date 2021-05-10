@@ -17,12 +17,11 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.display import (
-    add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
-    get_entity_data, get_file_path,  get_profile_image_table_link, link, uc_first)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import is_authorized, required_group
+from openatlas.util.util import (
+    add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
+    get_entity_data, get_file_path, is_authorized, link, required_group, uc_first)
 from openatlas.views.reference import AddReferenceForm
 
 
@@ -122,10 +121,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                 first,
                 last,
                 link_.description]
-            data = add_edit_link(
-                data,
-                url_for('involvement_update', id_=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, link_.domain.name, link_, entity, 'event')
+            add_edit_link(data, url_for('involvement_update', id_=link_.id, origin_id=entity.id))
+            add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
             type_ = ''
@@ -142,10 +139,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                         link_.type.get_name_directed(True),
                         url_for('entity_view', id_=link_.type.id))
             data = [type_, link(related), link_.first, link_.last, link_.description]
-            data = add_edit_link(
-                data,
-                url_for('relation_update', id_=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, related.name, link_, entity, 'relation')
+            add_edit_link(data, url_for('relation_update', id_=link_.id, origin_id=entity.id))
+            add_remove_link(data, related.name, link_, entity, 'relation')
             tabs['relation'].table.rows.append(data)
         for link_ in entity.get_links('P107', True):
             data = [
@@ -154,8 +149,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                 link_.first,
                 link_.last,
                 link_.description]
-            data = add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
+            add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=entity.id))
+            add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
             tabs['member_of'].table.rows.append(data)
         if entity.class_.name != 'group':
             del tabs['member']
@@ -167,10 +162,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                     link_.first,
                     link_.last,
                     link_.description]
-                data = add_edit_link(
-                    data,
-                    url_for('member_update', id_=link_.id, origin_id=entity.id))
-                data = add_remove_link(data, link_.range.name, link_, entity, 'member')
+                add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=entity.id))
+                add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity)
@@ -195,10 +188,8 @@ def entity_view(id_: int) -> Union[str, Response]:
                 last,
                 g.properties[link_.property.code].name_inverse,
                 link_.description]
-            data = add_edit_link(
-                data,
-                url_for('involvement_update', id_=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, link_.range.name, link_, entity, 'actor')
+            add_edit_link(data, url_for('involvement_update', id_=link_.id, origin_id=entity.id))
+            add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
@@ -211,15 +202,15 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            add_remove_link(data, range_.name, link_, entity, range_.class_.name)
             tabs[range_.class_.view].table.rows.append(data)
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
-            data = add_edit_link(
+            add_edit_link(
                 data,
                 url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, link_.domain.name, link_, entity, 'reference')
+            add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'place':
         tabs['source'] = Tab('source', entity)
@@ -259,10 +250,10 @@ def entity_view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            data = add_edit_link(
+            add_edit_link(
                 data,
                 url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            add_remove_link(data, range_.name, link_, entity, range_.class_.name)
             tabs[range_.class_.view].table.rows.append(data)
     elif entity.class_.view == 'source':
         for name in ['actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
@@ -276,7 +267,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            data = add_remove_link(data, range_.name, link_, entity, range_.class_.name)
+            add_remove_link(data, range_.name, link_, entity, range_.class_.name)
             tabs[range_.class_.view].table.rows.append(data)
 
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
@@ -306,7 +297,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         if domain.id in overlays:
-                            data = add_edit_link(
+                            add_edit_link(
                                 data,
                                 url_for('overlay_update', id_=overlays[domain.id].id))
                         else:
@@ -321,13 +312,13 @@ def entity_view(id_: int) -> Union[str, Response]:
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
-                data = add_edit_link(
+                add_edit_link(
                     data,
                     url_for('reference_link_update', link_id=link_.id, origin_id=entity.id))
                 if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)
                     continue
-            data = add_remove_link(data, domain.name, link_, entity, domain.class_.view)
+            add_remove_link(data, domain.name, link_, entity, domain.class_.view)
             tabs[domain.class_.view].table.rows.append(data)
 
     structure = None  # Needed for place
@@ -368,6 +359,18 @@ def entity_view(id_: int) -> Union[str, Response]:
         gis_data=gis_data,
         title=entity.name,
         crumbs=add_crumbs(entity, structure))
+
+
+def get_profile_image_table_link(
+        file: Entity,
+        entity: Entity,
+        extension: str,
+        profile_image_id: Optional[int] = None) -> str:
+    if file.id == profile_image_id:
+        return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
+    elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+        return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+    return ''  # pragma: no cover
 
 
 def add_crumbs(entity: Union[Entity, Node], structure: Optional[Dict[str, Any]]) -> List[str]:
