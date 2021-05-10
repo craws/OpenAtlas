@@ -32,7 +32,6 @@ from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util.image_processing import ImageProcessing
-from openatlas.util.table import Table
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -696,17 +695,15 @@ def download_button(entity: Entity) -> str:
 
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
+    path = get_file_path(entity.image_id if entity.image_id else entity)
     if not path:
-        return ''  # pragma: no cover
+        return ''
     ext = app.config['PROCESSED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
         'DISPLAY_FILE_EXTENSIONS']
     if entity.class_.view == 'file' and not path.suffix.lower() in ext:
-        html = uc_first(_('no preview available'))  # pragma: no cover
+        return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
     elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
-        html = uc_first(_('no preview available'))  # pragma: no cover
+        return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
     else:
         resized_path = get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail'])
         width = session['settings']['profile_image_width']
@@ -720,7 +717,8 @@ def display_profile_image(entity: Entity) -> str:
         rel = 'noopener noreferrer' if entity.class_.view == 'file' else ''
         html = (f'<a href="{url}" rel="{rel}" target="_blank">'
                 f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
-    return Markup(f'<div id="profile_image_div">{html}</div>')
+        return Markup(f'<div id="profile_image_div">{html}</div>')
+
 
 
 @app.template_filter()

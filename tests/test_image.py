@@ -8,6 +8,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.util import display_profile_image
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -49,7 +50,7 @@ class ImageTest(TestBaseCase):
             # Create entities for file
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                insert_entity('Pathless_File', 'file')
+                file_pathless = insert_entity('Pathless_File', 'file')
 
                 file = insert_entity('Test_File', 'file')
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
@@ -74,11 +75,16 @@ class ImageTest(TestBaseCase):
                 # Exception
                 ImageProcessing.safe_resized_image(file2.id, '.png', size="???")
                 ImageProcessing.create_folder(pathlib.Path(app.root_path) / '???')
+                display_profile_image(file_pathless)
 
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('entity_view', id_=file.id))
             assert b'Test_File' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=file_py.id))
+            assert b'No preview available' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=file_pathless.id))
+            assert b'Missing file' in rv.data
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
 
