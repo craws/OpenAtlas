@@ -703,7 +703,8 @@ def display_profile_image(entity: Entity) -> str:
     if entity.class_.view == 'file' and not path.suffix.lower() in ext:
         return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
     elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
-        return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
+        return Markup(  # pragma: no cover
+            f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
     else:
         resized_path = get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail'])
         width = session['settings']['profile_image_width']
@@ -878,6 +879,6 @@ def delete_tmp_files() -> None:
         try:
             file_.unlink()
             path.rmdir()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.log('error', 'tmp', 'failed deletion', e)
             continue

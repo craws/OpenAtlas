@@ -74,9 +74,7 @@ class ImageTest(TestBaseCase):
 
                 # Exception
                 ImageProcessing.safe_resized_image(file2.id, '.png', size="???")
-                ImageProcessing.create_folder(pathlib.Path(app.root_path) / '???')
                 display_profile_image(file_pathless)
-
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('entity_view', id_=file.id))
@@ -103,7 +101,7 @@ class ImageTest(TestBaseCase):
             assert b'Test_File' in rv.data
 
             # Exception
-            app.config['IMAGE_SIZE']['tmp'] = '?'
+            app.config['IMAGE_SIZE']['tmp'] = '<'
             rv = self.app.get(url_for('entity_view', id_=file.id))
             assert b'Test_File' in rv.data
             app.config['IMAGE_SIZE']['tmp'] = '1'

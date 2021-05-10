@@ -40,7 +40,7 @@ class ImageProcessing:
                         ImageProcessing.safe_resized_image(name, file_format, size)
                 return True
             return False
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.log('debug', 'image validation failed', 'fail to validate file as image', e)
             return False
 
@@ -54,7 +54,7 @@ class ImageProcessing:
         try:
             folder.mkdir()
             return True
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             logger.log('debug', 'folder creation failed', 'failed to create a folder', e)
             return False
 
