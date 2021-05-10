@@ -37,6 +37,7 @@ from openatlas.util.table import Table
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
     from openatlas.models.node import Node
+    from openatlas.util.table import Table
 
 
 @app.template_filter()
@@ -437,10 +438,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-        'begin_year_from', 'begin_month_from', 'begin_day_from',
-        'begin_year_to', 'begin_month_to', 'begin_day_to',
-        'end_year_from', 'end_month_from', 'end_day_from',
-        'end_year_to', 'end_month_to', 'end_day_to']:
+            'begin_year_from', 'begin_month_from', 'begin_day_from',
+            'begin_year_to', 'begin_month_to', 'begin_day_to',
+            'end_year_from', 'end_month_from', 'end_day_from',
+            'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -633,7 +634,7 @@ def breadcrumb(crumbs: List[Any]) -> str:
 
 
 @app.template_filter()
-def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+def tab_header(id_: str, table: Optional['Table'] = None, active: Optional[bool] = False) -> str:
     return Markup(render_template('util/tab_header.html', active=active, id=id_, table=table))
 
 
