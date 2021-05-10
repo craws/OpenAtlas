@@ -13,7 +13,6 @@ from openatlas.models.place import get_structure
 
 
 class GetSubunit(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/subunit.yml", endpoint="subunit")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()

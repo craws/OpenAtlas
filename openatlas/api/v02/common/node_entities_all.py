@@ -11,7 +11,6 @@ from openatlas.api.v02.templates.nodes import NodeTemplate
 
 
 class GetNodeEntitiesAll(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/nodes_all.yml", endpoint="node_entities_all")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = default_parser.parse_args()

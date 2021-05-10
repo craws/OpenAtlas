@@ -15,7 +15,6 @@ from openatlas.models.entity import Entity
 
 
 class GetBySystemClass(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/system_class.yml", endpoint="system_class")
     def get(self, system_class: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()

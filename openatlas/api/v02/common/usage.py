@@ -8,7 +8,6 @@ from openatlas.api.v02.templates.usage import UsageTemplate
 
 
 class ShowUsage(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/usage.yml", endpoint="usage")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         usage = {

@@ -13,7 +13,6 @@ from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/type_entities_all.yml", endpoint="type_entities_all")
     def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()

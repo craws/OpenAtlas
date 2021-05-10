@@ -16,7 +16,6 @@ from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
 class GetQuery(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/query.yml", endpoint="query")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = query_parser.parse_args()

@@ -9,7 +9,6 @@ from openatlas.models.entity import Entity
 
 
 class OverviewCount(Resource):  # type: ignore
-    @api_access()  # type: ignore
     @swag_from("../swagger/overview_count.yml", endpoint="overview_count")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         overview = []
