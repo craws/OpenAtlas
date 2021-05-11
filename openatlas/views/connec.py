@@ -8,8 +8,11 @@ from openatlas import app
 from openatlas.models.entity import Entity
 
 # Script to restructure CONNEC letter data, used locally, using a view to get setup
-# Make sure to set database in instance/production.py to openatlas_connec and start script going to
-# http://127.0.0.1:5000/connec
+# How to:
+# Place fresh online SQL dump to instance/connec.sql
+# Set database in instance/production.py to openatlas_connec
+# http://127.0.0.1:5000/connec - to start script
+# To view results switch database in instance/production.oy to openatlas_connec_test
 
 source_artifact: Dict[int, Any] = {}
 sources: Dict[int, Entity] = {}
@@ -34,10 +37,25 @@ def restructure_connec():
             sources[source.id] = source
     output.append(f'Sources with letter type: {len(source_artifact)}')
     insert_artifacts()
-    update_types(letter_type_ids)
+    add_artifact_letter_type()
+    copy_case_study_type_links()
     output.append(update_links())
     output.append('Done')
     return '<br>'.join(output)
+
+
+def copy_case_study_type_links():
+    # Link case study to artefact form
+    g.connec_cursor.execute(
+        "INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES (137, 20);")
+    sql = ''
+    for source_id, source in sources.items():
+        for node in source.nodes:
+            if node.root and node.root[-1] == 137:
+                sql += f"""
+                    INSERT INTO model.link(property_code, domain_id, range_id)
+                    VALUES ('P2', {source_artifact[source_id]}, {node.id});"""
+    g.connec_cursor.execute(sql)
 
 
 def update_links():
@@ -83,7 +101,7 @@ def insert_artifacts():
         source_artifact[source.id] = g.connec_cursor.fetchone()['id']
 
 
-def update_types(letter_type_ids):
+def add_artifact_letter_type():
     # Create artifact type "letter", connect entries
     sql = """
         INSERT INTO model.entity (name, system_class, class_code)
