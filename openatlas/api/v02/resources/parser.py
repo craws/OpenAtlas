@@ -16,7 +16,7 @@ language_parser.add_argument(
     case_sensitive=False,
     choices=app.config['LANGUAGES'].keys())
 
-entity_parser = default_parser.copy()  # inherit the default parser
+entity_parser = default_parser.copy()
 entity_parser.add_argument(
     'sort',
     choices=('desc', 'asc'),
@@ -72,4 +72,4 @@ query_parser.add_argument(
         'reference_system', 'stratigraphic_unit', 'source_translation', 'type'))
 
 image_parser = default_parser.copy()
-image_parser.add_argument('thumbnail', type=int, help="Not a valid tuple")
+image_parser.add_argument('image_size', type=str, help="Not a valid size")

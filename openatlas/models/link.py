@@ -10,7 +10,6 @@ from openatlas import logger
 from openatlas.database.link import Link as Db
 from openatlas.models.date import Date
 
-
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
 
@@ -194,7 +193,7 @@ class Link:
     @staticmethod
     def get_invalid_cidoc_links() -> List[Dict[str, str]]:
         from openatlas.models.entity import Entity
-        from openatlas.util.filters import link
+        from openatlas.util.util import link
         invalid_linking = []
         for row in Db.get_cidoc_links():
             property_ = g.properties[row['property_code']]
@@ -225,7 +224,8 @@ class Link:
     def check_single_type_duplicates() -> List[List[str]]:
         from openatlas.models.node import Node
         from openatlas.models.entity import Entity
-        from openatlas.util.filters import link, uc_first
+        from openatlas.util.util import uc_first
+        from openatlas.util.util import link
         data = []
         for node in g.nodes.values():
             if node.root or node.multiple or node.value_type:

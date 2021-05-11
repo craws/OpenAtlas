@@ -12,7 +12,7 @@ from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.user import User as Db
-from openatlas.util.filters import sanitize
+from openatlas.util.util import sanitize
 
 
 class User(UserMixin):  # type: ignore
@@ -163,8 +163,8 @@ class User(UserMixin):  # type: ignore
             'table_show_aliases': True,
             'show_email': False}
         for setting in session['settings']:
-            if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] or \
-                    setting.startswith('module_'):
+            if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
+                    or setting.startswith('module_'):
                 settings[setting] = session['settings'][setting]
         for row in Db.get_settings(user_id):
             settings[row['name']] = row['value']

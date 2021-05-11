@@ -1,7 +1,7 @@
 from typing import Any, Dict, List, Union
 
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -10,11 +10,8 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
-from openatlas.util.filters import link
-from openatlas.util.util import required_group
-from openatlas.util.filters import sanitize
 from openatlas.util.table import Table
-from flask_babel import format_number
+from openatlas.util.util import link, required_group, sanitize, uc_first
 
 
 def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
@@ -94,10 +91,12 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     getattr(form, str(root.id)).data = node.id
     return render_template(
         'types/move.html',
-        node=node,
+        table=Table(
+            header=['#', uc_first(_('selection'))],
+            rows=[[item, item.label.text] for item in form.selection]),
         root=root,
         form=form,
-        title=_('types'),
+        entity=node,
         crumbs=[[_('types'), url_for('node_index')], root, node, _('move entities')])
 
 

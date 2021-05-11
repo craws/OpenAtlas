@@ -8,7 +8,7 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm, widgets
 from wtforms import (
-    BooleanField, FieldList, FileField, HiddenField, SelectField, SelectMultipleField,
+    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField, SelectMultipleField,
     StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
@@ -21,9 +21,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.filters import get_base_table_data, uc_first
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats
+from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
 
 forms = {
     'acquisition': ['name', 'date', 'description', 'continue'],
@@ -171,23 +170,20 @@ def add_buttons(
             and (name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-    insert_and_add = uc_first(_('insert and add')) + ' '
+    insert_add = uc_first(_('insert and add')) + ' '
     if name == 'place':
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('feature')))
+        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('feature')))
     elif name == 'feature' and origin and origin.class_.name == 'place':
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('stratigraphic unit')))
+        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('stratigraphic unit')))
     elif name == 'stratigraphic_unit':
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('find')))
-        setattr(
-            form,
-            'insert_continue_human_remains',
-            SubmitField(insert_and_add + _('human remains')))
+        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('find')))
+        setattr(form, 'insert_continue_human_remains', SubmitField(insert_add + _('human remains')))
     return form
 
 
@@ -261,7 +257,7 @@ def add_fields(
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
     elif class_ == 'file' and not item:
-        setattr(form, 'file', FileField(_('file'), [InputRequired()]))
+        setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
     elif class_ == 'group':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
