@@ -1,17 +1,17 @@
 import subprocess
-from typing import Dict
+from typing import Any, Dict
 
 from flask import g
 from psycopg2 import connect, extras
 
 from openatlas import app
-
-# Script to restructure CONNEC letter data, used locally, using a view to get setup
-# Make sure to set database in instance/production.py to openatlas_connec
-
 from openatlas.models.entity import Entity
 
-source_artifact: Dict[int, int] = {}
+# Script to restructure CONNEC letter data, used locally, using a view to get setup
+# Make sure to set database in instance/production.py to openatlas_connec and start script going to
+# http://127.0.0.1:5000/connec
+
+source_artifact: Dict[int, Any] = {}
 sources: Dict[int, Entity] = {}
 source_type_id = 35
 artifact_type_id = 9417
@@ -26,7 +26,7 @@ def restructure_connec():
     letter_type_ids = []
     for type_id in letter_type_root_ids:
         letter_type_ids += [type_id] + g.nodes[type_id].subs
-    output.append(f'Letter tye ids: {letter_type_ids}')
+    output.append(f'Letter type ids: {letter_type_ids}')
     for id_ in letter_type_ids:
         items = g.nodes[id_].get_linked_entities('P2', inverse=True, nodes=True)
         for source in items:
@@ -48,7 +48,7 @@ def update_links():
         INSERT INTO model.link (property_code, domain_id, range_id)
         VALUES ('P128', {artifact_id}, {source_id});"""
 
-    # Change source - move link to artifact - move link
+    # Change "source - move link" to "artifact - move link"
     counter = 0
     invalid = ''
     missing_type = ''
@@ -84,23 +84,7 @@ def insert_artifacts():
 
 
 def update_types(letter_type_ids):
-    sql = ''
-    for source_id, artifact_id in source_artifact.items():
-        sql += f"""
-            UPDATE model.link SET domain_id = {artifact_id} 
-            WHERE 
-                domain_id = {source_id} 
-                AND property_code = 'P2'
-                AND range_id in {tuple(letter_type_ids)};"""
-
-    # Move letter root types from source super to artifact super
-    for id_ in letter_type_root_ids:
-        sql += f"""
-            UPDATE model.link SET range_id = {artifact_type_id}
-            WHERE property_code = 'P127' AND domain_id = {id_} AND range_id = {source_type_id};"""
-    g.connec_cursor.execute(sql)
-
-    # Create source type "letter", connect entries
+    # Create artifact type "letter", connect entries
     sql = """
         INSERT INTO model.entity (name, system_class, class_code)
         VALUES ('Letter', 'type', 'E55') RETURNING id;"""
@@ -108,11 +92,11 @@ def update_types(letter_type_ids):
     letter_type_id = g.connec_cursor.fetchone()['id']
     sql = f"""
         INSERT INTO model.link (property_code, domain_id, range_id)
-        VALUES ('P127', {letter_type_id}, {source_type_id});"""
-    for source in sources.values():
+        VALUES ('P127', {letter_type_id}, {artifact_type_id});"""
+    for artifact_id in source_artifact.values():
         sql += f"""
             INSERT INTO model.link (property_code, domain_id, range_id)
-            VALUES ('P2', {source.id}, {letter_type_id});"""
+            VALUES ('P2', {artifact_id}, {letter_type_id});"""
     g.connec_cursor.execute(sql)
 
 
