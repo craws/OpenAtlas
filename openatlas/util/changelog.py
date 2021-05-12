@@ -1,6 +1,7 @@
 class Changelog:
 
     versions = {
+        '6.3.0': ['TBA', {}],
         '6.2.1': ['2021-05-12', {
             'fix': {
                 '1514': 'End dates of entities are not displayed correctly'}}],
