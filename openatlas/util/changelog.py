@@ -1,8 +1,9 @@
 class Changelog:
 
     versions = {
-        '6.3.0': ['TBA', {
-            'feature': {}}],
+        '6.2.1': ['2021-05-12', {
+            'fix': {
+                '1514': 'End dates of entities are not displayed correctly'}}],
         '6.2.0': ['2021-05-08', {
             'feature': {
                 '940': 'Multiple file upload',
