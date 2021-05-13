@@ -50,7 +50,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
             flash(_('user deleted'), 'info')
         elif action == 'remove_logo':
             Settings.set_logo()
-            return redirect(url_for('admin_index') + '#tab-file')
+            return redirect(f"{url_for('admin_index')}#tab-file")
     dirs = {
         'uploads': True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,
         'export/sql': True if os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK) else False,
@@ -113,12 +113,15 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
 def admin_content(item: str) -> Union[str, Response]:
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
-        setattr(ContentForm, language, TextAreaField())
+        setattr(
+            ContentForm,
+            language,
+            StringField() if item == 'site_name_for_frontend' else TextAreaField())
     form = ContentForm()
     if form.validate_on_submit():
         Content.update_content(item, form)
         flash(_('info update'), 'info')
-        return redirect(url_for('admin_index') + '#tab-content')
+        return redirect(f"{url_for('admin_index')}#tab-content")
     content = Content.get_content()
     for language in languages:
         form.__getattribute__(language).data = content[item][language]
@@ -128,7 +131,7 @@ def admin_content(item: str) -> Union[str, Response]:
         form=form,
         languages=languages,
         title=_('content'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-content'], _(item)])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)])
 
 
 @app.route('/admin/check_links')
@@ -141,7 +144,7 @@ def admin_check_links() -> str:
             rows=[
                 [x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
         title=_('admin'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('check links')])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check links')])
 
 
 @app.route('/admin/check_link_duplicates')
@@ -149,9 +152,9 @@ def admin_check_links() -> str:
 @required_group('contributor')
 def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
-        delete_count = str(Link.delete_link_duplicates())
-        logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
-        flash(_('deleted links') + ': ' + delete_count, 'info')
+        count = Link.delete_link_duplicates()
+        logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+        flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table([
         'domain', 'range', 'property_code', 'description', 'type_id', 'begin_from', 'begin_to',
@@ -213,12 +216,12 @@ def admin_settings(category: str) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         tab = 'data' if category == 'api' else category
         tab = 'email' if category == 'mail' else tab
-        return redirect(url_for('admin_index') + '#tab-' + tab)
+        return redirect(f"{url_for('admin_index')}#tab-{tab}")
     set_form_settings(form)
     return render_template(
         'display_form.html',
         form=form,
-        manual_page='admin/' + category,
+        manual_page=f"admin/{category}",
         title=_('admin'),
         crumbs=[
             [_('admin'),
@@ -307,8 +310,7 @@ def admin_orphans() -> str:
     for entity in Entity.get_orphans():
         if isinstance(entity, ReferenceSystem):
             continue
-        name = 'unlinked' if entity.class_.view else 'orphans'
-        tables[name].rows.append([
+        tables['unlinked' if entity.class_.view else 'orphans'].rows.append([
             link(entity),
             link(entity.class_),
             entity.print_standard_type(),
@@ -371,7 +373,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
                 except Exception as e:
                     logger.log('error', 'file', f'deletion of {file.name} failed', e)
                     flash(_('error file delete'), 'error')
-    return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
+    return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
 
 @app.route('/admin/logo/')
@@ -382,7 +384,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         abort(418)  # pragma: no cover - Logo already set
     if id_:
         Settings.set_logo(id_)
-        return redirect(url_for('admin_index') + '#tab-file')
+        return redirect(f"{url_for('admin_index')}#tab-file")
     file_stats = get_file_stats()
     table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
@@ -417,7 +419,7 @@ def admin_log() -> str:
             try:
                 user = link(User.get_by_id(row['user_id']))
             except AttributeError:  # pragma: no cover - user already deleted
-                user = 'id ' + str(row['user_id'])
+                user = f"id {row['user_id']}"
         table.rows.append([
             format_datetime(row['created']),
             f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
