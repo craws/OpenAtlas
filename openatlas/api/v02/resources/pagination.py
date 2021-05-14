@@ -22,6 +22,7 @@ class Pagination:
             raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]
+        count = len(total)
         for num, i in enumerate(list(itertools.islice(total, 0, None, int(parser['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
         if parser['last'] or parser['first']:
@@ -34,6 +35,6 @@ class Pagination:
             "result": entities_result,
             "pagination": {
                 'entity_per_page': int(parser['limit']),
-                'entities': len(total),
+                'entities': count,
                 'index': index, 'total_pages': len(index)}}
         return result
