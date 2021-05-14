@@ -16,26 +16,39 @@ from openatlas.models.entity import Entity
 
 source_artifact: Dict[int, Any] = {}
 sources: Dict[int, Entity] = {}
-source_type_id = 35
+source_move_links = []
 artifact_type_id = 9417
-letter_type_root_ids = [38, 1255, 201, 6098, 6103]
-invalid_entries_ids = [8998]
+move_ids_to_ignore = [
+    8220, 8383, 8436, 8585, 8593, 8597, 8614, 8631, 8660, 8675, 8811, 8817, 8820, 8830, 8831, 8837,
+    8870, 8880, 9075, 9078, 9195, 9238, 9241, 9243, 9246, 9252, 9268, 9275, 9276, 9279, 9280, 9281,
+    9283, 9284, 9285, 9286, 9294, 9299, 9300, 9301, 9313, 9314, 9317, 9320, 9321, 9336, 9341, 9344]
 
 
 @app.route('/connec')
 def restructure_connec():
     output = ['Setup database']
     setup()
-    letter_type_ids = []
-    for type_id in letter_type_root_ids:
-        letter_type_ids += [type_id] + g.nodes[type_id].subs
-    output.append(f'Letter type ids: {letter_type_ids}')
-    for id_ in letter_type_ids:
-        items = g.nodes[id_].get_linked_entities('P2', inverse=True, nodes=True)
-        for source in items:
-            source_artifact[source.id] = None
-            sources[source.id] = source
-    output.append(f'Sources with letter type: {len(source_artifact)}')
+    sql = """
+        SELECT m.id AS move_id, l.id AS link_id, s.id AS source_id, m.system_class
+        FROM model.entity m
+        JOIN model.link l ON l.range_id = m.id
+            AND l.property_code = 'P67'
+            AND m.system_class = 'move'
+        JOIN model.entity s ON l.domain_id = s.id
+        WHERE m.id NOT IN %(ignore_ids)s;"""
+    g.cursor.execute(sql, {'ignore_ids': tuple(move_ids_to_ignore)})
+    for row in g.cursor.fetchall():
+        source_move_links.append({
+            'move_id': row['move_id'],
+            'link_id': row['link_id'],
+            'source_id': row['source_id']})
+    for link_ in source_move_links:
+        if link_['source_id'] not in source_artifact:
+            source_artifact[link_['source_id']] = None
+    for source in Entity.get_by_ids(source_artifact.keys(), nodes=True):
+        sources[source.id] = source
+    output.append(f'Links for moves: {len(source_move_links)}')
+    output.append(f'Sources for moves: {len(sources)}')
     insert_artifacts()
     add_artifact_letter_type()
     copy_case_study_type_links()
@@ -68,28 +81,25 @@ def update_links():
 
     # Change "source - move link" to "artifact - move link"
     counter = 0
-    invalid = ''
     missing_type = ''
-    for move in Entity.get_by_class('move'):
-        for link_ in move.get_links('P67', inverse=True):
-            if link_.domain.class_.name != 'source':
-                invalid += f'invalid id: {link_.domain.id}, class={link_.domain.class_.name}<br>'
-            elif link_.domain.id not in source_artifact:
-                missing_type += f'missing type?: {link_.domain.id}, class={link_.domain.class_.name}<br>'
-            else:
-                counter += 1
-                sql += f"""
-                    UPDATE model.link
-                    SET
-                        domain_id = {link_.range.id},
-                        range_id = {source_artifact[link_.domain.id]},
-                        property_code = 'P25'
-                    WHERE
-                        domain_id = {link_.domain.id}
-                        AND range_id = {link_.range.id}
-                        AND property_code = 'P67';"""
+    for link_ in source_move_links:
+        if link_['source_id'] not in sources:
+            missing_type += \
+                f'missing type?: {link_.domain.id}, class={link_.domain.class_.name}<br>'
+            continue
+        counter += 1
+        sql += f"""
+            UPDATE model.link
+            SET
+                domain_id = {link_['move_id']},
+                range_id = {source_artifact[link_['source_id']]},
+                property_code = 'P25'
+            WHERE
+                domain_id = {link_['source_id']}
+                AND range_id = {link_['move_id']}
+                AND property_code = 'P67';"""
     g.connec_cursor.execute(sql)
-    return f'Move links updated: {counter}.<br>{invalid}<br>{missing_type}'
+    return f'Move links updated: {counter}<br>{missing_type}'
 
 
 def insert_artifacts():
@@ -98,11 +108,20 @@ def insert_artifacts():
             INSERT INTO model.entity (name, description, system_class, class_code)
             VALUES (%(name)s, %(description)s, 'artifact', 'E22') RETURNING id;"""
         g.connec_cursor.execute(sql, {'name': source.name, 'description': source.description})
-        source_artifact[source.id] = g.connec_cursor.fetchone()['id']
+        artifact_id = g.connec_cursor.fetchone()['id']
+        source_artifact[source.id] = artifact_id
+        sql = """
+            INSERT INTO model.entity (name, system_class, class_code)
+            VALUES (%(name)s, 'object_location', 'E53') RETURNING id;"""
+        g.connec_cursor.execute(sql, {'name': 'Location of ' + source.name})
+        location_id = g.connec_cursor.fetchone()['id']
+        sql = f"""
+            INSERT INTO model.link (property_code, domain_id, range_id)
+            VALUES ('P53', {artifact_id}, {location_id})"""
+        g.connec_cursor.execute(sql)
 
 
-def add_artifact_letter_type():
-    # Create artifact type "letter", connect entries
+def add_artifact_letter_type():  # Create artifact type "letter", connect entries
     sql = """
         INSERT INTO model.entity (name, system_class, class_code)
         VALUES ('Letter', 'type', 'E55') RETURNING id;"""
