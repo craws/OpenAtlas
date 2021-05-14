@@ -34,7 +34,7 @@ def restructure_connec():
         JOIN model.link l ON l.range_id = m.id
             AND l.property_code = 'P67'
             AND m.system_class = 'move'
-        JOIN model.entity s ON l.domain_id = s.id
+        JOIN model.entity s ON l.domain_id = s.id AND s.system_class = 'source'
         WHERE m.id NOT IN %(ignore_ids)s;"""
     g.cursor.execute(sql, {'ignore_ids': tuple(move_ids_to_ignore)})
     for row in g.cursor.fetchall():
