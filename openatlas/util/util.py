@@ -127,7 +127,7 @@ def format_entity_date(
                 begin=format_date(getattr(entity, f'{type_}_from')),
                 end=format_date(getattr(entity, f'{type_}_to')))
         else:
-            html += format_date(entity.begin_from)
+            html += format_date(getattr(entity, f'{type_}_from'))
     comment = getattr(entity, f'{type_}_comment')
     return html + (f" ({comment})" if comment else '')
 
