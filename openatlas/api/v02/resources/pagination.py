@@ -22,8 +22,9 @@ class Pagination:
             raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]
+        count = len(total)
         for num, i in enumerate(list(itertools.islice(total, 0, None, int(parser['limit'])))):
-            index.append(({'page': num + 1, 'start_id': i}))
+            index.append(({'page': num + 1, 'startId': i}))
         if parser['last'] or parser['first']:
             total = Pagination.get_shown_entities(total, parser)
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
@@ -31,9 +32,10 @@ class Pagination:
         entities_result = [LinkedPlacesEntity.get_entity(r, parser)
                            for r in entity_limit[:int(parser['limit'])]]
         result = {
-            "result": entities_result,
+            "results": entities_result,
             "pagination": {
-                'entity_per_page': int(parser['limit']),
-                'entities': len(total),
-                'index': index, 'total_pages': len(index)}}
+                'entitiesPerPage': int(parser['limit']),
+                'entities': count,
+                'index': index,
+                'totalPages': len(index)}}
         return result

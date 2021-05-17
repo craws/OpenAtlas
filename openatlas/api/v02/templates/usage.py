@@ -12,13 +12,13 @@ class UsageTemplate:
             'entity': fields.String,
             'code': fields.String,
             'class': fields.String,
-            'system_class': fields.String,
+            'systemClass': fields.String,
             'query': fields.String,
             'latest': fields.String,
-            'node_entities': fields.String,
-            'node_entities_all': fields.String,
+            'nodeEntities': fields.String,
+            'nodeEntitiesAll': fields.String,
             'subunit': fields.String,
-            'subunit_hierarchy': fields.String}
+            'subunitHierarchy': fields.String}
 
         return {
             'message': fields.String,

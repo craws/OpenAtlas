@@ -34,7 +34,7 @@ class Table:
             'stateSave': 'true',
             'columns':
                 [{'title': uc_first(_(item)) if item else ''} for item in self.header] +
-                [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))],  # Add empty,
+                [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))],  # Add empty
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}

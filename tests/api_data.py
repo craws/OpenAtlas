@@ -2,7 +2,7 @@ api_place_entity = {
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/104', 'type': 'Feature',
-         'crmClass': 'crm:E18 Physical Thing', 'system_class': 'place',
+         'crmClass': 'crm:E18 Physical Thing', 'systemClass': 'place',
          'properties': {'title': 'Nostromos'}, 'description': [{'value': 'That is the Nostromos'}],
          'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                                  'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]},
@@ -48,7 +48,7 @@ api_place_entity = {
                  'end': {'earliest': None, 'latest': None}}]}}],
          'names': [{'alias': 'Cargo hauler'}], 'links': [
             {'type': 'close match', 'identifier': 'https://www.geonames.org/2761369',
-             'reference_system': 'GeoNames'}],
+             'referenceSystem': 'GeoNames'}],
          'geometry': {'type': 'Point', 'coordinates': [9, 17], 'title': '', 'description': ''},
          'depictions': [{'@id': 'http://local.host/api/0.2/entity/112', 'title': 'Datei',
                          'license': 'Open license', 'url': 'N/A'}]}]}
