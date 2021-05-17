@@ -702,10 +702,7 @@ def display_profile_image(entity: Entity) -> str:
         'DISPLAY_FILE_EXTENSIONS']
     if entity.class_.view == 'file' and not path.suffix.lower() in ext:
         return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
-    elif app.config['IMAGE_PROCESSING'] and not ImageProcessing.check_processed_image(path.name):
-        return Markup(  # pragma: no cover
-            f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
-    else:
+    elif app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
         resized_path = get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail'])
         width = session['settings']['profile_image_width']
         filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
@@ -719,7 +716,8 @@ def display_profile_image(entity: Entity) -> str:
         html = (f'<a href="{url}" rel="{rel}" target="_blank">'
                 f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
         return Markup(f'<div id="profile_image_div">{html}</div>')
-
+    return Markup(  # pragma: no cover
+            f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
 
 
 @app.template_filter()
