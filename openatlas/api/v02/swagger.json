@@ -281,10 +281,10 @@
       "OutputModel": {
         "type": "object",
         "properties": {
-          "GeoJson": {
+          "results": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/GeoJsonModel"
+              "$ref": "#/components/schemas/LinkedPlaceModel"
             }
           },
           "pagination": {
@@ -343,10 +343,10 @@
       "LatestModel": {
         "type": "array",
         "items": {
-          "$ref": "#/components/schemas/GeoJsonModel"
+          "$ref": "#/components/schemas/LinkedPlaceModel"
         }
       },
-      "GeoJsonModel": {
+      "LinkedPlaceModel": {
         "type": "object",
         "required": [
           "type",

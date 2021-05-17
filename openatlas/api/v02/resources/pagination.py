@@ -32,7 +32,7 @@ class Pagination:
         entities_result = [LinkedPlacesEntity.get_entity(r, parser)
                            for r in entity_limit[:int(parser['limit'])]]
         result = {
-            "result": entities_result,
+            "results": entities_result,
             "pagination": {
                 'entitiesPerPage': int(parser['limit']),
                 'entities': count,
