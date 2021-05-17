@@ -7,4 +7,4 @@ class TypeTreeTemplate:
 
     @staticmethod
     def type_tree_template() -> Dict[str, Any]:
-        return {'type_tree': fields.Raw}
+        return {'typeTree': fields.Raw}

@@ -20,7 +20,7 @@ class LinkedPlacesTemplate:
         links = {
             'type': fields.String,
             'identifier': fields.String,
-            'reference_system': fields.String}
+            'referenceSystem': fields.String}
 
         types = {
             'identifier': fields.String,
@@ -63,7 +63,7 @@ class LinkedPlacesTemplate:
             '@id': fields.String,
             'type': fields.String,
             'crmClass': fields.String,
-            'system_class': fields.String,
+            'systemClass': fields.String,
             'properties': fields.Nested(title),
             'description': fields.List(fields.Nested(description))}
 
@@ -96,13 +96,13 @@ class LinkedPlacesTemplate:
     def pagination(show: Dict[str, str]) -> Dict[str, List]:
         page_index = {
             "page": fields.Integer,
-            "start_id": fields.Integer}
+            "startId": fields.Integer}
 
         pagination_model = {
             "entities": fields.Integer,
-            "entity_per_page": fields.Integer,
+            "entitiesPerPage": fields.Integer,
             "index": fields.List(fields.Nested(page_index)),
-            "total_pages": fields.Integer}
+            "totalPages": fields.Integer}
 
         return {
             "result": fields.List(fields.Nested(LinkedPlacesTemplate.linked_places_template(show))),

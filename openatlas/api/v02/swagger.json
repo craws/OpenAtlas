@@ -46,16 +46,16 @@
           "type": "string",
           "enum": [
             "id",
-            "class_code",
+            "classCode",
             "name",
             "description",
             "created",
             "modified",
-            "system_class",
-            "begin_from",
-            "begin_to",
-            "end_from",
-            "end_to"
+            "systemClass",
+            "beginFrom",
+            "beginTo",
+            "endFrom",
+            "endTo"
           ]
         }
       },
@@ -163,10 +163,10 @@
           "intro": {
             "type": "string"
           },
-          "legal-notice": {
+          "legalNotice": {
             "type": "string"
           },
-          "site-name": {
+          "siteName": {
             "type": "string"
           }
         }
@@ -293,10 +293,10 @@
               "entities": {
                 "type": "number"
               },
-              "entity_per_page": {
+              "entitiesPerPage": {
                 "type": "number"
               },
-              "total_pages": {
+              "totalPages": {
                 "type": "number"
               },
               "index": {
@@ -315,10 +315,10 @@
           "entities": {
             "type": "number"
           },
-          "entity_per_page": {
+          "entitiesPerPage": {
             "type": "number"
           },
-          "total_pages": {
+          "totalPages": {
             "type": "number"
           },
           "index": {
@@ -335,7 +335,7 @@
           "page": {
             "type": "number"
           },
-          "start_id": {
+          "startId": {
             "type": "number"
           }
         }
@@ -381,7 +381,7 @@
           "crmClass": {
             "type": "string"
           },
-          "system_class": {
+          "systemClass": {
             "type": "string"
           },
           "type": {
@@ -473,7 +473,7 @@
           "type": {
             "type": "string"
           },
-          "reference_system": {
+          "referenceSystem": {
             "type": "string"
           }
         }
