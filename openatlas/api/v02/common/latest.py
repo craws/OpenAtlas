@@ -15,7 +15,7 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
-        entities = {"result": GetLatest.get_entities_get_latest(latest, parser)}
+        entities = {"results": GetLatest.get_entities_get_latest(latest, parser)}
         if parser['count']:
             return jsonify(len(entities))
         template = LinkedPlacesTemplate.pagination(parser['show'])
