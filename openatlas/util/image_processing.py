@@ -19,12 +19,11 @@ class ImageProcessing:
     def safe_resized_image(name: str, file_format: str, size: str) -> None:
         try:
             ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
-            path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
+            path = Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]"
             with Image(filename=path) as src:
                 with src.convert('png') as img:
                     img.transform(resize=size + 'x' + size + '>')
-                    img.save(
-                        filename=str(Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
+                    img.save(filename=Path(app.config['RESIZED_IMAGES']) / size / (name + '.png'))
         except Exception as e:
             logger.log('debug', 'image resizing', 'failed to save', e)
 
@@ -38,8 +37,7 @@ class ImageProcessing:
                     p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
                     if not p.is_file():
                         ImageProcessing.safe_resized_image(name, file_format, size)
-                return True
-            return False
+            return True
         except Exception as e:  # pragma: no cover
             logger.log('debug', 'image validation failed', 'fail to validate file as image', e)
             return False
