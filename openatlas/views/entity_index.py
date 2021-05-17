@@ -88,9 +88,10 @@ def file_preview(entity_id: int) -> str:
         if not path:
             return ''
         if ImageProcessing.check_processed_image(path.name):
-            return f"<img src='{url_for('display_icon', filename=f'{entity_id}.png')}'>"
+            return f"<img src='{url_for('display_icon', filename=f'{entity_id}.png')}' " \
+                   f"loading='lazy'>"
         return ''
-    return f"<img src='{url_for('display_icon', filename=icon_path.name)}'>"
+    return f"<img src='{url_for('display_icon', filename=icon_path.name)}' loading='lazy'>"
 
 
 def delete_entity(id_: int) -> Optional[str]:
