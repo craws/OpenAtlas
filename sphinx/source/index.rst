@@ -15,4 +15,5 @@ Redmine `Wiki <https://redmine.openatlas.eu/projects/uni/wiki/Wiki>`_.
    form/index
    tools/index
    admin/index
+   examples/index
    troubleshooting/index
