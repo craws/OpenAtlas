@@ -15,7 +15,6 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
-        # entities = {"results": GetLatest.get_entities_get_latest(latest, parser)}
         entities = Pagination.pagination(GetLatest.get_entities_get_latest(latest, parser), parser)
         if parser['count']:
             return jsonify(len(entities))
@@ -25,7 +24,7 @@ class GetLatest(Resource):  # type: ignore
         return marshal(entities, template), 200
 
     @staticmethod
-    def get_entities_get_latest(limit_: int, parser: Dict[str, Any]) -> List[Entity]:
+    def get_entities_get_latest(limit_: int) -> List[Entity]:
         if not (0 < limit_ < 101):
             raise InvalidLimitError
         return Entity.get_latest(limit_)
