@@ -167,7 +167,67 @@
 <h1>Letters<a class="headerlink" href="#letters" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Description: : here you can see how to enter letters into OpenAtlas</p>
+<p>This describes how to enter a letter exchange event.
+We will start with describing the involved elements:</p>
+<ul class="simple">
+<li><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: the physical presentation of the letter</li>
+<li><a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a>: the content of the letter</li>
+<li><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a>: the <strong>Move</strong> of the letter from one place to another</li>
+<li><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: Start or end point of the letter exchange</li>
+<li><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a>: Sender/recipient of the letter</li>
+<li><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</li>
+</ul>
+<div class="section" id="adding-an-artifact">
+<h2>Adding an artifact<a class="headerlink" href="#adding-an-artifact" title="Permalink to this headline">¶</a></h2>
+<p>The created artifact is the physical presentation of the letter and the following data concerns the object
+e.g. the begin date would be the creation of the letter, the description can be used to record e.g. the
+material of the object.</p>
+<ul class="simple">
+<li>Click on <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> in the menu and create a new entry by using the ‘+ Artifact’ button</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: from the list, e.g. letter</li>
+<li>Add further information as date or description if available</li>
+<li>Press ‘Insert’ to save the entry</li>
+</ul>
+</div>
+<div class="section" id="adding-a-source">
+<h2>Adding a source<a class="headerlink" href="#adding-a-source" title="Permalink to this headline">¶</a></h2>
+<p>With <a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a> you can record the content of said letter. For example, if there are copies of
+the letter, they all have the same text (= source).</p>
+<ul class="simple">
+<li>Click on <a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a> in the main menu and create a new entry by using the ‘+ Source’ button</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: from the list</li>
+<li>Click on the artifact button and choose the before created letter from the list</li>
+<li>Press ‘Insert’ to save the entry</li>
+</ul>
+<p>It is important to link the artifact to the source in this way. If you would link it using the tab
+“artifact” it means the source refers to the artifact not the source is written on the letter.</p>
+</div>
+<div class="section" id="adding-the-move-event">
+<h2>Adding the move event<a class="headerlink" href="#adding-the-move-event" title="Permalink to this headline">¶</a></h2>
+<p>The creates an entry concerning the movement of the letter.</p>
+<ul class="simple">
+<li>After saving the source, you can see the linked artifact with its name in the source view and click on it</li>
+<li>In the artifact view click on the ‘Event’ tab in the menu and create a new move with the ‘+ Move’ button</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: from the list, e.g. letter exchange</li>
+<li>With “from” and “to” you can choose the starting and ending location of the move</li>
+<li>The respective artifact should already be preset</li>
+<li>If available, enter the dates for the letter exchange</li>
+<li>Press ‘Insert’ to save the entry</li>
+</ul>
+</div>
+<div class="section" id="adding-sender-and-recipient">
+<h2>Adding sender and recipient<a class="headerlink" href="#adding-sender-and-recipient" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Open the created event by clicking on it in the event tab of the move</li>
+<li>Click on the ‘actor’ tab</li>
+<li>Either link an already entered person with ‘Link’ or create a new one with ‘+ Person’ button</li>
+<li>When entering the involvement information, choose the actor and add the respective type (sender/recipient)</li>
+<li>Press ‘Insert’ to save the entry</li>
+</ul>
+</div>
 </div>
 
 
