@@ -7,7 +7,7 @@ identify bits of information like **persons**, **events** and **places** and map
 can ask questions like: *Where was this person in the course of his life?* or
 *Who participated at an event?*
 
-The menu structure reflects that workflow.
+The :doc:`/ui/menu` structure reflects that workflow.
 
 .. toctree::
    :maxdepth: 1
