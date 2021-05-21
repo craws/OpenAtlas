@@ -29,9 +29,10 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for entity in entities:
-            data = get_base_table_data(entity, show_links=False)
-            data.insert(0, render_template('forms/checkbox_table.html', entity=entity, field=field))
+        for e in entities:
+            data = get_base_table_data(e, show_links=False)
+            checked = 'checked' if field.data and e.id in field.data else ''
+            data.insert(0, f'<input type="checkbox" id="{e.id}" value="{e.name}" {checked}>')
             table.rows.append(data)
         html = render_template(
             'forms/table_multi_select.html',
