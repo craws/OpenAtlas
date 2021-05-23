@@ -18,16 +18,19 @@ source_artifact: Dict[int, Any] = {}
 sources: Dict[int, Entity] = {}
 source_move_links = []
 artifact_type_id = 9417
+book_node_id = 201  # will be excluded
 move_ids_to_ignore = [
     8220, 8383, 8436, 8585, 8593, 8597, 8614, 8631, 8660, 8675, 8811, 8817, 8820, 8830, 8831, 8837,
     8870, 8880, 9075, 9078, 9195, 9238, 9241, 9243, 9246, 9252, 9268, 9275, 9276, 9279, 9280, 9281,
-    9283, 9284, 9285, 9286, 9294, 9299, 9300, 9301, 9313, 9314, 9317, 9320, 9321, 9336, 9341, 9344]
+    9283, 9284, 9285, 9286, 9294, 9299, 9300, 9301, 9313, 9314, 9317, 9320, 9321, 9336, 9341, 9344,
+    7684, 7902, 9092, 9094, 9179, 8713, 9118, 8866, 8680, 8596]
 
 
 @app.route('/connec')
 def restructure_connec():
     output = ['Setup database']
     setup()
+    book_node =g.nodes[book_node_id]
     sql = """
         SELECT m.id AS move_id, l.id AS link_id, s.id AS source_id, m.system_class
         FROM model.entity m
@@ -38,6 +41,9 @@ def restructure_connec():
         WHERE m.id NOT IN %(ignore_ids)s;"""
     g.cursor.execute(sql, {'ignore_ids': tuple(move_ids_to_ignore)})
     for row in g.cursor.fetchall():
+        source = Entity.get_by_id(row['source_id'], nodes=True)
+        if book_node in source.nodes:
+            continue
         source_move_links.append({
             'move_id': row['move_id'],
             'link_id': row['link_id'],
@@ -105,9 +111,9 @@ def update_links():
 def insert_artifacts():
     for source in sources.values():
         sql = """
-            INSERT INTO model.entity (name, description, system_class, class_code)
-            VALUES (%(name)s, %(description)s, 'artifact', 'E22') RETURNING id;"""
-        g.connec_cursor.execute(sql, {'name': source.name, 'description': source.description})
+            INSERT INTO model.entity (name, system_class, class_code)
+            VALUES (%(name)s, 'artifact', 'E22') RETURNING id;"""
+        g.connec_cursor.execute(sql, {'name': source.name})
         artifact_id = g.connec_cursor.fetchone()['id']
         source_artifact[source.id] = artifact_id
         sql = """
