@@ -122,7 +122,7 @@ class LinkedPlacesEntity:
                 'identifier':
                     (system.resolver_url if system.resolver_url else '') + link_.description,
                 'type': g.nodes[link_.type.id].name,
-                'reference_system': system.name})
+                'referenceSystem': system.name})
         return ref if ref else None
 
     @staticmethod
@@ -141,7 +141,7 @@ class LinkedPlacesEntity:
             '@id': url_for('entity_view', id_=entity.id, _external=True),
             'type': 'Feature',
             'crmClass': "crm:" + class_code,
-            'system_class': entity.class_.name,
+            'systemClass': entity.class_.name,
             'properties': {'title': entity.name}}
         if entity.description:
             features['description'] = [{'value': entity.description}]

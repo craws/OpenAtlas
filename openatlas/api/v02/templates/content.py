@@ -11,5 +11,5 @@ class ContentTemplate:
         return {
             'intro': fields.String,
             'contact': fields.String,
-            'legal-notice': fields.String,
-            'site-name': fields.String}
+            'legalNotice': fields.String,
+            'siteName': fields.String}

@@ -3,7 +3,7 @@ File
 
 .. toctree::
 
-A file overview can be seen navigating to menu item **Admin** at the right top of the site.
+A file overview can be seen navigating to :doc:`/ui/menu` item **Admin** at the right top of the site.
 The first tab will be **Files** with a **List** button to show all files.
 
 .. include:: /entity/navigation.rst
