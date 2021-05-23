@@ -34,12 +34,7 @@ from openatlas.util import processor
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy, index, involvement,
     imports, link, login, member, model, note, overlay, profile, reference, relation,
-    reference_system, search, source, sql, types, user, connec)
-from openatlas.util import processor
-
-#  Restful API import
-from openatlas.api import util  # contains routes for each version
-from openatlas.api.v02 import routes  # New routes
+    reference_system, search, source, sql, types, user)
 
 
 @babel.localeselector
