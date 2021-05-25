@@ -4,7 +4,7 @@ Type
 .. toctree::
 
 Types are used to add information or group entities. They are hierarchical and can be accessed and
-edited via the **Types** menu item. With this feature the model and user interface can be
+edited via the **Types** :doc:`/ui/menu` item. With this feature the model and user interface can be
 adapted for specific research interests.
 
 * You can checked **untyped entities** at the type overview with clicking the **show** link

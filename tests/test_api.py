@@ -82,7 +82,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('latest', latest=10))
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
-            assert b'1' in rv.data
+            assert b'2' in rv.data
 
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data
@@ -110,7 +110,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('node_overview'))
             assert b'Actor' in rv.data
             rv = self.app.get(url_for('type_tree'))
-            assert b'type_tree' in rv.data
+            assert b'typeTree' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('entity', id_=place.id, download=True))

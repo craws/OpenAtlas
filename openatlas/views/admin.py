@@ -122,9 +122,8 @@ def admin_content(item: str) -> Union[str, Response]:
         Content.update_content(item, form)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
-    content = Content.get_content()
     for language in languages:
-        form.__getattribute__(language).data = content[item][language]
+        form.__getattribute__(language).data = Content.get_content()[item][language]
     return render_template(
         'admin/content.html',
         item=item,

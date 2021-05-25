@@ -39,7 +39,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 tab_hash = '#menu-tab-value_collapse-'
             else:
                 tab_hash = '#menu-tab-custom_collapse-'
-            return redirect(url_for('node_index') + tab_hash + str(id_))
+            return redirect(f"{url_for('node_index')}{tab_hash}{id_}")
     elif id_ in g.reference_systems:
         entity = g.reference_systems[id_]
     else:
@@ -84,18 +84,15 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:
-                name = \
-                    '<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'.format(
-                        url=entity.resolver_url + name, name=name)
+                url = entity.resolver_url + name
+                name = f'<a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a>'
             tab_name = link_.range.class_.name
             tabs[tab_name].table.rows.append([link(link_.range), name, link_.type.name])
         for form_id, form in entity.get_forms().items():
             if not tabs[form['name']].table.rows and is_authorized('manager'):
-                tabs[form['name']].buttons = [
-                    button(_('remove'),
-                           url_for('reference_system_remove_form',
-                                   system_id=entity.id,
-                                   form_id=form_id))]
+                tabs[form['name']].buttons = [button(
+                    _('remove'),
+                    url_for('reference_system_remove_form', system_id=entity.id, form_id=form_id))]
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
             tabs[name] = Tab(name, entity)
@@ -110,10 +107,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                 link_.object_ = object_  # Needed later for first/last appearance info
             first = link_.first
             if not link_.first and event.first:
-                first = '<span class="inactive">' + event.first + '</span>'
+                first = f'<span class="inactive">{event.first}</span>'
             last = link_.last
             if not link_.last and event.last:
-                last = '<span class="inactive">' + event.last + '</span>'
+                last = f'<span class="inactive">{event.last}</span>'
             data = [
                 link(event),
                 event.class_.label,
@@ -176,10 +173,10 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
             first = link_.first
             if not link_.first and entity.first:
-                first = '<span class="inactive">' + entity.first + '</span>'
+                first = f'<span class="inactive">{entity.first}</span>'
             last = link_.last
             if not link_.last and entity.last:
-                last = '<span class="inactive">' + entity.last + '</span>'
+                last = f'<span class="inactive">{entity.last}</span>'
             data = [
                 link(link_.range),
                 link_.range.class_.label,
@@ -301,13 +298,11 @@ def entity_view(id_: int) -> Union[str, Response]:
                                 data,
                                 url_for('overlay_update', id_=overlays[domain.id].id))
                         else:
-                            data.append(
-                                link(_('link'),
-                                     url_for(
-                                         'overlay_insert',
-                                         image_id=domain.id,
-                                         place_id=entity.id,
-                                         link_id=link_.id)))
+                            data.append(link(_('link'), url_for(
+                                 'overlay_insert',
+                                 image_id=domain.id,
+                                 place_id=entity.id,
+                                 link_id=link_.id)))
                     else:  # pragma: no cover
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
@@ -345,9 +340,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             uc_first(_('public')) if note['public'] else uc_first(_('private')),
             link(User.get_by_id(note['user_id'])),
             note['text'],
-            '<a href="{url}">{label}</a>'.format(
-                url=url_for('note_view', id_=note['id']),
-                label=uc_first(_('view')))]
+            f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>']
         tabs['note'].table.rows.append(data)
     return render_template(
         'entity/view.html',
@@ -433,7 +426,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
+        return redirect(f"{url_for('entity_view', id_=id_)}#tab-file")
     form = build_table_form('file', entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
@@ -443,7 +436,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            _('link') + ' ' + _('file')])
+            f"{_('link')} {_('file')}"])
 
 
 @app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
@@ -453,7 +446,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
+        return redirect(f"{url_for('entity_view', id_=id_)}#tab-source")
     form = build_table_form('source', entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
@@ -462,7 +455,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            _('link') + ' ' + _('source')])
+            f"{_('link')} {_('source')}"])
 
 
 @app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
@@ -472,7 +465,7 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
     form = AddReferenceForm()
     if form.validate_on_submit():
         entity.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
+        return redirect(f"{url_for('entity_view', id_=id_)}#tab-reference")
     form.page.label.text = uc_first(_('page / link text'))
     return render_template(
         'display_form.html',
@@ -481,4 +474,4 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            _('link') + ' ' + _('reference')])
+            f"{_('link')} {_('reference')}"])
