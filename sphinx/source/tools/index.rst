@@ -9,6 +9,5 @@ Tools
    notes
    map
    network
-   table
    model
    api
