@@ -37,7 +37,8 @@ class ImageProcessing:
                     p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.png'
                     if not p.is_file():
                         ImageProcessing.safe_resized_image(name, file_format, size)
-            return True
+                return True
+            return False
         except Exception as e:  # pragma: no cover
             logger.log('debug', 'image validation failed', 'fail to validate file as image', e)
             return False
