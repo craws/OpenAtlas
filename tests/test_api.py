@@ -96,7 +96,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('latest', latest=10))
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('latest', count=True, latest=1))
-            assert b'1' in rv.data
+            assert b'2' in rv.data
 
             rv = self.app.get(url_for('code', code='reference'))
             assert b'openatlas' in rv.data

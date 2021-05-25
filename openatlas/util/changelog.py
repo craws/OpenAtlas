@@ -2,6 +2,9 @@ class Changelog:
 
     versions = {
         '6.3.0': ['TBA', {
+            'feature': {
+                '1478': 'API: latest with pagination',
+                '1516': 'API: implement Google JSON style'},
             'fix': {
                 '1515': 'API: Paging count faulty'
             }
