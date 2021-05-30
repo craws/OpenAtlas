@@ -264,8 +264,7 @@ def insert_file(form: FlaskForm, origin: Optional[Entity] = None) -> Union[str, 
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
             if len(form.file.data) > 1:
-                count = str(count + 1).zfill(2)
-                form.name.data = f'{entity_name}_{count}'
+                form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:
                     url = f"{url_for('entity_view', id_=origin.id)}#tab-file"
             entity.update(form)

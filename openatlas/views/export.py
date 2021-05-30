@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from typing import Any, Union
 
 from flask import flash, render_template, send_from_directory, url_for
@@ -40,6 +41,18 @@ class ExportCsvForm(FlaskForm):  # type: ignore
     save = SubmitField(uc_first(_('export CSV')))
 
 
+@app.route('/download/sql/<filename>')
+@required_group('manager')
+def download_sql(filename: str) -> Response:
+    return send_from_directory(app.config['EXPORT_DIR'] / 'sql', filename, as_attachment=True)
+
+
+@app.route('/download/csv/<filename>')
+@required_group('manager')
+def download_csv(filename: str) -> Any:
+    return send_from_directory(app.config['EXPORT_DIR'] / 'csv', filename, as_attachment=True)
+
+
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
@@ -54,49 +67,13 @@ def export_sql() -> Union[str, Response]:
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
-    table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [f for f in path.iterdir() if (path / f).is_file()]:
-        if file.name == '.gitignore':
-            continue
-        data = [
-            file.name,
-            convert_size(file.stat().st_size),
-            link(_('download'), url_for('download_sql', filename=file.name))]
-        if is_authorized('admin') and writeable:
-            data.append(delete_link(file.name, url_for('delete_sql', filename=file.name)))
-        table.rows.append(data)
     return render_template(
-        'export/export_sql.html',
+        'export.html',
         form=form,
-        table=table,
+        table=get_table('sql', path, writeable),
         writeable=writeable,
         title=_('export SQL'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('export SQL')])
-
-
-@app.route('/download/sql/<filename>')
-@required_group('manager')
-def download_sql(filename: str) -> Response:
-    return send_from_directory(app.config['EXPORT_DIR'] / 'sql', filename, as_attachment=True)
-
-
-@app.route('/delete/sql/<filename>')
-@required_group('admin')
-def delete_sql(filename: str) -> Response:
-    try:
-        (app.config['EXPORT_DIR'] / 'sql' / filename).unlink()
-        logger.log('info', 'file', 'SQL file deleted')
-        flash(_('file deleted'), 'info')
-    except Exception as e:
-        logger.log('error', 'file', 'SQL file deletion failed', e)
-        flash(_('error file delete'), 'error')
-    return redirect(url_for('export_sql'))
-
-
-@app.route('/download/csv/<filename>')
-@required_group('manager')
-def download_csv(filename: str) -> Any:
-    return send_from_directory(app.config['EXPORT_DIR'] / 'csv', filename, as_attachment=True)
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('export SQL')])
 
 
 @app.route('/export/csv', methods=['POST', 'GET'])
@@ -110,34 +87,37 @@ def export_csv() -> Union[str, Response]:
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
+    return render_template(
+        'export.html',
+        form=form,
+        table=get_table('csv', path, writeable),
+        writeable=writeable,
+        title=_('export CSV'),
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('export CSV')])
+
+
+def get_table(type_: str, path: Path, writeable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [f for f in path.iterdir() if (path / f).is_file()]:
-        if file.name == '.gitignore':
-            continue
+    for file in [f for f in path.iterdir() if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,
             convert_size(file.stat().st_size),
-            link(_('download'), url_for('download_csv', filename=file.name))]
+            link(_('download'), url_for(f'download_{type_}', filename=file.name))]
         if is_authorized('admin') and writeable:
-            data.append(delete_link(file.name, url_for('delete_csv', filename=file.name)))
+            data.append(
+                delete_link(file.name, url_for('delete_export', type_=type_, filename=file.name)))
         table.rows.append(data)
-    return render_template(
-        'export/export_csv.html',
-        form=form,
-        table=table,
-        writeable=writeable,
-        title=_('export CSV'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('export CSV')])
+    return table
 
 
-@app.route('/delete/csv/<filename>')
+@app.route('/delete_export/<type_>/<filename>')
 @required_group('admin')
-def delete_csv(filename: str) -> Response:
+def delete_export(type_: str, filename: str) -> Response:
     try:
-        (app.config['EXPORT_DIR'] / 'csv' / filename).unlink()
-        logger.log('info', 'file', 'CSV file deleted')
+        (app.config['EXPORT_DIR'] / type_ / filename).unlink()
+        logger.log('info', 'file', f'{type_} file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:
-        logger.log('error', 'file', 'CSV deletion failed', e)
+        logger.log('error', 'file', f'{type_} file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for('export_csv'))
+    return redirect(url_for(f'export_{type_}'))
