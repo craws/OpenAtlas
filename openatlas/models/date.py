@@ -15,12 +15,7 @@ class Date:
     @staticmethod
     def current_date_for_filename() -> str:
         today = datetime.today()
-        return '{year}-{month}-{day}_{hour}{minute}'.format(
-            year=today.year,
-            month=str(today.month).zfill(2),
-            day=str(today.day).zfill(2),
-            hour=str(today.hour).zfill(2),
-            minute=str(today.minute).zfill(2))
+        return f'{today.year}-{today.month:02}-{today.day:02}_{today.hour:02}{today.minute:02}'
 
     @staticmethod
     def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
@@ -28,7 +23,7 @@ class Date:
             return None
         if 'BC' in string:
             parts = string.split(' ')[0].split('-')
-            string = '-' + str(int(parts[0]) - 1) + '-' + parts[1] + '-' + parts[2]
+            string = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}'
         return numpy.datetime64(string.split(' ')[0])
 
     @staticmethod
@@ -42,9 +37,7 @@ class Date:
             postfix = ' BC'
         parts = string.split('-')
         year = int(parts[0]) + 1 if postfix else int(parts[0])
-        month = int(parts[1])
-        day = int(parts[2])
-        return format(year, '04d') + '-' + format(month, '02d') + '-' + format(day, '02d') + postfix
+        return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
 
     @staticmethod
     def get_invalid_dates() -> List['Entity']:
@@ -69,7 +62,7 @@ class Date:
             to_date: bool = False) -> Optional[numpy.datetime64]:
         if not year:
             return None
-        year = format(year, '03d') if year > 0 else format(year + 1, '04d')
+        year = year if year > 0 else year + 1
 
         def is_leap_year(year_: int) -> bool:
             if year_ % 400 == 0:  # e.g. 2000
@@ -91,21 +84,21 @@ class Date:
             return date_lookup[month_]
 
         if month:
-            month = format(month, '02d')
+            month = f'{month:02}'
         elif to_date:
             month = '12'
         else:
             month = '01'
 
         if day:
-            day = format(day, '02d')
+            day = f'{day:02}'
         elif to_date:
-            day = format(get_last_day_of_month(int(year), int(month)), '02d')
+            day = f'{get_last_day_of_month(int(year), int(month)):02}'
         else:
             day = '01'
 
         try:
-            datetime_ = numpy.datetime64(str(year) + '-' + str(month) + '-' + str(day))
+            date_time = numpy.datetime64(f'{year}-{month}-{day}')
         except ValueError:
             return None
-        return datetime_
+        return date_time
