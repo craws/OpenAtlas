@@ -26,23 +26,19 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
             return render_template('display_form.html', form=form)
         save(form, param=param)
         flash(_('entity created'), 'info')
-        return redirect(url_for('node_index') + '#menu-tab-' + param)
+        return redirect(f"{url_for('node_index')}#menu-tab-{param}")
     return render_template(
         'display_form.html',
         form=form,
         manual_page='entity/type',
         title=_('types'),
-        crumbs=[[_('types'), url_for('node_index')], '+ ' + uc_first(_(param))])
+        crumbs=[[_('types'), url_for('node_index')], f'+ {uc_first(_(param))}'])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.nodes[id_]
-    if g.nodes[id_].value_type:
-        tab_hash = '#menu-tab-value_collapse-'
-    else:
-        tab_hash = '#menu-tab-custom_collapse-'
     if hierarchy.standard:
         abort(403)
     form = build_form('hierarchy', hierarchy)
@@ -52,24 +48,23 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         if form.name.data != hierarchy.name and Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return redirect(url_for('node_index') + tab_hash + str(hierarchy.id))
-        save(form, hierarchy)
-        flash(_('info update'), 'info')
-        return redirect(url_for('node_index') + tab_hash + str(hierarchy.id))
+        else:
+            save(form, hierarchy)
+            flash(_('info update'), 'info')
+        tab = 'value' if g.nodes[id_].value_type else 'custom'
+        return redirect(f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
     form.multiple = hierarchy.multiple
     table = Table(paging=False)
-    for form_id, form_ in hierarchy.forms.items():
-        link_ = link(
-            _('remove'),
-            url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=form_id))
-        count = Node.get_form_count(hierarchy, form_id)
-        label = g.classes[form_['name']].label
-        table.rows.append([label, format_number(count) if count else link_])
+    for id_, form_ in hierarchy.forms.items():
+        count = Node.get_form_count(hierarchy, id_)
+        table.rows.append([
+            g.classes[form_['name']].label,
+            format_number(count) if count else link(
+                _('remove'), url_for('remove_form', id_=hierarchy.id, form_id=id_))])
     return render_template(
         'display_form.html',
         form=form,
         table=table,
-        forms=[form.id for form in form.forms],
         manual_page='entity/type',
         title=_('types'),
         crumbs=[[_('types'), url_for('node_index')], hierarchy, _('edit')])
@@ -77,7 +72,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
 @required_group('manager')
-def hierarchy_remove_form(id_: int, form_id: int) -> Response:
+def remove_form(id_: int, form_id: int) -> Response:
     root = g.nodes[id_]
     if Node.get_form_count(root, form_id):
         abort(403)  # pragma: no cover

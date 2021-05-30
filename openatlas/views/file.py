@@ -48,13 +48,12 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=entity.id) + '#tab-' + view)
-    form = build_table_form(view, entity.get_linked_entities('P67'))
+        return redirect(f"{url_for('entity_view', id_=entity.id)}#tab-{view}")
     return render_template(
         'form.html',
-        form=form,
+        form=build_table_form(view, entity.get_linked_entities('P67')),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
-            _('link') + ' ' + _(view)])
+            f"{_('link')} {_(view)}"])

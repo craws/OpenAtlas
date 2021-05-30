@@ -43,7 +43,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.post(url_for('insert', class_='type', origin_id=hierarchy.id), data=data)
             node_id = rv.location.split('/')[-1]
             rv = self.app.get(
-                url_for('hierarchy_remove_form', id_=hierarchy.id, form_id=5),
+                url_for('remove_form', id_=hierarchy.id, form_id=5),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
             rv = self.app.get(url_for('node_delete', id_=node_id), follow_redirects=True)
