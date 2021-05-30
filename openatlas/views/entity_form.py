@@ -57,10 +57,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     return render_template(
         'entity/insert.html',
         form=form,
-        class_=class_,
-        origin=origin,
         view_name=view_name,
-        structure=structure,
         gis_data=gis_data,
         geonames_module=geonames_module,
         writeable=True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,  # For files
@@ -95,7 +92,7 @@ def add_crumbs(
             for node_id in reversed(origin.root):
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
-    return crumbs + (['+ ' + g.classes[class_].label] if insert_ else [_('edit')])
+    return crumbs + [f'+ {g.classes[class_].label}' if insert_ else _('edit')]
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
@@ -111,15 +108,15 @@ def update(id_: int) -> Union[str, Response]:
         if not root and (entity.standard or entity.locked):
             abort(403)  # pragma: no cover
 
-    # Archaeological sub units
     geonames_module = False
     if entity.class_.name == 'place' and ReferenceSystem.get_by_name('GeoNames').forms:
         geonames_module = True
+
+    # Archaeological sub units
     structure = None
     gis_data = None
     overlays = None
     location = None
-
     if entity.class_.view in ['artifact', 'place']:
         structure = get_structure(entity)
         location = entity.get_linked_entity_safe('P53', nodes=True)
@@ -161,7 +158,6 @@ def update(id_: int) -> Union[str, Response]:
                 'entity/update.html',
                 form=form,
                 entity=entity,
-                structure=structure,
                 modifier=link(logger.get_log_for_advanced_view(entity.id)['modifier']))
         return redirect(save(form, entity))
     populate_update_form(form, entity)
@@ -169,7 +165,6 @@ def update(id_: int) -> Union[str, Response]:
         'entity/update.html',
         form=form,
         entity=entity,
-        structure=structure,
         gis_data=gis_data,
         overlays=overlays,
         geonames_module=geonames_module,
@@ -264,7 +259,7 @@ def insert_file(form: FlaskForm, origin: Optional[Entity] = None) -> Union[str, 
             entity = Entity.insert('file', file.filename)
             url = link_and_get_redirect_url(form, entity, 'file', origin)
             # Add an 'a' to prevent emtpy temporary filename, this doesn't affect stored information
-            filename = secure_filename('a' + file.filename)  # type: ignore
+            filename = secure_filename(f'a{file.filename}')  # type: ignore
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
@@ -345,7 +340,7 @@ def insert_entity(
         origin: Optional[Union[Entity, Node]] = None) -> Union[Entity, Node, ReferenceSystem]:
     if class_ == 'artifact':
         entity = Entity.insert(class_, form.name.data)
-        location = Entity.insert('object_location', 'Location of ' + form.name.data)
+        location = Entity.insert('object_location', f'Location of {form.name.data}')
         entity.link('P53', location)
     elif class_ in ['place', 'human_remains', 'stratigraphic_unit', 'feature', 'find', 'artifact']:
         if class_ == 'human_remains':
@@ -359,7 +354,7 @@ def insert_entity(
             elif origin and origin.class_.name == 'feature':
                 system_class = 'stratigraphic_unit'
             entity = Entity.insert(system_class, form.name.data)
-        entity.link('P53', Entity.insert('object_location', 'Location of ' + form.name.data))
+        entity.link('P53', Entity.insert('object_location', f'Location of {form.name.data}'))
     elif class_ == 'reference_system':
         entity = ReferenceSystem.insert_system(form)
     else:
@@ -431,7 +426,7 @@ def link_and_get_redirect_url(
         origin: Union[Entity, None] = None) -> str:
     url = url_for('entity_view', id_=entity.id)
     if origin and class_ not in ('administrative_unit', 'type'):  # Can't be tested with isinstance
-        url = url_for('entity_view', id_=origin.id) + '#tab-' + entity.class_.view
+        url = f"{url_for('entity_view', id_=origin.id)}#tab-{entity.class_.view}"
         if origin.class_.view == 'reference':
             link_id = origin.link('P67', entity)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
