@@ -38,10 +38,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                     link_.update()
             else:
                 for event in Entity.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_ = Link.get_by_id(event.link(
-                        form.activity.data,
-                        origin,
-                        form.description.data)[0])
+                    link_ = Link.get_by_id(
+                        event.link(form.activity.data, origin, form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -53,13 +51,14 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin.class_.view == 'event' else 'event'
-        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-{tab}")
     return render_template(
         'display_form.html',
         form=form,
-        crumbs=[[_(origin.class_.view), url_for('index', view=origin.class_.view)],
-                origin,
-                _('involvement')])
+        crumbs=[
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            origin,
+            _('involvement')])
 
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -90,7 +89,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'actor' if origin.class_.view == 'event' else 'event'
-        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-{tab}")
     form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description
