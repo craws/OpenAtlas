@@ -437,10 +437,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-        'begin_year_from', 'begin_month_from', 'begin_day_from',
-        'begin_year_to', 'begin_month_to', 'begin_day_to',
-        'end_year_from', 'end_month_from', 'end_day_from',
-        'end_year_to', 'end_month_to', 'end_day_to']:
+            'begin_year_from', 'begin_month_from', 'begin_day_from',
+            'begin_year_to', 'begin_month_to', 'begin_day_to',
+            'end_year_from', 'end_month_from', 'end_day_from',
+            'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -703,8 +703,7 @@ def display_profile_image(entity: Entity) -> str:
     if entity.class_.view == 'file' and not path.suffix.lower() in ext:
         return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
     elif app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
-        resized_path = get_image_path(entity.image_id if entity.image_id else entity,
-                                      app.config['IMAGE_SIZE']['thumbnail'])
+        resized_path = get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail'])
         width = session['settings']['profile_image_width']
         filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
         display = 'display_thumbnail' if app.config['IMAGE_PROCESSING'] else 'display_file'
@@ -718,7 +717,7 @@ def display_profile_image(entity: Entity) -> str:
                 f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
         return Markup(f'<div id="profile_image_div">{html}</div>')
     return Markup(  # pragma: no cover
-        f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
+            f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
 
 
 @app.template_filter()
