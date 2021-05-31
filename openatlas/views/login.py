@@ -144,7 +144,7 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
     body += f"{uc_first(_('username'))}: {user.username}\n"
     body += f"{uc_first(_('password'))}: {password}\n"
     if send_mail(subject, body, user.email, False):
-        flash(_('Send new password mail to %(email)s.', email=user.email), 'info')
+        flash(_('A new password was sent to %(email)s.', email=user.email), 'info')
     else:
         flash(_('Failed to send password mail to %(email)s.', email=user.email), 'error')
     return redirect(url_for('login'))
