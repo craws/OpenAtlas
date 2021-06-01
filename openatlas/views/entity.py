@@ -22,6 +22,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import (
     add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
     get_entity_data, get_file_path, is_authorized, link, required_group, uc_first)
+from openatlas.views.entity_index import file_preview
 from openatlas.views.reference import AddReferenceForm
 
 
@@ -342,6 +343,10 @@ def entity_view(id_: int) -> Union[str, Response]:
             note['text'],
             f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>']
         tabs['note'].table.rows.append(data)
+    if 'file' in tabs and current_user.settings['table_show_icons']:
+        for row in tabs['file'].table.rows:
+            string = row[0].replace('<a href="/entity/', '')
+            row.insert(1, file_preview(int(string.split('"')[0])))
     return render_template(
         'entity/view.html',
         entity=entity,

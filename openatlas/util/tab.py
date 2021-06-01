@@ -42,7 +42,10 @@ class Tab:
 
         id_ = origin.id
         buttons: List[str] = []
-        table = Table(g.table_headers[name])
+        header = g.table_headers[name]
+        if name == 'file' and current_user.settings['table_show_icons']:
+            header.insert(1, _('icon'))
+        table = Table(header)
         view = origin.class_.view
         class_ = origin.class_
 

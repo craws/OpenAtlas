@@ -48,23 +48,29 @@ def get_buttons(view: str) -> List[str]:
 
 
 def get_table(view: str) -> Table:
-    table = Table(g.table_headers[view])
+    header = g.table_headers[view]
     if view == 'file':
-        table.header = ['date'] + table.header
+        header = ['date'] + header
+        if current_user.settings['table_show_icons']:
+            header.insert(1, _('icon'))
+    table = Table(header)
+    if view == 'file':
         file_stats = get_file_stats()
         for entity in Entity.get_by_class('file', nodes=True):
             date = 'N/A'
             if entity.id in file_stats:
                 date = format_date(
                     datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
-            table.rows.append([
+            data = [
                 date,
                 link(entity),
                 entity.print_standard_type(),
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
-                entity.description,
-                file_preview(entity.id) if current_user.settings['table_show_icons'] else ''])
+                entity.description]
+            if current_user.settings['table_show_icons']:
+                data.insert(1, file_preview(entity.id))
+            table.rows.append(data)
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
