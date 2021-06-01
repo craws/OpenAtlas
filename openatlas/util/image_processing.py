@@ -19,13 +19,14 @@ class ImageProcessing:
     def safe_resized_image(name: str, file_format: str, size: str) -> None:
         try:
             ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
-            path = Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]"
+            path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
             with Image(filename=path) as src:
                 with src.convert('png') as img:
                     img.transform(resize=size + 'x' + size + '>')
-                    img.save(filename=Path(app.config['RESIZED_IMAGES']) / size / (name + '.png'))
+                    img.save(filename=str(
+                        Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
         except Exception as e:
-            logger.log('debug', 'image resizing', 'failed to save', e)
+            logger.log('info', 'image resizing', 'failed to save', e)
 
     @staticmethod
     def check_processed_image(filename: str) -> bool:
@@ -40,7 +41,7 @@ class ImageProcessing:
                 return True
             return False
         except Exception as e:  # pragma: no cover
-            logger.log('debug', 'image validation failed', 'fail to validate file as image', e)
+            logger.log('info', 'image validation failed', 'fail to validate file as image', e)
             return False
 
     @staticmethod
@@ -54,7 +55,7 @@ class ImageProcessing:
             folder.mkdir()
             return True
         except Exception as e:  # pragma: no cover
-            logger.log('debug', 'folder creation failed', 'failed to create a folder', e)
+            logger.log('info', 'folder creation failed', 'failed to create a folder', e)
             return False
 
     @staticmethod
@@ -62,7 +63,7 @@ class ImageProcessing:
         path = str(app.config['UPLOAD_DIR']) + '/' + filename
         if ImageProcessing.check_if_folder_exist(
                 app.config['OA_TMP_DIR'],
-                Path(app.config['RESIZED_IMAGES'])):
+                str(Path(app.config['RESIZED_IMAGES']))):
             with Image(filename=path) as img:
                 img.transform(resize=size + 'x' + size + '>')
                 img.save(
