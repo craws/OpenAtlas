@@ -3,6 +3,7 @@ from typing import List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -63,7 +64,7 @@ def get_table(view: str) -> Table:
                 convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
                 entity.description,
-                file_preview(entity.id) if app.config['IMAGE_PREVIEW'] else ''])
+                file_preview(entity.id) if current_user.settings['table_show_icons'] else ''])
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([

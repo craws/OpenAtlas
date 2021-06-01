@@ -16,7 +16,6 @@ class ImageTest(TestBaseCase):
 
     def test_image(self) -> None:
         app.config['IMAGE_PROCESSING'] = True
-        app.config['IMAGE_PREVIEW'] = True
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():  # type: ignore
             with app.test_request_context():
@@ -119,4 +118,3 @@ class ImageTest(TestBaseCase):
             dst_py.unlink()
             del app.config['IMAGE_SIZE']['tmp']
             app.config['IMAGE_PROCESSING'] = False
-            app.config['IMAGE_PREVIEW'] = False
