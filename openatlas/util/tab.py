@@ -46,7 +46,7 @@ class Tab:
         view = origin.class_.view
         class_ = origin.class_
 
-        if name == 'reference':
+        if name == 'reference' or origin.class_.view == 'reference':
             table.header = table.header + ['page']
         if name == 'actor':
             if view == 'place':

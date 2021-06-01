@@ -48,7 +48,7 @@ def overlay_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         Overlay.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
         flash(_('info update'), 'info')
-        return redirect(url_for('entity_view', id_=overlay.place_id) + '#tab-file')
+        return redirect(f"{url_for('entity_view', id_=overlay.place_id)}#tab-file")
     bounding = ast.literal_eval(overlay.bounding_box)
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
@@ -71,4 +71,4 @@ def overlay_update(id_: int) -> Union[str, Response]:
 @required_group('editor')
 def overlay_remove(id_: int, place_id: int) -> Response:
     Overlay.remove(id_)
-    return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
+    return redirect(f"{url_for('entity_view', id_=place_id)}#tab-file")

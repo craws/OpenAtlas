@@ -430,8 +430,11 @@ def link_and_get_redirect_url(
     if origin and class_ not in ('administrative_unit', 'type'):  # Can't be tested with isinstance
         url = f"{url_for('entity_view', id_=origin.id)}#tab-{entity.class_.view}"
         if origin.class_.view == 'reference':
-            link_id = origin.link('P67', entity)[0]
-            url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+            if entity.class_.name == 'file':
+                origin.link('P67', entity, form.page.data)
+            else:
+                link_id = origin.link('P67', entity)[0]
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
         elif entity.class_.name == 'file':
             entity.link('P67', origin)
             url = url_for('entity_view', id_=origin.id) + '#tab-file'
