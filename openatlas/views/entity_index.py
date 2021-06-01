@@ -75,7 +75,7 @@ def get_table(view: str) -> Table:
                 link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
                 system.description])
     else:
-        classes = ['place'] if view == 'place' else g.view_class_mapping[view]
+        classes = 'place' if view == 'place' else g.view_class_mapping[view]
         entities = Entity.get_by_class(classes, nodes=True, aliases=True)
         table.rows = [get_base_table_data(entity) for entity in entities]
     return table
@@ -114,7 +114,7 @@ def delete_entity(id_: int) -> Optional[str]:
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
         if parent:
-            tab = '#tab-' + entity.class_.name.replace('_', '-')
+            tab = f"#tab-{entity.class_.name.replace('_', '-')}"
             url = url_for('entity_view', id_=parent.id) + tab
     else:
         Entity.delete_(id_)

@@ -660,7 +660,7 @@ def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
         type_data[label].append(render_template(
             'util/type_data_entry.html',
             node=node,
-            value=format_number(value) if root.value_type else None,
+            value=f'{float(value):g}' if root.value_type else None,
             title=' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))))
 
     type_data = OrderedDict(sorted(type_data.items()))

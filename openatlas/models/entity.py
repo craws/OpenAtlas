@@ -260,7 +260,10 @@ class Entity:
         return entities
 
     @staticmethod
-    def insert(class_name: str, name: str, description: Optional[str] = None) -> Entity:
+    def insert(
+            class_name: str,
+            name: str,
+            description: Optional[str] = None) -> Union[Entity, Node]:
         if not name:  # pragma: no cover
             from openatlas import logger
             logger.log('error', 'model', 'Insert entity without name')
