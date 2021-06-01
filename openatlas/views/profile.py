@@ -67,7 +67,7 @@ def profile_settings(category: str) -> Union[str, Response]:
         abort(403)  # pragma: no cover
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
-        uc_first(category) + 'Form')()
+        f"{uc_first(category)}Form")()
     if form.validate_on_submit():
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
@@ -89,14 +89,14 @@ def profile_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('profile_index') + '#tab-' + category)
+        return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(
         'display_form.html',
         form=form,
         manual_page='profile',
         title=_('profile'),
-        crumbs=[[_('profile'), url_for('profile_index') + '#tab-' + category], _(category)])
+        crumbs=[[_('profile'), f"{url_for('profile_index')}#tab-{category}"], _(category)])
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])
