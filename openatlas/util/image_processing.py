@@ -17,6 +17,7 @@ class ImageProcessing:
 
     @staticmethod
     def safe_resized_image(name: str, file_format: str, size: str) -> None:
+        # With python3-wand 0.6. Path seems to work and str conversation can be removed
         try:
             ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
             path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
