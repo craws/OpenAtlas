@@ -40,7 +40,7 @@ IMAGE_SIZE = {
     'table': '100',
     'icon': '30'}
 PROCESSED_IMAGE_EXT = ['.jpeg', '.jpg', '.png', '.tiff', '.tif', '.raw', '.eps', '.ico', '.svg',
-                       '.bmp', '.pdf', '.mp4', '.gif', '.psd', '.ai', '.xcf']
+                       '.bmp', '.gif']
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
