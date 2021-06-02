@@ -11,7 +11,7 @@ from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, sanitize, uc_first
+from openatlas.util.util import link, required_group, sanitize
 
 
 def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
@@ -23,7 +23,7 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
             'id': item.id,
             'href': url_for('entity_view', id_=item.id),
             'a_attr': {'href': url_for('entity_view', id_=item.id)},
-            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
+            'text': item.name.replace("'", "&apos;") + f' {format_number(item.count)}{count_subs}',
             'children': walk_tree(item.subs)})
     return items
 
@@ -46,12 +46,7 @@ def node_index() -> str:
             'forms/tree_select_item.html',
             name=sanitize(node.name),
             data=walk_tree(Node.get_nodes(node.name)))
-    return render_template(
-        'types/index.html',
-        nodes=nodes,
-        placeholder=_('type to search'),
-        title=_('types'),
-        crumbs=[_('types')])
+    return render_template('types/index.html', nodes=nodes, title=_('types'), crumbs=[_('types')])
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -71,14 +66,6 @@ def node_delete(id_: int) -> Response:
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    if node.class_.name == 'administrative_unit':
-        tab_hash = '#menu-tab-places_collapse-'
-    elif root.standard:
-        tab_hash = '#menu-tab-standard_collapse-'
-    elif node.value_type:  # pragma: no cover
-        tab_hash = '#menu-tab-value_collapse-'
-    else:
-        tab_hash = '#menu-tab-custom_collapse-'
     if root.value_type:  # pragma: no cover
         abort(403)
     form = build_move_form(node)
@@ -87,12 +74,20 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         Transaction.commit()
         flash(_('Entities were updated'), 'success')
-        return redirect(url_for('node_index') + tab_hash + str(root.id))
+        if node.class_.name == 'administrative_unit':
+            tab = 'places'
+        elif root.standard:
+            tab = 'standard'
+        elif node.value_type:  # pragma: no cover
+            tab = 'value'
+        else:
+            tab = 'custom'
+        return redirect(f"{url_for('node_index')}#menu-tab-{tab}_collapse-{root.id}")
     getattr(form, str(root.id)).data = node.id
     return render_template(
         'types/move.html',
         table=Table(
-            header=['#', uc_first(_('selection'))],
+            header=['#', _('selection')],
             rows=[[item, item.label.text] for item in form.selection]),
         root=root,
         form=form,

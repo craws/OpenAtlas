@@ -29,7 +29,7 @@ def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Res
     form = OverlayForm()
     if form.validate_on_submit():
         Overlay.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
-        return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
+        return redirect(f"{url_for('entity_view', id_=place_id)}#tab-file")
     return render_template(
         'overlay/insert.html',
         form=form,
