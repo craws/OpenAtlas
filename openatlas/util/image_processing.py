@@ -22,10 +22,11 @@ class ImageProcessing:
             ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES'])
             path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
             with Image(filename=path) as src:
-                with src.convert('png') as img:
+                with src.convert('jpeg') as img:
                     img.transform(resize=size + 'x' + size + '>')
+                    img.compression_quality = 75
                     img.save(filename=str(
-                        Path(app.config['RESIZED_IMAGES']) / size / (name + '.png')))
+                        Path(app.config['RESIZED_IMAGES']) / size / (name + '.jpeg')))
         except Exception as e:
             logger.log('info', 'image resizing', 'failed to save', e)
 
