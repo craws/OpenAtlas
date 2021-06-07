@@ -89,16 +89,16 @@ def get_table(view: str) -> Table:
 
 
 def file_preview(entity_id: int) -> str:
-    icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['icon'])
+    icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['table'])
     if not icon_path:
         path = get_file_path(entity_id)
         if not path:
             return ''
         if ImageProcessing.check_processed_image(path.name):
-            return f"<img src='{url_for('display_icon', filename=f'{entity_id}.png')}' " \
+            return f"<img src='{url_for('display_table', filename=f'{entity_id}.jpeg')}' " \
                    f"loading='lazy'>"
         return ''
-    return f"<img src='{url_for('display_icon', filename=icon_path.name)}' loading='lazy'>"
+    return f"<img src='{url_for('display_table', filename=icon_path.name)}' loading='lazy'>"
 
 
 def delete_entity(id_: int) -> Optional[str]:

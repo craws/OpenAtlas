@@ -31,11 +31,11 @@ def display_thumbnail(filename: str) -> Any:
         filename)
 
 
-@app.route('/display_icon/<path:filename>')
+@app.route('/display_table/<path:filename>')
 @required_group('readonly')
-def display_icon(filename: str) -> Any:
+def display_table(filename: str) -> Any:
     return send_from_directory(
-        app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['icon'],
+        app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['table'],
         filename)
 
 
