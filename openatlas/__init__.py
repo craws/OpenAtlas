@@ -95,10 +95,5 @@ def teardown_request(exception: Any) -> None:
     close_connection()
 
 
-@app.teardown_request
-def clear_tmp_folder(exception: Any) -> None:
-    from openatlas.util.util import delete_tmp_files
-    delete_tmp_files()
-
 if __name__ == "__main__":  # pragma: no cover
     app.run()

@@ -53,14 +53,14 @@ class ImageTest(TestBaseCase):
 
                 file = insert_entity('Test_File', 'file')
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
-                file_name = f'{file.id}.png'
+                file_name = f'{file.id}.jpeg'
                 src_png = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
                 dst_png = pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
                 copyfile(src_png, dst_png)
 
                 file2 = insert_entity('Test_File2', 'file')
                 file2.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
-                file2_name = f'{file2.id}.png'
+                file2_name = f'{file2.id}.jpeg'
                 src2_png = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
                 dst2_png = pathlib.Path(app.config['UPLOAD_DIR'] / file2_name)
                 copyfile(src2_png, dst2_png)
@@ -86,12 +86,12 @@ class ImageTest(TestBaseCase):
             assert b'Test_File' in rv.data
 
             # Display file
-            rv = self.app.get(url_for('display_file_api', filename=file_name, image_size=200))
-            assert b'PNG' in rv.data
+            rv = self.app.get(url_for('display_file_api', filename=file_name, image_size='icon'))
+            assert b'\xff' in rv.data
             rv = self.app.get(url_for('display_thumbnail', filename=file_name))
-            assert b'PNG' in rv.data
+            assert b'\xff' in rv.data
             rv = self.app.get(url_for('display_icon', filename=file_name))
-            assert b'PNG' in rv.data
+            assert b'\xff' in rv.data
             rv = self.app.get(url_for('display_thumbnail', filename=file_name_py))
             assert b'404' in rv.data
 

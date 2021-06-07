@@ -32,7 +32,6 @@ UPLOAD_DIR = Path(app.root_path) / 'uploads'
 IMAGE_PROCESSING = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
-OA_TMP_DIR = 'tmp'
 IMAGE_SIZE = {
     'overview': '400',
     'thumbnail': '200',
