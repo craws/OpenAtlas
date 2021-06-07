@@ -73,7 +73,7 @@ def search_index() -> str:
     elif form.validate_on_submit():
         table = build_search_table(form)
     return render_template(
-        'search/index.html',
+        'search.html',
         form=form,
         table=table,
         title=_('search'),

@@ -22,11 +22,10 @@ def source_add(id_: int, view: str) -> Union[str, Response]:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=source.id) + '#tab-' + view)
-    form = build_table_form(view, source.get_linked_entities('P67'))
+        return redirect(f"{url_for('entity_view', id_=source.id)}#tab-{view}")
     return render_template(
         'form.html',
-        form=form,
+        form=build_table_form(view, source.get_linked_entities('P67')),
         title=_('source'),
         crumbs=[[_('source'), url_for('index', view='source')], source, _('link')])
 
@@ -45,7 +44,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
     return render_template(
         'display_form.html',
         form=form,
-        crumbs=[[_('source'), url_for('index', view='source')], source, '+ ' + uc_first(_('text'))])
+        crumbs=[[_('source'), url_for('index', view='source')], source, f"+ {uc_first(_('text'))}"])
 
 
 @app.route('/source/translation/delete/<int:id_>')
@@ -54,14 +53,13 @@ def translation_delete(id_: int) -> Response:
     source = Link.get_linked_entity_safe(id_, 'P73', inverse=True)
     Entity.delete_(id_)
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('entity_view', id_=source.id) + '#tab-text')
+    return redirect(f"{url_for('entity_view', id_=source.id)}#tab-text")
 
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_update(id_: int) -> Union[str, Response]:
     translation = Entity.get_by_id(id_, nodes=True)
-    source = translation.get_linked_entity('P73', True)
     form = build_form('source_translation', translation)
     if form.validate_on_submit():
         save(form, translation)
@@ -71,7 +69,11 @@ def translation_update(id_: int) -> Union[str, Response]:
         'display_form.html',
         form=form,
         title=translation.name,
-        crumbs=[[_('source'), url_for('index', view='source')], source, translation, _('edit')])
+        crumbs=[
+            [_('source'), url_for('index', view='source')],
+            translation.get_linked_entity('P73', True),
+            translation,
+            _('edit')])
 
 
 def save(form: FlaskForm,

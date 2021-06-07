@@ -48,7 +48,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
         crumbs=[
             [_('actor'), url_for('index', view='actor')],
             origin,
-            '+ ' + uc_first(_('relation'))])
+            f"+ {uc_first(_('relation'))}"])
 
 
 @app.route('/relation/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -77,7 +77,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
+        return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-relation")
     if origin.id == range_.id:
         form.inverse.data = True
     return render_template(
