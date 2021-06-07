@@ -16,7 +16,7 @@ from openatlas.database.connect import Transaction
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
-from openatlas.util.tab import Tab
+from openatlas.util.tab2 import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import format_date, get_backup_file_data, link, required_group, uc_first
 
@@ -72,18 +72,18 @@ def import_project_insert() -> Union[str, Response]:
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
     project = Import.get_project_by_id(id_)
-    tabs = {'info': Tab('info'), 'entities': Tab('entities')}
-    tabs['entities'].table = Table(['name', 'class', 'description', 'origin ID', 'date'])
+    tabs = {
+        'info': Tab('info', content=render_template('import/project_view.html', project=project)),
+        'e': Tab('entities', table=Table(['name', 'class', 'description', 'origin ID', 'date']))}
     for entity in Entity.get_by_project_id(id_):
-        tabs['entities'].table.rows.append([
+        tabs['e'].table.rows.append([
             link(entity),
             entity.class_.label,
             entity.description,
             entity.origin_id,
             format_date(entity.created)])
     return render_template(
-        'import/project_view.html',
-        project=project,
+        'tabs2.html',
         tabs=tabs,
         title=_('import'),
         crumbs=[

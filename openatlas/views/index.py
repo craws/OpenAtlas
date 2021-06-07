@@ -15,7 +15,7 @@ from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
-from openatlas.util.tab2 import Tab2
+from openatlas.util.tab2 import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
@@ -37,11 +37,9 @@ class FeedbackForm(FlaskForm):  # type: ignore
 @app.route('/overview')
 def overview() -> str:
     tabs = {
-        'info': Tab2('info'),
-        'bookmarks': Tab2('bookmarks', table=Table(['name', 'class', _('first'), _('last')])),
-        'notes': Tab2(
-            'notes',
-            table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
+        'info': Tab('info'),
+        'bookmarks': Tab('bookmarks', table=Table(['name', 'class', _('first'), _('last')])),
+        'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
         'latest': Table(order=[[0, 'desc']])}
@@ -86,10 +84,10 @@ def overview() -> str:
                 entity.first,
                 entity.last,
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-        tabs['info'].content = render_template(
-            'index/index.html',
-            intro=Content.get_translation('intro'),
-            tables=tables)
+    tabs['info'].content = render_template(
+        'index/index.html',
+        intro=Content.get_translation('intro'),
+        tables=tables)
     return render_template('tabs2.html', tabs=tabs, crumbs=['overview'])
 
 

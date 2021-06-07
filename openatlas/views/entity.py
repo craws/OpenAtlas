@@ -17,7 +17,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.tab import Tab
+from openatlas.util.tab2 import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
@@ -52,8 +52,8 @@ def entity_view(id_: int) -> Union[str, Response]:
     overlays = None  # Needed for place
     tabs = {'info': Tab('info')}
     if isinstance(entity, Node):
-        tabs['subs'] = Tab('subs', entity)
-        tabs['entities'] = Tab('entities', entity)
+        tabs['subs'] = Tab('subs', entity=entity)
+        tabs['entities'] = Tab('entities', entity=entity)
         root = g.nodes[entity.root[-1]] if entity.root else None
         if root and root.value_type:  # pragma: no cover
             tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
@@ -79,7 +79,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                     link(Entity.get_by_id(row['range_id']))])
     elif isinstance(entity, ReferenceSystem):
         for form_id, form in entity.get_forms().items():
-            tabs[form['name']] = Tab(form['name'], origin=entity)
+            tabs[form['name']] = Tab(form['name'], entity=entity)
             tabs[form['name']].table = Table([_('entity'), 'id', _('precision')])
         for link_ in entity.get_links('P67'):
             name = link_.description
@@ -95,7 +95,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                     url_for('reference_system_remove_form', system_id=entity.id, form_id=form_id))]
     elif entity.class_.view == 'actor':
         for name in ['source', 'event', 'relation', 'member_of', 'member']:
-            tabs[name] = Tab(name, entity)
+            tabs[name] = Tab(name, entity=entity)
         event_links = entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
         for link_ in event_links:
             event = link_.domain
@@ -163,10 +163,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                 add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
     elif entity.class_.view == 'artifact':
-        tabs['source'] = Tab('source', entity)
+        tabs['source'] = Tab('source', entity=entity)
     elif entity.class_.view == 'event':
         for name in ['subs', 'source', 'actor']:
-            tabs[name] = Tab(name, entity)
+            tabs[name] = Tab(name, entity=entity)
         for sub_event in entity.get_linked_entities('P117', inverse=True, nodes=True):
             tabs['subs'].table.rows.append(get_base_table_data(sub_event))
         tabs['actor'].table.header.insert(5, _('activity'))  # Add a table column for activity
@@ -194,7 +194,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'file':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
                      'artifact', 'human_remains', 'reference', 'type']:
-            tabs[name] = Tab(name, entity)
+            tabs[name] = Tab(name, entity=entity)
         entity.image_id = entity.id if get_file_path(entity.id) else None
         for link_ in entity.get_links('P67'):
             range_ = link_.range
@@ -210,17 +210,17 @@ def entity_view(id_: int) -> Union[str, Response]:
             add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'place':
-        tabs['source'] = Tab('source', entity)
-        tabs['event'] = Tab('event', entity)
-        tabs['reference'] = Tab('reference', entity)
+        tabs['source'] = Tab('source', entity=entity)
+        tabs['event'] = Tab('event', entity=entity)
+        tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.name == 'place':
-            tabs['actor'] = Tab('actor', entity)
-            tabs['feature'] = Tab('feature', origin=entity)
+            tabs['actor'] = Tab('actor', entity=entity)
+            tabs['feature'] = Tab('feature', entity=entity)
         elif entity.class_.name == 'feature':
-            tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=entity)
+            tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', entity=entity)
         elif entity.class_.name == 'stratigraphic_unit':
-            tabs['find'] = Tab('find', origin=entity)
-            tabs['human_remains'] = Tab('human_remains', origin=entity)
+            tabs['find'] = Tab('find', entity=entity)
+            tabs['human_remains'] = Tab('human_remains', entity=entity)
         entity.location = entity.get_linked_entity_safe('P53', nodes=True)
         event_ids = []  # Keep track of already inserted events to prevent doubles
         for event in entity.location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
@@ -242,7 +242,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'reference':
         for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit',
                      'human_remains', 'artifact', 'file']:
-            tabs[name] = Tab(name, entity)
+            tabs[name] = Tab(name, entity=entity)
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
@@ -255,7 +255,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'source':
         for name in ['actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
                      'stratigraphic_unit', 'text']:
-            tabs[name] = Tab(name, entity)
+            tabs[name] = Tab(name, entity=entity)
         for text in entity.get_linked_entities('P73', nodes=True):
             tabs['text'].table.rows.append([
                 link(text),
@@ -269,13 +269,13 @@ def entity_view(id_: int) -> Union[str, Response]:
 
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'source', 'type']:
         if entity.class_.view != 'reference' and not isinstance(entity, Node):
-            tabs['reference'] = Tab('reference', entity)
+            tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.view == 'artifact':
-            tabs['event'] = Tab('event', entity)
+            tabs['event'] = Tab('event', entity=entity)
             for link_ in entity.get_links('P25', True):
                 data = get_base_table_data(link_.domain)
                 tabs['event'].table.rows.append(data)
-        tabs['file'] = Tab('file', entity)
+        tabs['file'] = Tab('file', entity=entity)
         entity.image_id = entity.get_profile_image_id()
         if entity.class_.view == 'place' and is_authorized('editor') and \
                 current_user.settings['module_map_overlay']:
@@ -333,7 +333,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     if not gis_data:
         gis_data = Gis.get_all(entity.linked_places) if entity.linked_places else None
     entity.info_data = get_entity_data(entity, event_links=event_links)
-    tabs['note'] = Tab('note', entity)
+    tabs['note'] = Tab('note', entity=entity)
     for note in current_user.get_notes_by_entity_id(entity.id):
         data = [
             format_date(note['created']),
@@ -342,16 +342,19 @@ def entity_view(id_: int) -> Union[str, Response]:
             note['text'],
             f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>']
         tabs['note'].table.rows.append(data)
-    return render_template(
+    tabs['info'].content = render_template(
         'entity/view.html',
-        entity=entity,
-        tabs=tabs,
         buttons=add_buttons(entity),
+        entity=entity,
         structure=structure,  # Needed for place views
         overlays=overlays,  # Needed for place views
         gis_data=gis_data,
-        title=entity.name,
-        crumbs=add_crumbs(entity, structure))
+        title=entity.name)
+    return render_template(
+        'tabs2.html',
+        tabs=tabs,
+        crumbs=add_crumbs(entity, structure),
+        entity=entity)
 
 
 def get_profile_image_table_link(
