@@ -92,7 +92,7 @@ class ImageTest(TestBaseCase):
             assert b'\xff' in rv.data
             rv = self.app.get(url_for('display_thumbnail', filename=file_name))
             assert b'\xff' in rv.data
-            rv = self.app.get(url_for('display_icon', filename=file_name))
+            rv = self.app.get(url_for('display_table', filename=file_name))
             assert b'\xff' in rv.data
             rv = self.app.get(url_for('display_thumbnail', filename=file_name_py))
             assert b'404' in rv.data

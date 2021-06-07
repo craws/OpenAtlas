@@ -31,7 +31,7 @@ def display_file_api(filename: str) -> Any:
             size = app.config['IMAGE_SIZE'][parser['image_size']]
             if not ImageProcessing.check_if_processed_image_exist(name, size):
                 raise APIFileNotFoundError
-            path = f"{app.config['RESIZED_IMAGES']}/{size}/{name}.jpeg"
+            path = f"{app.config['RESIZED_IMAGES']}/{size}/{name}{app.config['PROCESSED_EXT']}"
         return send_file(path, as_attachment=True if parser['download'] else False)
     except Exception:
         raise APIFileNotFoundError

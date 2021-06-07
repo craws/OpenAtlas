@@ -698,7 +698,7 @@ def display_profile_image(entity: Entity) -> str:
     path = get_file_path(entity.image_id if entity.image_id else entity)
     if not path:
         return ''
-    ext = app.config['PROCESSED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
+    ext = app.config['ALLOWED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
         'DISPLAY_FILE_EXTENSIONS']
     if entity.class_.view == 'file' and not path.suffix.lower() in ext:
         return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')

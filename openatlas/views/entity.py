@@ -367,7 +367,7 @@ def get_profile_image_table_link(
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
     elif app.config['IMAGE_PROCESSING']:
-        if extension in app.config['PROCESSED_IMAGE_EXT']:
+        if extension in app.config['ALLOWED_IMAGE_EXT']:
             return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))

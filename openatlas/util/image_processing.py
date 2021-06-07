@@ -11,7 +11,7 @@ class ImageProcessing:
     def resize_image(filename: str) -> None:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = '.' + filename.split('.', 1)[1].lower()
-        if file_format in app.config['PROCESSED_IMAGE_EXT']:
+        if file_format in app.config['ALLOWED_IMAGE_EXT']:
             for size in app.config['IMAGE_SIZE'].values():
                 ImageProcessing.safe_resized_image(name, file_format, size)
 
@@ -26,7 +26,8 @@ class ImageProcessing:
                         img.transform(resize=size + 'x' + size + '>')
                         img.compression_quality = 75
                         img.save(filename=str(
-                            Path(app.config['RESIZED_IMAGES']) / size / (name + '.jpeg')))
+                            Path(app.config[
+                                     'RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"))
                         return True
             return False  # pragma: no cover
         except Exception as e:
@@ -38,9 +39,10 @@ class ImageProcessing:
         name = filename.rsplit('.', 1)[0].lower()
         file_format = '.' + filename.split('.', 1)[1].lower()
         try:
-            if file_format in app.config['PROCESSED_IMAGE_EXT']:
+            if file_format in app.config['ALLOWED_IMAGE_EXT']:
                 for size in app.config['IMAGE_SIZE'].values():
-                    p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.jpeg'
+                    p = Path(app.config[
+                                 'RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"
                     if not p.is_file():
                         if not ImageProcessing.safe_resized_image(name, file_format, size):
                             return False  # pragma: no cover
@@ -66,6 +68,25 @@ class ImageProcessing:
 
     @staticmethod
     def check_if_processed_image_exist(name, size):
-        p = Path(app.config['RESIZED_IMAGES']) / size / f'{name}.jpeg'
+        p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"
         return True if p.is_file() else False
 
+    # Todo: implement admin interface
+    @staticmethod
+    def search_and_delete_orphaned_images():
+        uploaded_files = []
+        for uploaded in app.config['UPLOAD_DIR'].glob('**/*'):
+            uploaded_files.append(uploaded.name.rsplit('.', 1)[0].lower())
+        for size in app.config['IMAGE_SIZE'].values():
+            p = Path(app.config['RESIZED_IMAGES']) / size
+            for file in p.glob('**/*'):
+                if file.name.rsplit('.', 1)[1].lower() not in app.config['PROCESSED_EXT']:
+                    file.unlink()
+                if file.name.rsplit('.', 1)[0].lower() not in uploaded_files:
+                    file.unlink()
+
+    # Todo: implement admin interface
+    @staticmethod
+    def create_resized_images():
+        for file in app.config['UPLOAD_DIR'].glob('**/*'):
+            ImageProcessing.resize_image(file.name)
