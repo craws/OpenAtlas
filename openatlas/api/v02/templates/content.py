@@ -12,4 +12,5 @@ class ContentTemplate:
             'intro': fields.String,
             'contact': fields.String,
             'legalNotice': fields.String,
-            'siteName': fields.String}
+            'siteName': fields.String,
+            'imageSizes': fields.Raw}

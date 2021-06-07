@@ -3,6 +3,7 @@ from typing import Tuple, Union
 from flask import Response
 from flask_restful import Resource, marshal
 
+from openatlas import app
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.parser import language_parser
 from openatlas.api.v02.templates.content import ContentTemplate
@@ -17,7 +18,8 @@ class GetContent(Resource):  # type: ignore
             'intro': Content.get_translation('intro_for_frontend', parser['lang']),
             'contact': Content.get_translation('contact_for_frontend', parser['lang']),
             'legalNotice': Content.get_translation('legal_notice_for_frontend', parser['lang']),
-            'siteName': Content.get_translation('site_name_for_frontend', parser['lang'])}
+            'siteName': Content.get_translation('site_name_for_frontend', parser['lang']),
+            'imageSizes': app.config['IMAGE_SIZE']}
         template = ContentTemplate.content_template()
         if parser['download']:
             return Download.download(data=content, template=template, name='content')
