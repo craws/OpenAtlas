@@ -3,8 +3,10 @@ import shutil
 from shutil import copyfile
 
 from flask import g, url_for
+from nose.tools import raises
 
 from openatlas import app
+from openatlas.api.v02.resources.error import APIFileNotFoundError
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.image_processing import ImageProcessing
@@ -118,3 +120,8 @@ class ImageTest(TestBaseCase):
             dst_py.unlink()
             del app.config['IMAGE_SIZE']['tmp']
             app.config['IMAGE_PROCESSING'] = False
+
+    @raises(APIFileNotFoundError)
+    def error_file_not_found(self) -> None:  # pragma: nocover
+        with app.app_context():  # type: ignore
+            self.app.get(url_for('display_file_api', filename="132358765.jpg", image_size='icon'))

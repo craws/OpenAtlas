@@ -69,6 +69,9 @@ class FilterDelimiterError(Exception):
 class FilterLogicalOperatorError(Exception):
     pass
 
+class APIFileNotFoundError(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -126,5 +129,8 @@ errors = {
         "status": 404},
     "FilterDelimiterError": {
         "message": "Filter delimiter are wrong.",
+        "status": 404},
+    "APIFileNotFoundError": {
+        "message": "Image file not found.",
         "status": 404}
 }

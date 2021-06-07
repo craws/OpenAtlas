@@ -140,5 +140,5 @@ def delete_entity(id_: int) -> Optional[str]:
 
 
 def delete_processed_image(id_: int) -> None:
-    for path in app.config['RESIZED_IMAGES'].glob('**/' + str(id_) + '.png'):
+    for path in app.config['RESIZED_IMAGES'].glob('**/' + str(id_) + '.jpeg'):
         path.unlink()
