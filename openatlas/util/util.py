@@ -577,6 +577,13 @@ def button(
 
 
 @app.template_filter()
+def button_bar(buttons: List[Any]) -> str:
+    if not buttons:
+        return ''
+    return Markup(f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>')
+
+
+@app.template_filter()
 def display_citation_example(code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
