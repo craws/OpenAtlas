@@ -7,6 +7,10 @@ identify bits of information like **persons**, **events** and **places** and map
 can ask questions like: *Where was this person in the course of his life?* or
 *Who participated at an event?*
 
+For archaeologist the first step of workflow is to create a new :doc:`/entity/place` and link subunits
+e.g. :doc:`/entity/feature` and :doc:`/entity/stratigraphic_unit` to it. For a detailed workflow example see
+:doc:`/examples/archaeological data`.
+
 The :doc:`/ui/menu` structure reflects that workflow.
 
 .. toctree::
@@ -16,8 +20,11 @@ The :doc:`/ui/menu` structure reflects that workflow.
    event
    actor
    place
-   reference
+   feature
+   stratigraphic_unit
+   human_remains
    artifact
+   reference
    type
    file
    reference_system

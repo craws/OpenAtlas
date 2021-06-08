@@ -36,7 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Reference" href="reference.html" />
+    <link rel="next" title="Feature" href="feature.html" />
     <link rel="prev" title="Actor" href="actor.html" /> 
 </head>
 
@@ -95,8 +95,11 @@
 <li class="toctree-l2"><a class="reference internal" href="event.html">Event</a></li>
 <li class="toctree-l2"><a class="reference internal" href="actor.html">Actor</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Place</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
+<li class="toctree-l2"><a class="reference internal" href="feature.html">Feature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="stratigraphic_unit.html">Stratigraphic unit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="human_remains.html">Human remains</a></li>
 <li class="toctree-l2"><a class="reference internal" href="artifact.html">Artifact</a></li>
+<li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
 <li class="toctree-l2"><a class="reference internal" href="type.html">Type</a></li>
 <li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
 <li class="toctree-l2"><a class="reference internal" href="reference_system.html">Reference System</a></li>
@@ -211,29 +214,24 @@
 <ul class="simple">
 <li><a class="reference internal" href="source.html"><span class="doc">Source</span></a> - when it is referenced there</li>
 <li><a class="reference internal" href="event.html"><span class="doc">Event</span></a> - as an event location</li>
+<li><a class="reference internal" href="feature.html"><span class="doc">Feature</span></a> - its subunit</li>
 <li><a class="reference internal" href="reference.html"><span class="doc">Reference</span></a></li>
 <li><a class="reference internal" href="file.html"><span class="doc">File</span></a></li>
 </ul>
 </div>
-<div class="section" id="sub-units">
-<h2>Sub units<a class="headerlink" href="#sub-units" title="Permalink to this headline">¶</a></h2>
-<p>In the OpenAtlas database a place is a physical thing that has a certain position and or extend in
-space that can be connected to various other information (temporal, spatial, events, sources etc.).</p>
-<p>To record archaeological information a place can be divided into multiple subunits. The place can be
-understood as the superior unit and container for multiple further features (E.g. buildings, graves,
-pits, ditches, ramparts etc.). They are labelled as <strong>Feature</strong> and can be accessed via the
-features tab. They are structured the same way as the place is and may also contain multiple
-subunits that are labelled as <strong>Stratigraphic Unit</strong>. The stratigraphic units can again contain
-multiple subunits labelled as <strong>Find</strong> and again are structured the same way as the superior units.</p>
-<p>One example would be a graveyard. It will be the superior unit (Place). Each grave of this cemetery
-is a (sub) feature that forms part of the cemetery. Each grave is composed of one or many subunits
-(stratigraphic units). This would be the burials in the very grave (e.g. a primary and a secondary
-burial) and the back filling. Each stratigraphic unit may have associated finds belonging to the
-respective unit: e.g. the grave goods of one of the burials, the finds found in the back filling.</p>
+<div class="section" id="places-and-their-subunits">
+<h2>Places and their subunits<a class="headerlink" href="#places-and-their-subunits" title="Permalink to this headline">¶</a></h2>
+<p>In OpenAtlas a place is a physical thing that has a certain position and/or extend in
+space that can be connected to various other information (temporal, spatial, events, sources etc.).
+Furthermore, places can be divided into multiple subunits to record archaeological information. For more information on those
+subunits see <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a>, <a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>, Find (<a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a>), and Human remains as well as a detailed workflow example ().</p>
+<p>An example of a place would be a graveyard. That place is the superior unit. Each grave of this cemetery
+is considered a <a class="reference internal" href="feature.html"><span class="doc">Feature</span></a> that forms the cemetery. Each of those graves is composed of one or many subunits
+(<a class="reference internal" href="stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>). This would be the burials in the very grave (e.g. a primary and a secondary
+burial) and the back filling. Each stratigraphic unit may have associated finds (<a class="reference internal" href="artifact.html"><span class="doc">Artifact</span></a>) belonging to the
+respective unit: e.g. the grave goods of one of the burials, the finds found in the back filling. Anthropological information
+can be added via <a class="reference internal" href="human_remains.html"><span class="doc">Human remains</span></a> - another subunit of stratigraphic unit.</p>
 <img alt="../_images/sub_unit.jpg" src="../_images/sub_unit.jpg" />
-<p>Also Human remains can be recorded in detail, especially for anthropological analyses. This way
-each bone (resp. part of the human remains) can be recorded as subunits of stratigraphic units
-labelled as <strong>Human Remains</strong>.</p>
 </div>
 </div>
 
@@ -245,7 +243,7 @@ labelled as <strong>Human Remains</strong>.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="reference.html" class="btn btn-neutral float-right" title="Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="feature.html" class="btn btn-neutral float-right" title="Feature" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="actor.html" class="btn btn-neutral float-left" title="Actor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

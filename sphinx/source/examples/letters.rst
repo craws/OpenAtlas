@@ -21,7 +21,7 @@ material of the object.
 
 * Click on :doc:`/entity/artifact` in the :doc:`/ui/menu` and create a new entry by using the **+ Artifact** button
 * Choose a descriptive name
-* Select an appropriate :doc:`/entity/type`: from the list, e.g. letter
+* Select an appropriate :doc:`/entity/type` from the list, e.g. letter
 * Add further information as date or description if available
 * Press **Insert** to save the entry
 
@@ -30,7 +30,7 @@ Adding a source
 With :doc:`/entity/source` you can record the content of said letter. For example, if there are copies of
 the letter, they all have the same text (= source).
 
-* Click on :doc:`/entity/source` in the main menu and create a new entry by using the **+ Source** button
+* Click on :doc:`/entity/source` in the menu and create a new entry by using the **+ Source** button
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list
 * Click on **Artifact** and choose the before created letter from the list
