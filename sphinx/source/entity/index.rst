@@ -9,7 +9,7 @@ can ask questions like: *Where was this person in the course of his life?* or
 
 For archaeologist the first step of workflow is to create a new :doc:`/entity/place` and link subunits
 e.g. :doc:`/entity/feature` and :doc:`/entity/stratigraphic_unit` to it. For a detailed workflow example see
-:doc:`/examples/archaeological data`.
+:doc:`/examples/archaeological_data`.
 
 The :doc:`/ui/menu` structure reflects that workflow.
 

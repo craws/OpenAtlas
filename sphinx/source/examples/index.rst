@@ -9,5 +9,5 @@ your team.
 .. toctree::
    :maxdepth: 1
 
-   archaeological data
+   archaeological_data
    letters

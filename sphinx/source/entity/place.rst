@@ -23,11 +23,13 @@ You can edit administrative units and historical places at **Types** in the **Pl
 
 Administrative Unit
 *******************
-Hierarchy of administrative units in which the place is located, e.g. Austria, Italy and their respective subunits like Lower Austria, Styria.
+Hierarchy of administrative units in which the place is located, e.g. Austria, Italy and their
+respective subunits like Lower Austria, Styria.
 
 Historical Place
 ****************
-Hierarchy of historical places respectively historical administrative units in which the place is located e.g. Duchy of Bavaria or Lombard Kingdom.
+Hierarchy of historical places respectively historical administrative units in which the place is
+located e.g. Duchy of Bavaria or Lombard Kingdom.
 
 Can be linked via tabs to
 -------------------------
@@ -37,13 +39,13 @@ Can be linked via tabs to
 * :doc:`reference`
 * :doc:`file`
 
-
 Places and their subunits
 -------------------------
 In OpenAtlas a place is a physical thing that has a certain position and/or extend in
 space that can be connected to various other information (temporal, spatial, events, sources etc.).
-Furthermore, places can be divided into multiple subunits to record archaeological information. For more information on those
-subunits see :doc:`feature`, :doc:`stratigraphic_unit`, Find (:doc:`artifact`), and Human remains as well as a detailed workflow example ().
+Furthermore, places can be divided into multiple subunits to record archaeological information.
+For more information on those subunits see :doc:`feature`, :doc:`stratigraphic_unit`,
+Find (:doc:`artifact`), and Human remains as well as a detailed workflow example (:doc:`/examples/archaeological_data`).
 
 An example of a place would be a graveyard. That place is the superior unit. Each grave of this cemetery
 is considered a :doc:`feature` that forms the cemetery. Each of those graves is composed of one or many subunits
@@ -53,5 +55,3 @@ respective unit: e.g. the grave goods of one of the burials, the finds found in 
 can be added via :doc:`/entity/human_remains` - another subunit of stratigraphic unit.
 
 .. image:: sub_unit.jpg
-
-
