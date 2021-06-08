@@ -28,10 +28,11 @@ from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     convert_size, delete_link, format_date, format_datetime, get_disk_space_info, get_file_path,
-    get_file_stats, is_authorized, link, required_group, sanitize, send_mail, uc_first)
+    get_file_stats, is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -252,12 +253,18 @@ def admin_check_similar() -> str:
 @app.route('/admin/check/dates')
 @required_group('contributor')
 def admin_check_dates() -> str:
-    tables = {
-        'link_dates': Table(['link', 'domain', 'range']),
-        'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
-        'dates': Table(['name', 'class', 'type', 'created', 'updated', 'description'])}
+    tabs = {
+        'dates':
+            Tab(
+                'invalid_dates',
+                table=Table(['name', 'class', 'type', 'created', 'updated', 'description'])),
+        'link_dates': Tab('invalid_link_dates', table=Table(['link', 'domain', 'range'])),
+        'involvement_dates':
+            Tab(
+                'invalid_involvement_dates',
+                table=Table(['actor', 'event', 'class', 'involvement', 'description']))}
     for entity in Date.get_invalid_dates():
-        tables['dates'].rows.append([
+        tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
             entity.print_standard_type(),
@@ -272,7 +279,7 @@ def admin_check_dates() -> str:
             name = 'member'
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             name = 'involvement'
-        tables['link_dates'].rows.append([
+        tabs['link_dates'].table.rows.append([
             link(_(name), url_for(f'{name}_update', id_=link_.id, origin_id=link_.domain.id)),
             link(link_.domain),
             link(link_.range)])
@@ -286,10 +293,14 @@ def admin_check_dates() -> str:
             link_.type.name if link_.type else '',
             link_.description,
             link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
-        tables['involvement_dates'].rows.append(data)
+        tabs['involvement_dates'].table.rows.append(data)
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if not tab.table.rows:
+            tab.content = _('Congratulations, everything looks fine!')  # pragma: no cover
     return render_template(
-        'admin/check_dates.html',
-        tables=tables,
+        'tabs.html',
+        tabs=tabs,
         title=_('admin'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check dates')])
 
