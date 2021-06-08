@@ -31,7 +31,8 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    convert_size, delete_link, format_date, format_datetime, get_disk_space_info, get_file_path,
+    button, convert_size, delete_link, format_date, format_datetime, get_disk_space_info,
+    get_file_path,
     get_file_stats, is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
 
 
@@ -309,18 +310,20 @@ def admin_check_dates() -> str:
 @required_group('contributor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {
-        'orphans': Table(header),
-        'unlinked': Table(header),
-        'missing_files': Table(header),
-        'circular': Table(['entity']),
-        'nodes': Table(['name', 'root']),
-        'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
-    tables['circular'].rows = [[link(entity)] for entity in Entity.get_entities_linked_to_itself()]
-    for entity in Entity.get_orphans():
-        if isinstance(entity, ReferenceSystem):
-            continue
-        tables['unlinked' if entity.class_.view else 'orphans'].rows.append([
+    tabs = {
+        'orphans': Tab('orphans', table=Table(header)),
+        'unlinked': Tab('unlinked', table=Table(header)),
+        'nodes': Tab('type', table=Table(
+            ['name', 'root'],
+            [[link(node), link(g.nodes[node.root[-1]])] for node in Node.get_node_orphans()])),
+        'missing_files': Tab('missing_files', table=Table(header)),
+        'orphaned_files': Tab('orphaned_files', table=Table(['name', 'size', 'date', 'ext'])),
+        'circular': Tab('circular_dependencies', table=Table(
+            ['entity'],
+            [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
+
+    for entity in filter(lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
+        tabs['unlinked' if entity.class_.view else 'orphans'].table.rows.append([
             link(entity),
             link(entity.class_),
             entity.print_standard_type(),
@@ -328,15 +331,13 @@ def admin_orphans() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for node in Node.get_node_orphans():
-        tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
-    # Get orphaned file entities with no corresponding file
+    # Orphaned file entities with no corresponding file
     entity_file_ids = []
     for entity in Entity.get_by_class('file', nodes=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
-            tables['missing_files'].rows.append([
+            tabs['missing_files'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 entity.print_standard_type(),
@@ -345,19 +346,31 @@ def admin_orphans() -> str:
                 format_date(entity.modified),
                 entity.description])
 
-    # Get orphaned files with no corresponding entity
+    # Orphaned files with no corresponding entity
     for file in app.config['UPLOAD_DIR'].iterdir():
         if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
-            tables['orphaned_files'].rows.append([
+            tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
                 format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 file.suffix,
                 link(_('download'), url_for('download_file', filename=file.name)),
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
+
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if not tab.table.rows:
+            tab.content = _('Congratulations, everything looks fine!')
+    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
+        tabs['orphaned_files'].buttons.append(
+            button(
+                _('delete all files'),
+                url_for('admin_file_delete', filename='all'),
+                onclick="return confirm('" +
+                        uc_first(_('delete all files without corresponding entities?')) + "')"))
     return render_template(
-        'admin/check_orphans.html',
-        tables=tables,
+        'tabs.html',
+        tabs=tabs,
         title=_('admin'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('orphans')])
 
