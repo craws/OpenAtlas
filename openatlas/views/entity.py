@@ -17,7 +17,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.user import User
-from openatlas.util.tab2 import Tab
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
@@ -351,7 +351,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         gis_data=gis_data,
         title=entity.name)
     return render_template(
-        'tabs2.html',
+        'tabs.html',
         tabs=tabs,
         crumbs=add_crumbs(entity, structure),
         entity=entity)

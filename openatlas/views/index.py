@@ -15,7 +15,7 @@ from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
-from openatlas.util.tab2 import Tab
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
@@ -88,7 +88,7 @@ def overview() -> str:
         'index/index.html',
         intro=Content.get_translation('intro'),
         tables=tables)
-    return render_template('tabs2.html', tabs=tabs, crumbs=['overview'])
+    return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
 
 
 @app.route('/index/setlocale/<language>')

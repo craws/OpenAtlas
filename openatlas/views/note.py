@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.tab2 import Tab
+from openatlas.util.tab import Tab
 from openatlas.util.util import button, is_authorized, link, manual, required_group, uc_first
 
 
@@ -33,7 +33,7 @@ def note_view(id_: int) -> str:
         buttons=buttons,
         content=f"<h1>{uc_first(_('note'))}</h1>{note['text']}")}
     return render_template(
-        'tabs2.html',
+        'tabs.html',
         tabs=tabs,
         entity=entity,
         crumbs=[

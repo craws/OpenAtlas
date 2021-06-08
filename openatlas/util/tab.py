@@ -1,8 +1,9 @@
 from typing import List, Optional, TYPE_CHECKING
 
-from flask import g, url_for
+from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from markupsafe import Markup
 
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
@@ -29,28 +30,34 @@ _('site_name_for_frontend')
 
 
 class Tab:
-    origin: Optional['Entity']
-    buttons: Optional[List[str]]
-    table: Table
 
-    def __init__(self, name: str, origin: Optional['Entity'] = None) -> None:
+    def __init__(
+            self,
+            name: str,
+            content: Optional[str] = None,
+            table: Optional[Table] = None,
+            buttons: Optional[List[str]] = None,
+            entity: Optional['Entity'] = None) -> None:
+
         self.name = name
+        self.content = content
         self.title = uc_first(_(name.replace('_', ' ')))
-        self.origin = origin
-        if not origin:
-            return
-
-        id_ = origin.id
-        buttons: List[str] = []
-        table = Table(g.table_headers[name])
-        view = origin.class_.view
-        class_ = origin.class_
-
-        if name == 'reference' or origin.class_.view == 'reference':
-            table.header = table.header + ['page']
+        self.entity = entity
+        self.table = table if table else Table()
+        id_ = None
+        view = None
+        class_ = None
+        buttons = []
+        if entity:
+            id_ = entity.id
+            view = entity.class_.view
+            class_ = entity.class_
+            self.table.header = g.table_headers[name]
+        if name == 'reference' or entity and entity.class_.view == 'reference':
+            self.table.header = self.table.header + ['page']
         if name == 'actor':
             if view == 'place':
-                table.header = ['actor', 'property', 'class', 'first', 'last', 'description']
+                self.table.header = ['actor', 'property', 'class', 'first', 'last', 'description']
             elif view == 'file':
                 buttons = [button('link', url_for('file_add', id_=id_, view=name))]
             elif view == 'reference':
@@ -58,7 +65,7 @@ class Tab:
             elif view == 'source':
                 buttons = [button('link', url_for('source_add', id_=id_, view=name))]
             elif view == 'event':
-                table.header = ['actor', 'class', 'involvement', 'first', 'last', 'description']
+                self.table.header = ['actor', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
             for item in g.view_class_mapping['actor']:
                 buttons.append(button(
@@ -71,12 +78,13 @@ class Tab:
                     g.classes['artifact'].label,
                     url_for('insert', class_='artifact', origin_id=id_))]
         elif name == 'entities':
-            buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
+            if id_:
+                buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
             if view == 'file':
                 buttons = [button('link', url_for('file_add', id_=id_, view='event'))]
             elif view == 'actor':
-                table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
+                self.table.header = ['event', 'class', 'involvement', 'first', 'last', 'description']
                 buttons = [button('link', url_for('involvement_insert', origin_id=id_))]
             elif view == 'source':
                 buttons = [button('link', url_for('source_add', id_=id_, view='event'))]
@@ -103,7 +111,7 @@ class Tab:
             if view == 'reference':
                 buttons = [button('link', url_for('reference_add', id_=id_, view=name))]
             else:
-                table.header += [_('main image')]
+                self.table.header += [_('main image')]
                 buttons = [button('link', url_for('entity_add_file', id_=id_))]
             buttons.append(button(
                 g.classes[name].label,
@@ -153,9 +161,9 @@ class Tab:
                 g.classes['source'].label,
                 url_for('insert', class_=name, origin_id=id_)))
         elif name == 'subs':
-            table.header = [_('name'), _('count'), _('info')]
+            self.table.header = [_('name'), _('count'), _('info')]
             if view == 'event':
-                table.header = g.table_headers['event']
+                self.table.header = g.table_headers['event']
         elif name == 'stratigraphic_unit':
             if current_user.settings['module_sub_units'] and class_.name == 'feature':
                 buttons = [button(
@@ -163,6 +171,8 @@ class Tab:
                     url_for('insert', class_=name, origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
-        self.table = table
-        if is_authorized('contributor'):
-            self.buttons = buttons
+
+        self.buttons = buttons if buttons and is_authorized('contributor') else []
+
+    def display_header(self, active: bool) -> str:
+        return Markup(render_template('util/tab_header2.html', tab=self, active=active))
