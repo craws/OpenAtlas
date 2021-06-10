@@ -53,18 +53,16 @@ def overview() -> str:
             entity = Entity.get_by_id(note['entity_id'])
             tables['notes'].rows.append([
                 format_date(note['created']),
-                uc_first(_('public')) if note['public'] else uc_first(_('private')),
+                uc_first(_('public') if note['public'] else _('private')),
                 link(entity),
                 entity.class_.label,
                 note['text'],
-                '<a href="{url}">{label}</a>'.format(
-                    url=url_for('note_view', id_=note['id']),
-                    label=uc_first(_('view')))])
+                f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>'])
         for name, count in Entity.get_overview_counts().items():
             if count:
                 url = url_for('index', view=g.class_view_mapping[name])
                 if name == 'administrative_unit':
-                    url = url_for('node_index') + '#menu-tab-places'
+                    url = f"{url_for('node_index')}#menu-tab-places"
                 elif name == 'type':
                     url = url_for('node_index')
                 elif name == 'find':
@@ -104,10 +102,10 @@ def set_locale(language: str) -> Response:
 def index_feedback() -> Union[str, Response]:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        subject = uc_first(form.subject.data) + ' from ' + session['settings']['site_name']
+        subject = f"{uc_first(form.subject.data)} from {session['settings']['site_name']}"
         user = current_user
-        body = form.subject.data + ' from ' + user.username + ' (' + str(user.id) + ') '
-        body += user.email + ' at ' + request.headers['Host'] + "\n\n" + form.description.data
+        body = f'{form.subject.data} from {user.username} ({user.id}) '
+        body += f'{user.email} at {request.headers["Host"]}\n\n{form.description.data}'
         if send_mail(subject, body, session['settings']['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:

@@ -211,7 +211,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'place':
         tabs['source'] = Tab('source', entity)
-        tabs['event'] = Tab('event', entity)
+        if entity.class_.name == 'place':
+            tabs['event'] = Tab('event', entity)
         tabs['reference'] = Tab('reference', entity)
         if entity.class_.name == 'place':
             tabs['actor'] = Tab('actor', entity)

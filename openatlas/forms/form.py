@@ -54,7 +54,7 @@ forms = {
 
 def build_form(
         class_: str,
-        item: Optional[Union[Entity, Link, Node]] = None,
+        entity: Optional[Union[Entity, Link, Node]] = None,
         code: Optional[str] = None,
         origin: Union[Entity, Node, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
@@ -77,7 +77,7 @@ def build_form(
     if 'alias' in forms[class_]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     add_types(Form, class_)
-    add_fields(Form, class_, code, item, origin)
+    add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
     if 'date' in forms[class_]:
         date.add_date_fields(Form)
@@ -85,7 +85,7 @@ def build_form(
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
-            node = item if item else origin
+            node = entity if entity else origin
             root = g.nodes[node.root[-1]] if node.root else node
             if root.value_type:
                 del Form.description
@@ -94,12 +94,12 @@ def build_form(
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
-    add_buttons(Form, class_, item, origin)
-    if not item or (request and request.method != 'GET'):
+    add_buttons(Form, class_, entity, origin)
+    if not entity or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(Form(obj=item), item, location)
-    customize_labels(class_, form, item, origin)
+        form = populate_form(Form(obj=entity), entity, location)
+    customize_labels(class_, form, entity, origin)
     return form
 
 
@@ -236,11 +236,11 @@ def add_fields(
         form: Any,
         class_: str,
         code: Union[str, None],
-        item: Union[Entity, Node, Link, None],
+        entity: Union[Entity, Node, Link, None],
         origin: Union[Entity, Node, None]) -> None:
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
-        if not item:
+        if not entity:
             setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
             setattr(form, 'relation_origin_id', HiddenField())
     elif class_ in ['activity', 'acquisition', 'move']:
@@ -256,14 +256,16 @@ def add_fields(
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
-    elif class_ == 'file' and not item:
+    elif class_ == 'file' and not entity:
         setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
+        if origin and origin.class_.view == 'reference':
+            setattr(form, 'page', StringField())
     elif class_ == 'group':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if code == 'custom' or (item and not item.value_type):
+        if code == 'custom' or (entity and not entity.value_type):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
@@ -276,11 +278,11 @@ def add_fields(
             widget=widgets.ListWidget(prefix_label=False),
             coerce=int))
     elif class_ == 'involvement':
-        if not item and origin:
+        if not entity and origin:
             involved_with = 'actor' if origin.class_.view == 'event' else 'event'
             setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
-    elif class_ == 'member' and not item:
+    elif class_ == 'member' and not entity:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(
             form,
@@ -288,7 +290,7 @@ def add_fields(
             TableMultiField(_('actor'), [InputRequired()]))
     elif class_ in g.classes and g.classes[class_].view == 'type':
         setattr(form, 'is_node_form', HiddenField())
-        node = item if item else origin
+        node = entity if entity else origin
         root = g.nodes[node.root[-1]] if node.root else node
         setattr(form, str(root.id), TreeField(str(root.id)))
         if root.directional:
@@ -309,7 +311,7 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_node_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_node_id, TreeField(precision_node_id))
-        choices = ReferenceSystem.get_form_choices(item)
+        choices = ReferenceSystem.get_form_choices(entity)
         if choices:
             setattr(form, 'forms', SelectMultipleField(
                 _('classes'),

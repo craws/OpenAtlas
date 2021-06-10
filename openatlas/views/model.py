@@ -163,8 +163,8 @@ def property_view(code: str) -> str:
         'code': property_.code,
         'name': property_.name,
         'inverse': property_.name_inverse,
-        'domain': link(domain) + ' ' + domain.name,
-        'range': link(range_) + ' ' + range_.name}
+        'domain': f'{link(domain)} {domain.name}',
+        'range': f'{link(range_)} {range_.name}'}
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(paging=False, defs=[

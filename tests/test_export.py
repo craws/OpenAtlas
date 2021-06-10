@@ -17,7 +17,7 @@ class ExportTest(TestBaseCase):
             date_string = Date.current_date_for_filename()  # Less error prone to do before
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
-            self.app.get(url_for('download_sql', filename=date_string + '_dump.sql'))
+            self.app.get(url_for('download_sql', filename=f'{date_string}_dump.sql'))
 
             # SQL execute (located here because a recent dump is needed to work
             rv = self.app.get(url_for('sql_index'))
@@ -30,11 +30,14 @@ class ExportTest(TestBaseCase):
             assert b'relation "fail" does not exist' in rv.data
 
             # Delete SQL dump
-            rv = self.app.get(url_for('delete_sql', filename=date_string + '_dump.sql.7z'),
-                              follow_redirects=True)
+            rv = self.app.get(
+                url_for('delete_export', type_='sql', filename=f'{date_string}_dump.sql.7z'),
+                follow_redirects=True)
             if os.name == 'posix':
                 assert b'File deleted' in rv.data
-            rv = self.app.get(url_for('delete_sql', filename='non_existing'), follow_redirects=True)
+            rv = self.app.get(
+                url_for('delete_export', type_='sql', filename='non_existing'),
+                follow_redirects=True)
             assert b'An error occurred when trying to delete the file' in rv.data
 
             # CSV export
@@ -52,16 +55,17 @@ class ExportTest(TestBaseCase):
                 'gis_polygon': True,
                 'gis_format': 'postgis'}
             rv = self.app.post(url_for('export_csv'), follow_redirects=True, data=data)
-
             assert b'Data was exported as CSV' in rv.data
             data['gis_point'] = True
             data['gis_format'] = 'coordinates'
             rv = self.app.post(url_for('export_csv'), follow_redirects=True, data=data)
             assert b'Data was exported as CSV' in rv.data
-            self.app.get(url_for('download_csv', filename=date_string + '_csv.zip'))
+            self.app.get(url_for('download_csv', filename=f'{date_string}_csv.zip'))
             rv = self.app.get(
-                url_for('delete_csv', filename=date_string + '_csv.zip'),
+                url_for('delete_export', type_='csv', filename=f'{date_string}_csv.zip'),
                 follow_redirects=True)
             assert b'File deleted' in rv.data
-            rv = self.app.get(url_for('delete_csv', filename='non_existing'), follow_redirects=True)
+            rv = self.app.get(
+                url_for('delete_export', type_='csv', filename='non_existing'),
+                follow_redirects=True)
             assert b'An error occurred when trying to delete the file' in rv.data

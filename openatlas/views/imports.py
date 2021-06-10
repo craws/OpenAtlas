@@ -46,7 +46,7 @@ def import_index() -> str:
         'import/index.html',
         table=table,
         title=_('import'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('import')])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('import')])
 
 
 @app.route('/import/project/insert', methods=['POST', 'GET'])
@@ -65,7 +65,7 @@ def import_project_insert() -> Union[str, Response]:
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
             [_('import'), url_for('import_index')],
-            '+ ' + uc_first(_('project'))])
+            f"+ {uc_first(_('project'))}"])
 
 
 @app.route('/import/project/view/<int:id_>')
@@ -87,7 +87,7 @@ def import_project_view(id_: int) -> str:
         tabs=tabs,
         title=_('import'),
         crumbs=[
-            [_('admin'), url_for('admin_index') + '#tab-data'],
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
             [_('import'), url_for('import_index')],
             project.name])
 
@@ -110,7 +110,7 @@ def import_project_update(id_: int) -> Union[str, Response]:
         manual_page='admin/import',
         title=_('import'),
         crumbs=[
-            [_('admin'), url_for('admin_index') + '#tab-data'],
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
             [_('import'), url_for('import_index')],
             project,
             _('edit')])
@@ -156,8 +156,9 @@ def import_data(project_id: int, class_: str) -> str:
         file_ = request.files['file']
         file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)  # type: ignore
         columns: Dict[str, List[str]] = {
-            'allowed': ['name', 'id', 'description', 'begin_from', 'begin_to', 'begin_comment',
-                        'end_from', 'end_to', 'end_comment', 'type_ids'],
+            'allowed': [
+                'name', 'id', 'description', 'begin_from', 'begin_to', 'begin_comment', 'end_from',
+                'end_to', 'end_comment', 'type_ids'],
             'valid': [],
             'invalid': []}
         if class_ == 'place':
@@ -174,7 +175,7 @@ def import_data(project_id: int, class_: str) -> str:
                     columns['invalid'].append(item)
                     del df[item]
             if columns['invalid']:  # pragma: no cover
-                messages['warn'].append(_('invalid columns') + ': ' + ','.join(columns['invalid']))
+                messages['warn'].append(f"{_('invalid columns')}: {','.join(columns['invalid'])}")
             headers = list(df.columns.values)  # Read cleaned headers again
             table_data = []
             checked_data = []
@@ -197,11 +198,11 @@ def import_data(project_id: int, class_: str) -> str:
                             if Import.check_type_id(type_id, class_):
                                 type_ids.append(type_id)
                             else:
-                                type_ids.append('<span class="error">' + type_id + '</span>')
+                                type_ids.append(f'<span class="error">{type_id}</span>')
                                 invalid_type_ids = True
                         value = ' '.join(type_ids)
                     if item in ['northing', 'easting'] and row[item] and not is_float(row[item]):
-                        value = '<span class="error">' + value + '</span>'  # pragma: no cover
+                        value = f'<span class="error">{value}</span>'  # pragma: no cover
                         invalid_geoms = True  # pragma: no cover
                     if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
                         if not value:
@@ -215,7 +216,7 @@ def import_data(project_id: int, class_: str) -> str:
                                 if str(value) == 'NaT':
                                     value = ''
                                 else:
-                                    value = '<span class="error">' + str(value) + '</span>'
+                                    value = f'<span class="error">{value}</span>'
                     table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
@@ -231,17 +232,17 @@ def import_data(project_id: int, class_: str) -> str:
             table = Table(headers, rows=table_data)
             # Checking for data inconsistency
             if missing_name_count:  # pragma: no cover
-                messages['warn'].append(_('empty names') + ': ' + str(missing_name_count))
+                messages['warn'].append(f"{_('empty names')}: {missing_name_count}")
             doubles = [item for item, count in collections.Counter(origin_ids).items() if count > 1]
             if doubles:  # pragma: no cover
-                messages['error'].append(_('double IDs in import') + ': ' + ', '.join(doubles))
+                messages['error'].append(f"{_('double IDs in import')}: {', '.join(doubles)}")
             existing = Import.get_origin_ids(project, origin_ids) if origin_ids else None
             if existing:
-                messages['error'].append(_('IDs already in database') + ': ' + ', '.join(existing))
+                messages['error'].append(f"{_('IDs already in database')}: {', '.join(existing)}")
             if form.duplicate.data:  # Check for possible duplicates
                 duplicates = Import.check_duplicates(class_, names)
                 if duplicates:  # pragma: no cover
-                    messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
+                    messages['warn'].append(f"{_('possible duplicates')}: {', '.join(duplicates)}")
             if messages['error']:
                 raise Exception()
         except Exception:  # pragma: no cover
@@ -253,7 +254,7 @@ def import_data(project_id: int, class_: str) -> str:
                 file_data=file_data,
                 title=_('import'),
                 crumbs=[
-                    [_('admin'), url_for('admin_index') + '#tab-data'],
+                    [_('admin'), f"{url_for('admin_index')}#tab-data"],
                     [_('import'), url_for('import_index')],
                     project,
                     class_label])
@@ -264,8 +265,8 @@ def import_data(project_id: int, class_: str) -> str:
                 try:
                     Import.import_data(project, class_, checked_data)
                     Transaction.commit()
-                    logger.log('info', 'import', 'import: ' + str(len(checked_data)))
-                    flash(_('import of') + ': ' + str(len(checked_data)), 'info')
+                    logger.log('info', 'import', f'import: {len(checked_data)}')
+                    flash(f"{_('import of')}: {len(checked_data)}", 'info')
                     imported = True
                 except Exception as e:  # pragma: no cover
                     Transaction.rollback()
@@ -273,11 +274,13 @@ def import_data(project_id: int, class_: str) -> str:
                     flash(_('error transaction'), 'error')
     return render_template(
         'import/import_data.html',
-        project=project,
         form=form,
         file_data=file_data,
-        class_=class_,
-        class_label=class_label,
         table=table,
         imported=imported,
-        messages=messages)
+        messages=messages,
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            [_('import'), url_for('import_index')],
+            project,
+            class_label])

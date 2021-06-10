@@ -23,7 +23,7 @@ def sql_index() -> str:
     return render_template(
         'sql/index.html',
         title=_('SQL'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-data'], _('SQL')])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('SQL')])
 
 
 @app.route('/sql/execute', methods=['POST', 'GET'])
@@ -36,9 +36,9 @@ def sql_execute() -> str:
         Transaction.begin()
         try:
             g.cursor.execute(form.statement.data)
-            response = '<p>Rows affected: {count}</p>'.format(count=g.cursor.rowcount)
+            response = f'<p>Rows affected: {g.cursor.rowcount}</p>'
             try:
-                response += '<p>{rows}</p>'.format(rows=g.cursor.fetchall())
+                response += f'<p>{g.cursor.fetchall()}</p>'
             except Exception:  # pragma: no cover
                 pass  # Assuming it was no SELECT statement so returning just the rowcount
             Transaction.commit()
@@ -55,6 +55,6 @@ def sql_execute() -> str:
         file_data=file_data,
         title=_('SQL'),
         crumbs=[
-            [_('admin'), url_for('admin_index') + '#tab-data'],
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
             [_('SQL'), url_for('sql_index')],
             _('execute')])
