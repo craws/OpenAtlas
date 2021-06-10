@@ -18,7 +18,11 @@ class GetEntity(Resource):  # type: ignore
     def get(id_: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['format'] == 'geojson':
-            GetEntity.get_geojson(id_, parser)
+            entity = GetEntity.get_geojson(id_)
+            template = GeojsonTemplate.geojson_template()
+            if parser['download']:
+                return Download.download(data=entity, template=template, name=id_)
+            return marshal(entity, template), 200
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(get_entity_by_id(id_))
         entity = LinkedPlaces.get_entity(get_entity_by_id(id_), parser)
@@ -28,10 +32,5 @@ class GetEntity(Resource):  # type: ignore
         return marshal(entity, template), 200
 
     @staticmethod
-    def get_geojson(id_: int, parser: Dict[str, Any]) -> Union[Tuple[Resource, int], Response]:
-        entity = Geojson.check_if_geometry(get_entity_by_id(id_))
-        template = GeojsonTemplate.geojson_template()
-        print(entity)
-        if parser['download']:
-            return Download.download(data=entity, template=template, name=id_)
-        return marshal(entity, template), 200
+    def get_geojson(id_: int) -> Dict[str, Any]:
+        return Geojson.check_if_geometry(get_entity_by_id(id_))

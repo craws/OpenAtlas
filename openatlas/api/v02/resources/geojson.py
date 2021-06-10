@@ -9,15 +9,26 @@ from openatlas.models.link import Link
 
 
 class Geojson:
+    @staticmethod
+    def get_geoms_by_entity(entity: Entity) -> List[Dict[str, Any]]:
+        return Gis.get_by_id(entity.id)
 
     @staticmethod
     def check_if_geometry(entity: Entity):
-        geoms = Gis.get_by_id(entity.id)
+        geoms = None
+        if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
+            geoms = Geojson.get_geoms_by_entity(Link.get_linked_entity(entity.id, 'P53'))
+        elif entity.class_.name == 'object_location':
+            geoms = Geojson.get_geoms_by_entity(entity)
+        out = []
         if geoms:
             for geom in geoms:
-                Geojson.get_entity(entity, geom)
+                out.append(Geojson.get_entity(entity, geom))
         else:
-            return Geojson.get_entity(entity)
+            out.append(Geojson.get_entity(entity))
+        return {
+            'type': 'FeatureCollection',
+            'features': out}
 
     @staticmethod
     def get_entity(entity: Entity, geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
@@ -38,9 +49,7 @@ class Geojson:
                 'types': Geojson.get_node(entity)}}
         for node in entity.nodes:
             features[node.name] = Geojson.get_value(node, get_all_links(entity))
-        return {
-            'type': 'FeatureCollection',
-            'features': [features]}
+        return features
 
     @staticmethod
     def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
