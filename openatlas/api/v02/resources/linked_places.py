@@ -33,7 +33,7 @@ class LinkedPlaces:
         for link in links:
             out.append({
                 'label': link.range.name,
-                'relationTo': url_for('entity', id_=link.range.id, _external=True),
+                'relationTo': url_for('api.entity', id_=link.range.id, _external=True),
                 'relationType': 'crm:' + link.property.code + ' ' + link.property.i18n['en'],
                 'relationSystemClass': link.range.class_.name,
                 'type': link.type.name if link.type else None,
@@ -44,7 +44,7 @@ class LinkedPlaces:
                 property_ = link.property.i18n_inverse['en']
             out.append({
                 'label': link.domain.name,
-                'relationTo': url_for('entity', id_=link.domain.id, _external=True),
+                'relationTo': url_for('api.entity', id_=link.domain.id, _external=True),
                 'relationType': 'crm:' + link.property.code + 'i ' + property_,
                 'relationSystemClass': link.domain.class_.name,
                 'type': link.type.name if link.type else None,
@@ -59,7 +59,7 @@ class LinkedPlaces:
                 continue
             path = get_file_path(link.domain.id)
             files.append({
-                '@id': url_for('entity', id_=link.domain.id, _external=True),
+                '@id': url_for('api.entity', id_=link.domain.id, _external=True),
                 'title': link.domain.name,
                 'license': LinkedPlaces.get_license(link.domain),
                 'url': url_for(
@@ -79,7 +79,7 @@ class LinkedPlaces:
         nodes = []
         for node in entity.nodes:
             nodes_dict = {
-                'identifier': url_for('entity', id_=node.id, _external=True),
+                'identifier': url_for('api.entity', id_=node.id, _external=True),
                 'label': node.name}
             for link in links:
                 if link.range.id == node.id and link.description:
