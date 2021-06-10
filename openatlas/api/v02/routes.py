@@ -20,7 +20,6 @@ from openatlas.api.v02.common.system_class import GetBySystemClass
 from openatlas.api.v02.common.type_entities import GetTypeEntities
 from openatlas.api.v02.common.type_entities_all import GetTypeEntitiesAll
 from openatlas.api.v02.common.type_tree import GetTypeTree
-from openatlas.api.v02.common.usage import ShowUsage
 from openatlas.api.v02.resources.display_image import DisplayImage
 from openatlas.api.v02.resources.error import errors
 
