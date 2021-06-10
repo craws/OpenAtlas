@@ -2,7 +2,8 @@ from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOperatorError, \
+from openatlas.api.v02.resources.error import APIFileNotFoundError, EntityDoesNotExistError, \
+    FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
     InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
@@ -87,210 +88,213 @@ class ApiTests(TestBaseCase):
 
             # Test GeoJson output
             self.maxDiff = None
-            rv = self.app.get(url_for('entity', id_=place.id))
+            rv = self.app.get(url_for('api.entity', id_=place.id))
             self.assertEqual(rv.get_json(), api_data.api_place_entity)
 
             # Path Tests
-            rv = self.app.get(url_for('usage'))
-            assert b'message' in rv.data
-            rv = self.app.get(url_for('latest', latest=10))
+            rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
-            rv = self.app.get(url_for('latest', count=True, latest=1))
+            rv = self.app.get(url_for('api.latest', count=True, latest=1))
             assert b'2' in rv.data
 
-            rv = self.app.get(url_for('code', code='reference'))
+            rv = self.app.get(url_for('api.code', code='reference'))
             assert b'openatlas' in rv.data
-            rv = self.app.get(url_for('system_class', system_class='appellation'))
+            rv = self.app.get(url_for('api.system_class', system_class='appellation'))
             assert b'Cargo hauler' in rv.data
-            rv = self.app.get(url_for('class', class_code='E31'))
+            rv = self.app.get(url_for('api.class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('node_entities', id_=unit_node.id))
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id))
             assert b'Austria' in rv.data
-            rv = self.app.get(url_for('node_entities_all', id_=unit_node.id))
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
-            rv = self.app.get(url_for('type_entities', id_=unit_node.id))
+            rv = self.app.get(url_for('api.type_entities', id_=unit_node.id))
             assert b'Austria' in rv.data
-            rv = self.app.get(url_for('type_entities_all', id_=unit_node.id))
+            rv = self.app.get(url_for('api.type_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
             rv = self.app.get(
-                url_for('query', entities=place.id, classes='E18', items='place'))
+                url_for('api.query', entities=place.id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('content', lang='de'))
+            rv = self.app.get(url_for('api.content', lang='de'))
             assert b'intro' in rv.data
-            rv = self.app.get(url_for('overview_count'))
+            rv = self.app.get(url_for('api.overview_count'))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('class_mapping'))
+            rv = self.app.get(url_for('api.class_mapping'))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('node_overview'))
+            rv = self.app.get(url_for('api.node_overview'))
             assert b'Actor' in rv.data
-            rv = self.app.get(url_for('type_tree'))
+            rv = self.app.get(url_for('api.type_tree'))
             assert b'typeTree' in rv.data
 
             # Path test with download
-            rv = self.app.get(url_for('entity', id_=place.id, download=True))
+            rv = self.app.get(url_for('api.entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('latest', latest=1, download=True))
+            rv = self.app.get(url_for('api.latest', latest=1, download=True))
             assert b'Datei' in rv.data
-            rv = self.app.get(url_for('code', code='reference', download=True))
+            rv = self.app.get(url_for('api.code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('system_class', system_class='appellation', download=True))
+            rv = self.app.get(url_for('api.system_class', system_class='appellation', download=True))
             assert b'Cargo hauler' in rv.data
-            rv = self.app.get(url_for('class', class_code='E31', download=True))
+            rv = self.app.get(url_for('api.class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('node_entities', id_=unit_node.id, download=True))
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, download=True))
             assert b'Austria' in rv.data
-            rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, download=True))
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, download=True))
             assert b'Austria' in rv.data
-            rv = self.app.get(url_for('query', classes='E31', download=True))
+            rv = self.app.get(url_for('api.query', classes='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('content', lang='de', download=True))
+            rv = self.app.get(url_for('api.content', lang='de', download=True))
             assert b'intro' in rv.data
-            rv = self.app.get(url_for('overview_count', download=True))
+            rv = self.app.get(url_for('api.overview_count', download=True))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('class_mapping', download=True))
+            rv = self.app.get(url_for('api.class_mapping', download=True))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('node_overview', download=True))
+            rv = self.app.get(url_for('api.node_overview', download=True))
             assert b'Actor' in rv.data
 
             # Path with export
-            rv = self.app.get(url_for('entity', id_=place.id, export='csv'))
+            rv = self.app.get(url_for('api.entity', id_=place.id, export='csv'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('class', class_code='E18', export='csv'))
+            rv = self.app.get(url_for('api.class', class_code='E18', export='csv'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('system_class', system_class='place', export='csv'))
+            rv = self.app.get(url_for('api.system_class', system_class='place', export='csv'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('code', code='reference', export='csv'))
+            rv = self.app.get(url_for('api.code', code='reference', export='csv'))
             assert b'https://openatlas.eu' in rv.data
 
             # Testing Subunit
-            rv = self.app.get(url_for('subunit', id_=place.id))
+            rv = self.app.get(url_for('api.subunit', id_=place.id))
             assert b'Feature' in rv.data and b'Strato' not in rv.data
-            rv = self.app.get(url_for('subunit', id_=place.id, download=True))
+            rv = self.app.get(url_for('api.subunit', id_=place.id, download=True))
             assert b'Feature' in rv.data and b'Strato' not in rv.data
-            rv = self.app.get(url_for('subunit', id_=place.id, count=True))
+            rv = self.app.get(url_for('api.subunit', id_=place.id, count=True))
             assert b'1' in rv.data
-            rv = self.app.get(url_for('subunit_hierarchy', id_=place.id))
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id))
             assert b'Strato' in rv.data
-            rv = self.app.get(url_for('subunit_hierarchy', id_=place.id, download=True))
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, download=True))
             assert b'Strato' in rv.data
-            rv = self.app.get(url_for('subunit_hierarchy', id_=place.id, count=True))
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, count=True))
             assert b'2' in rv.data
 
             # Parameter: filter
-            rv = self.app.get(url_for('code', code='place', limit=10, sort='desc', column='name',
+            rv = self.app.get(url_for('api.code', code='place', limit=10, sort='desc', column='name',
                                       filter='or|name|like|Nostromos'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('code', code='reference'))
+            rv = self.app.get(url_for('api.code', code='reference'))
             assert b'openatlas' in rv.data
-            rv = self.app.get(url_for('class', class_code='E18', filter='or|name|like|Nostr'))
+            rv = self.app.get(url_for('api.class', class_code='E18', filter='or|name|like|Nostr'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('code', code='place', filter='or|id|eq|' + str(place.id)))
+            rv = self.app.get(url_for('api.code', code='place', filter='or|id|eq|' + str(place.id)))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
 
             # Parameter: last
-            rv = self.app.get(url_for('class', class_code='E18', last=place.id))
+            rv = self.app.get(url_for('api.class', class_code='E18', last=place.id))
             assert b'entities' in rv.data
             # Parameter: first
-            rv = self.app.get(url_for('class', class_code='E18', first=place.id))
+            rv = self.app.get(url_for('api.class', class_code='E18', first=place.id))
             assert b'entities' in rv.data
 
             # Parameter: show
-            rv = self.app.get(url_for('class', class_code='E31', show='types'))
+            rv = self.app.get(url_for('api.class', class_code='E31', show='types'))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('class', class_code='E18', show='when'))
+            rv = self.app.get(url_for('api.class', class_code='E18', show='when'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('class', class_code='E31', show='none'))
+            rv = self.app.get(url_for('api.class', class_code='E31', show='none'))
             assert b'https://openatlas.eu' in rv.data
 
             # Parameter: count
-            rv = self.app.get(url_for('class', class_code='E31', count=True))
+            rv = self.app.get(url_for('api.class', class_code='E31', count=True))
             assert b'2' in rv.data
-            rv = self.app.get(url_for('code', code='place', count=True))
+            rv = self.app.get(url_for('api.code', code='place', count=True))
             assert b'3' in rv.data
-            rv = self.app.get(url_for('system_class', system_class='appellation', count=True))
+            rv = self.app.get(url_for('api.system_class', system_class='appellation', count=True))
             assert b'1' in rv.data
 
             rv = self.app.get(
-                url_for('query', entities=place.id, classes='E18', codes='place'))
+                url_for('api.query', entities=place.id, classes='E18', codes='place'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(
-                url_for('query', entities=place.id, classes='E18', codes='place', count=True))
+                url_for('api.query', entities=place.id, classes='E18', codes='place', count=True))
             assert b'7' in rv.data
-            rv = self.app.get(url_for('node_entities', id_=unit_node.id, count=True))
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, count=True))
             assert b'6' in rv.data
-            rv = self.app.get(url_for('node_entities_all', id_=unit_node.id, count=True))
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('class', class_code='E18', last=1231223121321))
+            self.app.get(url_for('api.class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
     def error_query_query(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('query'))
+            self.app.get(url_for('api.query'))
 
     @raises(InvalidSubunitError)
     def error_node_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('node_entities', id_=1234))
+            self.app.get(url_for('api.node_entities', id_=1234))
 
     @raises(InvalidSubunitError)
     def error_node_all_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('node_entities_all', id_=1234))
+            self.app.get(url_for('api.node_entities_all', id_=1234))
 
     @raises(InvalidCidocClassCode)
     def error_class_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('class', class_code='e99999999'))
+            self.app.get(url_for('api.class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
     def error_code_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='Invalid'))
+            self.app.get(url_for('api.code', code='Invalid'))
 
     @raises(InvalidLimitError)
     def error_latest_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('latest', latest='99999999'))
+            self.app.get(url_for('api.latest', latest='99999999'))
 
     @raises(EntityDoesNotExistError)
     def error_subunit_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('subunit', id_='99999999'))
+            self.app.get(url_for('api.subunit', id_='99999999'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_1(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='Wrong|name|like|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='Wrong|name|like|Nostromos'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|Wrong|like|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='or|Wrong|like|Nostromos'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_3(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|name|Wrong|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='or|name|Wrong|Nostromos'))
 
     @raises(NoSearchStringError)
     def error_filter_search(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|name|Wrong|'))
+            self.app.get(url_for('api.code', code='place', filter='or|name|Wrong|'))
 
     @raises(InvalidSearchDateError)
     def error_filter_date(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|begin_from|like|WRONG'))
+            self.app.get(url_for('api.code', code='place', filter='or|begin_from|like|WRONG'))
 
     @raises(InvalidSearchNumberError)
     def error_filter_date2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|id|eq|WRONG'))
+            self.app.get(url_for('api.code', code='place', filter='or|id|eq|WRONG'))
+
+    @raises(APIFileNotFoundError)
+    def file_not_found(self) -> None:  # pragma: nocover
+        with app.app_context():  # type: ignore
+            self.app.get(url_for('api.some_wrong_url'))

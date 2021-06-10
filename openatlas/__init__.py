@@ -26,9 +26,9 @@ if os.name == "posix":
 babel = Babel(app)
 
 from openatlas.models.logger import Logger
+
 logger = Logger()
 
-from openatlas.api import general_endpoints  # contains routes for each version
 from openatlas.api.v02 import routes  # New routes
 from openatlas.util import processor
 from openatlas.views import (
