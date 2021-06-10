@@ -11,6 +11,7 @@ from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import query_parser
+from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
@@ -26,7 +27,7 @@ class GetQuery(Resource):  # type: ignore
         entities = []
         if parser['entities']:
             for entity in parser['entities']:
-                entities.append(LinkedPlaces.get_entity_by_id(entity))
+                entities.append(get_entity_by_id(entity))
         if parser['codes']:
             for code_ in parser['codes']:
                 entities.extend(GetByCode.get_entities_by_view(code_=code_, parser=parser))

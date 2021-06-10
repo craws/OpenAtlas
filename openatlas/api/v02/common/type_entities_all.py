@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import InvalidSubunitError
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
+from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
@@ -17,7 +18,7 @@ class GetTypeEntitiesAll(Resource):  # type: ignore
         parser = entity_parser.parse_args()
         entities = []
         for entity in GetTypeEntitiesAll.get_node_all(id_):
-            entities.append(LinkedPlaces.get_entity_by_id(entity))
+            entities.append(get_entity_by_id(entity))
         if parser['count']:
             return jsonify(len(entities))
         output = Pagination.pagination(entities=entities, parser=parser)

@@ -3,7 +3,6 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -124,14 +123,6 @@ class LinkedPlaces:
                 'type': g.nodes[link_.type.id].name,
                 'referenceSystem': system.name})
         return ref if ref else None
-
-    @staticmethod
-    def get_entity_by_id(id_: int) -> Entity:
-        try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            raise EntityDoesNotExistError
-        return entity
 
     @staticmethod
     def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
