@@ -139,7 +139,7 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    if request.path.startswith('/api/'):
+    if request.path.startswith('/api/'):  # pragma: nocover
         raise APIFileNotFoundError
     return render_template('404.html', crumbs=['404 - File not found'], e=e), 404
 

@@ -2,7 +2,8 @@ from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, FilterOperatorError, \
+from openatlas.api.v02.resources.error import APIFileNotFoundError, EntityDoesNotExistError, \
+    FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
     InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError
 from openatlas.models.entity import Entity
@@ -91,8 +92,6 @@ class ApiTests(TestBaseCase):
             self.assertEqual(rv.get_json(), api_data.api_place_entity)
 
             # Path Tests
-            rv = self.app.get(url_for('api.usage'))
-            assert b'message' in rv.data
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('api.latest', count=True, latest=1))
@@ -228,69 +227,74 @@ class ApiTests(TestBaseCase):
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('class', class_code='E18', last=1231223121321))
+            self.app.get(url_for('api.class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
     def error_query_query(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('query'))
+            self.app.get(url_for('api.query'))
 
     @raises(InvalidSubunitError)
     def error_node_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('node_entities', id_=1234))
+            self.app.get(url_for('api.node_entities', id_=1234))
 
     @raises(InvalidSubunitError)
     def error_node_all_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('node_entities_all', id_=1234))
+            self.app.get(url_for('api.node_entities_all', id_=1234))
 
     @raises(InvalidCidocClassCode)
     def error_class_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('class', class_code='e99999999'))
+            self.app.get(url_for('api.class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
     def error_code_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='Invalid'))
+            self.app.get(url_for('api.code', code='Invalid'))
 
     @raises(InvalidLimitError)
     def error_latest_invalid(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('latest', latest='99999999'))
+            self.app.get(url_for('api.latest', latest='99999999'))
 
     @raises(EntityDoesNotExistError)
     def error_subunit_entity(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('subunit', id_='99999999'))
+            self.app.get(url_for('api.subunit', id_='99999999'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_1(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='Wrong|name|like|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='Wrong|name|like|Nostromos'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|Wrong|like|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='or|Wrong|like|Nostromos'))
 
     @raises(FilterOperatorError)
     def error_filter_operator_3(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|name|Wrong|Nostromos'))
+            self.app.get(url_for('api.code', code='place', filter='or|name|Wrong|Nostromos'))
 
     @raises(NoSearchStringError)
     def error_filter_search(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|name|Wrong|'))
+            self.app.get(url_for('api.code', code='place', filter='or|name|Wrong|'))
 
     @raises(InvalidSearchDateError)
     def error_filter_date(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|begin_from|like|WRONG'))
+            self.app.get(url_for('api.code', code='place', filter='or|begin_from|like|WRONG'))
 
     @raises(InvalidSearchNumberError)
     def error_filter_date2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('code', code='place', filter='or|id|eq|WRONG'))
+            self.app.get(url_for('api.code', code='place', filter='or|id|eq|WRONG'))
+
+    @raises(APIFileNotFoundError)
+    def file_not_found(self) -> None:  # pragma: nocover
+        with app.app_context():  # type: ignore
+            self.app.get(url_for('api.some_wrong_url'))
