@@ -1,9 +1,0 @@
-{% extends "layout.html" %}
-{% block content %}
-    {% if writeable %}
-        {{ form|display_form(manual_page='admin/export') }}
-    {% else %}
-        <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
-    {% endif %}
-    {{ table.display() }}
-{% endblock %}

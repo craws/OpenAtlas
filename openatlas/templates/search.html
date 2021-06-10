@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block content %}
     <div class="row">
-        <div class="col-3">
+        <div class="col-2">
             <form method="post">
                 {{ form.csrf_token }}
                 {{ form.term }}<br><br>
@@ -26,7 +26,7 @@
                 </div>
             </form>
         </div>
-        <div class="col-9">
+        <div class="col-10">
             {{ table.display() }}
         </div>
     </div>

@@ -43,10 +43,10 @@ class UserForm(FlaskForm):  # type: ignore
             username = user.username
             user_email = user.email
         if username != self.username.data and User.get_by_username(self.username.data):
-            self.username.errors.append(str(_('error username exists')))
+            self.username.errors.append(_('error username exists'))
             valid = False
         if user_email != self.email.data and User.get_by_email(self.email.data):
-            self.email.errors.append(str(_('error email exists')))
+            self.email.errors.append(_('error email exists'))
             valid = False
         if getattr(self, 'password'):
             if self.password.data != self.password2.data:
@@ -82,24 +82,24 @@ def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     if form.validate_on_submit():
-        activities = User.get_activities(
-            int(form.limit.data),
-            int(form.user.data),
-            form.action.data)
+        activity = User.get_activities(int(form.limit.data), int(form.user.data), form.action.data)
     elif user_id:
         form.user.data = user_id
-        activities = User.get_activities(100, user_id, 'all')
+        activity = User.get_activities(100, user_id, 'all')
     else:
-        activities = User.get_activities(100, 0, 'all')
+        activity = User.get_activities(100, 0, 'all')
     table = Table(['date', 'user', 'action', 'entity'], order=[[0, 'desc']])
-    for row in activities:
+    for row in activity:
         try:
             entity = link(Entity.get_by_id(row['entity_id']))
         except AttributeError:  # pragma: no cover - entity already deleted
-            entity = 'id ' + str(row['entity_id'])
+            entity = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
-        user = link(user) if user else 'id ' + str(row['user_id'])
-        table.rows.append([format_date(row['created']), user, _(row['action']), entity])
+        table.rows.append([
+            format_date(row['created']),
+            link(user) if user else f"id {row['user_id']}",
+            _(row['action']),
+            entity])
     return render_template(
         'user/activity.html',
         table=table,
@@ -125,7 +125,7 @@ def user_view(id_: int) -> str:
         user=user,
         info=info,
         title=user.username,
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'], user.username])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], user.username])
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
@@ -155,7 +155,7 @@ def user_update(id_: int) -> Union[str, Response]:
         form=form,
         title=user.username,
         manual_page='admin/user',
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'], user, _('edit')])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], user, _('edit')])
 
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
@@ -188,11 +188,11 @@ def user_insert() -> Union[str, Response]:
         'user/insert.html',
         form=form,
         title=_('user'),
-        crumbs=[[_('admin'), url_for('admin_index') + '#tab-user'], '+ ' + uc_first(_('user'))])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], f"+ {uc_first(_('user'))}"])
 
 
 def get_groups() -> List[Tuple[str, str]]:
-    """Returns groups hardcoded because the order (weakest permissions to strongest) is relevant"""
+    """List groups from weakest permissions to strongest"""
     choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))

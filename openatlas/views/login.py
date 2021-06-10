@@ -61,19 +61,19 @@ def login() -> Union[str, Response]:
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
-                    logger.log('info', 'auth', 'Login of ' + user.username)
+                    logger.log('info', 'auth', f'Login of {user.username}')
                     return redirect(request.args.get('next') or url_for('overview'))
                 else:
-                    logger.log('notice', 'auth', 'Inactive login try ' + user.username)
+                    logger.log('notice', 'auth', f'Inactive login try {user.username}')
                     flash(_('error inactive'), 'error')
             else:
-                logger.log('notice', 'auth', 'Wrong password: ' + user.username)
+                logger.log('notice', 'auth', f'Wrong password: {user.username}')
                 user.login_failed_count += 1
                 user.login_last_failure = datetime.datetime.now()
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
-            logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
+            logger.log('notice', 'auth', f"Wrong username: {request.form['username']}")
             flash(_('error username'), 'error')
     return render_template('login/index.html', title=_('login'), crumbs=[_('login')], form=form)
 
@@ -86,23 +86,24 @@ def reset_password() -> Union[str, Response]:
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = User.get_by_email(form.email.data)
         if not user:
-            logger.log('info', 'password', 'Password reset for non existing ' + form.email.data)
+            logger.log('info', 'password', f'Password reset for non existing {form.email.data}')
             flash(_('error non existing email'), 'error')
         else:
             code = User.generate_password()
             user.password_reset_code = code
             user.password_reset_date = datetime.datetime.now()
             user.update()
-            link = request.scheme + '://' + request.headers['Host']
-            link += url_for('reset_confirm', code=code)
-            subject = _('Password reset request for %(site_name)s',
-                        site_name=session['settings']['site_name'])
-            body = _('We received a password reset request for %(username)s',
-                     username=user.username)
-            body += ' ' + _('at') + ' '
-            body += request.headers['Host'] + '\n\n' + _('reset password link') + ':\n\n'
-            body += link + '\n\n' + _('The link is valid for') + ' '
-            body += str(session['settings']['reset_confirm_hours']) + ' ' + _('hours') + '.'
+            url = url_for('reset_confirm', code=code)
+            link = f"{request.scheme}://{request.headers['Host']}{url}"
+            subject = _(
+                'Password reset request for %(site_name)s',
+                site_name=session['settings']['site_name'])
+            body = _(
+                'We received a password reset request for %(username)s',
+                username=user.username)
+            body += f" {_('at')} {request.headers['Host']}\n\n{_('reset password link')}:\n\n"
+            body += f"{link}\n\n{_('The link is valid for')} "
+            body += f"{session['settings']['reset_confirm_hours']} {_('hours')}."
             email = form.email.data
             if send_mail(subject, body, form.email.data):
                 flash(
@@ -139,11 +140,11 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
     user.update()
     subject = _('New password for %(sitename)s', sitename=session['settings']['site_name'])
     body = _('New password for %(username)s', username=user.username) + ' '
-    body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + ':\n\n'
-    body += uc_first(_('username')) + ': ' + user.username + '\n'
-    body += uc_first(_('password')) + ': ' + password + '\n'
+    body += f"{_('at')} {request.scheme}://{request.headers['Host']}:\n\n"
+    body += f"{uc_first(_('username'))}: {user.username}\n"
+    body += f"{uc_first(_('password'))}: {password}\n"
     if send_mail(subject, body, user.email, False):
-        flash(_('Send new password mail to %(email)s.', email=user.email), 'info')
+        flash(_('A new password was sent to %(email)s.', email=user.email), 'info')
     else:
         flash(_('Failed to send password mail to %(email)s.', email=user.email), 'error')
     return redirect(url_for('login'))
