@@ -47,7 +47,13 @@ entity_parser.add_argument(
     choices=(
         'when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'geonames',
         'none'))
-entity_parser.add_argument('export', type=str, help='{error_msg}', choices='csv')
+entity_parser.add_argument('export', type=str, help='{error_msg}', choices=('csv'))
+entity_parser.add_argument(
+    'format',
+    type=str,
+    help='{error_msg}',
+    case_sensitive=False,
+    choices=('lp', 'geojson'))
 
 query_parser = entity_parser.copy()
 query_parser.add_argument('entities', type=int, action='append', help="{error_msg}")

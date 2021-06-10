@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse, get_license
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -11,20 +12,6 @@ from openatlas.util.util import get_file_path
 
 
 class LinkedPlaces:
-
-    @staticmethod
-    def get_all_links(entity: Entity) -> List[Link]:
-        links = []
-        for link in Link.get_links(entity.id, list(g.properties)):
-            links.append(link)
-        return links
-
-    @staticmethod
-    def get_all_links_inverse(entity: Entity) -> List[Link]:
-        links_inverse = []
-        for link in Link.get_links(entity.id, list(g.properties), inverse=True):
-            links_inverse.append(link)
-        return links_inverse
 
     @staticmethod
     def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
@@ -60,18 +47,10 @@ class LinkedPlaces:
             files.append({
                 '@id': url_for('api.entity', id_=link.domain.id, _external=True),
                 'title': link.domain.name,
-                'license': LinkedPlaces.get_license(link.domain),
+                'license': get_license(link.domain),
                 'url': url_for(
                     'api.display', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
-
-    @staticmethod
-    def get_license(entity: Entity) -> Optional[str]:
-        file_license = None
-        for node in entity.nodes:
-            if g.nodes[node.root[-1]].name == 'License':
-                file_license = node.name
-        return file_license
 
     @staticmethod
     def get_node(entity: Entity, links: List[Link]) -> Optional[List[Dict[str, Any]]]:
@@ -144,8 +123,8 @@ class LinkedPlaces:
         links: List[Link] = []
         links_inverse: List[Link] = []
         if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
-            links = LinkedPlaces.get_all_links(entity)
-            links_inverse = LinkedPlaces.get_all_links_inverse(entity)
+            links = get_all_links(entity)
+            links_inverse = get_all_links_inverse(entity)
 
         features['relations'] = \
             LinkedPlaces.get_links(links, links_inverse) if 'relations' in parser['show'] else None
