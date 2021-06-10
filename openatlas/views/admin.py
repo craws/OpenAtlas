@@ -31,9 +31,9 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, convert_size, delete_link, format_date, format_datetime, get_disk_space_info,
-    get_file_path,
-    get_file_stats, is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
+    button, convert_size, delete_link, display_form, display_info, format_date, format_datetime,
+    get_disk_space_info, get_file_path, get_file_stats, is_authorized, link, manual, required_group,
+    sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -91,23 +91,71 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
         else:
             form.receiver.data = current_user.email
-    return render_template(
-        'admin/index.html',
-        form=form,
-        tables=tables,
-        settings=session['settings'],
-        writeable_dirs=dirs,
-        disk_space_info=get_disk_space_info(),
-        imports=Import.get_all_projects(),
-        title=_('admin'),
-        crumbs=[_('admin')],
-        info={
-            'file': get_form_settings(FilesForm()),
-            'general': get_form_settings(GeneralForm()),
-            'mail': get_form_settings(MailForm()),
-            'map': get_form_settings(MapForm()),
-            'api': get_form_settings(ApiForm()),
-            'modules': get_form_settings(ModulesForm())})
+    tabs = {
+        'files': Tab(
+            _('files'),
+            buttons=[
+                manual('entity/file'),
+                button(_('edit'), url_for('admin_settings', category='files'))
+                if is_authorized('manager') else '',
+                button(_('list'), url_for('index', view='file')),
+                button(_('file'), url_for('insert', class_='file'))],
+            content=render_template(
+                'admin/file.html',
+                writeable_dirs=dirs,
+                info=get_form_settings(FilesForm()),
+                settings=session['settings'],
+                disk_space_info=get_disk_space_info())),
+        'user': Tab(
+            _('user'),
+            table=tables['user'],
+            buttons=[
+                manual('admin/user'),
+                button(_('activity'), url_for('user_activity')),
+                button(_('newsletter'), url_for('admin_newsletter'))
+                if is_authorized('manager') and session['settings']['mail'] else '',
+                button(_('user'), url_for('user_insert')) if is_authorized('manager') else ''])}
+    if is_authorized('admin'):
+        tabs['general'] = Tab(
+            'general',
+            content=display_info(get_form_settings(GeneralForm())),
+            buttons=[
+                manual('admin/general'),
+                button(_('edit'), url_for('admin_settings', category='general')),
+                button(_('system log'), url_for('admin_log'))])
+        tabs['email'] = Tab(
+            'email',
+            content=display_info(get_form_settings(MailForm())),
+            buttons=[
+                manual('admin/mail'),
+                button(_('edit'), url_for('admin_settings', category='mail'))])
+        if session['settings']['mail']:
+            tabs['email'].content += display_form(form)
+    if is_authorized('manager'):
+        tabs['modules'] = Tab(
+            _('modules'),
+            content=f"""
+                <h1>{_('Defaults for new user')}</h1>
+                {display_info(get_form_settings(ModulesForm()))}""",
+            buttons=[
+                manual('admin/modules'),
+                button(_('edit'), url_for('admin_settings', category='modules'))])
+        tabs['map'] = Tab(
+            'map',
+            content=display_info(get_form_settings(MapForm())),
+            buttons=[
+                manual('admin/map'),
+                button(_('edit'), url_for('admin_settings', category='map'))])
+        tabs['content'] = Tab(
+            'content',
+            table=tables['content'],
+            buttons=[manual('admin/content')])
+    if is_authorized('contributor'):
+        tabs['data'] = Tab('data', content=render_template(
+            'admin/data.html',
+            imports=Import.get_all_projects(),
+            info=get_form_settings(ApiForm())))
+    return render_template('tabs.html', tabs=tabs, title=_('admin'), crumbs=[_('admin')])
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
