@@ -14,7 +14,6 @@ from openatlas.api.v02.common.node_entities_all import GetNodeEntitiesAll
 from openatlas.api.v02.common.node_overview import GetNodeOverview
 from openatlas.api.v02.common.overview_count import OverviewCount
 from openatlas.api.v02.common.query import GetQuery
-from openatlas.api.v02.common.resource_gone import ResourceGone
 from openatlas.api.v02.common.subunit import GetSubunit
 from openatlas.api.v02.common.subunit_hierarchy import GetSubunitHierarchy
 from openatlas.api.v02.common.system_class import GetBySystemClass
@@ -54,19 +53,6 @@ api.add_resource(GetTypeTree, '/0.2/type_tree/', endpoint="type_tree")
 api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
 api.add_resource(GetContent, '/0.2/content/', endpoint="content")
 api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count')
-
-
-api.add_resource(
-    ShowUsage, '/0.2/', '/0.2/entity/', '/0.2/class/', '/0.2/code/',
-    '/0.2/latest/', '/0.2/node_entities/', '/0.2/node_entities_all/',
-    '/0.2/subunit/', '/0.2/subunit_hierarchy/', '/0.2/system_class/', endpoint='usage')
-
-api.add_resource(
-    ResourceGone, '/0.1/', '/0.1/entity/', '/0.1/class/', '/0.1/code/',
-    '/0.1/latest/', '/0.1/node_entities/', '/0.1/node_entities_all/',
-    '/0.1/subunit/', '/0.1/subunit_hierarchy/', '/0.1/system_class/',
-    '/0.1/entity/<int:id_>', '/0.1/query/', '/0.1/class/<string:class_code>',
-    '/0.1/code/<string:code>', '/0.1/content/', endpoint="gone")
 
 api.add_resource(DisplayImage, '/display/<path:filename>', endpoint='display')
 

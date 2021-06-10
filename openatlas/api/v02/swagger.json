@@ -171,17 +171,6 @@
           }
         }
       },
-      "UsageModel": {
-        "type": "object",
-        "properties": {
-          "message": {
-            "type": "string"
-          },
-          "examples": {
-            "type": "string"
-          }
-        }
-      },
       "OverviewCountModel": {
         "type": "object",
         "properties": {

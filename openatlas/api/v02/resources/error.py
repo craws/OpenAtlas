@@ -70,6 +70,10 @@ class FilterLogicalOperatorError(Exception):
     pass
 
 
+class APIFileNotFoundError(Exception):
+    pass
+
+
 errors = {
     "InternalServerError": {
         "message": "Something went wrong",
@@ -126,5 +130,8 @@ errors = {
         "status": 404},
     "FilterDelimiterError": {
         "message": "Filter delimiter are wrong.",
+        "status": 404},
+    "APIFileNotFoundError": {
+        "message": "The requested endpoint doesn't exist.",
         "status": 404}
 }
