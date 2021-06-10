@@ -37,5 +37,5 @@ class GetSubunit(Resource):  # type: ignore
             subunits.append({
                 'id': subunit.id,
                 'label': subunit.name,
-                'url': url_for('entity', id_=subunit.id, _external=True)})
+                'url': url_for('api.entity', id_=subunit.id, _external=True)})
         return subunits
