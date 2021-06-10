@@ -22,6 +22,7 @@ from openatlas.api.v02.common.type_entities import GetTypeEntities
 from openatlas.api.v02.common.type_entities_all import GetTypeEntitiesAll
 from openatlas.api.v02.common.type_tree import GetTypeTree
 from openatlas.api.v02.common.usage import ShowUsage
+from openatlas.api.v02.resources.display_image import DisplayImage
 from openatlas.api.v02.resources.error import errors
 
 app.config['SWAGGER'] = {'openapi': '3.0.2', 'uiversion': 3}
@@ -54,6 +55,7 @@ api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
 api.add_resource(GetContent, '/0.2/content/', endpoint="content")
 api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count')
 
+
 api.add_resource(
     ShowUsage, '/0.2/', '/0.2/entity/', '/0.2/class/', '/0.2/code/',
     '/0.2/latest/', '/0.2/node_entities/', '/0.2/node_entities_all/',
@@ -65,5 +67,7 @@ api.add_resource(
     '/0.1/subunit/', '/0.1/subunit_hierarchy/', '/0.1/system_class/',
     '/0.1/entity/<int:id_>', '/0.1/query/', '/0.1/class/<string:class_code>',
     '/0.1/code/<string:code>', '/0.1/content/', endpoint="gone")
+
+api.add_resource(DisplayImage, '/display/<path:filename>', endpoint='display')
 
 app.register_blueprint(api_bp)

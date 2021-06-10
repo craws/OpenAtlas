@@ -63,7 +63,7 @@ class LinkedPlaces:
                 'title': link.domain.name,
                 'license': LinkedPlaces.get_license(link.domain),
                 'url': url_for(
-                    'display_file_api', filename=path.name, _external=True) if path else "N/A"})
+                    'api.display', filename=path.name, _external=True) if path else "N/A"})
         return files if files else None
 
     @staticmethod
