@@ -4,7 +4,19 @@
         <div class="col-12">
             <ul class="nav nav-tabs" role="tablist">
                 {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows %}
-                    {{ tab.display_header(active=True if loop.first else False) }}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link {% if loop.first %}active{% endif %}"
+                            data-toggle="tab"
+                            role="tab"
+                            aria-selected="{% if active %}true{% else %}false{% endif %}"
+                            href="#tab-{{ tab.name|replace('_', '-') }}">
+                                {{ _(tab.name|replace('_', ' '))|uc_first }}
+                                {% if tab.table.rows|length %}
+                                    <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
+                                {% endif %}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
             <div class="tab-content">

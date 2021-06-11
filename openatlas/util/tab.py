@@ -175,6 +175,3 @@ class Tab:
             buttons += [button(_('text'), url_for('translation_insert', source_id=id_))]
 
         self.buttons = buttons if buttons and is_authorized('contributor') else []
-
-    def display_header(self, active: bool) -> str:
-        return Markup(render_template('util/tab_header2.html', tab=self, active=active))
