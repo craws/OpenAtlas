@@ -260,7 +260,7 @@ p {
 
 textarea#description {
     height: 8em;
-    width: 65%;
+    width: 100%;
 }
 
 .description {
@@ -269,12 +269,24 @@ textarea#description {
 }
 
 label[for="description"] {
-    height: 8em;
+
 }
 
 .table-cell textarea {
-    z-index: 1;
-    position: absolute;
+    vertical-align: top;
+}
+
+.table-row {
+    width: 100%;
+}
+
+.table-cell {
+    width: 100%;
+}
+
+#map-info-display {
+    float: left;
+    width: 100%;
 }
 
 .overlay {
@@ -371,7 +383,7 @@ div.data-table > div {
 div.data-table > div > div {
     display: table-cell;
     padding: 0.2em 0.6em 0.2em 0;
-    width: inherit;
+    white-space: nowrap;
 }
 
 .dt-body-right  {
