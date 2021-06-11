@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHEC
 
 import numpy
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import LazyString, format_number, lazy_gettext as _
+from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from markupsafe import Markup, escape
@@ -35,7 +35,6 @@ from openatlas.models.model import CidocClass, CidocProperty
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
     from openatlas.models.node import Node
-    from openatlas.util.table import Table
 
 
 @app.template_filter()
@@ -629,11 +628,6 @@ def breadcrumb(crumbs: List[Any]) -> str:
         else:
             items.append(uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
-
-
-@app.template_filter()
-def tab_header(id_: str, table: Optional['Table'] = None, active: Optional[bool] = False) -> str:
-    return Markup(render_template('util/tab_header.html', active=active, id=id_, table=table))
 
 
 @app.template_filter()
