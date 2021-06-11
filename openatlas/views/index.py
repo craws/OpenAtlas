@@ -38,7 +38,7 @@ class FeedbackForm(FlaskForm):  # type: ignore
 def overview() -> str:
     tabs = {
         'info': Tab('info'),
-        'bookmarks': Tab('bookmarks', table=Table(['name', 'class', _('first'), _('last')])),
+        'bookmarks': Tab('bookmarks', table=Table(['name', 'class', 'begin', 'end'])),
         'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),

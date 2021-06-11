@@ -22,13 +22,13 @@ class Table:
         self.paging = paging
         self.order = order if order else ''
         self.defs = defs if defs else []
-        self.defs.append({
-            'className': 'dt-body-right',
-            'targets': [i for i, j in enumerate(self.header) if j in ['begin', 'end', 'size']]})
 
     def display(self, name: Optional[str] = 'default') -> str:
         if not self.rows:
             return Markup(f"<p>{uc_first(_('no entries'))}</p>")
+        self.defs.append({
+            'className': 'dt-body-right',
+            'targets': [i for i, j in enumerate(self.header) if j in ['begin', 'end', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',
