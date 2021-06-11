@@ -148,7 +148,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 button(_('edit'), url_for('admin_settings', category='map'))])
         tabs['content'] = Tab(
             'content',
-            table=tables['content'],
+            content=tables['content'].display(),
             buttons=[manual('admin/content')])
     if is_authorized('contributor'):
         tabs['data'] = Tab('data', content=render_template(

@@ -1,10 +1,10 @@
-from typing import List, Optional, TYPE_CHECKING
+from typing import List, Optional, TYPE_CHECKING, Union
 
-from flask import g, render_template, url_for
+from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from markupsafe import Markup
 
+from openatlas.models.system import SystemClass
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 
@@ -47,7 +47,6 @@ class Tab:
         id_ = None
         view = None
         class_ = None
-        buttons = buttons if buttons else []
         if entity:
             id_ = entity.id
             view = entity.class_.view
@@ -55,6 +54,18 @@ class Tab:
             self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']
+        buttons = buttons if buttons else []
+        self.add_buttons(name, buttons, view, id_, class_)
+        self.buttons = buttons if buttons and is_authorized('contributor') else []
+
+    def add_buttons(
+            self,
+            name: str,
+            buttons: List[str],
+            view: Union[None, str],
+            id_: Union[None, int],
+            class_: Union[None, SystemClass]):
+
         if name == 'actor':
             if view == 'place':
                 self.table.header = ['actor', 'property', 'class', 'first', 'last', 'description']
@@ -129,7 +140,7 @@ class Tab:
             buttons += [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'note':
             if is_authorized('contributor'):
-                buttons = [button(_('note'),  url_for('note_insert', entity_id=id_))]
+                buttons += [button(_('note'),  url_for('note_insert', entity_id=id_))]
         elif name == 'place':
             if class_.name == 'file':
                 buttons += [button('link', url_for('file_add', id_=id_, view=name))]
@@ -173,5 +184,3 @@ class Tab:
                     url_for('insert', class_=name, origin_id=id_))]
         elif name == 'text':
             buttons += [button(_('text'), url_for('translation_insert', source_id=id_))]
-
-        self.buttons = buttons if buttons and is_authorized('contributor') else []
