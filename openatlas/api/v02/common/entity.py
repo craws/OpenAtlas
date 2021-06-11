@@ -33,4 +33,4 @@ class GetEntity(Resource):  # type: ignore
 
     @staticmethod
     def get_geojson(id_: int) -> Dict[str, Any]:
-        return Geojson.check_if_geometry(get_entity_by_id(id_))
+        return Geojson.return_output(Geojson.check_if_geometry(get_entity_by_id(id_)))
