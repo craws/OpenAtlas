@@ -5,6 +5,7 @@ class Changelog:
             'feature': {
                 '1513': 'Add reference page for multiple files',
                 '1520': 'Better value type display',
+                '1527': 'Improved tab system',
                 '1509': 'Manual - examples for use cases',
                 '1478': 'API: latest with pagination',
                 '1516': 'API: implement Google JSON style'},
