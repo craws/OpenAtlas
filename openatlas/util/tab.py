@@ -64,7 +64,7 @@ class Tab:
             buttons: List[str],
             view: Union[None, str],
             id_: Union[None, int],
-            class_: Union[None, SystemClass]):
+            class_: Union[None, SystemClass]) -> None:
 
         if name == 'actor':
             if view == 'place':
