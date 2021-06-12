@@ -347,13 +347,14 @@ def entity_view(id_: int) -> Union[str, Response]:
         'entity/view.html',
         buttons=add_buttons(entity),
         entity=entity,
+        gis_data=gis_data,
         structure=structure,  # Needed for place views
         overlays=overlays,  # Needed for place views
-        gis_data=gis_data,
         title=entity.name)
     return render_template(
         'tabs.html',
         tabs=tabs,
+        gis_data=gis_data,
         crumbs=add_crumbs(entity, structure),
         entity=entity)
 
