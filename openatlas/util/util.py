@@ -156,10 +156,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(
-        entity: 'Entity',
-        file_stats: Optional[Dict[Union[int, str], Any]] = None,
-        show_links: Optional[bool] = True) -> List[Any]:
+def get_base_table_data(entity: 'Entity', show_links: Optional[bool] = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
@@ -167,14 +164,10 @@ def get_base_table_data(
     if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
         data.append(entity.print_standard_type(show_links=False))
     if entity.class_.name == 'file':
-        if file_stats:
-            data.append(convert_size(
-                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
-            data.append(
-                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
-        else:
-            data.append(print_file_size(entity))
-            data.append(get_file_extension(entity))
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
+        data.append(g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A')
+        data.append(g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A')
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -282,8 +275,11 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
             data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
             data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
     elif entity.class_.view == 'file':
-        data[_('size')] = print_file_size(entity)
-        data[_('extension')] = get_file_extension(entity)
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
+        data[_('size')] = g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A'
+        data[_('extension')] = g.file_stats[entity.id]['ext'] \
+            if entity.id in g.file_stats else 'N/A'
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
             link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
@@ -445,11 +441,6 @@ def add_dates_to_form(form: Any) -> str:
         errors=errors,
         style='' if valid_dates else 'display:table-row',
         label=_('hide') if form.begin_year_from.data or form.end_year_from.data else _('show'))
-
-
-def print_file_size(entity: 'Entity') -> str:
-    path = get_file_path(entity.id)
-    return convert_size(path.stat().st_size) if path else 'N/A'
 
 
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
