@@ -190,7 +190,10 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
     stats: Dict[int, Dict[str, Any]] = {}
     for f in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(f.stem)] = {'ext': f.suffix, 'size': f.stat().st_size, 'date': f.stat().st_ctime}
+        stats[int(f.stem)] = {
+            'ext': f.suffix,
+            'size': convert_size(f.stat().st_size),
+            'date': f.stat().st_ctime}
     return stats
 
 

@@ -466,7 +466,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
             entity.print_standard_type(),
-            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
+            file_stats[entity.id]['size'] if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,
             date])
