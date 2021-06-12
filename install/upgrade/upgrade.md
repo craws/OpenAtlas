@@ -11,6 +11,9 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 6.2.x to 6.3.0
+A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+
 ### 6.2.0 to 6.2.1
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
