@@ -1,6 +1,7 @@
 class Changelog:
 
     versions = {
+        '6.4.0': ['TBA', {}],
         '6.3.0': ['2021-06-13', {
             'feature': {
                 '1513': 'Add reference page for multiple files',
