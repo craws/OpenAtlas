@@ -1,17 +1,18 @@
 class Changelog:
 
     versions = {
-        '6.3.0': ['TBA', {
+        '6.4.0': ['TBA', {}],
+        '6.3.0': ['2021-06-13', {
             'feature': {
                 '1513': 'Add reference page for multiple files',
                 '1520': 'Better value type display',
+                '1527': 'Improved tab system',
+                '1502': 'Show count of finds when entering additional',
                 '1509': 'Manual - examples for use cases',
                 '1478': 'API: latest with pagination',
                 '1516': 'API: implement Google JSON style'},
             'fix': {
-                '1515': 'API: Paging count faulty'
-            }
-        }],
+                '1515': 'API: Paging count faulty'}}],
         '6.2.1': ['2021-05-12', {
             'fix': {
                 '1514': 'End dates of entities are not displayed correctly'}}],

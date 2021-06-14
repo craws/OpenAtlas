@@ -13,8 +13,8 @@ from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, convert_size, external_url, format_date, get_base_table_data, get_file_path,
-    get_file_stats, is_authorized, link, required_group)
+    button, external_url, format_date, get_base_table_data, get_file_path, get_file_stats,
+    is_authorized, link, required_group)
 
 
 @app.route('/index/<view>')
@@ -49,18 +49,19 @@ def get_table(view: str) -> Table:
     table = Table(g.table_headers[view])
     if view == 'file':
         table.header = ['date'] + table.header
-        file_stats = get_file_stats()
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file', nodes=True):
             date = 'N/A'
-            if entity.id in file_stats:
+            if entity.id in g.file_stats:
                 date = format_date(
-                    datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
+                    datetime.datetime.utcfromtimestamp(g.file_stats[entity.id]['date']))
             table.rows.append([
                 date,
                 link(entity),
                 entity.print_standard_type(),
-                convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
-                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
+                g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A',
+                g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A',
                 entity.description])
     elif view == 'reference_system':
         for system in g.reference_systems.values():

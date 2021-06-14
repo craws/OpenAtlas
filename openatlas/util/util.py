@@ -16,7 +16,7 @@ from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHEC
 
 import numpy
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import LazyString, format_number, lazy_gettext as _
+from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from markupsafe import Markup, escape
@@ -35,7 +35,6 @@ from openatlas.models.model import CidocClass, CidocProperty
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
     from openatlas.models.node import Node
-    from openatlas.util.table import Table
 
 
 @app.template_filter()
@@ -157,10 +156,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(
-        entity: 'Entity',
-        file_stats: Optional[Dict[Union[int, str], Any]] = None,
-        show_links: Optional[bool] = True) -> List[Any]:
+def get_base_table_data(entity: 'Entity', show_links: Optional[bool] = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
@@ -168,14 +164,10 @@ def get_base_table_data(
     if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
         data.append(entity.print_standard_type(show_links=False))
     if entity.class_.name == 'file':
-        if file_stats:
-            data.append(convert_size(
-                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
-            data.append(
-                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
-        else:
-            data.append(print_file_size(entity))
-            data.append(get_file_extension(entity))
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
+        data.append(g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A')
+        data.append(g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A')
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -198,7 +190,10 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
     stats: Dict[int, Dict[str, Any]] = {}
     for f in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(f.stem)] = {'ext': f.suffix, 'size': f.stat().st_size, 'date': f.stat().st_ctime}
+        stats[int(f.stem)] = {
+            'ext': f.suffix,
+            'size': convert_size(f.stat().st_size),
+            'date': f.stat().st_ctime}
     return stats
 
 
@@ -283,8 +278,11 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
             data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
             data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
     elif entity.class_.view == 'file':
-        data[_('size')] = print_file_size(entity)
-        data[_('extension')] = get_file_extension(entity)
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
+        data[_('size')] = g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A'
+        data[_('extension')] = g.file_stats[entity.id]['ext'] \
+            if entity.id in g.file_stats else 'N/A'
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
             link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
@@ -448,11 +446,6 @@ def add_dates_to_form(form: Any) -> str:
         label=_('hide') if form.begin_year_from.data or form.end_year_from.data else _('show'))
 
 
-def print_file_size(entity: 'Entity') -> str:
-    path = get_file_path(entity.id)
-    return convert_size(path.stat().st_size) if path else 'N/A'
-
-
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
@@ -577,6 +570,13 @@ def button(
 
 
 @app.template_filter()
+def button_bar(buttons: List[Any]) -> str:
+    if not buttons:
+        return ''
+    return Markup(f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>')
+
+
+@app.template_filter()
 def display_citation_example(code: str) -> str:
     text = Content.get_translation('citation_example')
     if not text or code != 'reference':
@@ -622,11 +622,6 @@ def breadcrumb(crumbs: List[Any]) -> str:
         else:
             items.append(uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
-
-
-@app.template_filter()
-def tab_header(id_: str, table: Optional['Table'] = None, active: Optional[bool] = False) -> str:
-    return Markup(render_template('util/tab_header.html', active=active, id=id_, table=table))
 
 
 @app.template_filter()
