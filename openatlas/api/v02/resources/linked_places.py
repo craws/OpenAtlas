@@ -148,7 +148,7 @@ class LinkedPlaces:
         return entity
 
     @staticmethod
-    def get_entity(entity: Entity, all_links: List[Link], all_links_inverse: List[Link], parser: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(entity: Entity, links: List[Link], links_inverse: List[Link], parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
         class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en'])
         features = {
@@ -169,15 +169,21 @@ class LinkedPlaces:
         # if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
         #     links = LinkedPlaces.get_all_links(entity)
         #     links_inverse = LinkedPlaces.get_all_links_inverse(entity)
-        links=[]
-        links_inverse=[]
-        for i in all_links:
-            if i.domain.id == entity.id:
-                links.append(i)
 
-        for i in all_links_inverse:
-            if i.range.id == entity.id:
-                links_inverse.append(i)
+
+
+
+        ### Moved this code to pagionation
+
+        # links=[]
+        # links_inverse=[]
+        # for i in all_links:
+        #     if i.domain.id == entity.id:
+        #         links.append(i)
+        #
+        # for i in all_links_inverse:
+        #     if i.range.id == entity.id:
+        #         links_inverse.append(i)
 
         features['relations'] = \
             LinkedPlaces.get_links(links, links_inverse) if 'relations' in parser['show'] else None
