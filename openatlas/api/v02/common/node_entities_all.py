@@ -33,7 +33,7 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
             data.append({
                 'id': entity.id,
                 'label': entity.name,
-                'url': url_for('entity', id_=entity.id, _external=True)})
+                'url': url_for('api.entity', id_=entity.id, _external=True)})
         for sub_id in g.nodes[id_].subs:
             GetNodeEntitiesAll.get_recursive_node_entities(sub_id, data)
         return data

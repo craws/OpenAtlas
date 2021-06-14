@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-version = '6.3.0'
-release = '6.3.0'
+version = '6.4.0'
+release = '6.4.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
 project = 'OpenAtlas'
-author = 'Alexander Watzinger and the OpenAtlas team'
+author = 'The OpenAtlas team'
 language = 'en'
 pygments_style = 'sphinx'
 extensions: List[str] = []

@@ -30,5 +30,5 @@ class GetNodeEntities(Resource):  # type: ignore
             data.append({
                 'id': entity.id,
                 'label': entity.name,
-                'url': url_for('entity', id_=entity.id, _external=True)})
+                'url': url_for('api.entity', id_=entity.id, _external=True)})
         return data

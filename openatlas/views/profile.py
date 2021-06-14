@@ -16,7 +16,8 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.util.util import is_authorized, uc_first
+from openatlas.util.tab import Tab
+from openatlas.util.util import button, display_info, is_authorized, manual, uc_first
 
 
 class PasswordForm(FlaskForm):  # type: ignore
@@ -50,14 +51,28 @@ class PasswordForm(FlaskForm):  # type: ignore
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index() -> str:
-    return render_template(
-        'profile/index.html',
-        info={
-            'profile': get_form_settings(ProfileForm(), True),
-            'modules': get_form_settings(ModulesForm(), True),
-            'display': get_form_settings(DisplayForm(), True)},
-        title=_('profile'),
-        crumbs=[_('profile')])
+    tabs = {'profile': Tab(
+        'profile',
+        content=display_info(get_form_settings(ProfileForm(), True)),
+        buttons=[manual('tools/profile')])}
+    if is_authorized('contributor'):
+        tabs['modules'] = Tab(
+            'modules',
+            content=display_info(get_form_settings(ModulesForm(), True)),
+            buttons=[manual('tools/profile')])
+    tabs['display'] = Tab(
+        'display',
+        content=display_info(get_form_settings(DisplayForm(), True)),
+        buttons=[manual('tools/profile')])
+    if not app.config['DEMO_MODE']:
+        tabs['profile'].buttons += [
+            button(_('edit'), url_for('profile_settings', category='profile')),
+            button(_('change password'), url_for('profile_password'))]
+        tabs['modules'].buttons.append(
+            button(_('edit'), url_for('profile_settings', category='modules')))
+        tabs['display'].buttons.append(
+            button(_('edit'), url_for('profile_settings', category='display')))
+    return render_template('tabs.html', tabs=tabs, title=_('profile'), crumbs=[_('profile')])
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
@@ -111,7 +126,7 @@ def profile_password() -> Union[str, Response]:
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))
     return render_template(
-        'profile/password.html',
+        'user/password.html',
         form=form,
         title=_('profile'),
         crumbs=[[_('profile'), url_for('profile_index')], _('change password')])

@@ -31,7 +31,6 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.api import util  # contains routes for each version
 from openatlas.api.v02 import routes  # New routes
 from openatlas.util import processor
 from openatlas.views import (
@@ -69,6 +68,7 @@ def before_request() -> None:
     g.class_view_mapping = system.get_class_view_mapping()
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
+    g.file_stats = None
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
