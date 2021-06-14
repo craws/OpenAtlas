@@ -28,6 +28,20 @@ class LinkedPlaces:
         return links_inverse
 
     @staticmethod
+    def get_all_links_multiple(entities: List[int]) -> List[Link]:
+        links = []
+        for link in Link.get_links_from_multiple_entities(entities, list(g.properties)):
+            links.append(link)
+        return links
+
+    @staticmethod
+    def get_all_links_inverse_multiple(entities: List[int]) -> List[Link]:
+        links_inverse = []
+        for link in Link.get_links_from_multiple_entities(entities, list(g.properties), inverse=True):
+            links_inverse.append(link)
+        return links_inverse
+
+    @staticmethod
     def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
         out = []
         for link in links:
@@ -134,7 +148,7 @@ class LinkedPlaces:
         return entity
 
     @staticmethod
-    def get_entity(entity: Entity, parser: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(entity: Entity, all_links: List[Link], all_links_inverse: List[Link], parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
         class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en'])
         features = {
@@ -150,11 +164,20 @@ class LinkedPlaces:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        links: List[Link] = []
-        links_inverse: List[Link] = []
-        if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
-            links = LinkedPlaces.get_all_links(entity)
-            links_inverse = LinkedPlaces.get_all_links_inverse(entity)
+        # links: List[Link] = []
+        # links_inverse: List[Link] = []
+        # if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
+        #     links = LinkedPlaces.get_all_links(entity)
+        #     links_inverse = LinkedPlaces.get_all_links_inverse(entity)
+        links=[]
+        links_inverse=[]
+        for i in all_links:
+            if i.domain.id == entity.id:
+                links.append(i)
+
+        for i in all_links_inverse:
+            if i.range.id == entity.id:
+                links_inverse.append(i)
 
         features['relations'] = \
             LinkedPlaces.get_links(links, links_inverse) if 'relations' in parser['show'] else None
@@ -173,6 +196,7 @@ class LinkedPlaces:
                     Link.get_linked_entity(entity.id, 'P53'))
             elif entity.class_.name == 'object_location':
                 features['geometry'] = LinkedPlaces.get_geoms_by_entity(entity)
+
         return {
             'type': type_,
             '@context': app.config['API_SCHEMA'],

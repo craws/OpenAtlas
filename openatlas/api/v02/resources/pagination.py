@@ -29,8 +29,13 @@ class Pagination:
             total = Pagination.get_shown_entities(total, parser)
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
         entity_limit = [e for idx, e in enumerate(entities[h[0]:])]
-        entities_result = [LinkedPlaces.get_entity(r, parser)
+        links = LinkedPlaces.get_all_links_multiple([e.id for e in entity_limit])
+        links_inverse = LinkedPlaces.get_all_links_inverse_multiple([e.id for e in entity_limit])
+        entities_result = [LinkedPlaces.get_entity(r, links, links_inverse, parser)
                            for r in entity_limit[:int(parser['limit'])]]
+
+
+
         result = {
             "results": entities_result,
             "pagination": {

@@ -35,3 +35,4 @@ class GetByClass(Resource):  # type: ignore
         if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode
         return [Entity(row) for row in Db.get_by_class_code(class_code, parser)]
+

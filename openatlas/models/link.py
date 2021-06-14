@@ -175,6 +175,26 @@ class Link:
         return links
 
     @staticmethod
+    def get_links_from_multiple_entities(
+            entities: List[int],
+            codes: Union[str, List[str], None] = None,
+            inverse: bool = False) -> List[Link]:
+        from openatlas.models.entity import Entity
+        entity_ids = set()
+        result = Db.get_links_from_multiple_entities(entities, codes if isinstance(codes, list) else [codes], inverse)
+        for row in result:
+            entity_ids.add(row['domain_id'])
+            entity_ids.add(row['range_id'])
+        entities = {entity.id: entity for entity in Entity.get_by_ids(entity_ids, nodes=True)}
+        links = []
+        for row in result:
+            links.append(Link(
+                row,
+                domain=entities[row['domain_id']],
+                range_=entities[row['range_id']]))
+        return links
+
+    @staticmethod
     def delete_by_codes(entity: 'Entity', codes: List[str], inverse: bool = False) -> None:
         Db.delete_by_codes(entity.id, codes, inverse)
 
