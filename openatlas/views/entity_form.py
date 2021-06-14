@@ -92,7 +92,13 @@ def add_crumbs(
             for node_id in reversed(origin.root):
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
-    return crumbs + [f'+ {g.classes[class_].label}' if insert_ else _('edit')]
+    sibling_count = 0
+    if origin and origin.class_.name == 'stratigraphic_unit' and structure and insert_:
+        for item in structure['siblings']:
+            if item.class_.name == class_:  # pragma: no cover
+                sibling_count += 1
+    info = f" ({sibling_count} {_('exists')})" if sibling_count else ''
+    return crumbs + [f'+ {g.classes[class_].label}{info}' if insert_ else _('edit')]
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])

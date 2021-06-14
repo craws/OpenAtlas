@@ -33,16 +33,16 @@ class ContentTests(TestBaseCase):
             assert b'Login' not in rv.data
 
     def test_links(self) -> None:
-        from openatlas.database.entity import Entity
-        from openatlas.database.link import Link
+        from openatlas.database.entity import Entity as DbEntity
+        from openatlas.database.link import Link as DbLink
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                id_ = Entity.insert({
+                id_ = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'system_class': 'artifact',
                     'code': 'E13', 'description': ''})
-                Link.insert({
+                DbLink.insert({
                     'property_code': 'P86',
                     'domain_id': id_,
                     'range_id': id_,
@@ -67,7 +67,7 @@ class ContentTests(TestBaseCase):
                 involvement.end_from = '2017-01-01'
                 involvement.update()
             rv = self.app.get(url_for('admin_check_dates'))
-            assert b'<span class="tab-counter">1</span>' in rv.data
+            assert b'<span class="tab-counter">' in rv.data
 
     def test_duplicates(self) -> None:
         with app.app_context():  # type: ignore

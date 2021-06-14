@@ -1,38 +1,35 @@
-{% extends "tabs.html" %}
-{% block tab_info %}
-    <div class="row">
-        <div class="col-6">
-            <div class="toolbar">
-                {{ ('entity/' + entity.class_.view)|manual }}
-                {{ buttons|join(' ') }}
-                {{ entity.id|bookmark_toggle }}
-                {% if entity.class_.view == 'file' %}
-                    {% if entity.image_id %}
-                        {{ entity|download_button }}
-                    {% else %}
-                        <span class="error">{{ _("missing file")|uc_first }}</span>
-                    {% endif %}
-                {% endif %}
-                {{ entity|siblings_pager(structure) }}
-            </div>
-            <h1>{{ entity.name }}</h1>
-            <div>
+<div class="row">
+    <div class="col-6">
+        <div class="toolbar">
+            {{ ('entity/' + entity.class_.view)|manual }}
+            {{ buttons|join(' ') }}
+            {{ entity.id|bookmark_toggle }}
+            {% if entity.class_.view == 'file' %}
                 {% if entity.image_id %}
-                    {{ entity|display_profile_image }}
+                    {{ entity|download_button }}
+                {% else %}
+                    <span class="error">{{ _("missing file")|uc_first }}</span>
                 {% endif %}
-                <div style="float:left;">
-                    {{ entity.info_data|display_info }}
-                </div>
-            </div>
-            <div style="clear:both;"></div>
-            {{ entity|display_external_references }}
-            {{ entity|description }}
+            {% endif %}
+            {{ entity|siblings_pager(structure) }}
         </div>
-        {% if gis_data %}
-            <div class="col-6">
-                <div id="map" class="map"></div>
-                <script src="/static/js/map/map.js"></script>
+        <h1>{{ entity.name }}</h1>
+        <div>
+            {% if entity.image_id %}
+                {{ entity|display_profile_image }}
+            {% endif %}
+            <div style="float:left;">
+                {{ entity.info_data|display_info }}
             </div>
-        {% endif %}
+        </div>
+        <div style="clear:both;"></div>
+        {{ entity|display_external_references }}
+        {{ entity|description }}
     </div>
-{% endblock %}
+    {% if gis_data %}
+        <div class="col-6">
+            <div id="map" class="map"></div>
+            <script src="/static/js/map/map.js"></script>
+        </div>
+    {% endif %}
+</div>

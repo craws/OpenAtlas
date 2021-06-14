@@ -22,7 +22,7 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
+from openatlas.util.util import get_base_table_data, uc_first
 
 forms = {
     'acquisition': ['name', 'date', 'description', 'continue'],
@@ -340,16 +340,14 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
         entities = Entity.get_by_class('place', nodes=True, aliases=True)
     else:
         entities = Entity.get_by_view(class_, nodes=True, aliases=True)
-
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
-    file_stats = get_file_stats() if class_ == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = f"""
             <input id="selection-{entity.id}" name="values" type="checkbox" value="{entity.id}">"""
-        table.rows.append([input_] + get_base_table_data(entity, file_stats))
+        table.rows.append([input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
         return uc_first(_('no entries'))
     return render_template('forms/form_table.html', table=table.display(class_))

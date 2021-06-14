@@ -12,7 +12,7 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
-from openatlas.util.util import button, is_authorized, link, required_group, uc_first
+from openatlas.util.util import button, is_authorized, link, manual, required_group, uc_first
 
 
 @app.route('/note/view/<int:id_>')
@@ -21,19 +21,21 @@ def note_view(id_: int) -> str:
     if not note['public'] and note['user_id'] != current_user.id:
         abort(403)  # pragma: no cover
     entity = Entity.get_by_id(note['entity_id'])
-    buttons: List[str] = []
+    buttons: List[str] = [manual('tools/notes')]
     if note['user_id'] == current_user.id:
-        buttons = [
+        buttons += [
             button(_('edit'), url_for('note_update', id_=note['id'])),
             button(_('delete'), url_for('note_delete', id_=note['id']))]
     elif is_authorized('manager'):  # pragma: no cover
-        buttons = [button(_('set private'), url_for('note_set_private', id_=note['id']))]
-    return render_template(
-        'user/note.html',
-        entity=entity,
-        note=note,
-        tabs={'info': Tab('info')},
+        buttons += [button(_('set private'), url_for('note_set_private', id_=note['id']))]
+    tabs = {'info': Tab(
+        'info',
         buttons=buttons,
+        content=f"<h1>{uc_first(_('note'))}</h1>{note['text']}")}
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        entity=entity,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             link(entity),
