@@ -15,7 +15,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button,  external_url, format_date, get_base_table_data, get_file_path,
+    button, external_url, format_date, get_base_table_data, get_file_path,
     get_file_stats, get_image_path, is_authorized, link, required_group)
 
 
@@ -55,7 +55,6 @@ def get_table(view: str) -> Table:
             header.insert(1, _('icon'))
     table = Table(header)
     if view == 'file':
-        table.header = ['date'] + table.header
         if not g.file_stats:
             g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file', nodes=True):
@@ -63,15 +62,17 @@ def get_table(view: str) -> Table:
             if entity.id in g.file_stats:
                 date = format_date(
                     datetime.datetime.utcfromtimestamp(g.file_stats[entity.id]['date']))
-            table.rows.append([
+            data = [
                 date,
                 link(entity),
                 entity.print_standard_type(),
                 g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A',
                 g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A',
-                entity.description])
+                entity.description]
             if current_user.settings['table_show_icons']:
-                table.rows.insert(1, file_preview(entity.id))
+                data.insert(1, file_preview(entity.id))
+            table.rows.append(data)
+
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
