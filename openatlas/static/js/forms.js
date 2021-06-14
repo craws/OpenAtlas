@@ -145,4 +145,19 @@ $(document).ready(function () {
         $("input[type='search']").focus();
     });
 
+    $('.extend-icon').click((a) => {
+        console.log(a.currentTarget.id);
+        if(a.currentTarget.id === 'extend-form-icon') {
+            $('#extend-form-icon').hide();
+            $('#extend-map-icon').show();
+            $('.col-4').toggleClass("col-4").toggleClass("col-11");
+            $('.col-8').toggleClass("col-8").toggleClass("col-1");
+            return;
+        }
+        $('#extend-form-icon').show();
+        $('#extend-map-icon').hide();
+        $('.col-11').toggleClass("col-11").toggleClass("col-4");
+        $('.col-1').toggleClass("col-1").toggleClass("col-8");
+    });
+
 });
