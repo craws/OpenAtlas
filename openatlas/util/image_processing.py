@@ -26,8 +26,8 @@ class ImageProcessing:
                         img.transform(resize=size + 'x' + size + '>')
                         img.compression_quality = 75
                         img.save(filename=str(
-                            Path(app.config[
-                                     'RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"))
+                            Path(
+                                app.config['RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"))
                         return True
             return False  # pragma: no cover
         except Exception as e:

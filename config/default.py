@@ -33,10 +33,8 @@ IMAGE_PROCESSING = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {
-    'overview': '400',
     'thumbnail': '200',
-    'table': '100',
-    'icon': '30'}
+    'table': '100'}
 ALLOWED_IMAGE_EXT = ['.jpeg', '.jpg', '.png', '.tiff', '.tif', '.ico', '.svg', '.bmp', '.gif']
 PROCESSED_EXT = '.jpeg'
 
