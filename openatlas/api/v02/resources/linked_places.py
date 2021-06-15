@@ -13,20 +13,6 @@ from openatlas.util.util import get_file_path
 
 class LinkedPlaces:
 
-    # @staticmethod
-    # def get_all_links(entity: Entity) -> List[Link]:
-    #     links = []
-    #     for link in Link.get_links(entity.id, list(g.properties)):
-    #         links.append(link)
-    #     return links
-    #
-    # @staticmethod
-    # def get_all_links_inverse(entity: Entity) -> List[Link]:
-    #     links_inverse = []
-    #     for link in Link.get_links(entity.id, list(g.properties), inverse=True):
-    #         links_inverse.append(link)
-    #     return links_inverse
-
     @staticmethod
     def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
         links = []
