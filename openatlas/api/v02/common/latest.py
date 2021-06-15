@@ -15,16 +15,16 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
-        entities = Pagination.pagination(GetLatest.get_entities_get_latest(latest), parser)
+        entities = Pagination.pagination(GetLatest.get_latest(latest), parser)
         if parser['count']:
             return jsonify(len(entities))
         template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
-            return Download.download(data=entities, template=template, name=latest)
+            return Download.download(entities, template, latest)
         return marshal(entities, template), 200
 
     @staticmethod
-    def get_entities_get_latest(limit_: int) -> List[Entity]:
+    def get_latest(limit_: int) -> List[Entity]:
         if not (0 < limit_ < 101):
             raise InvalidLimitError
         return Entity.get_latest(limit_)

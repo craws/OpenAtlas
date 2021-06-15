@@ -19,19 +19,20 @@ class GetByCode(Resource):  # type: ignore
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(
-                GetByCode.get_entities_by_view(code_=code, parser=parser), code)
+                GetByCode.get_by_view(code, parser), code)
         code_ = Pagination.pagination(
-            GetByCode.get_entities_by_view(code_=code, parser=parser),
+            GetByCode.get_by_view(code, parser),
             parser=parser)
         if parser['count']:
             return jsonify(code_['pagination']['entities'])
         template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
-            return Download.download(data=code_, template=template, name=code)
+            return Download.download(code_, template, code)
         return marshal(code_, template), 200
 
     @staticmethod
-    def get_entities_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
+    def get_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
         if code_ not in g.view_class_mapping:
             raise InvalidCodeError
-        return [Entity(row) for row in Db.get_by_system_class(g.view_class_mapping[code_], parser)]
+        sys_class = Db.get_by_system_class(g.view_class_mapping[code_], parser)
+        return [Entity(row) for row in sys_class]
