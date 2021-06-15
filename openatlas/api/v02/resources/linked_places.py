@@ -148,7 +148,8 @@ class LinkedPlaces:
         return entity
 
     @staticmethod
-    def get_entity(entity: Entity, links: List[Link], links_inverse: List[Link], parser: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(entity: Entity, links: List[Link], links_inverse: List[Link],
+                   parser: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
         class_code = ''.join(entity.cidoc_class.code + " " + entity.cidoc_class.i18n['en'])
         features = {
