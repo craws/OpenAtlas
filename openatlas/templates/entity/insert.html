@@ -18,8 +18,17 @@
     {% else %}
         <div class="row">
             <div class="col-4">
-                <div id='map-info-display' style="float:left;">
-                    {{ form|display_form(manual_page='entity/' + view_name) }}
+                <div class="row">
+                    <div id='map-info-display' style="float:left;">
+                        {{ form|display_form(manual_page='entity/' + view_name) }}
+                    </div>
+                    <div id="map-info-display-ext">
+                    <span class="extend-icon" id="extend-form-icon"><i class="fas fa-arrow-right"
+                                                                       title="Enlarge Form"></i></span>
+                        <span class="extend-icon" id="extend-map-icon" style="display: none;"><i
+                                class="fas fa-arrow-left "
+                                title="Enlarge Map"></i></span>
+                    </div>
                 </div>
             </div>
             <div class="col-8">
