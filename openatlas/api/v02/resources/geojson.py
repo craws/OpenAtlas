@@ -1,6 +1,5 @@
 from typing import Any, Dict, List, Optional
 
-from openatlas.api.v02.resources.util import get_all_links
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

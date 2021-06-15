@@ -3,6 +3,7 @@ from typing import Any, Dict, List
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
+from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse
 from openatlas.models.entity import Entity
 
 
@@ -29,9 +30,8 @@ class Pagination:
             total = Pagination.get_shown_entities(total, parser)
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
         entity_limit = [e for idx, e in enumerate(entities[h[0]:])]
-        links = LinkedPlaces.get_all_links([e.id for e in entity_limit[:int(parser['limit'])]])
-        links_inverse = \
-            LinkedPlaces.get_all_links_inverse([e.id for e in entity_limit[:int(parser['limit'])]])
+        links = get_all_links([e.id for e in entity_limit[:int(parser['limit'])]])
+        links_inverse = get_all_links_inverse([e.id for e in entity_limit[:int(parser['limit'])]])
         entities_result = \
             [LinkedPlaces.get_entity(
                 entity,

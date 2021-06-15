@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse, get_license
+from openatlas.api.v02.resources.util import get_license
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -12,21 +12,6 @@ from openatlas.util.util import get_file_path
 
 
 class LinkedPlaces:
-
-    @staticmethod
-    def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
-        links = []
-        for link in Link.get_links(entities, list(g.properties)):
-            links.append(link)
-        return links
-
-    @staticmethod
-    def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
-        links_inverse = []
-        for link in Link.get_links(entities, list(g.properties), inverse=True):
-            links_inverse.append(link)
-        return links_inverse
-
     @staticmethod
     def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
         out = []
