@@ -39,7 +39,7 @@ class Link:
 
     @staticmethod
     def get_links(
-            entity_id: int,
+            entities: Union[int, List[int]],
             codes: Union[str, List[str], None],
             inverse: bool = False) -> List[Dict[str, Any]]:
         sql = f"""
@@ -55,10 +55,12 @@ class Link:
             codes = codes if isinstance(codes, list) else [codes]
             sql += ' AND l.property_code IN %(codes)s '
         sql += f"""
-            WHERE l.{'range' if inverse else 'domain'}_id = %(entity_id)s
+            WHERE l.{'range' if inverse else 'domain'}_id in %(entities)s
             GROUP BY l.id, e.name
             ORDER BY e.name;"""
-        g.cursor.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes) if codes else ''})
+        g.cursor.execute(sql,
+                         {'entities': tuple(entities if isinstance(entities, list) else [entities]),
+                          'codes': tuple(codes) if codes else ''})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

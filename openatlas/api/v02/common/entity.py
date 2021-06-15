@@ -16,7 +16,11 @@ class GetEntity(Resource):  # type: ignore
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(LinkedPlaces.get_entity_by_id(id_))
-        entity = LinkedPlaces.get_entity(LinkedPlaces.get_entity_by_id(id_), parser)
+        entity = LinkedPlaces.get_entity(
+            LinkedPlaces.get_entity_by_id(id_),
+            LinkedPlaces.get_all_links(id_),
+            LinkedPlaces.get_all_links_inverse(id_),
+            parser)
         template = LinkedPlacesTemplate.linked_places_template(parser['show'])
         if parser['download']:
             return Download.download(data=entity, template=template, name=id_)
