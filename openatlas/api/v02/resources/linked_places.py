@@ -13,31 +13,31 @@ from openatlas.util.util import get_file_path
 
 class LinkedPlaces:
 
+    # @staticmethod
+    # def get_all_links(entity: Entity) -> List[Link]:
+    #     links = []
+    #     for link in Link.get_links(entity.id, list(g.properties)):
+    #         links.append(link)
+    #     return links
+    #
+    # @staticmethod
+    # def get_all_links_inverse(entity: Entity) -> List[Link]:
+    #     links_inverse = []
+    #     for link in Link.get_links(entity.id, list(g.properties), inverse=True):
+    #         links_inverse.append(link)
+    #     return links_inverse
+
     @staticmethod
-    def get_all_links(entity: Entity) -> List[Link]:
+    def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
         links = []
-        for link in Link.get_links(entity.id, list(g.properties)):
+        for link in Link.get_links(entities, list(g.properties)):
             links.append(link)
         return links
 
     @staticmethod
-    def get_all_links_inverse(entity: Entity) -> List[Link]:
+    def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
         links_inverse = []
-        for link in Link.get_links(entity.id, list(g.properties), inverse=True):
-            links_inverse.append(link)
-        return links_inverse
-
-    @staticmethod
-    def get_all_links_multiple(entities: List[int]) -> List[Link]:
-        links = []
-        for link in Link.get_links_from_multiple_entities(entities, list(g.properties)):
-            links.append(link)
-        return links
-
-    @staticmethod
-    def get_all_links_inverse_multiple(entities: List[int]) -> List[Link]:
-        links_inverse = []
-        for link in Link.get_links_from_multiple_entities(entities, list(g.properties), inverse=True):
+        for link in Link.get_links(entities, list(g.properties), inverse=True):
             links_inverse.append(link)
         return links_inverse
 
@@ -163,27 +163,6 @@ class LinkedPlaces:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
-
-        # links: List[Link] = []
-        # links_inverse: List[Link] = []
-        # if any(i in ['relations', 'types', 'depictions', 'links'] for i in parser['show']):
-        #     links = LinkedPlaces.get_all_links(entity)
-        #     links_inverse = LinkedPlaces.get_all_links_inverse(entity)
-
-
-
-
-        ### Moved this code to pagionation
-
-        # links=[]
-        # links_inverse=[]
-        # for i in all_links:
-        #     if i.domain.id == entity.id:
-        #         links.append(i)
-        #
-        # for i in all_links_inverse:
-        #     if i.range.id == entity.id:
-        #         links_inverse.append(i)
 
         features['relations'] = \
             LinkedPlaces.get_links(links, links_inverse) if 'relations' in parser['show'] else None
