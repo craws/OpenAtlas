@@ -11,6 +11,11 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 6.3.0 to 6.4.0
+Install python3-wand e.g. on Debian:
+
+    # apt install python3-wand
+
 ### 6.2.x to 6.3.0
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
@@ -19,11 +24,6 @@ A code base update (e.g. with git pull) and an Apache restart should be sufficie
 
 ### 6.1.0 to 6.2.0
 Execute **install/upgrade/6.2.0.sql** after making backups.
-
-Install package needed for image processing:
-    
-    
-    #   apt install python3-wand
 
 ### 6.0.x to 6.1.0
 Execute **install/upgrade/6.1.0.sql** after making backups.

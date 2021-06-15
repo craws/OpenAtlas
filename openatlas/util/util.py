@@ -408,8 +408,7 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
 
 def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
-    p = app.config['RESIZED_IMAGES'] / size
-    path = next(p.glob(str(entity_id) + '.*'), None)
+    path = next((app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)
     return path if path else None
 
 
@@ -435,10 +434,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-        'begin_year_from', 'begin_month_from', 'begin_day_from',
-        'begin_year_to', 'begin_month_to', 'begin_day_to',
-        'end_year_from', 'end_month_from', 'end_day_from',
-        'end_year_to', 'end_month_to', 'end_day_to']:
+            'begin_year_from', 'begin_month_from', 'begin_day_from',
+            'begin_year_to', 'begin_month_to', 'begin_day_to',
+            'end_year_from', 'end_month_from', 'end_day_from',
+            'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -690,29 +689,18 @@ def download_button(entity: Entity) -> str:
 
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
-    path = get_file_path(entity.image_id if entity.image_id else entity)
-    if not path:
+    if not entity.image_id:
         return ''
-    ext = app.config['ALLOWED_IMAGE_EXT'] if app.config['IMAGE_PROCESSING'] else app.config[
-        'DISPLAY_FILE_EXTENSIONS']
-    if entity.class_.view == 'file' and not path.suffix.lower() in ext:
-        return Markup(f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
-    elif app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
-        resized_path = get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail'])
-        width = session['settings']['profile_image_width']
-        filename = resized_path.name if app.config['IMAGE_PROCESSING'] else path.name
-        display = 'display_thumbnail' if app.config['IMAGE_PROCESSING'] else 'display_file'
-        src = url_for(display, filename=filename)
-        if entity.class_.view == 'file':
-            url = url_for('display_file', filename=path.name)
-        else:
-            url = url_for('entity_view', id_=entity.image_id)
-        rel = 'noopener noreferrer' if entity.class_.view == 'file' else ''
-        html = (f'<a href="{url}" rel="{rel}" target="_blank">'
-                f'<img style="max-width:{width}px;" alt="image" src="{src}"></a>')
-        return Markup(f'<div id="profile_image_div">{html}</div>')
-    return Markup(  # pragma: no cover
-        f'<div id="profile_image_div">{uc_first(_("no preview available"))}</div>')
+    path = get_file_path(entity.image_id)
+    if not path:
+        return ''  # pragma: no cover
+    resized = None
+    if app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
+        resized = url_for(
+            'display_thumbnail',
+            filename=get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail']).name)
+    return Markup(
+        render_template('util/profile_image.html', entity=entity, path=path, resized=resized))
 
 
 @app.template_filter()

@@ -23,15 +23,16 @@ class ImageProcessing:
                 path = str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")
                 with Image(filename=path) as src:
                     with src.convert('jpeg') as img:
-                        img.transform(resize=size + 'x' + size + '>')
+                        img.transform(resize=f"{size}x{size}>")
                         img.compression_quality = 75
                         img.save(filename=str(
-                            Path(
-                                app.config['RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"))
+                            Path(app.config['RESIZED_IMAGES'])
+                            / size
+                            / f"{name}{app.config['PROCESSED_EXT']}"))
                         return True
             return False  # pragma: no cover
         except Exception as e:
-            logger.log('info', 'image resizing', 'failed to save', e)
+            logger.log('info', 'image processing', 'failed to save resized image', e)
             return False
 
     @staticmethod
@@ -43,13 +44,13 @@ class ImageProcessing:
                 for size in app.config['IMAGE_SIZE'].values():
                     p = Path(app.config[
                                  'RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"
-                    if not p.is_file():
-                        if not ImageProcessing.safe_resized_image(name, file_format, size):
-                            return False  # pragma: no cover
+                    if not p.is_file() \
+                            and not ImageProcessing.safe_resized_image(name, file_format, size):
+                        return False  # pragma: no cover
                 return True
             return False
         except Exception as e:  # pragma: no cover
-            logger.log('info', 'image validation failed', 'fail to validate file as image', e)
+            logger.log('info', 'image processing', 'failed to validate file as image', e)
             return False
 
     @staticmethod
@@ -63,17 +64,12 @@ class ImageProcessing:
             folder.mkdir()
             return True
         except Exception as e:  # pragma: no cover
-            logger.log('info', 'folder creation failed', 'failed to create a folder', e)
+            logger.log('info', 'image processing', 'failed to create a folder', e)
             return False
-
-    @staticmethod
-    def check_if_processed_image_exist(name, size):
-        p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{app.config['PROCESSED_EXT']}"
-        return True if p.is_file() else False
 
     # Todo: implement admin interface
     @staticmethod
-    def search_and_delete_orphaned_images():
+    def search_and_delete_orphaned_images() -> None:
         uploaded_files = []
         for uploaded in app.config['UPLOAD_DIR'].glob('**/*'):
             uploaded_files.append(uploaded.name.rsplit('.', 1)[0].lower())
@@ -87,6 +83,6 @@ class ImageProcessing:
 
     # Todo: implement admin interface
     @staticmethod
-    def create_resized_images():
+    def create_resized_images() -> None:
         for file in app.config['UPLOAD_DIR'].glob('**/*'):
             ImageProcessing.resize_image(file.name)

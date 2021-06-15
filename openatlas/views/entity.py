@@ -346,8 +346,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         tabs['note'].table.rows.append(data)
     if 'file' in tabs and current_user.settings['table_show_icons']:
         for row in tabs['file'].table.rows:
-            string = row[0].replace('<a href="/entity/', '')
-            row.insert(1, file_preview(int(string.split('"')[0])))
+            row.insert(1, file_preview(int(row[0].replace('<a href="/entity/', '').split('"')[0])))
     tabs['info'].content = render_template(
         'entity/view.html',
         buttons=add_buttons(entity),
@@ -371,10 +370,8 @@ def get_profile_image_table_link(
         profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
-    elif app.config['IMAGE_PROCESSING']:
-        if extension in app.config['ALLOWED_IMAGE_EXT']:
-            return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
-    elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] \
+            or (app.config['IMAGE_PROCESSING'] and extension in app.config['ALLOWED_IMAGE_EXT']):
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover
 

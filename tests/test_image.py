@@ -22,7 +22,6 @@ class ImageTest(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-
                 place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
                 logo = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
 

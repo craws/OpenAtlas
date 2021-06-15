@@ -38,7 +38,6 @@ IMAGE_SIZE = {
 ALLOWED_IMAGE_EXT = ['.jpeg', '.jpg', '.png', '.tiff', '.tif', '.ico', '.svg', '.bmp', '.gif']
 PROCESSED_EXT = '.jpeg'
 
-
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
 REMEMBER_COOKIE_SECURE = True

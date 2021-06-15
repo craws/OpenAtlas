@@ -1,7 +1,6 @@
 import locale
 import os
 import sys
-from pathlib import Path
 from typing import Any
 
 from flask import Flask, Response, g, request, session
@@ -11,7 +10,6 @@ from flask_wtf.csrf import CSRFProtect
 
 from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
-
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected

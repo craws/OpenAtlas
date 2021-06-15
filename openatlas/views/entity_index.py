@@ -92,15 +92,15 @@ def get_table(view: str) -> Table:
 
 def file_preview(entity_id: int) -> str:
     icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['table'])
-    if not icon_path:
-        path = get_file_path(entity_id)
-        if not path:
-            return ''
-        if ImageProcessing.check_processed_image(path.name):
-            return f"<img src='{url_for('display_table', filename=f'{entity_id}.jpeg')}' " \
-                   f"loading='lazy'>"
+    if icon_path:
+        return f"<img src='{url_for('display_table', filename=icon_path.name)}' loading='lazy'>"
+    path = get_file_path(entity_id)
+    if not path:
         return ''
-    return f"<img src='{url_for('display_table', filename=icon_path.name)}' loading='lazy'>"
+    if ImageProcessing.check_processed_image(path.name):
+        url = url_for('display_table', filename=f'{entity_id}.jpeg')
+        return f"<img src='{url}' loading='lazy' alt='image'>"
+    return ''
 
 
 def delete_entity(id_: int) -> Optional[str]:
@@ -131,16 +131,16 @@ def delete_entity(id_: int) -> Optional[str]:
         flash(_('entity deleted'), 'info')
         if entity.class_.name == 'file':
             try:
-                path = get_file_path(id_)
-                if path:  # Only delete file on disk if it exists to prevent a missing file error
-                    delete_processed_image(id_)
-                    path.unlink()
+                delete_files(id_)
             except Exception as e:  # pragma: no cover
                 logger.log('error', 'file', 'file deletion failed', e)
                 flash(_('error file delete'), 'error')
     return url
 
 
-def delete_processed_image(id_: int) -> None:
-    for path in app.config['RESIZED_IMAGES'].glob('**/' + str(id_) + '.jpeg'):
+def delete_files(id_: int) -> None:
+    path = get_file_path(id_)
+    if path:  # Only delete file on disk if it exists to prevent a missing file error
+        path.unlink()
+    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.jpeg'):
         path.unlink()
