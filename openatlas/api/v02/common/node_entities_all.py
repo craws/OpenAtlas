@@ -18,7 +18,7 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
             return jsonify(len(node['nodes']))
         template = NodeTemplate.node_template()
         if parser['download']:
-            return Download.download(data=node, template=template, name=id_)
+            return Download.download(node, template, id_)
         return marshal(node, template), 200
 
     @staticmethod
@@ -28,7 +28,8 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])
 
     @staticmethod
-    def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) \
+            -> List[Dict[str, Any]]:
         for entity in g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True):
             data.append({
                 'id': entity.id,

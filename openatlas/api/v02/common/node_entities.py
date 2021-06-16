@@ -18,7 +18,7 @@ class GetNodeEntities(Resource):  # type: ignore
             return jsonify(len(node['nodes']))
         template = NodeTemplate.node_template()
         if parser['download']:
-            return Download.download(data=node, template=template, name=id_)
+            return Download.download(node, template, id_)
         return marshal(node, template), 200
 
     @staticmethod

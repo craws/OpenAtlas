@@ -5,7 +5,6 @@ from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidSubunitError
-from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.util import get_entity_by_id, get_template

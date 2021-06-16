@@ -18,7 +18,7 @@ class GetTypeTree(Resource):  # type: ignore
             return jsonify(len(type_tree['type_tree']))
         template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
-            return Download.download(data=type_tree, template=template, name='type_tree')
+            return Download.download(type_tree, template, 'type_tree')
         return marshal(type_tree, template), 200
 
     @staticmethod
