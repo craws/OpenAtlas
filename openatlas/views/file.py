@@ -23,20 +23,11 @@ def display_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
-@app.route('/display_thumbnail/<path:filename>')
+@app.route('/display_resized/<string:filename>')
 @required_group('readonly')
-def display_thumbnail(filename: str) -> Any:
+def display_resized(filename: str) -> Any:
     return send_from_directory(
-        app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['thumbnail'],
-        filename)
-
-
-@app.route('/display_table/<path:filename>')
-@required_group('readonly')
-def display_table(filename: str) -> Any:
-    return send_from_directory(
-        app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['table'],
-        filename)
+        app.config['RESIZED_IMAGES'] / request.args.get('size'), filename)
 
 
 @app.route('/display_logo/<path:filename>')

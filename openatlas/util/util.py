@@ -434,10 +434,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -695,10 +695,11 @@ def display_profile_image(entity: Entity) -> str:
     if not path:
         return ''  # pragma: no cover
     resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
     if app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
         resized = url_for(
-            'display_thumbnail',
-            filename=get_image_path(entity.image_id, app.config['IMAGE_SIZE']['thumbnail']).name)
+            'display_resized',
+            filename=get_image_path(entity.image_id, size).name, size=size)
     return Markup(
         render_template('util/profile_image.html', entity=entity, path=path, resized=resized))
 
