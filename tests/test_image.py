@@ -73,7 +73,7 @@ class ImageTest(TestBaseCase):
                 copyfile(src_py, dst_py)
 
                 # Exception
-                ImageProcessing.safe_resized_image(file2.id, '.png', size="???")
+                ImageProcessing.safe_resize_image(file2.id, '.png', size="???")
                 display_profile_image(file_pathless)
 
             # Resizing images (don't change order!)
@@ -116,15 +116,18 @@ class ImageTest(TestBaseCase):
             app.config['IMAGE_SIZE']['tmp'] = '1'
 
             # Clean up files
-            for dir_ in app.config['IMAGE_SIZE'].values():
-                pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file_name).unlink()
-                pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file2_name).unlink()
+            # for dir_ in app.config['IMAGE_SIZE'].values():
+            #     pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file_name).unlink()
+            #     pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file2_name).unlink()
+
+            rv = self.app.get(url_for('index', view='file', delete_id=file.id))
+            assert b'The entry has been deleted' in rv.data
+            rv = self.app.get(url_for('index', view='file', delete_id=file2.id))
+            assert b'The entry has been deleted' in rv.data
 
             shutil.rmtree(
                 pathlib.Path(app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['tmp']))
 
-            dst_png.unlink()
-            dst2_png.unlink()
             dst_py.unlink()
             del app.config['IMAGE_SIZE']['tmp']
             app.config['IMAGE_PROCESSING'] = False

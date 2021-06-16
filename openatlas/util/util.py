@@ -405,7 +405,7 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
     path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
     return path if path else None
 
-
+# Todo: collapse with get_file_path
 def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
     path = next((app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)

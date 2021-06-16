@@ -144,5 +144,5 @@ def delete_files(id_: int) -> None:
     path = get_file_path(id_)
     if path:  # Only delete file on disk if it exists to prevent a missing file error
         path.unlink()
-    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.jpeg'):
+    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
         path.unlink()

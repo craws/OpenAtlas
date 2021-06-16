@@ -35,7 +35,8 @@ RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',
     'table': '100'}
-ALLOWED_IMAGE_EXT = ['.jpeg', '.jpg', '.png', '.tiff', '.tif', '.ico', '.svg', '.bmp', '.gif']
+NONE_DISPLAY_EXT = ['.tiff', '.tif']
+ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
 # Security
