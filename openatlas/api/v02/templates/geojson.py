@@ -21,14 +21,16 @@ class GeojsonTemplate:
             'end_comment': fields.String,
             'types': fields.Raw}
 
-        features = {
+        return {
             'type': fields.String,
             'geometry': fields.Raw,
             'properties': fields.List(fields.Nested(properties))}
 
+    @staticmethod
+    def geojson_collection_template():
         return {
             'type': fields.String,
-            'features': fields.List(fields.Nested(features))}
+            'features': fields.List(fields.Nested(GeojsonTemplate.geojson_template()))}
 
     @staticmethod
     def pagination() -> Dict[str, Union[List, Nested]]:
@@ -44,5 +46,5 @@ class GeojsonTemplate:
 
         return {
             "results": fields.List(
-                fields.Nested(GeojsonTemplate.geojson_template())),
+                fields.Nested(GeojsonTemplate.geojson_collection_template())),
             "pagination": fields.Nested(pagination_model)}

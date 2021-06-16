@@ -70,26 +70,15 @@ class ApiTests(TestBaseCase):
                 precision_id = Node.get_hierarchy('External reference match').subs[0]
                 geonames.link('P67', place, description='2761369', type_id=precision_id)
 
-                # Testing directly against model
-                # parser = {'download': False, 'count': False, 'sort': 'asc', 'column': ['name'],
-                #           'filter': None, 'limit': 20, 'first': None, 'last': None,
-                #           'show': ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                #                    'depictions', 'geonames'], 'export': None}
-                # data = GeoJsonEntity.get_entity(place, parser)
-                # test_data = {
-                #     'type': 'FeatureCollection',
-                #     'start': {
-                #         'earliest': '2018-01-31'
-                #     },
-                # }
-                # print(data['features'][0]['when']['timespans'][0]['start'])
-                # for key, value in test_data.items():
-                #     assert data[key] == value
-
-            # Test GeoJson output
+            # Test LinkedPlaces output
             self.maxDiff = None
             rv = self.app.get(url_for('api.entity', id_=place.id))
-            self.assertEqual(rv.get_json(), api_data.api_place_entity)
+            self.assertEqual(rv.get_json(), api_data.api_linked_place_template)
+
+            # Test Geojson output
+            self.maxDiff = None
+            rv = self.app.get(url_for('api.entity', id_=place.id, format='geojson'))
+            self.assertEqual(rv.get_json(), api_data.api_geojson_template)
 
             # Path Tests
             rv = self.app.get(url_for('api.latest', latest=10))

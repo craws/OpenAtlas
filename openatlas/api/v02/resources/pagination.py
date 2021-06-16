@@ -38,8 +38,7 @@ class Pagination:
         if parser['format'] == 'lp':
             result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
         if parser['format'] == 'geojson':
-            result = Pagination.get_geojson(new_entities)
-        print(result)
+            result = Pagination.get_geojson(new_entities, parser)
         return {
             "results": result,
             "pagination": {
@@ -51,15 +50,13 @@ class Pagination:
     @staticmethod
     def linked_places_result(links: List[Link], links_inverse: List[Link], entity_limit,
                              parser: Dict[str, str]) -> List[Dict[str, Any]]:
-        return [
-            LinkedPlaces.get_entity(
-                entity,
-                [link.id for link in links if link.domain == entity.id],
-                [link.id for link in links_inverse if link.range == entity.id],
-                parser)
+        return [LinkedPlaces.get_entity(
+            entity,
+            [link.id for link in links if link.domain == entity.id],
+            [link.id for link in links_inverse if link.range == entity.id],
+            parser)
             for entity in entity_limit[:int(parser['limit'])]]
 
     @staticmethod
-    def get_geojson(entity_limit: List[Entity]) -> Dict[str, Any]:
-        class_json = [Geojson.check_if_geometry(entity) for entity in entity_limit]
-        return Geojson.return_output(class_json)
+    def get_geojson(entity_limit: List[Entity], parser: Dict[str, str]) -> Dict[str, Any]:
+        return Geojson.return_output(Geojson.get_geojson(entity_limit[:int(parser['limit'])]))

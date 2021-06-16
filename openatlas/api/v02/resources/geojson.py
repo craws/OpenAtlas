@@ -6,27 +6,24 @@ from openatlas.models.link import Link
 
 
 class Geojson:
-    @staticmethod
-    def get_geoms_by_entity(entity: Entity) -> List[Dict[str, Any]]:
-        return Gis.get_by_id(entity.id)
 
     @staticmethod
-    def check_if_geometry(entity: Entity):
+    def get_geojson(entities: List[Entity]) -> List[Dict[str, Any]]:
         geoms = None
-        if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
-            geoms = Geojson.get_geoms_by_entity(Link.get_linked_entity(entity.id, 'P53'))
-        elif entity.class_.name == 'object_location':
-            geoms = Geojson.get_geoms_by_entity(entity)
         out = []
-        if geoms:
-            for geom in geoms:
-                out.append(Geojson.get_entity(entity,  geom))
-        else:
+        for entity in entities:
+            if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
+                geoms = Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
+            elif entity.class_.name == 'object_location':
+                geoms = Gis.get_by_id(entity.id)
+            if geoms:
+                for geom in geoms:
+                    out.append(Geojson.get_entity(entity, geom))
             out.append(Geojson.get_entity(entity))
         return out
 
     @staticmethod
-    def get_entity(entity: Entity,  geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get_entity(entity: Entity, geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         features = {
             'type': 'Feature',
             'geometry': geom,
@@ -50,18 +47,9 @@ class Geojson:
         nodes = []
         for node in entity.nodes:
             out = [node.name]
-            # for link in links:
-            #     link_out = []
-            #     if link.range.id == node.id and link.description:
-            #         link_out.append(link.description)
-            #         if link.range.id == node.id and node.description:
-            #             link_out.append(node.description)
-            #         out.append(' '.join(link_out))
             nodes.append(': '.join(out))
         return nodes if nodes else None
 
     @staticmethod
     def return_output(output: List[Any]) -> Dict[str, Any]:
         return {'type': 'FeatureCollection', 'features': output}
-
-

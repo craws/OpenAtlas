@@ -19,12 +19,9 @@ class GetBySystemClass(Resource):  # type: ignore
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(
-                GetBySystemClass.get_by_system_class(
-                    system_class=system_class,
-                    parser=parser),
-                system_class)
+                GetBySystemClass.get_by_system_class(system_class, parser), system_class)
         system_class_ = Pagination.pagination(
-            GetBySystemClass.get_entities_by_system_class(system_class, parser), parser)
+            GetBySystemClass.get_by_system_class(system_class, parser), parser)
         if parser['count']:
             return jsonify(system_class_['pagination']['entities'])
         if parser['download']:
