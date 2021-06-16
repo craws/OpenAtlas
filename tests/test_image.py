@@ -76,6 +76,9 @@ class ImageTest(TestBaseCase):
                 ImageProcessing.safe_resize_image(file2.id, '.png', size="???")
                 display_profile_image(file_pathless)
 
+            rv = self.app.get(url_for('index', view='file'))
+            assert b'Test_File2' in rv.data
+
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('entity_view', id_=file.id))
             assert b'Test_File' in rv.data

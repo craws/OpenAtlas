@@ -100,7 +100,8 @@ def file_preview(entity_id: int) -> str:
     if not path:
         return ''
     if ImageProcessing.check_processed_image(path.name):
-        url = url_for('display_file', filename=f'{entity_id}.jpeg', size=size)
+        icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
+        url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' loading='lazy' alt='image'>"
     return ''
 

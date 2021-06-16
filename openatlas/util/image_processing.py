@@ -24,7 +24,7 @@ class ImageProcessing:
         # With python3-wand 0.6. Path seems to work and str conversation can be removed
         try:
             if ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
-                ImageProcessing.image_resizing(name, file_format, size)
+                return ImageProcessing.image_resizing(name, file_format, size)
             return False  # pragma: no cover
         except Exception as e:
             logger.log('info', 'image processing', 'failed to save resized image', e)
@@ -58,10 +58,10 @@ class ImageProcessing:
 
     @staticmethod
     def loop_through_processed_folders(name: str, file_format: str) -> bool:
-        format = app.config['PROCESSED_EXT'] \
+        format_ = app.config['PROCESSED_EXT'] \
             if file_format in app.config['NONE_DISPLAY_EXT'] else file_format
         for size in app.config['IMAGE_SIZE'].values():
-            p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{format}"
+            p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{format_}"
             if not p.is_file() and not ImageProcessing.safe_resize_image(name, file_format, size):
                 return False  # pragma: no cover
         return True
