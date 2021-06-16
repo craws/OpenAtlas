@@ -18,8 +18,10 @@ from openatlas.util.util import required_group
 class OverlayForm(FlaskForm):  # type: ignore
     top_left_easting = FloatField('', [InputRequired()], render_kw={'autofocus': True})
     top_left_northing = FloatField('', [InputRequired()])
-    bottom_right_easting = FloatField('', [InputRequired()])
-    bottom_right_northing = FloatField('', [InputRequired()])
+    top_right_easting = FloatField('', [InputRequired()])
+    top_right_northing = FloatField('', [InputRequired()])
+    bottom_left_easting = FloatField('', [InputRequired()])
+    bottom_left_northing = FloatField('', [InputRequired()])
     save = SubmitField()
 
 
@@ -52,8 +54,10 @@ def overlay_update(id_: int) -> Union[str, Response]:
     bounding = ast.literal_eval(overlay.bounding_box)
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
-    form.bottom_right_easting.data = bounding[1][1]
-    form.bottom_right_northing.data = bounding[1][0]
+    form.top_right_easting.data = bounding[1][1]
+    form.top_right_northing.data = bounding[1][0]
+    form.bottom_left_easting.data = bounding[2][1]
+    form.bottom_left_northing.data = bounding[2][0]
     entity = Entity.get_by_id(overlay.place_id)
     return render_template(
         'overlay/update.html',
