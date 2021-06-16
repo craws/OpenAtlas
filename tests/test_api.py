@@ -88,9 +88,16 @@ class ApiTests(TestBaseCase):
 
             rv = self.app.get(url_for('api.code', code='reference'))
             assert b'openatlas' in rv.data
+            rv = self.app.get(url_for('api.code', code='reference', format='geojson'))
+            assert b'openatlas' in rv.data
             rv = self.app.get(url_for('api.system_class', system_class='appellation'))
             assert b'Cargo hauler' in rv.data
+            rv = self.app.get(
+                url_for('api.system_class', system_class='appellation', format='geojson'))
+            assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('api.class', class_code='E31'))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.class', class_code='E31', format='geojson'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for('api.node_entities', id_=unit_node.id))
             assert b'Austria' in rv.data
@@ -102,6 +109,10 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(
                 url_for('api.query', entities=place.id, classes='E18', items='place'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(
+                url_for('api.query', entities=place.id, classes='E18', items='place',
+                        format='geojson'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.content', lang='de'))
             assert b'intro' in rv.data
@@ -121,7 +132,8 @@ class ApiTests(TestBaseCase):
             assert b'Datei' in rv.data
             rv = self.app.get(url_for('api.code', code='reference', download=True))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.system_class', system_class='appellation', download=True))
+            rv = self.app.get(
+                url_for('api.system_class', system_class='appellation', download=True))
             assert b'Cargo hauler' in rv.data
             rv = self.app.get(url_for('api.class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
@@ -165,8 +177,9 @@ class ApiTests(TestBaseCase):
             assert b'2' in rv.data
 
             # Parameter: filter
-            rv = self.app.get(url_for('api.code', code='place', limit=10, sort='desc', column='name',
-                                      filter='or|name|like|Nostromos'))
+            rv = self.app.get(
+                url_for('api.code', code='place', limit=10, sort='desc', column='name',
+                        filter='or|name|like|Nostromos'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.code', code='reference'))
             assert b'openatlas' in rv.data
