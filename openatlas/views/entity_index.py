@@ -94,13 +94,13 @@ def file_preview(entity_id: int) -> str:
     icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
     if icon_path:
-        return f"""<img src='{url_for('display_resized', filename=icon_path.name, size=size)}'
+        return f"""<img src='{url_for('display_file', filename=icon_path.name, size=size)}'
                 loading='lazy'>"""
     path = get_file_path(entity_id)
     if not path:
         return ''
     if ImageProcessing.check_processed_image(path.name):
-        url = url_for('display_resized', filename=f'{entity_id}.jpeg', size=size)
+        url = url_for('display_file', filename=f'{entity_id}.jpeg', size=size)
         return f"<img src='{url}' loading='lazy' alt='image'>"
     return ''
 

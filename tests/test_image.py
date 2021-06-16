@@ -90,17 +90,17 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('display_file', filename=file_name))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_resized',
+                url_for('display_file',
                         filename=file_name,
                         size=app.config['IMAGE_SIZE']['thumbnail']))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_resized',
+                url_for('display_file',
                         filename=file_name,
                         size=app.config['IMAGE_SIZE']['table']))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_resized',
+                url_for('display_file',
                         filename=file_name_py,
                         size=app.config['IMAGE_SIZE']['table']))
             assert b'404' in rv.data

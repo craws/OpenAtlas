@@ -20,14 +20,10 @@ def download_file(filename: str) -> Any:
 @app.route('/display/<path:filename>')
 @required_group('readonly')
 def display_file(filename: str) -> Any:
+    if request.args.get('size'):
+        return send_from_directory(
+            app.config['RESIZED_IMAGES'] / request.args.get('size'), filename)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
-
-
-@app.route('/display_resized/<string:filename>')
-@required_group('readonly')
-def display_resized(filename: str) -> Any:
-    return send_from_directory(
-        app.config['RESIZED_IMAGES'] / request.args.get('size'), filename)
 
 
 @app.route('/display_logo/<path:filename>')

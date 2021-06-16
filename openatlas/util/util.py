@@ -698,7 +698,7 @@ def display_profile_image(entity: Entity) -> str:
     size = app.config['IMAGE_SIZE']['thumbnail']
     if app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
         resized = url_for(
-            'display_resized',
+            'display_file',
             filename=get_image_path(entity.image_id, size).name, size=size)
     return Markup(
         render_template('util/profile_image.html', entity=entity, path=path, resized=resized))
