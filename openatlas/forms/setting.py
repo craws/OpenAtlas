@@ -107,7 +107,8 @@ class DisplayForm(FlaskForm):  # type: ignore
         choices=list(app.config['TABLE_ROWS'].items()),
         coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
-    table_show_icons = BooleanField(_('show icons in tables'))
+    if app.config['IMAGE_PROCESSING']:
+        table_show_icons = BooleanField(_('show icons in tables'))
     entity_show_dates = BooleanField(_('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))
     entity_show_class = BooleanField(_('show CIDOC class'))

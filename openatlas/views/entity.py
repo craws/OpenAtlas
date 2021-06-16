@@ -344,10 +344,9 @@ def entity_view(id_: int) -> Union[str, Response]:
             note['text'],
             f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>']
         tabs['note'].table.rows.append(data)
-    if 'file' in tabs and current_user.settings['table_show_icons']:
+    if 'file' in tabs and current_user.settings['table_show_icons'] and app.config['IMAGE_PROCESSING']:
         tabs['file'].table.header.insert(1, uc_first(_('icon')))
         for row in tabs['file'].table.rows:
-
             row.insert(1, file_preview(int(row[0].replace('<a href="/entity/', '').split('"')[0])))
     tabs['info'].content = render_template(
         'entity/view.html',
