@@ -20,9 +20,7 @@ class GetByClass(Resource):  # type: ignore
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entities(
                 GetByClass.get_by_class(class_code, parser), class_code)
-        class_ = Pagination.pagination(
-            GetByClass.get_by_class(class_code, parser),
-            parser=parser)
+        class_ = Pagination.pagination(GetByClass.get_by_class(class_code, parser), parser)
         if parser['count']:
             return jsonify(class_['pagination']['entities'])
         if parser['download']:

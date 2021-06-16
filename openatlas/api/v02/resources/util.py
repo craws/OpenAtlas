@@ -1,6 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
 from flask import g
+from flask_restful.fields import Nested
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
@@ -39,8 +40,8 @@ def get_license(entity: Entity) -> Optional[str]:
     return file_license
 
 
-def get_template(parser: Dict[str, str]) -> Dict[str, List]:
+def get_template(parser: Dict[str, str]) -> Dict[str, Union[List, Nested]]:
     if parser['format'] == 'lp':
         return LinkedPlacesTemplate.pagination(parser['show'])
     if parser['format'] == 'geojson':
-        return GeojsonTemplate.geojson_template()
+        return GeojsonTemplate.pagination()

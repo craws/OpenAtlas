@@ -31,15 +31,14 @@ class Pagination:
         if parser['last'] or parser['first']:
             total = Pagination.get_shown_entities(total, parser)
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
-        entity_limit = [e for idx, e in enumerate(entities[h[0]:])]
-        links = get_all_links([e.id for e in entity_limit[:int(parser['limit'])]])
-        links_inverse = get_all_links_inverse([e.id for e in entity_limit[:int(parser['limit'])]])
-
+        new_entities = [e for idx, e in enumerate(entities[h[0]:])]
+        links = get_all_links([e.id for e in new_entities[:int(parser['limit'])]])
+        links_inverse = get_all_links_inverse([e.id for e in new_entities[:int(parser['limit'])]])
         result = []
         if parser['format'] == 'lp':
-            result = Pagination.linked_places_result(links, links_inverse, entity_limit, parser)
+            result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
         if parser['format'] == 'geojson':
-            result = Pagination.get_geojson(entity_limit)
+            result = Pagination.get_geojson(new_entities)
         print(result)
         return {
             "results": result,
@@ -52,11 +51,12 @@ class Pagination:
     @staticmethod
     def linked_places_result(links: List[Link], links_inverse: List[Link], entity_limit,
                              parser: Dict[str, str]) -> List[Dict[str, Any]]:
-        return [LinkedPlaces.get_entity(
-            entity,
-            [link.id for link in links if link.domain == entity.id],
-            [link.id for link in links_inverse if link.range == entity.id],
-            parser)
+        return [
+            LinkedPlaces.get_entity(
+                entity,
+                [link.id for link in links if link.domain == entity.id],
+                [link.id for link in links_inverse if link.range == entity.id],
+                parser)
             for entity in entity_limit[:int(parser['limit'])]]
 
     @staticmethod

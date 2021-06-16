@@ -18,11 +18,8 @@ class GetByCode(Resource):  # type: ignore
     def get(code: str) -> Union[Tuple[Resource, int], Response]:
         parser = entity_parser.parse_args()
         if parser['export'] == 'csv':
-            return ApiExportCSV.export_entities(
-                GetByCode.get_by_view(code, parser), code)
-        code_ = Pagination.pagination(
-            GetByCode.get_by_view(code, parser),
-            parser=parser)
+            return ApiExportCSV.export_entities(GetByCode.get_by_view(code, parser), code)
+        code_ = Pagination.pagination(GetByCode.get_by_view(code, parser), parser)
         if parser['count']:
             return jsonify(code_['pagination']['entities'])
         if parser['download']:
