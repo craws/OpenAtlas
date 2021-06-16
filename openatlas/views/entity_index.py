@@ -16,7 +16,7 @@ from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, external_url, format_date, get_base_table_data, get_file_path,
-    get_file_stats, get_image_path, is_authorized, link, required_group)
+    get_file_stats, is_authorized, link, required_group)
 
 
 @app.route('/index/<view>')
@@ -91,7 +91,7 @@ def get_table(view: str) -> Table:
 
 
 def file_preview(entity_id: int) -> str:
-    icon_path = get_image_path(entity_id, app.config['IMAGE_SIZE']['table'])
+    icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
     if icon_path:
         return f"""<img src='{url_for('display_file', filename=icon_path.name, size=size)}'

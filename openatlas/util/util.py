@@ -400,15 +400,11 @@ def get_file_extension(entity: Union[int, 'Entity']) -> str:
     return path.suffix if path else 'N/A'
 
 
-def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
+def get_file_path(entity: Union[int, 'Entity'], size: Optional[str] = None) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
     path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
-    return path if path else None
-
-# Todo: collapse with get_file_path
-def get_image_path(entity: Union[int, 'Entity'], size: str) -> Optional[Path]:
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = next((app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)
+    if size:
+        path = next((app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)
     return path if path else None
 
 
@@ -699,7 +695,7 @@ def display_profile_image(entity: Entity) -> str:
     if app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
         resized = url_for(
             'display_file',
-            filename=get_image_path(entity.image_id, size).name, size=size)
+            filename=get_file_path(entity.image_id, size).name, size=size)
     return Markup(
         render_template('util/profile_image.html', entity=entity, path=path, resized=resized))
 
