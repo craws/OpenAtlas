@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCodeError
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import entity_parser
+from openatlas.api.v02.resources.util import get_template
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
@@ -24,14 +25,12 @@ class GetBySystemClass(Resource):  # type: ignore
                     parser=parser),
                 system_class)
         system_class_ = Pagination.pagination(
-            GetBySystemClass.get_entities_by_system_class(system_class=system_class, parser=parser),
-            parser=parser)
+            GetBySystemClass.get_entities_by_system_class(system_class, parser), parser)
         if parser['count']:
             return jsonify(system_class_['pagination']['entities'])
-        template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
-            return Download.download(data=system_class_, template=template, name=system_class)
-        return marshal(system_class_, template), 200
+            return Download.download(system_class_, get_template(parser), system_class)
+        return marshal(system_class_, get_template(parser)), 200
 
     @staticmethod
     def get_entities_by_system_class(system_class: str, parser: Dict[str, Any]) -> List[Entity]:

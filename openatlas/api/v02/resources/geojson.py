@@ -26,8 +26,7 @@ class Geojson:
         return out
 
     @staticmethod
-    def get_entity(entity: Entity,  geom: Optional[Dict[str, Any]] = None) -> Dict[
-        str, Any]:
+    def get_entity(entity: Entity,  geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         features = {
             'type': 'Feature',
             'geometry': geom,
@@ -50,7 +49,6 @@ class Geojson:
     def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         nodes = []
         for node in entity.nodes:
-            print(node.description)
             out = [node.name]
             # for link in links:
             #     link_out = []
@@ -65,3 +63,5 @@ class Geojson:
     @staticmethod
     def return_output(output: List[Any]) -> Dict[str, Any]:
         return {'type': 'FeatureCollection', 'features': output}
+
+

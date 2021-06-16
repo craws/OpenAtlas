@@ -11,7 +11,7 @@ from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.resources.parser import query_parser
-from openatlas.api.v02.resources.util import get_entity_by_id
+from openatlas.api.v02.resources.util import get_entity_by_id, get_template
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
 
@@ -42,7 +42,6 @@ class GetQuery(Resource):  # type: ignore
         output = Pagination.pagination(entities=entities, parser=parser)
         if parser['count']:
             return jsonify(output['pagination']['entities'])
-        template = LinkedPlacesTemplate.pagination(parser['show'])
         if parser['download']:
-            return Download.download(data=output, template=template, name='query')
-        return marshal(output, template), 200
+            return Download.download(output, get_template(parser), 'query')
+        return marshal(output, get_template(parser)), 200

@@ -8,7 +8,8 @@ from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse, get_entity_by_id
+from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse, get_entity_by_id, \
+    get_template
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 
@@ -30,10 +31,9 @@ class GetEntity(Resource):  # type: ignore
             get_all_links(id_),
             get_all_links_inverse(id_),
             parser)
-        template = LinkedPlacesTemplate.linked_places_template(parser['show'])
         if parser['download']:
-            return Download.download(data=entity, template=template, name=id_)
-        return marshal(entity, template), 200
+            return Download.download(entity, get_template(parser), id_)
+        return marshal(entity, get_template(parser)), 200
 
     @staticmethod
     def get_geojson(id_: int) -> Dict[str, Any]:
