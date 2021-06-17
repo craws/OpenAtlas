@@ -13,15 +13,16 @@ from openatlas.api.v02.templates.nodes import NodeTemplate
 from openatlas.models.entity import Entity
 
 
-def get_template(parser: Dict[str, str]) -> Dict[str, Union[List, Nested]]:
-    if parser['format'] == 'lp':
-        return LinkedPlacesTemplate.pagination(parser['show'])
+def get_template(parser: Dict[str, str]) -> Dict[str, Any]:
     if parser['format'] == 'geojson':
         return GeojsonTemplate.pagination()
+    return LinkedPlacesTemplate.pagination(parser)
 
 
-def resolve_entity(entities: Union[List[Entity], Entity], parser: Dict[str, Any],
-                   file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+def resolve_entity(
+        entities: List[Entity],
+        parser: Dict[str, Any],
+        file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     result = Pagination.pagination(entities, parser)
@@ -32,8 +33,10 @@ def resolve_entity(entities: Union[List[Entity], Entity], parser: Dict[str, Any]
     return marshal(result, get_template(parser)), 200
 
 
-def resolve_node_parser(node: Dict[str, Any], parser: Dict[str, Any], file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+def resolve_node_parser(
+        node: Dict[str, Any],
+        parser: Dict[str, Any],
+        file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['count']:
         return jsonify(len(node['nodes']))
     if parser['download']:

@@ -48,8 +48,11 @@ class Pagination:
                 'totalPages': len(index)}}
 
     @staticmethod
-    def linked_places_result(links: List[Link], links_inverse: List[Link], entity_limit,
-                             parser: Dict[str, str]) -> List[Dict[str, Any]]:
+    def linked_places_result(
+            links: List[Link],
+            links_inverse: List[Link],
+            entity_limit: List[Entity],
+            parser: Dict[str, str]) -> List[Dict[str, Any]]:
         return [LinkedPlaces.get_entity(
             entity,
             [link.id for link in links if link.domain == entity.id],

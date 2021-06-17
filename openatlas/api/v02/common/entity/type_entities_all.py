@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response, g
 from flask_restful import Resource
@@ -11,7 +11,7 @@ from openatlas.api.v02.resources.util import get_entity_by_id
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
     @staticmethod
-    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         entities = [get_entity_by_id(entity) for entity in GetTypeEntitiesAll.get_node_all(id_)]
         return resolve_entity(entities, entity_parser.parse_args(), id_)
 

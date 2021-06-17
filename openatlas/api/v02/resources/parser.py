@@ -67,7 +67,7 @@ entity_parser.add_argument(
     'export',
     type=str,
     help='{error_msg}',
-    choices=('csv'))
+    choices='csv')
 entity_parser.add_argument(
     'format',
     type=str,

@@ -7,7 +7,7 @@ from flask_restful.fields import List, Nested, String
 class LinkedPlacesTemplate:
 
     @staticmethod
-    def linked_places_template(show: Dict[str, str]) -> Dict[str, Type[String]]:
+    def linked_places_template(show: str) -> Dict[str, Type[String]]:
         title = {
             'title': fields.String}
 
@@ -93,7 +93,7 @@ class LinkedPlacesTemplate:
             'features': fields.List(fields.Nested(feature))}
 
     @staticmethod
-    def pagination(show: Dict[str, str]) -> Dict[str, Union[List, Nested]]:
+    def pagination(parser: Dict[str, str]) -> Dict[str, Union[List, Nested]]:
         page_index = {
             "page": fields.Integer,
             "startId": fields.Integer}
@@ -106,5 +106,5 @@ class LinkedPlacesTemplate:
 
         return {
             "results": fields.List(
-                fields.Nested(LinkedPlacesTemplate.linked_places_template(show))),
+                fields.Nested(LinkedPlacesTemplate.linked_places_template(parser['show']))),
             "pagination": fields.Nested(pagination_model)}

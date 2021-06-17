@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 
 class GetByClass(Resource):  # type: ignore
     @staticmethod
-    def get(class_code: str) -> Union[Tuple[Resource, int], Response]:
+    def get(class_code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         p = entity_parser.parse_args()
         return resolve_entity(GetByClass.get_by_class(class_code, p), p, class_code)
 

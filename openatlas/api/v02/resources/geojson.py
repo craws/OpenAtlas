@@ -43,7 +43,7 @@ class Geojson:
         return features
 
     @staticmethod
-    def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
+    def get_node(entity: Entity) -> Optional[List[str]]:
         nodes = []
         for node in entity.nodes:
             out = [node.name]

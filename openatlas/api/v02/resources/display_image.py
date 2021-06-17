@@ -1,6 +1,4 @@
-from typing import Any
-
-from flask import send_file, send_from_directory
+from flask import Response, send_file, send_from_directory
 from flask_restful import Resource
 
 from openatlas import app
@@ -12,7 +10,7 @@ from openatlas.models.node import Node
 
 class DisplayImage(Resource):
     @staticmethod
-    def get(filename: str) -> Any:
+    def get(filename: str) -> Response:
         from pathlib import Path as Pathlib_path
         entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
         license_ = None

@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response
 from flask_restful import Resource
@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 
 class GetLatest(Resource):  # type: ignore
     @staticmethod
-    def get(latest: int) -> Union[Tuple[Resource, int], Response]:
+    def get(latest: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entity(
             GetLatest.get_latest(latest),
             entity_parser.parse_args(),

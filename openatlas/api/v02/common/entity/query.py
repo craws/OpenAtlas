@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response
 from flask_restful import Resource
@@ -10,11 +10,12 @@ from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import query_parser
 from openatlas.api.v02.resources.util import get_entity_by_id
+from openatlas.models.entity import Entity
 
 
 class GetQuery(Resource):  # type: ignore
     @staticmethod
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parser = query_parser.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \
@@ -24,7 +25,7 @@ class GetQuery(Resource):  # type: ignore
         return resolve_entity(GetQuery.get_entities(parser), parser, 'query')
 
     @staticmethod
-    def get_entities(parser):
+    def get_entities(parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if parser['entities']:
             for entity in parser['entities']:
