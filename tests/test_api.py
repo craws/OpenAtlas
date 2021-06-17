@@ -80,6 +80,11 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api.entity', id_=place.id, format='geojson'))
             self.assertEqual(rv.get_json(), api_data.api_geojson_template)
 
+            # Test geometries Endpoint
+            self.maxDiff = None
+            rv = self.app.get(url_for('api.geometric_entities'))
+            self.assertEqual(rv.get_json(), api_data.api_geometries_template)
+
             # Path Tests
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
