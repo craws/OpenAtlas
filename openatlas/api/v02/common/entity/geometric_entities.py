@@ -1,5 +1,6 @@
 from typing import Any, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, json, jsonify
 from flask_restful import Resource, marshal
 
@@ -10,8 +11,8 @@ from openatlas.models.gis import Gis
 
 
 class GetGeometricEntities(Resource):  # type: ignore
-    @staticmethod
-    def get() -> Union[Tuple[Any, int], Response]:
+    @swag_from("../swagger/geometric_entities.yml", endpoint="api.geometric_entities")
+    def get(self) -> Union[Tuple[Any, int], Response]:
         parser = gis_parser.parse_args()
         choices = ['gisPointAll', 'gisPointSupers', 'gisPointSubs', 'gisPointSibling',
                    'gisLineAll', 'gisPolygonAll']
