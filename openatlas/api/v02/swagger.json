@@ -309,26 +309,6 @@
           }
         }
       },
-      "PaginationModel": {
-        "type": "object",
-        "properties": {
-          "entities": {
-            "type": "number"
-          },
-          "entitiesPerPage": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          },
-          "index": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaginationIndexModel"
-            }
-          }
-        }
-      },
       "PaginationIndexModel": {
         "type": "object",
         "properties": {
