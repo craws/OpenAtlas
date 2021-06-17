@@ -4,7 +4,7 @@ from flask import Response
 from flask_restful import Resource
 
 from openatlas.api.v02.resources.error import InvalidLimitError
-from openatlas.api.v02.resources.helpers import resolve_entity_parser
+from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.models.entity import Entity
 
@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response]:
-        return resolve_entity_parser(
+        return resolve_entity(
             GetLatest.get_latest(latest),
             entity_parser.parse_args(),
             latest)
