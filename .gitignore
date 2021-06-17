@@ -21,6 +21,7 @@ cover
 openatlas/uploads/
 openatlas/export/csv/
 openatlas/export/sql/
+openatlas/processed_images/
 
 # ide
 .idea

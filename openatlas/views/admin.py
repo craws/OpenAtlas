@@ -28,10 +28,12 @@ from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    convert_size, delete_link, format_date, format_datetime, get_disk_space_info, get_file_path,
-    get_file_stats, is_authorized, link, required_group, sanitize, send_mail, uc_first)
+    button, convert_size, delete_link, display_form, display_info, format_date, format_datetime,
+    get_disk_space_info, get_file_path, get_file_stats, is_authorized, link, manual, required_group,
+    sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -89,23 +91,71 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
         else:
             form.receiver.data = current_user.email
-    return render_template(
-        'admin/index.html',
-        form=form,
-        tables=tables,
-        settings=session['settings'],
-        writeable_dirs=dirs,
-        disk_space_info=get_disk_space_info(),
-        imports=Import.get_all_projects(),
-        title=_('admin'),
-        crumbs=[_('admin')],
-        info={
-            'file': get_form_settings(FilesForm()),
-            'general': get_form_settings(GeneralForm()),
-            'mail': get_form_settings(MailForm()),
-            'map': get_form_settings(MapForm()),
-            'api': get_form_settings(ApiForm()),
-            'modules': get_form_settings(ModulesForm())})
+    tabs = {
+        'files': Tab(
+            _('files'),
+            buttons=[
+                manual('entity/file'),
+                button(_('edit'), url_for('admin_settings', category='files'))
+                if is_authorized('manager') else '',
+                button(_('list'), url_for('index', view='file')),
+                button(_('file'), url_for('insert', class_='file'))],
+            content=render_template(
+                'admin/file.html',
+                writeable_dirs=dirs,
+                info=get_form_settings(FilesForm()),
+                settings=session['settings'],
+                disk_space_info=get_disk_space_info())),
+        'user': Tab(
+            _('user'),
+            table=tables['user'],
+            buttons=[
+                manual('admin/user'),
+                button(_('activity'), url_for('user_activity')),
+                button(_('newsletter'), url_for('admin_newsletter'))
+                if is_authorized('manager') and session['settings']['mail'] else '',
+                button(_('user'), url_for('user_insert')) if is_authorized('manager') else ''])}
+    if is_authorized('admin'):
+        tabs['general'] = Tab(
+            'general',
+            content=display_info(get_form_settings(GeneralForm())),
+            buttons=[
+                manual('admin/general'),
+                button(_('edit'), url_for('admin_settings', category='general')),
+                button(_('system log'), url_for('admin_log'))])
+        tabs['email'] = Tab(
+            'email',
+            content=display_info(get_form_settings(MailForm())),
+            buttons=[
+                manual('admin/mail'),
+                button(_('edit'), url_for('admin_settings', category='mail'))])
+        if session['settings']['mail']:
+            tabs['email'].content += display_form(form)
+    if is_authorized('manager'):
+        tabs['modules'] = Tab(
+            _('modules'),
+            content=f"""
+                <h1>{_('Defaults for new user')}</h1>
+                {display_info(get_form_settings(ModulesForm()))}""",
+            buttons=[
+                manual('admin/modules'),
+                button(_('edit'), url_for('admin_settings', category='modules'))])
+        tabs['map'] = Tab(
+            'map',
+            content=display_info(get_form_settings(MapForm())),
+            buttons=[
+                manual('admin/map'),
+                button(_('edit'), url_for('admin_settings', category='map'))])
+        tabs['content'] = Tab(
+            'content',
+            content=tables['content'].display(),
+            buttons=[manual('admin/content')])
+    if is_authorized('contributor'):
+        tabs['data'] = Tab('data', content=render_template(
+            'admin/data.html',
+            imports=Import.get_all_projects(),
+            info=get_form_settings(ApiForm())))
+    return render_template('tabs.html', tabs=tabs, title=_('admin'), crumbs=[_('admin')])
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
@@ -252,12 +302,18 @@ def admin_check_similar() -> str:
 @app.route('/admin/check/dates')
 @required_group('contributor')
 def admin_check_dates() -> str:
-    tables = {
-        'link_dates': Table(['link', 'domain', 'range']),
-        'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
-        'dates': Table(['name', 'class', 'type', 'created', 'updated', 'description'])}
+    tabs = {
+        'dates':
+            Tab(
+                'invalid_dates',
+                table=Table(['name', 'class', 'type', 'created', 'updated', 'description'])),
+        'link_dates': Tab('invalid_link_dates', table=Table(['link', 'domain', 'range'])),
+        'involvement_dates':
+            Tab(
+                'invalid_involvement_dates',
+                table=Table(['actor', 'event', 'class', 'involvement', 'description']))}
     for entity in Date.get_invalid_dates():
-        tables['dates'].rows.append([
+        tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
             entity.print_standard_type(),
@@ -272,7 +328,7 @@ def admin_check_dates() -> str:
             name = 'member'
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             name = 'involvement'
-        tables['link_dates'].rows.append([
+        tabs['link_dates'].table.rows.append([
             link(_(name), url_for(f'{name}_update', id_=link_.id, origin_id=link_.domain.id)),
             link(link_.domain),
             link(link_.range)])
@@ -286,10 +342,14 @@ def admin_check_dates() -> str:
             link_.type.name if link_.type else '',
             link_.description,
             link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
-        tables['involvement_dates'].rows.append(data)
+        tabs['involvement_dates'].table.rows.append(data)
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if not tab.table.rows:
+            tab.content = _('Congratulations, everything looks fine!')  # pragma: no cover
     return render_template(
-        'admin/check_dates.html',
-        tables=tables,
+        'tabs.html',
+        tabs=tabs,
         title=_('admin'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check dates')])
 
@@ -298,18 +358,20 @@ def admin_check_dates() -> str:
 @required_group('contributor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {
-        'orphans': Table(header),
-        'unlinked': Table(header),
-        'missing_files': Table(header),
-        'circular': Table(['entity']),
-        'nodes': Table(['name', 'root']),
-        'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
-    tables['circular'].rows = [[link(entity)] for entity in Entity.get_entities_linked_to_itself()]
-    for entity in Entity.get_orphans():
-        if isinstance(entity, ReferenceSystem):
-            continue
-        tables['unlinked' if entity.class_.view else 'orphans'].rows.append([
+    tabs = {
+        'orphans': Tab('orphans', table=Table(header)),
+        'unlinked': Tab('unlinked', table=Table(header)),
+        'nodes': Tab('type', table=Table(
+            ['name', 'root'],
+            [[link(node), link(g.nodes[node.root[-1]])] for node in Node.get_node_orphans()])),
+        'missing_files': Tab('missing_files', table=Table(header)),
+        'orphaned_files': Tab('orphaned_files', table=Table(['name', 'size', 'date', 'ext'])),
+        'circular': Tab('circular_dependencies', table=Table(
+            ['entity'],
+            [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
+
+    for entity in filter(lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
+        tabs['unlinked' if entity.class_.view else 'orphans'].table.rows.append([
             link(entity),
             link(entity.class_),
             entity.print_standard_type(),
@@ -317,15 +379,13 @@ def admin_orphans() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for node in Node.get_node_orphans():
-        tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
-    # Get orphaned file entities with no corresponding file
+    # Orphaned file entities with no corresponding file
     entity_file_ids = []
     for entity in Entity.get_by_class('file', nodes=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
-            tables['missing_files'].rows.append([
+            tabs['missing_files'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 entity.print_standard_type(),
@@ -334,19 +394,31 @@ def admin_orphans() -> str:
                 format_date(entity.modified),
                 entity.description])
 
-    # Get orphaned files with no corresponding entity
+    # Orphaned files with no corresponding entity
     for file in app.config['UPLOAD_DIR'].iterdir():
         if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
-            tables['orphaned_files'].rows.append([
+            tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
                 format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 file.suffix,
                 link(_('download'), url_for('download_file', filename=file.name)),
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
+
+    for tab in tabs.values():
+        tab.buttons = [manual('admin/data_integrity_checks')]
+        if not tab.table.rows:
+            tab.content = _('Congratulations, everything looks fine!')
+    if tabs['orphaned_files'].table.rows and is_authorized('admin'):
+        tabs['orphaned_files'].buttons.append(
+            button(
+                _('delete all files'),
+                url_for('admin_file_delete', filename='all'),
+                onclick="return confirm('" +
+                        uc_first(_('delete all files without corresponding entities?')) + "')"))
     return render_template(
-        'admin/check_orphans.html',
-        tables=tables,
+        'tabs.html',
+        tabs=tabs,
         title=_('admin'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('orphans')])
 
@@ -394,7 +466,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
             entity.print_standard_type(),
-            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
+            file_stats[entity.id]['size'] if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,
             date])

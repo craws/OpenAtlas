@@ -21,7 +21,7 @@ class GetSubunit(Resource):  # type: ignore
             return jsonify(len(node['nodes']))
         template = NodeTemplate.node_template()
         if parser['download']:
-            return Download.download(data=node, template=template, name=id_)
+            return Download.download(node, template, id_)
         return marshal(node, template), 200
 
     @staticmethod
@@ -38,5 +38,5 @@ class GetSubunit(Resource):  # type: ignore
             subunits.append({
                 'id': subunit.id,
                 'label': subunit.name,
-                'url': url_for('entity', id_=subunit.id, _external=True)})
+                'url': url_for('api.entity', id_=subunit.id, _external=True)})
         return subunits

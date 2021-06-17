@@ -37,7 +37,6 @@ class Api:
 class Filter:
     logical_operators: Dict[str, Any] = {
         'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT'}
-
     valid_columns: Dict[str, str] = {
         'id': 'e.id', 'class_code': 'e.class_code', 'name': 'e.name',
         'description': 'e.description', 'system_class': 'e.system_class',

@@ -24,7 +24,7 @@ def get_structure(
             place = super_.get_linked_entity_safe('P46', inverse=True)
         elif super_.class_.name == 'place':
             place = super_
-            siblings = super_.get_linked_entities('P46')
+        siblings = super_.get_linked_entities('P46')
     elif not object_:
         return None
     else:

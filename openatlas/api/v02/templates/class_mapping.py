@@ -7,7 +7,7 @@ from flask_restful.fields import String
 class ClassMappingTemplate:
 
     @staticmethod
-    def class_mapping_template() -> Dict[str, Type[String]]:
+    def class_template() -> Dict[str, Type[String]]:
         return {
             'systemClass': fields.String,
             'crmClass': fields.String,

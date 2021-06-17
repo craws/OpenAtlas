@@ -2,8 +2,11 @@ import itertools
 from typing import Any, Dict, List
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable
+from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
+from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 
 
 class Pagination:
@@ -28,14 +31,32 @@ class Pagination:
         if parser['last'] or parser['first']:
             total = Pagination.get_shown_entities(total, parser)
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
-        entity_limit = [e for idx, e in enumerate(entities[h[0]:])]
-        entities_result = [LinkedPlaces.get_entity(r, parser)
-                           for r in entity_limit[:int(parser['limit'])]]
-        result = {
-            "results": entities_result,
+        new_entities = [e for idx, e in enumerate(entities[h[0]:])]
+        links = get_all_links([e.id for e in new_entities[:int(parser['limit'])]])
+        links_inverse = get_all_links_inverse([e.id for e in new_entities[:int(parser['limit'])]])
+        result = []
+        if parser['format'] == 'lp':
+            result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
+        if parser['format'] == 'geojson':
+            result = Pagination.get_geojson(new_entities, parser)
+        return {
+            "results": result,
             "pagination": {
                 'entitiesPerPage': int(parser['limit']),
                 'entities': count,
                 'index': index,
                 'totalPages': len(index)}}
-        return result
+
+    @staticmethod
+    def linked_places_result(links: List[Link], links_inverse: List[Link], entity_limit,
+                             parser: Dict[str, str]) -> List[Dict[str, Any]]:
+        return [LinkedPlaces.get_entity(
+            entity,
+            [link.id for link in links if link.domain == entity.id],
+            [link.id for link in links_inverse if link.range == entity.id],
+            parser)
+            for entity in entity_limit[:int(parser['limit'])]]
+
+    @staticmethod
+    def get_geojson(entity_limit: List[Entity], parser: Dict[str, str]) -> Dict[str, Any]:
+        return Geojson.return_output(Geojson.get_geojson(entity_limit[:int(parser['limit'])]))

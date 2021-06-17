@@ -19,7 +19,7 @@ class GetNodeEntities(Resource):  # type: ignore
             return jsonify(len(node['nodes']))
         template = NodeTemplate.node_template()
         if parser['download']:
-            return Download.download(data=node, template=template, name=id_)
+            return Download.download(node, template, id_)
         return marshal(node, template), 200
 
     @staticmethod
@@ -31,5 +31,5 @@ class GetNodeEntities(Resource):  # type: ignore
             data.append({
                 'id': entity.id,
                 'label': entity.name,
-                'url': url_for('entity', id_=entity.id, _external=True)})
+                'url': url_for('api.entity', id_=entity.id, _external=True)})
         return data

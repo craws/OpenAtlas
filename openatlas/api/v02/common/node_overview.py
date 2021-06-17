@@ -23,7 +23,11 @@ class GetNodeOverview(Resource):  # type: ignore
 
     @staticmethod
     def get_node_overview() -> Dict[str, Dict[Entity, str]]:
-        nodes: Dict[str, Any] = {'standard': {}, 'custom': {}, 'places': {}, 'value': {}}
+        nodes: Dict[str, Any] = {
+            'standard': {},
+            'custom': {},
+            'places': {},
+            'value': {}}
         for id_, node in g.nodes.items():
             if node.root:
                 continue
@@ -44,7 +48,7 @@ class GetNodeOverview(Resource):  # type: ignore
             item = g.nodes[id_]
             items.append({
                 'id': item.id,
-                'url': url_for('entity', id_=item.id, _external=True),
+                'url': url_for('api.entity', id_=item.id, _external=True),
                 'label': item.name.replace("'", "&apos;"),
                 'children': GetNodeOverview.walk_tree(item.subs)})
         return items

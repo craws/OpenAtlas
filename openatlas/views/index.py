@@ -10,11 +10,12 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.api.v02.resources.error import MethodNotAllowedError
+from openatlas.api.v02.resources.error import APIFileNotFoundError, MethodNotAllowedError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
@@ -35,15 +36,17 @@ class FeedbackForm(FlaskForm):  # type: ignore
 @app.route('/')
 @app.route('/overview')
 def overview() -> str:
+    tabs = {
+        'info': Tab('info'),
+        'bookmarks': Tab('bookmarks', table=Table(['name', 'class', 'begin', 'end'])),
+        'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'bookmarks': Table(['name', 'class', _('first'), _('last')]),
-        'notes': Table(['date', _('visibility'), 'entity', 'class', _('note')]),
         'latest': Table(order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
-            tables['bookmarks'].rows.append([
+            tabs['bookmarks'].table.rows.append([
                 link(entity),
                 entity.class_.label,
                 entity.first,
@@ -51,7 +54,7 @@ def overview() -> str:
                 bookmark_toggle(entity.id, True)])
         for note in User.get_notes_by_user_id(current_user.id):
             entity = Entity.get_by_id(note['entity_id'])
-            tables['notes'].rows.append([
+            tabs['notes'].table.rows.append([
                 format_date(note['created']),
                 uc_first(_('public') if note['public'] else _('private')),
                 link(entity),
@@ -81,11 +84,11 @@ def overview() -> str:
                 entity.first,
                 entity.last,
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-    return render_template(
+    tabs['info'].content = render_template(
         'index/index.html',
         intro=Content.get_translation('intro'),
-        crumbs=['overview'],
         tables=tables)
+    return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
 
 
 @app.route('/index/setlocale/<language>')
@@ -139,6 +142,8 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+    if request.path.startswith('/api/'):  # pragma: nocover
+        raise APIFileNotFoundError
     return render_template('404.html', crumbs=['404 - File not found'], e=e), 404
 
 
