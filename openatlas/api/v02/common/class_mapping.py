@@ -12,7 +12,7 @@ class ClassMapping(Resource):  # type: ignore
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
             ClassMapping.mapping,
-            ClassMappingTemplate.class_mapping_template()), 200
+            ClassMappingTemplate.class_template()), 200
 
     mapping = [
         {
