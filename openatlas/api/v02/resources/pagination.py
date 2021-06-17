@@ -38,7 +38,7 @@ class Pagination:
         if parser['format'] == 'lp':
             result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
         if parser['format'] == 'geojson':
-            result = Pagination.get_geojson(new_entities, parser)
+            result = [Pagination.get_geojson(new_entities, parser)]
         return {
             "results": result,
             "pagination": {

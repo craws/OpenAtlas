@@ -12,7 +12,7 @@ from openatlas.models.place import get_structure
 
 class GetSubunitHierarchy(Resource):  # type: ignore
     @staticmethod
-    def get(id_: int) -> Union[Tuple[Resource, int], Response]:
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser({"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
                                    default_parser.parse_args(), id_)
 

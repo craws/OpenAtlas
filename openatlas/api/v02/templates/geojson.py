@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Union
 
 from flask_restful import fields
 from flask_restful.fields import List as RestList, Nested
@@ -27,13 +27,13 @@ class GeojsonTemplate:
             'properties': fields.List(fields.Nested(properties))}
 
     @staticmethod
-    def geojson_collection_template():
+    def geojson_collection_template() -> Dict[str, Any]:
         return {
             'type': fields.String,
             'features': fields.List(fields.Nested(GeojsonTemplate.geojson_template()))}
 
     @staticmethod
-    def pagination() -> Dict[str, Union[List, Nested]]:
+    def pagination() -> Dict[str, Any]:
         page_index = {
             "page": fields.Integer,
             "startId": fields.Integer}
