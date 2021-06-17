@@ -1,29 +1,19 @@
 from typing import List, Tuple, Union
 
-from flask import Response, g, jsonify
+from flask import Response, g
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidSubunitError
-from openatlas.api.v02.resources.pagination import Pagination
+from openatlas.api.v02.resources.helpers import get_template, resolve_entity_parser
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.resources.util import get_entity_by_id, get_template
-from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
+from openatlas.api.v02.resources.util import get_entity_by_id
 
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
     @staticmethod
     def get(id_: int) -> Union[Tuple[Resource, int], Response]:
-        parser = entity_parser.parse_args()
-        entities = []
-        for entity in GetTypeEntitiesAll.get_node_all(id_):
-            entities.append(get_entity_by_id(entity))
-        if parser['count']:
-            return jsonify(len(entities))
-        output = Pagination.pagination(entities=entities, parser=parser)
-        if parser['download']:
-            return Download.download(output, get_template(parser), id_)
-        return marshal(output, get_template(parser)), 200
+        entities = [get_entity_by_id(entity) for entity in GetTypeEntitiesAll.get_node_all(id_)]
+        return resolve_entity_parser(entities, entity_parser.parse_args(), id_)
 
     @staticmethod
     def get_node_all(id_: int) -> List[int]:

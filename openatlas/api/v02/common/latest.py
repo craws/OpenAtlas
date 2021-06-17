@@ -1,26 +1,21 @@
 from typing import List, Tuple, Union
 
-from flask import Response, jsonify
-from flask_restful import Resource, marshal
+from flask import Response
+from flask_restful import Resource
 
-from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidLimitError
-from openatlas.api.v02.resources.pagination import Pagination
+from openatlas.api.v02.resources.helpers import resolve_entity_parser
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.resources.util import get_template
 from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response]:
-        parser = entity_parser.parse_args()
-        entities = Pagination.pagination(GetLatest.get_latest(latest), parser)
-        if parser['count']:
-            return jsonify(len(entities))
-        if parser['download']:
-            return Download.download(entities, get_template(parser), latest)
-        return marshal(entities, get_template(parser)), 200
+        return resolve_entity_parser(
+            GetLatest.get_latest(latest),
+            entity_parser.parse_args(),
+            latest)
 
     @staticmethod
     def get_latest(limit_: int) -> List[Entity]:

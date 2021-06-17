@@ -1,13 +1,10 @@
 from typing import Any, Dict, List, Tuple, Union
-from openatlas.api.v02.resources.util import get_template
 
-from flask import Response, g, jsonify
-from flask_restful import Resource, marshal
+from flask import Response, g
+from flask_restful import Resource
 
-from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidCidocClassCode
-from openatlas.api.v02.resources.pagination import Pagination
+from openatlas.api.v02.resources.helpers import resolve_entity_parser
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
@@ -16,16 +13,8 @@ from openatlas.models.entity import Entity
 class GetByClass(Resource):  # type: ignore
     @staticmethod
     def get(class_code: str) -> Union[Tuple[Resource, int], Response]:
-        parser = entity_parser.parse_args()
-        if parser['export'] == 'csv':
-            return ApiExportCSV.export_entities(
-                GetByClass.get_by_class(class_code, parser), class_code)
-        class_ = Pagination.pagination(GetByClass.get_by_class(class_code, parser), parser)
-        if parser['count']:
-            return jsonify(class_['pagination']['entities'])
-        if parser['download']:
-            return Download.download(class_, get_template(parser), class_code)
-        return marshal(class_, get_template(parser)), 200
+        p = entity_parser.parse_args()
+        return resolve_entity_parser(GetByClass.get_by_class(class_code, p), p, class_code)
 
     @staticmethod
     def get_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:

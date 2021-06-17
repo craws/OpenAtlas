@@ -83,7 +83,7 @@ class ApiTests(TestBaseCase):
             # Path Tests
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
-            rv = self.app.get(url_for('api.latest', count=True, latest=1))
+            rv = self.app.get(url_for('api.latest', count=True, latest=2))
             assert b'2' in rv.data
 
             rv = self.app.get(url_for('api.code', code='reference'))
