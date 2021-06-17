@@ -43,7 +43,7 @@ class Geojson:
         return features
 
     @staticmethod
-    def get_node(entity: Entity) -> Optional[List[Dict[str, Any]]]:
+    def get_node(entity: Entity) -> Optional[List[str]]:
         nodes = []
         for node in entity.nodes:
             out = [node.name]
@@ -51,5 +51,5 @@ class Geojson:
         return nodes if nodes else None
 
     @staticmethod
-    def return_output(output: List[Any]) -> Dict[str, Any]:
+    def return_output(output: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {'type': 'FeatureCollection', 'features': output}

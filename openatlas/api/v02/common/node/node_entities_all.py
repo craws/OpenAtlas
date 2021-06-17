@@ -1,26 +1,19 @@
 from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
-from flask import Response, g, jsonify, url_for
-from flask_restful import Resource, marshal
+from flask import Response, g
+from flask_restful import Resource
 
-from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.error import InvalidSubunitError
+from openatlas.api.v02.resources.helpers import get_node_dict, resolve_node_parser
 from openatlas.api.v02.resources.parser import default_parser
-from openatlas.api.v02.templates.nodes import NodeTemplate
 
 
 class GetNodeEntitiesAll(Resource):  # type: ignore
     @swag_from("../swagger/nodes_all.yml", endpoint="node_entities_all")
-    def get(self, id_: int) -> Union[Tuple[Resource, int], Response]:
-        parser = default_parser.parse_args()
-        node = {"nodes": GetNodeEntitiesAll.get_node_all(id_)}
-        if parser['count']:
-            return jsonify(len(node['nodes']))
-        template = NodeTemplate.node_template()
-        if parser['download']:
-            return Download.download(node, template, id_)
-        return marshal(node, template), 200
+    def get(self, id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+        return resolve_node_parser(
+            {"nodes": GetNodeEntitiesAll.get_node_all(id_)}, default_parser.parse_args(), id_)
 
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
@@ -32,10 +25,7 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
     def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) \
             -> List[Dict[str, Any]]:
         for entity in g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True):
-            data.append({
-                'id': entity.id,
-                'label': entity.name,
-                'url': url_for('api.entity', id_=entity.id, _external=True)})
+            data.append(get_node_dict(entity))
         for sub_id in g.nodes[id_].subs:
             GetNodeEntitiesAll.get_recursive_node_entities(sub_id, data)
         return data

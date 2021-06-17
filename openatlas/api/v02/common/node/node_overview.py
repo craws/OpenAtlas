@@ -18,7 +18,7 @@ class GetNodeOverview(Resource):  # type: ignore
         node = {"types": GetNodeOverview.get_node_overview()}
         template = NodesOverviewTemplate.node_overview_template()
         if parser['download']:
-            return Download.download(data=node, template=template, name='types')
+            return Download.download(node, template, 'types')
         return marshal(node, template), 200
 
     @staticmethod

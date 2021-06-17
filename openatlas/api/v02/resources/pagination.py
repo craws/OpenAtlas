@@ -38,7 +38,7 @@ class Pagination:
         if parser['format'] == 'lp':
             result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
         if parser['format'] == 'geojson':
-            result = Pagination.get_geojson(new_entities, parser)
+            result = [Pagination.get_geojson(new_entities, parser)]
         return {
             "results": result,
             "pagination": {
@@ -48,8 +48,11 @@ class Pagination:
                 'totalPages': len(index)}}
 
     @staticmethod
-    def linked_places_result(links: List[Link], links_inverse: List[Link], entity_limit,
-                             parser: Dict[str, str]) -> List[Dict[str, Any]]:
+    def linked_places_result(
+            links: List[Link],
+            links_inverse: List[Link],
+            entity_limit: List[Entity],
+            parser: Dict[str, str]) -> List[Dict[str, Any]]:
         return [LinkedPlaces.get_entity(
             entity,
             [link.id for link in links if link.domain == entity.id],
