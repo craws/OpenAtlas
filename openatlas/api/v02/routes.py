@@ -3,22 +3,23 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.v02.common.entity.class_ import GetByClass
 from openatlas.api.v02.common.content.class_mapping import ClassMapping
-from openatlas.api.v02.common.entity.code import GetByCode
 from openatlas.api.v02.common.content.content import GetContent
-from openatlas.api.v02.common.entity.entity import GetEntity
-from openatlas.api.v02.common.entity.latest import GetLatest
-from openatlas.api.v02.common.node.node_entities import GetNodeEntities
-from openatlas.api.v02.common.node.node_entities_all import GetNodeEntitiesAll
-from openatlas.api.v02.common.node.node_overview import GetNodeOverview
 from openatlas.api.v02.common.content.overview_count import OverviewCount
+from openatlas.api.v02.common.entity.class_ import GetByClass
+from openatlas.api.v02.common.entity.code import GetByCode
+from openatlas.api.v02.common.entity.entity import GetEntity
+from openatlas.api.v02.common.entity.geometric_entities import GetGeometricEntities
+from openatlas.api.v02.common.entity.latest import GetLatest
 from openatlas.api.v02.common.entity.query import GetQuery
-from openatlas.api.v02.common.node.subunit import GetSubunit
-from openatlas.api.v02.common.node.subunit_hierarchy import GetSubunitHierarchy
 from openatlas.api.v02.common.entity.system_class import GetBySystemClass
 from openatlas.api.v02.common.entity.type_entities import GetTypeEntities
 from openatlas.api.v02.common.entity.type_entities_all import GetTypeEntitiesAll
+from openatlas.api.v02.common.node.node_entities import GetNodeEntities
+from openatlas.api.v02.common.node.node_entities_all import GetNodeEntitiesAll
+from openatlas.api.v02.common.node.node_overview import GetNodeOverview
+from openatlas.api.v02.common.node.subunit import GetSubunit
+from openatlas.api.v02.common.node.subunit_hierarchy import GetSubunitHierarchy
 from openatlas.api.v02.common.node.type_tree import GetTypeTree
 from openatlas.api.v02.resources.display_image import DisplayImage
 from openatlas.api.v02.resources.error import errors
@@ -39,6 +40,7 @@ api.add_resource(GetBySystemClass, '/0.2/system_class/<string:system_class>',
 api.add_resource(GetTypeEntities, '/0.2/type_entities/<int:id_>', endpoint="type_entities")
 api.add_resource(GetTypeEntitiesAll, '/0.2/type_entities_all/<int:id_>',
                  endpoint="type_entities_all")
+api.add_resource(GetGeometricEntities, '/0.2/geometric_entities/', endpoint="geometric_entities")
 
 api.add_resource(GetNodeEntities, '/0.2/node_entities/<int:id_>', endpoint="node_entities")
 api.add_resource(GetNodeEntitiesAll, '/0.2/node_entities_all/<int:id_>',

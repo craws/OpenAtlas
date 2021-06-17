@@ -1,7 +1,7 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict
 
 from flask_restful import fields
-from flask_restful.fields import List as RestList, Nested
+from flask_restful.fields import List as RestList
 
 
 class GeojsonTemplate:
