@@ -1,34 +1,13 @@
-Query endpoint
+System Class endpoint
 ---
 tags:
   - Entities
-description: Retrieves a list of Geojson representations by entity id, CIDOC CRM code or menu item
+description: Retrieves a json with a list of entities based on their OpenAtlas system class. Available categories are **acquisition**, **activity**, **actor_appellation**, **administrative_unit**, **appellation**, **artifact**, **bibliography**, **edition**, **external_reference**, **feature**, **file**, **find**, **group**, **human_remains**, **move**, **object_location**, **person**, **place**, **source**, **reference_system**, **stratigraphic_unit**, **source_translation**, **type**,  The result can also be filtered, ordered and manipulated through different parameters.  By default results are orderd alphabetically and 20 entities are shown.
 parameters:
-  - in: query
-    name: entities
-    description: Specific entity ID
-    schema:
-      type: number
-  - in: query
-    name: classes
-    description: Need to be a entity class code of the CIDOC CRM (e.g. E21, E18, E33). For further information visit https://redmine.craws.net/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping
-    schema:
-      type: string
-  - in: query
-    name: codes
-    description: Need to be an OpenAtlas menu items
-    schema:
-      type: string
-      enum:
-        - actor
-        - event
-        - place
-        - reference
-        - source
-        - object
-  - in: query
-    name: system_classes
+  - in: path
+    name: system_class
     description: Need to be an OpenAtlas system class
+    required: true
     schema:
       type: string
       enum:
@@ -64,6 +43,7 @@ parameters:
   - $ref: '#/components/parameters/showParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
+  - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
     description: A dictionary with a result dictionary and pagination information

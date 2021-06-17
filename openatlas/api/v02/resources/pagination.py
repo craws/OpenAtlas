@@ -35,7 +35,7 @@ class Pagination:
         links = get_all_links([e.id for e in new_entities[:int(parser['limit'])]])
         links_inverse = get_all_links_inverse([e.id for e in new_entities[:int(parser['limit'])]])
         result = []
-        if parser['format'] == 'lp':
+        if parser['format'] == 'linked_places':
             result = Pagination.linked_places_result(links, links_inverse, new_entities, parser)
         if parser['format'] == 'geojson':
             result = [Pagination.get_geojson(new_entities, parser)]

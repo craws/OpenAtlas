@@ -1,8 +1,8 @@
-Type Entities All Endpoint
+Type Entities Endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their OpenAtlas type. This endpoint also includes all entities, which are connected to an subtype. A possible *id* can be obtained by the *type_tree* or *node_overview* endpoint. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities based on their OpenAtlas type. A possible *id* can be obtained by the *type_tree* or *node_overview* endpoint. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
     name: id_
@@ -19,6 +19,7 @@ parameters:
   - $ref: '#/components/parameters/showParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
+  - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
     description: A dictionary with a result dictionary and pagination information

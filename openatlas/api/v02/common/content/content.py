@@ -11,7 +11,7 @@ from openatlas.models.content import Content as Ct
 
 
 class GetContent(Resource):  # type: ignore
-    @swag_from("../swagger/content.yml", endpoint="content")
+    @swag_from("../swagger/content.yml", endpoint="api.content")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = language_parser.parse_args()
         lang = parser['lang']

@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
@@ -10,9 +11,10 @@ from openatlas.api.v02.resources.util import get_entity_by_id
 
 
 class GetTypeEntities(Resource):  # type: ignore
-    @staticmethod
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @swag_from("../swagger/type_entities.yml", endpoint="api.type_entities")
+    def get(self, id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         entities = [get_entity_by_id(entity) for entity in GetTypeEntities.get_node(id_)]
+        print(entities)
         return resolve_entity(entities, entity_parser.parse_args(), id_)
 
     @staticmethod

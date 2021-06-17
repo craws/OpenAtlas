@@ -73,8 +73,8 @@ entity_parser.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    default='lp',
-    choices=('lp', 'geojson'))
+    default='linked_places',
+    choices=('linked_places', 'geojson'))
 
 query_parser = entity_parser.copy()
 query_parser.add_argument(

@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
@@ -9,8 +10,8 @@ from openatlas.api.v02.resources.parser import default_parser
 
 
 class GetNodeEntities(Resource):  # type: ignore
-    @staticmethod
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @swag_from("../swagger/nodes.yml", endpoint="api.node_entities")
+    def get(self, id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser(
             {"nodes": GetNodeEntities.get_node(id_)}, default_parser.parse_args(), id_)
 

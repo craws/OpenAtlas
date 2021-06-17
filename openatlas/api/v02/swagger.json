@@ -140,7 +140,7 @@
           ]
         }
       },
-      "exportParam": {
+      "exportParam":{
         "name": "export",
         "in": "query",
         "description": "Select to which format the output is downloaded",
@@ -148,6 +148,18 @@
           "type": "string",
           "enum": [
             "csv"
+          ]
+        }
+      },
+      "formatParam":{
+        "name": "format",
+        "in": "query",
+        "description": "Select to which output format is prefered",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "linked_places",
+            "geojson"
           ]
         }
       }
