@@ -306,14 +306,14 @@ api_geojson_template = [
 ]
 
 api_geometries_template = [{'type': 'Feature',
-                           'geometry':
-                               {'coordinates': [9, 17], 'type': 'Point'},
-                           'properties': [
-                               {'id': 1,
-                                'name': '',
-                                'description': '',
-                                'objectId': 104,
-                                'objectDescription': 'That is the Nostromos',
-                                'objectName': 'Nostromos',
-                                'objectType': None,
-                                'shapeType': 'centerpoint'}]}]
+                            'geometry':
+                                {'coordinates': [9, 17], 'type': 'Point'},
+                            'properties': [
+                                {'id': 1,
+                                 'name': '',
+                                 'description': '',
+                                 'objectId': 104,
+                                 'objectDescription': 'That is the Nostromos',
+                                 'objectName': 'Nostromos',
+                                 'objectType': None,
+                                 'shapeType': 'centerpoint'}]}]

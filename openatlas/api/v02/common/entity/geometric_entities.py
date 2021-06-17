@@ -1,4 +1,4 @@
-from typing import Any, List, Tuple, Union
+from typing import Any, Tuple, Union
 
 from flask import Response, json, jsonify
 from flask_restful import Resource, marshal
