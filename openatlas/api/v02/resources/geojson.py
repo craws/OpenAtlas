@@ -51,5 +51,5 @@ class Geojson:
         return nodes if nodes else None
 
     @staticmethod
-    def return_output(output: List[Entity]) -> Dict[str, Any]:
+    def return_output(output: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {'type': 'FeatureCollection', 'features': output}
