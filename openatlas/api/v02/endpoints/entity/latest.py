@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response
 from flask_restful import Resource
 
+from openatlas.api.v02.resources.enpoints_util import resolve_entities
 from openatlas.api.v02.resources.error import InvalidLimitError
-from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.models.entity import Entity
 
@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get(latest: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
-        return resolve_entity(
+        return resolve_entities(
             GetLatest.get_latest(latest),
             entity_parser.parse_args(),
             latest)

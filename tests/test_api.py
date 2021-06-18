@@ -2,7 +2,7 @@ from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
-from openatlas.api.v02.common.content.class_mapping import ClassMapping
+from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v02.resources.error import APIFileNotFoundError, EntityDoesNotExistError, \
     FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
@@ -104,7 +104,9 @@ class ApiTests(TestBaseCase):
 
             # /api/0.2/overview_count/
             rv = self.app.get(url_for('api.overview_count'))
+            print(rv.get_json())
             self.assertEqual(rv.get_json(), api_data.api_overview_count)
+
 
             # ---Nodes---
 

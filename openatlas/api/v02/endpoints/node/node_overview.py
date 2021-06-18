@@ -3,7 +3,7 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
@@ -17,7 +17,7 @@ class GetNodeOverview(Resource):  # type: ignore
         node = {"types": GetNodeOverview.get_node_overview()}
         template = NodesOverviewTemplate.node_overview_template()
         if parser['download']:
-            return Download.download(node, template, 'types')
+            return download(node, template, 'types')
         return marshal(node, template), 200
 
     @staticmethod

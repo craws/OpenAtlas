@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable
 from openatlas.api.v02.resources.geojson import Geojson
@@ -60,8 +60,8 @@ class Pagination:
     def linked_places_result(
             entities: List[Entity],
             parser: Dict[str, str],
-            links: Optional[List[Link]],
-            links_inverse: Optional[List[Link]]) -> List[Dict[str, Any]]:
+            links: List[Link],
+            links_inverse: List[Link]) -> List[Dict[str, Any]]:
         return [LinkedPlaces.get_entity(
             entity,
             [link_ for link_ in links if link_.domain.id == entity.id],

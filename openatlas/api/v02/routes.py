@@ -3,25 +3,25 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.v02.common.content.class_mapping import ClassMapping
-from openatlas.api.v02.common.content.content import GetContent
-from openatlas.api.v02.common.content.overview_count import OverviewCount
-from openatlas.api.v02.common.entity.class_ import GetByClass
-from openatlas.api.v02.common.entity.code import GetByCode
-from openatlas.api.v02.common.entity.entity import GetEntity
-from openatlas.api.v02.common.entity.geometric_entities import GetGeometricEntities
-from openatlas.api.v02.common.entity.latest import GetLatest
-from openatlas.api.v02.common.entity.query import GetQuery
-from openatlas.api.v02.common.entity.system_class import GetBySystemClass
-from openatlas.api.v02.common.entity.type_entities import GetTypeEntities
-from openatlas.api.v02.common.entity.type_entities_all import GetTypeEntitiesAll
-from openatlas.api.v02.common.node.node_entities import GetNodeEntities
-from openatlas.api.v02.common.node.node_entities_all import GetNodeEntitiesAll
-from openatlas.api.v02.common.node.node_overview import GetNodeOverview
-from openatlas.api.v02.common.node.subunit import GetSubunit
-from openatlas.api.v02.common.node.subunit_hierarchy import GetSubunitHierarchy
-from openatlas.api.v02.common.node.type_tree import GetTypeTree
-from openatlas.api.v02.resources.display_image import DisplayImage
+from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
+from openatlas.api.v02.endpoints.content.content import GetContent
+from openatlas.api.v02.endpoints.content.overview_count import OverviewCount
+from openatlas.api.v02.endpoints.display_image import DisplayImage
+from openatlas.api.v02.endpoints.entity.class_ import GetByClass
+from openatlas.api.v02.endpoints.entity.code import GetByCode
+from openatlas.api.v02.endpoints.entity.entity import GetEntity
+from openatlas.api.v02.endpoints.entity.geometric_entities import GetGeometricEntities
+from openatlas.api.v02.endpoints.entity.latest import GetLatest
+from openatlas.api.v02.endpoints.entity.query import GetQuery
+from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
+from openatlas.api.v02.endpoints.entity.type_entities import GetTypeEntities
+from openatlas.api.v02.endpoints.entity.type_entities_all import GetTypeEntitiesAll
+from openatlas.api.v02.endpoints.node.node_entities import GetNodeEntities
+from openatlas.api.v02.endpoints.node.node_entities_all import GetNodeEntitiesAll
+from openatlas.api.v02.endpoints.node.node_overview import GetNodeOverview
+from openatlas.api.v02.endpoints.node.subunit import GetSubunit
+from openatlas.api.v02.endpoints.node.subunit_hierarchy import GetSubunitHierarchy
+from openatlas.api.v02.endpoints.node.type_tree import GetTypeTree
 from openatlas.api.v02.resources.error import errors
 
 app.config['SWAGGER'] = {'openapi': '3.0.2', 'uiversion': 3}

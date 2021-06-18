@@ -3,11 +3,11 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response
 from flask_restful import Resource
 
-from openatlas.api.v02.common.entity.class_ import GetByClass
-from openatlas.api.v02.common.entity.code import GetByCode
-from openatlas.api.v02.common.entity.system_class import GetBySystemClass
+from openatlas.api.v02.endpoints.entity.class_ import GetByClass
+from openatlas.api.v02.endpoints.entity.code import GetByCode
+from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
+from openatlas.api.v02.resources.enpoints_util import resolve_entities
 from openatlas.api.v02.resources.error import QueryEmptyError
-from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import query_parser
 from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.models.entity import Entity
@@ -22,7 +22,7 @@ class GetQuery(Resource):  # type: ignore
                 and not parser['classes'] \
                 and not parser['system_classes']:
             raise QueryEmptyError
-        return resolve_entity(GetQuery.get_entities(parser), parser, 'query')
+        return resolve_entities(GetQuery.get_entities(parser), parser, 'query')
 
     @staticmethod
     def get_entities(parser: Dict[str, Any]) -> List[Entity]:

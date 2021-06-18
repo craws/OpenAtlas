@@ -321,13 +321,8 @@ api_geometries_template = [{'type': 'Feature',
 api_content_en = {'intro': 'This is English', 'contact': '', 'legalNotice': '', 'siteName': ''}
 api_content_de = {'intro': 'Das ist Deutsch', 'contact': '', 'legalNotice': '', 'siteName': ''}
 
-api_overview_count = [{'systemClass': 'external_reference', 'count': 1},
-                      {'systemClass': 'reference_system', 'count': 2},
-                      {'systemClass': 'file', 'count': 1}, {'systemClass': 'feature', 'count': 1},
-                      {'systemClass': 'type', 'count': 87},
-                      {'systemClass': 'administrative_unit', 'count': 14},
-                      {'systemClass': 'place', 'count': 1},
-                      {'systemClass': 'stratigraphic_unit', 'count': 1}]
+api_overview_count = [{'systemClass': 'external_reference', 'count': 1}, {'systemClass': 'reference_system', 'count': 2}, {'systemClass': 'file', 'count': 1}, {'systemClass': 'feature', 'count': 1}, {'systemClass': 'type', 'count': 87}, {'systemClass': 'administrative_unit', 'count': 14}, {'systemClass': 'place', 'count': 1}, {'systemClass': 'stratigraphic_unit', 'count': 1}]
+
 
 api_node_entities = {
     'nodes': [{'id': 84, 'label': 'Austria', 'url': 'http://local.host/api/0.2/entity/84'},

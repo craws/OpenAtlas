@@ -4,7 +4,7 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.parser import entity_parser
@@ -27,7 +27,7 @@ class GetEntity(Resource):  # type: ignore
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
         if parser['download']:
-            return Download.download(result, GetEntity.get_template(parser), entity.id)
+            return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200
 
     @staticmethod

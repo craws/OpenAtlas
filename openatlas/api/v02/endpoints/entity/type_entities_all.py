@@ -3,8 +3,8 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response, g
 from flask_restful import Resource
 
+from openatlas.api.v02.resources.enpoints_util import resolve_entities
 from openatlas.api.v02.resources.error import InvalidSubunitError
-from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.resources.util import get_entity_by_id
 
@@ -13,7 +13,7 @@ class GetTypeEntitiesAll(Resource):  # type: ignore
     @staticmethod
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         entities = [get_entity_by_id(entity) for entity in GetTypeEntitiesAll.get_node_all(id_)]
-        return resolve_entity(entities, entity_parser.parse_args(), id_)
+        return resolve_entities(entities, entity_parser.parse_args(), id_)
 
     @staticmethod
     def get_node_all(id_: int) -> List[int]:
