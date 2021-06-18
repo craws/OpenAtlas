@@ -93,38 +93,120 @@ class ApiTests(TestBaseCase):
             self.assertEqual(rv.get_json(), api_data.api_content_en)
 
             # /api/0.2/geometric_entities/
+            rv = self.app.get(url_for('api.geometric_entities'))
+            self.assertEqual(rv.get_json(), api_data.api_geometries_template)
             rv = self.app.get(url_for('api.geometric_entities', download=True))
             self.assertEqual(rv.get_json(), api_data.api_geometries_template)
             rv = self.app.get(url_for('api.geometric_entities', count=True))
             assert b'1' in rv.data
             rv = self.app.get(url_for('api.geometric_entities', geometry='gisLineAll', count=True))
-            print(rv.get_json())
             assert b'0' in rv.data
 
+            # /api/0.2/overview_count/
+            rv = self.app.get(url_for('api.overview_count'))
+            self.assertEqual(rv.get_json(), api_data.api_overview_count)
+
+            # ---Nodes---
+
+            # /api/0.2/node_entities/
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id))
+            self.assertEqual(rv.get_json(), api_data.api_node_entities)
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, download=True))
+            self.assertEqual(rv.get_json(), api_data.api_node_entities)
+            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, count=True))
+            assert b'6' in rv.data
+
+            # /api/0.2/node_entities_all/
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id))
+            self.assertEqual(rv.get_json(), api_data.api_node_entities_all)
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, download=True))
+            self.assertEqual(rv.get_json(), api_data.api_node_entities_all)
+            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, count=True))
+            assert b'8' in rv.data
+
+            # /api/0.2/node_overview/
+            rv = self.app.get(url_for('api.node_overview'))
+            self.assertEqual(rv.get_json(), api_data.api_node_overview)
+            rv = self.app.get(url_for('api.node_overview', download=True))
+            self.assertEqual(rv.get_json(), api_data.api_node_overview)
+
+            # /api/0.2/subunit/
+            rv = self.app.get(url_for('api.subunit', id_=place.id))
+            self.assertEqual(rv.get_json(), api_data.api_subunit)
+            rv = self.app.get(url_for('api.subunit', id_=place.id, download=True))
+            self.assertEqual(rv.get_json(), api_data.api_subunit)
+            rv = self.app.get(url_for('api.subunit', id_=place.id, count=True))
+            assert b'1' in rv.data
+
+            # /api/0.2/subunit_hierarchy/
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id))
+            self.assertEqual(rv.get_json(), api_data.api_subunit_hierarchy)
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, download=True))
+            self.assertEqual(rv.get_json(), api_data.api_subunit_hierarchy)
+            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, count=True))
+            assert b'2' in rv.data
+
+            # /api/0.2/type_tree/
+            rv = self.app.get(url_for('api.type_tree'))
+            self.assertEqual(rv.get_json(), api_data.api_type_tree)
+            rv = self.app.get(url_for('api.type_tree', download=True))
+            self.assertEqual(rv.get_json(), api_data.api_type_tree)
+
+            # ---Entity---
+            # /api/0.2/code/
+            rv = self.app.get(url_for('api.code', code='reference'))
+            self.assertEqual(rv.get_json(), api_data.api_code_reference)
+            rv = self.app.get(url_for('api.code', code='reference', format='geojson'))
+            self.assertEqual(rv.get_json(), api_data.api_code_reference_geojson)
+            rv = self.app.get(url_for('api.code', code='reference', download=True))
+            self.assertEqual(rv.get_json(), api_data.api_code_reference)
+            rv = self.app.get(url_for('api.code', code='place', count=True))
+            assert b'3' in rv.data
+            rv = self.app.get(
+                url_for('api.code', code='place', show='geometry', limit=2, sort='desc',
+                        first=feature.id))
+            self.assertEqual(rv.get_json(), api_data.api_code_place_first_sort_show_limit)
+            rv = self.app.get(
+                url_for('api.code', code='place', limit=10, sort='desc', column='name',
+                        filter='or|name|like|Nostromos'))
+            print(rv.get_json())
+            assert b'Nostromos' in rv.data
+
+
+
+            rv = self.app.get(url_for('api.code', code='reference', export='csv'))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.code', code='place', filter='or|id|eq|' + str(place.id)))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            assert b'Nostromos' in rv.data
+
+            rv = self.app.get(url_for('api.code', code='reference'))
+            assert b'openatlas' in rv.data
+
             # Path Tests
+            rv = self.app.get(url_for('api.class', class_code='E31'))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.class', class_code='E31', format='geojson'))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.class', class_code='E31', download=True))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.class', class_code='E18', export='csv'))
+            assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
 
             rv = self.app.get(url_for('api.latest', count=True, latest=2))
             assert b'2' in rv.data
 
-            rv = self.app.get(url_for('api.code', code='reference'))
-            assert b'openatlas' in rv.data
-            rv = self.app.get(url_for('api.code', code='reference', format='geojson'))
-            assert b'openatlas' in rv.data
             rv = self.app.get(url_for('api.system_class', system_class='appellation'))
             assert b'Cargo hauler' in rv.data
             rv = self.app.get(
                 url_for('api.system_class', system_class='appellation', format='geojson'))
             assert b'Cargo hauler' in rv.data
-            rv = self.app.get(url_for('api.class', class_code='E31'))
-            assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.class', class_code='E31', format='geojson'))
-            assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id))
-            assert b'Austria' in rv.data
-            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id))
-            assert b'Austria' in rv.data
+
             rv = self.app.get(url_for('api.type_entities', id_=unit_node.id))
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('api.type_entities_all', id_=unit_node.id))
@@ -137,30 +219,16 @@ class ApiTests(TestBaseCase):
                         format='geojson'))
             assert b'Nostromos' in rv.data
 
-            rv = self.app.get(url_for('api.overview_count'))
-            assert b'systemClass' in rv.data
-
-            rv = self.app.get(url_for('api.node_overview'))
-            assert b'Actor' in rv.data
-            rv = self.app.get(url_for('api.type_tree'))
-            assert b'typeTree' in rv.data
-
             # Path test with download
             rv = self.app.get(url_for('api.entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.latest', latest=1, download=True))
             assert b'Datei' in rv.data
-            rv = self.app.get(url_for('api.code', code='reference', download=True))
-            assert b'https://openatlas.eu' in rv.data
+
             rv = self.app.get(
                 url_for('api.system_class', system_class='appellation', download=True))
             assert b'Cargo hauler' in rv.data
-            rv = self.app.get(url_for('api.class', class_code='E31', download=True))
-            assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, download=True))
-            assert b'Austria' in rv.data
-            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, download=True))
-            assert b'Austria' in rv.data
+
             rv = self.app.get(url_for('api.query', classes='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
 
@@ -168,47 +236,19 @@ class ApiTests(TestBaseCase):
             assert b'systemClass' in rv.data
             rv = self.app.get(url_for('api.class_mapping', download=True))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('api.node_overview', download=True))
-            assert b'Actor' in rv.data
 
             # Path with export
             rv = self.app.get(url_for('api.entity', id_=place.id, export='csv'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.class', class_code='E18', export='csv'))
-            assert b'Nostromos' in rv.data
+
             rv = self.app.get(url_for('api.system_class', system_class='place', export='csv'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='reference', export='csv'))
-            assert b'https://openatlas.eu' in rv.data
 
             # Testing Subunit
-            rv = self.app.get(url_for('api.subunit', id_=place.id))
-            assert b'Feature' in rv.data and b'Strato' not in rv.data
-            rv = self.app.get(url_for('api.subunit', id_=place.id, download=True))
-            assert b'Feature' in rv.data and b'Strato' not in rv.data
-            rv = self.app.get(url_for('api.subunit', id_=place.id, count=True))
-            assert b'1' in rv.data
-            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id))
-            assert b'Strato' in rv.data
-            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, download=True))
-            assert b'Strato' in rv.data
-            rv = self.app.get(url_for('api.subunit_hierarchy', id_=place.id, count=True))
-            assert b'2' in rv.data
 
             # Parameter: filter
-            rv = self.app.get(
-                url_for('api.code', code='place', limit=10, sort='desc', column='name',
-                        filter='or|name|like|Nostromos'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='reference'))
-            assert b'openatlas' in rv.data
+
             rv = self.app.get(url_for('api.class', class_code='E18', filter='or|name|like|Nostr'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|id|eq|' + str(place.id)))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
             assert b'Nostromos' in rv.data
 
             # Parameter: last
@@ -229,8 +269,7 @@ class ApiTests(TestBaseCase):
             # Parameter: count
             rv = self.app.get(url_for('api.class', class_code='E31', count=True))
             assert b'2' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', count=True))
-            assert b'3' in rv.data
+
             rv = self.app.get(url_for('api.system_class', system_class='appellation', count=True))
             assert b'1' in rv.data
 
@@ -240,10 +279,6 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(
                 url_for('api.query', entities=place.id, classes='E18', codes='place', count=True))
             assert b'7' in rv.data
-            rv = self.app.get(url_for('api.node_entities', id_=unit_node.id, count=True))
-            assert b'6' in rv.data
-            rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, count=True))
-            assert b'8' in rv.data
 
     @raises(EntityDoesNotExistError)
     def error_class_entity(self) -> None:  # pragma: nocover
