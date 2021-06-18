@@ -18,27 +18,25 @@ class LPHelper:
                 return link_.range.id
 
     @staticmethod
+    def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
+        property_ = f"i {link_.property.i18n_inverse['en']}" \
+            if inverse and link_.property.i18n_inverse['en'] else f" {link_.property.i18n['en']}"
+        return {
+            'label': link_.domain.name if inverse else link_.range.name,
+            'relationTo': url_for('api.entity', id_=link_.domain.id if inverse else link_.range.id,
+                                  _external=True),
+            'relationType': f"crm:{link_.property.code}{property_}",
+            'relationSystemClass': link_.domain.class_.name if inverse else link_.range.class_.name,
+            'type': link_.type.name if link_.type else None,
+            'when': {'timespans': [LPHelper.get_time(link_.domain if inverse else link_.range)]}}
+
+    @staticmethod
     def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
         out = []
-        for link in links:
-            out.append({
-                'label': link.range.name,
-                'relationTo': url_for('api.entity', id_=link.range.id, _external=True),
-                'relationType': 'crm:' + link.property.code + ' ' + link.property.i18n['en'],
-                'relationSystemClass': link.range.class_.name,
-                'type': link.type.name if link.type else None,
-                'when': {'timespans': [LPHelper.get_time(link.range)]}})
-        for link in links_inverse:
-            property_ = link.property.i18n['en']
-            if link.property.i18n_inverse['en']:
-                property_ = link.property.i18n_inverse['en']
-            out.append({
-                'label': link.domain.name,
-                'relationTo': url_for('api.entity', id_=link.domain.id, _external=True),
-                'relationType': 'crm:' + link.property.code + 'i ' + property_,
-                'relationSystemClass': link.domain.class_.name,
-                'type': link.type.name if link.type else None,
-                'when': {'timespans': [LPHelper.get_time(link.domain)]}})
+        for link_ in links:
+            out.append(LPHelper.link_dict(link_))
+        for link_ in links_inverse:
+            out.append(LPHelper.link_dict(link_, inverse=True))
         return out if out else None
 
     @staticmethod

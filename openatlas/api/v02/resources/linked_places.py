@@ -80,6 +80,7 @@ class LinkedPlaces:
 
     @staticmethod
     def get_names(entity: Entity, parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+
         return [{"alias": value} for value in
                 entity.aliases.values()] if entity.aliases and 'names' in parser['show'] else None
 

@@ -104,9 +104,7 @@ class ApiTests(TestBaseCase):
 
             # /api/0.2/overview_count/
             rv = self.app.get(url_for('api.overview_count'))
-            print(rv.get_json())
             self.assertEqual(rv.get_json(), api_data.api_overview_count)
-
 
             # ---Nodes---
 
@@ -178,8 +176,6 @@ class ApiTests(TestBaseCase):
             self.assertEqual(rv.get_json(), api_data.api_code_place_filter_time)
             rv = self.app.get(url_for('api.code', code='reference', export='csv'))
             assert b'https://openatlas.eu' in rv.data
-
-
 
             # Path Tests
             rv = self.app.get(url_for('api.class', class_code='E31'))
