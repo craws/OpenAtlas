@@ -14,3 +14,8 @@ INSERT INTO web.user_settings (user_id, name, value) VALUES
 -- Citation example
 INSERT INTO web.i18n (name, language, text) VALUES
     ('citation_example', 'en', 'citation example');
+-- Content example for API
+INSERT INTO web.i18n (name, language, text) VALUES
+    ('intro_for_frontend', 'en', 'This is English');
+INSERT INTO web.i18n (name, language, text) VALUES
+    ('intro_for_frontend', 'de', 'Das ist Deutsch');

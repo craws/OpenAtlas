@@ -317,3 +317,6 @@ api_geometries_template = [{'type': 'Feature',
                                  'objectName': 'Nostromos',
                                  'objectType': None,
                                  'shapeType': 'centerpoint'}]}]
+
+api_content_en = {'intro': 'This is English', 'contact': '', 'legalNotice': '', 'siteName': ''}
+api_content_de = {'intro': 'Das ist Deutsch', 'contact': '', 'legalNotice': '', 'siteName': ''}

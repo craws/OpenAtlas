@@ -2,6 +2,7 @@ from flask import g, url_for
 from nose.tools import raises
 
 from openatlas import app
+from openatlas.api.v02.common.content.class_mapping import ClassMapping
 from openatlas.api.v02.resources.error import APIFileNotFoundError, EntityDoesNotExistError, \
     FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError, \
@@ -76,18 +77,34 @@ class ApiTests(TestBaseCase):
             self.assertEqual(rv.get_json(), api_data.api_linked_place_template)
 
             # Test Geojson output
-            self.maxDiff = None
             rv = self.app.get(url_for('api.entity', id_=place.id, format='geojson'))
             self.assertEqual(rv.get_json(), api_data.api_geojson_template)
 
-            # Test geometries Endpoint
-            self.maxDiff = None
-            rv = self.app.get(url_for('api.geometric_entities'))
+            # ---Content---
+
+            # /api/0.2/classes/
+            rv = self.app.get(url_for('api.class_mapping'))
+            self.assertEqual(rv.get_json(), ClassMapping.mapping)
+
+            # /api/0.2/content/
+            rv = self.app.get(url_for('api.content', lang='de'))
+            self.assertEqual(rv.get_json(), api_data.api_content_de)
+            rv = self.app.get(url_for('api.content', lang='en', download=True))
+            self.assertEqual(rv.get_json(), api_data.api_content_en)
+
+            # /api/0.2/geometric_entities/
+            rv = self.app.get(url_for('api.geometric_entities', download=True))
             self.assertEqual(rv.get_json(), api_data.api_geometries_template)
+            rv = self.app.get(url_for('api.geometric_entities', count=True))
+            assert b'1' in rv.data
+            rv = self.app.get(url_for('api.geometric_entities', geometry='gisLineAll', count=True))
+            print(rv.get_json())
+            assert b'0' in rv.data
 
             # Path Tests
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
+
             rv = self.app.get(url_for('api.latest', count=True, latest=2))
             assert b'2' in rv.data
 
@@ -119,12 +136,10 @@ class ApiTests(TestBaseCase):
                 url_for('api.query', entities=place.id, classes='E18', items='place',
                         format='geojson'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.content', lang='de'))
-            assert b'intro' in rv.data
+
             rv = self.app.get(url_for('api.overview_count'))
             assert b'systemClass' in rv.data
-            rv = self.app.get(url_for('api.class_mapping'))
-            assert b'systemClass' in rv.data
+
             rv = self.app.get(url_for('api.node_overview'))
             assert b'Actor' in rv.data
             rv = self.app.get(url_for('api.type_tree'))
@@ -148,8 +163,7 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('api.query', classes='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.content', lang='de', download=True))
-            assert b'intro' in rv.data
+
             rv = self.app.get(url_for('api.overview_count', download=True))
             assert b'systemClass' in rv.data
             rv = self.app.get(url_for('api.class_mapping', download=True))
