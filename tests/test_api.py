@@ -169,22 +169,15 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(
                 url_for('api.code', code='place', limit=10, sort='desc', column='name',
                         filter='or|name|like|Nostromos'))
-
-            assert b'Nostromos' in rv.data
-
-
-
+            self.assertEqual(rv.get_json(), api_data.api_code_place_limit_sort_column_filter)
+            rv = self.app.get(url_for('api.code', code='place', filter='or|id|eq|' + str(place.id)))
+            self.assertEqual(rv.get_json(), api_data.api_code_place_filter_id)
+            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
+            self.assertEqual(rv.get_json(), api_data.api_code_place_filter_time)
             rv = self.app.get(url_for('api.code', code='reference', export='csv'))
             assert b'https://openatlas.eu' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|id|eq|' + str(place.id)))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api.code', code='place', filter='or|begin_from|ge|2018-1-1'))
-            assert b'Nostromos' in rv.data
 
-            rv = self.app.get(url_for('api.code', code='reference'))
-            assert b'openatlas' in rv.data
+
 
             # Path Tests
             rv = self.app.get(url_for('api.class', class_code='E31'))
