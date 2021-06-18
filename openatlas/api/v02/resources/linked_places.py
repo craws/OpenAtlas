@@ -119,7 +119,6 @@ class LinkedPlaces:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
-
         features['relations'] = \
             LinkedPlaces.get_links(links, links_inverse) if 'relations' in parser['show'] else None
         features['types'] = \

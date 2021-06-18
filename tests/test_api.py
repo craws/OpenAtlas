@@ -169,7 +169,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(
                 url_for('api.code', code='place', limit=10, sort='desc', column='name',
                         filter='or|name|like|Nostromos'))
-            print(rv.get_json())
+
             assert b'Nostromos' in rv.data
 
 
