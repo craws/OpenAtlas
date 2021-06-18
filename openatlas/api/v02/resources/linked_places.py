@@ -13,6 +13,12 @@ from openatlas.util.util import get_file_path
 
 class LinkedPlaces:
     @staticmethod
+    def get_location_id(links: List[Link]) -> int:
+        for link_ in links:
+            if link_.property.code == 'P53':
+                return link_.range.id
+
+    @staticmethod
     def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
         out = []
         for link in links:
@@ -82,8 +88,8 @@ class LinkedPlaces:
                 'comment': entity.end_comment}}
 
     @staticmethod
-    def get_geoms_by_entity(entity: Entity) -> Union[str, Dict[str, Any]]:
-        geoms = Gis.get_by_id(entity.id)
+    def get_geoms_by_entity(entity_id: int) -> Union[str, Dict[str, Any]]:
+        geoms = Gis.get_by_id(entity_id)
         if len(geoms) == 1:
             return geoms[0]
         return {'type': 'GeometryCollection', 'geometries': geoms}
@@ -133,9 +139,9 @@ class LinkedPlaces:
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 features['geometry'] = LinkedPlaces.get_geoms_by_entity(
-                    Link.get_linked_entity(entity.id, 'P53'))
+                    LinkedPlaces.get_location_id(links))
             elif entity.class_.name == 'object_location':
-                features['geometry'] = LinkedPlaces.get_geoms_by_entity(entity)
+                features['geometry'] = LinkedPlaces.get_geoms_by_entity(entity.id)
 
         return {
             'type': type_,
