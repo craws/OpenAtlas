@@ -1,13 +1,12 @@
 from typing import Any, Dict
 
 from flask_restful import fields
-from flask_restful.fields import List as RestList
 
 
 class GeojsonTemplate:
 
     @staticmethod
-    def geojson_template() -> Dict[str, RestList]:
+    def geojson_template() -> Dict[str, Any]:
         properties = {
             '@id': fields.Integer,
             'systemClass': fields.String,
@@ -24,7 +23,7 @@ class GeojsonTemplate:
         return {
             'type': fields.String,
             'geometry': fields.Raw,
-            'properties': fields.List(fields.Nested(properties))}
+            'properties': fields.Nested(properties)}
 
     @staticmethod
     def geojson_collection_template() -> Dict[str, Any]:
