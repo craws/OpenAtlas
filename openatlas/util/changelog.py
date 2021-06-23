@@ -1,7 +1,10 @@
 class Changelog:
-
     versions = {
         '6.4.0': ['TBA', {
+            'feature': {
+                '1495': 'API: Additional Geojson output for QGIS imports',
+                '1529': 'API: Increase request performance',
+                '1530': 'API: Geometries endpoint for frontend map'},
             'fix': {
                 '1414': 'Enlarged Description Field Covers up Entry Buttons'
             }

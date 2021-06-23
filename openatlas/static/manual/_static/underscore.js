@@ -318,18 +318,18 @@
     });
   });
 
-  // Convenience version of a common use case of `map`: fetching a property.
+  // Convenience version of a endpoints use case of `map`: fetching a property.
   _.pluck = function(obj, key) {
     return _.map(obj, _.property(key));
   };
 
-  // Convenience version of a common use case of `filter`: selecting only objects
+  // Convenience version of a endpoints use case of `filter`: selecting only objects
   // containing specific `key:value` pairs.
   _.where = function(obj, attrs) {
     return _.filter(obj, _.matcher(attrs));
   };
 
-  // Convenience version of a common use case of `find`: getting the first object
+  // Convenience version of a endpoints use case of `find`: getting the first object
   // containing specific `key:value` pairs.
   _.findWhere = function(obj, attrs) {
     return _.find(obj, _.matcher(attrs));

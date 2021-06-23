@@ -13,7 +13,6 @@
       "email": "bernhard.koschicek@oeaw.ac.at"
     }
   },
-  "servers": [],
   "tags": [
     {
       "name": "Entities",
@@ -151,6 +150,35 @@
             "csv"
           ]
         }
+      },
+      "formatParam": {
+        "name": "format",
+        "in": "query",
+        "description": "Select to which output format is prefered",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "linked_places",
+            "geojson"
+          ]
+        }
+      },
+      "geometryParam": {
+        "name": "geometry",
+        "in": "query",
+        "description": "Select geometry types.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "gisAll",
+            "gisPointAll",
+            "gisPointSupers",
+            "gisPointSubs",
+            "gisPointSibling",
+            "gisLineAll",
+            "gisPolygonAll"
+          ]
+        }
       }
     },
     "schemas": {
@@ -242,7 +270,7 @@
               "type": "string"
             }
           },
-          "cusxtom": {
+          "custom": {
             "type": "array",
             "items": {
               "type": "string"
@@ -294,26 +322,6 @@
                   "$ref": "#/components/schemas/PaginationIndexModel"
                 }
               }
-            }
-          }
-        }
-      },
-      "PaginationModel": {
-        "type": "object",
-        "properties": {
-          "entities": {
-            "type": "number"
-          },
-          "entitiesPerPage": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          },
-          "index": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaginationIndexModel"
             }
           }
         }
@@ -541,6 +549,97 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TimespansModel"
+            }
+          }
+        }
+      },
+      "TypeModel": {
+        "type": "object",
+        "properties": {
+          "Type_IDs": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "origin_id": {
+                "type": "integer"
+              },
+              "first": {
+                "type": "integer"
+              },
+              "last": {
+                "type": "integer"
+              },
+              "root": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "subs": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "count": {
+                "type": "integer"
+              },
+              "count_subs": {
+                "type": "integer"
+              },
+              "locked": {
+                "type": "boolean"
+              },
+              "standard": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "TypeTreeModel": {
+        "type": "object",
+        "properties": {
+          "type_tree": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeModel"
+            }
+          }
+        }
+      },
+      "GeometryModel": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string"
+            },
+            "geometry": {
+              "type": "object",
+              "properties": {
+                "coordinates": {
+                  "type": "array"
+                },
+                "type": {
+                  "type": "string"
+                }
+              }
+            },
+            "properties": {
+              "type": "array"
             }
           }
         }

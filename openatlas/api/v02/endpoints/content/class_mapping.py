@@ -9,7 +9,9 @@ from openatlas.api.v02.templates.class_mapping import ClassMappingTemplate
 class ClassMapping(Resource):  # type: ignore
     @staticmethod
     def get() -> Union[Tuple[Resource, int], Response]:
-        return marshal(ClassMapping.mapping, ClassMappingTemplate.class_mapping_template()), 200
+        return marshal(
+            ClassMapping.mapping,
+            ClassMappingTemplate.class_template()), 200
 
     mapping = [
         {

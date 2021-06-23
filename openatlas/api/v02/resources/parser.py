@@ -77,7 +77,28 @@ entity_parser.add_argument(
     type=str,
     help='{error_msg}',
     choices='csv')
+entity_parser.add_argument(
+    'format',
+    type=str,
+    help='{error_msg}',
+    case_sensitive=False,
+    default='lp',
+    choices=('lp', 'geojson'))
 
+gis_parser = default_parser.copy()
+gis_parser.add_argument(
+    'geometry',
+    type=str,
+    help='{error_msg}',
+    default='gisAll',
+    action='append',
+    choices=('gisAll',
+             'gisPointAll',
+             'gisPointSupers',
+             'gisPointSubs',
+             'gisPointSibling',
+             'gisLineAll',
+             'gisPolygonAll'))
 query_parser = entity_parser.copy()
 query_parser.add_argument(
     'entities',
@@ -103,10 +124,11 @@ query_parser.add_argument(
     help="{error_msg}",
     case_sensitive=False,
     choices=(
-        'acquisition', 'activity', 'actor_appellation', 'administrative_unit', 'appellation',
-        'artifact', 'bibliography', 'edition', 'external_reference', 'feature', 'file', 'find',
-        'group', 'human_remains', 'move', 'object_location', 'person', 'place', 'source',
-        'reference_system', 'stratigraphic_unit', 'source_translation', 'type'))
+        'acquisition', 'activity', 'actor_appellation', 'administrative_unit',
+        'appellation', 'artifact', 'bibliography', 'edition', 'find', 'file',
+        'external_reference', 'feature', 'group', 'human_remains', 'move',
+        'object_location', 'person', 'place', 'source', 'reference_system',
+        'stratigraphic_unit', 'source_translation', 'type'))
 
 image_parser = default_parser.copy()
 image_parser.add_argument(
