@@ -114,11 +114,16 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = [
                 link(event),
                 event.class_.label,
-                link(link_.type),
+                _('moved') if link_.property.code == 'P25' else link(link_.type),
                 first,
                 last,
                 link_.description]
-            add_edit_link(data, url_for('involvement_update', id_=link_.id, origin_id=entity.id))
+            if link_.property.code == 'P25':
+                data += ['']
+            else:
+                add_edit_link(
+                    data,
+                    url_for('involvement_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):

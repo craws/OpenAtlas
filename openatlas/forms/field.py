@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List
+from typing import Any, List
 
 from flask import g, render_template
 from flask_login import current_user
