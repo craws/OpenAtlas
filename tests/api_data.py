@@ -315,8 +315,16 @@ api_geometries_template = {'features': [{'geometry': {'coordinates': [9, 17], 't
                                          'type': 'Feature'}],
                            'type': 'FeatureCollection'}
 
-api_content_en = {'intro': 'This is English', 'contact': '', 'legalNotice': '', 'siteName': ''}
-api_content_de = {'intro': 'Das ist Deutsch', 'contact': '', 'legalNotice': '', 'siteName': ''}
+api_content_en = {'contact': '',
+ 'imageSizes': {'table': '100', 'thumbnail': '200'},
+ 'intro': 'This is English',
+ 'legalNotice': '',
+ 'siteName': ''}
+api_content_de = {'contact': '',
+ 'imageSizes': {'table': '100', 'thumbnail': '200'},
+ 'intro': 'Das ist Deutsch',
+ 'legalNotice': '',
+ 'siteName': ''}
 
 api_overview_count = [{'systemClass': 'external_reference', 'count': 1},
                       {'systemClass': 'reference_system', 'count': 2},
