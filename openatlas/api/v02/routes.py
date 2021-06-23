@@ -30,7 +30,7 @@ cors = CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(api_bp, catch_all_404s=False, errors=errors)
 
-api.add_resource(ClassMapping, '/0.2/classes/', endpoint='class_mapping')
+
 api.add_resource(GetByCode, '/0.2/code/<string:code>', endpoint="code")
 api.add_resource(GetEntity, '/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetLatest, '/0.2/latest/<int:latest>', endpoint="latest")
@@ -54,6 +54,7 @@ api.add_resource(GetTypeTree, '/0.2/type_tree/', endpoint="type_tree")
 api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
 api.add_resource(GetContent, '/0.2/content/', endpoint="content")
 api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count')
+api.add_resource(ClassMapping, '/0.2/classes/', endpoint='class_mapping')
 
 api.add_resource(DisplayImage, '/display/<path:filename>', endpoint='display')
 

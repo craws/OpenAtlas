@@ -34,6 +34,10 @@ class InvalidCodeError(Exception):
     pass
 
 
+class InvalidSystemClassError(Exception):
+    pass
+
+
 class NoSearchStringError(Exception):
     pass
 
@@ -106,6 +110,9 @@ errors = {
     "InvalidCodeError": {
         "message": "The code is not valid. Valid codes are: actor, event, place, source, reference"
                    " and object. For further usage, please confer the help page.",
+        "status": 404},
+    "InvalidSystemClassError": {
+        "message": "System class is not valid. For further usage, please confer the help page.",
         "status": 404},
     "NoSearchStringError": {
         "message": "The filter parameter has no search string.",
