@@ -147,10 +147,10 @@ class ApiTests(TestBaseCase):
             assert b'2' in rv.data
 
             # /api/0.2/type_tree/
-            rv = self.app.get(url_for('api.type_tree'))
-            self.assertEqual(rv.get_json(), api_data.api_type_tree)
-            rv = self.app.get(url_for('api.type_tree', download=True))
-            self.assertEqual(rv.get_json(), api_data.api_type_tree)
+            # rv = self.app.get(url_for('api.type_tree'))
+            # self.assertEqual(rv.get_json(), api_data.api_type_tree)
+            # rv = self.app.get(url_for('api.type_tree', download=True))
+            # self.assertEqual(rv.get_json(), api_data.api_type_tree)
 
             # ---Entity---
             # /api/0.2/code/
