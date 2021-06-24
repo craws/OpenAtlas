@@ -42,7 +42,7 @@ def overview() -> str:
         'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table(order=[[0, 'desc']])}
+        'latest': Table(paging=False, order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
