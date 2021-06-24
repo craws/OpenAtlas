@@ -51,9 +51,10 @@ class Pagination:
             return [Pagination.get_geojson(new_entities, parser)]
 
     @staticmethod
-    def link_builder(new_entities: List[Entity],
-                     parser,
-                     inverse: bool = False) -> Optional[List[Link]]:
+    def link_builder(
+            new_entities: List[Entity],
+            parser,
+            inverse: bool = False) -> Optional[List[Link]]:
         if any(i in ['relations', 'types', 'depictions', 'links', 'geometry'] for i in
                parser['show']):
             entities = [e.id for e in new_entities[:int(parser['limit'])]]

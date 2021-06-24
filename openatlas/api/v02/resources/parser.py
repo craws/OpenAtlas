@@ -75,6 +75,12 @@ entity_parser.add_argument(
     case_sensitive=False,
     default='lp',
     choices=('lp', 'geojson'))
+entity_parser.add_argument(
+    'display',
+    type=str,
+    help="{error_msg}",
+    choices=('pagination', 'results')
+)
 
 gis_parser = default_parser.copy()
 gis_parser.add_argument(
@@ -83,13 +89,14 @@ gis_parser.add_argument(
     help='{error_msg}',
     default='gisAll',
     action='append',
-    choices=('gisAll',
-             'gisPointAll',
-             'gisPointSupers',
-             'gisPointSubs',
-             'gisPointSibling',
-             'gisLineAll',
-             'gisPolygonAll'))
+    choices=(
+        'gisAll',
+        'gisPointAll',
+        'gisPointSupers',
+        'gisPointSubs',
+        'gisPointSibling',
+        'gisLineAll',
+        'gisPolygonAll'))
 query_parser = entity_parser.copy()
 query_parser.add_argument(
     'entities',

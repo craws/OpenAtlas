@@ -38,8 +38,7 @@ class LinkedPlaces:
             links: List[Link],
             links_inverse: List[Link],
             parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
-        return LPHelper.get_links(links, links_inverse) if 'relations' in parser[
-            'show'] else None
+        return LPHelper.get_links(links, links_inverse) if 'relations' in parser['show'] else None
 
     @staticmethod
     def get_types(
@@ -62,8 +61,7 @@ class LinkedPlaces:
     def get_reference_links(
             links_inverse: List[Link],
             parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-        return LPHelper.get_reference_systems(links_inverse) if 'links' in parser[
-            'show'] else None
+        return LPHelper.get_reference_systems(links_inverse) if 'links' in parser['show'] else None
 
     @staticmethod
     def get_geometries(
