@@ -4,9 +4,9 @@ from nose.tools import raises
 from openatlas import app
 from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v02.resources.error import (
-    APIFileNotFoundError, EntityDoesNotExistError, FilterOperatorError,
-    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError,
-    InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError)
+    EntityDoesNotExistError, FilterOperatorError, InvalidCidocClassCode, InvalidCodeError,
+    InvalidLimitError, InvalidSearchDateError, InvalidSearchNumberError, InvalidSubunitError,
+    NoSearchStringError, QueryEmptyError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -340,8 +340,3 @@ class ApiTests(TestBaseCase):
     def error_filter_date2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place', filter='or|id|eq|WRONG'))
-
-    @raises(APIFileNotFoundError)
-    def file_not_found(self) -> None:  # pragma: nocover
-        with app.app_context():  # type: ignore
-            self.app.get(url_for('api.some_wrong_url'))
