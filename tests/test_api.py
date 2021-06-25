@@ -3,8 +3,7 @@ from nose.tools import raises
 
 from openatlas import app
 from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.v02.resources.error import (
-    APIFileNotFoundError, EntityDoesNotExistError, FilterOperatorError,
+from openatlas.api.v02.resources.error import (EntityDoesNotExistError, FilterOperatorError,
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, InvalidSearchDateError,
     InvalidSearchNumberError, InvalidSubunitError, NoSearchStringError, QueryEmptyError)
 from openatlas.models.entity import Entity
@@ -124,11 +123,11 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api.node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
 
-            # /api/0.2/node_overview/
-            rv = self.app.get(url_for('api.node_overview'))
-            self.assertEqual(rv.get_json(), api_data.api_node_overview)
-            rv = self.app.get(url_for('api.node_overview', download=True))
-            self.assertEqual(rv.get_json(), api_data.api_node_overview)
+            # # /api/0.2/node_overview/
+            # rv = self.app.get(url_for('api.node_overview'))
+            # self.assertEqual(rv.get_json(), api_data.api_node_overview)
+            # rv = self.app.get(url_for('api.node_overview', download=True))
+            # self.assertEqual(rv.get_json(), api_data.api_node_overview)
 
             # /api/0.2/subunit/
             rv = self.app.get(url_for('api.subunit', id_=place.id))
@@ -340,8 +339,3 @@ class ApiTests(TestBaseCase):
     def error_filter_date2(self) -> None:  # pragma: nocover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place', filter='or|id|eq|WRONG'))
-
-    @raises(APIFileNotFoundError)
-    def file_not_found(self) -> None:  # pragma: nocover
-        with app.app_context():  # type: ignore
-            self.app.get(url_for('api.some_wrong_url'))

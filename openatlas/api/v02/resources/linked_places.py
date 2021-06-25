@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import url_for
 
@@ -67,7 +67,7 @@ class LinkedPlaces:
     def get_geometries(
             entity: Entity,
             links: List[Link],
-            parser: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            parser: Dict[str, Any]) -> Union[Dict[str, Any], None]:
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 return LPHelper.get_geoms_by_entity(
