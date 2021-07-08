@@ -73,6 +73,9 @@ class FilterDelimiterError(Exception):
 class FilterLogicalOperatorError(Exception):
     pass
 
+class TypeIDError(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -133,5 +136,8 @@ errors = {
         "status": 404},
     "FilterDelimiterError": {
         "message": "Filter delimiter are wrong.",
+        "status": 404},
+    "TypeIDError": {
+        "message": "One type ID is wrong.",
         "status": 404}
 }

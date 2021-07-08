@@ -1,7 +1,8 @@
 import itertools
 from typing import Any, Dict, List
 
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable
+from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable, \
+    TypeIDError
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.util import get_all_links, get_all_links_inverse, get_entity_by_id
@@ -41,6 +42,11 @@ class Pagination:
 
     @staticmethod
     def get_results(new_entities: List[Entity], parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+        if parser['type_id']:
+            new_entities = Pagination.get_entities_by_type(new_entities, parser)
+            if not new_entities:
+                raise TypeIDError
+
         if parser['format'] == 'lp':
             return Pagination.linked_places_result(
                 new_entities[:int(parser['limit'])],
@@ -49,6 +55,14 @@ class Pagination:
                 Pagination.link_builder(new_entities, parser, True))
         if parser['format'] == 'geojson':
             return [Pagination.get_geojson(new_entities, parser)]
+
+    @staticmethod
+    def get_entities_by_type(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
+        new_entities = []
+        for entity in entities:
+            if any(ids in [key.id for key in entity.nodes] for ids in parser['type_id']):
+                new_entities.append(entity)
+        return new_entities
 
     @staticmethod
     def link_builder(

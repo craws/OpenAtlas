@@ -75,6 +75,12 @@ entity_parser.add_argument(
     case_sensitive=False,
     default='lp',
     choices=('lp', 'geojson'))
+entity_parser.add_argument(
+    'type_id',
+    type=int,
+    help='{error_msg}',
+    action='append'
+)
 
 gis_parser = default_parser.copy()
 gis_parser.add_argument(
