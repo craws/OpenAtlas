@@ -5,12 +5,12 @@ from flask_restful import Api
 from openatlas import app
 from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v02.endpoints.content.content import GetContent
+from openatlas.api.v02.endpoints.content.geometric_entities import GetGeometricEntities
 from openatlas.api.v02.endpoints.content.overview_count import OverviewCount
 from openatlas.api.v02.endpoints.display_image import DisplayImage
 from openatlas.api.v02.endpoints.entity.class_ import GetByClass
 from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.entity.entity import GetEntity
-from openatlas.api.v02.endpoints.content.geometric_entities import GetGeometricEntities
 from openatlas.api.v02.endpoints.entity.latest import GetLatest
 from openatlas.api.v02.endpoints.entity.query import GetQuery
 from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
@@ -29,7 +29,6 @@ app.config['SWAGGER'] = {'openapi': '3.0.2', 'uiversion': 3}
 cors = CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(api_bp, catch_all_404s=False, errors=errors)
-
 
 api.add_resource(GetByCode, '/0.2/code/<string:code>', endpoint="code")
 api.add_resource(GetEntity, '/0.2/entity/<int:id_>', endpoint='entity')

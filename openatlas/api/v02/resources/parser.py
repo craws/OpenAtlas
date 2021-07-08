@@ -76,7 +76,6 @@ entity_parser.add_argument(
     default='lp',
     choices=('lp', 'geojson'))
 
-
 gis_parser = default_parser.copy()
 gis_parser.add_argument(
     'geometry',

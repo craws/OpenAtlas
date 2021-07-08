@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, NoEntityAvailable
 from openatlas.api.v02.resources.geojson import Geojson
