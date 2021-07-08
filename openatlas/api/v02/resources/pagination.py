@@ -46,7 +46,6 @@ class Pagination:
             new_entities = Pagination.get_entities_by_type(new_entities, parser)
             if not new_entities:
                 raise TypeIDError
-
         if parser['format'] == 'lp':
             return Pagination.linked_places_result(
                 new_entities[:int(parser['limit'])],

@@ -77,12 +77,12 @@ class LPHelper:
     def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
         return {
             'start': {
-                'earliest': entity.begin_from,
-                'latest': entity.begin_to,
+                'earliest': str(entity.begin_from),
+                'latest': str(entity.begin_to),
                 'comment': entity.begin_comment},
             'end': {
-                'earliest': entity.end_from,
-                'latest': entity.end_to,
+                'earliest': str(entity.end_from),
+                'latest': str(entity.end_to),
                 'comment': entity.end_comment}}
 
     @staticmethod

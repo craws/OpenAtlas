@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from flask import Response
+from flask import Response, json
 from flask_restful import Resource, marshal
 
 from openatlas.api.export.csv_export import ApiExportCSV
@@ -13,6 +13,9 @@ from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.models.entity import Entity
 
+from rdflib.plugin import register, Parser
+register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
+from rdflib import Graph, URIRef, Literal
 
 class GetEntity(Resource):  # type: ignore
     @staticmethod
@@ -26,6 +29,11 @@ class GetEntity(Resource):  # type: ignore
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
+
+        g = Graph().parse(data=json.dumps(result), format='json-ld')
+
+        print(g.serialize(format='turtle').decode('utf-8'))
+
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200
