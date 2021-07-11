@@ -57,7 +57,7 @@ def download_csv(filename: str) -> Any:
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
     path = app.config['EXPORT_DIR'] / 'sql'
-    writeable = True if os.access(path, os.W_OK) else False
+    writeable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writeable:
         if Export.export_sql():
@@ -80,7 +80,7 @@ def export_sql() -> Union[str, Response]:
 @required_group('manager')
 def export_csv() -> Union[str, Response]:
     path = app.config['EXPORT_DIR'] / 'csv'
-    writeable = True if os.access(path, os.W_OK) else False
+    writeable = os.access(path, os.W_OK)
     form = ExportCsvForm()
     if form.validate_on_submit() and writeable:
         Export.export_csv(form)

@@ -224,7 +224,7 @@ class Node(Entity):
         # Check if nodes are linked to entities before offering to remove a node from form
         node_ids = Node.get_all_sub_ids(root_node)
         if not node_ids:
-            return
+            return None
         return Db.get_form_count(form_id, node_ids)
 
     @staticmethod

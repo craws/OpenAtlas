@@ -165,18 +165,18 @@ def import_data(project_id: int, class_: str) -> str:
             columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(str(file_path))
-            df = pd.read_csv(file_path, keep_default_na=False)
-            headers = list(df.columns.values)
+            data_frame = pd.read_csv(file_path, keep_default_na=False)
+            headers = list(data_frame.columns.values)
             if 'name' not in headers:  # pragma: no cover
                 messages['error'].append(_('missing name column'))
                 raise Exception()
             for item in headers:  # pragma: no cover
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
-                    del df[item]
+                    del data_frame[item]
             if columns['invalid']:  # pragma: no cover
                 messages['warn'].append(f"{_('invalid columns')}: {','.join(columns['invalid'])}")
-            headers = list(df.columns.values)  # Read cleaned headers again
+            headers = list(data_frame.columns.values)  # Read cleaned headers again
             table_data = []
             checked_data = []
             origin_ids = []
@@ -184,7 +184,7 @@ def import_data(project_id: int, class_: str) -> str:
             missing_name_count = 0
             invalid_type_ids = False
             invalid_geoms = False
-            for index, row in df.iterrows():
+            for index, row in data_frame.iterrows():
                 if not row['name']:  # pragma: no cover
                     missing_name_count += 1
                     continue

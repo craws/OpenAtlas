@@ -19,7 +19,7 @@ class User(UserMixin):  # type: ignore
 
     def __init__(self, row: Dict[str, Any] = None, bookmarks: Optional[List[int]] = None) -> None:
         self.id = row['id']
-        self.active = True if row['active'] == 1 else False
+        self.active = row['active'] == 1
         self.username = row['username']
         self.password = row['password']
         self.login_last_success = row['login_last_success']
