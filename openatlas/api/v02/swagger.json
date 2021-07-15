@@ -179,6 +179,14 @@
             "gisPolygonAll"
           ]
         }
+      },
+      "typeParam": {
+        "name": "type_id",
+        "in": "query",
+        "description": "The output will be filtered by the type_id. Only entities with this type ids will be display. The relation is in logical OR.",
+        "schema": {
+          "type": "number"
+        }
       }
     },
     "schemas": {
