@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import url_for
 
@@ -38,8 +38,7 @@ class LinkedPlaces:
             links: List[Link],
             links_inverse: List[Link],
             parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
-        return LPHelper.get_links(links, links_inverse) if 'relations' in parser[
-            'show'] else None
+        return LPHelper.get_links(links, links_inverse) if 'relations' in parser['show'] else None
 
     @staticmethod
     def get_types(
@@ -62,14 +61,13 @@ class LinkedPlaces:
     def get_reference_links(
             links_inverse: List[Link],
             parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-        return LPHelper.get_reference_systems(links_inverse) if 'links' in parser[
-            'show'] else None
+        return LPHelper.get_reference_systems(links_inverse) if 'links' in parser['show'] else None
 
     @staticmethod
     def get_geometries(
             entity: Entity,
             links: List[Link],
-            parser: Dict[str, Any]) -> Optional[Dict[str, Any]]:
+            parser: Dict[str, Any]) -> Union[Dict[str, Any], None]:
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
                 return LPHelper.get_geoms_by_entity(

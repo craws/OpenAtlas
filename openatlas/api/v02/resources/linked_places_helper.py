@@ -12,10 +12,11 @@ from openatlas.util.util import get_file_path
 
 class LPHelper:
     @staticmethod
-    def get_location_id(links: List[Link]) -> int:
+    def get_location_id(links: List[Link]) -> Union[int, None]:
         for link_ in links:
             if link_.property.code == 'P53':
                 return link_.range.id
+        return None
 
     @staticmethod
     def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
@@ -85,7 +86,7 @@ class LPHelper:
                 'comment': entity.end_comment}}
 
     @staticmethod
-    def get_geoms_by_entity(entity_id: int) -> Union[str, Dict[str, Any]]:
+    def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
         geoms = Gis.get_by_id(entity_id)
         if len(geoms) == 1:
             return geoms[0]

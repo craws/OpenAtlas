@@ -2,7 +2,6 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import math
 import os
-import pathlib
 import re
 import smtplib
 from collections import OrderedDict
@@ -102,15 +101,15 @@ def sanitize(string: str, mode: Optional[str] = None) -> str:
     if mode == 'node':  # Only keep letters, numbers, minus, brackets and spaces
         return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
-        s = MLStripper()
-        s.feed(string)
-        return s.get_data().strip()
+        stripper = MLStripper()
+        stripper.feed(string)
+        return stripper.get_data().strip()
     return re.sub('[^A-Za-z0-9]+', '', string)  # Only keep ASCII letters and numbers
 
 
 @app.template_filter()
 def test_file(file_name: str) -> Optional[str]:
-    return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
+    return file_name if (Path(app.root_path) / file_name).is_file() else None
 
 
 def format_entity_date(
@@ -133,7 +132,7 @@ def format_entity_date(
 
 def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
-    if not len(entity.aliases) or not current_user.settings['table_show_aliases']:
+    if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
     return f'<p>{name}</p>{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
@@ -151,7 +150,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file.name
-        file_data['backup_too_old'] = True if yesterday > latest_file_date else False
+        file_data['backup_too_old'] = yesterday > latest_file_date
         file_data['size'] = convert_size(latest_file.stat().st_size)
         file_data['date'] = format_date(latest_file_date)
     return file_data
@@ -190,11 +189,11 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
     stats: Dict[int, Dict[str, Any]] = {}
-    for f in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(f.stem)] = {
-            'ext': f.suffix,
-            'size': convert_size(f.stat().st_size),
-            'date': f.stat().st_ctime}
+    for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
+        stats[int(file.stem)] = {
+            'ext': file.suffix,
+            'size': convert_size(file.stat().st_size),
+            'date': file.stat().st_ctime}
     return stats
 
 
@@ -291,14 +290,14 @@ def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) 
 
 
 def required_group(group: str):  # type: ignore
-    def wrapper(f):  # type: ignore
-        @wraps(f)
+    def wrapper(func):  # type: ignore
+        @wraps(func)
         def wrapped(*args, **kwargs):  # type: ignore
             if not current_user.is_authenticated:
                 return redirect(url_for('login', next=request.path))
             if not is_authorized(group):
                 abort(403)
-            return f(*args, **kwargs)
+            return func(*args, **kwargs)
 
         return wrapped
 
@@ -313,7 +312,7 @@ def send_mail(
     """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
-    if not settings['mail'] or len(recipients) < 1:
+    if not settings['mail'] or not recipients:
         return False
     mail_user = settings['mail_transport_username']
     from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
@@ -526,11 +525,12 @@ def display_delete_link(entity: Entity) -> str:
 
 
 @app.template_filter()
-def link(object_: Any,
-         url: Optional[str] = None,
-         class_: Optional[str] = '',
-         uc_first_: Optional[bool] = True,
-         js: Optional[str] = None) -> str:
+def link(
+        object_: Any,
+        url: Optional[str] = None,
+        class_: Optional[str] = '',
+        uc_first_: Optional[bool] = True,
+        js: Optional[str] = None) -> str:
     if isinstance(object_, (str, LazyString)):
         return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
@@ -618,7 +618,7 @@ def breadcrumb(crumbs: List[Any]) -> str:
     for item in crumbs:
         if not item:
             continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
-        elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
+        elif isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
             items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')
@@ -637,7 +637,7 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def add_type_data(entity: 'Entity', data: OrderedDict[str, Any]) -> None:
+def add_type_data(entity: 'Entity', data: OrderedD[str, Any]) -> None:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
 
@@ -713,7 +713,7 @@ def manual(site: str) -> str:
         return ''
     first = parts[0]
     second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
-    path = pathlib.Path(app.root_path) / 'static' / 'manual' / first / second
+    path = Path(app.root_path) / 'static' / 'manual' / first / second
     if not path.exists():
         # print('Missing manual link: ' + str(path))
         return ''

@@ -32,7 +32,7 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
 @required_group('readonly')
 def node_index() -> str:
     nodes: Dict[str, Dict[Entity, str]] = {'standard': {}, 'custom': {}, 'places': {}, 'value': {}}
-    for id_, node in g.nodes.items():
+    for node in g.nodes.values():
         if node.root:
             continue
         type_ = 'custom'

@@ -74,7 +74,7 @@ def class_index() -> str:
             {'className': 'dt-body-right', 'targets': 2},
             {'orderDataType': 'cidoc-model', 'targets': [0]},
             {'sType': 'numeric', 'targets': [0]}])
-    for class_id, class_ in g.cidoc_classes.items():
+    for class_ in g.cidoc_classes.values():
         count = ''
         if class_.count:
             count = format_number(class_.count)
@@ -101,7 +101,7 @@ def property_index() -> str:
             {'className': 'dt-body-right', 'targets': 7},
             {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
             {'sType': 'numeric', 'targets': [0]}])
-    for property_id, property_ in properties.items():
+    for property_ in properties.values():
         table.rows.append([
             link(property_),
             property_.name,
@@ -135,7 +135,7 @@ def class_view(code: str) -> str:
     tables['ranges'] = Table(paging=False, defs=[
         {'orderDataType': 'cidoc-model', 'targets': [0]},
         {'sType': 'numeric', 'targets': [0]}])
-    for key, property_ in g.properties.items():
+    for property_ in g.properties.values():
         if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
         elif class_.code == property_.range_class_code:
@@ -170,8 +170,8 @@ def property_view(code: str) -> str:
         tables[table] = Table(paging=False, defs=[
             {'orderDataType': 'cidoc-model', 'targets': [0]},
             {'sType': 'numeric', 'targets': [0]}])
-        for code in getattr(property_, table):
-            tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
+        for code_ in getattr(property_, table):
+            tables[table].rows.append([link(g.properties[code_]), g.properties[code_].name])
     return render_template(
         'model/property_view.html',
         tables=tables,

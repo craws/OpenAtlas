@@ -52,7 +52,7 @@ class CidocProperty:
         self._name = data['name']
         self._name_inverse = data['name_inverse']
         self.code = data['code']
-        self.comment = data['comment'],
+        self.comment = data['comment']
         self.domain_class_code = data['domain_class_code']
         self.range_class_code = data['range_class_code']
         self.count = data['count']
@@ -91,9 +91,7 @@ class CidocProperty:
 
     def find_subs(self, attr: str, class_id: int, valid_subs: List[int]) -> bool:
         for sub_id in valid_subs:
-            if sub_id == class_id:
-                return True
-            elif self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
+            if sub_id == class_id or self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
                 return True
         return False
 

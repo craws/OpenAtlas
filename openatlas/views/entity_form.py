@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -22,9 +22,6 @@ from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import (
     get_base_table_data, is_authorized, link, required_group, was_modified)
 
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
-
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
 @app.route('/insert/<class_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -44,7 +41,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
     if origin:
         populate_insert_form(form, view_name, class_, origin)
     else:
-        geonames_module = True if ReferenceSystem.get_by_name('GeoNames').forms else False
+        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').forms)
 
     # Archaeological sub units
     structure = None
@@ -61,7 +58,7 @@ def insert(class_: str, origin_id: Optional[int] = None) -> Union[str, Response]
         view_name=view_name,
         gis_data=gis_data,
         geonames_module=geonames_module,
-        writeable=True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,  # For files
+        writeable=os.access(app.config['UPLOAD_DIR'], os.W_OK),  # For files
         overlays=overlays,
         title=_(view_name),
         crumbs=add_crumbs(view_name, class_, origin, structure, insert_=True))
@@ -230,11 +227,11 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
             form.place_to.data = place_to.get_linked_entity_safe('P53', True).id if place_to else ''
             person_data = []
             object_data = []
-            for entity in entity.get_linked_entities('P25'):
-                if entity.class_.name == 'person':
-                    person_data.append(entity.id)
-                elif entity.class_.view == 'artifact':
-                    object_data.append(entity.id)
+            for linked_entity in entity.get_linked_entities('P25'):
+                if linked_entity.class_.name == 'person':
+                    person_data.append(linked_entity.id)
+                elif linked_entity.class_.view == 'artifact':
+                    object_data.append(linked_entity.id)
             form.person.data = person_data
             form.artifact.data = object_data
         else:

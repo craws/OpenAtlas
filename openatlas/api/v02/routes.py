@@ -10,7 +10,7 @@ from openatlas.api.v02.endpoints.display_image import DisplayImage
 from openatlas.api.v02.endpoints.entity.class_ import GetByClass
 from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.entity.entity import GetEntity
-from openatlas.api.v02.endpoints.entity.geometric_entities import GetGeometricEntities
+from openatlas.api.v02.endpoints.content.geometric_entities import GetGeometricEntities
 from openatlas.api.v02.endpoints.entity.latest import GetLatest
 from openatlas.api.v02.endpoints.entity.query import GetQuery
 from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass

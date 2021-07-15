@@ -57,19 +57,16 @@ class Import:
 
     @staticmethod
     def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
-        if not type_id.isdigit():
+        if not type_id.isdigit() or int(type_id) not in g.nodes:
             return False
-        elif int(type_id) not in g.nodes:
+        # Check if type is allowed (for corresponding form)
+        valid_type = False
+        root = g.nodes[g.nodes[int(type_id)].root[0]]
+        for form_object in root.forms.values():
+            if form_object['name'] == class_:
+                valid_type = True
+        if not valid_type:
             return False
-        else:
-            # Check if type is allowed (for corresponding form)
-            valid_type = False
-            root = g.nodes[g.nodes[int(type_id)].root[0]]
-            for form_id, form_object in root.forms.items():
-                if form_object['name'] == class_:
-                    valid_type = True
-            if not valid_type:
-                return False
         return True
 
     @staticmethod

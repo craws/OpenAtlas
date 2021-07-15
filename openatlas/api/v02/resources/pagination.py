@@ -40,7 +40,7 @@ class Pagination:
                 'totalPages': len(index)}}
 
     @staticmethod
-    def get_results(new_entities, parser):
+    def get_results(new_entities: List[Entity], parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         if parser['format'] == 'lp':
             return Pagination.linked_places_result(
                 new_entities[:int(parser['limit'])],
@@ -51,9 +51,10 @@ class Pagination:
             return [Pagination.get_geojson(new_entities, parser)]
 
     @staticmethod
-    def link_builder(new_entities: List[Entity],
-                     parser,
-                     inverse: bool = False) -> Optional[List[Link]]:
+    def link_builder(
+            new_entities: List[Entity],
+            parser: Dict[str, Any],
+            inverse: bool = False) -> List[Link]:
         if any(i in ['relations', 'types', 'depictions', 'links', 'geometry'] for i in
                parser['show']):
             entities = [e.id for e in new_entities[:int(parser['limit'])]]

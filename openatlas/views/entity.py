@@ -306,10 +306,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                                 url_for('overlay_update', id_=overlays[domain.id].id))
                         else:
                             data.append(link(_('link'), url_for(
-                                 'overlay_insert',
-                                 image_id=domain.id,
-                                 place_id=entity.id,
-                                 link_id=link_.id)))
+                                'overlay_insert',
+                                image_id=domain.id,
+                                place_id=entity.id,
+                                link_id=link_.id)))
                     else:  # pragma: no cover
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
