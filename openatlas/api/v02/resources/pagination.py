@@ -24,6 +24,10 @@ class Pagination:
     def pagination(entities: List[Entity], parser: Dict[str, Any]) -> Dict[str, Any]:
         if not entities:
             raise NoEntityAvailable
+        if parser['type_id']:
+            entities = Pagination.get_entities_by_type(entities, parser)
+            if not entities:
+                raise TypeIDError
         index = []
         total = [e.id for e in entities]
         count = len(total)
@@ -42,10 +46,6 @@ class Pagination:
 
     @staticmethod
     def get_results(new_entities: List[Entity], parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        if parser['type_id']:
-            new_entities = Pagination.get_entities_by_type(new_entities, parser)
-            if not new_entities:
-                raise TypeIDError
         if parser['format'] == 'lp':
             return Pagination.linked_places_result(
                 new_entities[:int(parser['limit'])],

@@ -92,7 +92,7 @@ class TableSelect(HiddenInput):  # type: ignore
             <a href='#' onclick="selectFromTable(this, '{field_id}', {entity.id})">
                 {entity.name}
             </a>"""
-        if not len(entity.aliases):
+        if not entity.aliases:
             return link
         html = f'<p>{link}</p>'
         for i, alias in enumerate(entity.aliases.values()):
@@ -126,7 +126,6 @@ class TreeMultiField(HiddenField):  # type: ignore
 class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
-        from openatlas.models.node import Node
         selection = ''
         selected_ids = []
         if field.data:
