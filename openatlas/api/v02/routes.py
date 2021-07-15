@@ -12,6 +12,7 @@ from openatlas.api.v02.endpoints.entity.class_ import GetByClass
 from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.entity.entity import GetEntity
 from openatlas.api.v02.endpoints.entity.latest import GetLatest
+from openatlas.api.v02.endpoints.entity.linked_entities import GetLinkedEntities
 from openatlas.api.v02.endpoints.entity.query import GetQuery
 from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v02.endpoints.entity.type_entities import GetTypeEntities
@@ -31,6 +32,7 @@ api_bp = Blueprint('api', __name__, url_prefix='/api')
 api = Api(api_bp, catch_all_404s=False, errors=errors)
 
 api.add_resource(GetByCode, '/0.2/code/<string:code>', endpoint="code")
+api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
 api.add_resource(GetEntity, '/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetLatest, '/0.2/latest/<int:latest>', endpoint="latest")
 api.add_resource(GetQuery, '/0.2/query/', endpoint="query")
@@ -40,6 +42,8 @@ api.add_resource(GetTypeEntities, '/0.2/type_entities/<int:id_>', endpoint="type
 api.add_resource(GetTypeEntitiesAll, '/0.2/type_entities_all/<int:id_>',
                  endpoint="type_entities_all")
 api.add_resource(GetGeometricEntities, '/0.2/geometric_entities/', endpoint="geometric_entities")
+api.add_resource(GetLinkedEntities, '/0.2/entities_linked_to_entity/<int:id_>',
+                 endpoint="entities_linked_to_entity")
 
 api.add_resource(GetNodeEntities, '/0.2/node_entities/<int:id_>', endpoint="node_entities")
 api.add_resource(GetNodeEntitiesAll, '/0.2/node_entities_all/<int:id_>',
@@ -50,7 +54,7 @@ api.add_resource(GetSubunitHierarchy, '/0.2/subunit_hierarchy/<int:id_>',
                  endpoint="subunit_hierarchy")
 api.add_resource(GetTypeTree, '/0.2/type_tree/', endpoint="type_tree")
 
-api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
+
 api.add_resource(GetContent, '/0.2/content/', endpoint="content")
 api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count')
 api.add_resource(ClassMapping, '/0.2/classes/', endpoint='class_mapping')
