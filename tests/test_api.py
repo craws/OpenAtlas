@@ -176,6 +176,8 @@ class ApiTests(TestBaseCase):
             self.assertEqual(rv.get_json(), api_data.api_code_place_filter_time)
             rv = self.app.get(url_for('api.code', code='reference', export='csv'))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api.entities_linked_to_entity', id_=place.id))
+            self.assertEqual(rv.get_json(), api_data.api_entities_linked_entity)
 
             # Path Tests
             rv = self.app.get(url_for('api.class', class_code='E31'))

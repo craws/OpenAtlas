@@ -1533,3 +1533,164 @@ api_code_place_filter_time = {'results': [{
          'depictions': None}]}], 'pagination': {'entities': 3, 'entitiesPerPage': 20,
                                                 'index': [{'page': 1, 'startId': 108}],
                                                 'totalPages': 1}}
+
+api_entities_linked_entity = {'results': [{
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/112', 'type': 'Feature', 'crmClass': 'crm:E31 Document',
+         'systemClass': 'file', 'properties': {'title': 'Datei'}, 'description': None, 'when': {
+            'timespans': [{'start': {'earliest': None, 'latest': None},
+                           'end': {'earliest': None, 'latest': None}}]}, 'types': [
+            {'identifier': 'http://local.host/api/0.2/entity/49', 'label': 'Open license',
+             'description': None, 'hierarchy': 'License', 'value': None, 'unit': None}],
+         'relations': [{'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+                        'relationType': 'crm:P67 refers to', 'relationSystemClass': 'place',
+                        'type': None, 'when': {'timespans': [
+                 {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                  'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}},
+                       {'label': 'Open license',
+                        'relationTo': 'http://local.host/api/0.2/entity/49',
+                        'relationType': 'crm:P2 has type', 'relationSystemClass': 'type',
+                        'type': None, 'when': {'timespans': [
+                           {'start': {'earliest': None, 'latest': None},
+                            'end': {'earliest': None, 'latest': None}}]}}], 'names': None,
+         'links': None, 'geometry': None, 'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/1', 'type': 'Feature',
+         'crmClass': 'crm:E32 Authority Document', 'systemClass': 'reference_system',
+         'properties': {'title': 'GeoNames'}, 'description': [
+            {'value': 'Geographical database covering all countries and many places.'}], 'when': {
+            'timespans': [{'start': {'earliest': None, 'latest': None},
+                           'end': {'earliest': None, 'latest': None}}]}, 'types': None,
+         'relations': [{'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+                        'relationType': 'crm:P67 refers to', 'relationSystemClass': 'place',
+                        'type': 'close match', 'when': {'timespans': [
+                 {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                  'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}], 'names': None,
+         'links': None, 'geometry': None, 'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/107', 'type': 'Feature', 'crmClass': 'crm:E31 Document',
+         'systemClass': 'external_reference', 'properties': {'title': 'https://openatlas.eu'},
+         'description': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                      'end': {'earliest': None, 'latest': None}}]},
+         'types': None, 'relations': [
+            {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+             'relationType': 'crm:P67 refers to', 'relationSystemClass': 'place', 'type': None,
+             'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                                     'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
+         'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/106', 'type': 'Feature',
+         'crmClass': 'crm:E41 Appellation', 'systemClass': 'appellation',
+         'properties': {'title': 'Cargo hauler'}, 'description': None, 'when': {'timespans': [
+            {'start': {'earliest': None, 'latest': None},
+             'end': {'earliest': None, 'latest': None}}]}, 'types': None, 'relations': [
+            {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+             'relationType': 'crm:P1i identifies', 'relationSystemClass': 'place', 'type': None,
+             'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                                     'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
+         'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/108', 'type': 'Feature',
+         'crmClass': 'crm:E18 Physical Thing', 'systemClass': 'feature',
+         'properties': {'title': 'Feature'}, 'description': None, 'when': {'timespans': [
+            {'start': {'earliest': None, 'latest': None},
+             'end': {'earliest': None, 'latest': None}}]}, 'types': None, 'relations': [
+            {'label': 'Location of Feature', 'relationTo': 'http://local.host/api/0.2/entity/109',
+             'relationType': 'crm:P53 has former or current location',
+             'relationSystemClass': 'object_location', 'type': None, 'when': {'timespans': [
+                {'start': {'earliest': None, 'latest': None},
+                 'end': {'earliest': None, 'latest': None}}]}},
+            {'label': 'Strato', 'relationTo': 'http://local.host/api/0.2/entity/110',
+             'relationType': 'crm:P46 is composed of', 'relationSystemClass': 'stratigraphic_unit',
+             'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                   'end': {'earliest': None, 'latest': None}}]}},
+            {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+             'relationType': 'crm:P46i forms part of', 'relationSystemClass': 'place', 'type': None,
+             'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                                     'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
+         'names': None, 'links': None, 'geometry': {'type': 'GeometryCollection', 'geometries': []},
+         'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/102', 'type': 'Feature', 'crmClass': 'crm:E55 Type',
+         'systemClass': 'type', 'properties': {'title': 'Height'},
+         'description': [{'value': 'centimeter'}], 'when': {'timespans': [
+            {'start': {'earliest': None, 'latest': None},
+             'end': {'earliest': None, 'latest': None}}]}, 'types': None, 'relations': [
+            {'label': 'Dimensions', 'relationTo': 'http://local.host/api/0.2/entity/101',
+             'relationType': 'crm:P127 has broader term', 'relationSystemClass': 'type',
+             'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                   'end': {'earliest': None, 'latest': None}}]}},
+            {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+             'relationType': 'crm:P2i is type of', 'relationSystemClass': 'place', 'type': None,
+             'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                                     'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
+         'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/105', 'type': 'Feature', 'crmClass': 'crm:E53 Place',
+         'systemClass': 'object_location', 'properties': {'title': 'Location of Nostromos'},
+         'description': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                      'end': {'earliest': None, 'latest': None}}]},
+         'types': None, 'relations': [
+            {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+             'relationType': 'crm:P53i is former or current location of',
+             'relationSystemClass': 'place', 'type': None, 'when': {'timespans': [
+                {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                 'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}], 'names': None,
+         'links': None,
+         'geometry': {'type': 'Point', 'coordinates': [9, 17], 'title': '', 'description': ''},
+         'depictions': None}]}, {
+                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+                                              'type': 'FeatureCollection', 'features': [
+        {'@id': 'http://local.host/entity/65', 'type': 'Feature', 'crmClass': 'crm:E55 Type',
+         'systemClass': 'type', 'properties': {'title': 'Place'}, 'description': [{
+                                                                                      'value': 'Types for non-moveable entities (i.e. places) with a certain extent and/or location like Settlement, Burial site, Ritual site, Fortification etc.'}],
+         'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                 'end': {'earliest': None, 'latest': None}}]}, 'types': None,
+         'relations': [
+             {'label': 'Boundary Mark', 'relationTo': 'http://local.host/api/0.2/entity/72',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Burial Site', 'relationTo': 'http://local.host/api/0.2/entity/69',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Economic Site', 'relationTo': 'http://local.host/api/0.2/entity/71',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Infrastructure', 'relationTo': 'http://local.host/api/0.2/entity/70',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Military Facility', 'relationTo': 'http://local.host/api/0.2/entity/67',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Nostromos', 'relationTo': 'http://local.host/api/0.2/entity/104',
+              'relationType': 'crm:P2i is type of', 'relationSystemClass': 'place', 'type': None,
+              'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                                      'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}},
+             {'label': 'Ritual Site', 'relationTo': 'http://local.host/api/0.2/entity/68',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Settlement', 'relationTo': 'http://local.host/api/0.2/entity/66',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}},
+             {'label': 'Topographical Entity', 'relationTo': 'http://local.host/api/0.2/entity/73',
+              'relationType': 'crm:P127i has narrower term', 'relationSystemClass': 'type',
+              'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
+                                                    'end': {'earliest': None, 'latest': None}}]}}],
+         'names': None, 'links': None, 'geometry': None, 'depictions': None}]}],
+                              'pagination': {'entities': 8, 'entitiesPerPage': 20,
+                                             'index': [{'page': 1, 'startId': 112}],
+                                             'totalPages': 1}}
