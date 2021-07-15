@@ -9,8 +9,12 @@ from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v02.resources.enpoints_util import resolve_entities
 from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.parser import query_parser
-from openatlas.api.v02.resources.util import get_entity_by_id
+from openatlas.api.v02.resources.util import get_entities_by_ids
 from openatlas.models.entity import Entity
+
+
+def get_entities_by_id(entity):
+    pass
 
 
 class GetQuery(Resource):  # type: ignore
@@ -28,8 +32,7 @@ class GetQuery(Resource):  # type: ignore
     def get_entities(parser: Dict[str, Any]) -> List[Entity]:
         entities = []
         if parser['entities']:
-            for entity in parser['entities']:
-                entities.append(get_entity_by_id(entity))
+            entities.extend(get_entities_by_ids(parser['entities']))
         if parser['codes']:
             for code_ in parser['codes']:
                 entities.extend(GetByCode.get_by_view(code_, parser))
