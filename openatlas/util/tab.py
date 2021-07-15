@@ -141,7 +141,7 @@ class Tab:
             buttons += [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'note':
             if is_authorized('contributor'):
-                buttons += [button(_('note'),  url_for('note_insert', entity_id=id_))]
+                buttons += [button(_('note'), url_for('note_insert', entity_id=id_))]
         elif name == 'place':
             if class_.name == 'file':
                 buttons += [button('link', url_for('file_add', id_=id_, view=name))]

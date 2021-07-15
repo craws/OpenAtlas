@@ -172,14 +172,13 @@ class Entity:
             {description_clause})
             {user_clause2}
             AND e.system_class IN %(classes)s GROUP BY e.id ORDER BY e.name;""".format(
-            user_clause="""
-                LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if own else '',
-            description_clause="""
-                OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
-                OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
-            if desc else '',
-            user_clause2=' AND ul.user_id = %(user_id)s ' if own else '')
+                user_clause="LEFT JOIN web.user_log ul ON e.id = ul.entity_id " if own else '',
+                description_clause="""
+                    OR UNACCENT(lower(e.description)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.begin_comment)) LIKE UNACCENT(lower(%(term)s))
+                    OR UNACCENT(lower(e.end_comment)) LIKE UNACCENT(lower(%(term)s))"""
+                if desc else '',
+                user_clause2=' AND ul.user_id = %(user_id)s ' if own else '')
         g.cursor.execute(sql, {
             'term': '%' + term + '%',
             'user_id': user_id,
