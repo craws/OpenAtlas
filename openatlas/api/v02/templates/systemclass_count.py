@@ -4,7 +4,7 @@ from flask_restful import fields
 from flask_restful.fields import Integer, String
 
 
-class SystemClassCountTemplate:
+class SystemClsCountTemplate:
 
     @staticmethod
     def overview_template() -> Dict[str, Type[Union[String, Integer]]]:

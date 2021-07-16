@@ -3,7 +3,7 @@ from flask_restful import Resource
 
 from openatlas import app
 from openatlas.api.v02.resources.error import AccessDeniedError
-from openatlas.api.v02.resources.parser import image_parser
+from openatlas.api.v02.resources.parser import image
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 
@@ -19,7 +19,9 @@ class DisplayImage(Resource):
                 license_ = node.name
         if not license_:
             raise AccessDeniedError
-        parser = image_parser.parse_args()
+        parser = image.parse_args()
         if parser['download']:
-            return send_file(f"{app.config['UPLOAD_DIR']}/{filename}", as_attachment=True)
+            return send_file(
+                f"{app.config['UPLOAD_DIR']}/{filename}",
+                as_attachment=True)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)

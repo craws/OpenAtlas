@@ -46,14 +46,13 @@ class Pagination:
 
     @staticmethod
     def get_results(new_entities: List[Entity], parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        if parser['format'] == 'lp':
-            return Pagination.linked_places_result(
-                new_entities[:int(parser['limit'])],
-                parser,
-                Pagination.link_builder(new_entities, parser),
-                Pagination.link_builder(new_entities, parser, True))
         if parser['format'] == 'geojson':
             return [Pagination.get_geojson(new_entities, parser)]
+        return Pagination.linked_places_result(
+            new_entities[:int(parser['limit'])],
+            parser,
+            Pagination.link_builder(new_entities, parser),
+            Pagination.link_builder(new_entities, parser, True))
 
     @staticmethod
     def get_entities_by_type(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
