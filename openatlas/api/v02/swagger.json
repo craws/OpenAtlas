@@ -13,6 +13,20 @@
       "email": "bernhard.koschicek@oeaw.ac.at"
     }
   },
+  "servers": [
+    {
+      "url": "https://demo.openatlas.eu",
+      "description": "Demo Server"
+    },
+    {
+      "url": "https://demo-dev.openatlas.eu",
+      "description": "Demo Dev Server"
+    },
+    {
+      "url": "https://connec.acdh.oeaw.ac.at",
+      "description": "Connec Production Server"
+    }
+  ],
   "tags": [
     {
       "name": "Entities",
@@ -684,26 +698,94 @@
         }
       },
       "GeometryModel": {
-        "type": "array",
-        "items": {
-          "type": "object",
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Geometries"
+            }
+          }
+        }
+      },
+      "Geometries": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
           "properties": {
-            "type": {
-              "type": "string"
-            },
-            "geometry": {
-              "type": "object",
-              "properties": {
-                "coordinates": {
-                  "type": "array"
-                },
-                "type": {
-                  "type": "string"
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "begin_from": {
+                "type": "string"
+              },
+              "begin_to": {
+                "type": "string"
+              },
+              "end_from": {
+                "type": "string"
+              },
+              "end_to": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "place": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "types": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
                 }
               }
-            },
-            "properties": {
-              "type": "array"
             }
           }
         }
