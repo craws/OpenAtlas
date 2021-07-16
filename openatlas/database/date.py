@@ -10,8 +10,14 @@ class Date:
         g.cursor.execute("""
             SELECT id FROM model.entity WHERE
                 begin_from > begin_to OR end_from > end_to
-                OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
-                OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);""")
+                OR (
+                    begin_from IS NOT NULL
+                    AND end_from IS NOT NULL
+                    AND begin_from > end_from)
+                OR (
+                    begin_to IS NOT NULL
+                    AND end_to IS NOT NULL
+                    AND begin_to > end_to);""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -19,8 +25,14 @@ class Date:
         g.cursor.execute("""
             SELECT id FROM model.link WHERE
                 begin_from > begin_to OR end_from > end_to
-                OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
-                OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);""")
+                OR (
+                    begin_from IS NOT NULL
+                    AND end_from IS NOT NULL
+                    AND begin_from > end_from)
+                OR (
+                    begin_to IS NOT NULL
+                    AND end_to IS NOT NULL
+                    AND begin_to > end_to);""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
