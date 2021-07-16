@@ -35,7 +35,7 @@ class GetEntity(Resource):  # type: ignore
             entity: Entity,
             parser: Dict[str, Any]) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         if parser['format'] == 'geojson':
-            return Geojson.get_geojson([entity])
+            return Geojson.return_output(Geojson.get_geojson([entity]))
         return LinkedPlaces.get_entity(
             entity,
             get_all_links(entity.id),
@@ -45,5 +45,5 @@ class GetEntity(Resource):  # type: ignore
     @staticmethod
     def get_template(parser: Dict[str, Any]) -> Dict[str, Any]:
         if parser['format'] == 'geojson':
-            return GeojsonTemplate.geojson_template()
+            return GeojsonTemplate.geojson_collection_template()
         return LinkedPlacesTemplate.linked_places_template(parser['show'])

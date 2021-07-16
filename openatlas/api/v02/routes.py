@@ -7,6 +7,7 @@ from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v02.endpoints.content.content import GetContent
 from openatlas.api.v02.endpoints.content.geometric_entities import GetGeometricEntities
 from openatlas.api.v02.endpoints.content.overview_count import OverviewCount
+from openatlas.api.v02.endpoints.content.systemclass_count import SystemClassCount
 from openatlas.api.v02.endpoints.display_image import DisplayImage
 from openatlas.api.v02.endpoints.entity.class_ import GetByClass
 from openatlas.api.v02.endpoints.entity.code import GetByCode
@@ -56,8 +57,9 @@ api.add_resource(GetTypeTree, '/0.2/type_tree/', endpoint="type_tree")
 
 
 api.add_resource(GetContent, '/0.2/content/', endpoint="content")
-api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count')
+api.add_resource(OverviewCount, '/0.2/overview_count/', endpoint='overview_count') # Deprecated
 api.add_resource(ClassMapping, '/0.2/classes/', endpoint='class_mapping')
+api.add_resource(SystemClassCount, '/0.2/system_class_count/', endpoint='system_class_count')
 
 api.add_resource(DisplayImage, '/display/<path:filename>', endpoint='display')
 

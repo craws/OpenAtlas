@@ -207,10 +207,66 @@
           }
         }
       },
+      "SystemClassCountModel": {
+        "type": "object",
+        "properties": {
+          "move": {
+            "type": "number"
+          },
+          "bibliography": {
+            "type": "number"
+          },
+          "person": {
+            "type": "number"
+          },
+          "acquisition": {
+            "type": "number"
+          },
+          "reference_system": {
+            "type": "number"
+          },
+          "feature": {
+            "type": "number"
+          },
+          "file": {
+            "type": "number"
+          },
+          "activity": {
+            "type": "number"
+          },
+          "type": {
+            "type": "number"
+          },
+          "administrative_unit": {
+            "type": "number"
+          },
+          "artifact": {
+            "type": "number"
+          },
+          "source_translation": {
+            "type": "number"
+          },
+          "place": {
+            "type": "number"
+          },
+          "stratigraphic_unit": {
+            "type": "number"
+          },
+          "edition": {
+            "type": "number"
+          },
+          "group": {
+            "type": "number"
+          },
+          "source": {
+            "type": "number"
+          }
+        }
+      },
       "OverviewCountModel": {
         "type": "object",
         "properties": {
-          "name": {
+          "systemClass": {
             "type": "string"
           },
           "count": {

@@ -6,7 +6,7 @@ from flask_restful import Resource, marshal
 from openatlas.api.v02.templates.overview_count import CountTemplate
 from openatlas.models.entity import Entity
 
-
+# Deprecated
 class OverviewCount(Resource):  # type: ignore
     @staticmethod
     def get() -> Union[Tuple[Resource, int], Response]:

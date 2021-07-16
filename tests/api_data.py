@@ -250,58 +250,38 @@ api_linked_place_template = {
     ]
 }
 
-api_geojson_template = [
-    {
-        "type": "Feature",
-        "geometry": {
-            "type": "Point",
-            "coordinates": [
-                9,
-                17
-            ],
-            "title": "",
-            "description": ""
-        },
-        "properties":
-            {
-                "@id": 104,
-                "systemClass": "place",
-                "name": "Nostromos",
-                "description": "That is the Nostromos",
-                "begin_earliest": "2018-01-31",
-                "begin_latest": "2018-03-01",
-                "begin_comment": "Begin of the Nostromos",
-                "end_earliest": "2019-01-31",
-                "end_latest": "2019-03-01",
-                "end_comment": "Destruction of the Nostromos",
-                "types": [
-                    "Place",
-                    "Height"
-                ]
-            }
-    },
-    {
-        "type": "Feature",
-        "geometry": None,
-        "properties":
-            {
-                "@id": 104,
-                "systemClass": "place",
-                "name": "Nostromos",
-                "description": "That is the Nostromos",
-                "begin_earliest": "2018-01-31",
-                "begin_latest": "2018-03-01",
-                "begin_comment": "Begin of the Nostromos",
-                "end_earliest": "2019-01-31",
-                "end_latest": "2019-03-01",
-                "end_comment": "Destruction of the Nostromos",
-                "types": [
-                    "Place",
-                    "Height"
-                ]
-            }
-    }
-]
+api_geojson_template = {'type': 'FeatureCollection', 'features': [{'type': 'Feature',
+                                                                   'geometry': {'type': 'Point',
+                                                                                'coordinates': [9,
+                                                                                                17],
+                                                                                'title': '',
+                                                                                'description': ''},
+                                                                   'properties': {'@id': 104,
+                                                                                  'systemClass': 'place',
+                                                                                  'name': 'Nostromos',
+                                                                                  'description': 'That is the Nostromos',
+                                                                                  'begin_earliest': '2018-01-31',
+                                                                                  'begin_latest': '2018-03-01',
+                                                                                  'begin_comment': 'Begin of the Nostromos',
+                                                                                  'end_earliest': '2019-01-31',
+                                                                                  'end_latest': '2019-03-01',
+                                                                                  'end_comment': 'Destruction of the Nostromos',
+                                                                                  'types': ['Place',
+                                                                                            'Height']}},
+                                                                  {'type': 'Feature',
+                                                                   'geometry': None,
+                                                                   'properties': {'@id': 104,
+                                                                                  'systemClass': 'place',
+                                                                                  'name': 'Nostromos',
+                                                                                  'description': 'That is the Nostromos',
+                                                                                  'begin_earliest': '2018-01-31',
+                                                                                  'begin_latest': '2018-03-01',
+                                                                                  'begin_comment': 'Begin of the Nostromos',
+                                                                                  'end_earliest': '2019-01-31',
+                                                                                  'end_latest': '2019-03-01',
+                                                                                  'end_comment': 'Destruction of the Nostromos',
+                                                                                  'types': ['Place',
+                                                                                            'Height']}}]}
 
 api_geometries_template = {'features': [{'geometry': {'coordinates': [9, 17], 'type': 'Point'},
                                          'properties': {'description': '',
@@ -317,6 +297,12 @@ api_geometries_template = {'features': [{'geometry': {'coordinates': [9, 17], 't
 
 api_content_en = {'intro': 'This is English', 'contact': '', 'legalNotice': '', 'siteName': ''}
 api_content_de = {'intro': 'Das ist Deutsch', 'contact': '', 'legalNotice': '', 'siteName': ''}
+
+api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 0, 'acquisition': 0,
+                          'reference_system': 2, 'feature': 1, 'file': 1, 'activity': 0, 'type': 87,
+                          'administrative_unit': 14, 'artifact': 0, 'source_translation': 0,
+                          'place': 1, 'stratigraphic_unit': 1, 'edition': 0, 'group': 0,
+                          'source': 0}
 
 api_overview_count = [{'systemClass': 'external_reference', 'count': 1},
                       {'systemClass': 'reference_system', 'count': 2},
@@ -1535,8 +1521,8 @@ api_code_place_filter_time = {'results': [{
                                                 'totalPages': 1}}
 
 api_entities_linked_entity = {'results': [{
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/112', 'type': 'Feature', 'crmClass': 'crm:E31 Document',
          'systemClass': 'file', 'properties': {'title': 'Datei'}, 'description': None, 'when': {
             'timespans': [{'start': {'earliest': None, 'latest': None},
@@ -1555,8 +1541,8 @@ api_entities_linked_entity = {'results': [{
                            {'start': {'earliest': None, 'latest': None},
                             'end': {'earliest': None, 'latest': None}}]}}], 'names': None,
          'links': None, 'geometry': None, 'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/1', 'type': 'Feature',
          'crmClass': 'crm:E32 Authority Document', 'systemClass': 'reference_system',
          'properties': {'title': 'GeoNames'}, 'description': [
@@ -1569,8 +1555,8 @@ api_entities_linked_entity = {'results': [{
                  {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                   'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}], 'names': None,
          'links': None, 'geometry': None, 'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/107', 'type': 'Feature', 'crmClass': 'crm:E31 Document',
          'systemClass': 'external_reference', 'properties': {'title': 'https://openatlas.eu'},
          'description': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
@@ -1581,8 +1567,8 @@ api_entities_linked_entity = {'results': [{
              'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                                      'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
          'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/106', 'type': 'Feature',
          'crmClass': 'crm:E41 Appellation', 'systemClass': 'appellation',
          'properties': {'title': 'Cargo hauler'}, 'description': None, 'when': {'timespans': [
@@ -1593,8 +1579,8 @@ api_entities_linked_entity = {'results': [{
              'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                                      'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
          'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/108', 'type': 'Feature',
          'crmClass': 'crm:E18 Physical Thing', 'systemClass': 'feature',
          'properties': {'title': 'Feature'}, 'description': None, 'when': {'timespans': [
@@ -1615,8 +1601,8 @@ api_entities_linked_entity = {'results': [{
                                      'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
          'names': None, 'links': None, 'geometry': {'type': 'GeometryCollection', 'geometries': []},
          'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/102', 'type': 'Feature', 'crmClass': 'crm:E55 Type',
          'systemClass': 'type', 'properties': {'title': 'Height'},
          'description': [{'value': 'centimeter'}], 'when': {'timespans': [
@@ -1631,8 +1617,8 @@ api_entities_linked_entity = {'results': [{
              'when': {'timespans': [{'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                                      'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]}}],
          'names': None, 'links': None, 'geometry': None, 'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/105', 'type': 'Feature', 'crmClass': 'crm:E53 Place',
          'systemClass': 'object_location', 'properties': {'title': 'Location of Nostromos'},
          'description': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
@@ -1646,11 +1632,11 @@ api_entities_linked_entity = {'results': [{
          'links': None,
          'geometry': {'type': 'Point', 'coordinates': [9, 17], 'title': '', 'description': ''},
          'depictions': None}]}, {
-                                              '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
-                                              'type': 'FeatureCollection', 'features': [
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/65', 'type': 'Feature', 'crmClass': 'crm:E55 Type',
          'systemClass': 'type', 'properties': {'title': 'Place'}, 'description': [{
-                                                                                      'value': 'Types for non-moveable entities (i.e. places) with a certain extent and/or location like Settlement, Burial site, Ritual site, Fortification etc.'}],
+            'value': 'Types for non-moveable entities (i.e. places) with a certain extent and/or location like Settlement, Burial site, Ritual site, Fortification etc.'}],
          'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
                                  'end': {'earliest': None, 'latest': None}}]}, 'types': None,
          'relations': [
@@ -1691,6 +1677,6 @@ api_entities_linked_entity = {'results': [{
               'type': None, 'when': {'timespans': [{'start': {'earliest': None, 'latest': None},
                                                     'end': {'earliest': None, 'latest': None}}]}}],
          'names': None, 'links': None, 'geometry': None, 'depictions': None}]}],
-                              'pagination': {'entities': 8, 'entitiesPerPage': 20,
-                                             'index': [{'page': 1, 'startId': 112}],
-                                             'totalPages': 1}}
+    'pagination': {'entities': 8, 'entitiesPerPage': 20,
+                   'index': [{'page': 1, 'startId': 112}],
+                   'totalPages': 1}}
