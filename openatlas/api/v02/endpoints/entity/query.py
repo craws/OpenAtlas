@@ -4,9 +4,9 @@ from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
-from openatlas.api.v02.common.entity.class_ import GetByClass
-from openatlas.api.v02.common.entity.code import GetByCode
-from openatlas.api.v02.common.entity.system_class import GetBySystemClass
+from openatlas.api.v02.endpoints.entity.class_ import GetByClass
+from openatlas.api.v02.endpoints.entity.code import GetByCode
+from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v02.resources.error import QueryEmptyError
 from openatlas.api.v02.resources.helpers import resolve_entity
 from openatlas.api.v02.resources.parser import query_parser
