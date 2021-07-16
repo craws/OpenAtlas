@@ -114,11 +114,16 @@ def entity_view(id_: int) -> Union[str, Response]:
             data = [
                 link(event),
                 event.class_.label,
-                link(link_.type),
+                _('moved') if link_.property.code == 'P25' else link(link_.type),
                 first,
                 last,
                 link_.description]
-            add_edit_link(data, url_for('involvement_update', id_=link_.id, origin_id=entity.id))
+            if link_.property.code == 'P25':
+                data += ['']
+            else:
+                add_edit_link(
+                    data,
+                    url_for('involvement_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
@@ -300,10 +305,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                                 url_for('overlay_update', id_=overlays[domain.id].id))
                         else:
                             data.append(link(_('link'), url_for(
-                                 'overlay_insert',
-                                 image_id=domain.id,
-                                 place_id=entity.id,
-                                 link_id=link_.id)))
+                                'overlay_insert',
+                                image_id=domain.id,
+                                place_id=entity.id,
+                                link_id=link_.id)))
                     else:  # pragma: no cover
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
@@ -366,7 +371,7 @@ def get_profile_image_table_link(
         profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
-    elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover
 

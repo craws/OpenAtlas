@@ -6,7 +6,6 @@ description: Retrieves a list of all selected geometries in the database in a st
 parameters:
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
-  - $ref: '#/components/parameters/geometryParam'
 responses:
   '200':
     description: Only places with geometries will retrieved.

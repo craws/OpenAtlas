@@ -8,6 +8,7 @@ from openatlas.api.v02.templates.overview_count import CountTemplate
 from openatlas.models.entity import Entity
 
 
+# Deprecated
 class OverviewCount(Resource):  # type: ignore
     @swag_from("../swagger/overview_count.yml", endpoint="api.overview_count")
     def get(self) -> Union[Tuple[Resource, int], Response]:

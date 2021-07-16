@@ -1,11 +1,10 @@
+import json
 from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response, jsonify, url_for
 from flask_restful import marshal
-from flask_restful.fields import Nested
 
 from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.download import Download
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
@@ -19,7 +18,7 @@ def get_template(parser: Dict[str, str]) -> Dict[str, Any]:
     return LinkedPlacesTemplate.pagination(parser)
 
 
-def resolve_entity(
+def resolve_entities(
         entities: List[Entity],
         parser: Dict[str, Any],
         file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
@@ -29,7 +28,7 @@ def resolve_entity(
     if parser['count']:
         return jsonify(result['pagination']['entities'])
     if parser['download']:
-        return Download.download(result, get_template(parser), file_name)
+        return download(result, get_template(parser), file_name)
     return marshal(result, get_template(parser)), 200
 
 
@@ -40,11 +39,22 @@ def resolve_node_parser(
     if parser['count']:
         return jsonify(len(node['nodes']))
     if parser['download']:
-        return Download.download(node, NodeTemplate.node_template(), file_name)
+        return download(node, NodeTemplate.node_template(), file_name)
     return marshal(node, NodeTemplate.node_template()), 200
 
 
 def get_node_dict(entity: Entity) -> Dict[str, Any]:
-    return {'id': entity.id,
-            'label': entity.name,
-            'url': url_for('api.entity', id_=entity.id, _external=True)}
+    return {
+        'id': entity.id,
+        'label': entity.name,
+        'url': url_for('api.entity', id_=entity.id, _external=True)}
+
+
+def download(
+        data: Union[List[Dict[str, Any]], Dict[str, Any], List[Entity]],
+        template: Dict[str, Any],
+        name: Union[str, int]) -> Response:
+    return Response(
+        json.dumps(marshal(data, template)),
+        mimetype='application/json',
+        headers={'Content-Disposition': 'attachment;filename=' + str(name) + '.json'})

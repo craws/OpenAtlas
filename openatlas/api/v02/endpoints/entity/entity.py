@@ -5,7 +5,7 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.parser import entity_parser
@@ -28,7 +28,7 @@ class GetEntity(Resource):  # type: ignore
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
         if parser['download']:
-            return Download.download(result, GetEntity.get_template(parser), entity.id)
+            return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200
 
     @staticmethod
@@ -36,7 +36,7 @@ class GetEntity(Resource):  # type: ignore
             entity: Entity,
             parser: Dict[str, Any]) -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         if parser['format'] == 'geojson':
-            return Geojson.get_geojson([entity])
+            return Geojson.return_output(Geojson.get_geojson([entity]))
         return LinkedPlaces.get_entity(
             entity,
             get_all_links(entity.id),
@@ -46,5 +46,5 @@ class GetEntity(Resource):  # type: ignore
     @staticmethod
     def get_template(parser: Dict[str, Any]) -> Dict[str, Any]:
         if parser['format'] == 'geojson':
-            return GeojsonTemplate.geojson_template()
+            return GeojsonTemplate.geojson_collection_template()
         return LinkedPlacesTemplate.linked_places_template(parser['show'])

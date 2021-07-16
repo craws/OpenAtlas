@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List
+from typing import Any, List
 
 from flask import g, render_template
 from flask_login import current_user
@@ -92,7 +92,7 @@ class TableSelect(HiddenInput):  # type: ignore
             <a href='#' onclick="selectFromTable(this, '{field_id}', {entity.id})">
                 {entity.name}
             </a>"""
-        if not len(entity.aliases):
+        if not entity.aliases:
             return link
         html = f'<p>{link}</p>'
         for i, alias in enumerate(entity.aliases.values()):
@@ -126,7 +126,6 @@ class TreeMultiField(HiddenField):  # type: ignore
 class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
-        from openatlas.models.node import Node
         selection = ''
         selected_ids = []
         if field.data:

@@ -1,11 +1,13 @@
 class Changelog:
-
     versions = {
         '6.4.0': ['TBA', {
+            'feature': {
+                '1495': 'API: Additional Geojson output for QGIS imports',
+                '1529': 'API: Increase request performance',
+                '1530': 'API: Geometries endpoint for frontend map'},
             'fix': {
-                '1414': 'Enlarged Description Field Covers up Entry Buttons'
-            }
-        }],
+                '1414': 'Enlarged Description Field Covers up Entry Buttons',
+                '1539': 'Pagination not shown for tables sometimes'}}],
         '6.3.0': ['2021-06-13', {
             'feature': {
                 '1513': 'Add reference page for multiple files',

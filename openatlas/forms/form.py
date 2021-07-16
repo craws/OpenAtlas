@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm, widgets
+from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, FieldList, HiddenField, MultipleFileField, SelectField, SelectMultipleField,
     StringField, SubmitField, TextAreaField, widgets)
@@ -24,7 +24,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
-forms = {
+FORMS = {
     'acquisition': ['name', 'date', 'description', 'continue'],
     'activity': ['name', 'date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
@@ -65,7 +65,7 @@ def build_form(
 
     if class_ == 'note':
         setattr(Form, 'public', BooleanField(_('public'), default=False))
-    if 'name' in forms[class_]:  # Set label and validators for name field
+    if 'name' in FORMS[class_]:  # Set label and validators for name field
         label = _('URL') if class_ == 'external_reference' else _('name')
         validators = [InputRequired(), URL()] if class_ == 'external_reference' else [
             InputRequired()]
@@ -74,14 +74,14 @@ def build_form(
             'name',
             StringField(label, validators=validators, render_kw={'autofocus': True}))
 
-    if 'alias' in forms[class_]:
+    if 'alias' in FORMS[class_]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
-    if 'date' in forms[class_]:
+    if 'date' in FORMS[class_]:
         date.add_date_fields(Form)
-    if 'description' in forms[class_]:
+    if 'description' in FORMS[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
@@ -90,7 +90,7 @@ def build_form(
             if root.value_type:
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
-    if 'map' in forms[class_]:
+    if 'map' in FORMS[class_]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
@@ -166,7 +166,7 @@ def add_buttons(
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in forms[name] \
+    if 'continue' in FORMS[name] \
             and (name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())

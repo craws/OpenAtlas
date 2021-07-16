@@ -4,8 +4,8 @@ from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
+from openatlas.api.v02.resources.enpoints_util import get_node_dict, resolve_node_parser
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, InvalidSubunitError
-from openatlas.api.v02.resources.helpers import get_node_dict, resolve_node_parser
 from openatlas.api.v02.resources.parser import default_parser
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure

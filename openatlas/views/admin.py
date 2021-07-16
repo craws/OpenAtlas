@@ -54,9 +54,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
     dirs = {
-        'uploads': True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,
-        'export/sql': True if os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK) else False,
-        'export/csv': True if os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK) else False}
+        'uploads': os.access(app.config['UPLOAD_DIR'], os.W_OK),
+        'export/sql': os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK),
+        'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK)}
     tables = {
         'user': Table([
             'username', 'name', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'
@@ -286,7 +286,7 @@ def admin_check_similar() -> str:
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for sample_id, sample in Entity.get_similar_named(form).items():
+        for sample in Entity.get_similar_named(form).values():
             html = link(sample['entity'])
             for entity in sample['entities']:
                 html += f'<br><br><br><br><br>{link(entity)}'  # Workaround for linebreaks in tables
@@ -415,7 +415,7 @@ def admin_orphans() -> str:
                 _('delete all files'),
                 url_for('admin_file_delete', filename='all'),
                 onclick="return confirm('" +
-                        uc_first(_('delete all files without corresponding entities?')) + "')"))
+                uc_first(_('delete all files without corresponding entities?')) + "')"))
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -532,7 +532,7 @@ def admin_newsletter() -> Union[str, Response]:
     form.save.label.text = uc_first(_('send'))
     if form.validate_on_submit():  # pragma: no cover
         count = 0
-        for user_id in (request.form.getlist('recipient')):
+        for user_id in request.form.getlist('recipient'):
             user = User.get_by_id(user_id)
             if user and user.settings['newsletter'] and user.active and user.email:
                 code = User.generate_password()

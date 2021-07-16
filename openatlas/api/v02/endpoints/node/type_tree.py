@@ -4,7 +4,7 @@ from flasgger import swag_from
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.download import Download
+from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import entity_parser
 from openatlas.api.v02.templates.type_tree import TypeTreeTemplate
 from openatlas.models.node import Node
@@ -19,7 +19,7 @@ class GetTypeTree(Resource):  # type: ignore
             return jsonify(len(type_tree['type_tree']))
         template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
-            return Download.download(type_tree, template, 'type_tree')
+            return download(type_tree, template, 'type_tree')
         return marshal(type_tree, template), 200
 
     @staticmethod

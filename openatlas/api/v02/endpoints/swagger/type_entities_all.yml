@@ -17,6 +17,7 @@ parameters:
   - $ref: '#/components/parameters/firstParam'
   - $ref: '#/components/parameters/lastParam'
   - $ref: '#/components/parameters/showParam'
+  - $ref: '#/components/parameters/typeParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
@@ -26,6 +27,6 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/OutputModel'
+          $ref: '#/components/schemas/TypeTreeModel'
   '404':
     description: Something went wrong. Please consult the error message.

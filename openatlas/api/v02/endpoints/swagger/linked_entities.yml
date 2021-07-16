@@ -1,15 +1,15 @@
-Classes endpoint
+Linked Entities endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their CIDOC CRM class code. The json contains a **result** and **pagination** key. All in OpenAtlas available codes can be found under `https://redmine.craws.net/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping`. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities, which are linked to the entered entity. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
-    name: class_code
-    description: Need to be a valid CIDOC CRM class code (e.g. E21, E18, E33)
+    name: id_
+    description: ID must be an entity
     required: true
     schema:
-      type: string
+      type: number
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'
@@ -20,10 +20,9 @@ parameters:
   - $ref: '#/components/parameters/typeParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
-  - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
-    description: A json with a list of results and pagination information
+    description: A dictionary with a result dictionary and pagination information
     content:
       application/ld+json:
         schema:

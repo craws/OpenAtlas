@@ -15,7 +15,7 @@ parameters:
   - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
-    description: A json with a result list and pagination information (null)
+    description: A json with a result list and pagination information
     content:
       application/ld+json:
         schema:

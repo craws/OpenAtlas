@@ -6,6 +6,6 @@ from openatlas.api.v02.resources.error import ResourceGoneError
 
 
 class ResourceGone(Resource):  # type: ignore
-    def get(self, *args: str, **kwargs: str)\
+    def get(self, *args: str, **kwargs: str) \
             -> Tuple[Type[ResourceGoneError], int]:
         raise ResourceGoneError

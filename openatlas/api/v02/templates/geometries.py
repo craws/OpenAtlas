@@ -1,13 +1,12 @@
-from typing import Dict
+from typing import Any, Dict
 
 from flask_restful import fields
-from flask_restful.fields import List as RestList
 
 
 class GeometriesTemplate:
 
     @staticmethod
-    def geometries_template() -> Dict[str, RestList]:
+    def geometries_template() -> Dict[str, Any]:
         properties = {
             'id': fields.Integer,
             'name': fields.String,
@@ -18,7 +17,10 @@ class GeometriesTemplate:
             'objectType': fields.String,
             'shapeType': fields.String}
 
-        return {
+        feature = {
             'type': fields.String,
             'geometry': fields.Raw,
-            'properties': fields.List(fields.Nested(properties))}
+            'properties': fields.Nested(properties)}
+
+        return {'type': fields.String,
+                'features': fields.Nested(feature)}

@@ -2,11 +2,11 @@ from typing import Any, Dict, List, Tuple, Union
 
 from flasgger import swag_from
 from flask import Response, g
-from flask_restful import Resource, marshal
+from flask_restful import Resource
 
+from openatlas.api.v02.resources.enpoints_util import resolve_entities
 from openatlas.api.v02.resources.error import InvalidCodeError
 from openatlas.api.v02.resources.parser import entity_parser
-from openatlas.api.v02.resources.helpers import get_template, resolve_entity
 from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 
@@ -15,7 +15,7 @@ class GetByCode(Resource):  # type: ignore
     @swag_from("../swagger/code.yml", endpoint="api.code")
     def get(self, code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         p = entity_parser.parse_args()
-        return resolve_entity(GetByCode.get_by_view(code, p), p, code)
+        return resolve_entities(GetByCode.get_by_view(code, p), p, code)
 
     @staticmethod
     def get_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
