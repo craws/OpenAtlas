@@ -225,5 +225,6 @@ class Entity:
                 user_clause2=' AND ul.user_id = %(user_id)s ' if own else '')
         g.cursor.execute(
             sql,
-            {'term': f'%{term}%', 'user_id': user_id,'classes': tuple(classes)})
+            {'term': f'%{term}%', 'user_id': user_id, 'classes': tuple(classes)}
+        )
         return [dict(row) for row in g.cursor.fetchall()]

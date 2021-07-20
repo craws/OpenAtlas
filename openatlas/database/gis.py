@@ -8,12 +8,15 @@ class Gis:
 
     @staticmethod
     def add_example_geom(id_: int) -> None:
-        sql = """INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (
-        (%(location_id)s),
-        '',
-        '',
-        'centerpoint',
-        public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9,17]}'),4326));
+        sql = """
+            INSERT INTO gis.point (
+                entity_id, name, description, type, geom)
+            VALUES (
+            (%(location_id)s),
+            '',
+            '',
+            'centerpoint',
+            public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9,17]}'),4326));
         """
         g.cursor.execute(sql, {'location_id': id_})
 
@@ -34,9 +37,11 @@ class Gis:
             g.cursor.execute(sql, {'id_': id_})
             for row in g.cursor.fetchall():
                 geometry = ast.literal_eval(row['geojson'])
-                geometry['title'] = row['name'].replace('"', '\"') if row['name'] else ''
+                geometry['title'] = row['name'].replace('"', '\"') \
+                    if row['name'] else ''
                 geometry['description'] = \
-                    row['description'].replace('"', '\"') if row['description'] else ''
+                    row['description'].replace('"', '\"') \
+                    if row['description'] else ''
                 geometries.append(geometry)
         return geometries
 
@@ -59,10 +64,12 @@ class Gis:
             JOIN model.link l ON place.id = l.range_id
             JOIN model.entity object ON l.domain_id = object.id
             JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
-            LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
+            LEFT JOIN model.link t ON object.id = t.domain_id
+                AND t.property_code = 'P2'
             WHERE place.class_code = 'E53'
                 AND l.property_code = 'P53'
-                AND (object.system_class = 'place' OR object.id IN %(extra_ids)s)
+                AND (object.system_class = 'place'
+                OR object.id IN %(extra_ids)s)
             GROUP BY object.id, {shape}.id;"""
         g.cursor.execute(sql, {'extra_ids': tuple(extra_ids)})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -79,27 +86,34 @@ class Gis:
     @staticmethod
     def insert(data: Dict[str, Any], shape: str) -> None:
         sql = f"""
-            INSERT INTO gis.{shape} (entity_id, name, description, type, geom) VALUES (
+            INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
+            VALUES (
                 %(entity_id)s,
                 %(name)s,
                 %(description)s,
                 %(type)s,
-                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
+                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
+        """
         g.cursor.execute(sql, data)
 
     @staticmethod
     def insert_import(data: Dict[str, Any]) -> None:
         sql = """
-            INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (
+            INSERT INTO gis.point (entity_id, name, description, type, geom)
+            VALUES (
                 %(entity_id)s,
                 '',
                 %(description)s,
                 'centerpoint',
-                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
+                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
+        """
         g.cursor.execute(sql, data)
 
     @staticmethod
     def delete_by_entity_id(id_: int) -> None:
-        g.cursor.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': id_})
-        g.cursor.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': id_})
-        g.cursor.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute(
+            'DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute(
+            'DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': id_})
+        g.cursor.execute(
+            'DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': id_})
