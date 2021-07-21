@@ -7,7 +7,8 @@ class Link:
 
     @staticmethod
     def update(data: Dict[str, Any]) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             UPDATE model.link SET (
                 property_code,
                 domain_id,
@@ -24,12 +25,12 @@ class Link:
                 %(type_id)s,
                 %(begin_from)s, %(begin_to)s, %(begin_comment)s,
                 %(end_from)s, %(end_to)s, %(end_comment)s)
-            WHERE id = %(id)s;"""
-        g.cursor.execute(sql, data)
+            WHERE id = %(id)s;""", data)
 
     @staticmethod
     def insert(data: Dict[str, Any]) -> int:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO model.link (
                 property_code,
                 domain_id,
@@ -42,8 +43,7 @@ class Link:
                 %(range_id)s,
                 %(description)s,
                 %(type_id)s)
-            RETURNING id;"""
-        g.cursor.execute(sql, data)
+            RETURNING id;""", data)
         return g.cursor.fetchone()['id']
 
     @staticmethod
@@ -93,8 +93,7 @@ class Link:
             GROUP BY l.id, e.name
             ORDER BY e.name;"""
         g.cursor.execute(
-            sql,
-            {
+            sql, {
                 'entities': tuple(
                     entities if isinstance(entities, list) else [entities]),
                 'codes': tuple(codes) if codes else ''})
@@ -112,7 +111,8 @@ class Link:
 
     @staticmethod
     def get_by_id(id_: int) -> Dict[str, Any]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT
                 l.id,
                 l.property_code,
@@ -130,16 +130,15 @@ class Link:
                     AS end_from, l.end_comment,
                 COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
-            WHERE l.id = %(id)s;"""
-        g.cursor.execute(sql, {'id': id_})
+            WHERE l.id = %(id)s;""", {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
     def get_entities_by_node(node_id: int) -> List[Dict[str, Any]]:
         g.cursor.execute(
             """
-                SELECT id, domain_id, range_id from model.link
-                WHERE type_id = %(node_id)s;""",
+            SELECT id, domain_id, range_id from model.link
+            WHERE type_id = %(node_id)s;""",
             {'node_id': node_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -162,7 +161,8 @@ class Link:
 
     @staticmethod
     def get_invalid_links(data: Dict[str, Any]) -> List[Dict[str, int]]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT
                 l.id,
                 l.property_code,
@@ -175,8 +175,8 @@ class Link:
             JOIN model.entity r ON l.range_id = r.id
             WHERE l.property_code = %(property_code)s
                 AND d.class_code = %(domain_code)s
-                AND r.class_code = %(range_code)s;"""
-        g.cursor.execute(sql, data)
+                AND r.class_code = %(range_code)s;""",
+            data)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -220,9 +220,10 @@ class Link:
 
     @staticmethod
     def check_single_type_duplicates(ids: List[int]) -> List[int]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT domain_id FROM model.link
             WHERE property_code = 'P2' AND range_id IN %(ids)s
-            GROUP BY domain_id HAVING COUNT(*) > 1;"""
-        g.cursor.execute(sql, {'ids': tuple(ids)})
+            GROUP BY domain_id HAVING COUNT(*) > 1;""",
+            {'ids': tuple(ids)})
         return [row['domain_id'] for row in g.cursor.fetchall()]

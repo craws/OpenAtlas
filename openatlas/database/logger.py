@@ -7,21 +7,27 @@ class Logger:
 
     @staticmethod
     def log(data: Dict[str, Any]) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.system_log (priority, type, message, user_id, info)
-            VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)
-            RETURNING id;"""
-        g.cursor.execute(sql, data)
+            VALUES (%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)
+            RETURNING id;""",
+            data)
 
     @staticmethod
-    def get_system_logs(limit: str, priority: str, user_id: str) -> List[Dict[str, Any]]:
-        sql = f"""
-            SELECT id, priority, type, message, user_id, info, created FROM web.system_log
+    def get_system_logs(
+            limit: str,
+            priority:
+            str, user_id: str) -> List[Dict[str, Any]]:
+        g.cursor.execute(
+            f"""
+            SELECT id, priority, type, message, user_id, info, created
+            FROM web.system_log
             WHERE priority <= %(priority)s
             {' AND user_id = %(user_id)s' if int(user_id) > 0 else ''}
             ORDER BY created DESC
-            {' LIMIT %(limit)s' if int(limit) > 0 else ''};"""
-        g.cursor.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
+            {' LIMIT %(limit)s' if int(limit) > 0 else ''};""",
+            {'limit': limit, 'priority': priority, 'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -30,10 +36,11 @@ class Logger:
 
     @staticmethod
     def log_user(entity_id: int, user_id: int, action: str) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.user_log (user_id, entity_id, action)
-            VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
-        g.cursor.execute(sql, {'user_id': user_id, 'entity_id': entity_id, 'action': action})
+            VALUES (%(user_id)s, %(entity_id)s, %(action)s);""",
+            {'user_id': user_id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
     def get_log_for_advanced_view(entity_id: str) -> Dict[str, Any]:
@@ -47,8 +54,11 @@ class Logger:
         row_insert = g.cursor.fetchone()
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
         row_update = g.cursor.fetchone()
-        sql = 'SELECT project_id, origin_id, user_id FROM import.entity WHERE entity_id = %(id)s;'
-        g.cursor.execute(sql, {'id': entity_id})
+        g.cursor.execute(
+            """
+            SELECT project_id, origin_id, user_id
+            FROM import.entity WHERE entity_id = %(id)s;""",
+            {'id': entity_id})
         row_import = g.cursor.fetchone()
         return {
             'creator_id': row_insert['user_id'] if row_insert else None,

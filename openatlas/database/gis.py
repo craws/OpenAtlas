@@ -8,17 +8,16 @@ class Gis:
 
     @staticmethod
     def add_example_geom(id_: int) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO gis.point (
                 entity_id, name, description, type, geom)
             VALUES (
-            (%(location_id)s),
-            '',
-            '',
-            'centerpoint',
-            public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9,17]}'),4326));
-        """
-        g.cursor.execute(sql, {'location_id': id_})
+                (%(location_id)s), '', '', 'centerpoint',
+                public.ST_SetSRID(
+                    public.ST_GeomFromGeoJSON(
+                        '{"type":"Point","coordinates":[9,17]}'),
+                        4326));""", {'location_id': id_})
 
     @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:
@@ -48,7 +47,9 @@ class Gis:
     @staticmethod
     def get_by_shape(shape: str, extra_ids: List[int]) -> List[Dict[str, Any]]:
         polygon_sql = '' if shape != 'polygon' else \
-            'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
+            """
+            public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom))
+                AS polygon_point, """
         sql = f"""
             SELECT
                 object.id AS object_id,
@@ -77,11 +78,15 @@ class Gis:
     @staticmethod
     def test_geom(geometry: str) -> None:
         from openatlas.models.gis import InvalidGeomException
-        sql = "SELECT st_isvalid(public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"
-        g.cursor.execute(sql, {'geojson': geometry})
+        g.cursor.execute(
+            """
+            SELECT st_isvalid(
+                public.ST_SetSRID(
+                    public.ST_GeomFromGeoJSON(%(geojson)s),
+                    4326));""",
+            {'geojson': geometry})
         if not g.cursor.fetchone()['st_isvalid']:
             raise InvalidGeomException
-        return
 
     @staticmethod
     def insert(data: Dict[str, Any], shape: str) -> None:

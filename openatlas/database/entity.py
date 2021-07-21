@@ -69,12 +69,13 @@ class Entity:
 
     @staticmethod
     def get_overview_counts(classes: List[str]) -> Dict[str, int]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT system_class, COUNT(system_class)
             FROM model.entity
             WHERE system_class IN %(classes)s
-            GROUP BY system_class;"""
-        g.cursor.execute(sql, {'classes': tuple(classes)})
+            GROUP BY system_class;""",
+            {'classes': tuple(classes)})
         return {
             row['system_class']: row['count'] for row in g.cursor.fetchall()}
 
@@ -106,26 +107,28 @@ class Entity:
 
     @staticmethod
     def insert(data: Dict[str, Any]) -> int:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO model.entity
                 (name, system_class, class_code, description)
             VALUES
                 (%(name)s, %(system_class)s, %(code)s, %(description)s)
-            RETURNING id;"""
-        g.cursor.execute(sql, data)
+            RETURNING id;""",
+            data)
         return g.cursor.fetchone()['id']
 
     @staticmethod
     def update(data: Dict[str, Any]) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             UPDATE model.entity SET (
                 name, description, begin_from, begin_to, begin_comment,
                 end_from, end_to, end_comment)
             = (
                 %(name)s, %(description)s, %(begin_from)s, %(begin_to)s,
                 %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
-            WHERE id = %(id)s;"""
-        g.cursor.execute(sql, data)
+            WHERE id = %(id)s;""",
+            data)
 
     @staticmethod
     def get_profile_image_id(id_: int) -> Optional[int]:
@@ -139,20 +142,21 @@ class Entity:
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.entity_profile_image (entity_id, image_id)
             VALUES (%(entity_id)s, %(image_id)s)
-            ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;"""
-        g.cursor.execute(sql, {'entity_id': origin_id, 'image_id': id_})
+            ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;""",
+            {'entity_id': origin_id, 'image_id': id_})
 
     @staticmethod
     def remove_profile_image(id_: int) -> None:
-        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;'
-        g.cursor.execute(sql, {'id': id_})
+        g.cursor.execute(
+            'DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;',
+            {'id': id_})
 
     @staticmethod
-    def delete(ids: List[int]) -> None:
-        """ Triggers psql function model.delete_entity_related() """
+    def delete(ids: List[int]) -> None:  # Triggers psql delete_entity_related()
         g.cursor.execute(
             'DELETE FROM model.entity WHERE id IN %(ids)s;',
             {'ids': tuple(ids)})

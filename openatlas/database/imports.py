@@ -16,11 +16,12 @@ class Import:
 
     @staticmethod
     def insert_project(name: str, description: str) -> int:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO import.project (name, description)
             VALUES (%(name)s, %(description)s)
-            RETURNING id;"""
-        g.cursor.execute(sql, {'name': name, 'description': description})
+            RETURNING id;""",
+            {'name': name, 'description': description})
         return g.cursor.fetchone()['id']
 
     @staticmethod
@@ -45,34 +46,33 @@ class Import:
     @staticmethod
     def delete_project(id_: int) -> None:
         g.cursor.execute(
-            'DELETE FROM import.project WHERE id = %(id)s;',
-            {'id': id_})
+            'DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
     def check_origin_ids(project_id: int, origin_ids: List[str]) -> List[str]:
         g.cursor.execute(
             """
-                SELECT origin_id FROM import.entity
-                WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;""",
+            SELECT origin_id FROM import.entity
+            WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;""",
             {'project_id': project_id, 'ids': tuple(set(origin_ids))})
         return [row['origin_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_duplicates(class_: str, names: List[str]) -> List[str]:
-        sql = """
+        g.cursor.execute(
+            """
             SELECT DISTINCT name FROM model.entity
-            WHERE system_class = %(class_)s AND LOWER(name) IN %(names)s;"""
-        g.cursor.execute(sql, {'class_': class_, 'names': tuple(names)})
+            WHERE system_class = %(class_)s AND LOWER(name) IN %(names)s;""",
+            {'class_': class_, 'names': tuple(names)})
         return [row['name'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def update_project(id_: int, name: str, description: str) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             UPDATE import.project
             SET (name, description) = (%(name)s, %(description)s)
-            WHERE id = %(id)s;"""
-        g.cursor.execute(
-            sql,
+            WHERE id = %(id)s;""",
             {'id': id_, 'name': name, 'description': description})
 
     @staticmethod
