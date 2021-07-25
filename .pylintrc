@@ -1,0 +1,4 @@
+[MASTER]
+min-public-methods=0
+disable=C0111  # missing-docstring
+good-names=i,j,k,ex,Run,_,e,js,bc,id,rv,ip  # default is i,j,k,ex,Run,_

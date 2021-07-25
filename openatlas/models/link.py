@@ -156,12 +156,12 @@ class Link:
 
     @staticmethod
     def get_links(
-            entity_id: int,
+            entities: Union[int, List[int]],
             codes: Union[str, List[str], None] = None,
             inverse: bool = False) -> List[Link]:
         from openatlas.models.entity import Entity
         entity_ids = set()
-        result = Db.get_links(entity_id, codes if isinstance(codes, list) else [codes], inverse)
+        result = Db.get_links(entities, codes if isinstance(codes, list) else [codes], inverse)
         for row in result:
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])

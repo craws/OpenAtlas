@@ -55,12 +55,13 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         return redirect(f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
     form.multiple = hierarchy.multiple
     table = Table(paging=False)
-    for id_, form_ in hierarchy.forms.items():
-        count = Node.get_form_count(hierarchy, id_)
+    for form_id, form_ in hierarchy.forms.items():
+        count = Node.get_form_count(hierarchy, form_id)
         table.rows.append([
             g.classes[form_['name']].label,
             format_number(count) if count else link(
-                _('remove'), url_for('remove_form', id_=hierarchy.id, form_id=id_))])
+                _('remove'),
+                url_for('remove_form', id_=hierarchy.id, form_id=form_id))])
     return render_template(
         'display_form.html',
         form=form,
@@ -106,7 +107,7 @@ def save(
             Node.update_hierarchy(node, form)
         else:
             node = Entity.insert('type', sanitize(form.name.data))
-            Node.insert_hierarchy(node, form, value_type=True if param == 'value' else False)
+            Node.insert_hierarchy(node, form, value_type=(param == 'value'))
         node.update(form)
         Transaction.commit()
     except Exception as e:  # pragma: no cover

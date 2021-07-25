@@ -13,7 +13,20 @@
       "email": "bernhard.koschicek@oeaw.ac.at"
     }
   },
-  "servers": [],
+  "servers": [
+    {
+      "url": "https://demo.openatlas.eu",
+      "description": "Demo Server"
+    },
+    {
+      "url": "https://demo-dev.openatlas.eu",
+      "description": "Demo Dev Server"
+    },
+    {
+      "url": "https://connec.acdh.oeaw.ac.at",
+      "description": "Connec Production Server"
+    }
+  ],
   "tags": [
     {
       "name": "Entities",
@@ -151,6 +164,43 @@
             "csv"
           ]
         }
+      },
+      "formatParam": {
+        "name": "format",
+        "in": "query",
+        "description": "Select to which output format is prefered",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "linked_places",
+            "geojson"
+          ]
+        }
+      },
+      "geometryParam": {
+        "name": "geometry",
+        "in": "query",
+        "description": "Select geometry types.",
+        "schema": {
+          "type": "string",
+          "enum": [
+            "gisAll",
+            "gisPointAll",
+            "gisPointSupers",
+            "gisPointSubs",
+            "gisPointSibling",
+            "gisLineAll",
+            "gisPolygonAll"
+          ]
+        }
+      },
+      "typeParam": {
+        "name": "type_id",
+        "in": "query",
+        "description": "The output will be filtered by the type_id. Only entities with this type ids will be display. The relation is in logical OR.",
+        "schema": {
+          "type": "number"
+        }
       }
     },
     "schemas": {
@@ -171,10 +221,66 @@
           }
         }
       },
+      "SystemClassCountModel": {
+        "type": "object",
+        "properties": {
+          "move": {
+            "type": "number"
+          },
+          "bibliography": {
+            "type": "number"
+          },
+          "person": {
+            "type": "number"
+          },
+          "acquisition": {
+            "type": "number"
+          },
+          "reference_system": {
+            "type": "number"
+          },
+          "feature": {
+            "type": "number"
+          },
+          "file": {
+            "type": "number"
+          },
+          "activity": {
+            "type": "number"
+          },
+          "type": {
+            "type": "number"
+          },
+          "administrative_unit": {
+            "type": "number"
+          },
+          "artifact": {
+            "type": "number"
+          },
+          "source_translation": {
+            "type": "number"
+          },
+          "place": {
+            "type": "number"
+          },
+          "stratigraphic_unit": {
+            "type": "number"
+          },
+          "edition": {
+            "type": "number"
+          },
+          "group": {
+            "type": "number"
+          },
+          "source": {
+            "type": "number"
+          }
+        }
+      },
       "OverviewCountModel": {
         "type": "object",
         "properties": {
-          "name": {
+          "systemClass": {
             "type": "string"
           },
           "count": {
@@ -242,7 +348,7 @@
               "type": "string"
             }
           },
-          "cusxtom": {
+          "custom": {
             "type": "array",
             "items": {
               "type": "string"
@@ -294,26 +400,6 @@
                   "$ref": "#/components/schemas/PaginationIndexModel"
                 }
               }
-            }
-          }
-        }
-      },
-      "PaginationModel": {
-        "type": "object",
-        "properties": {
-          "entities": {
-            "type": "number"
-          },
-          "entitiesPerPage": {
-            "type": "number"
-          },
-          "totalPages": {
-            "type": "number"
-          },
-          "index": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/PaginationIndexModel"
             }
           }
         }
@@ -541,6 +627,165 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/TimespansModel"
+            }
+          }
+        }
+      },
+      "TypeModel": {
+        "type": "object",
+        "properties": {
+          "Type_IDs": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "integer"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "note": {
+                "type": "string"
+              },
+              "origin_id": {
+                "type": "integer"
+              },
+              "first": {
+                "type": "integer"
+              },
+              "last": {
+                "type": "integer"
+              },
+              "root": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "subs": {
+                "type": "array",
+                "items": {
+                  "type": "integer"
+                }
+              },
+              "count": {
+                "type": "integer"
+              },
+              "count_subs": {
+                "type": "integer"
+              },
+              "locked": {
+                "type": "boolean"
+              },
+              "standard": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      },
+      "TypeTreeModel": {
+        "type": "object",
+        "properties": {
+          "type_tree": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeModel"
+            }
+          }
+        }
+      },
+      "GeometryModel": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Geometries"
+            }
+          }
+        }
+      },
+      "Geometries": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "begin_from": {
+                "type": "string"
+              },
+              "begin_to": {
+                "type": "string"
+              },
+              "end_from": {
+                "type": "string"
+              },
+              "end_to": {
+                "type": "string"
+              },
+              "type": {
+                "type": "string"
+              },
+              "place": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "types": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             }
           }
         }

@@ -34,6 +34,10 @@ class InvalidCodeError(Exception):
     pass
 
 
+class InvalidSystemClassError(Exception):
+    pass
+
+
 class NoSearchStringError(Exception):
     pass
 
@@ -69,8 +73,7 @@ class FilterDelimiterError(Exception):
 class FilterLogicalOperatorError(Exception):
     pass
 
-
-class APIFileNotFoundError(Exception):
+class TypeIDError(Exception):
     pass
 
 
@@ -107,6 +110,9 @@ errors = {
         "message": "The code is not valid. Valid codes are: actor, event, place, source, reference"
                    " and object. For further usage, please confer the help page.",
         "status": 404},
+    "InvalidSystemClassError": {
+        "message": "System class is not valid. For further usage, please confer the help page.",
+        "status": 404},
     "NoSearchStringError": {
         "message": "The filter parameter has no search string.",
         "status": 404},
@@ -131,7 +137,7 @@ errors = {
     "FilterDelimiterError": {
         "message": "Filter delimiter are wrong.",
         "status": 404},
-    "APIFileNotFoundError": {
-        "message": "The requested endpoint doesn't exist.",
+    "TypeIDError": {
+        "message": "One type ID is wrong.",
         "status": 404}
 }

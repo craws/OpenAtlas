@@ -3,9 +3,6 @@
     {% if not table.header %}
         #{{ name }}_table_wrapper .row:first-of-type {display:none;}
     {% endif %}
-    {% if table.rows|length <= current_user.settings.table_rows %}
-        #{{ name }}_table_wrapper .row:last-of-type {display:none;}
-     {% endif %}
 </style>
 <script>
     $(document).ready(function() {

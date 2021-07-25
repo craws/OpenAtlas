@@ -103,14 +103,15 @@ class Tab:
                 buttons += [button('link', url_for('source_add', id_=id_, view='event'))]
             elif view == 'reference':
                 buttons += [button('link', url_for('reference_add', id_=id_, view='event'))]
-            for item in g.view_class_mapping['event']:
-                buttons.append(button(
-                    g.classes[item].label,
-                    url_for('insert', class_=item, origin_id=id_)))
             if view == 'artifact':
                 buttons += [button(
                     g.classes['move'].label,
                     url_for('insert', class_='move', origin_id=id_))]
+            else:
+                for item in g.view_class_mapping['event']:
+                    buttons.append(button(
+                        g.classes[item].label,
+                        url_for('insert', class_=item, origin_id=id_)))
         elif name == 'feature':
             if current_user.settings['module_sub_units'] and class_.name == 'place':
                 buttons += [
@@ -140,7 +141,7 @@ class Tab:
             buttons += [button('link', url_for('member_insert', origin_id=id_, code='membership'))]
         elif name == 'note':
             if is_authorized('contributor'):
-                buttons += [button(_('note'),  url_for('note_insert', entity_id=id_))]
+                buttons += [button(_('note'), url_for('note_insert', entity_id=id_))]
         elif name == 'place':
             if class_.name == 'file':
                 buttons += [button('link', url_for('file_add', id_=id_, view=name))]

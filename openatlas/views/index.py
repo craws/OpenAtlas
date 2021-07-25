@@ -1,6 +1,6 @@
 from typing import Dict, Tuple, Union
 
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, jsonify, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -10,7 +10,7 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.api.v02.resources.error import APIFileNotFoundError, MethodNotAllowedError
+from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -42,7 +42,7 @@ def overview() -> str:
         'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
         'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
-        'latest': Table(order=[[0, 'desc']])}
+        'latest': Table(paging=False, order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
@@ -143,7 +143,7 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
-        raise APIFileNotFoundError
+        return jsonify({'message': 'Endpoint not found', 'status': 404}), 404
     return render_template('404.html', crumbs=['404 - File not found'], e=e), 404
 
 

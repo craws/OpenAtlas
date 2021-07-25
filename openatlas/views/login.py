@@ -63,9 +63,8 @@ def login() -> Union[str, Response]:
                     user.update()
                     logger.log('info', 'auth', f'Login of {user.username}')
                     return redirect(request.args.get('next') or url_for('overview'))
-                else:
-                    logger.log('notice', 'auth', f'Inactive login try {user.username}')
-                    flash(_('error inactive'), 'error')
+                logger.log('notice', 'auth', f'Inactive login try {user.username}')
+                flash(_('error inactive'), 'error')
             else:
                 logger.log('notice', 'auth', f'Wrong password: {user.username}')
                 user.login_failed_count += 1

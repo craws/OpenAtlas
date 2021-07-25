@@ -1,6 +1,7 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField
+from wtforms import (
+    BooleanField, IntegerField, SelectField, StringField, SubmitField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -55,7 +56,9 @@ class MailForm(FlaskForm):  # type: ignore
 
 
 class LogForm(FlaskForm):  # type: ignore
-    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
+    limit = SelectField(
+        _('limit'),
+        choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(
         _('priority'),
         choices=(list(app.config['LOG_LEVELS'].items())),
@@ -93,14 +96,23 @@ class SimilarForm(FlaskForm):  # type: ignore
 
 class ProfileForm(FlaskForm):  # type: ignore
     name = StringField(_('full name'), description=_('tooltip full name'))
-    email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
-    show_email = BooleanField(_('show email'), description=_('tooltip show email'))
-    newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
+    email = StringField(
+        _('email'),
+        [InputRequired(), Email()],
+        description=_('tooltip email'))
+    show_email = BooleanField(
+        _('show email'),
+        description=_('tooltip show email'))
+    newsletter = BooleanField(
+        _('newsletter'),
+        description=_('tooltip newsletter'))
     save = SubmitField(_('save'))
 
 
 class DisplayForm(FlaskForm):  # type: ignore
-    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
+    language = SelectField(
+        _('language'),
+        choices=list(app.config['LANGUAGES'].items()))
     table_rows = SelectField(
         _('table rows'),
         description=_('tooltip table rows'),

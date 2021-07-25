@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List
+from typing import Any, List
 
 from flask import g, render_template
 from flask_login import current_user
@@ -31,13 +31,15 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
         for e in entities:
             data = get_base_table_data(e, show_links=False)
-            checked = 'checked' if field.data and e.id in field.data else ''
-            data.insert(0, f'<input type="checkbox" id="{e.id}" value="{e.name}" {checked}>')
+            data.insert(0, f"""
+                <input type="checkbox" id="{e.id}" value="{e.name}"
+                {'checked' if field.data and e.id in field.data else ''}>""")
             table.rows.append(data)
         html = render_template(
             'forms/table_multi_select.html',
             field=field,
-            selection=[e.name for e in entities if field.data and e.id in field.data],
+            selection=[
+                e.name for e in entities if field.data and e.id in field.data],
             table=table)
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
@@ -56,21 +58,35 @@ class TableSelect(HiddenInput):  # type: ignore
 
         selection = ''
         if field.id in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-            entities = g.properties if field.id == 'cidoc_property' else g.cidoc_classes
+            entities = g.properties \
+                if field.id == 'cidoc_property' else g.cidoc_classes
             table = Table(['code', 'name'], defs=[
                 {'orderDataType': 'cidoc-model', 'targets': [0]},
                 {'sType': 'numeric', 'targets': [0]}])
             for id_, entity in entities.items():
-                js = f"selectFromTable(this,'{field.id}','{id_}','{entity.code} {entity.name}');"
-                table.rows.append([f'<a onclick="{js}" href="#">{entity.code}</a>', entity.name])
+                table.rows.append([
+                    f"""
+                    <a href="#" onclick="selectFromTable(
+                        this,
+                        '{field.id}',
+                        '{id_}',
+                        '{entity.code} {entity.name}');">{entity.code}</a>""",
+                    entity.name])
         else:
             aliases = current_user.settings['table_show_aliases']
-            if 'place' in field.id or field.id in ['begins_in', 'ends_in', 'residence']:
+            if 'place' in field.id \
+                    or field.id in ['begins_in', 'ends_in', 'residence']:
                 class_ = 'place'
-                entities = Entity.get_by_class('place', nodes=True, aliases=aliases)
+                entities = Entity.get_by_class(
+                    'place',
+                    nodes=True,
+                    aliases=aliases)
             else:
                 class_ = field.id
-                entities = Entity.get_by_view(class_, nodes=True, aliases=aliases)
+                entities = Entity.get_by_view(
+                    class_,
+                    nodes=True,
+                    aliases=aliases)
             table = Table(g.table_headers[class_])
             selection = ''
             for entity in entities:
@@ -89,10 +105,10 @@ class TableSelect(HiddenInput):  # type: ignore
     @staticmethod
     def format_name_and_aliases(entity: Entity, field_id: str) -> str:
         link = f"""
-            <a href='#' onclick="selectFromTable(this, '{field_id}', {entity.id})">
-                {entity.name}
-            </a>"""
-        if not len(entity.aliases):
+            <a href='#'
+                onclick="selectFromTable(this, '{field_id}', {entity.id})">
+                {entity.name}</a>"""
+        if not entity.aliases:
             return link
         html = f'<p>{link}</p>'
         for i, alias in enumerate(entity.aliases.values()):
@@ -109,7 +125,8 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data: List[int] = []
         if field.data:
-            data = ast.literal_eval(field.data) if isinstance(field.data, str) else field.data
+            data = ast.literal_eval(field.data) \
+                if isinstance(field.data, str) else field.data
         html = render_template(
             'forms/tree_multi_select.html',
             field=field,
@@ -126,11 +143,11 @@ class TreeMultiField(HiddenField):  # type: ignore
 class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
-        from openatlas.models.node import Node
         selection = ''
         selected_ids = []
         if field.data:
-            field.data = field.data[0] if isinstance(field.data, list) else field.data
+            field.data = field.data[0] \
+                if isinstance(field.data, list) else field.data
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
         html = render_template(
