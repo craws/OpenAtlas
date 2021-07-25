@@ -1,30 +1,32 @@
 {% extends 'layout.html' %}
 {% block content %}
     <div class="toolbar">
-        {{ _('remove')|button(url_for('overlay_remove', id_=overlay.id, place_id=entity.id), onclick="return confirm('" +  _('remove')|uc_first + "?');") }}
+        {{ _('remove')|button(
+            url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
+            onclick="return confirm('" +  _('remove')|uc_first + "?');") }}
     </div>
     <form method="post">
         {{ form.csrf_token }}
         <div class="data-table">
             <div class="table-row">
                 <div></div>
-                <div class="table-cell">{{ _('easting')|uc_first }}</div>
-                <div class="table-cell">{{ _('northing')|uc_first }}</div>
+                <div>{{ _('easting')|uc_first }}</div>
+                <div>{{ _('northing')|uc_first }}</div>
             </div>
             <div class="table-row">
                 <div>{{ _('top left')|uc_first }}</div>
-                <div class="table-cell">{{ form.top_left_easting(class_='number') }}</div>
-                <div class="table-cell">{{ form.top_left_northing(class_='number') }}</div>
+                <div>{{ form.top_left_easting(class_='number') }}</div>
+                <div>{{ form.top_left_northing(class_='number') }}</div>
             </div>
             <div class="table-row">
                 <div>{{ _('top right')|uc_first }}</div>
-                <div class="table-cell">{{ form.top_right_easting(class_='number') }}</div>
-                <div class="table-cell">{{ form.top_right_northing(class_='number') }}</div>
+                <div>{{ form.top_right_easting(class_='number') }}</div>
+                <div>{{ form.top_right_northing(class_='number') }}</div>
             </div>
             <div class="table-row">
                 <div>{{ _('bottom left')|uc_first }}</div>
-                <div class="table-cell">{{ form.bottom_left_easting(class_='number') }}</div>
-                <div class="table-cell">{{ form.bottom_left_northing(class_='number') }}</div>
+                <div>{{ form.bottom_left_easting(class_='number') }}</div>
+                <div>{{ form.bottom_left_northing(class_='number') }}</div>
             </div>
         </div>
         {{ form.save(class=config.CSS.button.primary) }}

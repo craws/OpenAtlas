@@ -15,6 +15,7 @@ package_json = {
         "datatables.net-buttons-dt": "^1.6.1",
         "datatables.net-bs4": "^1.10.20",
         "leaflet": "^1.5.1",
+        "leaflet-imageoverlay-rotated": "^v0.2.1",
         "save-svg-as-png": "^1.4.14",
         "tinymce": "^5.1.1",
         "bootstrap": "^4.3.1",
