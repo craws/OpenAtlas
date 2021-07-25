@@ -12,11 +12,14 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
-from openatlas.util.util import required_group
+from openatlas.util.util import button, required_group, uc_first
 
 
 class OverlayForm(FlaskForm):  # type: ignore
-    top_left_easting = FloatField('', [InputRequired()], render_kw={'autofocus': True})
+    top_left_easting = FloatField(
+        '',
+        [InputRequired()],
+        render_kw={'autofocus': True})
     top_left_northing = FloatField('', [InputRequired()])
     top_right_easting = FloatField('', [InputRequired()])
     top_right_northing = FloatField('', [InputRequired()])
@@ -25,15 +28,24 @@ class OverlayForm(FlaskForm):  # type: ignore
     save = SubmitField()
 
 
-@app.route('/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>', methods=['POST', 'GET'])
+@app.route(
+    '/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>',
+    methods=['POST', 'GET'])
 @required_group('editor')
-def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Response]:
+def overlay_insert(
+        image_id: int,
+        place_id: int,
+        link_id: int) -> Union[str, Response]:
     form = OverlayForm()
     if form.validate_on_submit():
-        Overlay.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
+        Overlay.insert(
+            form=form,
+            image_id=image_id,
+            place_id=place_id,
+            link_id=link_id)
         return redirect(f"{url_for('entity_view', id_=place_id)}#tab-file")
     return render_template(
-        'overlay/insert.html',
+        'overlay.html',
         form=form,
         crumbs=[
             [_('place'), url_for('index', view='place')],
@@ -48,9 +60,13 @@ def overlay_update(id_: int) -> Union[str, Response]:
     overlay = Overlay.get_by_id(id_)
     form = OverlayForm()
     if form.validate_on_submit():
-        Overlay.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
+        Overlay.update(
+            form=form,
+            image_id=overlay.image_id,
+            place_id=overlay.place_id)
         flash(_('info update'), 'info')
-        return redirect(f"{url_for('entity_view', id_=overlay.place_id)}#tab-file")
+        return redirect(
+            f"{url_for('entity_view', id_=overlay.place_id)}#tab-file")
     bounding = ast.literal_eval(overlay.bounding_box)
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
@@ -60,10 +76,14 @@ def overlay_update(id_: int) -> Union[str, Response]:
     form.bottom_left_northing.data = bounding[2][0]
     entity = Entity.get_by_id(overlay.place_id)
     return render_template(
-        'overlay/update.html',
+        'overlay.html',
         form=form,
         overlay=overlay,
         entity=entity,
+        buttons=[button(
+            _('remove'),
+            url_for('overlay_remove', id_=overlay.id, place_id=entity.id),
+            onclick=f"return confirm('{uc_first(_('remove'))}?');")],
         crumbs=[
             [_('place'), url_for('index', view='place')],
             entity,
