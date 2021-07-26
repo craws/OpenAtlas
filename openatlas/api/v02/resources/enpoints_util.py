@@ -21,7 +21,8 @@ def get_template(parser: Dict[str, str]) -> Dict[str, Any]:
 def resolve_entities(
         entities: List[Entity],
         parser: Dict[str, Any],
-        file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        file_name: Union[int, str]) \
+        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     result = Pagination.pagination(entities, parser)
@@ -35,7 +36,8 @@ def resolve_entities(
 def resolve_node_parser(
         node: Dict[str, Any],
         parser: Dict[str, Any],
-        file_name: Union[int, str]) -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        file_name: Union[int, str])\
+        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['count']:
         return jsonify(len(node['nodes']))
     if parser['download']:
@@ -57,4 +59,4 @@ def download(
     return Response(
         json.dumps(marshal(data, template)),
         mimetype='application/json',
-        headers={'Content-Disposition': 'attachment;filename=' + str(name) + '.json'})
+        headers={'Content-Disposition': f'attachment;filename={name}.json'})

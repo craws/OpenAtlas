@@ -12,27 +12,37 @@ from openatlas.util.util import get_file_path
 
 class LPHelper:
     @staticmethod
-    def get_location_id(links: List[Link]) -> Union[int, None]:
+    def get_location_id(links: List[Link]) -> int:
         for link_ in links:
             if link_.property.code == 'P53':
                 return link_.range.id
-        return None
+
+    @staticmethod
+    def relation_type(link_: Link, inverse: bool = False) -> str:
+        property_ = f"i {link_.property.i18n_inverse['en']}" \
+            if inverse and link_.property.i18n_inverse['en'] \
+            else f" {link_.property.i18n['en']}"
+        return f"crm:{link_.property.code}{property_}"
 
     @staticmethod
     def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
-        property_ = f"i {link_.property.i18n_inverse['en']}" \
-            if inverse and link_.property.i18n_inverse['en'] else f" {link_.property.i18n['en']}"
         return {
             'label': link_.domain.name if inverse else link_.range.name,
-            'relationTo': url_for('api.entity', id_=link_.domain.id if inverse else link_.range.id,
-                                  _external=True),
-            'relationType': f"crm:{link_.property.code}{property_}",
-            'relationSystemClass': link_.domain.class_.name if inverse else link_.range.class_.name,
+            'relationTo':
+                url_for(
+                    'api.entity',
+                    id_=link_.domain.id if inverse else link_.range.id,
+                    _external=True),
+            'relationType': LPHelper.relation_type(link_, inverse),
+            'relationSystemClass': link_.domain.class_.name if
+            inverse else link_.range.class_.name,
             'type': link_.type.name if link_.type else None,
-            'when': {'timespans': [LPHelper.get_time(link_.domain if inverse else link_.range)]}}
+            'when': {'timespans': [
+                LPHelper.get_time(link_.domain if inverse else link_.range)]}}
 
     @staticmethod
-    def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+    def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[
+        List[Dict[str, str]]]:
         out = []
         for link_ in links:
             out.append(LPHelper.link_dict(link_))
@@ -48,19 +58,26 @@ class LPHelper:
                 continue
             path = get_file_path(link.domain.id)
             files.append({
-                '@id': url_for('api.entity', id_=link.domain.id, _external=True),
+                '@id': url_for('api.entity', id_=link.domain.id,
+                               _external=True),
                 'title': link.domain.name,
                 'license': get_license(link.domain),
                 'url': url_for(
-                    'api.display', filename=path.name, _external=True) if path else "N/A"})
+                    'api.display',
+                    filename=path.name,
+                    _external=True) if path else "N/A"})
         return files if files else None
 
     @staticmethod
-    def get_node(entity: Entity, links: List[Link]) -> Optional[List[Dict[str, Any]]]:
+    def get_node(entity: Entity,
+                 links: List[Link]) -> Optional[List[Dict[str, Any]]]:
         nodes = []
         for node in entity.nodes:
             nodes_dict = {
-                'identifier': url_for('api.entity', id_=node.id, _external=True),
+                'identifier': url_for(
+                    'api.entity',
+                    id_=node.id,
+                    _external=True),
                 'label': node.name}
             for link in links:
                 if link.range.id == node.id and link.description:
@@ -93,15 +110,16 @@ class LPHelper:
         return {'type': 'GeometryCollection', 'geometries': geoms}
 
     @staticmethod
-    def get_reference_systems(links_inverse: List[Link]) -> Optional[List[Dict[str, Any]]]:
+    def get_reference_systems(links_inverse: List[Link]) \
+            -> Optional[List[Dict[str, Any]]]:
         ref = []
         for link_ in links_inverse:
             if not isinstance(link_.domain, ReferenceSystem):
                 continue
             system = g.reference_systems[link_.domain.id]
+            identifier = system.resolver_url if system.resolver_url else ''
             ref.append({
-                'identifier':
-                    (system.resolver_url if system.resolver_url else '') + link_.description,
+                'identifier': f"{identifier}{link_.description}",
                 'type': g.nodes[link_.type.id].name,
                 'referenceSystem': system.name})
         return ref if ref else None

@@ -26,7 +26,7 @@ from wtforms.validators import Email
 
 from openatlas import app, logger
 from openatlas.models.content import Content
-from openatlas.models.date import Date
+from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
@@ -196,16 +196,19 @@ def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str
     return stats
 
 
-def get_entity_data(entity: 'Entity', event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: OrderedD[str, Any] = OrderedDict({_('alias'): list(entity.aliases.values())})
-
+def get_entity_data(
+        entity: 'Entity',
+        event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
+    data: OrderedD[str, Any] = OrderedDict(
+        {_('alias'): list(entity.aliases.values())})
     # Dates
     from_link = ''
     to_link = ''
     if entity.class_.name == 'move':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
-            from_link = link(place_from.get_linked_entity_safe('P53', True)) + ' '
+            from_link = link(place_from.get_linked_entity_safe('P53', True)) \
+                        + ' '
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
@@ -449,7 +452,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
-        date_ = Date.datetime64_to_timestamp(value)
+        date_ = datetime64_to_timestamp(value)
         return date_.lstrip('0') if date_ else ''
     return value.date().isoformat()
 
@@ -651,7 +654,7 @@ def add_type_data(entity: 'Entity', data: OrderedD[str, Any]) -> None:
             title=' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))))
 
     type_data = OrderedDict(sorted(type_data.items()))
-    for item in type_data.keys():  # Sort root types and move standard type to top
+    for item in type_data.keys():  # Sort root types, move standard type to top
         if item == _('type'):
             type_data.move_to_end(item, last=False)
             break
@@ -670,7 +673,9 @@ def description(entity: Union[Entity, Project]) -> str:
         label = _('content')
     return Markup(f"""
         <h2>{uc_first(label)}</h2>
-        <div class="description more">{'<br>'.join(entity.description.splitlines())}</div>""")
+        <div class="description more">
+            {'<br>'.join(entity.description.splitlines())}
+        </div>""")
 
 
 @app.template_filter()

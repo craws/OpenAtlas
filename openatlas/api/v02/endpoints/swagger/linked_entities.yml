@@ -1,12 +1,12 @@
-Type entities all endpoint
+Linked Entities endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their OpenAtlas type. A possible *id* can be obtained by the *type_tree* or *node_overview* endpoint. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities, which are linked to the entered entity. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
-    name: id_
-    description: Has to be a OpenAtlas type
+    name: linked_entities
+    description: ID must be an entity
     required: true
     schema:
       type: number

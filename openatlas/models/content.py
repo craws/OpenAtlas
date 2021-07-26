@@ -21,7 +21,8 @@ class Content:
                 'legal_notice_for_frontend',
                 'contact_for_frontend',
                 'site_name_for_frontend']:
-            content[name] = {language: '' for language in app.config['LANGUAGES'].keys()}
+            content[name] = \
+                {language: '' for language in app.config['LANGUAGES'].keys()}
         for row in Db.get_content():
             content[row['name']][row['language']] = row['text']
         return content
@@ -41,4 +42,7 @@ class Content:
     @staticmethod
     def update_content(name: str, form: FlaskForm) -> None:
         for language in app.config['LANGUAGES'].keys():
-            Db.update(name, language, form.__getattribute__(language).data.strip())
+            Db.update(
+                name,
+                language,
+                form.__getattribute__(language).data.strip())

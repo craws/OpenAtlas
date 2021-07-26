@@ -1,8 +1,9 @@
 import datetime
 from typing import Any, Dict, List
 
-from openatlas.api.v02.resources.error import FilterColumnError, FilterLogicalOperatorError, \
-    FilterOperatorError, InvalidSearchDateError, InvalidSearchNumberError, NoSearchStringError
+from openatlas.api.v02.resources.error import FilterColumnError, \
+    FilterLogicalOperatorError, FilterOperatorError, InvalidSearchDateError, \
+    InvalidSearchNumberError, NoSearchStringError
 
 
 class Validation:

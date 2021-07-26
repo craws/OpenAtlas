@@ -73,6 +73,7 @@ class FilterDelimiterError(Exception):
 class FilterLogicalOperatorError(Exception):
     pass
 
+
 class TypeIDError(Exception):
     pass
 

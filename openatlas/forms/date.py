@@ -17,34 +17,34 @@ def add_date_fields(form: Any) -> None:
     validator_month = [Optional(), NumberRange(min=1, max=12)]
     validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
 
-    setattr(form, 'begin_year_from',
-            IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'begin_month_from',
-            IntegerField(render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'begin_day_from',
-            IntegerField(render_kw={'placeholder': _('DD')}, validators=validator_day))
-    setattr(form, 'begin_year_to',
-            IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'begin_month_to',
-            IntegerField(render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'begin_day_to',
-            IntegerField(render_kw={'placeholder': _('DD')}, validators=validator_day))
-    setattr(form, 'begin_comment',
-            StringField(render_kw={'placeholder': _('comment')}))
-    setattr(form, 'end_year_from',
-            IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'end_month_from',
-            IntegerField(render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'end_day_from',
-            IntegerField(render_kw={'placeholder': _('DD')}, validators=validator_day))
-    setattr(form, 'end_year_to',
-            IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'end_month_to',
-            IntegerField(render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'end_day_to',
-            IntegerField(render_kw={'placeholder': _('DD')}, validators=validator_day))
-    setattr(form, 'end_comment',
-            StringField(render_kw={'placeholder': _('comment')}))
+    setattr(form, 'begin_year_from', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'begin_month_from', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'begin_day_from', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_year_to', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'begin_month_to', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'begin_day_to', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_comment', StringField(
+        render_kw={'placeholder': _('comment')}))
+    setattr(form, 'end_year_from', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'end_month_from', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'end_day_from', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_year_to', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'end_month_to', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'end_day_to', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_comment', StringField(
+        render_kw={'placeholder': _('comment')}))
 
 
 def populate_dates(form: FlaskForm, item: Union['Entity', Link]) -> None:

@@ -15,6 +15,14 @@ def get_entity_by_id(id_: int) -> Entity:
     return entity
 
 
+def get_entities_by_ids(ids: List[int]) -> List[Entity]:
+    try:
+        entity = Entity.get_by_ids(ids, nodes=True, aliases=True)
+    except Exception:
+        raise EntityDoesNotExistError
+    return entity
+
+
 def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
     links = []
     for link in Link.get_links(entities, list(g.properties)):
