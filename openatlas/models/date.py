@@ -15,7 +15,9 @@ class Date:
     @staticmethod
     def current_date_for_filename() -> str:
         today = datetime.today()
-        return f'{today.year}-{today.month:02}-{today.day:02}_{today.hour:02}{today.minute:02}'
+        return \
+            f'{today.year}-{today.month:02}-{today.day:02}_' \
+            f'{today.hour:02}{today.minute:02}'
 
     @staticmethod
     def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
@@ -42,17 +44,23 @@ class Date:
     @staticmethod
     def get_invalid_dates() -> List['Entity']:
         from openatlas.models.entity import Entity
-        return [Entity.get_by_id(row['id'], nodes=True) for row in Db.get_invalid_dates()]
+        return [
+            Entity.get_by_id(row['id'], nodes=True)
+            for row in Db.get_invalid_dates()]
 
     @staticmethod
     def invalid_involvement_dates() -> List['Link']:
         from openatlas.models.link import Link
-        return [Link.get_by_id(row['id']) for row in Db.invalid_involvement_dates()]
+        return [
+            Link.get_by_id(row['id'])
+            for row in Db.invalid_involvement_dates()]
 
     @staticmethod
     def get_invalid_link_dates() -> List['Link']:
         from openatlas.models.link import Link
-        return [Link.get_by_id(row['id']) for row in Db.get_invalid_link_dates()]
+        return [
+            Link.get_by_id(row['id'])
+            for row in Db.get_invalid_link_dates()]
 
     @staticmethod
     def form_to_datetime64(
@@ -75,12 +83,13 @@ class Date:
 
         def get_last_day_of_month(year_: int, month_: int) -> int:
             months_days: Dict[int, int] = {
-                1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30,
-                12: 31}
+                1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+                10: 31, 11: 30, 12: 31}
             months_days_leap: Dict[int, int] = {
-                1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31, 11: 30,
-                12: 31}
-            date_lookup = months_days_leap if is_leap_year(year_) else months_days
+                1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+                10: 31, 11: 30, 12: 31}
+            date_lookup = months_days_leap \
+                if is_leap_year(year_) else months_days
             return date_lookup[month_]
 
         if month:
