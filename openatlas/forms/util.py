@@ -13,7 +13,7 @@ from openatlas.util.util import uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
-    """ Returns the base type provided by a link form, e.g. involvement between actor and event."""
+    # Returns base type of a link form, e.g. involvement between actor and event
     for field in form:
         if isinstance(field, TreeField) and field.data:
             return g.nodes[int(field.data)]
@@ -25,8 +25,10 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         return {
             _('name'): current_user.real_name,
             _('email'): current_user.email,
-            _('show email'): str(_('on') if current_user.settings['show_email'] else _('off')),
-            _('newsletter'): str(_('on') if current_user.settings['newsletter'] else _('off'))}
+            _('show email'): str(_('on') if current_user.settings['show_email']
+                                 else _('off')),
+            _('newsletter'): str(_('on') if current_user.settings['newsletter']
+                                 else _('off'))}
     settings = {}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
@@ -37,16 +39,18 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         elif field.name in session['settings']:
             value = session['settings'][field.name]
         else:  # pragma: no cover
-            value = ''  # In case of a missing setting after an update introducing it
+            value = ''  # In case of a missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
-            settings[label] = str(_('on')) if value else str(_('off'))  # str() needed for templates
+            # str() needed for templates
+            settings[label] = str(_('on')) if value else str(_('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
-        if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+        if field.name in ['mail_recipients_feedback',
+                          'file_upload_allowed_extension']:
             settings[label] = ' '.join(value)
     return settings
 
@@ -67,10 +71,11 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in ['log_level']:
             field.data = int(session['settings'][field.name])
             continue
-        if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+        if field.name in ['mail_recipients_feedback',
+                          'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
             continue
         if field.name not in session['settings']:  # pragma: no cover
-            field.data = ''  # In case of a missing setting after an update introducing it
+            field.data = ''  # In case of a missing setting after an update
             continue
         field.data = session['settings'][field.name]

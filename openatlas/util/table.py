@@ -12,11 +12,11 @@ class Table:
 
     def __init__(
             self,
-            header: Optional[List[str]] = None,  # A list of column header labels
-            rows: Optional[List[List[Any]]] = None,  # Rows containing the data
-            order: Optional[List[List[Union[int, str]]]] = None,  # Column order option
-            defs: Optional[List[Dict[str, Any]]] = None,  # Definitions
-            paging: bool = True) -> None:  # Whether to show pager
+            header: Optional[List[str]] = None,
+            rows: Optional[List[List[Any]]] = None,
+            order: Optional[List[List[Union[int, str]]]] = None,
+            defs: Optional[List[Dict[str, Any]]] = None,
+            paging: bool = True) -> None:
         self.header = header if header else []
         self.rows = rows if rows else []
         self.paging = paging
@@ -28,13 +28,16 @@ class Table:
             return Markup(f"<p>{uc_first(_('no entries'))}</p>")
         self.defs.append({
             'className': 'dt-body-right',
-            'targets': [i for i, j in enumerate(self.header) if j in ['begin', 'end', 'size']]})
+            'targets': [i for i, j in enumerate(self.header)
+                        if j in ['begin', 'end', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',
             'columns':
-                [{'title': uc_first(_(item)) if item else ''} for item in self.header] +
-                [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))],  # Add empty
+                [{'title': uc_first(_(item)) if item else ''}
+                 for item in self.header] +
+                [{'title': ''}  # Add empty
+                 for i in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
