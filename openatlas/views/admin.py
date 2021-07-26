@@ -20,7 +20,6 @@ from openatlas.forms.setting import (
     SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import Content
-from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
@@ -312,7 +311,7 @@ def admin_check_dates() -> str:
             Tab(
                 'invalid_involvement_dates',
                 table=Table(['actor', 'event', 'class', 'involvement', 'description']))}
-    for entity in Date.get_invalid_dates():
+    for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
@@ -320,7 +319,7 @@ def admin_check_dates() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for link_ in Date.get_invalid_link_dates():
+    for link_ in Link.get_invalid_link_dates():
         name = ''
         if link_.property.code == 'OA7':  # pragma: no cover
             name = 'relation'
@@ -332,7 +331,7 @@ def admin_check_dates() -> str:
             link(_(name), url_for(f'{name}_update', id_=link_.id, origin_id=link_.domain.id)),
             link(link_.domain),
             link(link_.range)])
-    for link_ in Date.invalid_involvement_dates():
+    for link_ in Link.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
         data = [

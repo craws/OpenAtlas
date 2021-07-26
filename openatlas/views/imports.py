@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.models.date import Date
+from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
 from openatlas.util.tab import Tab
@@ -209,7 +209,7 @@ def import_data(project_id: int, class_: str) -> str:
                             value = ''
                         else:
                             try:
-                                value = Date.datetime64_to_timestamp(numpy.datetime64(value))
+                                value = datetime64_to_timestamp(numpy.datetime64(value))
                                 row[item] = value
                             except ValueError:  # pragma: no cover
                                 row[item] = ''

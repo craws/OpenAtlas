@@ -7,19 +7,19 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas import app
-from openatlas.models.date import Date
+from openatlas.models.date import current_date_for_filename
 
 
 class Export:
 
     @staticmethod
     def export_csv(form: FlaskForm) -> None:
-        """Create CSV file(s) in export/csv folder, filename begins with current date_time."""
         import pandas.io.sql as psql
-        date_string = Date.current_date_for_filename()
+        date_string = current_date_for_filename()
         path = app.config['EXPORT_DIR'] / 'csv'
         if form.zip.data:
-            path = app.config['TMP_DIR'] / (date_string + '_openatlas_csv_export')
+            path = app.config['TMP_DIR'] / \
+                   (date_string + '_openatlas_csv_export')
             if path.is_dir():
                 shutil.rmtree(path)  # pragma: no cover
             path.mkdir()
@@ -51,10 +51,12 @@ class Export:
                 "replace(to_char(end_to, 'yyyy-mm-dd BC'), ' AD', '')",
                 'end_comment'],
             'model_property': [
-                'id', 'code', 'range_class_code', 'domain_class_code', 'name', 'name_inverse'],
+                'id', 'code', 'range_class_code', 'domain_class_code', 'name',
+                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],
             'gis_point': ['id', 'entity_id', 'name', 'description', 'type'],
-            'gis_linestring': ['id', 'entity_id', 'name', 'description', 'type'],
+            'gis_linestring':
+                ['id', 'entity_id', 'name', 'description', 'type'],
             'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type']}
         gis_tables = ['gis_point', 'gis_linestring', 'gis_polygon']
         for table, fields in tables.items():
@@ -67,11 +69,13 @@ class Export:
                         fields.append("ST_AsText(geom)")
                     elif form.gis_format.data == 'coordinates':
                         if table == 'gis_point':
-                            fields.append("ST_X(geom) || ' ' || ST_Y(geom) AS coordinates")
+                            fields.append(
+                                "ST_X(geom) || ' ' || ST_Y(geom) AS coordinates")
                         else:
                             fields.append("""
                                 ST_X(public.ST_PointOnSurface(geom)) || ' ' ||
-                                ST_Y(public.ST_PointOnSurface(geom)) AS polygon_center_point""")
+                                ST_Y(public.ST_PointOnSurface(geom)) 
+                                AS polygon_center_point""")
                     else:
                         fields.append('geom')
                 sql = f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};"
@@ -91,8 +95,8 @@ class Export:
 
     @staticmethod
     def export_sql() -> bool:
-        """Creates pg_dump file in export/sql folder, filename begins with current date_time"""
-        file = app.config['EXPORT_DIR'] / 'sql' / (Date.current_date_for_filename() + '_dump.sql')
+        file = app.config['EXPORT_DIR'] / 'sql' \
+               / (current_date_for_filename() + '_dump.sql')
         if os.name == 'posix':
             command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
                 host=app.config['DATABASE_HOST'],

@@ -10,8 +10,9 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.database.entity import Entity as Db
+from openatlas.database.date import Date
 from openatlas.forms.date import format_date
-from openatlas.models.date import Date
+from openatlas.models.date import timestamp_to_datetime64, datetime64_to_timestamp, form_to_datetime64
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_stats, link, sanitize
 
@@ -58,11 +59,11 @@ class Entity:
         self.first = None
         self.last = None
         if 'begin_from' in data:
-            self.begin_from = Date.timestamp_to_datetime64(data['begin_from'])
-            self.begin_to = Date.timestamp_to_datetime64(data['begin_to'])
+            self.begin_from = timestamp_to_datetime64(data['begin_from'])
+            self.begin_to = timestamp_to_datetime64(data['begin_to'])
             self.begin_comment = data['begin_comment']
-            self.end_from = Date.timestamp_to_datetime64(data['end_from'])
-            self.end_to = Date.timestamp_to_datetime64(data['end_to'])
+            self.end_from = timestamp_to_datetime64(data['end_from'])
+            self.end_to = timestamp_to_datetime64(data['end_to'])
             self.end_comment = data['end_comment']
             self.first = format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = format_date(self.end_from, 'year') if self.end_from else None
@@ -140,10 +141,10 @@ class Entity:
         Db.update({
             'id': self.id,
             'name': str(self.name).strip(),
-            'begin_from': Date.datetime64_to_timestamp(self.begin_from),
-            'begin_to': Date.datetime64_to_timestamp(self.begin_to),
-            'end_from': Date.datetime64_to_timestamp(self.end_from),
-            'end_to': Date.datetime64_to_timestamp(self.end_to),
+            'begin_from': datetime64_to_timestamp(self.begin_from),
+            'begin_to': datetime64_to_timestamp(self.begin_to),
+            'end_from': datetime64_to_timestamp(self.end_from),
+            'end_to': datetime64_to_timestamp(self.end_to),
             'begin_comment': str(self.begin_comment).strip() if self.begin_comment else None,
             'end_comment': str(self.end_comment).strip() if self.end_comment else None,
             'description': sanitize(self.description, 'text') if self.description else None})
@@ -182,11 +183,11 @@ class Entity:
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
             self.begin_comment = form.begin_comment.data
-            self.begin_from = Date.form_to_datetime64(
+            self.begin_from = form_to_datetime64(
                 form.begin_year_from.data,
                 form.begin_month_from.data,
                 form.begin_day_from.data)
-            self.begin_to = Date.form_to_datetime64(
+            self.begin_to = form_to_datetime64(
                 form.begin_year_to.data,
                 form.begin_month_to.data,
                 form.begin_day_to.data,
@@ -194,11 +195,11 @@ class Entity:
 
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
             self.end_comment = form.end_comment.data
-            self.end_from = Date.form_to_datetime64(
+            self.end_from = form_to_datetime64(
                 form.end_year_from.data,
                 form.end_month_from.data,
                 form.end_day_from.data)
-            self.end_to = Date.form_to_datetime64(
+            self.end_to = form_to_datetime64(
                 form.end_year_to.data,
                 form.end_month_to.data,
                 form.end_day_to.data,
@@ -221,11 +222,17 @@ class Entity:
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
-        """Returns name part of a directed type e.g. actor actor relation: parent of (child of)"""
+        """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
-            return sanitize(name_parts[1][:-1], 'node')  # remove closing bracket
+            return sanitize(name_parts[1][:-1], 'node')  # remove close bracket
         return name_parts[0]
+
+    @staticmethod
+    def get_invalid_dates() -> List[Entity]:
+        return [
+            Entity.get_by_id(row['id'], nodes=True)
+            for row in Date.get_invalid_dates()]
 
     @staticmethod
     def delete_(id_: Union[int, List[int]]) -> None:
