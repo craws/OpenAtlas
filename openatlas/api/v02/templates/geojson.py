@@ -29,7 +29,8 @@ class GeojsonTemplate:
     def geojson_collection_template() -> Dict[str, Any]:
         return {
             'type': fields.String,
-            'features': fields.List(fields.Nested(GeojsonTemplate.geojson_template()))}
+            'features': fields.List(
+                fields.Nested(GeojsonTemplate.geojson_template()))}
 
     @staticmethod
     def pagination() -> Dict[str, Any]:
