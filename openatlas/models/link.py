@@ -16,7 +16,6 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 
 class Link:
-    object_: Optional['Entity']
 
     def __init__(
             self,

@@ -70,7 +70,8 @@ class Export:
                     elif form.gis_format.data == 'coordinates':
                         if table == 'gis_point':
                             fields.append(
-                                "ST_X(geom) || ' ' || ST_Y(geom) AS coordinates")
+                                "ST_X(geom) || ' ' || "
+                                "ST_Y(geom) AS coordinates")
                         else:
                             fields.append("""
                                 ST_X(public.ST_PointOnSurface(geom)) || ' ' ||
@@ -78,15 +79,18 @@ class Export:
                                 AS polygon_center_point""")
                     else:
                         fields.append('geom')
-                sql = f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};"
-                data_frame = psql.read_sql(sql, g.db)
-                data_frame.to_csv(path / (date_string + '_' + table + '.csv'), index=False)
+                data_frame = psql.read_sql(
+                    f"SELECT {','.join(fields)} "
+                    f"FROM {table.replace('_', '.', 1)};",
+                    g.db)
+                data_frame.to_csv(
+                    path / f'{date_string}_{table}.csv',
+                    index=False)
         if form.zip.data:
-            info = 'CSV export from: {host}\n'.format(host=request.headers['Host'])
-            info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(
-                date=date_string,
-                user=current_user.username,
-                version=app.config['VERSION'])
+            info = f"CSV export from: {request.headers['Host']}\n"
+            info += \
+                f"Created: {date_string} by {current_user.username}\n" \
+                f"OpenAtlas version: {app.config['VERSION']}"
             with open(path / 'info.txt', "w") as file:
                 print(info, file=file)
             zip_file = app.config['EXPORT_DIR'] / 'csv' / (date_string + '_csv')
@@ -98,12 +102,13 @@ class Export:
         file = app.config['EXPORT_DIR'] / 'sql' \
                / (current_date_for_filename() + '_dump.sql')
         if os.name == 'posix':
-            command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
-                host=app.config['DATABASE_HOST'],
-                database=app.config['DATABASE_NAME'],
-                port=app.config['DATABASE_PORT'],
-                user=app.config['DATABASE_USER'],
-                file=file)
+            command = \
+                f"pg_dump " \
+                f"-h {app.config['DATABASE_HOST']} " \
+                f"-d {app.config['DATABASE_NAME']} " \
+                f"-U {app.config['DATABASE_USER']} " \
+                f"-p {app.config['DATABASE_PORT']} " \
+                f"-f {file}"
             try:
                 subprocess.Popen(
                     command,
@@ -111,16 +116,17 @@ class Export:
                     stdin=subprocess.PIPE,
                     env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
                 with open(os.devnull, 'w') as null:
-                    subprocess.Popen(['7z', 'a', f'{file}.7z', file], stdout=null).wait()
+                    subprocess.Popen(
+                        ['7z', 'a', f'{file}.7z', file], stdout=null).wait()
                 file.unlink()
             except Exception:  # pragma: no cover
                 return False
         else:  # pragma: no cover
-            os.popen("""{pg_dump} -h {host} -d {database} -U {user} -p {port} > {file}""".format(
-                host='127.0.0.1',
-                database=app.config['DATABASE_NAME'],
-                port=app.config['DATABASE_PORT'],
-                user=app.config['DATABASE_USER'],
-                pg_dump='"' + shutil.which('pg_dump') + '"',
-                file=file))
+            os.popen(
+                f'"{shutil.which("pg_dump")}" '
+                f'-h 127.0.0.1 '
+                f'-d {app.config["DATABASE_NAME"]} '
+                f'-U {app.config["DATABASE_USER"]} '
+                f'-p {app.config["DATABASE_PORT"]} '
+                f'> {file}')
         return True
