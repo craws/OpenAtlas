@@ -277,15 +277,16 @@ api_geometries_template = {
     'type': 'FeatureCollection'}
 
 api_content_en = {'contact': '',
- 'imageSizes': {'table': '100', 'thumbnail': '200'},
- 'intro': 'This is English',
- 'legalNotice': '',
- 'siteName': ''}
+                  'imageSizes': {'table': '100', 'thumbnail': '200'},
+                  'intro': 'This is English',
+                  'legalNotice': '',
+                  'siteName': ''}
 api_content_de = {'contact': '',
- 'imageSizes': {'table': '100', 'thumbnail': '200'},
- 'intro': 'Das ist Deutsch',
- 'legalNotice': '',
- 'siteName': ''}api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 0,
+                  'imageSizes': {'table': '100', 'thumbnail': '200'},
+                  'intro': 'Das ist Deutsch',
+                  'legalNotice': '',
+                  'siteName': ''}
+api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 0,
                           'acquisition': 0,
                           'reference_system': 2, 'feature': 1, 'file': 1,
                           'activity': 0, 'type': 87,
