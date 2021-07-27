@@ -15,11 +15,14 @@ is working.
 
 ### 6.3.0 to 6.4.0
 For the new image rotate function an additional JavaScript package has to be
-installed with npm. Otherwise, your maps will break. Execute e.g.
+installed with npm. Otherwise, maps with overlays will break. Execute e.g.
 
     $ cd openatlas/static
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
+
+If you get the error "not overwriting existing 'static/package.json'",
+delete this file and try again.
 
 ### 6.2.x to 6.3.0
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
