@@ -148,8 +148,10 @@ class PlaceTest(TestBaseCase):
             data = {
                 'top_left_easting': 42,
                 'top_left_northing': 12,
-                'bottom_right_easting': 43,
-                'bottom_right_northing': 13}
+                'top_right_easting': 43,
+                'top_right_northing': 13,
+                'bottom_left_easting': 10,
+                'bottom_left_northing': 20}
             rv = self.app.post(
                 url_for('overlay_insert', image_id=file.id, place_id=place.id, link_id=link_id),
                 data=data,

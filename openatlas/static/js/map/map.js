@@ -250,7 +250,15 @@ function setGeometries(data, level) {
 
 // Overlay maps
 for (i = 0; i < overlays.length; i++) {
-    overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
+    if (((overlays[i].boundingBox).length) === 2) {
+        overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
+    }
+    if (((overlays[i].boundingBox).length) === 3) {
+        var topleft    = L.latLng(overlays[i].boundingBox[0]);
+	    var topright   = L.latLng(overlays[i].boundingBox[1]);
+	    var bottomleft = L.latLng(overlays[i].boundingBox[2]);
+        overlay = L.imageOverlay.rotated('/display/' + overlays[i].image, topleft, topright, bottomleft)
+    }
     UnitControls[overlays[i].name] = overlay;
     overlay.addTo(map)
 }

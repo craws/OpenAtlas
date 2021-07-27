@@ -41,7 +41,7 @@
 
 // Edge <= 12 - 13+, Firefox <=18 - 45+, IE 10 - 11, Safari 5.1 - 9+, iOS 6 - 9.1
 // throw exceptions when non-strict code (e.g., ASP.NET 4.5) accesses strict mode
-// arguments.callee.caller (trac-13335). But as of jQuery 3.0 (2016), strict mode should be endpoints
+// arguments.callee.caller (trac-13335). But as of jQuery 3.0 (2016), strict mode should be common
 // enough that all such attempts are guarded in a try block.
 
 
@@ -1459,7 +1459,7 @@ setDocument = Sizzle.setDocument = function( node ) {
 		}
 
 		return i ?
-			// Do a sibling check if the nodes have a endpoints ancestor
+			// Do a sibling check if the nodes have a common ancestor
 			siblingCheck( ap[i], bp[i] ) :
 
 			// Otherwise nodes in our document sort first
@@ -5450,7 +5450,7 @@ jQuery.Event.prototype = {
 	}
 };
 
-// Includes all endpoints event props including KeyEvent and MouseEvent specific props
+// Includes all common event props including KeyEvent and MouseEvent specific props
 jQuery.each( {
 	altKey: true,
 	bubbles: true,
@@ -7984,7 +7984,7 @@ jQuery.fn.extend( {
 
 				ret = elem.value;
 
-				// Handle most endpoints string cases
+				// Handle most common string cases
 				if ( typeof ret === "string" ) {
 					return ret.replace( rreturn, "" );
 				}
@@ -9913,7 +9913,7 @@ jQuery.fn.load = function( url, params, callback ) {
 
 
 
-// Attach a bunch of functions for handling endpoints AJAX events
+// Attach a bunch of functions for handling common AJAX events
 jQuery.each( [
 	"ajaxStart",
 	"ajaxStop",
