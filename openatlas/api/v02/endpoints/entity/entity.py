@@ -35,7 +35,7 @@ class GetEntity(Resource):  # type: ignore
         result = GetEntity.get_format(entity, parser)
 
         g = Graph().parse(data=json.dumps(result), format='json-ld')
-
+       # xml, n3, turtle, nt, pretty - xml, trix, trig and nquads
         print(g.serialize(format='turtle').decode('utf-8'))
 
         if parser['download']:
