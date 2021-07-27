@@ -68,8 +68,8 @@ def overlay_update(id_: int) -> Union[str, Response]:
         return redirect(
             f"{url_for('entity_view', id_=overlay.place_id)}#tab-file")
     bounding = ast.literal_eval(overlay.bounding_box)
-    if len(bounding) == 2:
-        bounding = [[0,0], [0,0], [0,0]]
+    if len(bounding) == 2:  # pragma no cover
+        bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
     form.top_right_easting.data = bounding[1][1]
