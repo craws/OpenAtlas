@@ -3,9 +3,11 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from flask import Response
 from flask_restful import Resource
 
-from openatlas.api.v02.resources.enpoints_util import get_node_dict, resolve_node_parser
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, InvalidSubunitError
-from openatlas.api.v02.resources.parser import default_parser
+from openatlas.api.v02.resources.enpoints_util import get_node_dict, \
+    resolve_node_parser
+from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
+    InvalidSubunitError
+from openatlas.api.v02.resources.parser import default
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
 
@@ -13,8 +15,10 @@ from openatlas.models.place import get_structure
 class GetSubunitHierarchy(Resource):  # type: ignore
     @staticmethod
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
-        return resolve_node_parser({"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
-                                   default_parser.parse_args(), id_)
+        return resolve_node_parser(
+            {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
+            default.parse_args(),
+            id_)
 
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:

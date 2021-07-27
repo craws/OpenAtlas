@@ -1,13 +1,15 @@
 ## INFO
-Before executing SQL statements, backup the database. Replace database role "openatlas" if needed.
-Older upgrade scripts and information can be found in the archive directory.
+Before executing SQL statements, backup the database. Replace database role
+"openatlas" if needed. Older upgrade scripts and information can be found in
+the archive directory.
 
-If you are using git and want to update to the latest stable release you can fetch the main branch
-e.g.
+If you are using git and want to update to the latest stable release you can
+fetch the main branch e.g.
 
     git pull origin main
 
-After following the instructions restart Apache and test if the application is working.
+After following the instructions restart Apache and test if the application
+is working.
 
     service apache2 restart
 
@@ -15,12 +17,22 @@ After following the instructions restart Apache and test if the application is w
 Install python3-wand e.g. on Debian:
 
     # apt install python3-wand
+    
+For the new image rotate function an additional JavaScript package has to be
+installed with npm. Otherwise, maps with overlays will break. Execute e.g.
+
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
+If you get the error "not overwriting existing 'static/package.json'",
+delete this file and try again.
 
 ### 6.2.x to 6.3.0
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.2.0 to 6.2.1
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.1.0 to 6.2.0
 Execute **install/upgrade/6.2.0.sql** after making backups.

@@ -1,8 +1,8 @@
-Overview Count endpoint
+System Class Count endpoint
 ---
 tags:
   - Content
-summary: Provides a count of all types
+summary: Provides a count of entities based on the system class
 deprecated: True
 responses:
   '200':

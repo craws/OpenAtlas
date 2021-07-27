@@ -8,8 +8,8 @@ from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField, SelectMultipleField,
-    StringField, SubmitField, TextAreaField, widgets)
+    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField,
+    SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
 from openatlas import app
@@ -58,24 +58,25 @@ def build_form(
         code: Optional[str] = None,
         origin: Union[Entity, Node, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
-    # Builds a dynamic form regarding types, module settings and class specific fields
+
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
         validate = validate
 
     if class_ == 'note':
         setattr(Form, 'public', BooleanField(_('public'), default=False))
-    if 'name' in FORMS[class_]:  # Set label and validators for name field
-        label = _('URL') if class_ == 'external_reference' else _('name')
-        validators = [InputRequired(), URL()] if class_ == 'external_reference' else [
-            InputRequired()]
-        setattr(
-            Form,
-            'name',
-            StringField(label, validators=validators, render_kw={'autofocus': True}))
+    if 'name' in FORMS[class_]:
+        setattr(Form, 'name', StringField(
+            _('URL') if class_ == 'external_reference' else _('name'),
+            [InputRequired(), URL()] if class_ == 'external_reference'
+            else [InputRequired()],
+            render_kw={'autofocus': True}))
 
     if 'alias' in FORMS[class_]:
-        setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
+        setattr(
+            Form,
+            'alias',
+            FieldList(StringField(''), description=_('tooltip alias')))
     add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
@@ -133,15 +134,19 @@ def populate_form(
 
 
 def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
+
     system_links = {
+        # Can't use isinstance for class_ check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
-        if link_.domain.class_.name == 'reference_system'}  # Can't use isinstance here
+        if link_.domain.class_.name == 'reference_system'}
     for field in form:
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
                 field.data = system_links[system_id].description
-                precision_field = getattr(form, f'reference_system_precision_{system_id}')
+                precision_field = getattr(
+                    form,
+                    f'reference_system_precision_{system_id}')
                 precision_field.data = str(system_links[system_id].type.id)
 
 
@@ -166,53 +171,88 @@ def add_buttons(
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in FORMS[name] \
-            and (name in ['involvement', 'find', 'human_remains', 'type'] or not origin):
-        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+    if 'continue' in FORMS[name] and (
+            name in ['involvement', 'find', 'human_remains', 'type']
+            or not origin):
+        setattr(
+            form,
+            'insert_and_continue',
+            SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_add = uc_first(_('insert and add')) + ' '
     if name == 'place':
-        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(
+            form,
+            'insert_and_continue',
+            SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('feature')))
+        setattr(
+            form,
+            'insert_continue_sub',
+            SubmitField(insert_add + _('feature')))
     elif name == 'feature' and origin and origin.class_.name == 'place':
-        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(
+            form,
+            'insert_and_continue',
+            SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('stratigraphic unit')))
+        setattr(
+            form,
+            'insert_continue_sub',
+            SubmitField(insert_add + _('stratigraphic unit')))
     elif name == 'stratigraphic_unit':
-        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(
+            form,
+            'insert_and_continue',
+            SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-        setattr(form, 'insert_continue_sub', SubmitField(insert_add + _('find')))
-        setattr(form, 'insert_continue_human_remains', SubmitField(insert_add + _('human remains')))
+        setattr(
+            form,
+            'insert_continue_sub',
+            SubmitField(insert_add + _('find')))
+        setattr(
+            form,
+            'insert_continue_human_remains',
+            SubmitField(insert_add + _('human remains')))
     return form
 
 
 def add_reference_systems(form: Any, form_name: str) -> None:
     precision_nodes = Node.get_hierarchy('External reference match').subs
-    precisions = [('', '')] + [(str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
+    precisions = [('', '')] + [
+        (str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
-        if form_name not in [form_['name'] for form_ in system.get_forms().values()]:
+        if form_name \
+                not in [form_['name'] for form_ in system.get_forms().values()]:
             continue
         setattr(
             form,
             f'reference_system_id_{system.id}',
             StringField(
                 uc_first(system.name),
-                validators=[OptionalValidator()],
+                [OptionalValidator()],
                 description=system.description,
-                render_kw={'autocomplete': 'off', 'placeholder': system.placeholder}))
+                render_kw={
+                    'autocomplete': 'off',
+                    'placeholder': system.placeholder}))
         setattr(
             form,
             f'reference_system_precision_{system.id}',
-            SelectField(_('precision'), choices=precisions, default=system.precision_default_id))
+            SelectField(
+                _('precision'),
+                choices=precisions,
+                default=system.precision_default_id))
 
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
     for sub_id in subs:
         sub = g.nodes[sub_id]
-        setattr(form, str(sub.id), ValueFloatField(sub.name, [OptionalValidator()]))
+        setattr(
+            form,
+            str(sub.id),
+            ValueFloatField(sub.name, [OptionalValidator()]))
         add_value_type_fields(form, sub.subs)
 
 
@@ -241,7 +281,10 @@ def add_fields(
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not entity:
-            setattr(form, 'actor', TableMultiField(_('actor'), [InputRequired()]))
+            setattr(
+                form,
+                'actor',
+                TableMultiField(_('actor'), [InputRequired()]))
             setattr(form, 'relation_origin_id', HiddenField())
     elif class_ in ['activity', 'acquisition', 'move']:
         setattr(form, 'event_id', HiddenField())
@@ -279,8 +322,12 @@ def add_fields(
             coerce=int))
     elif class_ == 'involvement':
         if not entity and origin:
-            involved_with = 'actor' if origin.class_.view == 'event' else 'event'
-            setattr(form, involved_with, TableMultiField(_(involved_with), [InputRequired()]))
+            involved_with = 'actor' \
+                if origin.class_.view == 'event' else 'event'
+            setattr(
+                form,
+                involved_with,
+                TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
     elif class_ == 'member' and not entity:
         setattr(form, 'member_origin_id', HiddenField())
@@ -303,14 +350,14 @@ def add_fields(
         setattr(
             form,
             'website_url',
-            StringField(_('website URL'), validators=[OptionalValidator(), URL()]))
+            StringField(_('website URL'), [OptionalValidator(), URL()]))
         setattr(
             form,
             'resolver_url',
-            StringField(_('resolver URL'), validators=[OptionalValidator(), URL()]))
+            StringField(_('resolver URL'), [OptionalValidator(), URL()]))
         setattr(form, 'placeholder', StringField(_('example ID')))
-        precision_node_id = str(Node.get_hierarchy('External reference match').id)
-        setattr(form, precision_node_id, TreeField(precision_node_id))
+        precision_id = str(Node.get_hierarchy('External reference match').id)
+        setattr(form, precision_id, TreeField(precision_id))
         choices = ReferenceSystem.get_form_choices(entity)
         if choices:
             setattr(form, 'forms', SelectMultipleField(
@@ -346,8 +393,12 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = f"""
-            <input id="selection-{entity.id}" name="values" type="checkbox" value="{entity.id}">"""
-        table.rows.append([input_] + get_base_table_data(entity, show_links=False))
+            <input
+                id="selection-{entity.id}"
+                name="values"
+                type="checkbox" value="{entity.id}">"""
+        table.rows.append(
+            [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
         return uc_first(_('no entries'))
     return render_template('forms/form_table.html', table=table.display(class_))

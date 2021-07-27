@@ -3,7 +3,7 @@ from typing import Dict, Type, Union
 from flask_restful import fields
 from flask_restful.fields import Integer, String
 
-
+# Deprecated
 class CountTemplate:
 
     @staticmethod

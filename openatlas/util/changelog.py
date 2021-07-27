@@ -2,9 +2,15 @@ class Changelog:
     versions = {
         '6.4.0': ['TBA', {
             'feature': {
+                '1538': 'Focus on table filter at overview pages',
+                '1531': 'Map overlay improved',
                 '1495': 'API: Additional Geojson output for QGIS imports',
                 '1529': 'API: Increase request performance',
-                '1530': 'API: Geometries endpoint for frontend map'},
+                '1530': 'API: Geometries endpoint for frontend map',
+                '1535': 'API: Get all entities linked to an entity',
+                '1537': 'API: type_entities for actor types',
+                '1545': 'API: Filter entities by types'
+                },
             'fix': {
                 '1414': 'Enlarged Description Field Covers up Entry Buttons',
                 '1539': 'Pagination not shown for tables sometimes'}}],

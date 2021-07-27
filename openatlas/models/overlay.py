@@ -30,7 +30,8 @@ class Overlay:
             'link_id': link_id,
             'bounding_box': f'''[
                 [{form.top_left_northing.data}, {form.top_left_easting.data}],
-                [{form.bottom_right_northing.data}, {form.bottom_right_easting.data}]]'''})
+                [{form.top_right_northing.data}, {form.top_right_easting.data}],
+                [{form.bottom_left_northing.data}, {form.bottom_left_easting.data}]]'''})
 
     @staticmethod
     def update(form: FlaskForm, image_id: int, place_id: int) -> None:
@@ -39,7 +40,8 @@ class Overlay:
             'place_id': place_id,
             'bounding_box': f'''[
                 [{form.top_left_northing.data}, {form.top_left_easting.data}],
-                [{form.bottom_right_northing.data}, {form.bottom_right_easting.data}]]'''})
+                [{form.top_right_northing.data}, {form.top_right_easting.data}],
+                [{form.bottom_left_northing.data}, {form.bottom_left_easting.data}]]'''})
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:

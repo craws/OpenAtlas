@@ -3,7 +3,7 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.date import Date
+from openatlas.models.date import current_date_for_filename
 from tests.base import TestBaseCase
 
 
@@ -14,7 +14,7 @@ class ExportTest(TestBaseCase):
             # SQL export
             rv = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
-            date_string = Date.current_date_for_filename()  # Less error prone to do before
+            date_string = current_date_for_filename()  # Less error before
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
             self.app.get(url_for('download_sql', filename=f'{date_string}_dump.sql'))
@@ -43,7 +43,7 @@ class ExportTest(TestBaseCase):
             # CSV export
             rv = self.app.get(url_for('export_csv'))
             assert b'Export CSV' in rv.data
-            date_string = Date.current_date_for_filename()
+            date_string = current_date_for_filename()
             rv = self.app.post(
                 url_for('export_csv'),
                 follow_redirects=True,

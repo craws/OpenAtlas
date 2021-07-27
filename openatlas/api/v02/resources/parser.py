@@ -4,35 +4,35 @@ from openatlas import app
 
 app.config['BUNDLE_ERRORS'] = True
 
-default_parser = reqparse.RequestParser()
-default_parser.add_argument(
+default = reqparse.RequestParser()
+default.add_argument(
     'download',
     type=bool,
     help='{error_msg}',
     default=False)
-default_parser.add_argument(
+default.add_argument(
     'count',
     type=bool,
     help='{error_msg}',
     default=False)
 
-language_parser = default_parser.copy()
-language_parser.add_argument(
+language = default.copy()
+language.add_argument(
     'lang',
     type=str,
     help='{error_msg}',
     case_sensitive=False,
     choices=app.config['LANGUAGES'].keys())
 
-entity_parser = default_parser.copy()
-entity_parser.add_argument(
+entity_ = default.copy()
+entity_.add_argument(
     'sort',
     choices=('desc', 'asc'),
     type=str,
     default='asc',
     case_sensitive=False,
     help='{error_msg}. Only "desc" or "asc" will work.')
-entity_parser.add_argument(
+entity_.add_argument(
     'column',
     type=str,
     default=['name'],
@@ -41,26 +41,26 @@ entity_parser.add_argument(
     help='{error_msg}',
     choices=(
         'id', 'class_code', 'name', 'description', 'created', 'modified',
-        'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
-entity_parser.add_argument(
+         'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
+entity_.add_argument(
     'filter',
     type=str,
     help='{error_msg}',
     action='append')
-entity_parser.add_argument(
+entity_.add_argument(
     'limit',
     type=int,
     default=20,
     help="Invalid number for limit")
-entity_parser.add_argument(
+entity_.add_argument(
     'first',
     type=int,
     help="Not a valid ID")
-entity_parser.add_argument(
+entity_.add_argument(
     'last',
     type=int,
     help="Not a valid ID")
-entity_parser.add_argument(
+entity_.add_argument(
     'show',
     type=str,
     help='{error_msg}.',
@@ -72,22 +72,27 @@ entity_parser.add_argument(
     choices=(
         'when', 'types', 'relations', 'names', 'links', 'geometry',
         'depictions', 'geonames', 'none'))
-entity_parser.add_argument(
+entity_.add_argument(
     'export',
     type=str,
     help='{error_msg}',
     choices='csv')
-entity_parser.add_argument(
+entity_.add_argument(
     'format',
     type=str,
     help='{error_msg}',
     case_sensitive=False,
     default='lp',
     choices=('lp', 'geojson'))
+entity_.add_argument(
+    'type_id',
+    type=int,
+    help='{error_msg}',
+    action='append'
+)
 
-
-gis_parser = default_parser.copy()
-gis_parser.add_argument(
+gis = default.copy()
+gis.add_argument(
     'geometry',
     type=str,
     help='{error_msg}',
@@ -101,25 +106,25 @@ gis_parser.add_argument(
         'gisPointSibling',
         'gisLineAll',
         'gisPolygonAll'))
-query_parser = entity_parser.copy()
-query_parser.add_argument(
+query = entity_.copy()
+query.add_argument(
     'entities',
     type=int,
     action='append',
     help="{error_msg}")
-query_parser.add_argument(
+query.add_argument(
     'classes',
     type=str,
     action='append',
     help="{error_msg}")
-query_parser.add_argument(
+query.add_argument(
     'codes',
     type=str,
     action='append',
     help="{error_msg}",
     case_sensitive=False,
     choices=('actor', 'event', 'place', 'reference', 'source', 'artifact'))
-query_parser.add_argument(
+query.add_argument(
     'system_classes',
     type=str,
     action='append',
@@ -132,8 +137,8 @@ query_parser.add_argument(
         'object_location', 'person', 'place', 'source', 'reference_system',
         'stratigraphic_unit', 'source_translation', 'type'))
 
-image_parser = default_parser.copy()
-image_parser.add_argument(
+image = default.copy()
+image.add_argument(
     'image_size',
     type=str,
     help="{error_msg}",

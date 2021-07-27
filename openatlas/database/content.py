@@ -12,9 +12,10 @@ class Content:
 
     @staticmethod
     def update(name: str, language: str, text: str) -> None:
-        sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
-        g.cursor.execute(sql, {'name': name, 'language': language})
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.i18n (name, language, text)
-            VALUES (%(name)s, %(language)s, %(text)s);"""
-        g.cursor.execute(sql, {'name': name, 'language': language, 'text': text})
+            VALUES (%(name)s, %(language)s, %(text)s)
+            ON CONFLICT (name, language)
+            DO UPDATE set text = %(text)s;""",
+            {'name': name, 'language': language, 'text': text})

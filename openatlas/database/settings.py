@@ -12,12 +12,16 @@ class Settings:
 
     @staticmethod
     def update(field_name: str, value: Any) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.settings (name, value) VALUES (%(name)s, %(value)s)
-            ON CONFLICT (name) DO UPDATE SET "value" = %(value)s;"""
-        g.cursor.execute(sql, {'name': field_name, 'value': value})
+            ON CONFLICT (name) DO UPDATE SET "value" = %(value)s;""",
+            {'name': field_name, 'value': value})
 
     @staticmethod
     def set_logo(file_id: Union[int, str] = None) -> None:
-        sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
-        g.cursor.execute(sql, {'file_id': file_id})
+        g.cursor.execute(
+            """
+            UPDATE web.settings
+            SET value = %(file_id)s
+            WHERE name = 'logo_file_id';""", {'file_id': file_id})
