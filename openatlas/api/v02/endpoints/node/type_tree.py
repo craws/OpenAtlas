@@ -5,7 +5,7 @@ from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.enpoints_util import download
-from openatlas.api.v02.resources.parser import entity_parser
+from openatlas.api.v02.resources.parser import entity_
 from openatlas.api.v02.templates.type_tree import TypeTreeTemplate
 from openatlas.models.node import Node
 
@@ -13,7 +13,7 @@ from openatlas.models.node import Node
 class GetTypeTree(Resource):  # type: ignore
     @swag_from("../swagger/type_tree.yml", endpoint="api.type_tree")
     def get(self) -> Union[Tuple[Resource, int], Response]:
-        parser = entity_parser.parse_args()
+        parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         if parser['count']:
             return jsonify(len(type_tree['type_tree']))

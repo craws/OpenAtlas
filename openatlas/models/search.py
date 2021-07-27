@@ -6,7 +6,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.entity import Entity as Db
-from openatlas.models.date import Date
+from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -21,11 +21,11 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
         classes.append('appellation')
 
     # Repopulate date fields with autocompleted values
-    from_date = Date.form_to_datetime64(
+    from_date = form_to_datetime64(
         form.begin_year.data,
         form.begin_month.data,
         form.begin_day.data)
-    to_date = Date.form_to_datetime64(
+    to_date = form_to_datetime64(
         form.end_year.data,
         form.end_month.data,
         form.end_day.data,

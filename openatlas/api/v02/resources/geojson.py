@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -9,21 +9,17 @@ class Geojson:
 
     @staticmethod
     def get_geojson(entities: List[Entity]) -> List[Dict[str, Any]]:
-        geoms = None
         out = []
         for entity in entities:
-            if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
-                geoms = Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
-            elif entity.class_.name == 'object_location':
-                geoms = Gis.get_by_id(entity.id)
-            if geoms:
-                for geom in geoms:
-                    out.append(Geojson.get_entity(entity, geom))
-            out.append(Geojson.get_entity(entity))
+            geoms = [Geojson.get_entity(entity, geom)
+                     for geom in Geojson.get_geom(entity)]
+            out.extend(geoms) if geoms else out.append(
+                Geojson.get_entity(entity))
         return out
 
     @staticmethod
-    def get_entity(entity: Entity, geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+    def get_entity(entity: Entity, geom: Dict[str, Any] = None) \
+            -> Dict[str, Any]:
         features = {
             'type': 'Feature',
             'geometry': geom,
@@ -53,3 +49,13 @@ class Geojson:
     @staticmethod
     def return_output(output: List[Dict[str, Any]]) -> Dict[str, Any]:
         return {'type': 'FeatureCollection', 'features': output}
+
+    @staticmethod
+    def get_geom(entity: Entity) -> Union[List[Dict[str, Any]], List[Any]]:
+        if entity.class_.view == 'place' or entity.class_.name in ['find',
+                                                                   'artifact']:
+            return Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
+        if entity.class_.name == 'object_location':
+            print("here")
+            return Gis.get_by_id(entity.id)
+        return []

@@ -6,7 +6,7 @@ from wtforms import (
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
-from openatlas.models.date import Date
+from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.search import search
 from openatlas.util.table import Table
@@ -42,11 +42,11 @@ class SearchForm(FlaskForm):  # type: ignore
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        from_date = Date.form_to_datetime64(
+        from_date = form_to_datetime64(
             self.begin_year.data,
             self.begin_month.data,
             self.begin_day.data)
-        to_date = Date.form_to_datetime64(
+        to_date = form_to_datetime64(
             self.end_year.data,
             self.end_month.data,
             self.end_day.data,

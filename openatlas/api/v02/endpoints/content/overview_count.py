@@ -14,4 +14,5 @@ class OverviewCount(Resource):  # type: ignore
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
             [{'systemClass': name, 'count': count} for name, count in
-             Entity.get_overview_counts().items()], CountTemplate.overview_template()), 200
+             Entity.get_overview_counts().items()],
+            CountTemplate.overview_template()), 200

@@ -17,7 +17,7 @@ class ApiExportCSV:
         return Response(
             pd.DataFrame(data=frames).to_csv(),
             mimetype='text/csv',
-            headers={'Content-Disposition': 'attachment;filename=' + name + '.csv'})
+            headers={'Content-Disposition': f'attachment;filename={name}.csv'})
 
     @staticmethod
     def build_dataframe(entity: Entity) -> Dict[str, List[Union[str, int]]]:
@@ -44,13 +44,13 @@ class ApiExportCSV:
 
     @staticmethod
     def export_entity(entity: Entity) -> Response:
+        name = entity.name.replace(',', '').encode(encoding='UTF-8')
         return Response(
             pd.DataFrame.from_dict(
                 data=ApiExportCSV.build_dataframe(entity),
                 orient='index').T.to_csv(encoding="utf-8"),
             mimetype='text/csv',
-            headers={'Content-Disposition': 'attachment;filename=' + str(
-                entity.name.replace(',', '').encode(encoding='UTF-8')) + '.csv'})
+            headers={'Content-Disposition': f"attachment;filename={name}.csv"})
 
     @staticmethod
     def get_node(entity: Entity) -> Dict[Any, List[Any]]:
@@ -72,10 +72,12 @@ class ApiExportCSV:
     def get_links(entity: Entity) -> Dict[str, Any]:
         links: Dict[str, Any] = defaultdict(list)
         for link in Link.get_links(entity.id):
-            key = link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name
+            key = f"""{link.property.i18n['en'].replace(' ', '_')}
+                  _{link.range.class_.name}"""
             links[key].append(link.range.name)
         for link in Link.get_links(entity.id, inverse=True):
-            key = link.property.i18n['en'].replace(' ', '_') + '_' + link.range.class_.name
+            key = f"""{link.property.i18n['en'].replace(' ', '_')}
+                  _{link.range.class_.name}"""
             if link.property.i18n_inverse['en']:
                 key = link.property.i18n_inverse['en'].replace(' ', '_')
                 key += '_' + link.domain.class_.name
@@ -86,8 +88,10 @@ class ApiExportCSV:
     @staticmethod
     def get_geom_entry(entity: Entity) -> Dict[str, None]:
         geom = {'type': None, 'coordinates': None}
-        if entity.class_.view == 'place' or entity.class_.name in ['find', 'artifact']:
-            geom = ApiExportCSV.get_geometry(Link.get_linked_entity(entity.id, 'P53'))
+        if entity.class_.view == 'place' \
+                or entity.class_.name in ['find', 'artifact']:
+            geom = ApiExportCSV.get_geometry(
+                Link.get_linked_entity(entity.id, 'P53'))
         elif entity.class_.name == 'object_location':
             geom = ApiExportCSV.get_geometry(entity)
         return geom
