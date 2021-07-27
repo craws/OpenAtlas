@@ -4,7 +4,7 @@ from flask import request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
-from openatlas.models.date import Date
+from openatlas.models.date import form_to_datetime64
 from openatlas.util.util import uc_first
 
 
@@ -24,7 +24,7 @@ def validate(self: FlaskForm) -> bool:
                 valid = False
             for postfix in ['_from', '_to']:
                 if getattr(self, prefix + 'year' + postfix).data:
-                    date_ = Date.form_to_datetime64(
+                    date_ = form_to_datetime64(
                         getattr(self, prefix + 'year' + postfix).data,
                         getattr(self, prefix + 'month' + postfix).data,
                         getattr(self, prefix + 'day' + postfix).data)

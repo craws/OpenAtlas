@@ -4,7 +4,7 @@ from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.enpoints_util import download
-from openatlas.api.v02.resources.parser import default_parser
+from openatlas.api.v02.resources.parser import default
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -13,7 +13,7 @@ from openatlas.models.node import Node
 class GetNodeOverview(Resource):  # type: ignore
     @staticmethod
     def get() -> Union[Tuple[Resource, int], Response]:
-        parser = default_parser.parse_args()
+        parser = default.parse_args()
         node = {"types": GetNodeOverview.get_node_overview()}
         template = NodesOverviewTemplate.node_overview_template()
         if parser['download']:
@@ -37,7 +37,8 @@ class GetNodeOverview(Resource):  # type: ignore
                 type_ = 'standard'
             elif node.value_type:
                 type_ = 'value'
-            nodes[type_][node.name] = GetNodeOverview.walk_tree(Node.get_nodes(node.name))
+            nodes[type_][node.name] = GetNodeOverview.walk_tree(
+                Node.get_nodes(node.name))
         return nodes
 
     @staticmethod

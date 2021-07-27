@@ -26,7 +26,7 @@ from wtforms.validators import Email
 
 from openatlas import app, logger
 from openatlas.models.content import Content
-from openatlas.models.date import Date
+from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
@@ -452,7 +452,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
-        date_ = Date.datetime64_to_timestamp(value)
+        date_ = datetime64_to_timestamp(value)
         return date_.lstrip('0') if date_ else ''
     return value.date().isoformat()
 

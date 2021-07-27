@@ -8,14 +8,14 @@ from flask_wtf import FlaskForm
 
 from openatlas import logger
 from openatlas.database.link import Link as Db
-from openatlas.models.date import Date
+from openatlas.database.date import Date
+from openatlas.models.date import timestamp_to_datetime64, form_to_datetime64, datetime64_to_timestamp
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
 
 
 class Link:
-    object_: Optional['Entity']
 
     def __init__(
             self,
@@ -34,11 +34,11 @@ class Link:
         if 'type_id' in row and row['type_id']:
             self.nodes[g.nodes[row['type_id']]] = None
         if 'begin_from' in row:
-            self.begin_from = Date.timestamp_to_datetime64(row['begin_from'])
-            self.begin_to = Date.timestamp_to_datetime64(row['begin_to'])
+            self.begin_from = timestamp_to_datetime64(row['begin_from'])
+            self.begin_to = timestamp_to_datetime64(row['begin_to'])
             self.begin_comment = row['begin_comment']
-            self.end_from = Date.timestamp_to_datetime64(row['end_from'])
-            self.end_to = Date.timestamp_to_datetime64(row['end_to'])
+            self.end_from = timestamp_to_datetime64(row['end_from'])
+            self.end_to = timestamp_to_datetime64(row['end_to'])
             self.end_comment = row['end_comment']
             self.first = format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = format_date(self.end_from, 'year') if self.end_from else None
@@ -52,11 +52,11 @@ class Link:
             'range_id': self.range.id,
             'type_id': self.type.id if self.type else None,
             'description': self.description,
-            'begin_from': Date.datetime64_to_timestamp(self.begin_from),
-            'begin_to': Date.datetime64_to_timestamp(self.begin_to),
+            'begin_from': datetime64_to_timestamp(self.begin_from),
+            'begin_to': datetime64_to_timestamp(self.begin_to),
             'begin_comment': self.begin_comment,
-            'end_from': Date.datetime64_to_timestamp(self.end_from),
-            'end_to': Date.datetime64_to_timestamp(self.end_to),
+            'end_from': datetime64_to_timestamp(self.end_from),
+            'end_to': datetime64_to_timestamp(self.end_to),
             'end_comment': self.end_comment})
 
     def delete(self) -> None:
@@ -70,15 +70,15 @@ class Link:
         self.end_to = None
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
-            self.begin_from = Date.form_to_datetime64(
+            self.begin_from = form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
-            self.begin_to = Date.form_to_datetime64(
+            self.begin_to = form_to_datetime64(
                 form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
             self.begin_comment = form.begin_comment.data
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
-            self.end_from = Date.form_to_datetime64(
+            self.end_from = form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
-            self.end_to = Date.form_to_datetime64(
+            self.end_to = form_to_datetime64(
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
             self.end_comment = form.end_comment.data
 
@@ -211,6 +211,18 @@ class Link:
                     'property': link(g.properties[row['property_code']]),
                     'range': link(range_) + ' (' + range_.cidoc_class.code + ')'})
         return invalid_links
+
+    @staticmethod
+    def invalid_involvement_dates() -> List['Link']:
+        return [
+            Link.get_by_id(row['id'])
+            for row in Date.invalid_involvement_dates()]
+
+    @staticmethod
+    def get_invalid_link_dates() -> List['Link']:
+        return [
+            Link.get_by_id(row['id'])
+            for row in Date.get_invalid_link_dates()]
 
     @staticmethod
     def check_link_duplicates() -> List[Dict[str, Any]]:

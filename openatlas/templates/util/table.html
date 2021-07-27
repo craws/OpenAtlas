@@ -10,5 +10,6 @@
         overflow();
         $('#{{ name }}_table').on('page.dt', () => overflow());
         $('#{{ name }}_table').on('search.dt', () => overflow());
+        $('input[type="search"]').focus();
     });
 </script>
