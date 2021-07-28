@@ -82,7 +82,7 @@ class ImageProcessing:
 
     # Todo: implement admin interface
     @staticmethod
-    def search_and_delete_orphaned_images() -> None:
+    def delete_orphaned_resized_images() -> None:
         uploaded_files = []
         for uploaded in app.config['UPLOAD_DIR'].glob('**/*'):
             uploaded_files.append(uploaded.name.rsplit('.', 1)[0].lower())
