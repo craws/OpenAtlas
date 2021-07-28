@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from flask import g
 from wand.image import Image
 
 from openatlas import app, logger
@@ -23,18 +24,26 @@ class ImageProcessing:
     def safe_resize_image(name: str, file_format: str, size: str) -> bool:
         # With python3-wand 0.6. Path seems to work and str conversation can be removed
         try:
-            if ImageProcessing.check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
+            if ImageProcessing.check_if_folder_exist(
+                    size,
+                    app.config['RESIZED_IMAGES']):
                 return ImageProcessing.image_resizing(name, file_format, size)
             return False  # pragma: no cover
         except Exception as e:
-            logger.log('info', 'image processing', 'failed to save resized image', e)
+            logger.log(
+                'info',
+                'image processing',
+                'failed to save resized image',
+                e)
             return False
 
     @staticmethod
     def image_resizing(name: str, file_format: str, size: str) -> bool:
-        with Image(filename=str(Path(app.config['UPLOAD_DIR']) / f"{name}{file_format}[0]")) as src:
+        with Image(filename=str(Path(app.config['UPLOAD_DIR']) /
+                                f"{name}{file_format}[0]")) as src:
             extension = app.config['PROCESSED_EXT'] \
-                if file_format in app.config['NONE_DISPLAY_EXT'] else file_format
+                if file_format in app.config['NONE_DISPLAY_EXT'] \
+                else file_format
             with src.convert(extension.replace('.', '')) as img:
                 img.transform(resize=f"{size}x{size}>")
                 img.compression_quality = 75
@@ -50,10 +59,16 @@ class ImageProcessing:
         file_format = '.' + filename.split('.', 1)[1].lower()
         try:
             if file_format in app.config['ALLOWED_IMAGE_EXT']:
-                return ImageProcessing.loop_through_processed_folders(name, file_format)
+                return ImageProcessing.loop_through_processed_folders(
+                    name,
+                    file_format)
             return False
         except Exception as e:  # pragma: no cover
-            logger.log('info', 'image processing', 'failed to validate file as image', e)
+            logger.log(
+                'info',
+                'image processing',
+                'failed to validate file as image',
+                e)
             return False
 
     @staticmethod
@@ -62,14 +77,18 @@ class ImageProcessing:
             if file_format in app.config['NONE_DISPLAY_EXT'] else file_format
         for size in app.config['IMAGE_SIZE'].values():
             p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{format_}"
-            if not p.is_file() and not ImageProcessing.safe_resize_image(name, file_format, size):
+            if not p.is_file() and not ImageProcessing.safe_resize_image(
+                    name,
+                    file_format,
+                    size):
                 return False  # pragma: no cover
         return True
 
     @staticmethod
     def check_if_folder_exist(folder: str, path: str) -> bool:
         folder_to_check = Path(path) / folder
-        return True if folder_to_check.is_dir() else ImageProcessing.create_folder(folder_to_check)
+        return True if folder_to_check.is_dir() \
+            else ImageProcessing.create_folder(folder_to_check)
 
     @staticmethod
     def create_folder(folder: Path) -> bool:
@@ -77,25 +96,35 @@ class ImageProcessing:
             folder.mkdir()
             return True
         except Exception as e:  # pragma: no cover
-            logger.log('info', 'image processing', 'failed to create a folder', e)
+            logger.log(
+                'info',
+                'image processing',
+                'failed to create a folder',
+                e)
             return False
 
-    # Todo: implement admin interface
     @staticmethod
     def delete_orphaned_resized_images() -> None:
-        uploaded_files = []
-        for uploaded in app.config['UPLOAD_DIR'].glob('**/*'):
-            uploaded_files.append(uploaded.name.rsplit('.', 1)[0].lower())
+        from openatlas.util.util import get_file_stats
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
         for size in app.config['IMAGE_SIZE'].values():
             p = Path(app.config['RESIZED_IMAGES']) / size
             for file in p.glob('**/*'):
-                if file.name.rsplit('.', 1)[1].lower() not in app.config['PROCESSED_EXT']:
-                    file.unlink()
-                if file.name.rsplit('.', 1)[0].lower() not in uploaded_files:
+                file_name = file.name.rsplit('.', 1)[0].lower()
+                if not file_name.isdigit() or int(
+                        file_name) not in g.file_stats:
                     file.unlink()
 
-    # Todo: implement admin interface
     @staticmethod
     def create_resized_images() -> None:
-        for file in app.config['UPLOAD_DIR'].glob('**/*'):
-            ImageProcessing.resize_image(file.name)
+        from openatlas.models.entity import Entity
+        from openatlas.util.util import get_file_stats
+        if not g.file_stats:
+            g.file_stats = get_file_stats()
+        for entity in Entity.get_by_class('file'):
+            if entity.id in g.file_stats \
+                    and g.file_stats[entity.id]['ext'] \
+                    in app.config['ALLOWED_IMAGE_EXT']:
+                ImageProcessing.resize_image(
+                    f"{entity.id}{g.file_stats[entity.id]['ext']}")
