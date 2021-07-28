@@ -29,7 +29,6 @@ EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
 
 # Image processing
-IMAGE_PROCESSING = False
 PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {

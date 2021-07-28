@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -267,7 +267,7 @@ def insert_file(form: FlaskForm, origin: Optional[Entity] = None) -> Union[str, 
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
-            if app.config['IMAGE_PROCESSING']:
+            if session['settings']['image_processing']:
                 ImageProcessing.resize_image(new_name)
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'

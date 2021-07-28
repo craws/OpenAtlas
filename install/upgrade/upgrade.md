@@ -14,6 +14,9 @@ is working.
     service apache2 restart
 
 ### 6.3.0 to 6.4.0
+Execute **install/upgrade/6.4.0.sql** after making backups. This will activate
+image processing to e.g. generate thumbnails.
+
 Install python3-wand e.g. on Debian:
 
     # apt install python3-wand

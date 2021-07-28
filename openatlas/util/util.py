@@ -697,7 +697,8 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
-    if app.config['IMAGE_PROCESSING'] and ImageProcessing.check_processed_image(path.name):
+    if session['settings']['image_processing'] \
+            and ImageProcessing.check_processed_image(path.name):
         resized = url_for(
             'display_file',
             filename=get_file_path(entity.image_id, size).name, size=size)

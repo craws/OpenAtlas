@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -20,8 +20,9 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    add_edit_link, add_remove_link, button, display_delete_link, format_date, get_base_table_data,
-    get_entity_data, get_file_path, is_authorized, link, required_group, uc_first)
+    add_edit_link, add_remove_link, button, display_delete_link, format_date,
+    get_base_table_data, get_entity_data, get_file_path, is_authorized, link,
+    required_group, uc_first)
 from openatlas.views.entity_index import file_preview
 from openatlas.views.reference import AddReferenceForm
 
@@ -349,7 +350,8 @@ def entity_view(id_: int) -> Union[str, Response]:
             note['text'],
             f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>']
         tabs['note'].table.rows.append(data)
-    if 'file' in tabs and current_user.settings['table_show_icons'] and app.config['IMAGE_PROCESSING']:
+    if 'file' in tabs and current_user.settings['table_show_icons'] and \
+            session['settings']['image_processing']:
         tabs['file'].table.header.insert(1, uc_first(_('icon')))
         for row in tabs['file'].table.rows:
             row.insert(1, file_preview(int(row[0].replace('<a href="/entity/', '').split('"')[0])))
@@ -377,7 +379,8 @@ def get_profile_image_table_link(
     if file.id == profile_image_id:
         return link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
     if extension in app.config['DISPLAY_FILE_EXTENSIONS'] \
-            or (app.config['IMAGE_PROCESSING'] and extension in app.config['ALLOWED_IMAGE_EXT']):
+            or (session['settings']['image_processing']
+                and extension in app.config['ALLOWED_IMAGE_EXT']):
         return link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover
 

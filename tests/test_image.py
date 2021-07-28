@@ -3,7 +3,6 @@ import shutil
 from shutil import copyfile
 
 from flask import g, url_for
-from nose.tools import raises
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -16,7 +15,6 @@ from tests.base import TestBaseCase, insert_entity
 class ImageTest(TestBaseCase):
 
     def test_image(self) -> None:
-        app.config['IMAGE_PROCESSING'] = True
         app.config['IMAGE_SIZE']['tmp'] = '1'
         with app.app_context():  # type: ignore
             with app.test_request_context():
@@ -89,19 +87,22 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('display_file', filename=file_name))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_file',
-                        filename=file_name,
-                        size=app.config['IMAGE_SIZE']['thumbnail']))
+                url_for(
+                    'display_file',
+                    filename=file_name,
+                    size=app.config['IMAGE_SIZE']['thumbnail']))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_file',
-                        filename=file_name,
-                        size=app.config['IMAGE_SIZE']['table']))
+                url_for(
+                    'display_file',
+                    filename=file_name,
+                    size=app.config['IMAGE_SIZE']['table']))
             assert b'\xff' in rv.data
             rv = self.app.get(
-                url_for('display_file',
-                        filename=file_name_py,
-                        size=app.config['IMAGE_SIZE']['table']))
+                url_for(
+                    'display_file',
+                    filename=file_name_py,
+                    size=app.config['IMAGE_SIZE']['table']))
             assert b'404' in rv.data
 
             # Make directory if not exist
@@ -114,24 +115,14 @@ class ImageTest(TestBaseCase):
             assert b'Test_File' in rv.data
             app.config['IMAGE_SIZE']['tmp'] = '1'
 
-            # Clean up files
-            # for dir_ in app.config['IMAGE_SIZE'].values():
-            #     pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file_name).unlink()
-            #     pathlib.Path(app.config['RESIZED_IMAGES'] / dir_ / file2_name).unlink()
-
             rv = self.app.get(url_for('index', view='file', delete_id=file.id))
             assert b'The entry has been deleted' in rv.data
             rv = self.app.get(url_for('index', view='file', delete_id=file2.id))
             assert b'The entry has been deleted' in rv.data
 
             shutil.rmtree(
-                pathlib.Path(app.config['RESIZED_IMAGES'] / app.config['IMAGE_SIZE']['tmp']))
+                pathlib.Path(app.config['RESIZED_IMAGES']
+                             / app.config['IMAGE_SIZE']['tmp']))
 
             dst_py.unlink()
             del app.config['IMAGE_SIZE']['tmp']
-            app.config['IMAGE_PROCESSING'] = False
-
-    # @raises(APIFileNotFoundError)
-    # def error_file_not_found(self) -> None:  # pragma: nocover
-    #     with app.app_context():  # type: ignore
-    #         self.app.get(url_for('display_file_api', filename="132358765.jpg", image_size='icon'))

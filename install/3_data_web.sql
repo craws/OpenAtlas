@@ -22,6 +22,7 @@ INSERT INTO web.settings (name, value) VALUES
     ('file_upload_max_size', '10'),
     ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
     ('geonames_username', 'openatlas'),
+    ('image_processing', 'True'),
     ('log_level', '6'),
     ('logo_file_id', ''),
     ('mail', ''),
