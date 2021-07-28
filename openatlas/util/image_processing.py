@@ -112,9 +112,9 @@ class ImageProcessing:
             p = Path(app.config['RESIZED_IMAGES']) / size
             for file in p.glob('**/*'):
                 file_name = file.name.rsplit('.', 1)[0].lower()
-                if not file_name.isdigit() or int(
-                        file_name) not in g.file_stats:
-                    file.unlink()
+                if not file_name.isdigit() \
+                        or int(file_name) not in g.file_stats:
+                    file.unlink()  # pragma: no cover
 
     @staticmethod
     def create_resized_images() -> None:

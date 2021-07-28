@@ -115,6 +115,15 @@ class ImageTest(TestBaseCase):
             assert b'Test_File' in rv.data
             app.config['IMAGE_SIZE']['tmp'] = '1'
 
+            rv = self.app.get(
+                url_for('admin_resize_images'),
+                follow_redirects=True)
+            assert b'Images were created' in rv.data
+            rv = self.app.get(
+                url_for('admin_delete_orphaned_resized_images'),
+                follow_redirects=True)
+            assert b'Resized orphaned images were deleted' in rv.data
+
             rv = self.app.get(url_for('index', view='file', delete_id=file.id))
             assert b'The entry has been deleted' in rv.data
             rv = self.app.get(url_for('index', view='file', delete_id=file2.id))
