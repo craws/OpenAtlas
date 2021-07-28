@@ -16,3 +16,4 @@ Authentication
 * **Reset confirm hours** - how long a requested password reset code is valid
 * **Failed logins** - how often it could be tried to login with a specific username
 * **Failed login forget minutes** - minutes to wait after failed logins are exceeded
+* **Image processing** - if activated preview images for detail and table views are generated

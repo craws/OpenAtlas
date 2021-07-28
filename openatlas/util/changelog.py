@@ -2,6 +2,8 @@ class Changelog:
     versions = {
         '6.4.0': ['TBA', {
             'feature': {
+                '1280': 'Picture Preview',
+                '1492': 'Image Processing',
                 '1538': 'Focus on table filter at overview pages',
                 '1531': 'Map overlay improved',
                 '1495': 'API: Additional Geojson output for QGIS imports',

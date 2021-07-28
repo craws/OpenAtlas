@@ -36,6 +36,4 @@ Display
 * **Show API links** - in entity view: show a button for the :doc:`/tools/api` view
 * **Default map zoom** - define the lowest zoom level to include all features on a :doc:`/tools/map` view.
 * **Max map zoom** - adjust how far you can zoom into a :doc:`/tools/map`.
-
-
-
+* **Show icons in tables** - if activated small images of files are shown in tables.
