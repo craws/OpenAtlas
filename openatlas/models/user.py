@@ -161,6 +161,7 @@ class User(UserMixin):  # type: ignore
             'language': session['language'],
             'newsletter': False,
             'table_show_aliases': True,
+            'table_show_icons': False,
             'show_email': False}
         for setting in session['settings']:
             if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] \

@@ -27,6 +27,7 @@ from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -557,3 +558,19 @@ def admin_newsletter() -> Union[str, Response]:
         table=table,
         title=_('newsletter'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], _('newsletter')])
+
+
+@app.route('/admin/resize_images')
+@required_group('admin')
+def admin_resize_images():
+    ImageProcessing.create_resized_images()
+    flash(_('images were created'), 'info')
+    return redirect(url_for('admin_index') + '#tab-data')
+
+
+@app.route('/admin/delete_orphaned_resized_images')
+@required_group('admin')
+def admin_delete_orphaned_resized_images():
+    ImageProcessing.delete_orphaned_resized_images()
+    flash(_('resized orphaned images were deleted'), 'info')
+    return redirect(url_for('admin_index') + '#tab-data')

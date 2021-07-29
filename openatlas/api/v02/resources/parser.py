@@ -5,8 +5,16 @@ from openatlas import app
 app.config['BUNDLE_ERRORS'] = True
 
 default = reqparse.RequestParser()
-default.add_argument('download', type=bool, help='{error_msg}', default=False)
-default.add_argument('count', type=bool, help='{error_msg}', default=False)
+default.add_argument(
+    'download',
+    type=bool,
+    help='{error_msg}',
+    default=False)
+default.add_argument(
+    'count',
+    type=bool,
+    help='{error_msg}',
+    default=False)
 
 language = default.copy()
 language.add_argument(
@@ -30,9 +38,10 @@ entity_.add_argument(
     default=['name'],
     action='append',
     case_sensitive=False,
-    help='{error_msg}', choices=(
+    help='{error_msg}',
+    choices=(
         'id', 'class_code', 'name', 'description', 'created', 'modified',
-        'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
+         'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
 entity_.add_argument(
     'filter',
     type=str,
@@ -132,4 +141,6 @@ image = default.copy()
 image.add_argument(
     'image_size',
     type=str,
-    help="Not a valid size")
+    help="{error_msg}",
+    case_sensitive=False,
+    choices=('thumbnail', 'table'))

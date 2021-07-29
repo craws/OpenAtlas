@@ -55,3 +55,11 @@ Logo
 You can chose a custom logo. The file has to be uploaded before and has to have a display file
 extension. The displayed logo has a max-height of 120 px. If you selected a larger one the browser
 will try to scale it.
+
+Image preview
+-------------
+If image processing is enabled (default=on, configurable by admins) and user
+have **Show icons in tables** in their :doc:`/tools/profile` activated small
+images of files are shown in tables.
+
+Please be aware with many files and large tables this can impact performance.

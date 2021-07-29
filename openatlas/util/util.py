@@ -30,6 +30,7 @@ from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -401,9 +402,11 @@ def get_file_extension(entity: Union[int, 'Entity']) -> str:
     return path.suffix if path else 'N/A'
 
 
-def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
+def get_file_path(entity: Union[int, 'Entity'], size: Optional[str] = None) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
     path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
+    if size:
+        path = next((app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)
     return path if path else None
 
 
@@ -429,10 +432,10 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -687,10 +690,20 @@ def download_button(entity: Entity) -> str:
 
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
     path = get_file_path(entity.image_id)
-    if path:
-        return Markup(render_template('util/profile_image.html', entity=entity, path=path))
-    return ''  # pragma: no cover
+    if not path:
+        return ''  # pragma: no cover
+    resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
+    if session['settings']['image_processing'] \
+            and ImageProcessing.check_processed_image(path.name):
+        resized = url_for(
+            'display_file',
+            filename=get_file_path(entity.image_id, size).name, size=size)
+    return Markup(
+        render_template('util/profile_image.html', entity=entity, path=path, resized=resized))
 
 
 @app.template_filter()

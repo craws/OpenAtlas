@@ -1,7 +1,7 @@
 import os
 from typing import Any, Dict, List, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -18,6 +18,7 @@ from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import (
     get_base_table_data, is_authorized, link, required_group, was_modified)
 
@@ -266,6 +267,8 @@ def insert_file(form: FlaskForm, origin: Optional[Entity] = None) -> Union[str, 
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
             filenames.append(new_name)
+            if session['settings']['image_processing']:
+                ImageProcessing.resize_image(new_name)
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:

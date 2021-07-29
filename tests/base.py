@@ -16,6 +16,7 @@ class TestBaseCase(unittest.TestCase):
         app.config['SERVER_NAME'] = 'local.host'
         app.config['WTF_CSRF_ENABLED'] = False
         app.config['WTF_CSRF_METHODS'] = []  # This is the magic to disable CSRF for tests
+
         self.setup_database()
         self.app = app.test_client()
         self.login()  # Login on default because needed almost everywhere

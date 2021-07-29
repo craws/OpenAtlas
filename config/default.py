@@ -28,6 +28,16 @@ TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
 EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
 
+# Image processing
+PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
+RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
+IMAGE_SIZE = {
+    'thumbnail': '200',
+    'table': '100'}
+NONE_DISPLAY_EXT = ['.tiff', '.tif']
+ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
+PROCESSED_EXT = '.jpeg'
+
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
 REMEMBER_COOKIE_SECURE = True

@@ -1,8 +1,9 @@
 import datetime
 from typing import List, Optional, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -11,10 +12,11 @@ from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, external_url, format_date, get_base_table_data, get_file_path, get_file_stats,
-    is_authorized, link, required_group)
+    button, external_url, format_date, get_base_table_data, get_file_path,
+    get_file_stats, is_authorized, link, required_group)
 
 
 @app.route('/index/<view>')
@@ -46,9 +48,14 @@ def get_buttons(view: str) -> List[str]:
 
 
 def get_table(view: str) -> Table:
-    table = Table(g.table_headers[view])
+    header = g.table_headers[view]
     if view == 'file':
-        table.header = ['date'] + table.header
+        header = ['date'] + header
+        if session['settings']['image_processing'] \
+                and current_user.settings['table_show_icons']:
+            header.insert(1, _('icon'))
+    table = Table(header)
+    if view == 'file':
         if not g.file_stats:
             g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file', nodes=True):
@@ -56,13 +63,18 @@ def get_table(view: str) -> Table:
             if entity.id in g.file_stats:
                 date = format_date(
                     datetime.datetime.utcfromtimestamp(g.file_stats[entity.id]['date']))
-            table.rows.append([
+            data = [
                 date,
                 link(entity),
                 entity.print_standard_type(),
                 g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A',
                 g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A',
-                entity.description])
+                entity.description]
+            if session['settings']['image_processing'] \
+                    and current_user.settings['table_show_icons']:
+                data.insert(1, file_preview(entity.id))
+            table.rows.append(data)
+
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
@@ -78,6 +90,22 @@ def get_table(view: str) -> Table:
         entities = Entity.get_by_class(classes, nodes=True, aliases=True)
         table.rows = [get_base_table_data(entity) for entity in entities]
     return table
+
+
+def file_preview(entity_id: int) -> str:
+    icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
+    size = app.config['IMAGE_SIZE']['table']
+    if icon_path:
+        return f"""<img src='{url_for('display_file', filename=icon_path.name, size=size)}'
+                loading='lazy'>"""
+    path = get_file_path(entity_id)
+    if not path:
+        return ''
+    if ImageProcessing.check_processed_image(path.name):
+        icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
+        url = url_for('display_file', filename=icon_path.name, size=size)
+        return f"<img src='{url}' loading='lazy' alt='image'>"
+    return ''
 
 
 def delete_entity(id_: int) -> Optional[str]:
@@ -108,10 +136,16 @@ def delete_entity(id_: int) -> Optional[str]:
         flash(_('entity deleted'), 'info')
         if entity.class_.name == 'file':
             try:
-                path = get_file_path(id_)
-                if path:  # Only delete file on disk if it exists to prevent a missing file error
-                    path.unlink()
+                delete_files(id_)
             except Exception as e:  # pragma: no cover
                 logger.log('error', 'file', 'file deletion failed', e)
                 flash(_('error file delete'), 'error')
     return url
+
+
+def delete_files(id_: int) -> None:
+    path = get_file_path(id_)
+    if path:  # Only delete file on disk if it exists to prevent a missing file error
+        path.unlink()
+    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
+        path.unlink()
