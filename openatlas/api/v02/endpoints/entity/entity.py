@@ -35,9 +35,10 @@ class GetEntity(Resource):  # type: ignore
         result = GetEntity.get_format(entity, parser)
 
         g = Graph().parse(data=json.dumps(result), format='json-ld')
-       # xml, n3, turtle, nt, pretty - xml, trix, trig and nquads
+        # xml, n3, turtle, nt, pretty - xml, trix, trig and nquads
         print(g.serialize(format='turtle').decode('utf-8'))
-
+        print(type(g.serialize(format='xml').decode('utf-8')))
+        return g.serialize(format='xml')
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200

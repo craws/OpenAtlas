@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, url_for
 
-from openatlas.api.v02.resources.util import get_license
+from openatlas.api.v02.resources.util import get_license, to_camel_case
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -36,7 +36,7 @@ class LPHelper:
             'relationType': LPHelper.relation_type(link_, inverse),
             'relationSystemClass': link_.domain.class_.name if
             inverse else link_.range.class_.name,
-            'type': link_.type.name if link_.type else None,
+            'relationCategory': link_.type.name if link_.type else None,
             'when': {'timespans': [
                 LPHelper.get_time(link_.domain if inverse else link_.range)]}}
 
@@ -120,6 +120,6 @@ class LPHelper:
             identifier = system.resolver_url if system.resolver_url else ''
             ref.append({
                 'identifier': f"{identifier}{link_.description}",
-                'type': g.nodes[link_.type.id].name,
+                'type': to_camel_case(g.nodes[link_.type.id].name),
                 'referenceSystem': system.name})
         return ref if ref else None

@@ -42,3 +42,7 @@ def get_license(entity: Entity) -> Optional[str]:
         if g.nodes[node.root[-1]].name == 'License':
             return node.name
     return None
+
+
+def to_camel_case(s: str) -> str:
+    return (s[0] + s.title().translate(" ")[1:] if s else s).replace(" ", "")
