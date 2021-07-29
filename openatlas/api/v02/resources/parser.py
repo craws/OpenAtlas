@@ -143,4 +143,4 @@ image.add_argument(
     type=str,
     help="{error_msg}",
     case_sensitive=False,
-    choices=('overview', 'thumbnail', 'table', 'icon'))
+    choices=('thumbnail', 'table'))
