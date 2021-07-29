@@ -12,8 +12,8 @@ from openatlas.models.entity import Entity
 class ReferenceSystem(Entity):
 
     EXTERNAL_REFERENCES_FORMS = [
-        'acquisition', 'activity', 'artifact', 'feature', 'find', 'group', 'human_remains', 'move',
-        'person', 'place', 'type']
+        'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
+        'human_remains', 'move', 'person', 'place', 'type']
 
     website_url = None
     resolver_url = None
@@ -27,7 +27,8 @@ class ReferenceSystem(Entity):
         self.resolver_url = row['resolver_url']
         self.forms = row['form_ids']
         self.placeholder = row['identifier_example']
-        self.precision_default_id = list(self.nodes.keys())[0].id if self.nodes else None
+        self.precision_default_id = \
+            list(self.nodes.keys())[0].id if self.nodes else None
         self.count = row['count']
         self.system = row['system']
 
@@ -47,12 +48,14 @@ class ReferenceSystem(Entity):
     def remove_form(self, form_id: int) -> None:
         forms = self.get_forms()
         for link_ in self.get_links('P67'):
-            if link_.range.class_.name == forms[form_id]['name']:  # pragma: no cover
+            if link_.range.class_.name == \
+                    forms[form_id]['name']:  # pragma: no cover
                 return  # Abort if there are linked entities
         Db.remove_form(self.id, form_id)
 
     def get_forms(self) -> Dict[int, Dict[str, Any]]:
-        return {row['id']: {'name': row['name']} for row in Db.get_forms(self.id)}
+        return {
+            row['id']: {'name': row['name']} for row in Db.get_forms(self.id)}
 
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
@@ -66,29 +69,44 @@ class ReferenceSystem(Entity):
     @staticmethod
     def update_links(form: FlaskForm, entity: Entity) -> None:
         for field in form:
-            if field.id.startswith('reference_system_id_'):  # Delete and recreate link
-                system = Entity.get_by_id(int(field.id.replace('reference_system_id_', '')))
-                precision_field = getattr(form, field.id.replace('id_', 'precision_'))
+            if field.id.startswith('reference_system_id_'):  # Recreate link
+                system = Entity.get_by_id(
+                    int(field.id.replace('reference_system_id_', '')))
+                precision_field = getattr(
+                    form,
+                    field.id.replace('id_', 'precision_'))
                 Db.remove_link(system.id, entity.id)
                 if field.data:
-                    system.link('P67', entity, field.data, type_id=precision_field.data)
+                    system.link(
+                        'P67',
+                        entity,
+                        field.data,
+                        type_id=precision_field.data)
 
     @staticmethod
-    def get_form_choices(entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
+    def get_form_choices(
+            entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices(ReferenceSystem.EXTERNAL_REFERENCES_FORMS):
+        for row in Db.get_form_choices(
+                ReferenceSystem.EXTERNAL_REFERENCES_FORMS):
             if not entity or row['id'] not in entity.forms:
-                if entity and entity.name == 'GeoNames' and row['name'] != 'Place':
+                if entity and entity.name == 'GeoNames' \
+                        and row['name'] != 'Place':
                     continue
                 choices.append((row['id'], g.classes[row['name']].label))
         return choices
 
     @staticmethod
     def insert_system(form: FlaskForm) -> Entity:
-        entity = Entity.insert('reference_system', form.name.data, form.description.data)
+        entity = Entity.insert(
+            'reference_system',
+            form.name.data,
+            form.description.data)
         Db.insert_system({
             'entity_id': entity.id,
             'name': entity.name,
-            'website_url': form.website_url.data if form.website_url.data else None,
-            'resolver_url': form.resolver_url.data if form.resolver_url.data else None})
+            'website_url': form.website_url.data
+            if form.website_url.data else None,
+            'resolver_url': form.resolver_url.data
+            if form.resolver_url.data else None})
         return ReferenceSystem.get_all()[entity.id]

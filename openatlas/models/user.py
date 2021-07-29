@@ -17,7 +17,10 @@ from openatlas.util.util import sanitize
 
 class User(UserMixin):  # type: ignore
 
-    def __init__(self, row: Dict[str, Any] = None, bookmarks: Optional[List[int]] = None) -> None:
+    def __init__(
+            self,
+            row: Dict[str, Any] = None,
+            bookmarks: Optional[List[int]] = None) -> None:
         self.id = row['id']
         self.active = row['active'] == 1
         self.username = row['username']
@@ -56,8 +59,8 @@ class User(UserMixin):  # type: ignore
 
     def update_settings(self, form: Any) -> None:
         for field in form:
-            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] or \
-                    field.name in ['name', 'email']:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] \
+                    or field.name in ['name', 'email']:
                 continue
             value = field.data
             if field.type == 'BooleanField':
@@ -72,14 +75,15 @@ class User(UserMixin):  # type: ignore
 
     def login_attempts_exceeded(self) -> bool:
         failed_login_tries = int(session['settings']['failed_login_tries'])
-        if not self.login_last_failure or self.login_failed_count < failed_login_tries:
+        if not self.login_last_failure \
+                or self.login_failed_count < failed_login_tries:
             return False
         last_failure_date = self.login_last_failure
         forget_minutes = int(session['settings']['failed_login_forget_minutes'])
         last_failure_date += datetime.timedelta(minutes=forget_minutes)
         if last_failure_date > datetime.datetime.now():
             return True
-        return False  # pragma no cover - not waiting in tests for forget_minutes to pass
+        return False  # pragma no cover - no waiting in tests
 
     def get_notes_by_entity_id(self, entity_id: int) -> List[Dict[str, Any]]:
         return Db.get_notes_by_entity_id(self.id, entity_id)
@@ -92,8 +96,10 @@ class User(UserMixin):  # type: ignore
     def get_by_id(user_id: int, with_bookmarks: bool = False) -> Optional[User]:
         user_data = Db.get_by_id(user_id)
         if user_data:
-            return User(user_data, Db.get_bookmarks(user_id) if with_bookmarks else None)
-        return None  # pragma no cover - something went wrong, e.g. obsolete session values
+            return User(
+                user_data,
+                Db.get_bookmarks(user_id) if with_bookmarks else None)
+        return None  # pragma no cover - e.g. obsolete session values
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
@@ -116,7 +122,10 @@ class User(UserMixin):  # type: ignore
         return User(user_data) if user_data else None
 
     @staticmethod
-    def get_activities(limit: int, user_id: int, action: str) -> List[Dict[str, Any]]:
+    def get_activities(
+            limit: int,
+            user_id: int,
+            action: str) -> List[Dict[str, Any]]:
         return Db.get_activities(limit, user_id, action)
 
     @staticmethod
@@ -164,7 +173,8 @@ class User(UserMixin):  # type: ignore
             'table_show_icons': False,
             'show_email': False}
         for setting in session['settings']:
-            if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
+            if setting in \
+                    ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
                     or setting.startswith('module_'):
                 settings[setting] = session['settings'][setting]
         for row in Db.get_settings(user_id):
@@ -174,14 +184,21 @@ class User(UserMixin):  # type: ignore
         return settings
 
     @staticmethod
-    def generate_password(length: Optional[int] = None) -> str:  # pragma no cover - only for mail
-        length = length if length else session['settings']['random_password_length']
+    def generate_password(
+            length: Optional[int] = None) -> str:  # pragma no cover
+        length = length if length \
+            else session['settings']['random_password_length']
         return ''.join(
-            secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
+            secrets.choice(
+                string.ascii_uppercase + string.digits) for _ in range(length))
 
     @staticmethod
     def insert_note(entity_id: int, note: str, public: bool) -> None:
-        Db.insert_note(current_user.id, entity_id, sanitize(note, 'text'), public)
+        Db.insert_note(
+            current_user.id,
+            entity_id,
+            sanitize(note, 'text'),
+            public)
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:

@@ -10,7 +10,7 @@ class Settings:
     @staticmethod
     def get_settings() -> Dict[str, Any]:
         settings: Dict[str, Union[int, str, List[str]]] = {}
-        for name in Settings.MODULES:  # Set empty in case it doesn't exist, e.g. after an upgrade
+        for name in Settings.MODULES:  # Set empty in case it doesn't exist
             settings['module_' + name] = ''
         for row in Db.get_settings():
             settings[row['name']] = row['value']
@@ -23,7 +23,9 @@ class Settings:
                     'random_password_length',
                     'reset_confirm_hours']:
                 settings[row['name']] = int(row['value'])
-            if row['name'] in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+            if row['name'] in [
+                    'mail_recipients_feedback',
+                    'file_upload_allowed_extension']:
                 settings[row['name']] = row['value'].split(' ')
         return settings
 
