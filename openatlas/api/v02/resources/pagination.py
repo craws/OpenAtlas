@@ -10,6 +10,9 @@ from openatlas.api.v02.resources.util import get_all_links, \
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
+from rdflib.plugin import register, Parser
+register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
+from rdflib import Graph, URIRef, Literal
 
 class Pagination:
 
@@ -61,6 +64,18 @@ class Pagination:
             parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         if parser['format'] == 'geojson':
             return [Pagination.get_geojson(new_entities, parser)]
+
+        # from flask import json
+        # result = Pagination.linked_places_result(
+        #     new_entities[:int(parser['limit'])],
+        #     parser,
+        #     Pagination.link_builder(new_entities, parser),
+        #     Pagination.link_builder(new_entities, parser, True))
+        #
+        # g = Graph().parse(data=json.dumps(result), format='json-ld')
+        # # xml, n3, turtle, nt, pretty - xml, trix, trig and nquads
+        # print(g.serialize(format='xml').decode('utf-8'))
+
         return Pagination.linked_places_result(
             new_entities[:int(parser['limit'])],
             parser,
