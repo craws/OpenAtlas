@@ -2,6 +2,7 @@ from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response, json
 from flask_restful import Resource, marshal
+from rdflib.plugin import register, Parser
 
 from openatlas.api.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.enpoints_util import download
@@ -14,9 +15,9 @@ from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.models.entity import Entity
 
-from rdflib.plugin import register, Parser
 register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
-from rdflib import Graph, URIRef, Literal
+from rdflib import Graph
+
 
 class GetEntity(Resource):  # type: ignore
     @staticmethod
@@ -35,10 +36,12 @@ class GetEntity(Resource):  # type: ignore
         result = GetEntity.get_format(entity, parser)
 
         g = Graph().parse(data=json.dumps(result), format='json-ld')
-        # xml, n3, turtle, nt, pretty - xml, trix, trig and nquads
-        print(g.serialize(format='turtle').decode('utf-8'))
-        print(type(g.serialize(format='xml').decode('utf-8')))
-        return g.serialize(format='xml')
+        # xml, n3, turtle, nt, pretty - xml, trig and nquads
+        # print(g.serialize(format='turtle').decode('utf-8'))
+
+        serialize = g.serialize(format='nquads', encoding='utf-8')
+        print(serialize)
+        return Response(serialize, mimetype='application/n-quads')
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200
