@@ -16,8 +16,8 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (
-    ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm, ModulesForm,
-    SimilarForm, TestMailForm)
+    ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
+    ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
@@ -31,16 +31,18 @@ from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, convert_size, delete_link, display_form, display_info, format_date, format_datetime,
-    get_disk_space_info, get_file_path, get_file_stats, is_authorized, link, manual, required_group,
-    sanitize, send_mail, uc_first)
+    button, convert_size, delete_link, display_form, display_info, format_date,
+    format_datetime, get_disk_space_info, get_file_path, get_file_stats,
+    is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
 @app.route('/admin/', methods=["GET", "POST"])
 @app.route('/admin/<action>/<int:id_>')
 @required_group('readonly')
-def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
+def admin_index(
+        action: Optional[str] = None,
+        id_: Optional[int] = None) -> Union[str, Response]:
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             user = User.get_by_id(id_)
@@ -59,12 +61,20 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK)}
     tables = {
         'user': Table([
-            'username', 'name', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'
-        ]),
-        'content': Table(['name'] + [language for language in app.config['LANGUAGES'].keys()])}
+            'username',
+            'name',
+            'group',
+            'email',
+            'newsletter',
+            'created',
+            'last login',
+            'entities']),
+        'content': Table(['name'] + [
+            language for language in app.config['LANGUAGES'].keys()])}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
-        email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
+        email = user.email \
+            if is_authorized('manager') or user.settings['show_email'] else ''
         tables['user'].rows.append([
             link(user),
             user.real_name,
@@ -83,12 +93,19 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     form = None
     if is_authorized('admin'):
         form = TestMailForm()
-        if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-            subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
-            body = _('This test mail was sent by %(username)s', username=current_user.username)
+        if form.validate_on_submit() \
+                and session['settings']['mail']:  # pragma: no cover
+            subject = _(
+                'Test mail from %(site_name)s',
+                site_name=session['settings']['site_name'])
+            body = _(
+                'This test mail was sent by %(username)s',
+                username=current_user.username)
             body += f" {_('at')} '{request.headers['Host']}"
             if send_mail(subject, body, form.receiver.data):
-                flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
+                flash(_(
+                    'A test mail was sent to %(email)s.',
+                    email=form.receiver.data), 'info')
         else:
             form.receiver.data = current_user.email
     tabs = {
@@ -113,15 +130,19 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
                 button(_('newsletter'), url_for('admin_newsletter'))
-                if is_authorized('manager') and session['settings']['mail'] else '',
-                button(_('user'), url_for('user_insert')) if is_authorized('manager') else ''])}
+                if is_authorized('manager') and session['settings']['mail']
+                else '',
+                button(_('user'), url_for('user_insert'))
+                if is_authorized('manager') else ''])}
     if is_authorized('admin'):
         tabs['general'] = Tab(
             'general',
             content=display_info(get_form_settings(GeneralForm())),
             buttons=[
                 manual('admin/general'),
-                button(_('edit'), url_for('admin_settings', category='general')),
+                button(
+                    _('edit'),
+                    url_for('admin_settings', category='general')),
                 button(_('system log'), url_for('admin_log'))])
         tabs['email'] = Tab(
             'email',
@@ -139,7 +160,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                 {display_info(get_form_settings(ModulesForm()))}""",
             buttons=[
                 manual('admin/modules'),
-                button(_('edit'), url_for('admin_settings', category='modules'))])
+                button(
+                    _('edit'),
+                    url_for('admin_settings', category='modules'))])
         tabs['map'] = Tab(
             'map',
             content=display_info(get_form_settings(MapForm())),
@@ -155,7 +178,11 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
             'admin/data.html',
             imports=Import.get_all_projects(),
             info=get_form_settings(ApiForm())))
-    return render_template('tabs.html', tabs=tabs, title=_('admin'), crumbs=[_('admin')])
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        title=_('admin'),
+        crumbs=[_('admin')])
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
@@ -166,14 +193,16 @@ def admin_content(item: str) -> Union[str, Response]:
         setattr(
             ContentForm,
             language,
-            StringField() if item == 'site_name_for_frontend' else TextAreaField())
+            StringField()
+            if item == 'site_name_for_frontend' else TextAreaField())
     form = ContentForm()
     if form.validate_on_submit():
         Content.update_content(item, form)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in languages:
-        form.__getattribute__(language).data = Content.get_content()[item][language]
+        form.__getattribute__(language).data = \
+            Content.get_content()[item][language]
     return render_template(
         'admin/content.html',
         item=item,
@@ -191,23 +220,28 @@ def admin_check_links() -> str:
         table=Table(
             ['domain', 'property', 'range'],
             rows=[
-                [x['domain'], x['property'], x['range']] for x in Link.get_invalid_cidoc_links()]),
+                [x['domain'], x['property'], x['range']]
+                for x in Link.get_invalid_cidoc_links()]),
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check links')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('check links')])
 
 
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
 @required_group('contributor')
-def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Response]:
+def admin_check_link_duplicates(
+        delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
         count = Link.delete_link_duplicates()
         logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table([
-        'domain', 'range', 'property_code', 'description', 'type_id', 'begin_from', 'begin_to',
-        'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
+        'domain', 'range', 'property_code', 'description', 'type_id',
+        'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
+        'end_comment', 'count'])
     for row in Link.check_link_duplicates():
         table.rows.append([
             link(Entity.get_by_id(row['domain_id'])),
@@ -225,7 +259,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
     duplicates = False
     if table.rows:
         duplicates = True
-    else:  # If no exact duplicates where found check if single types are used multiple times
+    else:  # If no exact duplicates check single types for multiple use
         table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'],
             rows=Link.check_single_type_duplicates())
@@ -234,12 +268,16 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
         table=table,
         duplicates=duplicates,
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check link duplicates')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('check link duplicates')])
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
 @required_group('contributor')
-def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response:
+def admin_delete_single_type_duplicate(
+        entity_id: int,
+        node_id: int) -> Response:
     Node.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
@@ -251,7 +289,9 @@ def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
         abort(403)  # pragma: no cover
     form_name = f"{uc_first(category)}Form"
-    form = getattr(importlib.import_module('openatlas.forms.setting'), form_name)()
+    form = getattr(
+        importlib.import_module('openatlas.forms.setting'),
+        form_name)()
     if form.validate_on_submit():
         Transaction.begin()
         try:
@@ -273,8 +313,10 @@ def admin_settings(category: str) -> Union[str, Response]:
         manual_page=f"admin/{category}",
         title=_('admin'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-{'data' if category == 'api' else category}"],
+            [
+                _('admin'),
+                f"{url_for('admin_index')}"
+                f"#tab-{'data' if category == 'api' else category}"],
             _(category)])
 
 
@@ -282,36 +324,50 @@ def admin_settings(category: str) -> Union[str, Response]:
 @required_group('contributor')
 def admin_check_similar() -> str:
     form = SimilarForm()
-    form.classes.choices = [(x.name, x.label) for name, x in g.classes.items() if x.label]
+    form.classes.choices = [
+        (x.name, x.label) for name, x in g.classes.items() if x.label]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
         for sample in Entity.get_similar_named(form).values():
             html = link(sample['entity'])
-            for entity in sample['entities']:
-                html += f'<br><br><br><br><br>{link(entity)}'  # Workaround for linebreaks in tables
+            for entity in sample['entities']:  # Table linebreaks workaround
+                html += f'<br><br><br><br><br>{link(entity)}'
             table.rows.append([html, len(sample['entities']) + 1])
     return render_template(
         'admin/check_similar.html',
         table=table,
         form=form,
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check similar names')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('check similar names')])
 
 
 @app.route('/admin/check/dates')
 @required_group('contributor')
 def admin_check_dates() -> str:
     tabs = {
-        'dates':
-            Tab(
-                'invalid_dates',
-                table=Table(['name', 'class', 'type', 'created', 'updated', 'description'])),
-        'link_dates': Tab('invalid_link_dates', table=Table(['link', 'domain', 'range'])),
-        'involvement_dates':
-            Tab(
-                'invalid_involvement_dates',
-                table=Table(['actor', 'event', 'class', 'involvement', 'description']))}
+        'dates': Tab(
+            'invalid_dates',
+            table=Table([
+                'name',
+                'class',
+                'type',
+                'created',
+                'updated',
+                'description'])),
+        'link_dates': Tab(
+            'invalid_link_dates',
+            table=Table(['link', 'domain', 'range'])),
+        'involvement_dates': Tab(
+            'invalid_involvement_dates',
+            table=Table([
+                'actor',
+                'event',
+                'class',
+                'involvement',
+                'description']))}
     for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -329,7 +385,12 @@ def admin_check_dates() -> str:
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             name = 'involvement'
         tabs['link_dates'].table.rows.append([
-            link(_(name), url_for(f'{name}_update', id_=link_.id, origin_id=link_.domain.id)),
+            link(
+                _(name),
+                url_for(
+                    f'{name}_update',
+                    id_=link_.id,
+                    origin_id=link_.domain.id)),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
@@ -341,44 +402,64 @@ def admin_check_dates() -> str:
             event.class_.label,
             link_.type.name if link_.type else '',
             link_.description,
-            link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
+            link(
+                _('edit'),
+                url_for(
+                    'involvement_update',
+                    id_=link_.id,
+                    origin_id=actor.id))]
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-        if not tab.table.rows:
-            tab.content = _('Congratulations, everything looks fine!')  # pragma: no cover
+        if not tab.table.rows:  # pragma: no cover
+            tab.content = _('Congratulations, everything looks fine!')
     return render_template(
         'tabs.html',
         tabs=tabs,
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('check dates')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('check dates')])
 
 
 @app.route('/admin/orphans')
 @required_group('contributor')
 def admin_orphans() -> str:
-    header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
+    header = [
+        'name',
+        'class',
+        'type',
+        'system type',
+        'created',
+        'updated',
+        'description']
     tabs = {
         'orphans': Tab('orphans', table=Table(header)),
         'unlinked': Tab('unlinked', table=Table(header)),
         'nodes': Tab('type', table=Table(
             ['name', 'root'],
-            [[link(node), link(g.nodes[node.root[-1]])] for node in Node.get_node_orphans()])),
+            [[link(node), link(g.nodes[node.root[-1]])]
+             for node in Node.get_node_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
-        'orphaned_files': Tab('orphaned_files', table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_files': Tab(
+            'orphaned_files',
+            table=Table(['name', 'size', 'date', 'ext'])),
         'circular': Tab('circular_dependencies', table=Table(
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
-    for entity in filter(lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
-        tabs['unlinked' if entity.class_.view else 'orphans'].table.rows.append([
-            link(entity),
-            link(entity.class_),
-            entity.print_standard_type(),
-            entity.class_.label,
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+    for entity in filter(
+            lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
+        tabs[
+            'unlinked' if entity.class_.view
+            else 'orphans'].table.rows.append([
+                link(entity),
+                link(entity.class_),
+                entity.print_standard_type(),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -400,27 +481,34 @@ def admin_orphans() -> str:
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
-                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
+                format_date(
+                    datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 file.suffix,
-                link(_('download'), url_for('download_file', filename=file.name)),
-                delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
+                link(
+                    _('download'),
+                    url_for('download_file', filename=file.name)),
+                delete_link(
+                    file.name,
+                    url_for('admin_file_delete', filename=file.name))])
 
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     if tabs['orphaned_files'].table.rows and is_authorized('admin'):
+        text = uc_first(_('delete all files without corresponding entities?'))
         tabs['orphaned_files'].buttons.append(
             button(
                 _('delete all files'),
                 url_for('admin_file_delete', filename='all'),
-                onclick="return confirm('" +
-                uc_first(_('delete all files without corresponding entities?')) + "')"))
+                onclick=f"return confirm('{text}')"))
     return render_template(
         'tabs.html',
         tabs=tabs,
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('orphans')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('orphans')])
 
 
 @app.route('/admin/file/delete/<filename>')
@@ -438,11 +526,16 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if is_authorized('admin'):  # Delete all files with no corresponding entity
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
         for file in app.config['UPLOAD_DIR'].iterdir():
-            if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
+            if file.name != '.gitignore' and int(
+                    file.stem) not in entity_file_ids:
                 try:
                     (app.config['UPLOAD_DIR'] / file.name).unlink()
                 except Exception as e:
-                    logger.log('error', 'file', f'deletion of {file.name} failed', e)
+                    logger.log(
+                        'error',
+                        'file',
+                        f'deletion of {file.name} failed',
+                        e)
                     flash(_('error file delete'), 'error')
     return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
@@ -461,7 +554,8 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in file_stats:
-            date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
+            date = format_date(datetime.datetime.utcfromtimestamp(
+                file_stats[entity.id]['date']))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
@@ -482,8 +576,13 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
-    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order=[[0, 'desc']])
-    logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
+    table = Table(
+        ['date', 'priority', 'type', 'message', 'user', 'info'],
+        order=[[0, 'desc']])
+    logs = logger.get_system_logs(
+        form.limit.data,
+        form.priority.data,
+        form.user.data)
     for row in logs:
         user = None
         if row['user_id']:
@@ -503,7 +602,9 @@ def admin_log() -> str:
         table=table,
         form=form,
         title=_('admin'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-general"], _('system log')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-general"],
+            _('system log')])
 
 
 @app.route('/admin/log/delete')
@@ -521,7 +622,9 @@ def admin_newsletter() -> Union[str, Response]:
         subject = StringField(
             '',
             [InputRequired()],
-            render_kw={'placeholder': uc_first(_('subject')), 'autofocus': True})
+            render_kw={
+                'placeholder': uc_first(_('subject')),
+                'autofocus': True})
         body = TextAreaField(
             '',
             [InputRequired()],
@@ -534,30 +637,42 @@ def admin_newsletter() -> Union[str, Response]:
         count = 0
         for user_id in request.form.getlist('recipient'):
             user = User.get_by_id(user_id)
-            if user and user.settings['newsletter'] and user.active and user.email:
+            if user \
+                    and user.settings['newsletter'] \
+                    and user.active \
+                    and user.email:
                 code = User.generate_password()
                 user.unsubscribe_code = code
                 user.update()
                 link_ = f"{request.scheme}://{request.headers['Host']}"
                 link_ += url_for('index_unsubscribe', code=code)
-                unsubscribe = '\n\n' + _('To unsubscribe use the link below.') + '\n\n' + link_
-                if send_mail(form.subject.data, form.body.data + unsubscribe, user.email):
+                if send_mail(
+                        form.subject.data,
+                        f'{form.body.data}\n\n'
+                        f'{_("To unsubscribe use the link below.")}\n\n'
+                        f'{link}',
+                        user.email):
                     count += 1
         flash(f"{_('Newsletter send')}: {count}", 'info')
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in User.get_all():
-        if user and user.settings['newsletter'] and user.active:  # pragma: no cover
+        if user \
+                and user.settings['newsletter'] \
+                and user.active:  # pragma: no cover
             table.rows.append([
                 user.username,
                 user.email,
-                f'<input value="{user.id}" name="recipient" type="checkbox" checked="checked">'])
+                f'<input value="{user.id}" name="recipient" type="checkbox" '
+                f'checked="checked">'])
     return render_template(
         'admin/newsletter.html',
         form=form,
         table=table,
         title=_('newsletter'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], _('newsletter')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            _('newsletter')])
 
 
 @app.route('/admin/resize_images')
