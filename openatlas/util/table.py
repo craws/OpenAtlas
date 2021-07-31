@@ -28,8 +28,9 @@ class Table:
             return Markup(f"<p>{uc_first(_('no entries'))}</p>")
         self.defs.append({
             'className': 'dt-body-right',
-            'targets': [i for i, j in enumerate(self.header)
-                        if j in ['begin', 'end', 'size']]})
+            'targets': [
+                i for i, j in enumerate(self.header)
+                if j in ['begin', 'end', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',
