@@ -45,15 +45,11 @@ class Node(Entity):
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
-        from openatlas.util.util import uc_first
         forms = {}
         for row in Db.get_web_forms():
             forms[row['id']] = {
                 'id': row['id'],
                 'name': row['name'],
-                'label': g.classes[row['name']].label
-                if row['name'] in g.classes
-                else uc_first(_(row['name'].replace('_', ' '))),
                 'extendable': row['extendable']}
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for node in nodes.values():

@@ -607,7 +607,7 @@ def link(
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None) -> str:
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" class="{class_}" {js}>{label}</a>*'.format(
+        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
             class_=class_,
             js=f'onclick="{js}"' if js else '',
