@@ -375,8 +375,7 @@ def send_mail(
                 settings['mail_from_email'],
                 recipient, msg.as_string())
         log_text = \
-            f'Mail from {from_} to ' \
-            f'{", ".join(recipients)} Subject: {subject}'
+            f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
         log_text += f' Content: {text}' if log_body else ''
         logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
@@ -424,8 +423,8 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
                     and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
                 first_string = \
-                    f"{format_entity_date(link_, 'begin', link_.object_)}"
-                first_string += f" {_('at an')} {event_link}"
+                    f"{format_entity_date(link_, 'begin', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
             elif event.first \
                     and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
@@ -437,14 +436,14 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
                     and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
                 last_string = \
-                    f"{format_entity_date(link_, 'end', link_.object_)}"
-                last_string += f" {_('at an')} {event_link}"
+                    f"{format_entity_date(link_, 'end', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
             elif event.last \
                     and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
                 last_string = \
-                    f"{format_entity_date(event, 'end', link_.object_)}"
-                last_string += f" {_('at an')} {event_link}"
+                    f"{format_entity_date(event, 'end', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
     return first_string, last_string
 
 
@@ -661,10 +660,9 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: List[Any]) -> str:
-    if not buttons:
-        return ''
     return Markup(
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>')
+        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
+        if buttons else ''
 
 
 @app.template_filter()
@@ -788,7 +786,8 @@ def display_profile_image(entity: Entity) -> str:
             and ImageProcessing.check_processed_image(path.name):
         resized = url_for(
             'display_file',
-            filename=get_file_path(entity.image_id, size).name, size=size)
+            filename=get_file_path(entity.image_id, size).name,
+            size=size)
     return Markup(
         render_template(
             'util/profile_image.html',
@@ -814,9 +813,9 @@ def manual(site: str) -> str:
     if not path.exists():
         # print('Missing manual link: ' + str(path))
         return ''
-    return Markup(f"""
-        <a class="manual" href="/static/manual/{site}.html" target="_blank"
-            title="{uc_first('manual')}"><i class="fas fa-book"></i></a>""")
+    return Markup(
+        f'<a class="manual" href="/static/manual/{site}.html" target="_blank" '
+        f'title="{uc_first("manual")}"><i class="fas fa-book"></i></a>')
 
 
 def add_form_row(

@@ -28,7 +28,7 @@ class Logger:
             'info': '{method} {path}{info}'.format(
                 path=request.path,
                 method=request.method,
-                info='\n' + str(info) if info else '')})
+                info=f'\n{info}' if info else '')})
 
     @staticmethod
     def get_system_logs(
