@@ -30,7 +30,9 @@ class ArtifactTest(TestBaseCase):
             rv = self.app.post(
                 url_for('update', id_=artifact.id),
                 follow_redirects=True,
-                data={'name': 'A little hate', 'description': 'makes nothing better'})
+                data={
+                    'name': 'A little hate',
+                    'description': 'makes nothing better'})
             assert b'Changes have been saved' in rv.data
 
             # Add to artifact
@@ -43,7 +45,8 @@ class ArtifactTest(TestBaseCase):
             assert b'Necronomicon' in rv.data
 
             # Add to event
-            rv = self.app.get(url_for('insert', class_='move', origin_id=artifact.id))
+            rv = self.app.get(
+                url_for('insert', class_='move', origin_id=artifact.id))
             assert b'A little hate' in rv.data
             rv = self.app.post(
                 url_for('insert', class_='move', origin_id=artifact.id),
@@ -51,7 +54,8 @@ class ArtifactTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
 
-            rv = self.app.get(url_for('index', view='artifact', delete_id=artifact.id))
+            rv = self.app.get(
+                url_for('index', view='artifact', delete_id=artifact.id))
             assert b'has been deleted' in rv.data
 
             # Insert and continue

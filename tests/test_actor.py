@@ -28,7 +28,8 @@ class ActorTests(TestBaseCase):
             # Actor insert
             rv = self.app.get(url_for('insert', class_='person'))
             assert b'+ Person' in rv.data
-            self.app.get(url_for('insert', class_='person', origin_id=residence_id))
+            self.app.get(
+                url_for('insert', class_='person', origin_id=residence_id))
             data = {
                 sex_node.id: sex_node_sub_1.id,
                 'name': 'Sigourney Weaver',
@@ -57,7 +58,8 @@ class ActorTests(TestBaseCase):
             # Test actor nodes
             rv = self.app.get(url_for('entity_view', id_=sex_node_sub_1.id))
             assert b'Susan' in rv.data
-            rv = self.app.get(url_for('node_move_entities', id_=sex_node_sub_1.id))
+            rv = self.app.get(
+                url_for('node_move_entities', id_=sex_node_sub_1.id))
             assert b'Sigourney' in rv.data
             rv = self.app.post(
                 url_for('node_move_entities', id_=sex_node_sub_1.id),
@@ -70,11 +72,20 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(
                 url_for('node_move_entities', id_=sex_node_sub_2.id),
                 follow_redirects=True,
-                data={sex_node.id: '', 'selection': [actor_id], 'checkbox_values': str([actor_id])})
+                data={
+                    sex_node.id: '',
+                    'selection': [actor_id],
+                    'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data
-            self.app.post(url_for('insert', class_='person', origin_id=actor_id), data=data)
-            self.app.post(url_for('insert', class_='person', origin_id=event.id), data=data)
-            self.app.post(url_for('insert', class_='person', origin_id=source.id), data=data)
+            self.app.post(
+                url_for('insert', class_='person', origin_id=actor_id),
+                data=data)
+            self.app.post(
+                url_for('insert', class_='person', origin_id=event.id),
+                data=data)
+            self.app.post(
+                url_for('insert', class_='person', origin_id=source.id),
+                data=data)
             rv = self.app.post(
                 url_for('insert', class_='external_reference'),
                 data={'name': 'https://openatlas.eu'})
@@ -119,7 +130,10 @@ class ActorTests(TestBaseCase):
             data['end_year_to'] = ''
             data['begin_year_to'] = '1950'
             data['begin_day_from'] = ''
-            rv = self.app.post(url_for('update', id_=actor_id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=actor_id),
+                data=data,
+                follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             rv = self.app.post(
                 url_for('ajax_bookmark'),
@@ -139,5 +153,6 @@ class ActorTests(TestBaseCase):
             assert b'removed' in rv.data
 
             # Actor delete
-            rv = self.app.get(url_for('index', view='actor', delete_id=actor_id))
+            rv = self.app.get(
+                url_for('index', view='actor', delete_id=actor_id))
             assert b'The entry has been deleted.' in rv.data

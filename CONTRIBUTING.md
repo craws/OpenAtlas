@@ -1,6 +1,7 @@
 # How to contribute
 
-Thank you for thinking about to contribute to OpenAtlas and reading this document.
+Thank you for thinking about to contribute to OpenAtlas and reading this
+document.
 
 We are happy about participation and there are multiple ways to contribute.
 
@@ -14,8 +15,8 @@ reading our [How to report an issue](https://redmine.openatlas.eu/projects/uni/w
 
 ## Code contribution
 
-We also welcome code contributions e.g. via a Git pull request.
+We also welcome code contributions e.g. via a GitHub pull requests.
 
 Please be sure to read our
 [Development Standards](https://redmine.openatlas.eu/projects/uni/wiki/Standards)
-to avoid unnessacery complications.
+to avoid complications.
