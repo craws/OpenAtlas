@@ -4,7 +4,8 @@ from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField, widgets)
+    BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField,
+    widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -26,11 +27,14 @@ class LinkCheckForm(FlaskForm):  # type: ignore
 @required_group('readonly')
 def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = {code: f'{code} {class_.name}' for code, class_ in g.cidoc_classes.items()}
+    form_classes = \
+        {code: f'{code} {class_.name}'
+         for code, class_ in g.cidoc_classes.items()}
     form.cidoc_domain.choices = form_classes
     form.cidoc_range.choices = form_classes
     form.cidoc_property.choices = {
-        code: f'{code} {property_.name}' for code, property_ in g.properties.items()}
+        code: f'{code} {property_.name}'
+        for code, property_ in g.properties.items()}
     result = None
     if form.validate_on_submit():
         domain = g.cidoc_classes[form.cidoc_domain.data]
@@ -40,8 +44,12 @@ def model_index() -> str:
             'domain': domain,
             'property': property_,
             'range': range_,
-            'domain_valid': property_.find_object('domain_class_code', domain.code),
-            'range_valid': property_.find_object('range_class_code', range_.code)}
+            'domain_valid': property_.find_object(
+                'domain_class_code',
+                domain.code),
+            'range_valid': property_.find_object(
+                'range_class_code',
+                range_.code)}
     return render_template(
         'model/index.html',
         form=form,
@@ -53,7 +61,9 @@ def model_index() -> str:
 @app.route('/overview/model/class/<code>')
 @required_group('readonly')
 def class_entities(code: str) -> str:
-    table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_cidoc_class(code)])
+    table = Table(
+        ['name'],
+        rows=[[link(entity)] for entity in Entity.get_by_cidoc_class(code)])
     return render_template(
         'table.html',
         table=table,
@@ -96,7 +106,9 @@ def property_index() -> str:
     classes = g.cidoc_classes
     properties = g.properties
     table = Table(
-        ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name', 'count'],
+        [
+            'code', 'name', 'inverse', 'domain', 'domain name', 'range',
+            'range name', 'count'],
         defs=[
             {'className': 'dt-body-right', 'targets': 7},
             {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
@@ -128,7 +140,8 @@ def class_view(code: str) -> str:
             {'orderDataType': 'cidoc-model', 'targets': [0]},
             {'sType': 'numeric', 'targets': [0]}])
         for code_ in getattr(class_, table):
-            tables[table].rows.append([link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name])
+            tables[table].rows.append(
+                [link(g.cidoc_classes[code_]), g.cidoc_classes[code_].name])
     tables['domains'] = Table(paging=False, defs=[
         {'orderDataType': 'cidoc-model', 'targets': [0]},
         {'sType': 'numeric', 'targets': [0]}])
@@ -171,7 +184,8 @@ def property_view(code: str) -> str:
             {'orderDataType': 'cidoc-model', 'targets': [0]},
             {'sType': 'numeric', 'targets': [0]}])
         for code_ in getattr(property_, table):
-            tables[table].rows.append([link(g.properties[code_]), g.properties[code_].name])
+            tables[table].rows.append(
+                [link(g.properties[code_]), g.properties[code_].name])
     return render_template(
         'model/property_view.html',
         tables=tables,
@@ -190,7 +204,9 @@ class NetworkForm(FlaskForm):  # type: ignore
     charge = StringField(default=-80, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
     orphans = BooleanField(default=False)
-    classes = SelectMultipleField(_('classes'), widget=widgets.ListWidget(prefix_label=False))
+    classes = SelectMultipleField(
+        _('classes'),
+        widget=widgets.ListWidget(prefix_label=False))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])

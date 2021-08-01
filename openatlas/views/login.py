@@ -5,7 +5,8 @@ import bcrypt
 from bcrypt import hashpw
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import LoginManager, current_user, login_required, login_user, logout_user
+from flask_login import (
+    LoginManager, current_user, login_required, login_user, logout_user)
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -27,7 +28,10 @@ def load_user(user_id: int) -> User:
 
 
 class LoginForm(FlaskForm):  # type: ignore
-    username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
+    username = StringField(
+        _('username'),
+        [InputRequired()],
+        render_kw={'autofocus': True})
     password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))
@@ -47,10 +51,15 @@ def login() -> Union[str, Response]:
         user = User.get_by_username(request.form['username'])
         if user and user.username:
             if user.login_attempts_exceeded():
-                logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
+                logger.log(
+                    'notice',
+                    'auth',
+                    'Login attempts exceeded: ' + user.username)
                 flash(_('error login attempts exceeded'), 'error')
                 return render_template('login/index.html', form=form)
-            hash_ = hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
+            hash_ = hashpw(
+                request.form['password'].encode('utf-8'),
+                user.password.encode('utf-8'))
             if hash_ == user.password.encode('utf-8'):
                 if user.active:
                     login_user(user)
@@ -62,8 +71,12 @@ def login() -> Union[str, Response]:
                     user.login_failed_count = 0
                     user.update()
                     logger.log('info', 'auth', f'Login of {user.username}')
-                    return redirect(request.args.get('next') or url_for('overview'))
-                logger.log('notice', 'auth', f'Inactive login try {user.username}')
+                    return redirect(
+                        request.args.get('next') or url_for('overview'))
+                logger.log(
+                    'notice',
+                    'auth',
+                    f'Inactive login try {user.username}')
                 flash(_('error inactive'), 'error')
             else:
                 logger.log('notice', 'auth', f'Wrong password: {user.username}')
@@ -72,20 +85,30 @@ def login() -> Union[str, Response]:
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
-            logger.log('notice', 'auth', f"Wrong username: {request.form['username']}")
+            logger.log(
+                'notice',
+                'auth',
+                f"Wrong username: {request.form['username']}")
             flash(_('error username'), 'error')
-    return render_template('login/index.html', title=_('login'), crumbs=[_('login')], form=form)
+    return render_template(
+        'login/index.html',
+        title=_('login'),
+        crumbs=[_('login')], form=form)
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
 def reset_password() -> Union[str, Response]:
-    if current_user.is_authenticated:  # Prevent password reset if already logged in
+    if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))
     form = PasswordResetForm()
-    if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
+    if form.validate_on_submit() \
+            and session['settings']['mail']:  # pragma: no cover
         user = User.get_by_email(form.email.data)
         if not user:
-            logger.log('info', 'password', f'Password reset for non existing {form.email.data}')
+            logger.log(
+                'info',
+                'password',
+                f'Password reset for non existing {form.email.data}')
             flash(_('error non existing email'), 'error')
         else:
             code = User.generate_password()
@@ -100,17 +123,22 @@ def reset_password() -> Union[str, Response]:
             body = _(
                 'We received a password reset request for %(username)s',
                 username=user.username)
-            body += f" {_('at')} {request.headers['Host']}\n\n{_('reset password link')}:\n\n"
-            body += f"{link}\n\n{_('The link is valid for')} "
-            body += f"{session['settings']['reset_confirm_hours']} {_('hours')}."
+            body += \
+                f" {_('at')} {request.headers['Host']}\n\n" \
+                f"{_('reset password link')}:\n\n" \
+                f"{link}\n\n" \
+                f"{_('The link is valid for')} " \
+                f"{session['settings']['reset_confirm_hours']} {_('hours')}."
             email = form.email.data
             if send_mail(subject, body, form.email.data):
                 flash(
-                    _('A password reset confirmation mail was send to %(email)s.', email=email),
+                    _('A password reset confirmation mail was send '
+                      'to %(email)s.', email=email),
                     'info')
             else:
                 flash(
-                    _('Failed to send password reset confirmation mail to %(email)s.', email=email),
+                    _('Failed to send password reset confirmation mail '
+                      'to %(email)s.', email=email),
                     'error')
             return redirect(url_for('login'))
     return render_template(
@@ -127,25 +155,34 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
     hours = session['settings']['reset_confirm_hours']
-    if datetime.datetime.now() > user.password_reset_date + datetime.timedelta(hours=hours):
+    if datetime.datetime.now() > \
+            user.password_reset_date + datetime.timedelta(hours=hours):
         logger.log('info', 'auth', 'reset code expired')
         flash(_('This reset confirmation code has expired.'), 'error')
         abort(404)
     password = User.generate_password()
-    user.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    user.password = bcrypt.hashpw(
+        password.encode('utf-8'),
+        bcrypt.gensalt()).decode('utf-8')
     user.password_reset_code = None
     user.password_reset_date = None
     user.login_failed_count = 0
     user.update()
-    subject = _('New password for %(sitename)s', sitename=session['settings']['site_name'])
+    subject = _(
+        'New password for %(sitename)s',
+        sitename=session['settings']['site_name'])
     body = _('New password for %(username)s', username=user.username) + ' '
     body += f"{_('at')} {request.scheme}://{request.headers['Host']}:\n\n"
     body += f"{uc_first(_('username'))}: {user.username}\n"
     body += f"{uc_first(_('password'))}: {password}\n"
     if send_mail(subject, body, user.email, False):
-        flash(_('A new password was sent to %(email)s.', email=user.email), 'info')
+        flash(
+            _('A new password was sent to %(email)s.', email=user.email),
+            'info')
     else:
-        flash(_('Failed to send password mail to %(email)s.', email=user.email), 'error')
+        flash(
+            _('Failed to send password mail to %(email)s.', email=user.email),
+            'error')
     return redirect(url_for('login'))
 
 

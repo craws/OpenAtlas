@@ -7,7 +7,8 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (
-    BooleanField, HiddenField, PasswordField, SelectField, StringField, SubmitField, TextAreaField)
+    BooleanField, HiddenField, PasswordField, SelectField, StringField,
+    SubmitField, TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
@@ -21,7 +22,10 @@ from openatlas.util.util import (
 class UserForm(FlaskForm):  # type: ignore
     user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
+    username = StringField(
+        _('username'),
+        [InputRequired()],
+        render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
     email = StringField(_('email'), [InputRequired(), Email()])
     password = PasswordField(_('password'), [InputRequired()])
@@ -42,7 +46,8 @@ class UserForm(FlaskForm):  # type: ignore
             user = User.get_by_id(self.user_id)
             username = user.username
             user_email = user.email
-        if username != self.username.data and User.get_by_username(self.username.data):
+        if username != self.username.data \
+                and User.get_by_username(self.username.data):
             self.username.errors.append(_('error username exists'))
             valid = False
         if user_email != self.email.data and User.get_by_email(self.email.data):
@@ -53,7 +58,8 @@ class UserForm(FlaskForm):  # type: ignore
                 self.password.errors.append(_('error passwords must match'))
                 self.password2.errors.append(_('error passwords must match'))
                 valid = False
-            if len(self.password.data) < session['settings']['minimum_password_length']:
+            if len(self.password.data) < \
+                    session['settings']['minimum_password_length']:
                 self.password.errors.append(_('error password too short'))
                 valid = False
         return valid
@@ -70,7 +76,11 @@ class ActivityForm(FlaskForm):  # type: ignore
         choices=((0, _('all')), (100, 100), (500, 500)),
         default=100,
         coerce=int)
-    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0, coerce=int)
+    user = SelectField(
+        _('user'),
+        choices=([(0, _('all'))]),
+        default=0,
+        coerce=int)
     action = SelectField(_('action'), choices=action_choices, default='all')
     save = SubmitField(_('apply'))
 
@@ -82,7 +92,10 @@ def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
     if form.validate_on_submit():
-        activity = User.get_activities(int(form.limit.data), int(form.user.data), form.action.data)
+        activity = User.get_activities(
+            int(form.limit.data),
+            int(form.user.data),
+            form.action.data)
     elif user_id:
         form.user.data = user_id
         activity = User.get_activities(100, user_id, 'all')
@@ -116,16 +129,20 @@ def user_view(id_: int) -> str:
         _('username'): user.username,
         _('group'): user.group,
         _('full name'): user.real_name,
-        _('email'): user.email if is_authorized('manager') or user.settings['show_email'] else '',
+        _('email'): user.email
+        if is_authorized('manager') or user.settings['show_email'] else '',
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
-        _('failed logins'): user.login_failed_count if is_authorized('manager') else ''}
+        _('failed logins'): user.login_failed_count
+        if is_authorized('manager') else ''}
     return render_template(
         'user/view.html',
         user=user,
         info=info,
         title=user.username,
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], user.username])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            user.username])
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
@@ -136,10 +153,12 @@ def user_update(id_: int) -> Union[str, Response]:
         abort(403)  # pragma: no cover
     form = UserForm(obj=user)
     form.user_id = id_
-    del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
+    del form.password, form.password2, form.send_info
+    del form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
-        user.active = True if user.id == current_user.id else form.active.data  # No self deactivate
+        # Active is always true if current user to prevent self deactivation
+        user.active = True if user.id == current_user.id else form.active.data
         user.real_name = form.real_name.data
         user.username = form.username.data
         user.email = form.email.data
@@ -155,7 +174,10 @@ def user_update(id_: int) -> Union[str, Response]:
         form=form,
         title=user.username,
         manual_page='admin/user',
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], user, _('edit')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            user,
+            _('edit')])
 
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
@@ -168,19 +190,26 @@ def user_insert() -> Union[str, Response]:
     if form.validate_on_submit():
         user_id = User.insert(form)
         flash(_('user created'), 'info')
-        if session['settings']['mail'] and form.send_info.data:  # pragma: no cover
+        if session['settings']['mail'] \
+                and form.send_info.data:  # pragma: no cover
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=session['settings']['site_name'])
-            body = _('Account information for %(username)s', username=form.username.data) + ' '
-            body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
-            body += uc_first(_('username')) + ': ' + form.username.data + '\n'
-            body += uc_first(_('password')) + ': ' + form.password.data + '\n'
-            email = form.email.data
+            body = _('Account information for %(username)s',
+                     username=form.username.data) + \
+                f" {_('at')} {request.scheme}://{request.headers['Host']}\n\n" \
+                f"{uc_first(_('username'))}: {form.username.data}\n" \
+                f"{uc_first(_('password'))}: {form.password.data}\n"
             if send_mail(subject, body, form.email.data, False):
-                flash(_('Sent account information mail to %(email)s.', email=email), 'info')
+                flash(
+                    _('Sent account information mail to %(email)s.',
+                      email=form.email.data),
+                    'info')
             else:
-                flash(_('Failed to send account details to %(email)s.', email=email), 'error')
+                flash(
+                    _('Failed to send account details to %(email)s.',
+                      email=form.email.data),
+                    'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))
@@ -188,12 +217,19 @@ def user_insert() -> Union[str, Response]:
         'user/insert.html',
         form=form,
         title=_('user'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-user"], f"+ {uc_first(_('user'))}"])
+        crumbs=[
+            [_('admin'),
+             f"{url_for('admin_index')}#tab-user"],
+            f"+ {uc_first(_('user'))}"])
 
 
 def get_groups() -> List[Tuple[str, str]]:
     """List groups from weakest permissions to strongest"""
-    choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
+    choices = [(name, name) for name in [
+        'readonly',
+        'contributor',
+        'editor',
+        'manager']]
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))
     return choices
