@@ -83,26 +83,37 @@ class CidocProperty:
             return self.i18n_inverse[locale_default]
         return getattr(self, '_name_inverse')  # pragma: no cover
 
-    def find_object(self, attr: str, class_id: int) -> bool:  # Check if links are CIDOC CRM valid
+    def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)
-        if valid_domain_id == class_id:
+        if valid_domain_id == class_id:  # Check if links are CIDOC CRM valid
             return True
-        return self.find_subs(attr, class_id, g.cidoc_classes[valid_domain_id].sub)
+        return self.find_subs(
+            attr,
+            class_id,
+            g.cidoc_classes[valid_domain_id].sub)
 
-    def find_subs(self, attr: str, class_id: int, valid_subs: List[int]) -> bool:
+    def find_subs(
+            self, attr:
+            str, class_id:
+            int, valid_subs: List[int]) -> bool:
         for sub_id in valid_subs:
-            if sub_id == class_id or self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
+            if sub_id == class_id or self.find_subs(
+                    attr,
+                    class_id,
+                    g.cidoc_classes[sub_id].sub):
                 return True
         return False
 
     @staticmethod
     def get_all() -> Dict[str, CidocProperty]:
-        properties = {row['code']: CidocProperty(row) for row in Db.get_properties()}
+        properties = {
+            row['code']: CidocProperty(row) for row in Db.get_properties()}
         for row in Db.get_property_hierarchy():
             properties[row['super_code']].sub.append(row['sub_code'])
             properties[row['sub_code']].super.append(row['super_code'])
         for row in Db.get_property_translations(app.config['LANGUAGES'].keys()):
-            properties[row['property_code']].i18n[row['language_code']] = row['text']
+            properties[row['property_code']].i18n[row['language_code']] = \
+                row['text']
             properties[row['property_code']].i18n_inverse[
                 row['language_code']] = row['text_inverse']
         return properties
