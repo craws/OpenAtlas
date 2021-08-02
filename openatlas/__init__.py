@@ -33,10 +33,10 @@ logger = Logger()
 from openatlas.api.v02 import routes  # New routes
 from openatlas.util import processor
 from openatlas.views import (
-    admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
-    index, involvement, imports, link, login, member, model, note, overlay,
-    profile, reference, relation, reference_system, search, source, sql, types,
-    user)
+    admin, ajax, anthropology, entity, entity_index, entity_form, export, file,
+    hierarchy, index, involvement, imports, link, login, member, model, note,
+    overlay, profile, reference, relation, reference_system, search, source,
+    sql, types, user)
 
 
 @babel.localeselector
