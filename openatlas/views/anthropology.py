@@ -33,7 +33,8 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
         entity=entity,
         crumbs=[
             entity,
-            [_('anthropological analyzes'), url_for('anthropology_index', id_=entity.id)],
+            [_('anthropological analyzes'),
+             url_for('anthropology_index', id_=entity.id)],
             _('sex estimation')])
 
 
@@ -51,14 +52,16 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             label = uc_first(feature.replace('_', ' '))
             description = ''
             if values['female'] or values['male']:
-                description = f"Female: {values['female']}, male: {values['male']}"
-            setattr(Form,
-                    feature,
-                    SelectField(
-                        label,
-                        choices=choices,
-                        default='Not preserved',
-                        description=description))
+                description = \
+                    f"Female: {values['female']}, male: {values['male']}"
+            setattr(
+                Form,
+                feature,
+                SelectField(
+                    label,
+                    choices=choices,
+                    default='Not preserved',
+                    description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
 
@@ -84,6 +87,7 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         form=form,
         crumbs=[
             entity,
-            [_('anthropological analyzes'), url_for('anthropology_index', id_=entity.id)],
+            [_('anthropological analyzes'),
+             url_for('anthropology_index', id_=entity.id)],
             [_('sex estimation'), url_for('anthropology_sex', id_=entity.id)],
             _('edit')])
