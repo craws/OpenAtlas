@@ -746,9 +746,7 @@ def add_type_data(entity: 'Entity', data: OrderedD[str, Any]) -> None:
         if item == _('type'):
             type_data.move_to_end(item, last=False)
             break
-
-    for root_name, nodes in type_data.items():
-        data[root_name] = nodes
+    data.update(type_data)
 
 
 @app.template_filter()
