@@ -242,7 +242,7 @@ def get_entity_data(
     data[_('end')] = \
         (to_link if to_link else '') + format_entity_date(entity, 'end')
 
-    add_type_data(entity, data)
+    data.update(get_type_data(entity))
 
     # Class specific information
     from openatlas.models.node import Node
@@ -723,30 +723,29 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def add_type_data(entity: 'Entity', data: OrderedD[str, Any]) -> None:
+def get_type_data(entity: 'Entity') -> OrderedD[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
 
-    type_data: OrderedD[str, Any] = OrderedDict()
+    data: OrderedD[str, Any] = OrderedDict()
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         root = g.nodes[node.root[-1]]
         label = _('type') \
             if root.standard and root.class_.name == 'type' else root.name
-        if root.name not in type_data:
-            type_data[label] = []
-        type_data[label].append(render_template(
-            'util/type_data_entry.html',
-            node=node,
-            value=f'{float(value):g}' if root.value_type else None,
-            title=' > '.join(
-                reversed([g.nodes[id_].name for id_ in node.root]))))
+        if root.name not in data:
+            data[label] = []
+        title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
+        html = f'<span title="{title}">{link(node)}</span>'
+        if root.value_type:
+            html += f' {float(value):g} {node.description}'
+        data[label].append(html)
 
-    type_data = OrderedDict(sorted(type_data.items()))
-    for item in type_data.keys():  # Sort root types, move standard type to top
+    data = OrderedDict(sorted(data.items()))
+    for item in data.keys():  # Sort root types, move standard type to top
         if item == _('type'):
-            type_data.move_to_end(item, last=False)
+            data.move_to_end(item, last=False)
             break
-    data.update(type_data)
+    return data
 
 
 @app.template_filter()
