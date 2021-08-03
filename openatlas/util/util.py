@@ -4,16 +4,14 @@ import math
 import os
 import re
 import smtplib
-from collections import OrderedDict
+from collections import defaultdict
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import (
-    Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHECKING, Tuple,
-    Union)
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import flash, g, render_template, request, session, url_for
@@ -179,9 +177,8 @@ def get_base_table_data(
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
         data.append(entity.class_.label)
-    if entity.class_.view in [
-            'artifact', 'event', 'file', 'place', 'reference', 'source']:
-        data.append(entity.print_standard_type(show_links=False))
+    if entity.class_.standard_type:
+        data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
         if not g.file_stats:
             g.file_stats = get_file_stats()
@@ -224,8 +221,9 @@ def get_file_stats(
 def get_entity_data(
         entity: 'Entity',
         event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: OrderedD[str, Any] = OrderedDict(
-        {_('alias'): list(entity.aliases.values())})
+
+    data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
+
     # Dates
     from_link = ''
     to_link = ''
@@ -242,6 +240,12 @@ def get_entity_data(
     data[_('end')] = \
         (to_link if to_link else '') + format_entity_date(entity, 'end')
 
+    # Types
+    if entity.standard_type:
+        title = ' > '.join(
+            reversed([g.nodes[id_].name for id_ in entity.standard_type.root]))
+        data[_('type')] = \
+            f'<span title="{title}">{link(entity.standard_type)}</span>'
     data.update(get_type_data(entity))
 
     # Class specific information
@@ -723,29 +727,20 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def get_type_data(entity: 'Entity') -> OrderedD[str, Any]:
+def get_type_data(entity: 'Entity') -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
-
-    data: OrderedD[str, Any] = OrderedDict()
+    data: Dict[str, Any] = defaultdict(list)
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         root = g.nodes[node.root[-1]]
-        label = _('type') \
-            if root.standard and root.class_.name == 'type' else root.name
-        if root.name not in data:
-            data[label] = []
+        if entity.standard_type and node.id == entity.standard_type.id:
+            continue  # Standard type is already added
         title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
         html = f'<span title="{title}">{link(node)}</span>'
         if root.value_type:
             html += f' {float(value):g} {node.description}'
-        data[label].append(html)
-
-    data = OrderedDict(sorted(data.items()))
-    for item in data.keys():  # Sort root types, move standard type to top
-        if item == _('type'):
-            data.move_to_end(item, last=False)
-            break
-    return data
+        data[root.name].append(html)
+    return {key: data[key] for key in sorted(data.keys())}
 
 
 @app.template_filter()

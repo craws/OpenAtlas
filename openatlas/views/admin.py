@@ -372,7 +372,7 @@ def admin_check_dates() -> str:
         tabs['dates'].table.rows.append([
             link(entity),
             entity.class_.label,
-            entity.print_standard_type(),
+            link(entity.standard_type),
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
@@ -455,7 +455,7 @@ def admin_orphans() -> str:
             else 'orphans'].table.rows.append([
                 link(entity),
                 link(entity.class_),
-                entity.print_standard_type(),
+                link(entity.standard_type),
                 entity.class_.label,
                 format_date(entity.created),
                 format_date(entity.modified),
@@ -469,7 +469,7 @@ def admin_orphans() -> str:
             tabs['missing_files'].table.rows.append([
                 link(entity),
                 link(entity.class_),
-                entity.print_standard_type(),
+                link(entity.standard_type),
                 entity.class_.label,
                 format_date(entity.created),
                 format_date(entity.modified),
@@ -559,7 +559,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
-            entity.print_standard_type(),
+            link(entity.standard_type),
             file_stats[entity.id]['size'] if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description,

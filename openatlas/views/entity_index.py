@@ -69,7 +69,7 @@ def get_table(view: str) -> Table:
             data = [
                 date,
                 link(entity),
-                entity.print_standard_type(),
+                link(entity.standard_type),
                 g.file_stats[entity.id]['size']
                 if entity.id in g.file_stats else 'N/A',
                 g.file_stats[entity.id]['ext']
