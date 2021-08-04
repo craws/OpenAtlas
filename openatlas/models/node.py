@@ -4,7 +4,6 @@ import ast
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
-from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas import app
@@ -147,6 +146,8 @@ class Node(Entity):
         from openatlas.forms.field import TreeField
         from openatlas.forms.field import TreeMultiField
         from openatlas.forms.field import ValueFloatField
+        # Can't use isinstance checks for entity here because it is always a
+        # Entity at this point. So entity.class_.name checks have to be used.
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
@@ -166,8 +167,7 @@ class Node(Entity):
                 if g.nodes[int(field.id)].class_.name == 'administrative_unit':
                     if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
-                elif entity.class_.name != 'object_location' \
-                        and entity.class_.name != 'type':
+                elif entity.class_.name not in ['object_location', 'type']:
                     entity.link('P2', range_)
 
     @staticmethod
