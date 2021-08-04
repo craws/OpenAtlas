@@ -167,7 +167,7 @@ class Node(Entity):
                     if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
                 elif entity.class_.name != 'object_location' \
-                        and not isinstance(entity, Node):
+                        and entity.class_.name != 'type':
                     entity.link('P2', range_)
 
     @staticmethod

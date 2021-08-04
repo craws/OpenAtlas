@@ -313,10 +313,11 @@ def insert_file(
     return url
 
 
-def save(form: FlaskForm,
-         entity: Optional[Entity] = None,
-         class_: Optional[str] = None,
-         origin: Optional[Entity] = None) -> Union[str, Response]:
+def save(
+        form: FlaskForm,
+        entity: Optional[Entity] = None,
+        class_: Optional[str] = None,
+        origin: Optional[Entity] = None) -> Union[str, Response]:
     if class_ == 'file' and not entity:
         return insert_file(form, origin)
     Transaction.begin()
@@ -326,9 +327,9 @@ def save(form: FlaskForm,
             action = 'insert'
             entity = insert_entity(form, class_, origin)
         if isinstance(entity, ReferenceSystem):
-            entity.name = entity.name if hasattr(entity,
-                                                 'system') and entity.system \
-                else form.name.data
+            entity.name = entity.name \
+                if hasattr(entity, 'system') \
+                   and entity.system else form.name.data
             entity.description = form.description.data
             entity.website_url = form.website_url.data \
                 if form.website_url.data else None
