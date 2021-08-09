@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Examples &mdash; OpenAtlas 6.4.0 documentation</title>
+  <title>Profession &mdash; OpenAtlas 6.4.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Archaeological data" href="archaeological_data.html" />
-    <link rel="prev" title="Menu" href="../ui/menu.html" /> 
+    <link rel="next" title="Letters" href="letters.html" />
+    <link rel="prev" title="Archaeological data" href="archaeological_data.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,9 +95,9 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#archaeological">Archaeological</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#historical">Historical</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="index.html#archaeological">Archaeological</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#historical">Historical</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
@@ -146,7 +146,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Examples</li>
+          <li><a href="index.html">Examples</a> &raquo;</li>
+        
+      <li>Profession</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -163,29 +165,25 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="examples">
-<h1>Examples<a class="headerlink" href="#examples" title="Permalink to this headline">¶</a></h1>
-<p>Here, you can find step by step - examples for typical data entry scenarios, some of them are
-very project-specific. Please keep in mind, that there are different ways to enter the same
-set of data. The following examples are suggestions, but please discuss the best workflow for your project within
-your team.</p>
-<div class="section" id="archaeological">
-<h2>Archaeological<a class="headerlink" href="#archaeological" title="Permalink to this headline">¶</a></h2>
+  <div class="section" id="profession">
+<h1>Profession<a class="headerlink" href="#profession" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="archaeological_data.html">Archaeological data</a></li>
+</div>
+<p>The following steps describe how to enter a profession connected to a person.
+In OpenAtlas a profession exists in connection to a group (e.g. an institute, country, etc.).
+To add a profession to a person, follow the steps below:</p>
+<ul class="simple">
+<li>Create a person, see <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a></li>
+<li>Create a group, see <a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a></li>
+<li>Press the <strong>Member of</strong> tab in the actor</li>
+<li>Click the <strong>Link</strong> button</li>
+<li>In the form use <strong>Type</strong> to choose the function of the person within the group</li>
+<li>Choose the specific group or groups in the <strong>Actor</strong> field</li>
+<li>Add date and/or description if desired</li>
 </ul>
-</div>
-</div>
-<div class="section" id="historical">
-<h2>Historical<a class="headerlink" href="#historical" title="Permalink to this headline">¶</a></h2>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="profession.html">Profession</a></li>
-<li class="toctree-l1"><a class="reference internal" href="letters.html">Letters</a></li>
-</ul>
-</div>
-</div>
+<p>You can get the same result by using the <strong>Member</strong> tab in the group view and link a person there.</p>
+<p>Keep in mind that it is possible to edit the available functions or add new ones in <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>
+via <strong>Standard types</strong> and <strong>Actor function</strong>.</p>
 </div>
 
 
@@ -196,10 +194,10 @@ your team.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="archaeological_data.html" class="btn btn-neutral float-right" title="Archaeological data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="letters.html" class="btn btn-neutral float-right" title="Letters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../ui/menu.html" class="btn btn-neutral float-left" title="Menu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="archaeological_data.html" class="btn btn-neutral float-left" title="Archaeological data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
