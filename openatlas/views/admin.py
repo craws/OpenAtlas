@@ -68,7 +68,8 @@ def admin_index(
             'newsletter',
             'created',
             'last login',
-            'entities']),
+            'entities'],
+            defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + [
             language for language in app.config['LANGUAGES'].keys()])}
     for user in User.get_all():
