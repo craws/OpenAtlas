@@ -1,6 +1,8 @@
 class Changelog:
 
     versions = {
+        '6.5.0': ['TBA', {
+            'feature': {}}],
         '6.4.0': ['2021-08-10', {
             'feature': {
                 '1280': 'Picture Preview',
