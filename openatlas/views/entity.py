@@ -97,9 +97,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:
-                url = entity.resolver_url + name
                 name = \
-                    f'<a href="{url}"' \
+                    f'<a href="{entity.resolver_url + name}"' \
                     f' target="_blank" rel="noopener noreferrer">{name}</a>'
             tab_name = link_.range.class_.name
             tabs[tab_name].table.rows.append([
@@ -107,6 +106,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 name,
                 link_.type.name])
         for form_id, form in entity.get_forms().items():
+            tabs[form['name']].buttons = []
             if not tabs[form['name']].table.rows and is_authorized('manager'):
                 tabs[form['name']].buttons = [
                     button(

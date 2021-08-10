@@ -13,7 +13,7 @@ class ReferenceSystem(Entity):
 
     EXTERNAL_REFERENCES_FORMS = [
         'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
-        'human_remains', 'move', 'person', 'place', 'type']
+        'human_remains', 'move', 'person', 'place', 'source', 'type']
 
     website_url = None
     resolver_url = None

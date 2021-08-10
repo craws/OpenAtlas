@@ -328,8 +328,8 @@ def save(
             entity = insert_entity(form, class_, origin)
         if isinstance(entity, ReferenceSystem):
             entity.name = entity.name \
-                if hasattr(entity, 'system') \
-                   and entity.system else form.name.data
+                if hasattr(entity, 'system') and entity.system \
+                else form.name.data
             entity.description = form.description.data
             entity.website_url = form.website_url.data \
                 if form.website_url.data else None
@@ -425,7 +425,7 @@ def update_links(
         form: FlaskForm,
         action: str,
         origin: Union[Entity, None]) -> None:
-    if entity.class_.view in ['actor', 'event', 'place', 'artifact', 'type']:
+    if entity.class_.name in ReferenceSystem.EXTERNAL_REFERENCES_FORMS:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':
         if action == 'update':
