@@ -43,8 +43,8 @@ class User(UserMixin):  # type: ignore
     def update(self) -> None:
         Db.update({
             'id': self.id,
-            'username': self.username,
-            'real_name': self.real_name,
+            'username': self.username.strip(),
+            'real_name': self.real_name.strip(),
             'password': self.password,
             'info': self.description,
             'email': self.email,
@@ -135,8 +135,8 @@ class User(UserMixin):  # type: ignore
     @staticmethod
     def insert(form: FlaskForm) -> int:
         return Db.insert({
-            'username': form.username.data,
-            'real_name': form.real_name.data,
+            'username': form.username.data.strip(),
+            'real_name': form.real_name.data.strip(),
             'info': form.description.data,
             'email': form.email.data,
             'active': form.active.data,
