@@ -479,9 +479,9 @@ def get_profile_image_table_link(
         return link(
             _('unset'),
             url_for('file_remove_profile_image', entity_id=entity.id))
-    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] \
-            or (session['settings']['image_processing']
-                and extension in app.config['ALLOWED_IMAGE_EXT']):
+    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
+            session['settings']['image_processing']
+            and extension in app.config['ALLOWED_IMAGE_EXT']):
         return link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))

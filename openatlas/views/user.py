@@ -129,12 +129,13 @@ def user_view(id_: int) -> str:
         _('username'): user.username,
         _('group'): user.group,
         _('full name'): user.real_name,
-        _('email'): user.email
-        if is_authorized('manager') or user.settings['show_email'] else '',
+        _('email'):
+            user.email
+            if is_authorized('manager') or user.settings['show_email'] else '',
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
-        _('failed logins'): user.login_failed_count
-        if is_authorized('manager') else ''}
+        _('failed logins'):
+            user.login_failed_count if is_authorized('manager') else ''}
     return render_template(
         'user/view.html',
         user=user,

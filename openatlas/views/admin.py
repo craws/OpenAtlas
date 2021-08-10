@@ -60,15 +60,16 @@ def admin_index(
         'export/sql': os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK),
         'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK)}
     tables = {
-        'user': Table([
-            'username',
-            'name',
-            'group',
-            'email',
-            'newsletter',
-            'created',
-            'last login',
-            'entities'],
+        'user': Table(
+            [
+                'username',
+                'name',
+                'group',
+                'email',
+                'newsletter',
+                'created',
+                'last login',
+                'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + [
             language for language in app.config['LANGUAGES'].keys()])}

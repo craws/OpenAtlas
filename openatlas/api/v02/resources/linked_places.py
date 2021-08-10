@@ -95,7 +95,7 @@ class LinkedPlaces:
                     or entity.class_.name in ['find', 'artifact']:
                 return LPHelper.get_geoms_by_entity(
                     LPHelper.get_location_id(links))
-            elif entity.class_.name == 'object_location':
+            if entity.class_.name == 'object_location':
                 return LPHelper.get_geoms_by_entity(entity.id)
         return None
 

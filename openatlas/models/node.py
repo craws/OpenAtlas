@@ -122,8 +122,8 @@ class Node(Entity):
             items.append({
                 'id': item.id,
                 'text': item.name.replace("'", "&apos;"),
-                'state': {'selected': 'true'}
-                if item.id in selected_ids else '',
+                'state':
+                    {'selected': 'true'} if item.id in selected_ids else '',
                 'children': Node.walk_tree(item.subs, selected_ids)})
         return items
 
@@ -174,7 +174,8 @@ class Node(Entity):
     def insert_hierarchy(node: Node, form: FlaskForm, value_type: bool) -> None:
         multiple = False
         if value_type \
-                or (hasattr(form, 'multiple')
+                or (
+                    hasattr(form, 'multiple')
                     and form.multiple
                     and form.multiple.data):
             multiple = True

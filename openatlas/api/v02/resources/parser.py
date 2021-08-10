@@ -41,7 +41,7 @@ entity_.add_argument(
     help='{error_msg}',
     choices=(
         'id', 'class_code', 'name', 'description', 'created', 'modified',
-         'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
+        'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
 entity_.add_argument(
     'filter',
     type=str,

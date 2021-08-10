@@ -176,12 +176,13 @@ class Entity:
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment': str(self.begin_comment).strip()
-            if self.begin_comment else None,
-            'end_comment': str(self.end_comment).strip()
-            if self.end_comment else None,
-            'description': sanitize(self.description, 'text')
-            if self.description else None})
+            'begin_comment':
+                str(self.begin_comment).strip() if self.begin_comment else None,
+            'end_comment':
+                str(self.end_comment).strip() if self.end_comment else None,
+            'description':
+                sanitize(self.description, 'text') if self.description else None
+        })
 
     def update_aliases(self, form: FlaskForm) -> None:
         if not hasattr(form, 'alias'):
@@ -311,8 +312,8 @@ class Entity:
             'name': str(name).strip(),
             'code': g.classes[class_name].cidoc_class.code,
             'system_class': class_name,
-            'description': sanitize(description, 'text')
-            if description else None})
+            'description':
+                sanitize(description, 'text') if description else None})
         return Entity.get_by_id(id_)
 
     @staticmethod

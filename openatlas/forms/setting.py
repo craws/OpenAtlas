@@ -1,4 +1,3 @@
-from flask import session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (

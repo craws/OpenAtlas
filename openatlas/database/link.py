@@ -120,7 +120,7 @@ class Link:
                 l.range_id,
                 l.description,
                 l.created,
-                l.modified, 
+                l.modified,
                 l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '')
                     AS begin_from, l.begin_comment,

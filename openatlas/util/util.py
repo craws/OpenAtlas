@@ -146,7 +146,7 @@ def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
     return \
-        f'<p>{name}</p>'\
+        f'<p>{name}</p>' \
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
@@ -221,7 +221,6 @@ def get_file_stats(
 def get_entity_data(
         entity: 'Entity',
         event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-
     data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
 
     # Dates

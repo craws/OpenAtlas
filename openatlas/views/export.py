@@ -113,7 +113,7 @@ def export_csv() -> Union[str, Response]:
 def get_table(type_: str, path: Path, writeable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
-        f for f in path.iterdir()
+            f for f in path.iterdir()
             if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,

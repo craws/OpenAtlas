@@ -41,8 +41,9 @@ class LPHelper:
                 LPHelper.get_time(link_.domain if inverse else link_.range)]}}
 
     @staticmethod
-    def get_links(links: List[Link], links_inverse: List[Link]) -> Optional[
-        List[Dict[str, str]]]:
+    def get_links(
+            links: List[Link],
+            links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
         out = []
         for link_ in links:
             out.append(LPHelper.link_dict(link_))
