@@ -678,7 +678,7 @@ def admin_newsletter() -> Union[str, Response]:
 
 @app.route('/admin/resize_images')
 @required_group('admin')
-def admin_resize_images():
+def admin_resize_images() -> Response:
     ImageProcessing.create_resized_images()
     flash(_('images were created'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
@@ -686,7 +686,7 @@ def admin_resize_images():
 
 @app.route('/admin/delete_orphaned_resized_images')
 @required_group('admin')
-def admin_delete_orphaned_resized_images():
+def admin_delete_orphaned_resized_images() -> Response:
     ImageProcessing.delete_orphaned_resized_images()
     flash(_('resized orphaned images were deleted'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')

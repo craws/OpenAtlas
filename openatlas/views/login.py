@@ -1,5 +1,5 @@
 import datetime
-from typing import Union
+from typing import Optional, Union
 
 import bcrypt
 from bcrypt import hashpw
@@ -23,7 +23,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int) -> User:
+def load_user(user_id: int) -> Optional[User]:
     return User.get_by_id(user_id, True)
 
 

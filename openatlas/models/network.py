@@ -51,5 +51,5 @@ class Network:
             'edges' if dimensions else 'links': edges}) if nodes else None
 
     @staticmethod
-    def truncate(string: Optional[str] = '', length: int = 40) -> str:
+    def truncate(string: str = '', length: int = 40) -> str:
         return string if len(string) < length + 1 else string[:length] + '..'

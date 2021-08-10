@@ -124,11 +124,11 @@ def entity_view(id_: int) -> Union[str, Response]:
         for link_ in event_links:
             event = link_.domain
             places = event.get_linked_entities(['P7', 'P26', 'P27'])
-            link_.object_ = None
+            link_.object_ = None  # Needed for first/last appearance
             for place in places:
                 object_ = place.get_linked_entity_safe('P53', True)
                 entity.linked_places.append(object_)
-                link_.object_ = object_  # Needed for first/last appearance
+                link_.object_ = object_
             first = link_.first
             if not link_.first and event.first:
                 first = f'<span class="inactive">{event.first}</span>'
@@ -450,8 +450,10 @@ def entity_view(id_: int) -> Union[str, Response]:
             session['settings']['image_processing']:
         tabs['file'].table.header.insert(1, uc_first(_('icon')))
         for row in tabs['file'].table.rows:
-            row.insert(1, file_preview(int(row[0].replace(
-                '<a href="/entity/', '').split('"')[0])))
+            row.insert(
+                1,
+                file_preview(
+                    int(row[0].replace('<a href="/entity/', '').split('"')[0])))
     tabs['info'].content = render_template(
         'entity/view.html',
         buttons=add_buttons(entity),

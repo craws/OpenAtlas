@@ -45,7 +45,7 @@ class LinkedPlaces:
                 }
 
     @staticmethod
-    def get_description(entity: Entity) -> List[Dict[str, Any]]:
+    def get_description(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         return [{'value': entity.description}] if entity.description else None
 
     @staticmethod
