@@ -652,7 +652,7 @@ def admin_newsletter() -> Union[str, Response]:
                         form.subject.data,
                         f'{form.body.data}\n\n'
                         f'{_("To unsubscribe use the link below.")}\n\n'
-                        f'{link}',
+                        f'{link_}',
                         user.email):
                     count += 1
         flash(f"{_('Newsletter send')}: {count}", 'info')
