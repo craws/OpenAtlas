@@ -1,21 +1,27 @@
 class Changelog:
+
     versions = {
-        '6.4.0': ['TBA', {
+        '6.4.0': ['2021-08-10', {
             'feature': {
                 '1280': 'Picture Preview',
                 '1492': 'Image Processing',
+                '1552': 'External reference systems for sources',
                 '1538': 'Focus on table filter at overview pages',
                 '1531': 'Map overlay improved',
+                '1523': 'Performance issues while linking pictures',
+                '1558': 'Manual entry profession',
+                '1426': 'API: Display image smaller size',
                 '1495': 'API: Additional Geojson output for QGIS imports',
                 '1529': 'API: Increase request performance',
                 '1530': 'API: Geometries endpoint for frontend map',
                 '1535': 'API: Get all entities linked to an entity',
-                '1537': 'API: type_entities for actor types',
+                '1537': 'API: Type entities for actor types',
                 '1545': 'API: Filter entities by types'
                 },
             'fix': {
                 '1414': 'Enlarged Description Field Covers up Entry Buttons',
-                '1539': 'Pagination not shown for tables sometimes'}}],
+                '1539': 'Pagination not shown for tables sometimes',
+                '1554': 'Error at value type view'}}],
         '6.3.0': ['2021-06-13', {
             'feature': {
                 '1513': 'Add reference page for multiple files',
