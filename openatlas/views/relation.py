@@ -26,9 +26,11 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
         try:
             for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
-                    link_ = Link.get_by_id(actor.link('OA7', origin, form.description.data)[0])
+                    link_ = Link.get_by_id(
+                        actor.link('OA7', origin, form.description.data)[0])
                 else:
-                    link_ = Link.get_by_id(origin.link('OA7', actor, form.description.data)[0])
+                    link_ = Link.get_by_id(
+                        origin.link('OA7', actor, form.description.data)[0])
                 link_.set_dates(form)
                 link_.type = get_link_type(form)
                 link_.update()
@@ -51,7 +53,9 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             f"+ {uc_first(_('relation'))}"])
 
 
-@app.route('/relation/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route(
+    '/relation/update/<int:id_>/<int:origin_id>',
+    methods=['POST', 'GET'])
 @required_group('contributor')
 def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
@@ -65,9 +69,11 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
         try:
             link_.delete()
             if form.inverse.data:
-                link_ = Link.get_by_id(related.link('OA7', origin, form.description.data)[0])
+                link_ = Link.get_by_id(
+                    related.link('OA7', origin, form.description.data)[0])
             else:
-                link_ = Link.get_by_id(origin.link('OA7', related, form.description.data)[0])
+                link_ = Link.get_by_id(
+                    origin.link('OA7', related, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()
@@ -77,11 +83,16 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-relation")
+        return redirect(
+            f"{url_for('entity_view', id_=origin.id)}#tab-relation")
     if origin.id == range_.id:
         form.inverse.data = True
     return render_template(
         'display_form.html',
         form=form,
         title=_('relation'),
-        crumbs=[[_('actor'), url_for('index', view='actor')], origin, related, _('edit')])
+        crumbs=[
+            [_('actor'), url_for('index', view='actor')],
+            origin,
+            related,
+            _('edit')])

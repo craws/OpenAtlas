@@ -61,8 +61,8 @@ def get_table_headers() -> Dict[str, List[str]]:
         'relation': ['relation', 'actor', 'first', 'last', 'description'],
         'reference': ['name', 'class', 'type', 'description'],
         'reference_system':
-            ['name', 'count', 'website URL', 'resolver URL', 'example ID', 'default precision',
-             'description'],
+            ['name', 'count', 'website URL', 'resolver URL', 'example ID',
+             'default precision', 'description'],
         'source': ['name', 'type', 'description'],
         'subs': ['name', 'count', 'info'],
         'text': ['text', 'type', 'content']}

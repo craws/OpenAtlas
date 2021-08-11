@@ -24,22 +24,34 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
     if origin.class_.name in ['acquisition', 'activity']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
         if origin.class_.name == 'acquisition':
-            form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
-            form.activity.choices.append(('P23', g.properties['P23'].name_inverse))
+            form.activity.choices.append((
+                'P22',
+                g.properties['P22'].name_inverse))
+            form.activity.choices.append((
+                'P23',
+                g.properties['P23'].name_inverse))
     if form.validate_on_submit():
         Transaction.begin()
         try:
             if origin.class_.view == 'event':
-                for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
+                for actor in Entity.get_by_ids(
+                        ast.literal_eval(form.actor.data)):
                     link_ = Link.get_by_id(
-                        origin.link(form.activity.data, actor, form.description.data)[0])
+                        origin.link(
+                            form.activity.data,
+                            actor,
+                            form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
             else:
-                for event in Entity.get_by_ids(ast.literal_eval(form.event.data)):
+                for event in Entity.get_by_ids(
+                        ast.literal_eval(form.event.data)):
                     link_ = Link.get_by_id(
-                        event.link(form.activity.data, origin, form.description.data)[0])
+                        event.link(
+                            form.activity.data,
+                            origin,
+                            form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -61,7 +73,9 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             _('involvement')])
 
 
-@app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route(
+    '/involvement/update/<int:id_>/<int:origin_id>',
+    methods=['POST', 'GET'])
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
@@ -79,7 +93,8 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
         Transaction.begin()
         try:
             link_.delete()
-            link_ = Link.get_by_id(event.link(form.activity.data, actor, form.description.data)[0])
+            link_ = Link.get_by_id(
+                event.link(form.activity.data, actor, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

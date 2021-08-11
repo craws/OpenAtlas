@@ -23,7 +23,9 @@ class Import:
 
     @staticmethod
     def insert_project(name: str, description: Optional[str] = None) -> int:
-        return Db.insert_project(name, description.strip() if description else None)
+        return Db.insert_project(
+            name,
+            description.strip() if description else None)
 
     @staticmethod
     def get_all_projects() -> List[Project]:
@@ -53,7 +55,10 @@ class Import:
     @staticmethod
     def update_project(project: Project) -> None:
         from openatlas.util.util import sanitize
-        Db.update_project(project.id, project.name, sanitize(project.description, 'text'))
+        Db.update_project(
+            project.id,
+            project.name,
+            sanitize(project.description, 'text'))
 
     @staticmethod
     def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
@@ -108,7 +113,9 @@ class Import:
 
             # GIS
             if class_ == 'place':
-                location = Entity.insert('object_location', 'Location of ' + row['name'])
+                location = Entity.insert(
+                    'object_location',
+                    f"Location of {row['name']}")
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):

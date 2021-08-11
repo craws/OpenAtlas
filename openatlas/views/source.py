@@ -27,10 +27,15 @@ def source_add(id_: int, view: str) -> Union[str, Response]:
         'form.html',
         form=build_table_form(view, source.get_linked_entities('P67')),
         title=_('source'),
-        crumbs=[[_('source'), url_for('index', view='source')], source, _('link')])
+        crumbs=[
+            [_('source'), url_for('index', view='source')],
+            source,
+            _('link')])
 
 
-@app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
+@app.route(
+    '/source/translation/insert/<int:source_id>',
+    methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
     source = Entity.get_by_id(source_id)
@@ -44,7 +49,10 @@ def translation_insert(source_id: int) -> Union[str, Response]:
     return render_template(
         'display_form.html',
         form=form,
-        crumbs=[[_('source'), url_for('index', view='source')], source, f"+ {uc_first(_('text'))}"])
+        crumbs=[
+            [_('source'), url_for('index', view='source')],
+            source,
+            f"+ {uc_first(_('text'))}"])
 
 
 @app.route('/source/translation/delete/<int:id_>')
@@ -88,7 +96,7 @@ def save(form: FlaskForm,
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:
-            abort(400)  # pragma: no cover, either entity or source has to be provided
+            abort(400)  # pragma: no cover, entity or source needed
         entity.update(form)
         Transaction.commit()
     except Exception as e:  # pragma: no cover

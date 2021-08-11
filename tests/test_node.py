@@ -17,7 +17,8 @@ class NodeTest(TestBaseCase):
                 sex_node = Node.get_hierarchy('Sex')
             rv = self.app.get(url_for('node_index'))
             assert b'Actor actor relation' in rv.data
-            rv = self.app.get(url_for('insert', class_='type', origin_id=actor_node.id))
+            rv = self.app.get(
+                url_for('insert', class_='type', origin_id=actor_node.id))
             assert b'Actor actor relation' in rv.data
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_node.id),
@@ -27,12 +28,19 @@ class NodeTest(TestBaseCase):
                 'name': 'My secret node',
                 'name_inverse': 'Do I look inverse?',
                 'description': 'Very important!'}
-            rv = self.app.post(url_for('insert', class_='type', origin_id=actor_node.id), data=data)
+            rv = self.app.post(
+                url_for('insert', class_='type', origin_id=actor_node.id),
+                data=data)
             node_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('update', id_=node_id))
             assert b'My secret node' in rv.data and b'Super' in rv.data
-            self.app.post(url_for('insert', class_='type', origin_id=sex_node.id), data=data)
-            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
+            self.app.post(
+                url_for('insert', class_='type', origin_id=sex_node.id),
+                data=data)
+            rv = self.app.post(
+                url_for('update', id_=node_id),
+                data=data,
+                follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
             # Insert an continue
@@ -53,30 +61,45 @@ class NodeTest(TestBaseCase):
 
             # Update with self as root
             data[str(actor_node.id)] = node_id
-            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=node_id),
+                data=data,
+                follow_redirects=True)
             assert b'Type can&#39;t have itself as super.' in rv.data
 
             # Update with sub as root
-            rv = self.app.post(url_for('insert', class_='type', origin_id=actor_node.id), data=data)
+            rv = self.app.post(
+                url_for('insert', class_='type', origin_id=actor_node.id),
+                data=data)
             sub_node_id = rv.location.split('/')[-1].replace('node#tab-', '')
             data[str(actor_node.id)] = sub_node_id
-            rv = self.app.post(url_for('update', id_=node_id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=node_id),
+                data=data,
+                follow_redirects=True)
             assert b'Type can&#39;t have a sub as super.' in rv.data
 
             # Custom type
-            rv = self.app.get(url_for('entity_view', id_=sex_node.id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('entity_view', id_=sex_node.id),
+                follow_redirects=True)
             assert b'Male' in rv.data
 
             # Administrative unit
             rv = self.app.get(
-                url_for('entity_view', id_=Node.get_hierarchy('Administrative unit').id),
+                url_for(
+                    'entity_view',
+                    id_=Node.get_hierarchy('Administrative unit').id),
                 follow_redirects=True)
             assert b'Austria' in rv.data
 
             # Value type
-            rv = self.app.get(url_for('entity_view', id_=dimension_node.id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('entity_view', id_=dimension_node.id),
+                follow_redirects=True)
             assert b'Height' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=dimension_node.subs[0]))
+            rv = self.app.get(
+                url_for('entity_view', id_=dimension_node.subs[0]))
             assert b'Unit' in rv.data
             rv = self.app.get(url_for('update', id_=dimension_node.subs[0]))
             assert b'Dimensions' in rv.data
@@ -95,7 +118,11 @@ class NodeTest(TestBaseCase):
             assert b'No entries' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('node_delete', id_=actor_node.id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('node_delete', id_=actor_node.id),
+                follow_redirects=True)
             assert b'Forbidden' in rv.data
-            rv = self.app.get(url_for('node_delete', id_=sub_node_id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('node_delete', id_=sub_node_id),
+                follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

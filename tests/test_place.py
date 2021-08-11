@@ -23,10 +23,14 @@ class PlaceTest(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference = Entity.insert('external_reference', 'https://openatlas.eu')
+                reference = Entity.insert(
+                    'external_reference',
+                    'https://openatlas.eu')
                 place_node = Node.get_hierarchy('Place')
                 source = Entity.insert('source', 'Necronomicon')
-            geonames = 'reference_system_id_' + str(ReferenceSystem.get_by_name('GeoNames').id)
+            geonames = \
+                f"reference_system_id_" \
+                f"{ReferenceSystem.get_by_name('GeoNames').id}"
             precision = Node.get_hierarchy('External reference match').subs[0]
             data = {
                 'name': 'Asgard',
@@ -39,32 +43,48 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
-            assert b'Asgard' in rv.data and b'An entry has been created' in rv.data
+            assert b'Asgard' in rv.data \
+                   and b'An entry has been created' in rv.data
             rv = self.app.get(url_for('entity_view', id_=precision))
             assert b'Asgard' in rv.data
             rv = self.app.get(
-                url_for('entity_view', id_=ReferenceSystem.get_by_name('GeoNames').id))
+                url_for(
+                    'entity_view',
+                    id_=ReferenceSystem.get_by_name('GeoNames').id))
             assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{
-                "type":"Feature",
-                "geometry":{"type":"Point","coordinates":[9,17]},
-                "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
+                "type": "Feature",
+                "geometry": {"type":"Point","coordinates":[9,17]},
+                "properties": {
+                    "name": "Valhalla",
+                    "description": "",
+                    "shapeType": "centerpoint"}}]"""
             data['gis_lines'] = """[{
-                "type":"Feature",
+                "type": "Feature",
                 "geometry":{
-                    "type":"LineString",
-                    "coordinates":[[9.75307425847859,17.8111792731339],
-                    [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098]]},
-                "properties":{"name":"","description":"","shapeType":"line"}}]"""
+                    "type": "LineString",
+                    "coordinates": [
+                        [9.75307425847859,17.8111792731339],
+                        [9.75315472474904,17.8110005175436],
+                        [9.75333711496205,17.8110873417098]]},
+                "properties": {
+                    "name": "",
+                    "description": "",
+                    "shapeType": "line"}}]"""
             data['gis_polygons'] = """[{
-                "type":"Feature",
-                "geometry":{
-                    "type":"Polygon",
-                    "coordinates":[[[9.75307425847859,17.8111792731339],
-                    [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
-                    [9.75307425847859,17.8111792731339]]]},
-                "properties":{"name":"","description":"","shapeType":"shape"}}]"""
+                "type": "Feature",
+                "geometry": {
+                    "type": "Polygon",
+                    "coordinates": [[
+                        [9.75307425847859,17.8111792731339],
+                        [9.75315472474904,17.8110005175436],
+                        [9.75333711496205,17.8110873417098],
+                        [9.75307425847859,17.8111792731339]]]},
+                "properties":{
+                    "name": "",
+                    "description": "",
+                    "shapeType": "shape"}}]"""
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
             rv = self.app.post(
@@ -88,7 +108,10 @@ class PlaceTest(TestBaseCase):
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
             data['geonames_id'] = '321'
-            rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=place.id),
+                data=data,
+                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test error when viewing the corresponding location
@@ -96,17 +119,26 @@ class PlaceTest(TestBaseCase):
             assert b'be viewed directly' in rv.data
 
             # Test with same GeoNames id
-            rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=place.id),
+                data=data,
+                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test with same GeoNames id but different precision
             data['geonames_precision'] = ''
-            rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=place.id),
+                data=data,
+                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test update without the previous GeoNames id
             data['geonames_id'] = ''
-            rv = self.app.post(url_for('update', id_=place.id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=place.id),
+                data=data,
+                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             with app.test_request_context():
@@ -118,12 +150,20 @@ class PlaceTest(TestBaseCase):
             assert rv.data and b'Valhalla rising' in rv.data
 
             # Test invalid geom
-            data['gis_polygons'] = """[{"type": "Feature", "geometry":
-                {"type": "Polygon", "coordinates": [
-                [[298.9893436362036, -5.888919049309554], [299.00444983737543, -5.9138487869408545],
-                 [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
-                 [298.9893436362036, -5.888919049309554]]]},
-                "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
+            data['gis_polygons'] = """[{
+                "type": "Feature", 
+                "geometry": {
+                    "type": "Polygon", 
+                    "coordinates": [[
+                        [298.9893436362036, -5.888919049309554], 
+                        [299.00444983737543, -5.9138487869408545],
+                        [299.00650977389887, -5.893358673645309], 
+                        [298.9848804404028, -5.9070188333813585],
+                        [298.9893436362036, -5.888919049309554]]]},
+                "properties": {
+                "name": "", 
+                "description": "", 
+                "shapeType": "shape"}}]"""
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=source.id),
                 data=data,
@@ -131,7 +171,9 @@ class PlaceTest(TestBaseCase):
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
-            path = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
+            path = \
+                pathlib.Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
             with open(path, 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=place.id),
@@ -143,7 +185,11 @@ class PlaceTest(TestBaseCase):
                 file = Entity.get_by_class('file')[0]
                 link_id = Link.insert(file, 'P67', place)[0]
             rv = self.app.get(
-                url_for('overlay_insert', image_id=file.id, place_id=place.id, link_id=link_id))
+                url_for(
+                    'overlay_insert',
+                    image_id=file.id,
+                    place_id=place.id,
+                    link_id=link_id))
             assert b'X-Files' in rv.data
             data = {
                 'top_left_easting': 42,
@@ -153,7 +199,11 @@ class PlaceTest(TestBaseCase):
                 'bottom_left_easting': 10,
                 'bottom_left_northing': 20}
             rv = self.app.post(
-                url_for('overlay_insert', image_id=file.id, place_id=place.id, link_id=link_id),
+                url_for(
+                    'overlay_insert',
+                    image_id=file.id,
+                    place_id=place.id,
+                    link_id=link_id),
                 data=data,
                 follow_redirects=True)
             assert b'Edit' in rv.data
@@ -163,15 +213,26 @@ class PlaceTest(TestBaseCase):
                     overlay = Overlay.get_by_object(place)
                     overlay_id = overlay[list(overlay.keys())[0]].id
                 rv = self.app.get(
-                    url_for('overlay_update', id_=overlay_id, place_id=place.id, link_id=link_id))
+                    url_for(
+                        'overlay_update',
+                        id_=overlay_id,
+                        place_id=place.id,
+                        link_id=link_id))
                 assert b'42' in rv.data
                 rv = self.app.post(
-                    url_for('overlay_update', id_=overlay_id, place_id=place.id, link_id=link_id),
+                    url_for(
+                        'overlay_update',
+                        id_=overlay_id,
+                        place_id=place.id,
+                        link_id=link_id),
                     data=data,
                     follow_redirects=True)
                 assert b'Changes have been saved' in rv.data
                 self.app.get(
-                    url_for('overlay_remove', id_=overlay_id, place_id=place.id),
+                    url_for(
+                        'overlay_remove',
+                        id_=overlay_id,
+                        place_id=place.id),
                     follow_redirects=True)
 
             # Add to place
@@ -184,7 +245,8 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'X-Files' in rv.data
 
-            rv = self.app.get(url_for('reference_add', id_=reference.id, view='place'))
+            rv = self.app.get(
+                url_for('reference_add', id_=reference.id, view='place'))
             assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
             assert b'Link reference' in rv.data
@@ -208,7 +270,7 @@ class PlaceTest(TestBaseCase):
                     'checkbox_values': str([location.id])})
             assert b'Entities were updated' in rv.data
 
-            # Test move entities of multiple node if link to new node doesn't exists
+            # Test move entities of multiple node
             rv = self.app.post(
                 url_for('node_move_entities', id_=unit_sub2.id),
                 follow_redirects=True,
@@ -225,20 +287,32 @@ class PlaceTest(TestBaseCase):
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             self.app.get(url_for('insert', class_='place'))
-            rv = self.app.post(url_for('insert', class_='place'), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('insert', class_='place'),
+                data=data,
+                follow_redirects=True)
             assert b'Insert and add strati' in rv.data
             data['name'] = "It's not a bug, it's a feature!"
-            rv = self.app.get(url_for('insert', class_='stratigraphic_unit', origin_id=place.id))
+            rv = self.app.get(
+                url_for(
+                    'insert',
+                    class_='stratigraphic_unit',
+                    origin_id=place.id))
             assert b'Insert and add find' in rv.data
-            rv = self.app.post(url_for('insert', class_='place', origin_id=place.id), data=data)
+            rv = self.app.post(
+                url_for('insert', class_='place', origin_id=place.id),
+                data=data)
             feat_id = rv.location.split('/')[-1]
             self.app.get(url_for('insert', class_='place', origin_id=feat_id))
             self.app.get(url_for('update', id_=feat_id))
             self.app.post(url_for('update', id_=feat_id), data=data)
             data['name'] = "I'm a stratigraphic unit"
-            rv = self.app.post(url_for('insert', class_='place', origin_id=feat_id), data=data)
+            rv = self.app.post(
+                url_for('insert', class_='place', origin_id=feat_id),
+                data=data)
             stratigraphic_id = rv.location.split('/')[-1]
-            self.app.get(url_for('insert', class_='place', origin_id=stratigraphic_id))
+            self.app.get(
+                url_for('insert', class_='place', origin_id=stratigraphic_id))
             self.app.get(url_for('update', id_=stratigraphic_id))
             self.app.post(
                 url_for('update', id_=stratigraphic_id),
@@ -253,7 +327,10 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='find', origin_id=stratigraphic_id),
                 data=data)
             find_id = rv.location.split('/')[-1]
-            rv = self.app.post(url_for('update', id_=find_id), data=data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('update', id_=find_id),
+                data=data,
+                follow_redirects=True)
             assert b'50' in rv.data
             self.app.get(url_for('update', id_=find_id))
             data = {
@@ -261,7 +338,10 @@ class PlaceTest(TestBaseCase):
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
-                url_for('insert', class_='human_remains', origin_id=stratigraphic_id),
+                url_for(
+                    'insert',
+                    class_='human_remains',
+                    origin_id=stratigraphic_id),
                 data=data)
             human_remains_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('update', id_=human_remains_id))
@@ -283,5 +363,6 @@ class PlaceTest(TestBaseCase):
                 url_for('index', view='place', delete_id=find_id),
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            rv = self.app.get(url_for('index', view='place', delete_id=place2.id))
+            rv = self.app.get(
+                url_for('index', view='place', delete_id=place2.id))
             assert b'The entry has been deleted.' in rv.data

@@ -19,8 +19,13 @@ class ImageTest(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place = insert_entity('Nostromos', 'place', description='That is the Nostromos')
-                logo = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
+                place = insert_entity(
+                    'Nostromos',
+                    'place',
+                    description='That is the Nostromos')
+                logo = \
+                    pathlib.Path(app.root_path) \
+                    / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
             with open(logo, 'rb') as img:
@@ -52,14 +57,19 @@ class ImageTest(TestBaseCase):
                 file = insert_entity('Test_File', 'file')
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
-                src_png = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
-                dst_png = pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
+                src_png = \
+                    pathlib.Path(app.root_path) \
+                    / 'static' / 'images' / 'layout' / 'logo.png'
+                dst_png = \
+                    pathlib.Path(app.config['UPLOAD_DIR'] / file_name)
                 copyfile(src_png, dst_png)
 
                 file2 = insert_entity('Test_File2', 'file')
                 file2.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
                 file2_name = f'{file2.id}.jpeg'
-                src2_png = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
+                src2_png = \
+                    pathlib.Path(app.root_path) \
+                    / 'static' / 'images' / 'layout' / 'logo.png'
                 dst2_png = pathlib.Path(app.config['UPLOAD_DIR'] / file2_name)
                 copyfile(src2_png, dst2_png)
 

@@ -9,13 +9,15 @@ from flask_wtf import FlaskForm
 from openatlas import logger
 from openatlas.database.link import Link as Db
 from openatlas.database.date import Date
-from openatlas.models.date import timestamp_to_datetime64, form_to_datetime64, datetime64_to_timestamp
+from openatlas.models.date import (
+    timestamp_to_datetime64, form_to_datetime64, datetime64_to_timestamp)
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
 
 
 class Link:
+    object_: Optional['Entity']  # Needed for first/last appearance
 
     def __init__(
             self,
@@ -40,9 +42,12 @@ class Link:
             self.end_from = timestamp_to_datetime64(row['end_from'])
             self.end_to = timestamp_to_datetime64(row['end_to'])
             self.end_comment = row['end_comment']
-            self.first = format_date(self.begin_from, 'year') if self.begin_from else None
-            self.last = format_date(self.end_from, 'year') if self.end_from else None
-            self.last = format_date(self.end_to, 'year') if self.end_to else self.last
+            self.first = format_date(self.begin_from, 'year') \
+                if self.begin_from else None
+            self.last = format_date(self.end_from, 'year') \
+                if self.end_from else None
+            self.last = format_date(self.end_to, 'year') \
+                if self.end_to else self.last
 
     def update(self) -> None:
         Db.update({
@@ -69,17 +74,27 @@ class Link:
         self.end_from = None
         self.end_to = None
         self.end_comment = None
-        if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+        if form.begin_year_from.data:
             self.begin_from = form_to_datetime64(
-                form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+                form.begin_year_from.data,
+                form.begin_month_from.data,
+                form.begin_day_from.data)
             self.begin_to = form_to_datetime64(
-                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
+                form.begin_year_to.data,
+                form.begin_month_to.data,
+                form.begin_day_to.data,
+                True)
             self.begin_comment = form.begin_comment.data
-        if form.end_year_from.data:  # Only if end year is set create a year date or time span
+        if form.end_year_from.data:
             self.end_from = form_to_datetime64(
-                form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+                form.end_year_from.data,
+                form.end_month_from.data,
+                form.end_day_from.data)
             self.end_to = form_to_datetime64(
-                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
+                form.end_year_to.data,
+                form.end_month_to.data,
+                form.end_day_to.data,
+                True)
             self.end_comment = form.end_comment.data
 
     @staticmethod
@@ -98,13 +113,18 @@ class Link:
             range_ = entity if inverse else linked_entity
             domain_error = True
             range_error = True
-            if property_.find_object('domain_class_code', domain.class_.cidoc_class.code):
+            if property_.find_object(
+                    'domain_class_code',
+                    domain.class_.cidoc_class.code):
                 domain_error = False
-            if property_.find_object('range_class_code', range_.class_.cidoc_class.code):
+            if property_.find_object(
+                    'range_class_code',
+                    range_.class_.cidoc_class.code):
                 range_error = False
             if domain_error or range_error:
-                text = _('error link') + ': ' + domain.class_.cidoc_class.code + ' > '
-                text += property_code + ' > ' + range_.class_.cidoc_class.code
+                text = \
+                    f"{_('error link')}: {domain.class_.cidoc_class.code} > " \
+                    f"{property_code} > {range_.class_.cidoc_class.code}"
                 logger.log('error', 'model', text)
                 flash(text, 'error')
                 continue
@@ -123,9 +143,16 @@ class Link:
             code: str,
             inverse: bool = False,
             nodes: bool = False) -> 'Entity':
-        result = Link.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
+        result = Link.get_linked_entities(
+            id_,
+            code,
+            inverse=inverse,
+            nodes=nodes)
         if len(result) > 1:  # pragma: no cover
-            logger.log('error', 'model', 'Multiple linked entities found for ' + code)
+            logger.log(
+                'error',
+                'model',
+                f'Multiple linked entities found for {code}')
             flash(_('error multiple linked entities found'), 'error')
             abort(400)
         return result[0] if result else None
@@ -148,9 +175,13 @@ class Link:
             inverse: bool = False,
             nodes: bool = False) -> 'Entity':
         entity = Link.get_linked_entity(id_, code, inverse, nodes)
-        if not entity:  # pragma: no cover - should return an entity so abort if not
-            flash('Missing linked ' + code + ' for ' + str(id_), 'error')
-            logger.log('error', 'model', 'missing linked', 'id: ' + str(id_) + 'code: ' + code)
+        if not entity:  # pragma: no cover - should return an entity
+            flash(f'Missing linked {code} for {id_}', 'error')
+            logger.log(
+                'error',
+                'model',
+                'missing linked',
+                f'id: {id_}, code: {code}')
             abort(418)
         return entity
 
@@ -161,11 +192,15 @@ class Link:
             inverse: bool = False) -> List[Link]:
         from openatlas.models.entity import Entity
         entity_ids = set()
-        result = Db.get_links(entities, codes if isinstance(codes, list) else [codes], inverse)
+        result = Db.get_links(
+            entities,
+            codes if isinstance(codes, list) else [codes], inverse)
         for row in result:
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])
-        entities = {entity.id: entity for entity in Entity.get_by_ids(entity_ids, nodes=True)}
+        entities = {
+            entity.id: entity for entity
+            in Entity.get_by_ids(entity_ids, nodes=True)}
         links = []
         for row in result:
             links.append(Link(
@@ -175,7 +210,10 @@ class Link:
         return links
 
     @staticmethod
-    def delete_by_codes(entity: 'Entity', codes: List[str], inverse: bool = False) -> None:
+    def delete_by_codes(
+            entity: 'Entity',
+            codes: List[str],
+            inverse: bool = False) -> None:
         Db.delete_by_codes(entity.id, codes, inverse)
 
     @staticmethod
@@ -197,8 +235,12 @@ class Link:
         invalid_linking = []
         for row in Db.get_cidoc_links():
             property_ = g.properties[row['property_code']]
-            domain_is_valid = property_.find_object('domain_class_code', row['domain_code'])
-            range_is_valid = property_.find_object('range_class_code', row['range_code'])
+            domain_is_valid = property_.find_object(
+                'domain_class_code',
+                row['domain_code'])
+            range_is_valid = property_.find_object(
+                'range_class_code',
+                row['range_code'])
             if not domain_is_valid or not range_is_valid:
                 invalid_linking.append(row)
         invalid_links = []
@@ -207,9 +249,9 @@ class Link:
                 domain = Entity.get_by_id(row['domain_id'])
                 range_ = Entity.get_by_id(row['range_id'])
                 invalid_links.append({
-                    'domain': link(domain) + ' (' + domain.cidoc_class.code + ')',
+                    'domain': f"{link(domain)} ({domain.cidoc_class.code})",
                     'property': link(g.properties[row['property_code']]),
-                    'range': link(range_) + ' (' + range_.cidoc_class.code + ')'})
+                    'range': f"{link(range_)} ({range_.cidoc_class.code})"})
         return invalid_links
 
     @staticmethod
@@ -256,7 +298,8 @@ class Link:
                         entity_id=entity.id,
                         node_id=entity_node.id)
                     offending_nodes.append(
-                        f'<a href="{url}">{uc_first(_("remove"))}</a> {entity_node.name}')
+                        f'<a href="{url}">{uc_first(_("remove"))}</a> '
+                        f'{entity_node.name}')
                 data.append([
                     link(entity),
                     entity.class_.name,

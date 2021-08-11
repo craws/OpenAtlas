@@ -57,9 +57,9 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
             form.desc.data,
             form.own.data,
             current_user.id):
-        if row['system_class'] == 'actor_appellation':  # If found in actor alias
+        if row['system_class'] == 'actor_appellation':  # Found in actor alias
             entity = Link.get_linked_entity(row['id'], 'P131', True)
-        elif row['system_class'] == 'appellation':  # If found in place alias
+        elif row['system_class'] == 'appellation':  # Found in place alias
             entity = Link.get_linked_entity(row['id'], 'P1', True)
         else:
             entity = Entity(row)
@@ -72,14 +72,20 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
             continue
 
         # Date criteria present but entity has no dates
-        if not entity.begin_from and not entity.begin_to and not entity.end_from \
+        if not entity.begin_from \
+                and not entity.begin_to \
+                and not entity.end_from \
                 and not entity.end_to:
             if form.include_dateless.data:  # Include dateless entities
                 entities.append(entity)
             continue
 
         # Check date criteria
-        dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
+        dates = [
+            entity.begin_from,
+            entity.begin_to,
+            entity.end_from,
+            entity.end_to]
         begin_check_ok = False
         if not from_date:
             begin_check_ok = True  # pragma: no cover
@@ -98,4 +104,4 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
 
         if begin_check_ok and end_check_ok:
             entities.append(entity)
-    return {d.id: d for d in entities}.values()  # Remove duplicates before returning
+    return {d.id: d for d in entities}.values()  # Remove duplicates

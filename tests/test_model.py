@@ -21,24 +21,36 @@ class ModelTests(TestBaseCase):
             assert b'P68' in rv.data
             rv = self.app.post(
                 url_for('model_index'),
-                data={'cidoc_domain': 'E1', 'cidoc_range': 'E1', 'cidoc_property': 'P13'})
+                data={
+                    'cidoc_domain': 'E1',
+                    'cidoc_range': 'E1',
+                    'cidoc_property': 'P13'})
             assert b'Wrong domain' in rv.data
             self.app.post(
                 url_for('model_index'),
-                data={'cidoc_domain': 'E1', 'cidoc_range': 'E1', 'cidoc_property': 'P67'})
+                data={
+                    'cidoc_domain': 'E1',
+                    'cidoc_range': 'E1',
+                    'cidoc_property': 'P67'})
 
-            with app.test_request_context():  # Insert data to display in network view
+            with app.test_request_context():  # Insert data for network view
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'King Arthur')
-                event = Entity.insert('activity', 20*'Battle of Camlann - test truncated ..')
+                event = Entity.insert('activity', 'Battle of Camlann')
                 source = Entity.insert('source', 'The source')
                 actor.link('P11', event)
                 source.link('P67', event)
             self.app.get(url_for('model_network', dimensions=2))
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data
-            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
-            rv = self.app.post(url_for('model_network'), data=data)
+            rv = self.app.post(
+                url_for('model_network'),
+                data={
+                    'orphans': True,
+                    'width': 100,
+                    'height': 40,
+                    'distance': -666,
+                    'charge': 500})
             assert b'666' in rv.data
             rv = self.app.get(url_for('class_entities', code='E21'))
             assert b'King Arthur' in rv.data

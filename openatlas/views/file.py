@@ -14,7 +14,10 @@ from openatlas.util.util import required_group
 @app.route('/download/<path:filename>')
 @required_group('readonly')
 def download_file(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_DIR'], filename, as_attachment=True)
+    return send_from_directory(
+        app.config['UPLOAD_DIR'],
+        filename,
+        as_attachment=True)
 
 
 @app.route('/display/<path:filename>')

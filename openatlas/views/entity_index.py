@@ -23,7 +23,7 @@ from openatlas.util.util import (
 @app.route('/index/<view>/<int:delete_id>')
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
-    if delete_id:  # To prevent additional redirects deletion is done before showing index
+    if delete_id:  # Delete before showing index to prevent additional redirects
         url = delete_entity(delete_id)
         if url:  # e.g. an error occurred and entry is shown again
             return redirect(url)
@@ -40,10 +40,12 @@ def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
 
 def get_buttons(view: str) -> List[str]:
     buttons = []
-    names = [view] if view in ['artifact', 'place'] else g.view_class_mapping[view]
+    names = [view] \
+        if view in ['artifact', 'place'] else g.view_class_mapping[view]
     for name in names:
         if is_authorized(g.classes[name].write_access):
-            buttons.append(button(g.classes[name].label, url_for('insert', class_=name)))
+            buttons.append(
+                button(g.classes[name].label, url_for('insert', class_=name)))
     return buttons
 
 
@@ -62,13 +64,16 @@ def get_table(view: str) -> Table:
             date = 'N/A'
             if entity.id in g.file_stats:
                 date = format_date(
-                    datetime.datetime.utcfromtimestamp(g.file_stats[entity.id]['date']))
+                    datetime.datetime.utcfromtimestamp(
+                        g.file_stats[entity.id]['date']))
             data = [
                 date,
                 link(entity),
-                entity.print_standard_type(),
-                g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A',
-                g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A',
+                link(entity.standard_type),
+                g.file_stats[entity.id]['size']
+                if entity.id in g.file_stats else 'N/A',
+                g.file_stats[entity.id]['ext']
+                if entity.id in g.file_stats else 'N/A',
                 entity.description]
             if session['settings']['image_processing'] \
                     and current_user.settings['table_show_icons']:
@@ -83,7 +88,8 @@ def get_table(view: str) -> Table:
                 external_url(system.website_url),
                 external_url(system.resolver_url),
                 system.placeholder,
-                link(g.nodes[system.precision_default_id]) if system.precision_default_id else '',
+                link(g.nodes[system.precision_default_id])
+                if system.precision_default_id else '',
                 system.description])
     else:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]
@@ -95,16 +101,17 @@ def get_table(view: str) -> Table:
 def file_preview(entity_id: int) -> str:
     icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
+    parameter = f"loading='lazy' alt='image' width='{size}' height='{size}'"
     if icon_path:
-        return f"""<img src='{url_for('display_file', filename=icon_path.name, size=size)}'
-                loading='lazy'>"""
+        url = url_for('display_file', filename=icon_path.name, size=size)
+        return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
     if not path:
         return ''
     if ImageProcessing.check_processed_image(path.name):
         icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
         url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' loading='lazy' alt='image'>"
+        return f"<img src='{url}' {parameter}>"
     return ''
 
 
@@ -123,7 +130,9 @@ def delete_entity(id_: int) -> Optional[str]:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('entity_view', id_=id_)
-        parent = None if entity.class_.name == 'place' else entity.get_linked_entity('P46', True)
+        parent = None \
+            if entity.class_.name == 'place' \
+            else entity.get_linked_entity('P46', True)
         entity.delete()
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
@@ -145,7 +154,7 @@ def delete_entity(id_: int) -> Optional[str]:
 
 def delete_files(id_: int) -> None:
     path = get_file_path(id_)
-    if path:  # Only delete file on disk if it exists to prevent a missing file error
+    if path:  # Only delete existing files to prevent a missing file error
         path.unlink()
     for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
         path.unlink()

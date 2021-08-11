@@ -30,17 +30,23 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
     if form.validate_on_submit():
         entity = Entity.get_by_id(getattr(form, view).data)
         reference.link('P67', entity, form.page.data)
-        return redirect(f"{url_for('entity_view', id_=reference.id)}#tab-{view}")
+        return redirect(
+            f"{url_for('entity_view', id_=reference.id)}#tab-{view}")
     if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template(
         'display_form.html',
         form=form,
         title=_('reference'),
-        crumbs=[[_('reference'), url_for('index', view='reference')], reference, _('link')])
+        crumbs=[
+            [_('reference'), url_for('index', view='reference')],
+            reference,
+            _('link')])
 
 
-@app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
+@app.route(
+    '/reference/link-update/<int:link_id>/<int:origin_id>',
+    methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(link_id)
@@ -51,7 +57,8 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = link_.range.class_.view if origin.class_.view == 'reference' else 'reference'
+        tab = link_.range.class_.view \
+            if origin.class_.view == 'reference' else 'reference'
         return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-{tab}")
     form.save.label.text = _('save')
     form.page.data = link_.description

@@ -40,13 +40,17 @@ class HierarchyTest(TestBaseCase):
             assert b'+ Custom' in rv.data
 
             data = {'name': 'My secret node', 'description': 'Very important!'}
-            rv = self.app.post(url_for('insert', class_='type', origin_id=hierarchy.id), data=data)
+            rv = self.app.post(
+                url_for('insert', class_='type', origin_id=hierarchy.id),
+                data=data)
             node_id = rv.location.split('/')[-1]
             rv = self.app.get(
                 url_for('remove_form', id_=hierarchy.id, form_id=5),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
-            rv = self.app.get(url_for('node_delete', id_=node_id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('node_delete', id_=node_id),
+                follow_redirects=True)
             assert b'deleted' in rv.data
 
             rv = self.app.post(
@@ -54,7 +58,9 @@ class HierarchyTest(TestBaseCase):
                 data={'name': 'Actor actor relation'},
                 follow_redirects=True)
             assert b'The name is already in use' in rv.data
-            rv = self.app.post(url_for('hierarchy_delete', id_=hierarchy.id), follow_redirects=True)
+            rv = self.app.post(
+                url_for('hierarchy_delete', id_=hierarchy.id),
+                follow_redirects=True)
             assert b'deleted' in rv.data
 
             # Value types
@@ -63,7 +69,10 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.post(
                 url_for('hierarchy_insert', param='value'),
                 follow_redirects=True,
-                data={'name': 'A valued value', 'forms': [1], 'description': ''})
+                data={
+                    'name': 'A valued value',
+                    'forms': [1],
+                    'description': ''})
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 value_node = Node.get_hierarchy('A valued value')
@@ -72,7 +81,11 @@ class HierarchyTest(TestBaseCase):
 
             # Test checks
             actor_node = Node.get_hierarchy('Actor actor relation')
-            rv = self.app.get(url_for('hierarchy_update', id_=actor_node.id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('hierarchy_update', id_=actor_node.id),
+                follow_redirects=True)
             assert b'Forbidden' in rv.data
-            rv = self.app.get(url_for('hierarchy_delete', id_=actor_node.id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('hierarchy_delete', id_=actor_node.id),
+                follow_redirects=True)
             assert b'Forbidden' in rv.data

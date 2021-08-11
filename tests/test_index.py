@@ -27,12 +27,18 @@ class IndexTests(TestBaseCase):
             assert b'first' in rv.data
 
             # Translations
-            rv = self.app.get(url_for('set_locale', language='de'), follow_redirects=True)
+            rv = self.app.get(
+                url_for('set_locale', language='de'),
+                follow_redirects=True)
             assert b'Quelle' in rv.data
-            rv = self.app.get(url_for('set_locale', language='en'), follow_redirects=True)
+            rv = self.app.get(
+                url_for('set_locale', language='en'),
+                follow_redirects=True)
             assert b'Source' in rv.data
 
-            rv = self.app.get(url_for('entity_view', id_=666), follow_redirects=True)
+            rv = self.app.get(
+                url_for('entity_view', id_=666),
+                follow_redirects=True)
             assert b'teapot' in rv.data  # Id not found error
 
             rv = self.app.get('/404')
@@ -53,12 +59,20 @@ class IndexTests(TestBaseCase):
             # Login again
             rv = self.app.get(url_for('login'))
             assert b'Password' in rv.data
-            rv = self.app.post(url_for('login'), data={'username': 'Never', 'password': 'wrong'})
+            rv = self.app.post(
+                url_for('login'),
+                data={'username': 'Never', 'password': 'wrong'})
             assert b'No user with this name found' in rv.data
-            rv = self.app.post(url_for('login'), data={'username': 'Alice', 'password': 'wrong'})
+            rv = self.app.post(
+                url_for('login'),
+                data={'username': 'Alice', 'password': 'wrong'})
             assert b'Wrong Password' in rv.data
-            rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': 'test'})
+            rv = self.app.post(
+                url_for('login'),
+                data={'username': 'inactive', 'password': 'test'})
             assert b'This user is not activated' in rv.data
             for i in range(4):
-                rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': '?'})
+                rv = self.app.post(
+                    url_for('login'),
+                    data={'username': 'inactive', 'password': '?'})
             assert b'Too many login attempts' in rv.data

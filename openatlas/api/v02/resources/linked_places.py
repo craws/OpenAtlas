@@ -45,7 +45,7 @@ class LinkedPlaces:
                 }
 
     @staticmethod
-    def get_description(entity: Entity) -> List[Dict[str, Any]]:
+    def get_description(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         return [{'value': entity.description}] if entity.description else None
 
     @staticmethod
@@ -95,7 +95,7 @@ class LinkedPlaces:
                     or entity.class_.name in ['find', 'artifact']:
                 return LPHelper.get_geoms_by_entity(
                     LPHelper.get_location_id(links))
-            elif entity.class_.name == 'object_location':
+            if entity.class_.name == 'object_location':
                 return LPHelper.get_geoms_by_entity(entity.id)
         return None
 

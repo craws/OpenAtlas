@@ -13,7 +13,9 @@ class SearchTest(TestBaseCase):
             person = Entity.insert('person', 'Waldo')
             person.begin_to = '2018-01-01'
             person.update()
-            person.link('P131', Entity.insert('actor_appellation', 'Waldo alias'))
+            person.link(
+                'P131',
+                Entity.insert('actor_appellation', 'Waldo alias'))
             object_ = Entity.insert('place', 'Waldorf')
             object_.link('P1', Entity.insert('appellation', 'Waldorf alias'))
             Entity.insert('person', 'Waldo without date')
@@ -26,7 +28,9 @@ class SearchTest(TestBaseCase):
                     'include_dateless': True,
                     'begin_year': -100, 'end_year': 3000})
             assert b'Waldo' in rv.data
-            rv = self.app.post(url_for('search_index'), data={'term': 'wal', 'own': True})
+            rv = self.app.post(
+                url_for('search_index'),
+                data={'term': 'wal', 'own': True})
             assert b'Waldo' not in rv.data
             data = {'term': 'do', 'classes': 'person'}
             rv = self.app.post(url_for('search_index'), data=data)

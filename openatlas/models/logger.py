@@ -16,7 +16,8 @@ class Logger:
             message: str,
             info: Union[str, Exception, None] = None) -> None:
         log_levels = app.config['LOG_LEVELS']
-        priority = list(log_levels.keys())[list(log_levels.values()).index(priority_)]
+        priority = list(log_levels.keys())[
+            list(log_levels.values()).index(priority_)]
         if int(session['settings']['log_level']) < priority:  # pragma: no cover
             return
         Db.log({
@@ -27,10 +28,13 @@ class Logger:
             'info': '{method} {path}{info}'.format(
                 path=request.path,
                 method=request.method,
-                info='\n' + str(info) if info else '')})
+                info=f'\n{info}' if info else '')})
 
     @staticmethod
-    def get_system_logs(limit: str, priority: str, user_id: str) -> List[Dict[str, Any]]:
+    def get_system_logs(
+            limit: str,
+            priority: str,
+            user_id: str) -> List[Dict[str, Any]]:
         return Db.get_system_logs(limit, priority, user_id)
 
     @staticmethod
@@ -47,10 +51,14 @@ class Logger:
         from openatlas.models.imports import Import
         data = Db.get_log_for_advanced_view(entity_id)
         return {
-            'creator': User.get_by_id(data['creator_id']) if data['creator_id'] else None,
+            'creator': User.get_by_id(data['creator_id'])
+            if data['creator_id'] else None,
             'created': data['created'],
-            'modifier': User.get_by_id(data['modifier_id']) if data['modifier_id'] else None,
+            'modifier': User.get_by_id(data['modifier_id'])
+            if data['modifier_id'] else None,
             'modified': data['modified'],
-            'project': Import.get_project_by_id(data['project_id']) if data['project_id'] else None,
-            'importer': User.get_by_id(data['importer_id']) if data['importer_id'] else None,
+            'project': Import.get_project_by_id(data['project_id'])
+            if data['project_id'] else None,
+            'importer': User.get_by_id(data['importer_id'])
+            if data['importer_id'] else None,
             'origin_id': data['origin_id']}

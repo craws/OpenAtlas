@@ -6,8 +6,20 @@ very project-specific. Please keep in mind, that there are different ways to ent
 set of data. The following examples are suggestions, but please discuss the best workflow for your project within
 your team.
 
+Archaeological
+--------------
+
 .. toctree::
    :maxdepth: 1
 
    archaeological_data
+
+
+Historical
+----------
+
+.. toctree::
+   :maxdepth: 1
+
+   profession
    letters

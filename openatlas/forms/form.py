@@ -58,7 +58,6 @@ def build_form(
         code: Optional[str] = None,
         origin: Union[Entity, Node, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
-
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
         validate = validate
@@ -134,7 +133,6 @@ def populate_form(
 
 
 def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
-
     system_links = {
         # Can't use isinstance for class_ check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
@@ -368,7 +366,12 @@ def add_fields(
                 widget=widgets.ListWidget(prefix_label=False),
                 coerce=int))
     elif class_ == 'source':
-        setattr(form, 'artifact', TableMultiField())
+        setattr(
+            form,
+            'artifact',
+            TableMultiField(
+                description=
+                _('Link artifacts as the information carrier of the source')))
 
 
 def build_add_reference_form(class_: str) -> FlaskForm:

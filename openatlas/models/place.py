@@ -31,9 +31,11 @@ def get_structure(
         if object_.class_.name not in ['find', 'human_remains']:
             subunits = object_.get_linked_entities('P46', nodes=True)
         if object_.class_.name in ['find', 'human_remains']:
-            stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
+            stratigraphic_unit = \
+                object_.get_linked_entity_safe('P46', inverse=True)
             super_id = stratigraphic_unit.id
-            feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
+            feature = \
+                stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
             place = feature.get_linked_entity_safe('P46', inverse=True)
             siblings = stratigraphic_unit.get_linked_entities('P46')
         elif object_.class_.name == 'stratigraphic_unit':

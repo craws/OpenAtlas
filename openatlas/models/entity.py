@@ -10,13 +10,13 @@ from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.database.entity import Entity as Db
 from openatlas.database.date import Date
+from openatlas.database.entity import Entity as Db
 from openatlas.forms.date import format_date
 from openatlas.models.date import (
-    timestamp_to_datetime64, datetime64_to_timestamp, form_to_datetime64)
+    datetime64_to_timestamp, form_to_datetime64, timestamp_to_datetime64)
 from openatlas.models.link import Link
-from openatlas.util.util import get_file_stats, link, sanitize
+from openatlas.util.util import get_file_stats, sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.node import Node
@@ -28,12 +28,16 @@ class Entity:
     def __init__(self, data: Dict[str, Any]) -> None:
 
         self.id = data['id']
+        self.standard_type = None
         self.nodes: Dict['Node', str] = {}
 
         if 'nodes' in data and data['nodes']:
-            for node in data['nodes']:
-                # f1 = node id, f2 = value
-                self.nodes[g.nodes[node['f1']]] = node['f2']
+            for item in data['nodes']:
+                node = g.nodes[item['f1']]  # f1 = node id, f2 = value
+                self.nodes[node] = item['f2']
+                if node.root and g.nodes[node.root[-1]].standard:
+                    self.standard_type = node
+
         self.aliases: Dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
             for alias in data['aliases']:
@@ -41,7 +45,7 @@ class Entity:
                 self.aliases[alias['f1']] = alias['f2']
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
-                key=lambda item: item[1])}
+                key=lambda item_: item_[1])}
         self.name = data['name']
         self.description = data['description']
         self.created = data['created']
@@ -172,12 +176,13 @@ class Entity:
             'begin_to': datetime64_to_timestamp(self.begin_to),
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment': str(self.begin_comment).strip()
-            if self.begin_comment else None,
-            'end_comment': str(self.end_comment).strip()
-            if self.end_comment else None,
-            'description': sanitize(self.description, 'text')
-            if self.description else None})
+            'begin_comment':
+                str(self.begin_comment).strip() if self.begin_comment else None,
+            'end_comment':
+                str(self.end_comment).strip() if self.end_comment else None,
+            'description':
+                sanitize(self.description, 'text') if self.description else None
+        })
 
     def update_aliases(self, form: FlaskForm) -> None:
         if not hasattr(form, 'alias'):
@@ -240,16 +245,6 @@ class Entity:
 
     def remove_profile_image(self) -> None:
         Db.remove_profile_image(self.id)
-
-    def print_standard_type(self, show_links: Optional[bool] = True) -> str:
-        from openatlas.models.node import Node
-        if not self.class_.standard_type:
-            return ''
-        root_id = Node.get_hierarchy(self.class_.standard_type).id
-        for node in self.nodes:
-            if node.root and node.root[-1] == root_id:
-                return link(node) if show_links else node.name
-        return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. parent of (child of)"""
@@ -317,8 +312,8 @@ class Entity:
             'name': str(name).strip(),
             'code': g.classes[class_name].cidoc_class.code,
             'system_class': class_name,
-            'description': sanitize(description, 'text')
-            if description else None})
+            'description':
+                sanitize(description, 'text') if description else None})
         return Entity.get_by_id(id_)
 
     @staticmethod

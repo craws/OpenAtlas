@@ -105,6 +105,6 @@ class LinkedPlacesTemplate:
             "totalPages": fields.Integer}
 
         return {
-            "results": fields.List( fields.Nested(
+            "results": fields.List(fields.Nested(
                 LinkedPlacesTemplate.linked_places_template(parser['show']))),
             "pagination": fields.Nested(pagination_model)}
