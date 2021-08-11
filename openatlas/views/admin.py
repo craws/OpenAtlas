@@ -108,6 +108,8 @@ def admin_index(
                 flash(_(
                     'A test mail was sent to %(email)s.',
                     email=form.receiver.data), 'info')
+            else:
+                flash(_("The test mail couldn't be sent."), 'error')
         else:
             form.receiver.data = current_user.email
     tabs = {
