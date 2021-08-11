@@ -36,9 +36,9 @@ from openatlas.util.util import (
     is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
 
 
-@app.route('/admin', methods=["GET", "POST"])
-@app.route('/admin/', methods=["GET", "POST"])
-@app.route('/admin/<action>/<int:id_>')
+@app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
+@app.route('/admin/', methods=["GET", "POST"], strict_slashes=False)
+@app.route('/admin/<action>/<int:id_>', strict_slashes=False)
 @required_group('readonly')
 def admin_index(
         action: Optional[str] = None,
@@ -108,8 +108,6 @@ def admin_index(
                 flash(_(
                     'A test mail was sent to %(email)s.',
                     email=form.receiver.data), 'info')
-            else:
-                flash(_("The test mail couldn't be sent."), 'error')
         else:
             form.receiver.data = current_user.email
     tabs = {
