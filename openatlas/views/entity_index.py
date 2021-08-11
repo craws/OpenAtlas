@@ -101,7 +101,7 @@ def get_table(view: str) -> Table:
 def file_preview(entity_id: int) -> str:
     icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
-    parameter = f"loading='lazy' alt='image' width='{size}' height='{size}'"
+    parameter = f"loading='lazy' alt='image' width='{size}'"
     if icon_path:
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"

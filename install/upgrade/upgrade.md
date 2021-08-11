@@ -21,6 +21,14 @@ Install python3-wand e.g. on Debian:
 
     # apt install python3-wand
     
+Make the following folder writeable for the Apache user: 
+
+    openatlas/processed_images/resized
+    
+e.g: 
+
+    # chown www-data openatlas/processed_images/resized
+    
 For the new image rotate function an additional JavaScript package has to be
 installed with npm. Otherwise, maps with overlays will break. Execute e.g.
 
