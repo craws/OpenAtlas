@@ -101,16 +101,17 @@ def get_table(view: str) -> Table:
 def file_preview(entity_id: int) -> str:
     icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
+    parameter = f"loading='lazy' alt='image' width='{size}' height='{size}'"
     if icon_path:
         url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' loading='lazy'>"""
+        return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
     if not path:
         return ''
     if ImageProcessing.check_processed_image(path.name):
         icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
         url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' loading='lazy' alt='image'>"
+        return f"<img src='{url}' {parameter}>"
     return ''
 
 
