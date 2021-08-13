@@ -24,11 +24,11 @@ Install python3-wand e.g. on Debian:
 
     # apt install python3-wand
     
-Make the following folder writeable for the Apache user: 
+Make the following folder writeable for the Apache user:
 
     openatlas/processed_images/resized
-    
-e.g: 
+
+e.g:
 
     # chown www-data openatlas/processed_images/resized
     
