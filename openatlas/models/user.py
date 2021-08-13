@@ -7,7 +7,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import bcrypt
 from flask import session
-from flask_babel import lazy_gettext as _
 from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 
@@ -157,11 +156,9 @@ class User(UserMixin):  # type: ignore
     def toggle_bookmark(entity_id: int) -> str:
         if int(entity_id) in current_user.bookmarks:
             Db.delete_bookmark(current_user.id, entity_id)
-            label = _('bookmark')
-        else:
-            Db.insert_bookmark(current_user.id, entity_id)
-            label = _('bookmark remove')
-        return label
+            return 'bookmark'
+        Db.insert_bookmark(current_user.id, entity_id)
+        return 'bookmark remove'
 
     @staticmethod
     def get_settings(user_id: int) -> Dict[str, Any]:
