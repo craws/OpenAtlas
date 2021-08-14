@@ -296,19 +296,19 @@ def import_data(project_id: int, class_: str) -> str:
                     project,
                     class_label])
 
-        if not form.preview.data and checked_data:
-            if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
-                Transaction.begin()
-                try:
-                    Import.import_data(project, class_, checked_data)
-                    Transaction.commit()
-                    logger.log('info', 'import', f'import: {len(checked_data)}')
-                    flash(f"{_('import of')}: {len(checked_data)}", 'info')
-                    imported = True
-                except Exception as e:  # pragma: no cover
-                    Transaction.rollback()
-                    logger.log('error', 'import', 'import failed', e)
-                    flash(_('error transaction'), 'error')
+        if not form.preview.data and checked_data and \
+                (not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']):
+            Transaction.begin()
+            try:
+                Import.import_data(project, class_, checked_data)
+                Transaction.commit()
+                logger.log('info', 'import', f'import: {len(checked_data)}')
+                flash(f"{_('import of')}: {len(checked_data)}", 'info')
+                imported = True
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                logger.log('error', 'import', 'import failed', e)
+                flash(_('error transaction'), 'error')
     return render_template(
         'import/import_data.html',
         form=form,
