@@ -146,7 +146,6 @@ $(document).ready(function () {
     });
 
     $('.extend-icon').click((a) => {
-        console.log(a.currentTarget.id);
         if(a.currentTarget.id === 'extend-form-icon') {
             $('#extend-form-icon').hide();
             $('#extend-map-icon').show();
