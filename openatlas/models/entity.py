@@ -16,7 +16,7 @@ from openatlas.forms.date import format_date
 from openatlas.models.date import (
     datetime64_to_timestamp, form_to_datetime64, timestamp_to_datetime64)
 from openatlas.models.link import Link
-from openatlas.util.util import get_file_stats, sanitize
+from openatlas.util.util import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.node import Node
@@ -290,8 +290,6 @@ class Entity:
     @staticmethod
     def get_display_files() -> List[Entity]:
         entities = []
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for row in Db.get_by_class('file', nodes=True):
             ext = g.file_stats[row['id']]['ext'] \
                 if row['id'] in g.file_stats else 'N/A'

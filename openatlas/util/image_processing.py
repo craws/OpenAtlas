@@ -105,9 +105,6 @@ class ImageProcessing:
 
     @staticmethod
     def delete_orphaned_resized_images() -> None:
-        from openatlas.util.util import get_file_stats
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for size in app.config['IMAGE_SIZE'].values():
             p = Path(app.config['RESIZED_IMAGES']) / size
             for file in p.glob('**/*'):
@@ -119,9 +116,6 @@ class ImageProcessing:
     @staticmethod
     def create_resized_images() -> None:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import get_file_stats
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file'):
             if entity.id in g.file_stats \
                     and g.file_stats[entity.id]['ext'] \

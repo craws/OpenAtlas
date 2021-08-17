@@ -180,8 +180,6 @@ def get_base_table_data(
     if entity.class_.standard_type:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         data.append(
             g.file_stats[entity.id]['size']
             if entity.id in g.file_stats else 'N/A')
@@ -318,8 +316,6 @@ def get_entity_data(
             data[_('given place')] = [
                 link(place) for place in entity.get_linked_entities(['P24'])]
     elif entity.class_.view == 'file':
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         data[_('size')] = g.file_stats[entity.id]['size'] \
             if entity.id in g.file_stats else 'N/A'
         data[_('extension')] = g.file_stats[entity.id]['ext'] \
@@ -462,12 +458,16 @@ def get_file_extension(entity: Union[int, 'Entity']) -> str:
 def get_file_path(
         entity: Union[int, 'Entity'],
         size: Optional[str] = None) -> Optional[Path]:
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
+    id_ = entity if isinstance(entity, int) else entity.id
+    if id_ not in g.file_stats:
+        return None
+    ext = g.file_stats[id_]['ext']
     if size:
-        path = next(
-            (app.config['RESIZED_IMAGES'] / size).glob(f"{entity_id}.*"), None)
-    return path if path else None
+        if ext in app.config['NONE_DISPLAY_EXT']:
+            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+        path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
+        return path if os.path.exists(path) else None
+    return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
 
 
 def add_reference_systems_to_form(form: Any) -> str:

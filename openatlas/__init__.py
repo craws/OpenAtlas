@@ -32,6 +32,7 @@ logger = Logger()
 
 from openatlas.api.v02 import routes  # New routes
 from openatlas.util import processor
+from openatlas.util.util import get_file_stats
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
     index, involvement, imports, link, login, member, model, note, overlay,
@@ -54,6 +55,7 @@ def before_request() -> None:
     from openatlas.models.node import Node
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
+
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid overhead for files if not using Apache with static alias
     open_connection(app.config)
@@ -69,7 +71,7 @@ def before_request() -> None:
     g.class_view_mapping = system.get_class_view_mapping()
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
-    g.file_stats = None
+    g.file_stats = get_file_stats()
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = \

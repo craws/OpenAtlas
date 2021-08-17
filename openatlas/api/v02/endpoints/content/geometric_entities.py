@@ -11,10 +11,11 @@ from openatlas.models.gis import Gis
 
 class GetGeometricEntities(Resource):  # type: ignore
     @staticmethod
-    def get() -> Union[Tuple[Any, int], Response]:
+    def get() -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
-        output = {'type': 'FeatureCollection',
-                  'features': GetGeometricEntities.get_geometries(parser)}
+        output = {
+            'type': 'FeatureCollection',
+            'features': GetGeometricEntities.get_geometries(parser)}
         if parser['count']:
             return jsonify(len(output['features']))
         if parser['download']:
@@ -26,8 +27,9 @@ class GetGeometricEntities(Resource):  # type: ignore
 
     @staticmethod
     def get_geometries(parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        choices = ['gisPointAll', 'gisPointSupers', 'gisPointSubs',
-                   'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
+        choices = [
+            'gisPointAll', 'gisPointSupers', 'gisPointSubs',
+            'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
         out = []
         for item in choices \
                 if parser['geometry'] == 'gisAll' else parser['geometry']:
