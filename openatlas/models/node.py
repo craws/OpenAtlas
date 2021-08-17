@@ -173,11 +173,10 @@ class Node(Entity):
     @staticmethod
     def insert_hierarchy(node: Node, form: FlaskForm, value_type: bool) -> None:
         multiple = False
-        if value_type \
-                or (
-                    hasattr(form, 'multiple')
-                    and form.multiple
-                    and form.multiple.data):
+        if value_type or (
+                hasattr(form, 'multiple')
+                and form.multiple
+                and form.multiple.data):
             multiple = True
         Db.insert_hierarchy({
             'id': node.id,
