@@ -131,7 +131,6 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E31',
             label=_('external reference'),
             standard_type='External reference',
-            write_access='manager',
             form_fields=[]),
         'feature': SystemClass(
             name='feature',
