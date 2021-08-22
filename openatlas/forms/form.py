@@ -284,6 +284,8 @@ def add_fields(
                 'actor',
                 TableMultiField(_('actor'), [InputRequired()]))
             setattr(form, 'relation_origin_id', HiddenField())
+    elif class_ == 'artifact':
+        setattr(form, 'actor', TableField(_('owned by')))
     elif class_ in ['activity', 'acquisition', 'move']:
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))

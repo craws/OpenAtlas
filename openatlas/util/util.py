@@ -287,6 +287,7 @@ def get_entity_data(
     elif entity.class_.view == 'artifact':
         data[_('source')] = [
             link(source) for source in entity.get_linked_entities(['P128'])]
+        data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
         if super_event:

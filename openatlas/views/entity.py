@@ -90,10 +90,8 @@ def entity_view(id_: int) -> Union[str, Response]:
     elif isinstance(entity, ReferenceSystem):
         for form_id, form in entity.get_forms().items():
             tabs[form['name']] = Tab(form['name'], entity=entity)
-            tabs[form['name']].table = Table([
-                _('entity'),
-                'id',
-                _('precision')])
+            tabs[form['name']].table = \
+                Table([_('entity'), 'id', _('precision')])
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:

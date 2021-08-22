@@ -230,6 +230,9 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         last = entity.get_linked_entity('OA9')
         form.ends_in.data = last.get_linked_entity_safe('P53', True).id \
             if last else ''
+    elif entity.class_.name == 'artifact':
+        owner = entity.get_linked_entity('P52')
+        form.actor.data = owner.id if owner else None
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
         form.event.data = super_event.id if super_event else ''
@@ -470,6 +473,10 @@ def update_links(
             Gis.delete_by_entity(location)
         location.update(form)
         Gis.insert(location, form)
+        if entity.class_.name == 'artifact':
+            entity.delete_links(['P52'])
+            if form.actor.data:
+                entity.link_string('P52', form.actor.data)
     elif entity.class_.view == 'source' and not origin:
         if action == 'update':
             entity.delete_links(['P128'], inverse=True)
