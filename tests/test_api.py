@@ -181,7 +181,6 @@ class ApiTests(TestBaseCase):
             # ---Entity---
             # /api/0.2/code/
             rv = self.app.get(url_for('api.code', code='reference'))
-            print(rv.data)
             self.assertDictEqual(rv.get_json(), api_data.api_code_reference)
 
             rv = self.app.get(
