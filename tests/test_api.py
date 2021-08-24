@@ -159,12 +159,6 @@ class ApiTests(TestBaseCase):
                 url_for('api.node_entities_all', id_=unit_node.id, count=True))
             assert b'8' in rv.data
 
-            # # /api/0.2/node_overview/
-            # rv = self.app.get(url_for('api.node_overview'))
-            # self.assertDictEqual(rv.get_json(), api_data.api_node_overview)
-            # rv = self.app.get(url_for('api.node_overview', download=True))
-            # self.assertDictEqual(rv.get_json(), api_data.api_node_overview)
-
             # /api/0.2/subunit/
             rv = self.app.get(url_for('api.subunit', id_=place.id))
             self.assertDictEqual(rv.get_json(), api_data.api_subunit)
@@ -184,16 +178,12 @@ class ApiTests(TestBaseCase):
                 url_for('api.subunit_hierarchy', id_=place.id, count=True))
             assert b'2' in rv.data
 
-            # /api/0.2/type_tree/
-            # rv = self.app.get(url_for('api.type_tree'))
-            # self.assertDictEqual(rv.get_json(), api_data.api_type_tree)
-            # rv = self.app.get(url_for('api.type_tree', download=True))
-            # self.assertDictEqual(rv.get_json(), api_data.api_type_tree)
-
             # ---Entity---
             # /api/0.2/code/
             rv = self.app.get(url_for('api.code', code='reference'))
+            print(rv.data)
             self.assertDictEqual(rv.get_json(), api_data.api_code_reference)
+
             rv = self.app.get(
                 url_for('api.code', code='reference', format='geojson'))
             self.assertDictEqual(
