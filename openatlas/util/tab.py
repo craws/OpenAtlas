@@ -102,11 +102,23 @@ class Tab:
                     g.classes[item].label,
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            buttons += [
-                button('link', url_for('source_add', id_=id_, view='artifact')),
-                button(
-                    g.classes['artifact'].label,
-                    url_for('insert', class_='artifact', origin_id=id_))]
+            if view == 'actor':
+                # Todo: make a generic view instead using source_add
+                buttons += [
+                    button(
+                        'link',
+                        url_for('source_add', id_=id_, view='artifact')),
+                    button(
+                        g.classes['artifact'].label,
+                        url_for('insert', class_='artifact', origin_id=id_))]
+            elif view == 'source':
+                buttons += [
+                    button(
+                        'link',
+                        url_for('source_add', id_=id_, view='artifact')),
+                    button(
+                        g.classes['artifact'].label,
+                        url_for('insert', class_='artifact', origin_id=id_))]
         elif name == 'entities':
             if id_:
                 buttons += [button(

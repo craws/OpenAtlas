@@ -114,7 +114,9 @@ def entity_view(id_: int) -> Union[str, Response]:
                             system_id=entity.id,
                             form_id=form_id))]
     elif entity.class_.view == 'actor':
-        for name in ['source', 'event', 'relation', 'member_of', 'member']:
+        for name in [
+                'source', 'event', 'relation', 'member_of', 'member',
+                'artifact']:
             tabs[name] = Tab(name, entity=entity)
         event_links = entity.get_links(
             ['P11', 'P14', 'P22', 'P23', 'P25'],
@@ -204,6 +206,15 @@ def entity_view(id_: int) -> Union[str, Response]:
                     url_for('member_update', id_=link_.id, origin_id=entity.id))
                 add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
+        for link_ in entity.get_links('P52', True):
+            data = [
+                link(link_.domain),
+                link_.domain.class_.label,
+                link(link_.domain.standard_type),
+                link_.domain.first,
+                link_.domain.last,
+                link_.domain.description]
+            tabs['artifact'].table.rows.append(data)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
     elif entity.class_.view == 'event':
