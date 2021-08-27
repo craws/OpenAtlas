@@ -195,17 +195,11 @@ def populate_insert_form(
         view_name: str,
         class_: str,
         origin: Union[Entity, Node]) -> None:
-    if view_name == 'source':
-        if origin and origin.class_.name == 'artifact':
-            form.artifact.data = [origin.id]
-    elif view_name == 'actor':
-        if origin.class_.name == 'place':
-            form.residence.data = origin.id
-    elif view_name == 'type':
-        root_id = origin.root[-1] if origin.root else origin.id
-        getattr(form, str(root_id)).data = origin.id \
-            if origin.id != root_id else None
-    elif view_name == 'event':
+    if view_name == 'actor' and origin.class_.name == 'place':
+        form.residence.data = origin.id
+    if view_name == 'artifact' and origin.class_.view == 'actor':
+        form.actor.data = origin.id
+    if view_name == 'event':
         if origin.class_.view == 'artifact':
             form.artifact.data = [origin.id]
         elif origin.class_.view in ['artifact', 'place']:
@@ -213,6 +207,12 @@ def populate_insert_form(
                 form.place_from.data = origin.id
             else:
                 form.place.data = origin.id
+    if view_name == 'source' and origin.class_.name == 'artifact':
+        form.artifact.data = [origin.id]
+    if view_name == 'type':
+        root_id = origin.root[-1] if origin.root else origin.id
+        getattr(form, str(root_id)).data = origin.id \
+            if origin.id != root_id else None
 
 
 def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
@@ -241,9 +241,9 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
             form.place_from.data = place_from.get_linked_entity_safe(
                 'P53', True).id if place_from else ''
             place_to = entity.get_linked_entity('P26')
-            form.place_to.data = place_to.get_linked_entity_safe('P53',
-                                                                 True).id if \
-                place_to else ''
+            form.place_to.data = \
+                place_to.get_linked_entity_safe('P53', True).id \
+                if place_to else ''
             person_data = []
             object_data = []
             for linked_entity in entity.get_linked_entities('P25'):
