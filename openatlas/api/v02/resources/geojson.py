@@ -13,7 +13,8 @@ class Geojson:
         for entity in entities:
             geoms = [Geojson.get_entity(entity, geom)
                      for geom in Geojson.get_geom(entity)]
-            out.extend(geoms if geoms else Geojson.get_entity(entity))
+            out.extend(geoms) if geoms else out.append(
+                Geojson.get_entity(entity))
         return out
 
     @staticmethod
