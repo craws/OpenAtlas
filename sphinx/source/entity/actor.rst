@@ -28,5 +28,6 @@ Can be linked via tabs to
 * **Relation** - to other actors
 * **Member of** - the groups it is member of
 * **Member** - to actors who are members (only available for groups)
+* :doc:`artifact` - owned artifacts by that actor
 * :doc:`reference`
 * :doc:`file`
