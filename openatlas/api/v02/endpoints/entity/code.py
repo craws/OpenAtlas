@@ -13,7 +13,8 @@ from openatlas.models.entity import Entity
 
 class GetByCode(Resource):  # type: ignore
     @swag_from("../swagger/code.yml", endpoint="api.code")
-    def get(self, code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(self,
+            code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parsed = entity_.parse_args()
         return resolve_entities(
             GetByCode.get_by_view(code, parsed),
