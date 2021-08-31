@@ -151,8 +151,3 @@ Copy instance/example_testing.py to instance/testing.py and add/change values as
 appropriate.
 
     $ cp instance/example_testing.py instance/testing.py
-
-If using PyCharm, create a Nosetest and use these parameters for tests with
-coverage and HTML report:
-
-    --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase
