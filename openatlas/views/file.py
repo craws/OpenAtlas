@@ -14,12 +14,18 @@ from openatlas.util.util import required_group
 @app.route('/download/<path:filename>')
 @required_group('readonly')
 def download_file(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_DIR'], filename, as_attachment=True)
+    return send_from_directory(
+        app.config['UPLOAD_DIR'],
+        filename,
+        as_attachment=True)
 
 
 @app.route('/display/<path:filename>')
 @required_group('readonly')
 def display_file(filename: str) -> Any:
+    if request.args.get('size'):
+        return send_from_directory(
+            app.config['RESIZED_IMAGES'] / request.args.get('size'), filename)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 

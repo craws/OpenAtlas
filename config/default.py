@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openatlas import app
 
-VERSION = '6.4.0'
+VERSION = '6.5.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 IS_UNIT_TEST = False
 
@@ -27,6 +27,16 @@ DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.sv
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
 EXPORT_DIR = Path(app.root_path) / 'export'
 UPLOAD_DIR = Path(app.root_path) / 'uploads'
+
+# Image processing
+PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
+RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
+IMAGE_SIZE = {
+    'thumbnail': '200',
+    'table': '100'}
+NONE_DISPLAY_EXT = ['.tiff', '.tif']
+ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
+PROCESSED_EXT = '.jpeg'
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only

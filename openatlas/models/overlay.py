@@ -23,7 +23,11 @@ class Overlay:
         self.image_name = path.name if path else False
 
     @staticmethod
-    def insert(form: FlaskForm, image_id: int, place_id: int, link_id: int) -> None:
+    def insert(
+            form: FlaskForm,
+            image_id: int,
+            place_id: int,
+            link_id: int) -> None:
         Db.insert({
             'image_id': image_id,
             'place_id': place_id,
@@ -31,7 +35,8 @@ class Overlay:
             'bounding_box': f'''[
                 [{form.top_left_northing.data}, {form.top_left_easting.data}],
                 [{form.top_right_northing.data}, {form.top_right_easting.data}],
-                [{form.bottom_left_northing.data}, {form.bottom_left_easting.data}]]'''})
+                [{form.bottom_left_northing.data}, 
+                 {form.bottom_left_easting.data}]]'''})
 
     @staticmethod
     def update(form: FlaskForm, image_id: int, place_id: int) -> None:
@@ -41,12 +46,14 @@ class Overlay:
             'bounding_box': f'''[
                 [{form.top_left_northing.data}, {form.top_left_easting.data}],
                 [{form.top_right_northing.data}, {form.top_right_easting.data}],
-                [{form.bottom_left_northing.data}, {form.bottom_left_easting.data}]]'''})
+                [{form.bottom_left_northing.data}, 
+                 {form.bottom_left_easting.data}]]'''})
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:
-        if not app.config['IS_UNIT_TEST'] and not current_user.settings['module_map_overlay']:
-            return {}  # pragma: no cover - tests have no direct access to user settings
+        if not app.config['IS_UNIT_TEST'] \
+                and not current_user.settings['module_map_overlay']:
+            return {}  # pragma: no cover - tests can't access user settings
 
         ids = [object_.id]
         # Get overlays of parents

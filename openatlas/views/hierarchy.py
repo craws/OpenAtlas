@@ -52,7 +52,8 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             save(form, hierarchy)
             flash(_('info update'), 'info')
         tab = 'value' if g.nodes[id_].value_type else 'custom'
-        return redirect(f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
+        return redirect(
+            f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
     form.multiple = hierarchy.multiple
     table = Table(paging=False)
     for form_id, form_ in hierarchy.forms.items():

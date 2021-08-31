@@ -1,19 +1,32 @@
 class Changelog:
+
     versions = {
-        '6.4.0': ['TBA', {
+        '6.5.0': ['TBA', {
             'feature': {
+                '1462': 'Current owner of artifacts',
+                '1562': 'Update manual overlay'
+            }}],
+        '6.4.0': ['2021-08-10', {
+            'feature': {
+                '1280': 'Picture Preview',
+                '1492': 'Image Processing',
+                '1552': 'External reference systems for sources',
                 '1538': 'Focus on table filter at overview pages',
                 '1531': 'Map overlay improved',
+                '1523': 'Performance issues while linking pictures',
+                '1558': 'Manual entry profession',
+                '1426': 'API: Display image smaller size',
                 '1495': 'API: Additional Geojson output for QGIS imports',
                 '1529': 'API: Increase request performance',
                 '1530': 'API: Geometries endpoint for frontend map',
                 '1535': 'API: Get all entities linked to an entity',
-                '1537': 'API: type_entities for actor types',
+                '1537': 'API: Type entities for actor types',
                 '1545': 'API: Filter entities by types'
                 },
             'fix': {
                 '1414': 'Enlarged Description Field Covers up Entry Buttons',
-                '1539': 'Pagination not shown for tables sometimes'}}],
+                '1539': 'Pagination not shown for tables sometimes',
+                '1554': 'Error at value type view'}}],
         '6.3.0': ['2021-06-13', {
             'feature': {
                 '1513': 'Add reference page for multiple files',
@@ -53,7 +66,9 @@ class Changelog:
                 '1109': 'Sustainable web map services',
                 '1456': 'Artifacts',
                 '1187': 'Add files for artifacts',
-                '1465': 'Merge legal body to group, information carrier to artifact',
+                '1465':
+                    'Merge legal body to group, information carrier to '
+                    'artifact',
                 '1461': 'Also search in date comments',
                 '1398': 'Compress SQL export files',
                 '1274': 'API: Automatic documentation for code',
@@ -86,7 +101,8 @@ class Changelog:
                 '1395': 'Content for frontends',
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
-                '1407': 'Extend session availability (prevent CSRF token timeout)',
+                '1407':
+                    'Extend session availability (prevent CSRF token timeout)',
                 '1412': 'API: Include Wikidata',
                 '1350': 'API: Pagination in an extra array',
                 '1375': 'API: Download result of request path',
@@ -115,11 +131,14 @@ class Changelog:
                 '1299': 'API: Setting for CORS allowance in UI',
                 '1318': 'API: Selective requests'},
             'fix': {
-                '1306': 'Search results: small table, missing mouse over description',
+                '1306':
+                    'Search results: small table, missing mouse over '
+                    'description',
                 '1308': 'Missing connection for actors created from place',
                 '1319': 'Data table error in view',
                 '1326': 'User table in admin is not responsive',
-                '1328': 'Table layout error at check link duplicates function'}}],
+                '1328':
+                    'Table layout error at check link duplicates function'}}],
         '5.3.0': ['2020-07-15', {
             'feature': {
                 '1272': 'Tabs redesign',
@@ -268,10 +287,13 @@ class Changelog:
                 '961': 'Check function for dates and circular dependencies',
                 '962': 'Configurable character limit for live searches'},
             'fix': {
-                '970': "Insert and Continue doesn't work with place in Chrome"}}],
+                '970':
+                    "Insert and Continue doesn't work with place in Chrome"}}],
         '3.11.1': ['2018-11-30', {
             'fix': {
-                '964': 'Forms: tables with pager ignoring selection after changing page'}}],
+                '964':
+                    'Forms: tables with pager ignoring selection after '
+                    'changing page'}}],
         '3.11.0': ['2018-11-24', {
             'feature': {
                 '956': 'Clustering for maps',
@@ -284,7 +306,9 @@ class Changelog:
                 '538': 'Move/delete types for multiple entities',
                 '954': 'Documentation and links in application'},
             'fix': {
-                '942': 'Server 500 Error after wrong date input at Actor/Person'}}],
+                '942':
+                    'Server 500 Error after wrong date input at '
+                    'Actor/Person'}}],
         '3.9.0': ['2018-09-28', {
             'feature': {
                 '867': 'Network visualization advanced'},
@@ -331,10 +355,14 @@ class Changelog:
         '3.0.0': ['2017-12-31', {
             'feature': {
                 '877': """Python/Flask Port
-                <p>This version includes many new features and changes. Some are listed below.</p>
+                <p>
+                    This version includes many new features and changes.
+                    Some are listed below.
+                </p>
                 <p style="font-weight:bold">User Interface and Usability</p>
                 &#8226 Performance improvements<br>
-                &#8226 More possibilities to create and link entries in one go<br>
+                &#8226 More possibilities to create and link entries in one go
+                <br>
                 &#8226 Merge of front and backend and cleaner user interface<br>
                 &#8226 Advanced display and editing of source translations<br>
                 &#8226 Acquisition: multiple recipients, donors and places<br>
@@ -394,7 +422,8 @@ class Changelog:
                 '674': 'Place error occurs during saving'}}],
         '1.5.0': ['2016-04-01', {
             'feature': {
-                '564': 'Add multiple entries for relation, member and involvement',
+                '564':
+                    'Add multiple entries for relation, member and involvement',
                 '586': 'Bookmarks',
                 '671': 'Redmine links for changelog'}}],
         '1.4.0': ['2016-03-26', {
@@ -450,7 +479,9 @@ class Changelog:
                 '483': 'Actor - update for relations and involvements',
                 '486': 'Place - administrative units and historical places',
                 '389': 'Reference - bibliography',
-                '489': 'Layout - overwork, multiple possibilities to create and link entities',
+                '489':
+                    'Layout - overwork, multiple possibilities to create and '
+                    'link entities',
                 '421': 'CRM link checker'}}],
         '0.9.0': ['2015-07-12', {
             'feature': {
@@ -465,7 +496,8 @@ class Changelog:
             'feature': {
                 '403': 'Physical things - places',
                 '353': 'Maps - with Leaflet (GIS)',
-                '420': 'First and last dates in list views (e.g. actor, place)'}}],
+                '420': 'First and last dates in list views (e.g. actor, place)'}
+        }],
         '0.6.0': ['2015-05-13', {
             'feature': {
                 '402': 'Begin, end, birth and death (precise and fuzzy))',
@@ -481,7 +513,9 @@ class Changelog:
                 '386': 'Filter for tables'}}],
         '0.4.0': ['2015-02-23', {
             'feature': {
-                '362': 'Document - Insert, update, delete, add texts, link with actors',
+                '362':
+                    'Document - Insert, update, delete, add texts, link with '
+                    'actors',
                 '354': 'Alternative names',
                 '360': 'New color theme'},
             'fix': {
@@ -501,5 +535,7 @@ class Changelog:
                 '318': 'Import definitions from CIDOC rdfs'}}],
         '0.0.1': ['2014-11-05', {
             'feature': {
-                '': 'Initial version based on the "Zend Base" project from '
-                    '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}
+                '':
+                    'Initial version based on the "Zend Base" project from '
+                    '<a '
+                    'target="_blank" href="https://craws.net">craws.net</a>'}}]}

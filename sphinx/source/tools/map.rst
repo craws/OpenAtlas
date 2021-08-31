@@ -43,5 +43,11 @@ be visible on the map by default and can be toggled at map layer button at the u
 
 To insert new overlays (only available for editors and admins) go to the view of a specific place.
 After adding an image file in the file tab you can click **add** in the overlay column to enter
-coordinates for the top left, top right and bottom left corner of the image to position it on the map.
-The coordinates need to be in WGS84 decimal degrees (EPSG 4326).
+coordinates (Easting and Northing) for:
+
+* top left corner
+* top right corner
+* bottom left corner
+
+of the image to position it on the map.
+The coordinates need to be in **WGS84** decimal degrees (EPSG 4326).

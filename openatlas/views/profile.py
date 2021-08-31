@@ -17,7 +17,8 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.util.tab import Tab
-from openatlas.util.util import button, display_info, is_authorized, manual, uc_first
+from openatlas.util.util import (
+    button, display_info, is_authorized, manual, uc_first)
 
 
 class PasswordForm(FlaskForm):  # type: ignore
@@ -40,9 +41,11 @@ class PasswordForm(FlaskForm):  # type: ignore
             self.password2.errors.append(_('error passwords must match'))
             valid = False
         if self.password_old.data == self.password.data:
-            self.password.errors.append(_('error new password like old password'))
+            self.password.errors.append(
+                _('error new password like old password'))
             valid = False
-        if len(self.password.data) < session['settings']['minimum_password_length']:
+        if len(self.password.data) < \
+                session['settings']['minimum_password_length']:
             self.password.errors.append(_('error password too short'))
             valid = False
         return valid
@@ -72,13 +75,18 @@ def profile_index() -> str:
             button(_('edit'), url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
-    return render_template('tabs.html', tabs=tabs, title=_('profile'), crumbs=[_('profile')])
+    return render_template(
+        'tabs.html',
+        tabs=tabs,
+        title=_('profile'),
+        crumbs=[_('profile')])
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
 @login_required
 def profile_settings(category: str) -> Union[str, Response]:
-    if category not in ['profile', 'display'] and not is_authorized('contributor'):
+    if category not in ['profile', 'display'] \
+            and not is_authorized('contributor'):
         abort(403)  # pragma: no cover
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
@@ -111,7 +119,10 @@ def profile_settings(category: str) -> Union[str, Response]:
         form=form,
         manual_page='profile',
         title=_('profile'),
-        crumbs=[[_('profile'), f"{url_for('profile_index')}#tab-{category}"], _(category)])
+        crumbs=[
+            [_('profile'),
+             f"{url_for('profile_index')}#tab-{category}"],
+            _(category)])
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])

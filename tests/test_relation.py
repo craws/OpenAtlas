@@ -56,7 +56,8 @@ class RelationTests(TestBaseCase):
             assert b"link to itself" in rv.data
 
             # Relation types
-            rv = self.app.get(url_for('node_move_entities', id_=relation_sub_id))
+            rv = self.app.get(
+                url_for('node_move_entities', id_=relation_sub_id))
             assert b'The Kurgan' in rv.data
 
             # Update relationship
@@ -75,11 +76,15 @@ class RelationTests(TestBaseCase):
             assert b'Entities were updated' in rv.data
             rv = self.app.post(
                 url_for('node_move_entities', id_=relation_sub_id2),
-                data={relation_id: '', 'selection': [link_id], 'checkbox_values': str([link_id])},
+                data={
+                    relation_id: '',
+                    'selection': [link_id],
+                    'checkbox_values': str([link_id])},
                 follow_redirects=True)
             assert b'Entities were updated' in rv.data
 
-            rv = self.app.get(url_for('relation_update', id_=link_id, origin_id=related.id))
+            rv = self.app.get(
+                url_for('relation_update', id_=link_id, origin_id=related.id))
             assert b'Connor' in rv.data
             rv = self.app.post(
                 url_for('relation_update', id_=link_id, origin_id=actor.id),

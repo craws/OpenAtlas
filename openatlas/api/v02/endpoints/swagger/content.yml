@@ -2,7 +2,7 @@ Content endpoint
 ---
 tags:
   - Content
-description: Retrieves a json of the content (Intro, Legal Notice and Contact) from the OpenAtlas instance. The language can be choosen with the **lang** parameter (en or de).
+description: Retrieves a json of the content (Intro, Legal Notice, Contact and the size for processed images) from the OpenAtlas instance. The language can be choosen with the **lang** parameter (en or de).
 parameters:
   - $ref: '#/components/parameters/langParam'
   - $ref: '#/components/parameters/downloadParam'

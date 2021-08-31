@@ -32,10 +32,15 @@ class NoteTest(TestBaseCase):
                 url_for('note_update', id_=note_id),
                 data={'description': 'A very nice description'},
                 follow_redirects=True)
-            assert b'Note updated' in rv.data and b'A very nice description' in rv.data
+            assert b'Note updated' in rv.data \
+                   and b'A very nice description' in rv.data
             rv = self.app.get(url_for('note_view', id_=note_id))
             assert b'A very nice description' in rv.data
-            rv = self.app.get(url_for('note_set_private', id_=note_id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('note_set_private', id_=note_id),
+                follow_redirects=True)
             assert b'Note updated' in rv.data
-            rv = self.app.get(url_for('note_delete', id_=note_id), follow_redirects=True)
+            rv = self.app.get(
+                url_for('note_delete', id_=note_id),
+                follow_redirects=True)
             assert b'Note deleted' in rv.data

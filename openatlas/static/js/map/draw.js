@@ -472,7 +472,6 @@ function editGeometry() {
         });
         layer.remove();
     } else if (feature.properties.shapeType == 'polyline') {
-        console.log("editing line", geoJsonArray);
         $('#coordinatesDiv').hide();
         editLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
         // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
@@ -488,7 +487,6 @@ function editGeometry() {
             layer.remove(feature);
         });
     } else {
-        console.log("editing shape", geoJsonArray);
         $('#coordinatesDiv').hide();
         editLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
         // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804

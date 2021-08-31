@@ -68,16 +68,16 @@ class Filter:
         from openatlas.api.v02.resources.validation import Validation
         filter_clean = Validation.get_filter_from_url_parameter(filter_)
         out = []
-        for idx, filter_ in enumerate(filter_clean):
-            column = Filter.valid_columns[filter_[1]]
-            if Filter.compare_operators[filter_[2]] == 'LIKE':
-                column = 'LOWER(' + Filter.valid_columns[filter_[1]] + ')'
+        for key, value in enumerate(filter_clean):
+            column = Filter.valid_columns[value[1]]
+            if Filter.compare_operators[value[2]] == 'LIKE':
+                column = 'LOWER(' + Filter.valid_columns[value[1]] + ')'
             out.append({
-                'idx': idx,
-                'term': Filter.validate_term(filter_),
+                'idx': key,
+                'term': Filter.validate_term(value),
                 'clause':
-                    Filter.logical_operators[filter_[0]] + ' ' + column + ' ' +
-                    Filter.compare_operators[filter_[2]]})
+                    Filter.logical_operators[value[0]] + ' ' + column + ' ' +
+                    Filter.compare_operators[value[2]]})
         return out
 
     @staticmethod

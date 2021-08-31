@@ -19,7 +19,7 @@ class ContentTests(TestBaseCase):
                     self.precision_wikidata: ''})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                Entity.insert('file', 'One forsaken file entity')  # Add orphaned file
+                Entity.insert('file', 'One forsaken file entity')
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
             rv = self.app.get(url_for('admin_newsletter'))
@@ -29,7 +29,8 @@ class ContentTests(TestBaseCase):
         with app.app_context():  # type: ignore
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
-            rv = self.app.get(url_for('admin_log_delete', follow_redirects=True))
+            rv = self.app.get(
+                url_for('admin_log_delete', follow_redirects=True))
             assert b'Login' not in rv.data
 
     def test_links(self) -> None:

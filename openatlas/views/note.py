@@ -12,7 +12,8 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
-from openatlas.util.util import button, is_authorized, link, manual, required_group, uc_first
+from openatlas.util.util import (
+    button, is_authorized, link, manual, required_group, uc_first)
 
 
 @app.route('/note/view/<int:id_>')
@@ -27,7 +28,10 @@ def note_view(id_: int) -> str:
             button(_('edit'), url_for('note_update', id_=note['id'])),
             button(_('delete'), url_for('note_delete', id_=note['id']))]
     elif is_authorized('manager'):  # pragma: no cover
-        buttons += [button(_('set private'), url_for('note_set_private', id_=note['id']))]
+        buttons += [
+            button(
+                _('set private'),
+                url_for('note_set_private', id_=note['id']))]
     tabs = {'info': Tab(
         'info',
         buttons=buttons,
@@ -83,7 +87,8 @@ def note_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         User.update_note(note['id'], form.description.data, form.public.data)
         flash(_('note updated'), 'info')
-        return redirect(f"{url_for('entity_view', id_=note['entity_id'])}#tab-note")
+        return redirect(
+            f"{url_for('entity_view', id_=note['entity_id'])}#tab-note")
     form.save.label.text = _('save')
     form.description.data = note['text']
     form.public.data = note['public']

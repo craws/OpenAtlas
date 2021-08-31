@@ -25,27 +25,30 @@ class LinkedPlaces:
                 parser)]}
 
     @staticmethod
-    def build_feature(entity: Entity,
-                      links: List[Link],
-                      links_inverse: List[Link],
-                      p: Dict[str, Any]) -> Dict[str, Any]:
+    def build_feature(
+            entity: Entity,
+            links: List[Link],
+            links_inverse: List[Link],
+            parser: Dict[str, Any]) -> Dict[str, Any]:
         return {'@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': 'Feature',
                 'crmClass': LinkedPlaces.get_crm_class(entity),
                 'systemClass': entity.class_.name,
                 'properties': {'title': entity.name},
-                'types': LinkedPlaces.get_types(entity, links, p),
-                'depictions': LinkedPlaces.get_depictions(links_inverse, p),
-                'when': LinkedPlaces.get_timespans(entity, p),
-                'links': LinkedPlaces.get_reference_links(links_inverse, p),
+                'types': LinkedPlaces.get_types(entity, links, parser),
+                'depictions':
+                    LinkedPlaces.get_depictions(links_inverse, parser),
+                'when': LinkedPlaces.get_timespans(entity, parser),
+                'links':
+                    LinkedPlaces.get_reference_links(links_inverse, parser),
                 'description': LinkedPlaces.get_description(entity),
-                'names': LinkedPlaces.get_names(entity, p),
-                'geometry': LinkedPlaces.get_geometries(entity, links, p),
-                'relations': LinkedPlaces.get_relations(links, links_inverse, p)
-                }
+                'names': LinkedPlaces.get_names(entity, parser),
+                'geometry': LinkedPlaces.get_geometries(entity, links, parser),
+                'relations':
+                    LinkedPlaces.get_relations(links, links_inverse, parser)}
 
     @staticmethod
-    def get_description(entity: Entity) -> List[Dict[str, Any]]:
+    def get_description(entity: Entity) -> Optional[List[Dict[str, Any]]]:
         return [{'value': entity.description}] if entity.description else None
 
     @staticmethod
@@ -95,7 +98,7 @@ class LinkedPlaces:
                     or entity.class_.name in ['find', 'artifact']:
                 return LPHelper.get_geoms_by_entity(
                     LPHelper.get_location_id(links))
-            elif entity.class_.name == 'object_location':
+            if entity.class_.name == 'object_location':
                 return LPHelper.get_geoms_by_entity(entity.id)
         return None
 

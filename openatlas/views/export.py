@@ -10,7 +10,7 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
-from openatlas.models.export import Export
+from openatlas.models.export import csv_export, sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
     convert_size, delete_link, is_authorized, link, required_group, uc_first)
@@ -30,11 +30,15 @@ class ExportCsvForm(FlaskForm):  # type: ignore
             ('wkt', 'WKT'),
             ('postgis', 'PostGIS Geometry')])
     model_class = BooleanField('model.class', default=True)
-    model_class_inheritance = BooleanField('model.class_inheritance', default=True)
+    model_class_inheritance = BooleanField(
+        'model.class_inheritance',
+        default=True)
     model_entity = BooleanField('model.entity', default=True)
     model_link = BooleanField('model.link', default=True)
     model_property = BooleanField('model.property', default=True)
-    model_property_inheritance = BooleanField('model.property_inheritance', default=True)
+    model_property_inheritance = BooleanField(
+        'model.property_inheritance',
+        default=True)
     gis_point = BooleanField('gis.point', default=True)
     gis_linestring = BooleanField('gis.linestring', default=True)
     gis_polygon = BooleanField('gis.polygon', default=True)
@@ -44,13 +48,19 @@ class ExportCsvForm(FlaskForm):  # type: ignore
 @app.route('/download/sql/<filename>')
 @required_group('manager')
 def download_sql(filename: str) -> Response:
-    return send_from_directory(app.config['EXPORT_DIR'] / 'sql', filename, as_attachment=True)
+    return send_from_directory(
+        app.config['EXPORT_DIR'] / 'sql',
+        filename,
+        as_attachment=True)
 
 
 @app.route('/download/csv/<filename>')
 @required_group('manager')
 def download_csv(filename: str) -> Any:
-    return send_from_directory(app.config['EXPORT_DIR'] / 'csv', filename, as_attachment=True)
+    return send_from_directory(
+        app.config['EXPORT_DIR'] / 'csv',
+        filename,
+        as_attachment=True)
 
 
 @app.route('/export/sql', methods=['POST', 'GET'])
@@ -60,7 +70,7 @@ def export_sql() -> Union[str, Response]:
     writeable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writeable:
-        if Export.export_sql():
+        if sql_export():
             logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
         else:  # pragma: no cover
@@ -73,7 +83,9 @@ def export_sql() -> Union[str, Response]:
         table=get_table('sql', path, writeable),
         writeable=writeable,
         title=_('export SQL'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('export SQL')])
+        crumbs=[
+            [_('admin'),
+             f"{url_for('admin_index')}#tab-data"], _('export SQL')])
 
 
 @app.route('/export/csv', methods=['POST', 'GET'])
@@ -83,7 +95,7 @@ def export_csv() -> Union[str, Response]:
     writeable = os.access(path, os.W_OK)
     form = ExportCsvForm()
     if form.validate_on_submit() and writeable:
-        Export.export_csv(form)
+        csv_export(form)
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
@@ -93,19 +105,27 @@ def export_csv() -> Union[str, Response]:
         table=get_table('csv', path, writeable),
         writeable=writeable,
         title=_('export CSV'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('export CSV')])
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-data"],
+            _('export CSV')])
 
 
 def get_table(type_: str, path: Path, writeable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
-    for file in [f for f in path.iterdir() if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
         data = [
             file.name,
             convert_size(file.stat().st_size),
-            link(_('download'), url_for(f'download_{type_}', filename=file.name))]
+            link(
+                _('download'),
+                url_for(f'download_{type_}', filename=file.name))]
         if is_authorized('admin') and writeable:
             data.append(
-                delete_link(file.name, url_for('delete_export', type_=type_, filename=file.name)))
+                delete_link(
+                    file.name,
+                    url_for('delete_export', type_=type_, filename=file.name)))
         table.rows.append(data)
     return table
 

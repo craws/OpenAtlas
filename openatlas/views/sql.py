@@ -40,7 +40,7 @@ def sql_execute() -> str:
             try:
                 response += f'<p>{g.cursor.fetchall()}</p>'
             except Exception:  # pragma: no cover
-                pass  # Assuming it was no SELECT statement so returning just the rowcount
+                pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')
         except Exception as e:

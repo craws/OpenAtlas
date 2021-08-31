@@ -45,7 +45,9 @@ class UserTests(TestBaseCase):
             assert b'match' in rv.data
 
             # Test insert with continue
-            rv = self.app.post(url_for('user_insert'), follow_redirects=True, data=data2)
+            rv = self.app.post(
+                url_for('user_insert'),
+                follow_redirects=True, data=data2)
             assert b'Newt' not in rv.data
 
             rv = self.app.get(url_for('user_view', id_=user_id))
@@ -58,11 +60,12 @@ class UserTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'The warrant officer' in rv.data
-            rv = self.app.get(url_for('admin_index', action='delete_user', id_=user_id))
+            rv = self.app.get(
+                url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
 
             # Test activity log
-            data = {'name': 'test', 'description': 'test'}  # insert a reference to show something
+            data = {'name': 'test', 'description': 'test'}
             self.app.post(url_for('insert', class_='bibliography'), data=data)
             rv = self.app.get(url_for('user_activity'))
             assert b'Activity' in rv.data
@@ -76,6 +79,8 @@ class UserTests(TestBaseCase):
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
-            self.app.post('/login', data={'username': 'Editor', 'password': 'test'})
+            self.app.post(
+                '/login',
+                data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'403 - Forbidden' in rv.data

@@ -1,4 +1,4 @@
-from typing import Dict, Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 from flask import flash, g, jsonify, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -38,10 +38,17 @@ class FeedbackForm(FlaskForm):  # type: ignore
 def overview() -> str:
     tabs = {
         'info': Tab('info'),
-        'bookmarks': Tab('bookmarks', table=Table(['name', 'class', 'begin', 'end'])),
-        'notes': Tab('notes', table=Table(['date', _('visibility'), 'entity', 'class', _('note')]))}
+        'bookmarks': Tab(
+            'bookmarks',
+            table=Table(['name', 'class', 'begin', 'end'])),
+        'notes': Tab(
+            'notes',
+            table=Table(
+                ['date', _('visibility'), 'entity', 'class', _('note')]))}
     tables = {
-        'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
+        'overview': Table(
+            paging=False,
+            defs=[{'className': 'dt-body-right', 'targets': 1}]),
         'latest': Table(paging=False, order=[[0, 'desc']])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
@@ -60,7 +67,8 @@ def overview() -> str:
                 link(entity),
                 entity.class_.label,
                 note['text'],
-                f'<a href="{url_for("note_view", id_=note["id"])}">{uc_first(_("view"))}</a>'])
+                f'<a href="{url_for("note_view", id_=note["id"])}">'
+                f'{uc_first(_("view"))}</a>'])
         for name, count in Entity.get_overview_counts().items():
             if count:
                 url = url_for('index', view=g.class_view_mapping[name])
@@ -70,11 +78,15 @@ def overview() -> str:
                     url = url_for('node_index')
                 elif name == 'find':
                     url = url_for('index', view='artifact')
-                elif name in ['feature', 'human_remains', 'stratigraphic_unit',
-                              'source_translation']:
+                elif name in [
+                        'feature',
+                        'human_remains',
+                        'stratigraphic_unit',
+                        'source_translation']:
                     url = ''
                 tables['overview'].rows.append([
-                    link(g.classes[name].label, url) if url else g.classes[name].label,
+                    link(g.classes[name].label, url)
+                    if url else g.classes[name].label,
                     format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
@@ -104,12 +116,20 @@ def set_locale(language: str) -> Response:
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
     form = FeedbackForm()
-    if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        subject = f"{uc_first(form.subject.data)} from {session['settings']['site_name']}"
+    if form.validate_on_submit() \
+            and session['settings']['mail']:  # pragma: no cover
+        subject = \
+            f"{uc_first(form.subject.data)} " \
+            f"from {session['settings']['site_name']}"
         user = current_user
-        body = f'{form.subject.data} from {user.username} ({user.id}) '
-        body += f'{user.email} at {request.headers["Host"]}\n\n{form.description.data}'
-        if send_mail(subject, body, session['settings']['mail_recipients_feedback']):
+        body = \
+            f'{form.subject.data} from {user.username} ({user.id}) ' \
+            f'{user.email} at {request.headers["Host"]}\n\n' \
+            f'{form.description.data}'
+        if send_mail(
+                subject,
+                body,
+                session['settings']['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')
@@ -131,7 +151,7 @@ def index_content(item: str) -> str:
 
 
 @app.errorhandler(400)
-def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
+def bad_request(e: Exception) -> Tuple[Any, int]:  # pragma: no cover
     return render_template('400.html', crumbs=['400 - Bad Request'], e=e), 400
 
 
@@ -144,7 +164,10 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
         return jsonify({'message': 'Endpoint not found', 'status': 404}), 404
-    return render_template('404.html', crumbs=['404 - File not found'], e=e), 404
+    return render_template(
+        '404.html',
+        crumbs=['404 - File not found'],
+        e=e), 404
 
 
 @app.errorhandler(405)  # pragma: no cover
@@ -159,7 +182,10 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
-    return render_template('422.html', crumbs=['422 - Unprocessable entity'], e=e), 422
+    return render_template(
+        '422.html',
+        crumbs=['422 - Unprocessable entity'],
+        e=e), 422
 
 
 @app.route('/changelog')
@@ -180,7 +206,8 @@ def index_unsubscribe(code: str) -> str:
         user.unsubscribe_code = ''
         user.update()
         user.remove_newsletter()
-        text = _('You have successfully unsubscribed. You can subscribe again in your Profile.')
+        text = _('You have successfully unsubscribed. '
+                 'You can subscribe again in your Profile.')
     return render_template(
         'index/unsubscribe.html',
         text=text,

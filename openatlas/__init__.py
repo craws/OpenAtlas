@@ -15,11 +15,12 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use test database if running tests
-instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
+instance_name = 'production' \
+    if 'test_runner.py' not in sys.argv[0] else 'testing'
 
 app.config.from_object('config.default')  # type: ignore
 app.config.from_pyfile(instance_name + '.py')  # type: ignore
-app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for the life of the session.
+app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 if os.name == "posix":
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
@@ -31,17 +32,20 @@ logger = Logger()
 
 from openatlas.api.v02 import routes  # New routes
 from openatlas.util import processor
+from openatlas.util.util import get_file_stats
 from openatlas.views import (
-    admin, ajax, entity, entity_index, entity_form, export, file, hierarchy, index, involvement,
-    imports, link, login, member, model, note, overlay, profile, reference, relation,
-    reference_system, search, source, sql, types, user)
+    admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
+    index, involvement, imports, link, login, member, model, note, overlay,
+    profile, reference, relation, reference_system, search, source, sql, types,
+    user)
 
 
 @babel.localeselector
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
-    best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    best_match = request.accept_languages.best_match(
+        app.config['LANGUAGES'].keys())
     return best_match if best_match else session['settings']['default_language']
 
 
@@ -51,8 +55,9 @@ def before_request() -> None:
     from openatlas.models.node import Node
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
+
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Avoid overhead for static files, only needed if not using Apache with static alias
+        return  # Avoid overhead for files if not using Apache with static alias
     open_connection(app.config)
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
@@ -66,10 +71,11 @@ def before_request() -> None:
     g.class_view_mapping = system.get_class_view_mapping()
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
-    g.file_stats = None
+    g.file_stats = get_file_stats()
 
     # Set max file upload in MB
-    app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
+    app.config['MAX_CONTENT_LENGTH'] = \
+        session['settings']['file_upload_max_size'] * 1024 * 1024
 
     if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
@@ -81,7 +87,8 @@ def before_request() -> None:
 
 @app.after_request
 def apply_caching(response: Response) -> Response:
-    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['Strict-Transport-Security'] = \
+        'max-age=31536000; includeSubDomains'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
     response.headers['X-XSS-Protection'] = '1; mode=block'

@@ -18,8 +18,9 @@ class Geojson:
         return out
 
     @staticmethod
-    def get_entity(entity: Entity, geom: Dict[str, Any] = None) \
-            -> Dict[str, Any]:
+    def get_entity(
+            entity: Entity,
+            geom: Dict[str, Any] = None) -> Dict[str, Any]:
         features = {
             'type': 'Feature',
             'geometry': geom,

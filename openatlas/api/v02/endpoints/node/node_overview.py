@@ -28,7 +28,7 @@ class GetNodeOverview(Resource):  # type: ignore
             'custom': {},
             'places': {},
             'value': {}}
-        for id_, node in g.nodes.items():
+        for node in g.nodes.values():
             if node.root:
                 continue
             type_ = 'custom'

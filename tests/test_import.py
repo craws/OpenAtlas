@@ -14,7 +14,9 @@ class ExportTest(TestBaseCase):
             # Projects
             rv = self.app.get(url_for('import_project_insert'))
             assert b'Name *' in rv.data
-            rv = self.app.post(url_for('import_project_insert'), data={'name': 'Project Import'})
+            rv = self.app.post(
+                url_for('import_project_insert'),
+                data={'name': 'Project Import'})
             project_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('import_project_update', id_=project_id))
             assert b'Name *' in rv.data
@@ -32,24 +34,38 @@ class ExportTest(TestBaseCase):
             assert b'Yup' in rv.data
 
             # Import data
-            rv = self.app.get(url_for('import_data', class_='person', project_id=project_id))
+            rv = self.app.get(
+                url_for('import_data', class_='person', project_id=project_id))
             assert b'File *' in rv.data
-            csv = pathlib.Path(app.root_path) / 'static' / 'import' / 'example.csv'
+            csv = \
+                pathlib.Path(app.root_path) \
+                / 'static' / 'import' / 'example.csv'
             with open(csv, 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=project_id),
+                    url_for(
+                        'import_data',
+                        class_='place',
+                        project_id=project_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
             assert b'Vienna' in rv.data
             with open(csv, 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=project_id),
+                    url_for(
+                        'import_data',
+                        class_='place',
+                        project_id=project_id),
                     data={'file': file, 'duplicate': True},
                     follow_redirects=True)
             assert b'IDs already in database' in rv.data
-            with open(pathlib.Path(app.root_path) / 'static' / 'favicon.ico', 'rb') as file:
+            with open(
+                    pathlib.Path(app.root_path)
+                    / 'static' / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(
-                    url_for('import_data', class_='place', project_id=project_id),
+                    url_for(
+                        'import_data',
+                        class_='place',
+                        project_id=project_id),
                     data={'file': file},
                     follow_redirects=True)
             assert b'File type not allowed' in rv.data

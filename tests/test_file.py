@@ -20,9 +20,12 @@ class FileTest(TestBaseCase):
                 node_id = Node.get_hierarchy('Sex').subs[0]
 
             # Insert
-            rv = self.app.get(url_for('insert', class_='file', origin_id=actor.id))
+            rv = self.app.get(
+                url_for('insert', class_='file', origin_id=actor.id))
             assert b'+ File' in rv.data
-            logo = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
+            logo = \
+                pathlib.Path(app.root_path) \
+                / 'static' / 'images' / 'layout' / 'logo.png'
             with open(logo, 'rb') as img:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=actor.id),
@@ -48,18 +51,26 @@ class FileTest(TestBaseCase):
                 file_id2 = files[1].id
 
             # Logo
-            rv = self.app.get(url_for('admin_logo'), data={'file': file_id}, follow_redirects=True)
+            rv = self.app.get(
+                url_for('admin_logo'),
+                data={'file': file_id},
+                follow_redirects=True)
             assert b'OpenAtlas logo' in rv.data
-            with self.app.get(url_for('display_logo', filename=str(file_id) + '.png')):
-                pass   # Test logo display, calling with "with" to prevent unclosed files warning
-            rv = self.app.get(url_for('admin_logo', id_=file_id), follow_redirects=True)
+            with self.app.get(
+                    url_for('display_logo', filename=str(file_id) + '.png')):
+                pass  # Test logo with "with" to prevent unclosed files warning
+            rv = self.app.get(
+                url_for('admin_logo', id_=file_id),
+                follow_redirects=True)
             assert b'Remove custom logo' in rv.data
             rv = self.app.get(
                 url_for('admin_index', action="remove_logo", id_=0),
                 follow_redirects=True)
             assert b'Logo' in rv.data
 
-            with open(pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') as invalid_file:
+            with open(
+                    pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') \
+                    as invalid_file:
                 rv = self.app.post(
                     url_for('insert', class_='file', origin_id=actor.id),
                     data={'name': 'Invalid file', 'file': invalid_file},
@@ -78,9 +89,11 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('entity_view', id_=file_id2))
             assert b'OpenAtlas logo' in rv.data
 
-            with self.app.get(url_for('download_file', filename=str(file_id) + '.png')):
+            with self.app.get(
+                    url_for('download_file', filename=str(file_id) + '.png')):
                 pass  # Calling with "with" to prevent unclosed files warning
-            with self.app.get(url_for('display_file', filename=str(file_id) + '.png')):
+            with self.app.get(
+                    url_for('display_file', filename=str(file_id) + '.png')):
                 pass  # Calling with "with" to prevent unclosed files warning
 
             # Index
@@ -91,10 +104,12 @@ class FileTest(TestBaseCase):
             self.app.get(
                 url_for('set_profile_image', id_=file_id, origin_id=actor.id),
                 follow_redirects=True)
-            self.app.get(url_for('file_remove_profile_image', entity_id=actor.id))
+            self.app.get(
+                url_for('file_remove_profile_image', entity_id=actor.id))
 
             # Add to reference
-            rv = self.app.get(url_for('reference_add', id_=reference.id, view='file'))
+            rv = self.app.get(
+                url_for('reference_add', id_=reference.id, view='file'))
             assert b'OpenAtlas logo' in rv.data
             rv = self.app.post(
                 url_for('reference_add', id_=reference.id, view='file'),
@@ -109,7 +124,8 @@ class FileTest(TestBaseCase):
                 url_for('update', id_=file_id),
                 data={'name': 'Updated file'},
                 follow_redirects=True)
-            assert b'Changes have been saved' in rv.data and b'Updated file' in rv.data
+            assert b'Changes have been saved' in rv.data \
+                   and b'Updated file' in rv.data
             rv = self.app.get(url_for('file_add', id_=file_id, view='actor'))
             assert b'Link actor' in rv.data
             rv = self.app.post(
@@ -124,5 +140,7 @@ class FileTest(TestBaseCase):
             assert b'Updated file' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('index', view='file', delete_id=file_id))
-            assert b'The entry has been deleted' in rv.data
+            for file in files:
+                rv = self.app.get(
+                    url_for('index', view='file', delete_id=file.id))
+                assert b'The entry has been deleted' in rv.data

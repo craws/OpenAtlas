@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 
 
-class DisplayImage(Resource):
+class DisplayImage(Resource):  # type: ignore
     @staticmethod
     def get(filename: str) -> Response:
         from pathlib import Path as Pathlib_path
@@ -24,4 +24,9 @@ class DisplayImage(Resource):
             return send_file(
                 f"{app.config['UPLOAD_DIR']}/{filename}",
                 as_attachment=True)
+        if parser['image_size']:
+            size = app.config['IMAGE_SIZE'][parser['image_size']]
+            return send_from_directory(
+                f"{app.config['RESIZED_IMAGES']}/{size}",
+                filename)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)

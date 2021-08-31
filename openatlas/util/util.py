@@ -4,14 +4,14 @@ import math
 import os
 import re
 import smtplib
-from collections import OrderedDict
+from collections import defaultdict
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, List, Optional, OrderedDict as OrderedD, TYPE_CHECKING, Tuple, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import flash, g, render_template, request, session, url_for
@@ -30,6 +30,7 @@ from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -38,16 +39,21 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 @app.template_filter()
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
-    label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
+    label = uc_first(
+        _('bookmark remove')
+        if entity_id in current_user.bookmarks else _('bookmark'))
     onclick = f"ajaxBookmark('{entity_id}');"
     if for_table:
-        return f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">{label}</a>'
+        return \
+            f'<a href="#" id="bookmark{entity_id}" onclick="{onclick}">' \
+            f'{label}</a>'
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
 @app.template_filter()
 def display_external_references(entity: Entity) -> str:
-    return Markup(render_template('util/external_references.html', entity=entity))
+    return Markup(
+        render_template('util/external_references.html', entity=entity))
 
 
 @app.template_filter()
@@ -65,29 +71,35 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             active = 'active'
         elif len(request_parts) > 2 and request.path.startswith('/insert/'):
             name = request_parts[2]
-            if name in g.class_view_mapping and g.class_view_mapping[name] == item:
+            if name in g.class_view_mapping \
+                    and g.class_view_mapping[name] == item:
                 active = 'active'
         url = url_for('index', view=item)
-        html += f'<a href="{url}" class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
+        html += \
+            f'<a href="{url}" class="nav-item nav-link {active}">' \
+            f'{uc_first(_(item))}</a>'
     active = ''
     if request.path.startswith('/types') \
             or request.path.startswith('/insert/type') \
             or (entity and entity.class_.view == 'type'):
         active = 'active'
     url = url_for('node_index')
-    html += f'<a href="{url}" class="nav-item nav-link {active}"> {uc_first(_("types"))}</a>'
+    html += \
+        f'<a href="{url}" class="nav-item nav-link {active}">' \
+        f'{uc_first(_("types"))}</a>'
     return Markup(html)
 
 
 @app.template_filter()
 def is_authorized(group: str) -> bool:
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False  # pragma: no cover - needed because AnonymousUserMixin has no group
+        return False  # pragma: no cover - AnonymousUserMixin has no group
     if current_user.group == 'admin' \
             or current_user.group == group \
             or (current_user.group == 'manager'
                 and group in ['editor', 'contributor', 'readonly']) \
-            or (current_user.group == 'editor' and group in ['contributor', 'readonly']) \
+            or (current_user.group == 'editor'
+                and group in ['contributor', 'readonly']) \
             or (current_user.group == 'contributor' and group in ['readonly']):
         return True
     return False
@@ -97,13 +109,13 @@ def is_authorized(group: str) -> bool:
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'node':  # Only keep letters, numbers, minus, brackets and spaces
+    if mode == 'node':  # Filter letters, numbers, minus, brackets and spaces
         return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
         stripper.feed(string)
         return stripper.get_data().strip()
-    return re.sub('[^A-Za-z0-9]+', '', string)  # Only keep ASCII letters and numbers
+    return re.sub('[^A-Za-z0-9]+', '', string)  # Filter ASCII letters/numbers
 
 
 @app.template_filter()
@@ -133,14 +145,17 @@ def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
-    return f'<p>{name}</p>{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
+    return \
+        f'<p>{name}</p>' \
+        f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
 def get_backup_file_data() -> Dict[str, Any]:
     path = app.config['EXPORT_DIR'] / 'sql'
     latest_file = None
     latest_file_date = None
-    for file in [f for f in path.iterdir() if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [f for f in path.iterdir()
+                 if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -155,18 +170,22 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(entity: 'Entity', show_links: Optional[bool] = True) -> List[Any]:
+def get_base_table_data(
+        entity: 'Entity',
+        show_links: Optional[bool] = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
             entity.class_.name == 'find':
         data.append(entity.class_.label)
-    if entity.class_.view in ['artifact', 'event', 'file', 'place', 'reference', 'source']:
-        data.append(entity.print_standard_type(show_links=False))
+    if entity.class_.standard_type:
+        data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
-        data.append(g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A')
-        data.append(g.file_stats[entity.id]['ext'] if entity.id in g.file_stats else 'N/A')
+        data.append(
+            g.file_stats[entity.id]['size']
+            if entity.id in g.file_stats else 'N/A')
+        data.append(
+            g.file_stats[entity.id]['ext']
+            if entity.id in g.file_stats else 'N/A')
     if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
         data.append(entity.first)
         data.append(entity.last)
@@ -179,14 +198,15 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
         return None
     statvfs = os.statvfs(app.config['UPLOAD_DIR'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail
     return {
         'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
         'percent': 100 - math.ceil(free_space / (disk_space / 100))}
 
 
-def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
+def get_file_stats(
+        path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
     stats: Dict[int, Dict[str, Any]] = {}
     for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
         stats[int(file.stem)] = {
@@ -199,8 +219,8 @@ def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str
 def get_entity_data(
         entity: 'Entity',
         event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: OrderedD[str, Any] = OrderedDict(
-        {_('alias'): list(entity.aliases.values())})
+    data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
+
     # Dates
     from_link = ''
     to_link = ''
@@ -212,10 +232,18 @@ def get_entity_data(
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
-    data[_('begin')] = (from_link if from_link else '') + format_entity_date(entity, 'begin')
-    data[_('end')] = (to_link if to_link else '') + format_entity_date(entity, 'end')
+    data[_('begin')] = \
+        (from_link if from_link else '') + format_entity_date(entity, 'begin')
+    data[_('end')] = \
+        (to_link if to_link else '') + format_entity_date(entity, 'end')
 
-    add_type_data(entity, data)
+    # Types
+    if entity.standard_type:
+        title = ' > '.join(
+            reversed([g.nodes[id_].name for id_ in entity.standard_type.root]))
+        data[_('type')] = \
+            f'<span title="{title}">{link(entity.standard_type)}</span>'
+    data.update(get_type_data(entity))
 
     # Class specific information
     from openatlas.models.node import Node
@@ -243,7 +271,9 @@ def get_entity_data(
         residence_place = entity.get_linked_entity('P74')
         residence_object = None
         if residence_place:
-            residence_object = residence_place.get_linked_entity_safe('P53', True)
+            residence_object = residence_place.get_linked_entity_safe(
+                'P53',
+                True)
             entity.linked_places.append(residence_object)
         data[_('alias')] = list(entity.aliases.values())
         data[_('begin')] = format_entity_date(entity, 'begin', begin_object)
@@ -252,9 +282,12 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-        data[_('residence')] = link(residence_object) if residence_object else ''
+        data[_('residence')] = link(
+            residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
-        data[_('source')] = [link(source) for source in entity.get_linked_entities(['P128'])]
+        data[_('source')] = [
+            link(source) for source in entity.get_linked_entities(['P128'])]
+        data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
         if super_event:
@@ -272,22 +305,26 @@ def get_entity_data(
         else:
             place = entity.get_linked_entity('P7')
             if place:
-                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
+                data[_('location')] = link(
+                    place.get_linked_entity_safe('P53', True))
 
         if entity.class_.name == 'acquisition':
             data[_('recipient')] = [
-                link(recipient) for recipient in entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
+                link(recipient) for recipient
+                in entity.get_linked_entities(['P22'])]
+            data[_('donor')] = [
+                link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = [
+                link(place) for place in entity.get_linked_entities(['P24'])]
     elif entity.class_.view == 'file':
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
-        data[_('size')] = g.file_stats[entity.id]['size'] if entity.id in g.file_stats else 'N/A'
+        data[_('size')] = g.file_stats[entity.id]['size'] \
+            if entity.id in g.file_stats else 'N/A'
         data[_('extension')] = g.file_stats[entity.id]['ext'] \
             if entity.id in g.file_stats else 'N/A'
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
-            link(artifact) for artifact in entity.get_linked_entities(['P128'], inverse=True)]
+            link(artifact) for artifact
+            in entity.get_linked_entities(['P128'], inverse=True)]
     return add_system_data(entity, data)
 
 
@@ -311,14 +348,19 @@ def send_mail(
         text: str,
         recipients: Union[str, List[str]],
         log_body: bool = True) -> bool:  # pragma: no cover
-    """Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    """
+        Send one mail to every recipient.
+        Set log_body to False for sensitive data e.g. passwords.
+    """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
     if not settings['mail'] or not recipients:
         return False
     mail_user = settings['mail_transport_username']
     from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
-    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
+    server = smtplib.SMTP(
+        settings['mail_transport_host'],
+        settings['mail_transport_port'])
     server.ehlo()
     server.starttls()
     try:
@@ -329,8 +371,11 @@ def send_mail(
             msg['From'] = from_
             msg['To'] = recipient.strip()
             msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
-            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
-        log_text = f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
+            server.sendmail(
+                settings['mail_from_email'],
+                recipient, msg.as_string())
+        log_text = \
+            f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
         log_text += f' Content: {text}' if log_body else ''
         logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
@@ -348,8 +393,10 @@ def send_mail(
 def tooltip(text: str) -> str:
     if not text:
         return ''
-    return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
-        title=text.replace('"', "'"))
+    return """
+        <span>
+            <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
+        </span>""".format(title=text.replace('"', "'"))
 
 
 def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
@@ -372,23 +419,31 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
         actor = link_.range
         event_link = link(_('event'), url_for('entity_view', id_=event.id))
         if not actor.first:
-            if link_.first and (not first_year or int(link_.first) < int(first_year)):
+            if link_.first \
+                    and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
-                first_string = f"{format_entity_date(link_, 'begin', link_.object_)}"
-                first_string += f" {_('at an')} {event_link}"
-            elif event.first and (not first_year or int(event.first) < int(first_year)):
+                first_string = \
+                    f"{format_entity_date(link_, 'begin', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
+            elif event.first \
+                    and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
-                first_string = f"{format_entity_date(event, 'begin', link_.object_)}"
-                first_string += f" {_('at an')} {event_link}"
+                first_string = \
+                    f"{format_entity_date(event, 'begin', link_.object_)}" \
+                    f" {_('at an')} {event_link}"
         if not actor.last:
-            if link_.last and (not last_year or int(link_.last) > int(last_year)):
+            if link_.last \
+                    and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
-                last_string = f"{format_entity_date(link_, 'end', link_.object_)}"
-                last_string += f" {_('at an')} {event_link}"
-            elif event.last and (not last_year or int(event.last) > int(last_year)):
+                last_string = \
+                    f"{format_entity_date(link_, 'end', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
+            elif event.last \
+                    and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
-                last_string = f"{format_entity_date(event, 'end', link_.object_)}"
-                last_string += f" {_('at an')} {event_link}"
+                last_string = \
+                    f"{format_entity_date(event, 'end', link_.object_)} " \
+                    f"{_('at an')} {event_link}"
     return first_string, last_string
 
 
@@ -401,26 +456,37 @@ def get_file_extension(entity: Union[int, 'Entity']) -> str:
     return path.suffix if path else 'N/A'
 
 
-def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
-    return path if path else None
+def get_file_path(
+        entity: Union[int, 'Entity'],
+        size: Optional[str] = None) -> Optional[Path]:
+    id_ = entity if isinstance(entity, int) else entity.id
+    if id_ not in g.file_stats:
+        return None
+    ext = g.file_stats[id_]['ext']
+    if size:
+        if ext in app.config['NONE_DISPLAY_EXT']:
+            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+        path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
+        return path if os.path.exists(path) else None
+    return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
 
 
 def add_reference_systems_to_form(form: Any) -> str:
     html = ''
     switch_class = ''
-    fields = [field for field in form if field.id.startswith('reference_system_id_')]
+    fields = [
+        field for field in form if field.id.startswith('reference_system_id_')]
     if len(fields) > 3:  # pragma: no cover
         switch_class = 'reference-system-switch'
         html = render_template('util/reference_system_switch.html')
     for field in fields:
         precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-        class_ = field.label.text if field.label.text in ['GeoNames', 'Wikidata'] else ''
+        class_ = field.label.text \
+            if field.label.text in ['GeoNames', 'Wikidata'] else ''
         html += add_form_row(
             field,
             field.label,
-            ' '.join([str(field(class_=class_)), str(precision_field.label), str(precision_field)]),
+            f'{field(class_=class_)} {precision_field.label} {precision_field}',
             row_css=f'external-reference {switch_class}')
     return html
 
@@ -439,13 +505,15 @@ def add_dates_to_form(form: Any) -> str:
             errors[field_name] = ''
             for error in getattr(form, field_name).errors:
                 errors[field_name] += uc_first(error)
-            errors[field_name] = f'<label class="error">{errors[field_name]}</label>'
+            errors[field_name] = \
+                f'<label class="error">{errors[field_name]}</label>'
     return render_template(
         'util/dates.html',
         form=form,
         errors=errors,
         style='' if valid_dates else 'display:table-row',
-        label=_('hide') if form.begin_year_from.data or form.end_year_from.data else _('show'))
+        label=_('hide')
+        if form.begin_year_from.data or form.end_year_from.data else _('show'))
 
 
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
@@ -458,26 +526,33 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 
 def external_url(url: Union[str, None]) -> str:
-    return f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' if url else ''
+    return \
+        f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' \
+        if url else ''
 
 
 def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
     """Add additional information for entity views if activated in profile"""
     if not hasattr(current_user, 'settings'):
         return data  # pragma: no cover
-    if 'entity_show_class' in current_user.settings and current_user.settings['entity_show_class']:
+    if 'entity_show_class' in current_user.settings \
+            and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
     info = logger.get_log_for_advanced_view(entity.id)
-    if 'entity_show_dates' in current_user.settings and current_user.settings['entity_show_dates']:
-        data[_('created')] = f"{format_date(entity.created)} {link(info['creator'])}"
+    if 'entity_show_dates' in current_user.settings \
+            and current_user.settings['entity_show_dates']:
+        data[_('created')] = \
+            f"{format_date(entity.created)} {link(info['creator'])}"
         if info['modified']:
-            data[_('modified')] = f"{format_date(info['modified'])} {link(info['modifier'])}"
-    if 'entity_show_import' in current_user.settings:
-        if current_user.settings['entity_show_import']:
-            data[_('imported from')] = link(info['project'])
-            data[_('imported by')] = link(info['importer'])
-            data['origin ID'] = info['origin_id']
-    if 'entity_show_api' in current_user.settings and current_user.settings['entity_show_api']:
+            data[_('modified')] = \
+                f"{format_date(info['modified'])} {link(info['modifier'])}"
+    if 'entity_show_import' in current_user.settings \
+            and current_user.settings['entity_show_import']:
+        data[_('imported from')] = link(info['project'])
+        data[_('imported by')] = link(info['importer'])
+        data['origin ID'] = info['origin_id']
+    if 'entity_show_api' in current_user.settings \
+            and current_user.settings['entity_show_api']:
         data['API'] = render_template('util/api_links.html', entity=entity)
     return data
 
@@ -509,8 +584,12 @@ def add_remove_link(
     if is_authorized('contributor'):
         data.append(link(
             _('remove'),
-            url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab_,
-            js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
+            url_for(
+                'link_delete',
+                id_=link_.id,
+                origin_id=origin.id) + '#tab-' + tab_,
+            js="return confirm('{x}')".format(
+                x=_('Remove %(name)s?', name=name.replace("'", '')))))
 
 
 def display_delete_link(entity: Entity) -> str:
@@ -542,7 +621,9 @@ def link(
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     if isinstance(object_, Project):
-        return link(object_.name, url_for('import_project_view', id_=object_.id))
+        return link(
+            object_.name,
+            url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
         return link(
             object_.username,
@@ -554,7 +635,10 @@ def link(
     if isinstance(object_, CidocProperty):
         return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Entity):
-        return link(object_.name, url_for('entity_view', id_=object_.id), uc_first_=False)
+        return link(
+            object_.name,
+            url_for('entity_view', id_=object_.id),
+            uc_first_=False)
     return ''
 
 
@@ -569,14 +653,20 @@ def button(
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
     return Markup(
-        render_template('util/button.html', label=label, url=url, css=css, id_=id_, js=onclick))
+        render_template(
+            'util/button.html',
+            label=label,
+            url=url,
+            css=css,
+            id_=id_,
+            js=onclick))
 
 
 @app.template_filter()
 def button_bar(buttons: List[Any]) -> str:
-    if not buttons:
-        return ''
-    return Markup(f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>')
+    return Markup(
+        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
+        if buttons else ''
 
 
 @app.template_filter()
@@ -617,7 +707,7 @@ def breadcrumb(crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
-            continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
+            continue  # e.g. if a dynamic generated URL has no origin parameter
         elif isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
@@ -637,30 +727,20 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def add_type_data(entity: 'Entity', data: OrderedD[str, Any]) -> None:
+def get_type_data(entity: 'Entity') -> Dict[str, Any]:
     if entity.location:
         entity.nodes.update(entity.location.nodes)  # Add location types
-
-    type_data: OrderedD[str, Any] = OrderedDict()
+    data: Dict[str, Any] = defaultdict(list)
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         root = g.nodes[node.root[-1]]
-        label = _('type') if root.standard and root.class_.name == 'type' else root.name
-        if root.name not in type_data:
-            type_data[label] = []
-        type_data[label].append(render_template(
-            'util/type_data_entry.html',
-            node=node,
-            value=f'{float(value):g}' if root.value_type else None,
-            title=' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))))
-
-    type_data = OrderedDict(sorted(type_data.items()))
-    for item in type_data.keys():  # Sort root types, move standard type to top
-        if item == _('type'):
-            type_data.move_to_end(item, last=False)
-            break
-
-    for root_name, nodes in type_data.items():
-        data[root_name] = nodes
+        if entity.standard_type and node.id == entity.standard_type.id:
+            continue  # Standard type is already added
+        title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
+        html = f'<span title="{title}">{link(node)}</span>'
+        if root.value_type:
+            html += f' {float(value):g} {node.description}'
+        data[root.name].append(html)
+    return {key: data[key] for key in sorted(data.keys())}
 
 
 @app.template_filter()
@@ -687,10 +767,25 @@ def download_button(entity: Entity) -> str:
 
 @app.template_filter()
 def display_profile_image(entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
     path = get_file_path(entity.image_id)
-    if path:
-        return Markup(render_template('util/profile_image.html', entity=entity, path=path))
-    return ''  # pragma: no cover
+    if not path:
+        return ''  # pragma: no cover
+    resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
+    if session['settings']['image_processing'] \
+            and ImageProcessing.check_processed_image(path.name):
+        resized = url_for(
+            'display_file',
+            filename=get_file_path(entity.image_id, size).name,
+            size=size)
+    return Markup(
+        render_template(
+            'util/profile_image.html',
+            entity=entity,
+            path=path,
+            resized=resized))
 
 
 @app.template_filter()
@@ -710,9 +805,9 @@ def manual(site: str) -> str:
     if not path.exists():
         # print('Missing manual link: ' + str(path))
         return ''
-    return Markup(f"""
-        <a class="manual" href="/static/manual/{site}.html" target="_blank"
-            title="{uc_first('manual')}"><i class="fas fa-book"></i></a>""")
+    return Markup(
+        f'<a class="manual" href="/static/manual/{site}.html" target="_blank" '
+        f'title="{uc_first("manual")}"><i class="fas fa-book"></i></a>')
 
 
 def add_form_row(
@@ -749,11 +844,11 @@ def display_form(
     for field in form:
         if isinstance(field, ValueFloatField) or field.id.startswith(
                 ('insert_', 'reference_system_precision')):
-            continue  # These fields will be added in combination with other fields
+            continue  # These will be added in combination with other fields
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
-        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
+        if field.id.split('_', 1)[0] in ('begin', 'end'):
             if field.id == 'begin_year_from':
                 html += add_dates_to_form(form)
             continue
@@ -778,7 +873,8 @@ def display_form(
                         id_=f'value-type-switcher-{node.id}'))
                 html += display_value_type_fields(form, node)
                 continue
-            tooltip_ = '' if 'is_node_form' in form else ' ' + tooltip(node.description)
+            tooltip_ = '' \
+                if 'is_node_form' in form else f' {tooltip(node.description)}'
             html += add_form_row(field, label + tooltip_)
             continue
 
@@ -794,7 +890,8 @@ def display_form(
             if 'insert_continue_sub' in form:
                 buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
-                buttons.append(form.insert_continue_human_remains(class_=class_))
+                buttons.append(
+                    form.insert_continue_human_remains(class_=class_))
             html += add_form_row(
                 field,
                 label='',  # Setting this to '' keeps the button row label empty
@@ -807,10 +904,17 @@ def display_form(
                 reference_systems_added = True
             continue
         html += add_form_row(field, form_id=form_id)
-    return Markup(render_template('forms/form.html', form_id=form_id, form=form, html=html))
+    return Markup(render_template(
+        'forms/form.html',
+        form_id=form_id,
+        form=form,
+        html=html))
 
 
-def display_value_type_fields(form: Any, node_: 'Node', root: Optional['Node'] = None) -> str:
+def display_value_type_fields(
+        form: Any,
+        node_: 'Node',
+        root: Optional['Node'] = None) -> str:
     root = root if root else node_
     html = ''
     for sub_id in node_.subs:
@@ -819,7 +923,9 @@ def display_value_type_fields(form: Any, node_: 'Node', root: Optional['Node'] =
         html += f"""
             <div class="table-row value-type-switch{root.id}">
                 <div>{sub.name}</div>
-                <div class="table-cell">{field(class_='value-type')} {sub.description}</div>
+                <div class="table-cell">
+                    {field(class_='value-type')} {sub.description}
+                </div>
             </div>
             {display_value_type_fields(form, sub, root)}"""
     return html

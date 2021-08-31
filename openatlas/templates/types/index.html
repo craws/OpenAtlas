@@ -60,7 +60,7 @@
                                                     <p style="margin-top:0;">
                                                         <strong>{{ _('classes')|uc_first }}</strong>:
                                                         {% for form in node.forms.values() %}
-                                                            {{ form.label }}{{ "," if not loop.last }}
+                                                            {{ g.classes[form.name].label if form.name in g.classes else _(form.name|replace('_', ' '))|uc_first }}{{ "," if not loop.last }}
                                                         {% endfor %}
                                                     </p>
                                                 {% endif %}

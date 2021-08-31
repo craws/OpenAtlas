@@ -15,20 +15,25 @@ class TestBaseCase(unittest.TestCase):
         app.testing = True
         app.config['SERVER_NAME'] = 'local.host'
         app.config['WTF_CSRF_ENABLED'] = False
-        app.config['WTF_CSRF_METHODS'] = []  # This is the magic to disable CSRF for tests
+        app.config['WTF_CSRF_METHODS'] = []  # Disable CSRF in tests
+
         self.setup_database()
         self.app = app.test_client()
         self.login()  # Login on default because needed almost everywhere
         with app.app_context():  # type: ignore
-            self.app.get('/')  # Needed to get fieldnames below, to initialise g or something
+            self.app.get('/')  # Needed to initialise g
             self.precision_geonames = \
-                'reference_system_precision_' + str(ReferenceSystem.get_by_name('GeoNames').id)
+                'reference_system_precision_' + \
+                str(ReferenceSystem.get_by_name('GeoNames').id)
             self.precision_wikidata = \
-                'reference_system_precision_' + str(ReferenceSystem.get_by_name('Wikidata').id)
+                'reference_system_precision_' + \
+                str(ReferenceSystem.get_by_name('Wikidata').id)
 
     def login(self) -> None:
         with app.app_context():  # type: ignore
-            self.app.post('/login', data={'username': 'Alice', 'password': 'test'})
+            self.app.post(
+                '/login',
+                data={'username': 'Alice', 'password': 'test'})
 
     @staticmethod
     def setup_database() -> None:
@@ -40,9 +45,16 @@ class TestBaseCase(unittest.TestCase):
             port=app.config['DATABASE_PORT'])
         connection.autocommit = True
         cursor = connection.cursor()
-        for file_name in ['1_structure', '2_data_model', '3_data_web', '4_data_node', 'data_test']:
-            with open(pathlib.Path(app.root_path).parent / 'install' / (file_name + '.sql'),
-                      encoding='utf8') as sql_file:
+        for file_name in [
+                '1_structure',
+                '2_data_model',
+                '3_data_web',
+                '4_data_node',
+                'data_test']:
+            with open(
+                    pathlib.Path(app.root_path).parent / 'install' /
+                    (file_name + '.sql'),
+                    encoding='utf8') as sql_file:
                 cursor.execute(sql_file.read())
 
 

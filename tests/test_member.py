@@ -56,7 +56,8 @@ class MemberTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = Link.get_links(group.id, 'P107')[0].id
-            rv = self.app.get(url_for('member_update', id_=link_id, origin_id=group.id))
+            rv = self.app.get(
+                url_for('member_update', id_=link_id, origin_id=group.id))
             assert b'Ripley' in rv.data
             rv = self.app.post(
                 url_for('member_update', id_=link_id, origin_id=group.id),
