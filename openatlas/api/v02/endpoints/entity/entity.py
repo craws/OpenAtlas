@@ -38,7 +38,9 @@ class GetEntity(Resource):  # type: ignore
         if parser['format'] in app.config['RDF_FORMATS']:
             g = Graph().parse(data=json.dumps(result), format='json-ld')
             serialize = g.serialize(format=parser['format'], encoding='utf-8')
-            return Response(serialize, mimetype=app.config['RDF_FORMATS'][parser['format']])
+            return Response(
+                serialize,
+                mimetype=app.config['RDF_FORMATS'][parser['format']])
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200
