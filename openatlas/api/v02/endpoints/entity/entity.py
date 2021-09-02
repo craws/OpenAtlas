@@ -1,12 +1,11 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from flask import Response, json
+from flask import Response
 from flask_restful import Resource, marshal
-from rdflib.plugin import register, Parser
 
 from openatlas import app
 from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.enpoints_util import download
+from openatlas.api.v02.resources.enpoints_util import download, rdf_output
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.parser import entity_
@@ -15,9 +14,6 @@ from openatlas.api.v02.resources.util import get_all_links, \
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.models.entity import Entity
-
-register('json-ld', Parser, 'rdflib_jsonld.parser', 'JsonLDParser')
-from rdflib import Graph
 
 
 class GetEntity(Resource):  # type: ignore
@@ -36,10 +32,8 @@ class GetEntity(Resource):  # type: ignore
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
         if parser['format'] in app.config['RDF_FORMATS']:
-            g = Graph().parse(data=json.dumps(result), format='json-ld')
-            serialize = g.serialize(format=parser['format'], encoding='utf-8')
             return Response(
-                serialize,
+                rdf_output(result, parser),
                 mimetype=app.config['RDF_FORMATS'][parser['format']])
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
