@@ -56,7 +56,8 @@ class LinkedPlacesTemplate:
             'relationTo': fields.String,
             'relationType': fields.String,
             'relationSystemClass': fields.String,
-            'relationCategory': fields.String,
+            'relationDescription': fields.String,
+            'type': fields.String,
             'when': fields.Nested(when)}
 
         feature = {

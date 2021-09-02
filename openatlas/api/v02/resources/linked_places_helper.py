@@ -36,7 +36,8 @@ class LPHelper:
             'relationType': LPHelper.relation_type(link_, inverse),
             'relationSystemClass': link_.domain.class_.name
                 if inverse else link_.range.class_.name,
-            'relationCategory': link_.type.name if link_.type else None,
+            'type': to_camel_case(link_.type.name) if link_.type else None,
+            'relationDescription': link_.description,
             'when': {'timespans': [
                 LPHelper.get_time(link_.domain if inverse else link_.range)]}}
 
