@@ -82,8 +82,7 @@ entity_.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    default='lp',
-    choices=('lp', 'geojson'))
+    choices=frozenset(app.config['API_FORMATS']))
 entity_.add_argument(
     'type_id',
     type=int,

@@ -4,6 +4,7 @@ from flask import Response, json
 from flask_restful import Resource, marshal
 from rdflib.plugin import register, Parser
 
+from openatlas import app
 from openatlas.api.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.geojson import Geojson
@@ -34,14 +35,10 @@ class GetEntity(Resource):  # type: ignore
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
-
-        g = Graph().parse(data=json.dumps(result), format='json-ld')
-        # xml, n3, turtle, nt, pretty - xml, trig and nquads
-        # print(g.serialize(format='turtle').decode('utf-8'))
-
-        serialize = g.serialize(format='nquads', encoding='utf-8')
-        print(serialize)
-        return Response(serialize, mimetype='application/n-quads')
+        if parser['format'] in app.config['RDF_FORMATS']:
+            g = Graph().parse(data=json.dumps(result), format='json-ld')
+            serialize = g.serialize(format=parser['format'], encoding='utf-8')
+            return Response(serialize, mimetype=app.config['RDF_FORMATS'][parser['format']])
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200

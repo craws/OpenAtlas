@@ -47,6 +47,16 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
 ALLOWED_IPS = ['127.0.0.1']
+RDF_FORMATS = {
+    'xml': 'application/rdf+xml',
+    'pretty-xml': 'application/rdf+xml',
+    'n3': 'text/rdf+n3',
+    'turtle': 'application/x-turtle',
+    'nt': 'text/plain'}
+JSON_FORMATS = {
+    'lp': 'application/json',
+    'geojson': 'application/json'}
+API_FORMATS = {**RDF_FORMATS, **JSON_FORMATS}
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
@@ -71,3 +81,4 @@ CSS = {
 
 # Property types work differently than other types, e.g. they have no move functionality
 PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']
+
