@@ -1,7 +1,7 @@
 import json
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Iterable
 
-from flask import Response, jsonify, url_for, json
+from flask import Response, jsonify, url_for
 from flask_restful import marshal
 from rdflib import Graph
 
@@ -68,6 +68,9 @@ def download(
         headers={'Content-Disposition': f'attachment;filename={name}.json'})
 
 
-def rdf_output(data: Dict[str, Any], parser: Dict[str, Any]):
-    g = Graph().parse(data=json.dumps(data), format='json-ld')
-    return g.serialize(format=parser['format'], encoding='utf-8')
+def rdf_output(
+        data: Union[List[Dict[str, Any]], Dict[str, Any]],
+        parser: Dict[str, Any]) \
+        -> Union[str, bytes, bytearray, Iterable[str], Iterable[bytes], None]:
+    graph = Graph().parse(data=json.dumps(data), format='json-ld')
+    return graph.serialize(format=parser['format'], encoding='utf-8')

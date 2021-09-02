@@ -44,5 +44,5 @@ def get_license(entity: Entity) -> Optional[str]:
     return None
 
 
-def to_camel_case(s: str) -> str:
-    return (s[0] + s.title().translate(" ")[1:] if s else s).replace(" ", "")
+def to_camel_case(i: str) -> str:
+    return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
