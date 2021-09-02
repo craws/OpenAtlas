@@ -103,11 +103,13 @@ Make these directories writeable for the Apache user:
     openatlas/uploads
     openatlas/export/csv
     openatlas/export/sql
+    openatlas/processed_images/resized
 
 e.g.
 
     # chown www-data openatlas/uploads
     # chown www-data openatlas/export/*
+    # chown www-data openatlas/processed_images/resized
 
 ### Finishing
 
@@ -149,8 +151,3 @@ Copy instance/example_testing.py to instance/testing.py and add/change values as
 appropriate.
 
     $ cp instance/example_testing.py instance/testing.py
-
-If using PyCharm, create a Nosetest and use these parameters for tests with
-coverage and HTML report:
-
-    --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase

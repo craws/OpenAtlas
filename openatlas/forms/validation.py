@@ -38,12 +38,12 @@ def validate(self: FlaskForm) -> bool:
         # Check for valid date combination e.g. begin not after end
         if valid:
             for prefix in ['begin', 'end']:
-                if prefix + '_from' in dates and prefix + '_to' in dates:
-                    if dates[prefix + '_from'] > dates[prefix + '_to']:
-                        field = getattr(self, prefix + '_day_from')
-                        field.errors.append(
-                            _('First date cannot be after second.'))
-                        valid = False
+                if prefix + '_from' in dates \
+                        and prefix + '_to' in dates \
+                        and dates[prefix + '_from'] > dates[prefix + '_to']:
+                    field = getattr(self, prefix + '_day_from')
+                    field.errors.append(_('First date cannot be after second.'))
+                    valid = False
         if 'begin_from' in dates and 'end_from' in dates:
             field = getattr(self, 'begin_day_from')
             if len(dates) == 4:  # All dates are used
@@ -76,11 +76,12 @@ def validate(self: FlaskForm) -> bool:
                 valid = False
 
     # Super event
-    if hasattr(self, 'event') and hasattr(self, 'event_id'):
-        if self.event.data:
-            if str(self.event.data) == str(self.event_id.data):
-                self.event.errors.append(_('error node self as super'))
-                valid = False
+    if hasattr(self, 'event') \
+            and hasattr(self, 'event_id') \
+            and self.event.data \
+            and str(self.event.data) == str(self.event_id.data):
+        self.event.errors.append(_('error node self as super'))
+        valid = False
 
     # External reference systems
     for field_id, field in self.__dict__.items():
@@ -107,8 +108,8 @@ def validate(self: FlaskForm) -> bool:
             valid = False
 
     # Actor actor relation
-    if hasattr(self, 'relation_origin_id'):
-        if self.relation_origin_id.data in ast.literal_eval(self.actor.data):
-            self.actor.errors.append(_("Can't link to itself."))
-            valid = False
+    if hasattr(self, 'relation_origin_id') and \
+            self.relation_origin_id.data in ast.literal_eval(self.actor.data):
+        self.actor.errors.append(_("Can't link to itself."))
+        valid = False
     return valid

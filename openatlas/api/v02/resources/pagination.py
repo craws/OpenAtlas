@@ -45,8 +45,8 @@ class Pagination:
             index.append(({'page': num + 1, 'startId': i}))
         if parser['last'] or parser['first']:
             total = Pagination.get_start_entity(total, parser)
-        h = [i for i, x in enumerate(entities) if x.id == total[0]]
-        new_entities = [e for idx, e in enumerate(entities[h[0]:])]
+        j = [i for i, x in enumerate(entities) if x.id == total[0]]
+        new_entities = [e for idx, e in enumerate(entities[j[0]:])]
         return {
             "results": Pagination.get_results(new_entities, parser),
             "pagination": {
@@ -96,12 +96,14 @@ class Pagination:
             parser: Dict[str, str],
             links: List[Link],
             links_inverse: List[Link]) -> List[Dict[str, Any]]:
-        return [LinkedPlaces.get_entity(
-            get_entity_by_id(entity.id) if 'names' in parser['show']
-            else entity,
-            [link_ for link_ in links if link_.domain.id == entity.id],
-            [link_ for link_ in links_inverse if link_.range.id == entity.id],
-            parser)
+        return [
+            LinkedPlaces.get_entity(
+                get_entity_by_id(entity.id) if 'names' in parser['show']
+                else entity,
+                [link_ for link_ in links if link_.domain.id == entity.id],
+                [link_ for link_ in links_inverse if
+                 link_.range.id == entity.id],
+                parser)
             for entity in entities]
 
     @staticmethod

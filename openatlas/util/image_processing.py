@@ -73,11 +73,11 @@ class ImageProcessing:
 
     @staticmethod
     def loop_through_processed_folders(name: str, file_format: str) -> bool:
-        format_ = app.config['PROCESSED_EXT'] \
+        ext = app.config['PROCESSED_EXT'] \
             if file_format in app.config['NONE_DISPLAY_EXT'] else file_format
         for size in app.config['IMAGE_SIZE'].values():
-            p = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{format_}"
-            if not p.is_file() and not ImageProcessing.safe_resize_image(
+            path = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{ext}"
+            if not path.is_file() and not ImageProcessing.safe_resize_image(
                     name,
                     file_format,
                     size):
@@ -105,12 +105,9 @@ class ImageProcessing:
 
     @staticmethod
     def delete_orphaned_resized_images() -> None:
-        from openatlas.util.util import get_file_stats
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for size in app.config['IMAGE_SIZE'].values():
-            p = Path(app.config['RESIZED_IMAGES']) / size
-            for file in p.glob('**/*'):
+            path = Path(app.config['RESIZED_IMAGES']) / size
+            for file in path.glob('**/*'):
                 file_name = file.name.rsplit('.', 1)[0].lower()
                 if not file_name.isdigit() \
                         or int(file_name) not in g.file_stats:
@@ -119,9 +116,6 @@ class ImageProcessing:
     @staticmethod
     def create_resized_images() -> None:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import get_file_stats
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file'):
             if entity.id in g.file_stats \
                     and g.file_stats[entity.id]['ext'] \

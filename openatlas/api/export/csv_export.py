@@ -36,10 +36,10 @@ class ApiExportCSV:
             'system_class': entity.class_.name,
             'geom_type': geom['type'],
             'coordinates': geom['coordinates']}
-        for k, v in ApiExportCSV.get_links(entity).items():
-            data[k] = ' | '.join(list(map(str, v)))
-        for k, v in ApiExportCSV.get_node(entity).items():
-            data[k] = ' | '.join(list(map(str, v)))
+        for key, value in ApiExportCSV.get_links(entity).items():
+            data[key] = ' | '.join(list(map(str, value)))
+        for key, value in ApiExportCSV.get_node(entity).items():
+            data[key] = ' | '.join(list(map(str, value)))
         return data
 
     @staticmethod

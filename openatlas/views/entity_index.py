@@ -16,7 +16,7 @@ from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, external_url, format_date, get_base_table_data, get_file_path,
-    get_file_stats, is_authorized, link, required_group)
+    is_authorized, link, required_group)
 
 
 @app.route('/index/<view>')
@@ -58,8 +58,6 @@ def get_table(view: str) -> Table:
             header.insert(1, _('icon'))
     table = Table(header)
     if view == 'file':
-        if not g.file_stats:
-            g.file_stats = get_file_stats()
         for entity in Entity.get_by_class('file', nodes=True):
             date = 'N/A'
             if entity.id in g.file_stats:
@@ -101,14 +99,12 @@ def get_table(view: str) -> Table:
 def file_preview(entity_id: int) -> str:
     icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
-    parameter = f"loading='lazy' alt='image' width='{size}' height='{size}'"
+    parameter = f"loading='lazy' alt='image' width='{size}'"
     if icon_path:
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
-    if not path:
-        return ''
-    if ImageProcessing.check_processed_image(path.name):
+    if path and ImageProcessing.check_processed_image(path.name):
         icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"

@@ -10,7 +10,7 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
-from openatlas.models.export import Export
+from openatlas.models.export import csv_export, sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
     convert_size, delete_link, is_authorized, link, required_group, uc_first)
@@ -70,7 +70,7 @@ def export_sql() -> Union[str, Response]:
     writeable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writeable:
-        if Export.export_sql():
+        if sql_export():
             logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
         else:  # pragma: no cover
@@ -95,7 +95,7 @@ def export_csv() -> Union[str, Response]:
     writeable = os.access(path, os.W_OK)
     form = ExportCsvForm()
     if form.validate_on_submit() and writeable:
-        Export.export_csv(form)
+        csv_export(form)
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))

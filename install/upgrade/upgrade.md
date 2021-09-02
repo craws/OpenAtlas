@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 6.4.0 to 6.4.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 6.3.0 to 6.4.0
 Execute **install/upgrade/6.4.0.sql** after making backups. This will activate
 image processing to e.g. generate thumbnails.
@@ -20,6 +23,14 @@ image processing to e.g. generate thumbnails.
 Install python3-wand e.g. on Debian:
 
     # apt install python3-wand
+    
+Make the following folder writeable for the Apache user:
+
+    openatlas/processed_images/resized
+
+e.g:
+
+    # chown www-data openatlas/processed_images/resized
     
 For the new image rotate function an additional JavaScript package has to be
 installed with npm. Otherwise, maps with overlays will break. Execute e.g.

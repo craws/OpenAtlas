@@ -85,7 +85,7 @@ class Tab:
                     url_for('reference_add', id_=id_, view=name))]
             elif view == 'source':
                 buttons += [
-                    button('link', url_for('source_add', id_=id_, view=name))]
+                    button('link', url_for('link_insert', id_=id_, view=name))]
             elif view == 'event':
                 self.table.header = [
                     'actor',
@@ -103,7 +103,9 @@ class Tab:
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
             buttons += [
-                button('link', url_for('source_add', id_=id_, view='artifact')),
+                button(
+                    'link',
+                    url_for('link_insert', id_=id_, view='artifact')),
                 button(
                     g.classes['artifact'].label,
                     url_for('insert', class_='artifact', origin_id=id_))]
@@ -129,7 +131,7 @@ class Tab:
             elif view == 'source':
                 buttons += [button(
                     'link',
-                    url_for('source_add', id_=id_, view='event'))]
+                    url_for('link_insert', id_=id_, view='event'))]
             elif view == 'reference':
                 buttons += [button(
                     'link',
@@ -192,7 +194,7 @@ class Tab:
                     url_for('reference_add', id_=id_, view=name))]
             elif view == 'source':
                 buttons += [
-                    button('link', url_for('source_add', id_=id_, view=name))]
+                    button('link', url_for('link_insert', id_=id_, view=name))]
             buttons.append(button(
                 g.classes[name].label,
                 url_for('insert', class_=name, origin_id=id_)))

@@ -32,13 +32,13 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_disk_space_info, get_file_path, get_file_stats,
-    is_authorized, link, manual, required_group, sanitize, send_mail, uc_first)
+    format_datetime, get_disk_space_info, get_file_path, is_authorized, link,
+    manual, required_group, sanitize, send_mail, uc_first)
 
 
-@app.route('/admin', methods=["GET", "POST"])
-@app.route('/admin/', methods=["GET", "POST"])
-@app.route('/admin/<action>/<int:id_>')
+@app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
+@app.route('/admin/', methods=["GET", "POST"], strict_slashes=False)
+@app.route('/admin/<action>/<int:id_>', strict_slashes=False)
 @required_group('readonly')
 def admin_index(
         action: Optional[str] = None,
@@ -551,19 +551,20 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     if id_:
         Settings.set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
-    file_stats = get_file_stats()
     table = Table([''] + g.table_headers['file'] + ['date'])
     for entity in Entity.get_display_files():
         date = 'N/A'
-        if entity.id in file_stats:
+        if entity.id in g.file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(
-                file_stats[entity.id]['date']))
+                g.file_stats[entity.id]['date']))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
             link(entity.standard_type),
-            file_stats[entity.id]['size'] if entity.id in file_stats else 'N/A',
-            file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
+            g.file_stats[entity.id]['size']
+            if entity.id in g.file_stats else 'N/A',
+            g.file_stats[entity.id]['ext']
+            if entity.id in g.file_stats else 'N/A',
             entity.description,
             date])
     return render_template(

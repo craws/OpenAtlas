@@ -1,17 +1,9 @@
-from datetime import datetime
 from typing import Any, Dict, Optional, TYPE_CHECKING
 
 import numpy
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     pass
-
-
-def current_date_for_filename() -> str:
-    today = datetime.today()
-    return \
-        f'{today.year}-{today.month:02}-{today.day:02}_' \
-        f'{today.hour:02}{today.minute:02}'
 
 
 def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:

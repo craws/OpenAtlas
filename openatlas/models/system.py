@@ -17,15 +17,13 @@ class SystemClass:
             standard_type: Optional[str] = None,
             alias_possible: Optional[bool] = False,
             color: Optional[str] = None,
-            write_access: Optional[str] = 'contributor',
-            form_fields: Optional[List[str]] = None) -> None:
+            write_access: Optional[str] = 'contributor') -> None:
         self.name = name
         self.label = uc_first(label)
         self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.standard_type = standard_type
         self.color = color  # Specifies color of entity in network visualisation
         self.write_access = write_access
-        self.form_fields = form_fields if form_fields else []
         self.view = None
         self.alias_possible = alias_possible
         for item, classes in view_class_mapping.items():
@@ -87,23 +85,20 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E8',
             label=_('acquisition'),
             color='#0000FF',
-            standard_type='Event',
-            form_fields=[]),
+            standard_type='Event'),
         'activity': SystemClass(
             name='activity',
             cidoc_class='E7',
             label=_('activity'),
             color='#0000FF',
-            standard_type='Event',
-            form_fields=[]),
+            standard_type='Event'),
         'actor_appellation': SystemClass(
             name='appellation',
             cidoc_class='E82'),
         'administrative_unit': SystemClass(
             name='administrative_unit',
             cidoc_class='E53',
-            label=_('administrative unit'),
-            form_fields=[]),
+            label=_('administrative unit')),
         'appellation': SystemClass(
             name='appellation',
             cidoc_class='E41'),
@@ -112,65 +107,54 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E22',
             standard_type='Artifact',
             label=_('artifact'),
-            color='#EE82EE',
-            form_fields=[]),
+            color='#EE82EE'),
         'bibliography': SystemClass(
             name='bibliography',
             cidoc_class='E31',
             label=_('bibliography'),
-            standard_type='Bibliography',
-            form_fields=[]),
+            standard_type='Bibliography'),
         'edition': SystemClass(
             name='edition',
             cidoc_class='E31',
             label=_('edition'),
-            standard_type='Edition',
-            form_fields=[]),
+            standard_type='Edition'),
         'external_reference': SystemClass(
             name='external_reference',
             cidoc_class='E31',
             label=_('external reference'),
-            standard_type='External reference',
-            write_access='manager',
-            form_fields=[]),
+            standard_type='External reference'),
         'feature': SystemClass(
             name='feature',
             cidoc_class='E18',
             label=_('feature'),
-            standard_type='Feature',
-            form_fields=[]),
+            standard_type='Feature'),
         'file': SystemClass(
             name='file',
             cidoc_class='E31',
             label=_('file'),
-            standard_type='License',
-            form_fields=[]),
+            standard_type='License'),
         'find': SystemClass(
             name='find',
             cidoc_class='E22',
             standard_type='Artifact',
-            label=_('find'),
-            form_fields=[]),
+            label=_('find')),
         'group': SystemClass(
             name='group',
             cidoc_class='E74',
             label=_('group'),
             color='#34623C',
-            alias_possible=True,
-            form_fields=[]),
+            alias_possible=True),
         'human_remains': SystemClass(
             name='human_remains',
             cidoc_class='E20',
             label=_('human remains'),
-            standard_type='Human remains',
-            form_fields=[]),
+            standard_type='Human remains'),
         'move': SystemClass(
             name='move',
             cidoc_class='E9',
             label=_('move'),
             standard_type='Event',
-            color='#0000FF',
-            form_fields=[]),
+            color='#0000FF'),
         'object_location': SystemClass(
             name='object_location',
             color='#00FF00',
@@ -180,43 +164,36 @@ def get_system_classes() -> Dict[str, SystemClass]:
             cidoc_class='E21',
             label=_('person'),
             color='#34B522',
-            alias_possible=True,
-            form_fields=[]),
+            alias_possible=True),
         'place': SystemClass(
             name='place',
             cidoc_class='E18',
             label=_('place'),
             color='#FF0000',
             standard_type='Place',
-            alias_possible=True,
-            form_fields=[]),
+            alias_possible=True),
         'reference_system': SystemClass(
             name='reference_system',
             cidoc_class='E32',
             label=_('reference system'),
-            write_access='manager',
-            form_fields=[]),
+            write_access='manager'),
         'source': SystemClass(
             name='source',
             cidoc_class='E33',
             label=_('source'),
             standard_type='Source',
-            color='#FFA500',
-            form_fields=[]),
+            color='#FFA500'),
         'stratigraphic_unit': SystemClass(
             name='stratigraphic_unit',
             cidoc_class='E18',
             label=_('stratigraphic unit'),
-            standard_type='Stratigraphic unit',
-            form_fields=[]),
+            standard_type='Stratigraphic unit'),
         'source_translation': SystemClass(
             name='source_translation',
             cidoc_class='E33',
-            label=_('translation'),
-            form_fields=[]),
+            label=_('translation')),
         'type': SystemClass(
             name='type',
             cidoc_class='E55',
             label=_('type'),
-            write_access='editor',
-            form_fields=[])}
+            write_access='editor')}

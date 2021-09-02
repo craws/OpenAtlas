@@ -13,8 +13,11 @@ from openatlas.models.entity import Entity
 class GetByCode(Resource):  # type: ignore
     @staticmethod
     def get(code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
-        p = entity_.parse_args()
-        return resolve_entities(GetByCode.get_by_view(code, p), p, code)
+        parsed = entity_.parse_args()
+        return resolve_entities(
+            GetByCode.get_by_view(code, parsed),
+            parsed,
+            code)
 
     @staticmethod
     def get_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:

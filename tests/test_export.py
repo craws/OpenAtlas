@@ -3,7 +3,7 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.date import current_date_for_filename
+from openatlas.models.export import current_date_for_filename
 from tests.base import TestBaseCase
 
 

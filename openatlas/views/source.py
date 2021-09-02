@@ -15,24 +15,6 @@ from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
 
 
-@app.route('/source/add/<int:id_>/<view>', methods=['POST', 'GET'])
-@required_group('contributor')
-def source_add(id_: int, view: str) -> Union[str, Response]:
-    source = Entity.get_by_id(id_)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            source.link_string('P67', request.form['checkbox_values'])
-        return redirect(f"{url_for('entity_view', id_=source.id)}#tab-{view}")
-    return render_template(
-        'form.html',
-        form=build_table_form(view, source.get_linked_entities('P67')),
-        title=_('source'),
-        crumbs=[
-            [_('source'), url_for('index', view='source')],
-            source,
-            _('link')])
-
-
 @app.route(
     '/source/translation/insert/<int:source_id>',
     methods=['POST', 'GET'])
@@ -84,9 +66,10 @@ def translation_update(id_: int) -> Union[str, Response]:
             _('edit')])
 
 
-def save(form: FlaskForm,
-         entity: Optional[Entity] = None,
-         source: Optional[Entity] = None) -> Entity:
+def save(
+        form: FlaskForm,
+        entity: Optional[Entity] = None,
+        source: Optional[Entity] = None) -> Entity:
     Transaction.begin()
     try:
         if entity:
@@ -103,4 +86,4 @@ def save(form: FlaskForm,
         Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-    return entity  # type: ignore
+    return entity
