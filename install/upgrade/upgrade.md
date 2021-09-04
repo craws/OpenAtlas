@@ -13,6 +13,11 @@ is working.
 
     service apache2 restart
 
+### 6.4.1 to 6.5.0
+Install python3-rdflib and python3-rdflib-jsonld for the RDF feature:
+
+    # apt install python3-rdflib python3-rdflib-jsonld
+
 ### 6.4.0 to 6.4.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 

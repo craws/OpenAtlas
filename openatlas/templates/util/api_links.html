@@ -1,7 +1,60 @@
-<a href=" {{ url_for('api.entity', id_=entity.id) }}" target="_blank">GeoJSON</a>
-<a class="{{ config.CSS.button.primary }}" href="{{ url_for('api.entity', id_=entity.id, download=True) }}">
-    <i class="fas fa-download"></i> {{ _('download')|uc_first }}
-</a>
-<a class="{{ config.CSS.button.primary }}" href="{{ url_for('api.entity', id_=entity.id, export='csv') }}">
-    <i class="fas fa-download"></i> CSV
-</a>
+<div class="btn-toolbar">
+    <div class="btn-group mr-2">
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='lp') }}"
+           target="_blank">
+            Linked Places
+        </a>
+        <a class="{{ config.CSS.button.primary }}"
+           href="{{ url_for('api.entity', id_=entity.id, format='lp', download=True) }}">
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
+    <div class="btn-group mr-2">
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='geojson') }}"
+           target="_blank">
+            Geojson
+        </a>
+        <a class="{{ config.CSS.button.primary }}"
+           href="{{ url_for('api.entity', id_=entity.id, format='geojson', download=True) }}">
+            <i class="fas fa-download"></i>
+        </a>
+    </div>
+
+    <div class="btn-group mr-2">
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='xml') }}"
+           target="_blank">
+            XML <i class="fas fa-download"></i>
+        </a>
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='pretty-xml') }}"
+           target="_blank">
+            Pretty-XML <i class="fas fa-download"></i>
+        </a>
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='turtle') }}"
+           target="_blank">
+            Turtle <i class="fas fa-download"></i>
+        </a>
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='n3') }}"
+           target="_blank">
+            Notion 3
+        </a>
+
+        <a class="{{ config.CSS.button.primary }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='nt') }}"
+           target="_blank">
+            N-Triples
+        </a>
+    </div>
+
+    <div class="btn-group mr-2">
+        <a class="{{ config.CSS.button.primary }}"
+           href="{{ url_for('api.entity', id_=entity.id, export='csv') }}">
+            <i class="fas fa-download"></i> CSV
+        </a>
+    </div>
+</div>

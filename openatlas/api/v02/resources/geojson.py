@@ -20,7 +20,7 @@ class Geojson:
     @staticmethod
     def get_entity(
             entity: Entity,
-            geom: Dict[str, Any] = None) -> Dict[str, Any]:
+            geom: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
         features = {
             'type': 'Feature',
             'geometry': geom,

@@ -4,7 +4,7 @@ from pathlib import Path
 from openatlas import app
 
 VERSION = '6.5.0'
-DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
+DEMO_MODE = False  # If activated some options are disabled, login is pre filled
 IS_UNIT_TEST = False
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -18,8 +18,9 @@ DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-# Files with these extensions are available as profile image and will be displayed in the browser
-DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
+# Files with these extensions are can be displayed in the browser
+DISPLAY_FILE_EXTENSIONS = \
+    ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
@@ -39,7 +40,7 @@ ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
 # Security
-SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
+SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
@@ -47,6 +48,16 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
 ALLOWED_IPS = ['127.0.0.1']
+RDF_FORMATS = {
+    'xml': 'application/rdf+xml',
+    'pretty-xml': 'application/rdf+xml',
+    'n3': 'text/rdf+n3',
+    'turtle': 'application/x-turtle',
+    'nt': 'text/plain'}
+JSON_FORMATS = {
+    'lp': 'application/json',
+    'geojson': 'application/json'}
+API_FORMATS = {**RDF_FORMATS, **JSON_FORMATS}
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
@@ -69,5 +80,5 @@ CSS = {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-secondary btn-xsm'}}
 
-# Property types work differently than other types, e.g. they have no move functionality
+# Property types work differently than regular types, e.g. no move functionality
 PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']

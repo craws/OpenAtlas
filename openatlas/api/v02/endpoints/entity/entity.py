@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response
 from flask_restful import Resource, marshal
 
+from openatlas import app
 from openatlas.api.export.csv_export import ApiExportCSV
-from openatlas.api.v02.resources.enpoints_util import download
+from openatlas.api.v02.resources.enpoints_util import download, rdf_output
 from openatlas.api.v02.resources.geojson import Geojson
 from openatlas.api.v02.resources.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.parser import entity_
@@ -30,6 +31,10 @@ class GetEntity(Resource):  # type: ignore
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
+        if parser['format'] in app.config['RDF_FORMATS']:
+            return Response(
+                rdf_output(result, parser),
+                mimetype=app.config['RDF_FORMATS'][parser['format']])
         if parser['download']:
             return download(result, GetEntity.get_template(parser), entity.id)
         return marshal(result, GetEntity.get_template(parser)), 200

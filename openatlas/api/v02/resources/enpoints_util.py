@@ -1,9 +1,11 @@
 import json
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Tuple, Union, Iterable
 
 from flask import Response, jsonify, url_for
 from flask_restful import marshal
+from rdflib import Graph
 
+from openatlas import app
 from openatlas.api.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
@@ -26,6 +28,10 @@ def resolve_entities(
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     result = Pagination.pagination(entities, parser)
+    if parser['format'] in app.config['RDF_FORMATS']:
+        return Response(
+            rdf_output(result['results'], parser),
+            mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['count']:
         return jsonify(result['pagination']['entities'])
     if parser['download']:
@@ -36,7 +42,7 @@ def resolve_entities(
 def resolve_node_parser(
         node: Dict[str, Any],
         parser: Dict[str, Any],
-        file_name: Union[int, str])\
+        file_name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['count']:
         return jsonify(len(node['nodes']))
@@ -60,3 +66,11 @@ def download(
         json.dumps(marshal(data, template)),
         mimetype='application/json',
         headers={'Content-Disposition': f'attachment;filename={name}.json'})
+
+
+def rdf_output(
+        data: Union[List[Dict[str, Any]], Dict[str, Any]],
+        parser: Dict[str, Any]) \
+        -> Union[str, bytes, bytearray, Iterable[str], Iterable[bytes], None]:
+    graph = Graph().parse(data=json.dumps(data), format='json-ld')
+    return graph.serialize(format=parser['format'], encoding='utf-8')

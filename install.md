@@ -18,6 +18,7 @@ need substantially more knowledge about server administration.
     # apt install python3-flask-login python3-flaskext.wtf python3-markdown
     # apt install python3-numpy python3-pandas python3-jinja2 python3-flask-cors
     # apt install python3-flask-restful p7zip-full python3-wand
+    # apt install python3-rdflib python3-rdflib-jsonld
 
 ### Apache 2.4
 
@@ -151,8 +152,3 @@ Copy instance/example_testing.py to instance/testing.py and add/change values as
 appropriate.
 
     $ cp instance/example_testing.py instance/testing.py
-
-If using PyCharm, create a Nosetest and use these parameters for tests with
-coverage and HTML report:
-
-    --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase

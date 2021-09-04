@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, url_for
 
-from openatlas.api.v02.resources.util import get_license
+from openatlas.api.v02.resources.util import get_license, to_camel_case
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -35,8 +35,9 @@ class LPHelper:
                     _external=True),
             'relationType': LPHelper.relation_type(link_, inverse),
             'relationSystemClass': link_.domain.class_.name
-                if inverse else link_.range.class_.name,
-            'type': link_.type.name if link_.type else None,
+            if inverse else link_.range.class_.name,
+            'type': to_camel_case(link_.type.name) if link_.type else None,
+            'relationDescription': link_.description,
             'when': {'timespans': [
                 LPHelper.get_time(link_.domain if inverse else link_.range)]}}
 
@@ -95,12 +96,12 @@ class LPHelper:
     def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
         return {
             'start': {
-                'earliest': entity.begin_from,
-                'latest': entity.begin_to,
+                'earliest': str(entity.begin_from),
+                'latest': str(entity.begin_to),
                 'comment': entity.begin_comment},
             'end': {
-                'earliest': entity.end_from,
-                'latest': entity.end_to,
+                'earliest': str(entity.end_from),
+                'latest': str(entity.end_to),
                 'comment': entity.end_comment}}
 
     @staticmethod
@@ -121,6 +122,6 @@ class LPHelper:
             identifier = system.resolver_url if system.resolver_url else ''
             ref.append({
                 'identifier': f"{identifier}{link_.description}",
-                'type': g.nodes[link_.type.id].name,
+                'type': to_camel_case(g.nodes[link_.type.id].name),
                 'referenceSystem': system.name})
         return ref if ref else None
