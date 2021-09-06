@@ -35,7 +35,7 @@ Can be linked via tabs to
 Settings
 --------
 
-* **Maximum file size in MB**
+* **Maximum file size in MB** - this limits also the total size of multiple file upload
 * **Profile image width in pixel** - this only influences the layout of info tabs
 * **Allowed file extensions** - enter file extensions witout a dot and separated with a space e.g.
 
