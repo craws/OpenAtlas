@@ -58,7 +58,9 @@ def admin_index(
     dirs = {
         'uploads': os.access(app.config['UPLOAD_DIR'], os.W_OK),
         'export/sql': os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK),
-        'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK)}
+        'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK),
+        'processed_images/resized':
+            os.access(app.config['RESIZED_IMAGES'], os.W_OK)}
     tables = {
         'user': Table(
             [
