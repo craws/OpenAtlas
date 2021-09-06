@@ -12,17 +12,16 @@ tinymce.init({
 
 $(document).ready(function () {
 
-  // popovers init
-  $('[data-toggle="popover"]').popover();
+  $('[data-toggle="popover"]').popover(); // Popovers init
 
-  // DataTables - sort for checkbox columns
+  /* DataTables - sort for checkbox columns */
   $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
     return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
       return $('input', td).prop('checked') ? '1' : '0';
     });
   };
 
-  // DataTables - sort for CIDOC model
+  /* DataTables - sort for CIDOC model */
   $.fn.dataTable.ext.order['cidoc-model'] = function (settings, col) {
     return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
       const d = td.firstChild.innerText
@@ -32,7 +31,7 @@ $(document).ready(function () {
     });
   };
 
-  // DataTables - ignore special characters for search
+  /* DataTables - ignore special characters for search */
   var searchType = jQuery.fn.DataTable.ext.type.search;
   searchType.string = function (data) {
     return !data ?
@@ -80,7 +79,7 @@ $(document).ready(function () {
     return false;
   });
 
-  //bootstrap tabs navigation
+  /* Bootstrap tabs navigation */
   let url = location.href.replace(/\/$/, "");
   if (location.hash) {
     const hashes = url.split("#")[1].split("_");
@@ -103,9 +102,9 @@ $(document).ready(function () {
   });
 
   /**
-   * wikidata autocomplete
-   * documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
-   * bootstrap version needs to be manually set d/t
+   * Wikidata autocomplete
+   * Documentation: https://bootstrap-autocomplete.readthedocs.io/en/latest/
+   * Bootstrap version needs to be manually set d/t
    */
   $('.Wikidata').autoComplete({
     bootstrapVersion: '4',
@@ -133,7 +132,7 @@ $(document).ready(function () {
 $.jstree.defaults.core.themes.dots = false;
 
 /**
- * sets default text size to a multiple of 0.2em via body stylesheet
+ * Sets default text size to a multiple of 0.2em via body stylesheet
  * @param {number}multiplier
  */
 function resizeText(multiplier) {
@@ -145,7 +144,7 @@ function resizeText(multiplier) {
 }
 
 /**
- * sets first character of passed string to an uppercase
+ * Sets first character of passed string to an uppercase
  * @param {string}string
  * @returns {string}
  */
@@ -157,7 +156,7 @@ function ucString(string) {
 }
 
 /**
- * makes an ajax request to bookmark a passed entity
+ * Makes an ajax request to bookmark a passed entity
  * @param {number}entityId
  */
 function ajaxBookmark(entityId) {
