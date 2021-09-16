@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
@@ -12,8 +13,9 @@ from openatlas.models.place import get_structure
 
 
 class GetSubunit(Resource):  # type: ignore
-    @staticmethod
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @swag_from("../swagger/subunit.yml", endpoint="api.subunit")
+    def get(self,
+            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser({"nodes": GetSubunit.get_subunits(id_)},
                                    default.parse_args(), id_)
 

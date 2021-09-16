@@ -1,4 +1,4 @@
-Type entities all endpoint
+Type Entities Endpoint
 ---
 tags:
   - Entities
@@ -20,6 +20,7 @@ parameters:
   - $ref: '#/components/parameters/typeParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
+  - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
     description: A dictionary with a result dictionary and pagination information

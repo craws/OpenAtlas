@@ -1,4 +1,4 @@
-System_Class endpoint
+System Class endpoint
 ---
 tags:
   - Entities
@@ -43,6 +43,7 @@ parameters:
   - $ref: '#/components/parameters/showParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
+  - $ref: '#/components/parameters/formatParam'
 responses:
   '200':
     description: A dictionary with a result dictionary and pagination information
