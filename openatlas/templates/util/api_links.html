@@ -26,35 +26,33 @@
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='xml') }}"
            target="_blank">
-            XML <i class="fas fa-download"></i>
+            XML
         </a>
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='pretty-xml') }}"
            target="_blank">
-            Pretty-XML <i class="fas fa-download"></i>
+            Pretty-XML
         </a>
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='turtle') }}"
            target="_blank">
-            Turtle <i class="fas fa-download"></i>
+            Turtle
         </a>
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='n3') }}"
            target="_blank">
             Notion 3
         </a>
-
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='nt') }}"
            target="_blank">
             N-Triples
         </a>
-    </div>
-
-    <div class="btn-group mr-2">
         <a class="{{ config.CSS.button.primary }}"
            href="{{ url_for('api.entity', id_=entity.id, export='csv') }}">
-            <i class="fas fa-download"></i> CSV
+            CSV
         </a>
     </div>
+
+
 </div>
