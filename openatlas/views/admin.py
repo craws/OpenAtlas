@@ -19,7 +19,7 @@ from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
     ModulesForm, SimilarForm, TestMailForm)
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.models.content import Content
+from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
@@ -88,7 +88,7 @@ def admin_index(
             format_date(user.created),
             format_date(user.login_last_success),
             format_number(count) if count else ''])
-    for item, languages in Content.get_content().items():
+    for item, languages in get_content().items():
         content = [uc_first(_(item))]
         for language in app.config['LANGUAGES'].keys():
             content.append(sanitize(languages[language], 'text'))
@@ -201,12 +201,11 @@ def admin_content(item: str) -> Union[str, Response]:
             if item == 'site_name_for_frontend' else TextAreaField())
     form = ContentForm()
     if form.validate_on_submit():
-        Content.update_content(item, form)
+        update_content(item, form)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in languages:
-        form.__getattribute__(language).data = \
-            Content.get_content()[item][language]
+        form.__getattribute__(language).data = get_content()[item][language]
     return render_template(
         'admin/content.html',
         item=item,

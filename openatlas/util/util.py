@@ -18,6 +18,7 @@ from flask import flash, g, render_template, request, session, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from jinja2 import contextfilter
 from markupsafe import Markup, escape
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -25,7 +26,7 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app, logger
-from openatlas.models.content import Content
+from openatlas.models.content import get_translation
 from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
@@ -671,7 +672,7 @@ def button_bar(buttons: List[Any]) -> str:
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
-    text = Content.get_translation('citation_example')
+    text = get_translation('citation_example')
     if not text or code != 'reference':
         return ''
     return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
@@ -788,9 +789,10 @@ def display_profile_image(entity: Entity) -> str:
             resized=resized))
 
 
+@contextfilter
 @app.template_filter()
-def display_content_translation(text: str) -> str:
-    return Content.get_translation(text)
+def display_content_translation(_context, text: str) -> str:
+    return get_translation(text)
 
 
 @app.template_filter()
