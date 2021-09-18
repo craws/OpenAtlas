@@ -315,6 +315,10 @@ class Entity:
         return Entity.get_by_id(id_)
 
     @staticmethod
+    def get_by_cidoc_class(code: Union[str, List[str]]) -> List[Entity]:
+        return [Entity(row) for row in Db.get_by_cidoc_class(code)]
+
+    @staticmethod
     def get_by_id(
             id_: int,
             nodes: bool = False,
@@ -355,8 +359,8 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_by_cidoc_class(code: Union[str, List[str]]) -> List[Entity]:
-        return [Entity(row) for row in Db.get_by_cidoc_class(code)]
+    def get_by_link_property(code: str, class_: str) -> List[Entity]:
+        return [Entity(row) for row in Db.get_by_link_property(code, class_)]
 
     @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:

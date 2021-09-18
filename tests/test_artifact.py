@@ -56,6 +56,9 @@ class ArtifactTest(TestBaseCase):
             assert b'Event Horizon' in rv.data
 
             # Add to actor as owner
+            rv = self.app.get(
+                url_for('link_insert', id_=actor.id, view='artifact'))
+            assert b'A little hate' in rv.data
             rv = self.app.post(
                 url_for('link_insert', id_=actor.id, view='artifact'),
                 data={'checkbox_values': [artifact.id]},

@@ -30,6 +30,19 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_by_link_property(code: str, class_: str) -> List[Dict[str, Any]]:
+        sql = """
+            SELECT
+                e.id, e.class_code, e.name, e.system_class, e.description,
+                e.created, e.modified
+            FROM model.entity e
+            JOIN model.link l ON e.id = l.domain_id
+                AND l.property_code = %(code)s
+            WHERE e.system_class = %(class)s"""
+        g.cursor.execute(sql, {'code': code, 'class': class_})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_by_project_id(project_id: int) -> List[Dict[str, Any]]:
         sql = """
             SELECT
