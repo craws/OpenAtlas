@@ -475,9 +475,14 @@ def get_file_path(
 def add_reference_systems_to_form(form: Any) -> str:
     html = ''
     switch_class = ''
-    fields = [
-        field for field in form if field.id.startswith('reference_system_id_')]
-    if len(fields) > 3:  # pragma: no cover
+    errors = False
+    fields = []
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            fields.append(field)
+            if field.errors:
+                errors = True  # pragma: no cover
+    if len(fields) > 3 and not errors:  # pragma: no cover
         switch_class = 'reference-system-switch'
         html = render_template('util/reference_system_switch.html')
     for field in fields:
