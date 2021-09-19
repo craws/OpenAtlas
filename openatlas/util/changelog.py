@@ -1,6 +1,7 @@
 class Changelog:
 
     versions = {
+        '6.6.0': ['TBA', {}],
         '6.5.0': ['2021-09-19', {
             'feature': {
                 '1462': 'Current owner of artifacts',
