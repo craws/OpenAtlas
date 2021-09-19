@@ -810,7 +810,7 @@ def manual(site: str) -> str:
     second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
     path = Path(app.root_path) / 'static' / 'manual' / first / second
     if not path.exists():
-        # print('Missing manual link: ' + str(path))
+        # print(f'Missing manual link: {path}')
         return ''
     return Markup(
         f'<a class="manual" href="/static/manual/{site}.html" target="_blank" '
