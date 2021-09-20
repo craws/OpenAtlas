@@ -9,7 +9,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 
-class ApiExportCSV:
+class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
     def export_entities(entities: List[Entity], name: str) -> Response:

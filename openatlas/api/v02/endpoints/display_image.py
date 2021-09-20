@@ -10,7 +10,7 @@ from openatlas.models.node import Node
 
 class DisplayImage(Resource):  # type: ignore
     @staticmethod
-    def get(filename: str) -> Response:
+    def get(filename: str) -> Response:  # pragma: no cover
         from pathlib import Path as Pathlib_path
         entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
         license_ = None

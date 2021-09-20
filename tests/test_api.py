@@ -248,6 +248,15 @@ class ApiTests(TestBaseCase):
                 url_for('api.code', code='reference', export='csv'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(
+                url_for('api.entity', id_=actor.id, export='csv'))
+            assert b'Frodo' in rv.data
+            rv = self.app.get(
+                url_for('api.entity', id_=place.id, export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(
+                url_for('api.entity', id_=location.id, export='csv'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(
                 url_for('api.entities_linked_to_entity', id_=place.id))
             self.assertDictEqual(
                 rv.get_json(),
