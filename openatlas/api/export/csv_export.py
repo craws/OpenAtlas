@@ -9,7 +9,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 
 
-class ApiExportCSV:
+class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
     def export_entities(entities: List[Entity], name: str) -> Response:
@@ -98,7 +98,7 @@ class ApiExportCSV:
 
     @staticmethod
     def get_geometry(entity: Entity) -> Dict[str, Any]:
-        if entity.cidoc_class.code != 'E53':  # pragma: nocover
+        if entity.cidoc_class.code != 'E53':  # pragma: no cover
             return {'type': None, 'coordinates': None}
         geoms = Gis.get_by_id(entity.id)
         if geoms:
