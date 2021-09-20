@@ -25,14 +25,14 @@ class Pagination:
                 total,
                 total.index(int(parser['first'])),
                 None))
-        raise EntityDoesNotExistError
+        raise EntityDoesNotExistError  # pragma: no cover
 
     @staticmethod
     def pagination(
             entities: List[Entity],
             parser: Dict[str, Any]) -> Dict[str, Any]:
         if not entities:
-            raise NoEntityAvailable
+            raise NoEntityAvailable  # pragma: no cover
         if parser['type_id']:
             entities = Pagination.get_entities_by_type(entities, parser)
             if not entities:

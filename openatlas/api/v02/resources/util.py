@@ -11,7 +11,7 @@ def get_entity_by_id(id_: int) -> Entity:
     try:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     except Exception:
-        raise EntityDoesNotExistError
+        raise EntityDoesNotExistError  # pragma: no cover
     return entity
 
 
@@ -19,7 +19,7 @@ def get_entities_by_ids(ids: List[int]) -> List[Entity]:
     try:
         entity = Entity.get_by_ids(ids, nodes=True, aliases=True)
     except Exception:
-        raise EntityDoesNotExistError
+        raise EntityDoesNotExistError  # pragma: no cover
     return entity
 
 

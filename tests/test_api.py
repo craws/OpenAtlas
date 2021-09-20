@@ -70,6 +70,7 @@ class ApiTests(TestBaseCase):
                 file.link('P67', place)
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
 
+
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
@@ -84,6 +85,16 @@ class ApiTests(TestBaseCase):
                     place,
                     description='2761369',
                     type_id=precision_id)
+
+                actor = insert_entity(
+                    'Frodo', 'person',
+                    description='That is the Nostromos')
+                if not place:  # Needed for Mypy
+                    return  # pragma: no cover
+
+                file2 = insert_entity('No License', 'file')
+                file2.link('P67', actor)
+
 
             # Test LinkedPlaces output
             self.maxDiff = None
@@ -128,7 +139,7 @@ class ApiTests(TestBaseCase):
 
             # /api/0.2/overview_count/
             rv = self.app.get(url_for('api.overview_count'))
-            self.assertAlmostEqual(rv.get_json(), api_data.api_overview_count)
+            self.assertCountEqual(rv.get_json(), api_data.api_overview_count)
 
             # /api/0.2/overview_count/
             rv = self.app.get(url_for('api.system_class_count'))
@@ -271,7 +282,8 @@ class ApiTests(TestBaseCase):
                 'api.query',
                 entities=place.id,
                 classes='E18',
-                items='place'))
+                items='place',
+                system_class='person'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for(
                 'api.query',
@@ -281,12 +293,24 @@ class ApiTests(TestBaseCase):
                 format='geojson'))
             assert b'Nostromos' in rv.data
 
+            rv = self.app.get(
+                url_for('api.entity', id_=actor.id))
+            assert b'Frodo' in rv.data
+
             # Path test with download
             rv = self.app.get(
                 url_for('api.entity', id_=place.id, download=True))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.latest', latest=1, download=True))
-            assert b'Datei' in rv.data
+            assert b'No License' in rv.data
+
+            # Path test with rdf
+            rv = self.app.get(
+                url_for('api.entity', id_=place.id, format='xml'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(
+                url_for('api.system_class', system_class='place', format='xml'))
+            assert b'Nostromos' in rv.data
 
             rv = self.app.get(url_for(
                 'api.system_class',
@@ -344,7 +368,7 @@ class ApiTests(TestBaseCase):
             # Parameter: count
             rv = self.app.get(
                 url_for('api.class', class_code='E31', count=True))
-            assert b'2' in rv.data
+            assert b'3' in rv.data
 
             rv = self.app.get(url_for(
                 'api.system_class',
@@ -356,7 +380,8 @@ class ApiTests(TestBaseCase):
                 'api.query',
                 entities=place.id,
                 classes='E18',
-                codes='place'))
+                codes='place',
+                system_class='person'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for(
                 'api.query',
@@ -367,78 +392,78 @@ class ApiTests(TestBaseCase):
             assert b'7' in rv.data
 
     @raises(EntityDoesNotExistError)
-    def error_class_entity(self) -> None:  # pragma: nocover
+    def error_class_entity(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(
                 url_for('api.class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
-    def error_query_query(self) -> None:  # pragma: nocover
+    def error_query_query(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.query'))
 
     @raises(InvalidSubunitError)
-    def error_node_invalid(self) -> None:  # pragma: nocover
+    def error_node_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.node_entities', id_=1234))
 
     @raises(InvalidSubunitError)
-    def error_node_all_invalid(self) -> None:  # pragma: nocover
+    def error_node_all_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.node_entities_all', id_=1234))
 
     @raises(InvalidCidocClassCode)
-    def error_class_invalid(self) -> None:  # pragma: nocover
+    def error_class_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
-    def error_code_invalid(self) -> None:  # pragma: nocover
+    def error_code_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='Invalid'))
 
     @raises(InvalidLimitError)
-    def error_latest_invalid(self) -> None:  # pragma: nocover
+    def error_latest_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.latest', latest='99999999'))
 
     @raises(EntityDoesNotExistError)
-    def error_subunit_entity(self) -> None:  # pragma: nocover
+    def error_subunit_entity(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.subunit', id_='99999999'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_1(self) -> None:  # pragma: nocover
+    def error_filter_operator_1(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place',
                                  filter='Wrong|name|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_2(self) -> None:  # pragma: nocover
+    def error_filter_operator_2(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place',
                                  filter='or|Wrong|like|Nostromos'))
 
     @raises(FilterOperatorError)
-    def error_filter_operator_3(self) -> None:  # pragma: nocover
+    def error_filter_operator_3(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place',
                                  filter='or|name|Wrong|Nostromos'))
 
     @raises(NoSearchStringError)
-    def error_filter_search(self) -> None:  # pragma: nocover
+    def error_filter_search(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(
                 url_for('api.code', code='place', filter='or|name|Wrong|'))
 
     @raises(InvalidSearchDateError)
-    def error_filter_date(self) -> None:  # pragma: nocover
+    def error_filter_date(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(url_for('api.code', code='place',
                                  filter='or|begin_from|like|WRONG'))
 
     @raises(InvalidSearchNumberError)
-    def error_filter_date2(self) -> None:  # pragma: nocover
+    def error_filter_date2(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(
                 url_for('api.code', code='place', filter='or|id|eq|WRONG'))

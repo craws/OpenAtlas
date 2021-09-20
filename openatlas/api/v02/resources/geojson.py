@@ -57,6 +57,5 @@ class Geojson:
                                                                    'artifact']:
             return Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
         if entity.class_.name == 'object_location':
-            print("here")
             return Gis.get_by_id(entity.id)
         return []
