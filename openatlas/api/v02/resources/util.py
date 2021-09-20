@@ -10,16 +10,16 @@ from openatlas.models.link import Link
 def get_entity_by_id(id_: int) -> Entity:
     try:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-    except Exception:
-        raise EntityDoesNotExistError  # pragma: no cover
+    except Exception: # pragma: no cover
+        raise EntityDoesNotExistError
     return entity
 
 
 def get_entities_by_ids(ids: List[int]) -> List[Entity]:
     try:
         entity = Entity.get_by_ids(ids, nodes=True, aliases=True)
-    except Exception:
-        raise EntityDoesNotExistError  # pragma: no cover
+    except Exception: # pragma: no cover
+        raise EntityDoesNotExistError
     return entity
 
 

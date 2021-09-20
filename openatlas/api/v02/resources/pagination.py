@@ -36,7 +36,7 @@ class Pagination:
         if parser['type_id']:
             entities = Pagination.get_entities_by_type(entities, parser)
             if not entities:
-                raise TypeIDError
+                raise TypeIDError  # pragma: no cover
         index = []
         total = [e.id for e in entities]
         count = len(total)

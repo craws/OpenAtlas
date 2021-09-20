@@ -124,7 +124,7 @@ api_content_de = {'contact': '',
                   'intro': 'Das ist Deutsch',
                   'legalNotice': '',
                   'siteName': ''}
-api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 1,
+api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 2,
                           'acquisition': 0,
                           'reference_system': 2, 'feature': 1, 'file': 2,
                           'activity': 0, 'type': 87,
@@ -136,7 +136,7 @@ api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 1,
 
 api_overview_count = [
     {'systemClass': 'external_reference', 'count': 1},
-    {'systemClass': 'person', 'count': 1},
+    {'systemClass': 'person', 'count': 2},
     {'systemClass': 'reference_system', 'count': 2},
     {'systemClass': 'file', 'count': 2},
     {'systemClass': 'feature', 'count': 1},

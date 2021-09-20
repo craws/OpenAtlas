@@ -14,8 +14,6 @@ class GetTypeTree(Resource):  # type: ignore
     def get() -> Union[Tuple[Resource, int], Response]:
         parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
-        if parser['count']:
-            return jsonify(len(type_tree['type_tree']))
         template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
             return download(type_tree, template, 'type_tree')

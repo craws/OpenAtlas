@@ -70,7 +70,6 @@ class ApiTests(TestBaseCase):
                 file.link('P67', place)
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
 
-
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
@@ -88,13 +87,21 @@ class ApiTests(TestBaseCase):
 
                 actor = insert_entity(
                     'Frodo', 'person',
-                    description='That is the Nostromos')
+                    description='That is Frodo')
+                if not place:  # Needed for Mypy
+                    return  # pragma: no cover
+                actor2 = insert_entity(
+                    'Sam', 'person',
+                    description='That is Sam')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
 
+                relation_id = Node.get_hierarchy('Actor actor relation').id
+                relation_sub_id = g.nodes[relation_id].subs[0]
+                actor.link('OA7', actor2, type_id=relation_sub_id)
+
                 file2 = insert_entity('No License', 'file')
                 file2.link('P67', actor)
-
 
             # Test LinkedPlaces output
             self.maxDiff = None
@@ -249,9 +256,17 @@ class ApiTests(TestBaseCase):
             # Path Tests
             rv = self.app.get(url_for('api.class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for(
+                'api.system_class',
+                system_class='place',
+                type_id=102))
+            assert b'Nostromos' in rv.data
             rv = self.app.get(
                 url_for('api.class', class_code='E31', format='geojson'))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(
+                url_for('api.entity', id_=location.id, format='geojson'))
+            assert b'' in rv.data
             rv = self.app.get(
                 url_for('api.class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
@@ -260,6 +275,24 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
+            rv = self.app.get(url_for('api.node_overview'))
+            assert b'Economical' in rv.data
+            rv = self.app.get(url_for('api.node_overview', download=True))
+            assert b'Economical' in rv.data
+            rv = self.app.get(url_for('api.type_tree'))
+            assert b'Settlement' in rv.data
+            rv = self.app.get(url_for('api.type_tree', download=True))
+            assert b'Settlement' in rv.data
+            rv = self.app.get(url_for('api.type_tree', count=True))
+            assert b'Settlement' in rv.data
+            rv = self.app.get(url_for('api.type_entities', id_=102))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api.type_entities', id_=relation_sub_id))
+            assert b'Frodo' in rv.data
+            rv = self.app.get(url_for('api.type_entities_all', id_=102))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api.type_entities_all', id_=relation_sub_id))
+            assert b'Frodo' in rv.data
 
             rv = self.app.get(url_for('api.latest', count=True, latest=2))
             assert b'2' in rv.data
@@ -283,12 +316,12 @@ class ApiTests(TestBaseCase):
                 entities=place.id,
                 classes='E18',
                 items='place',
-                system_class='person'))
+                system_classes='person'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for(
                 'api.query',
                 entities=place.id,
-                classes='E18',
+                system_classes='place',
                 items='place',
                 format='geojson'))
             assert b'Nostromos' in rv.data
