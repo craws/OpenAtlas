@@ -82,8 +82,7 @@ Copy instance/example_production.py to instance/production.py
 
     $ cp instance/example_production.py instance/production.py
 
-Add/change values as appropriate. See config/default.py which settings are
-available.
+Add/change values as appropriate. See config.py which settings are available.
 
 ### Apache
 
