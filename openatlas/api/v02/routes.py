@@ -43,7 +43,9 @@ swagger = Swagger(app, parse=False, template_file="api/v02/swagger.json")
 # swagger = Swagger(app, parse=False, template=template)
 
 api.add_resource(GetByCode, '/0.2/code/<string:code>', endpoint="code")
-api.add_resource(GetByClass, '/0.2/class/<string:class_code>', endpoint="class")
+api.add_resource(GetByClass,
+                 '/0.2/class/<string:class_code>',
+                 endpoint="cidoc_class")
 api.add_resource(GetEntity, '/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetLatest, '/0.2/latest/<int:latest>', endpoint="latest")
 api.add_resource(GetQuery, '/0.2/query/', endpoint="query")

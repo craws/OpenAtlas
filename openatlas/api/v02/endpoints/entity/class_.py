@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByClass(Resource):  # type: ignore
-    @swag_from("../swagger/class_code.yml", endpoint="api.class_code")
+    @swag_from("../swagger/cidoc_class.yml", endpoint="api.cidoc_class")
     def get(self,
             class_code: str)\
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

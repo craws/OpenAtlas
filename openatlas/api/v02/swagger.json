@@ -9,8 +9,8 @@
       "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
     },
     "contact": {
-      "name": "Bernhard Koschicek",
-      "email": "bernhard.koschicek@oeaw.ac.at"
+      "name": "Bernhard Koschiček-Krombholz",
+      "email": "bernhard.koschicek-krombholz@oeaw.ac.at"
     }
   },
   "servers": [
@@ -218,6 +218,17 @@
           },
           "siteName": {
             "type": "string"
+          },
+          "imageSized": {
+            "type": "object",
+            "properties": {
+              "thumbnail": {
+                "type": "string"
+              },
+              "table": {
+                "type": "string"
+              }
+            }
           }
         }
       },
@@ -373,7 +384,7 @@
           }
         }
       },
-      "OutputModel": {
+      "OutputModelLPF": {
         "type": "object",
         "properties": {
           "results": {
@@ -383,23 +394,42 @@
             }
           },
           "pagination": {
-            "type": "object",
-            "properties": {
-              "entities": {
-                "type": "number"
-              },
-              "entitiesPerPage": {
-                "type": "number"
-              },
-              "totalPages": {
-                "type": "number"
-              },
-              "index": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/PaginationIndexModel"
-                }
-              }
+              "$ref": "#/components/schemas/PaginationModel"
+            }
+          }
+        }
+      },
+      "OutputModelGeojson": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeometryModel"
+            }
+          },
+          "pagination": {
+              "$ref": "#/components/schemas/PaginationModel"
+            }
+          }
+        }
+      },
+      "PaginationModel": {
+        "type": "object",
+        "properties": {
+          "entities": {
+            "type": "number"
+          },
+          "entitiesPerPage": {
+            "type": "number"
+          },
+          "totalPages": {
+            "type": "number"
+          },
+          "index": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaginationIndexModel"
             }
           }
         }
@@ -631,7 +661,7 @@
           }
         }
       },
-      "TypeModel": {
+      "TypeTreeSubModel": {
         "type": "object",
         "properties": {
           "Type_IDs": {
@@ -692,7 +722,7 @@
           "type_tree": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/TypeModel"
+              "$ref": "#/components/schemas/TypeTreeSubModel"
             }
           }
         }
@@ -707,6 +737,20 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Geometries"
+            }
+          }
+        }
+      },
+      "GeometricEntries": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GeometricEntry"
             }
           }
         }
@@ -785,6 +829,60 @@
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      },
+      "GeometricEntry": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "coordinates": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "number"
+                  }
+                }
+              },
+              "type": {
+                "type": "string"
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "objectId": {
+                "type": "integer"
+              },
+              "objectDescription": {
+                "type": "string"
+              },
+              "objectName": {
+                "type": "string"
+              },
+              "objectType": {
+                "type": "string"
+              },
+              "shapeType": {
+                "type": "string"
               }
             }
           }
