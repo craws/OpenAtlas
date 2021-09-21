@@ -1,6 +1,6 @@
 from typing import Optional, Union
 
-from flask import flash, render_template, request, url_for
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -9,7 +9,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form, build_table_form
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first

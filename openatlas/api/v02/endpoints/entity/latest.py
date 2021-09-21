@@ -22,5 +22,5 @@ class GetLatest(Resource):  # type: ignore
     @staticmethod
     def get_latest(limit_: int) -> List[Entity]:
         if not 0 < limit_ < 101:
-            raise InvalidLimitError
+            raise InvalidLimitError  # pragma: no cover
         return Entity.get_latest(limit_)

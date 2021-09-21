@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.api.v02.resources.error import MethodNotAllowedError
-from openatlas.models.content import Content
+from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
@@ -98,7 +98,7 @@ def overview() -> str:
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     tabs['info'].content = render_template(
         'index/index.html',
-        intro=Content.get_translation('intro'),
+        intro=get_translation('intro'),
         tables=tables)
     return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
 
@@ -145,7 +145,7 @@ def index_feedback() -> Union[str, Response]:
 def index_content(item: str) -> str:
     return render_template(
         'index/content.html',
-        text=Content.get_translation(item),
+        text=get_translation(item),
         title=_(_(item)),
         crumbs=[_(item)])
 
@@ -164,14 +164,12 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
         return jsonify({'message': 'Endpoint not found', 'status': 404}), 404
-    return render_template(
-        '404.html',
-        crumbs=['404 - File not found'],
-        e=e), 404
+    return \
+        render_template('404.html', crumbs=['404 - File not found'], e=e), 404
 
 
 @app.errorhandler(405)  # pragma: no cover
-def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def method_not_allowed(_e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     raise MethodNotAllowedError
 
 

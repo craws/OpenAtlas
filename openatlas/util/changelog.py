@@ -1,11 +1,18 @@
 class Changelog:
 
     versions = {
-        '6.5.0': ['TBA', {
+        '6.6.0': ['TBA', {}],
+        '6.5.0': ['2021-09-19', {
             'feature': {
                 '1462': 'Current owner of artifacts',
-                '1562': 'Update manual overlay'
-            }}],
+                '1562': 'Update manual overlay',
+                '1184': 'API: add additional output format RDFS',
+                '1551':
+                    'API: Relation type adaptions, adding relationDescription'},
+            'fix': {
+                '1557': 'Save buttons blocked by map',
+                '1580': 'Hidden error messages for reference systems',
+                '1570': 'API: Wrong type signature in OpenApi',}}],
         '6.4.0': ['2021-08-10', {
             'feature': {
                 '1280': 'Picture Preview',
@@ -21,8 +28,7 @@ class Changelog:
                 '1530': 'API: Geometries endpoint for frontend map',
                 '1535': 'API: Get all entities linked to an entity',
                 '1537': 'API: Type entities for actor types',
-                '1545': 'API: Filter entities by types'
-                },
+                '1545': 'API: Filter entities by types'},
             'fix': {
                 '1414': 'Enlarged Description Field Covers up Entry Buttons',
                 '1539': 'Pagination not shown for tables sometimes',

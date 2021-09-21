@@ -36,11 +36,13 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
                 request.form['checkbox_values'],
                 inverse=inverse)
         return redirect(f"{url_for('entity_view', id_=entity.id)}#tab-{view}")
+    if entity.class_.view == 'actor' and view == 'artifact':
+        excluded = Entity.get_by_link_property(property_code, 'artifact')
+    else:
+        excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'form.html',
-        form=build_table_form(
-            view,
-            entity.get_linked_entities(property_code, inverse=inverse)),
+        form=build_table_form(view, excluded),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

@@ -124,9 +124,9 @@ api_content_de = {'contact': '',
                   'intro': 'Das ist Deutsch',
                   'legalNotice': '',
                   'siteName': ''}
-api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 0,
+api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 2,
                           'acquisition': 0,
-                          'reference_system': 2, 'feature': 1, 'file': 1,
+                          'reference_system': 2, 'feature': 1, 'file': 2,
                           'activity': 0, 'type': 87,
                           'administrative_unit': 14, 'artifact': 0,
                           'source_translation': 0,
@@ -134,14 +134,17 @@ api_system_class_count = {'move': 0, 'bibliography': 0, 'person': 0,
                           'group': 0,
                           'source': 0}
 
-api_overview_count = [{'systemClass': 'external_reference', 'count': 1},
-                      {'systemClass': 'reference_system', 'count': 2},
-                      {'systemClass': 'file', 'count': 1},
-                      {'systemClass': 'feature', 'count': 1},
-                      {'systemClass': 'type', 'count': 87},
-                      {'systemClass': 'administrative_unit', 'count': 14},
-                      {'systemClass': 'place', 'count': 1},
-                      {'systemClass': 'stratigraphic_unit', 'count': 1}]
+api_overview_count = [
+    {'systemClass': 'external_reference', 'count': 1},
+    {'systemClass': 'person', 'count': 2},
+    {'systemClass': 'reference_system', 'count': 2},
+    {'systemClass': 'file', 'count': 2},
+    {'systemClass': 'feature', 'count': 1},
+    {'systemClass': 'type', 'count': 87},
+    {'systemClass': 'administrative_unit', 'count': 14},
+    {'systemClass': 'place', 'count': 1},
+    {'systemClass': 'stratigraphic_unit', 'count': 1}]
+
 
 api_node_entities = {
     'nodes': [{'id': 84, 'label': 'Austria',

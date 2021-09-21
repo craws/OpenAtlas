@@ -18,6 +18,7 @@ from flask import flash, g, render_template, request, session, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from jinja2 import contextfilter
 from markupsafe import Markup, escape
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -25,7 +26,7 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app, logger
-from openatlas.models.content import Content
+from openatlas.models.content import get_translation
 from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
@@ -474,9 +475,14 @@ def get_file_path(
 def add_reference_systems_to_form(form: Any) -> str:
     html = ''
     switch_class = ''
-    fields = [
-        field for field in form if field.id.startswith('reference_system_id_')]
-    if len(fields) > 3:  # pragma: no cover
+    errors = False
+    fields = []
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            fields.append(field)
+            if field.errors:
+                errors = True  # pragma: no cover
+    if len(fields) > 3 and not errors:  # pragma: no cover
         switch_class = 'reference-system-switch'
         html = render_template('util/reference_system_switch.html')
     for field in fields:
@@ -671,7 +677,7 @@ def button_bar(buttons: List[Any]) -> str:
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
-    text = Content.get_translation('citation_example')
+    text = get_translation('citation_example')
     if not text or code != 'reference':
         return ''
     return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
@@ -788,9 +794,10 @@ def display_profile_image(entity: Entity) -> str:
             resized=resized))
 
 
+@contextfilter
 @app.template_filter()
-def display_content_translation(text: str) -> str:
-    return Content.get_translation(text)
+def display_content_translation(_context, text: str) -> str:
+    return get_translation(text)
 
 
 @app.template_filter()
@@ -803,7 +810,7 @@ def manual(site: str) -> str:
     second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
     path = Path(app.root_path) / 'static' / 'manual' / first / second
     if not path.exists():
-        # print('Missing manual link: ' + str(path))
+        # print(f'Missing manual link: {path}')
         return ''
     return Markup(
         f'<a class="manual" href="/static/manual/{site}.html" target="_blank" '

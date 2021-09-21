@@ -117,11 +117,7 @@
                                 <span>{{ _('legal_notice')|uc_first }}</span>
                             </a>
                         {% endif %}
-                        {% if current_user.is_authenticated %}
-                            <a class="dropdown-item" href="/logout">
-                                <span>{{ _('logout')|uc_first }}</span>
-                            </a>
-                        {% endif %}
+                        <a class="dropdown-item" href="/logout"><span>{{ _('logout')|uc_first }}</span></a>
                     </div>
                 </div>
             {% else %}
