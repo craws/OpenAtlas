@@ -21,5 +21,5 @@ class GetSubunit(Resource):  # type: ignore
     def get_subunits(id_: int) -> List[Dict[str, Any]]:
         structure = get_structure(get_entity_by_id(id_))
         if not structure or not structure['subunits']:
-            raise InvalidSubunitError  # pragma: no cover
+            raise InvalidSubunitError
         return [get_node_dict(subunit) for subunit in structure['subunits']]

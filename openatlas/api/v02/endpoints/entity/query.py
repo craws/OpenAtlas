@@ -21,7 +21,7 @@ class GetQuery(Resource):  # type: ignore
                 and not parser['codes'] \
                 and not parser['classes'] \
                 and not parser['system_classes']:
-            raise QueryEmptyError  # pragma: no cover
+            raise QueryEmptyError
         return resolve_entities(GetQuery.get_entities(parser), parser, 'query')
 
     @staticmethod

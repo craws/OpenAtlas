@@ -98,7 +98,7 @@ class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
     def get_geometry(entity: Entity) -> Dict[str, Any]:
-        if entity.cidoc_class.code != 'E53':  # pragma: no cover
+        if entity.cidoc_class.code != 'E53':
             return {'type': None, 'coordinates': None}
         geoms = Gis.get_by_id(entity.id)
         if geoms:

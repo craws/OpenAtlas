@@ -23,6 +23,6 @@ class GetBySystemClass(Resource):  # type: ignore
     def get_by_system(system_class: str, parser: Dict[str, Any]) \
             -> List[Entity]:
         if system_class not in g.classes:
-            raise InvalidSystemClassError  # pragma: no cover
+            raise InvalidSystemClassError
         return [Entity(row) for row in
                 Db.get_by_system_class(system_class, parser)]

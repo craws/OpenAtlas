@@ -22,7 +22,7 @@ class GetTypeEntities(Resource):  # type: ignore
     @staticmethod
     def get_node(id_: int) -> List[Entity]:
         if id_ not in g.nodes:
-            raise InvalidSubunitError  # pragma: no cover
+            raise InvalidSubunitError
         return [e for e in
                 g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)]
 
