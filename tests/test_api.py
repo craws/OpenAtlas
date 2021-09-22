@@ -217,7 +217,7 @@ class ApiTests(TestBaseCase):
                 id_=relation_sub_id))
             self.assertDictEqual(
                 rv.get_json(),
-                type_entities.test_type_entities_special)
+                cidoc_class.test_cidoc_class)
 
             # /type_entities_all
             rv = self.app.get(url_for(
@@ -225,7 +225,7 @@ class ApiTests(TestBaseCase):
                 id_=relation_sub_id))
             self.assertDictEqual(
                 rv.get_json(),
-                type_entities.test_type_entities_all)
+                cidoc_class.test_cidoc_class)
             rv = self.app.get(url_for(
                 'api.type_entities_all',
                 id_=unit_node.id))
@@ -336,7 +336,7 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 filter='and|id|gt|100'))
-            self.assertDictEqual(rv.get_json(), query.test_query_filter_id)
+            self.assertDictEqual(rv.get_json(), query.test_query)
 
             # ---Content Endpoints---
 
@@ -448,60 +448,106 @@ class ApiTests(TestBaseCase):
                 node_entities.test_node_entities)
 
             with self.assertRaises(EntityDoesNotExistError):
-                self.app.get(url_for('api.class', class_code='E18', last=1231))
+                self.app.get(url_for(
+                    'api.class',
+                    class_code='E18',
+                    last=1231))
             with self.assertRaises(TypeIDError):
                 self.app.get(url_for(
                     'api.query',
                     system_classes='person',
                     type_id=Node.get_nodes('Place')[0]))
             with self.assertRaises(NoEntityAvailable):
-                self.app.get(url_for('api.query', entities=12345))
+                self.app.get(url_for(
+                    'api.query',
+                    entities=12345))
             with self.assertRaises(NoEntityAvailable):
-                self.app.get(url_for('api.class', class_code='E68', last=1231))
+                self.app.get(url_for(
+                    'api.class',
+                    class_code='E68',
+                    last=1231))
             with self.assertRaises(InvalidSystemClassError):
-                self.app.get(url_for('api.system_class', system_class='Wrong'))
+                self.app.get(url_for(
+                    'api.system_class',
+                    system_class='Wrong'))
             with self.assertRaises(QueryEmptyError):
                 self.app.get(url_for('api.query'))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.node_entities', id_=1234))
+                self.app.get(url_for(
+                    'api.node_entities',
+                    id_=1234))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.node_entities_all', id_=1234))
+                self.app.get(url_for(
+                    'api.node_entities_all',
+                    id_=1234))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.type_entities', id_=1234))
+                self.app.get(url_for(
+                    'api.type_entities',
+                    id_=1234))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.type_entities_all', id_=1234))
+                self.app.get(url_for(
+                    'api.type_entities_all',
+                    id_=1234))
             with self.assertRaises(InvalidCidocClassCode):
-                self.app.get(url_for('api.class', class_code='e99999999'))
+                self.app.get(url_for(
+                    'api.class',
+                    class_code='e99999999'))
             with self.assertRaises(InvalidCodeError):
-                self.app.get(url_for('api.code', code='Invalid'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='Invalid'))
             with self.assertRaises(InvalidLimitError):
-                self.app.get(url_for('api.latest', latest='99999999'))
+                self.app.get(url_for(
+                    'api.latest',
+                    latest='99999999'))
             with self.assertRaises(EntityDoesNotExistError):
-                self.app.get(url_for('api.subunit', id_='99999999'))
+                self.app.get(url_for(
+                    'api.subunit',
+                    id_='99999999'))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.subunit', id_=actor.id))
+                self.app.get(url_for(
+                    'api.subunit',
+                    id_=actor.id))
             with self.assertRaises(EntityDoesNotExistError):
-                self.app.get(url_for('api.subunit_hierarchy', id_='2342352525'))
+                self.app.get(url_for(
+                    'api.subunit_hierarchy',
+                    id_='2342352525'))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for('api.subunit_hierarchy', id_=actor.id))
+                self.app.get(url_for(
+                    'api.subunit_hierarchy',
+                    id_=actor.id))
             with self.assertRaises(FilterLogicalOperatorError):
-                self.app.get(url_for('api.code', code='place',
-                                     filter='Wrong|name|like|Nostromos'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='Wrong|name|like|Nostromos'))
             with self.assertRaises(FilterColumnError):
-                self.app.get(url_for('api.code', code='place',
-                                     filter='or|Wrong|like|Nostromos'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='or|Wrong|like|Nostromos'))
             with self.assertRaises(FilterOperatorError):
-                self.app.get(url_for('api.code', code='place',
-                                     filter='or|name|Wrong|Nostromos'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='or|name|Wrong|Nostromos'))
             with self.assertRaises(FilterOperatorError):
-                self.app.get(
-                    url_for('api.code', code='place', filter='or|name|Wrong|'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='or|name|Wrong|'))
             with self.assertRaises(NoSearchStringError):
-                self.app.get(
-                    url_for('api.code', code='place', filter='or|name|like|'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='or|name|like|'))
             with self.assertRaises(InvalidSearchDateError):
-                self.app.get(url_for('api.system_class', system_class='place',
-                                     filter='or|begin_from|like|19970-18-09'))
+                self.app.get(url_for(
+                    'api.system_class',
+                    system_class='place',
+                    filter='or|begin_from|like|19970-18-09'))
             with self.assertRaises(InvalidSearchNumberError):
-                self.app.get(
-                    url_for('api.code', code='place', filter='or|id|eq|25.5'))
+                self.app.get(url_for(
+                    'api.code',
+                    code='place',
+                    filter='or|id|eq|25.5'))

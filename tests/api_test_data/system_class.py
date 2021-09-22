@@ -18,15 +18,17 @@ test_system_class = {'results': [{
             'relationType': 'crm:P52 has current owner',
             'relationSystemClass': 'person',
             'relationDescription': None,
-            'type': None, 'when': {'timespans': [
-                {'start': {'earliest': 'None', 'latest': 'None'},
-                 'end': {'earliest': 'None', 'latest': 'None'}}]}},
-            {'label': 'Location of The One Ring',
-             'relationTo': 'http://local.host/api/0.2/entity/117',
-             'relationType': 'crm:P53 has former or current location',
-             'relationSystemClass': 'object_location',
-             'relationDescription': None,
-             'type': None, 'when': {'timespans': [{
+            'type': None,
+            'when':
+                {'timespans': [
+                    {'start': {'earliest': 'None', 'latest': 'None'},
+                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
+            'label': 'Location of The One Ring',
+            'relationTo': 'http://local.host/api/0.2/entity/117',
+            'relationType': 'crm:P53 has former or current location',
+            'relationSystemClass': 'object_location',
+            'relationDescription': None,
+            'type': None, 'when': {'timespans': [{
                 'start': {
                     'earliest': 'None',
                     'latest': 'None'},

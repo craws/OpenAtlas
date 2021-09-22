@@ -3,8 +3,10 @@ test_lpf = {
     'type': 'FeatureCollection', 'features': [
         {'@id': 'http://local.host/entity/104', 'type': 'Feature',
          'crmClass': 'crm:E18 Physical Thing', 'systemClass': 'place',
-         'properties': {'title': 'Shire'}, 'description': [
-            {'value': 'The Shire was the homeland of the hobbits.'}], 'when': {
+         'properties': {'title': 'Shire'},
+         'description': [
+            {'value': 'The Shire was the homeland of the hobbits.'}],
+         'when': {
             'timespans': [
                 {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
                  'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]},
@@ -159,4 +161,3 @@ test_geojson = {
             'end_latest': '2019-03-01',
             'end_comment': 'Descent of Shire',
             'types': ['Place', 'Height']}}]}
-
