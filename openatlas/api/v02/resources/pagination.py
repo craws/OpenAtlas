@@ -88,7 +88,7 @@ class Pagination:
             entities = [e.id for e in new_entities[:int(parser['limit'])]]
             return get_all_links_inverse(entities) \
                 if inverse else get_all_links(entities)
-        return []  # pragma: no cover
+        return []
 
     @staticmethod
     def linked_places_result(

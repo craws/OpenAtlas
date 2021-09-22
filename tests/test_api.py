@@ -166,7 +166,6 @@ class ApiTests(TestBaseCase):
                 id_=place.id,
                 format='xml'))
             assert b'Shire' in rv.data
-
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id,
@@ -178,6 +177,13 @@ class ApiTests(TestBaseCase):
                 'api.class',
                 class_code='E21'))
             self.assertDictEqual(rv.get_json(), cidoc_class.test_cidoc_class)
+            rv = self.app.get(url_for(
+                'api.class',
+                class_code='E21',
+                show='none'))
+            self.assertDictEqual(
+                rv.get_json(),
+                cidoc_class.test_cidoc_class_show_none)
 
             # /code
             rv = self.app.get(url_for(

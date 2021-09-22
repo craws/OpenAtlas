@@ -96,3 +96,30 @@ test_cidoc_class = {'results': [{
          'entitiesPerPage': 20,
          'index': [{'page': 1, 'startId': 113}],
          'totalPages': 1}}
+
+test_cidoc_class_show_none = {'results': [{
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection',
+    'features': [
+        {'@id': 'http://local.host/entity/113',
+         'type': 'Feature',
+         'crmClass': 'crm:E21 Person',
+         'systemClass': 'person',
+         'properties': {'title': 'Frodo'},
+         'description': [{'value': 'That is Frodo'}],
+         'geometry': None}]}, {
+    '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
+    'type': 'FeatureCollection',
+    'features': [
+        {'@id': 'http://local.host/entity/118',
+         'type': 'Feature',
+         'crmClass': 'crm:E21 Person',
+         'systemClass': 'person',
+         'properties': {'title': 'Sam'},
+         'description': [{'value': 'That is Sam'}],
+         'geometry': None}]}],
+    'pagination': {
+        'entities': 2,
+        'entitiesPerPage': 20,
+        'index': [{'page': 1, 'startId': 113}],
+        'totalPages': 1}}

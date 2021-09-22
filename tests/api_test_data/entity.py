@@ -5,11 +5,11 @@ test_lpf = {
          'crmClass': 'crm:E18 Physical Thing', 'systemClass': 'place',
          'properties': {'title': 'Shire'},
          'description': [
-            {'value': 'The Shire was the homeland of the hobbits.'}],
+             {'value': 'The Shire was the homeland of the hobbits.'}],
          'when': {
-            'timespans': [
-                {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
-                 'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]},
+             'timespans': [
+                 {'start': {'earliest': '2018-01-31', 'latest': '2018-03-01'},
+                  'end': {'earliest': '2019-01-31', 'latest': '2019-03-01'}}]},
          'types': [{'identifier': 'http://local.host/api/0.2/entity/65',
                     'label': 'Place', 'description': None, 'hierarchy': '',
                     'value': None, 'unit': None},
