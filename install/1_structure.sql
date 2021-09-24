@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.11 (Debian 11.11-0+deb10u1)
--- Dumped by pg_dump version 11.11 (Debian 11.11-0+deb10u1)
+-- Dumped from database version 11.12 (Debian 11.12-0+deb10u1)
+-- Dumped by pg_dump version 11.12 (Debian 11.12-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -43,9 +43,9 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fk
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
@@ -68,9 +68,9 @@ DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
-DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.class;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -113,13 +113,13 @@ ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS propert
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_pkey;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_name_key;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_code_key;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
@@ -147,9 +147,9 @@ ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class_i18n ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class_inheritance ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class_i18n ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.polygon ALTER COLUMN id DROP DEFAULT;
@@ -196,12 +196,12 @@ DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
-DROP SEQUENCE IF EXISTS model.class_inheritance_id_seq;
-DROP TABLE IF EXISTS model.class_inheritance;
-DROP SEQUENCE IF EXISTS model.class_id_seq;
-DROP SEQUENCE IF EXISTS model.class_i18n_id_seq;
-DROP TABLE IF EXISTS model.class_i18n;
-DROP TABLE IF EXISTS model.class;
+DROP SEQUENCE IF EXISTS model.cidoc_class_inheritance_id_seq;
+DROP TABLE IF EXISTS model.cidoc_class_inheritance;
+DROP SEQUENCE IF EXISTS model.cidoc_class_id_seq;
+DROP SEQUENCE IF EXISTS model.cidoc_class_i18n_id_seq;
+DROP TABLE IF EXISTS model.cidoc_class_i18n;
+DROP TABLE IF EXISTS model.cidoc_class;
 DROP SEQUENCE IF EXISTS import.project_id_seq;
 DROP TABLE IF EXISTS import.project;
 DROP SEQUENCE IF EXISTS import.entity_id_seq;
@@ -527,10 +527,10 @@ ALTER SEQUENCE import.project_id_seq OWNED BY import.project.id;
 
 
 --
--- Name: class; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: cidoc_class; Type: TABLE; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class (
+CREATE TABLE model.cidoc_class (
     id integer NOT NULL,
     code text NOT NULL,
     name text NOT NULL,
@@ -540,27 +540,27 @@ CREATE TABLE model.class (
 );
 
 
-ALTER TABLE model.class OWNER TO openatlas;
+ALTER TABLE model.cidoc_class OWNER TO openatlas;
 
 --
--- Name: COLUMN class.code; Type: COMMENT; Schema: model; Owner: openatlas
+-- Name: COLUMN cidoc_class.code; Type: COMMENT; Schema: model; Owner: openatlas
 --
 
-COMMENT ON COLUMN model.class.code IS 'e.g. E21';
-
-
---
--- Name: COLUMN class.name; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON COLUMN model.class.name IS 'e.g. Person';
+COMMENT ON COLUMN model.cidoc_class.code IS 'e.g. E21';
 
 
 --
--- Name: class_i18n; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: COLUMN cidoc_class.name; Type: COMMENT; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class_i18n (
+COMMENT ON COLUMN model.cidoc_class.name IS 'e.g. Person';
+
+
+--
+-- Name: cidoc_class_i18n; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.cidoc_class_i18n (
     id integer NOT NULL,
     class_code text NOT NULL,
     language_code text NOT NULL,
@@ -570,13 +570,13 @@ CREATE TABLE model.class_i18n (
 );
 
 
-ALTER TABLE model.class_i18n OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_i18n OWNER TO openatlas;
 
 --
--- Name: class_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_i18n_id_seq
+CREATE SEQUENCE model.cidoc_class_i18n_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -584,20 +584,20 @@ CREATE SEQUENCE model.class_i18n_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_i18n_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_i18n_id_seq OWNER TO openatlas;
 
 --
--- Name: class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_i18n_id_seq OWNED BY model.class_i18n.id;
+ALTER SEQUENCE model.cidoc_class_i18n_id_seq OWNED BY model.cidoc_class_i18n.id;
 
 
 --
--- Name: class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_id_seq
+CREATE SEQUENCE model.cidoc_class_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -605,20 +605,20 @@ CREATE SEQUENCE model.class_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_id_seq OWNER TO openatlas;
 
 --
--- Name: class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_id_seq OWNED BY model.class.id;
+ALTER SEQUENCE model.cidoc_class_id_seq OWNED BY model.cidoc_class.id;
 
 
 --
--- Name: class_inheritance; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance; Type: TABLE; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class_inheritance (
+CREATE TABLE model.cidoc_class_inheritance (
     id integer NOT NULL,
     super_code text NOT NULL,
     sub_code text NOT NULL,
@@ -627,13 +627,13 @@ CREATE TABLE model.class_inheritance (
 );
 
 
-ALTER TABLE model.class_inheritance OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_inheritance OWNER TO openatlas;
 
 --
--- Name: class_inheritance_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_inheritance_id_seq
+CREATE SEQUENCE model.cidoc_class_inheritance_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -641,13 +641,13 @@ CREATE SEQUENCE model.class_inheritance_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_inheritance_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_inheritance_id_seq OWNER TO openatlas;
 
 --
--- Name: class_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_inheritance_id_seq OWNED BY model.class_inheritance.id;
+ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNED BY model.cidoc_class_inheritance.id;
 
 
 --
@@ -1508,24 +1508,24 @@ ALTER TABLE ONLY import.project ALTER COLUMN id SET DEFAULT nextval('import.proj
 
 
 --
--- Name: class id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: cidoc_class id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class ALTER COLUMN id SET DEFAULT nextval('model.class_id_seq'::regclass);
-
-
---
--- Name: class_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.class_i18n ALTER COLUMN id SET DEFAULT nextval('model.class_i18n_id_seq'::regclass);
+ALTER TABLE ONLY model.cidoc_class ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_id_seq'::regclass);
 
 
 --
--- Name: class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance ALTER COLUMN id SET DEFAULT nextval('model.class_inheritance_id_seq'::regclass);
+ALTER TABLE ONLY model.cidoc_class_i18n ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_i18n_id_seq'::regclass);
+
+
+--
+-- Name: cidoc_class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.cidoc_class_inheritance ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_inheritance_id_seq'::regclass);
 
 
 --
@@ -1725,58 +1725,58 @@ ALTER TABLE ONLY import.project
 
 
 --
--- Name: class class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_code_key UNIQUE (code);
 
 
 --
--- Name: class_i18n class_i18n_class_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_class_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
+ALTER TABLE ONLY model.cidoc_class_i18n
     ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
 
 
 --
--- Name: class_i18n class_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
+ALTER TABLE ONLY model.cidoc_class_i18n
     ADD CONSTRAINT class_i18n_pkey PRIMARY KEY (id);
 
 
 --
--- Name: class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
+ALTER TABLE ONLY model.cidoc_class_inheritance
     ADD CONSTRAINT class_inheritance_pkey PRIMARY KEY (id);
 
 
 --
--- Name: class_inheritance class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
+ALTER TABLE ONLY model.cidoc_class_inheritance
     ADD CONSTRAINT class_inheritance_super_id_sub_id_key UNIQUE (super_code, sub_code);
 
 
 --
--- Name: class class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_name_key UNIQUE (name);
 
 
 --
--- Name: class class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_pkey PRIMARY KEY (id);
 
 
@@ -2112,24 +2112,24 @@ CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECU
 
 
 --
--- Name: class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: cidoc_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: cidoc_class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2293,27 +2293,27 @@ ALTER TABLE ONLY import.entity
 
 
 --
--- Name: class_i18n class_i18n_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
-    ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: class_inheritance class_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.class_inheritance
-    ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_i18n
+    ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: class_inheritance class_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
-    ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance
+    ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: cidoc_class_inheritance class_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.cidoc_class_inheritance
+    ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2321,7 +2321,7 @@ ALTER TABLE ONLY model.class_inheritance
 --
 
 ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2361,7 +2361,7 @@ ALTER TABLE ONLY model.link
 --
 
 ALTER TABLE ONLY model.property
-    ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2393,7 +2393,7 @@ ALTER TABLE ONLY model.property_inheritance
 --
 
 ALTER TABLE ONLY model.property
-    ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
