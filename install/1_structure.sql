@@ -38,6 +38,9 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_write_access_group_name_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_standard_type_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
@@ -66,6 +69,7 @@ DROP TRIGGER IF EXISTS update_modified ON web.form;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
+DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
@@ -102,6 +106,7 @@ ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_nam
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_form_id_key;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
+ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
@@ -111,6 +116,8 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_pkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
@@ -145,6 +152,7 @@ ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class_inheritance ALTER COLUMN id DROP DEFAULT;
@@ -192,6 +200,8 @@ DROP SEQUENCE IF EXISTS model.property_id_seq;
 DROP SEQUENCE IF EXISTS model.property_i18n_id_seq;
 DROP TABLE IF EXISTS model.property_i18n;
 DROP TABLE IF EXISTS model.property;
+DROP SEQUENCE IF EXISTS model.openatlas_class_id_seq;
+DROP TABLE IF EXISTS model.openatlas_class;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
@@ -738,6 +748,69 @@ ALTER TABLE model.link_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE model.link_id_seq OWNED BY model.link.id;
+
+
+--
+-- Name: openatlas_class; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.openatlas_class (
+    id integer NOT NULL,
+    name text NOT NULL,
+    cidoc_class_code text NOT NULL,
+    standard_type_id integer,
+    alias_possible boolean DEFAULT false,
+    write_access_group_name text,
+    layout_color integer NOT NULL,
+    layout_icon integer NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.openatlas_class OWNER TO openatlas;
+
+--
+-- Name: TABLE openatlas_class; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON TABLE model.openatlas_class IS 'A more fine grained use of CIDOC classes';
+
+
+--
+-- Name: COLUMN openatlas_class.layout_color; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON COLUMN model.openatlas_class.layout_color IS 'For e.g. network vizualistaion';
+
+
+--
+-- Name: COLUMN openatlas_class.layout_icon; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'for Bootstrap icons';
+
+
+--
+-- Name: openatlas_class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.openatlas_class_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE model.openatlas_class_id_seq OWNER TO openatlas;
+
+--
+-- Name: openatlas_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE model.openatlas_class_id_seq OWNED BY model.openatlas_class.id;
 
 
 --
@@ -1543,6 +1616,13 @@ ALTER TABLE ONLY model.link ALTER COLUMN id SET DEFAULT nextval('model.link_id_s
 
 
 --
+-- Name: openatlas_class id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class ALTER COLUMN id SET DEFAULT nextval('model.openatlas_class_id_seq'::regclass);
+
+
+--
 -- Name: property id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
@@ -1797,6 +1877,22 @@ ALTER TABLE ONLY model.link
 
 
 --
+-- Name: openatlas_class openatlas_class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_name_key UNIQUE (name);
+
+
+--
+-- Name: openatlas_class openatlas_class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: property property_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -1866,6 +1962,14 @@ ALTER TABLE ONLY web.form
 
 ALTER TABLE ONLY web.form
     ADD CONSTRAINT form_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: group group_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web."group"
+    ADD CONSTRAINT group_name_key UNIQUE (name);
 
 
 --
@@ -2147,6 +2251,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE 
 
 
 --
+-- Name: openatlas_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
 -- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
@@ -2354,6 +2465,30 @@ ALTER TABLE ONLY model.link
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_type_id_fkey FOREIGN KEY (type_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: openatlas_class openatlas_class_cidoc_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: openatlas_class openatlas_class_standard_type_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_standard_type_id_fkey FOREIGN KEY (standard_type_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: openatlas_class openatlas_class_write_access_group_name_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_write_access_group_name_fkey FOREIGN KEY (write_access_group_name) REFERENCES web."group"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
