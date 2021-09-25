@@ -16,7 +16,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from tests.api_test_data import entity, cidoc_class, code, \
     entities_linked_to_entity, latest, system_class, type_entities, query, \
     content, geometric_entities, system_class_count, node_entities, \
-    node_overview, type_tree, subunit, overview_count
+    subunit, overview_count
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -141,7 +141,7 @@ class ApiTests(TestBaseCase):
                 place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
 
                 # Creation of Silmarillion (source)
-                source = insert_entity('Silmarillion', 'source')
+                insert_entity('Silmarillion', 'source')
 
             self.maxDiff = None
 
@@ -408,36 +408,40 @@ class ApiTests(TestBaseCase):
                 node_entities.test_node_entities_all)
 
             # node_overview/
-            #rv = self.app.get(url_for('api.node_overview'))
-            #self.assertDictEqual(
+            rv = self.app.get(url_for('api.node_overview'))
+            assert b'Actor actor relation' in rv.data
+            # self.assertDictEqual(
             #    rv.get_json(),
             #    node_overview.test_node_overview)
             rv = self.app.get(url_for(
                 'api.node_overview',
                 download=True))
-            #self.assertDictEqual(
+            # self.assertDictEqual(
             #    rv.get_json(),
             #    node_overview.test_node_overview)
+            assert b'Actor actor relation' in rv.data
 
             # type_tree/
             rv = self.app.get(url_for('api.type_tree'))
             # self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
+            assert b'Source' in rv.data
             rv = self.app.get(url_for(
                 'api.type_tree',
                 download=True))
+            assert b'Source' in rv.data
             # self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
 
             # subunit/
             rv = self.app.get(url_for(
                 'api.subunit',
                 id_=place.id))
-            # self.assertDictEqual(rv.get_json(), subunit.test_subunit)
+            self.assertDictEqual(rv.get_json(), subunit.test_subunit)
 
             # subunit_hierarchy/
             rv = self.app.get(url_for(
                 'api.subunit_hierarchy',
                 id_=place.id))
-            # self.assertDictEqual(rv.get_json(), subunit.test_subunit_hierarchy)
+            self.assertDictEqual(rv.get_json(), subunit.test_subunit_hierarchy)
 
             # node_entities/ with parameters
             rv = self.app.get(url_for(
