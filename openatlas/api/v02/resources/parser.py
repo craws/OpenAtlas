@@ -122,7 +122,16 @@ query.add_argument(
     action='append',
     help="{error_msg}",
     case_sensitive=False,
-    choices=('actor', 'event', 'place', 'reference', 'source', 'artifact'))
+    choices=(
+        'actor',
+        'event',
+        'place',
+        'reference',
+        'source',
+        'artifact',
+        'type',
+        'file',
+        'source_translation'))
 query.add_argument(
     'system_classes',
     type=str,

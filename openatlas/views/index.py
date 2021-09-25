@@ -1,3 +1,4 @@
+import datetime
 from typing import Any, Dict, Tuple, Union
 
 from flask import flash, g, jsonify, render_template, request, session, url_for
@@ -79,10 +80,10 @@ def overview() -> str:
                 elif name == 'find':
                     url = url_for('index', view='artifact')
                 elif name in [
-                        'feature',
-                        'human_remains',
-                        'stratigraphic_unit',
-                        'source_translation']:
+                    'feature',
+                    'human_remains',
+                    'stratigraphic_unit',
+                    'source_translation']:
                     url = ''
                 tables['overview'].rows.append([
                     link(g.classes[name].label, url)
@@ -163,9 +164,15 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
-        return jsonify({'message': 'Endpoint not found', 'status': 404}), 404
-    return \
-        render_template('404.html', crumbs=['404 - File not found'], e=e), 404
+        return jsonify({
+            'message': 'Endpoint not found',
+            "url": request.url,
+            "timestamp": datetime.datetime.now(),
+            'status': 404}), 404
+    return render_template(
+        '404.html',
+        crumbs=['404 - File not found'],
+        e=e), 404
 
 
 @app.errorhandler(405)  # pragma: no cover
