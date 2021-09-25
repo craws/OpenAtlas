@@ -140,11 +140,11 @@ Install required packages:
 
     # apt install python3-coverage python3-nose
 
-As postgres
+As postgres:
 
     $ createdb openatlas_test -O openatlas
     $ psql openatlas_test -c "CREATE EXTENSION postgis; CREATE EXTENSION unaccent;"
 
-Copy instance/example_testing.py to instance/testing.py and adapt as needed.
+Copy instance/example_testing.py to instance/testing.py and adapt as needed:
 
     $ cp instance/example_testing.py instance/testing.py
