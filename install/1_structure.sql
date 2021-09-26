@@ -761,8 +761,8 @@ CREATE TABLE model.openatlas_class (
     standard_type_id integer,
     alias_possible boolean DEFAULT false,
     write_access_group_name text,
-    layout_color integer NOT NULL,
-    layout_icon integer NOT NULL,
+    layout_color text,
+    layout_icon text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );

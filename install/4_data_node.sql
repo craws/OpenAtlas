@@ -319,3 +319,27 @@ INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
     ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='place')),
     ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='person')),
     ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='group'));
+
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write_access_group_name, layout_color, standard_type_id) VALUES
+    ('acquisition',         'E8',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('activity',            'E7',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('actor_appellation',   'E82', false, 'contributor', NULL,      NULL),
+    ('administrative_unit', 'E53', false, 'contributor', NULL,      NULL),
+    ('appellation',         'E41', false, 'contributor', NULL,      NULL),
+    ('artifact',            'E22', false, 'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('edition',             'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Edition' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('external_reference',  'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'External reference' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('feature',             'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Feature' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('file',                'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'License' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('find',                'E22', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('group',               'E74', true,  'contributor', '#34623C', NULL),
+    ('human_remains',       'E20', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Human remains' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('move',                'E9',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('object_location',     'E53', false, 'contributor', '#00FF00', NULL),
+    ('person',              'E21', true,  'contributor', '#34B522', NULL),
+    ('place',               'E18', true,  'contributor', '#FF0000', (SELECT id FROM model.entity WHERE name = 'Place' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('reference_system',    'E32', false, 'manager',     NULL,      NULL),
+    ('source',              'E33', false, 'contributor', '#FFA500', (SELECT id FROM model.entity WHERE name = 'Source' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('stratigraphic_unit',  'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('source_translation',  'E33', false, 'contributor', NULL,      NULL),
+    ('type',                'E55', false, 'editor',      NULL,      NULL);
