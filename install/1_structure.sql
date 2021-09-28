@@ -45,6 +45,7 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fke
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
@@ -666,7 +667,7 @@ ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNED BY model.cidoc_class_i
 
 CREATE TABLE model.entity (
     id integer NOT NULL,
-    class_code text NOT NULL,
+    cidoc_class_code text NOT NULL,
     name text NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
@@ -678,7 +679,7 @@ CREATE TABLE model.entity (
     end_from timestamp without time zone,
     end_to timestamp without time zone,
     end_comment text,
-    system_class text NOT NULL
+    openatlas_class_name text NOT NULL
 );
 
 
@@ -2432,7 +2433,15 @@ ALTER TABLE ONLY model.cidoc_class_inheritance
 --
 
 ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity entity_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.entity
+    ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

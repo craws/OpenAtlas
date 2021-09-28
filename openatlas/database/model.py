@@ -10,7 +10,7 @@ class Model:
         g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
             FROM model.cidoc_class c
-            LEFT JOIN model.entity e ON c.code = e.class_code
+            LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
             GROUP BY (c.id, c.name, c.comment);""")
         return [dict(row) for row in g.cursor.fetchall()]
 

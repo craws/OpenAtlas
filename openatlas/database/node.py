@@ -12,9 +12,9 @@ class Node:
             SELECT
                 e.id,
                 e.name,
-                e.class_code,
+                e.cidoc_class_code,
                 e.description,
-                e.system_class,
+                e.openatlas_class_name,
                 e.created,
                 e.modified,
                 es.id AS super_id,
@@ -38,7 +38,7 @@ class Node:
                 AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
 
-            WHERE e.system_class = %(system_class)s
+            WHERE e.openatlas_class_name = %(system_class)s
             GROUP BY e.id, es.id
             ORDER BY e.name;""",
             {'system_class': system_class, 'property_code': property_})
