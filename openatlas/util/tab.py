@@ -4,7 +4,7 @@ from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.models.system import SystemClass
+from openatlas.models.model import OpenatlasClass
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 
@@ -59,7 +59,7 @@ class Tab:
             buttons: List[str],
             view: Union[None, str],
             id_: Union[None, int],
-            class_: Union[None, SystemClass]) -> None:
+            class_: Union[None, OpenatlasClass]) -> None:
 
         if name == 'actor':
             if view == 'place':

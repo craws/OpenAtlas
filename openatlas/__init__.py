@@ -51,7 +51,8 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.models.model import CidocClass, CidocProperty
+    from openatlas.models.model import (
+        CidocClass, CidocProperty, OpenatlasClass, view_class_mapping)
     from openatlas.models.node import Node
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
@@ -63,12 +64,10 @@ def before_request() -> None:
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
-
-    from openatlas.models import system
-    g.table_headers = system.get_table_headers()
-    g.classes = system.get_system_classes()
-    g.view_class_mapping = system.view_class_mapping
-    g.class_view_mapping = system.get_class_view_mapping()
+    g.table_headers = OpenatlasClass.get_table_headers()
+    g.classes = OpenatlasClass.get_openatlas_classes()
+    g.view_class_mapping = view_class_mapping
+    g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
     g.file_stats = get_file_stats()
@@ -96,7 +95,7 @@ def apply_caching(response: Response) -> Response:
 
 
 @app.teardown_request
-def teardown_request(exception: Any) -> None:
+def teardown_request(_exception: Any) -> None:
     close_connection()
 
 

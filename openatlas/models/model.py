@@ -1,11 +1,104 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import g, session
+from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.database.model import Model as Db
+
+view_class_mapping = {
+    'actor': ['person', 'group'],
+    'event': ['activity', 'acquisition', 'move'],
+    'file': ['file'],
+    'artifact': ['artifact', 'find'],
+    'place': ['feature', 'human_remains', 'place', 'stratigraphic_unit'],
+    'reference': ['bibliography', 'edition', 'external_reference'],
+    'reference_system': ['reference_system'],
+    'source': ['source'],
+    'type': ['administrative_unit', 'type'],
+    'source_translation': ['source_translation']}
+
+
+def uc_first(string: str) -> str:
+    return str(string)[0].upper() + str(string)[1:] if string else ''
+
+
+class OpenatlasClass:
+
+    # Needed for translations of class labels
+    _('source_translation')
+    _('actor_appellation')
+
+    def __init__(
+            self,
+            name: str,
+            cidoc_class: str,
+            standard_type_id: Optional[int] = None,
+            alias_possible: Optional[bool] = False,
+            color: Optional[str] = None,
+            write_access: Optional[str] = 'contributor') -> None:
+        self.name = name
+        self.label = uc_first(_(name.replace('_', ' ')))
+        self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
+        self.standard_type = standard_type_id
+        self.color = color  # Specifies color of entity in network visualisation
+        self.write_access = write_access
+        self.view = None
+        self.alias_possible = alias_possible
+        for item, classes in view_class_mapping.items():
+            if name in classes:
+                self.view = item
+
+    @staticmethod
+    def get_openatlas_classes() -> Dict[str, OpenatlasClass]:
+        classes = {}
+        for row in Db.get_openatlas_classes():
+            classes[row['name']] = OpenatlasClass(
+                name=row['name'],
+                cidoc_class=row['cidoc_class_code'],
+                standard_type_id=row['standard_type_id'],
+                alias_possible=row['alias_possible'],
+                write_access=row['write_access_group_name'],
+                color=row['layout_color'])
+        return classes
+
+    @staticmethod
+    def get_table_headers() -> Dict[str, List[str]]:
+        headers = {
+            'actor': ['name', 'class', 'begin', 'end', 'description'],
+            'artifact': ['name', 'class', 'type', 'begin', 'end',
+                         'description'],
+            'entities': ['name', 'class', 'info'],
+            'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
+            'file': ['name', 'license', 'size', 'extension', 'description'],
+            'member': ['member', 'function', 'first', 'last', 'description'],
+            'member_of': ['member of', 'function', 'first', 'last',
+                          'description'],
+            'note': ['date', 'visibility', 'user', 'note'],
+            'type': ['name', 'description'],
+            'place': ['name', 'type', 'begin', 'end', 'description'],
+            'relation': ['relation', 'actor', 'first', 'last', 'description'],
+            'reference': ['name', 'class', 'type', 'description'],
+            'reference_system':
+                ['name', 'count', 'website URL', 'resolver URL', 'example ID',
+                 'default precision', 'description'],
+            'source': ['name', 'type', 'description'],
+            'subs': ['name', 'count', 'info'],
+            'text': ['text', 'type', 'content']}
+        for view in ['actor', 'artifact', 'event', 'place']:
+            for class_ in view_class_mapping[view]:
+                headers[class_] = headers[view]
+        return headers
+
+    @staticmethod
+    def get_class_view_mapping() -> Dict['str', 'str']:
+        mapping = {}
+        for view, classes in view_class_mapping.items():
+            for class_ in classes:
+                mapping[class_] = view
+        return mapping
 
 
 class CidocClass:

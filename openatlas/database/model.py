@@ -6,6 +6,21 @@ from flask import g
 class Model:
 
     @staticmethod
+    def get_openatlas_classes() -> List[Dict[str, Any]]:
+        g.cursor.execute("""
+            SELECT
+                id,
+                name,
+                cidoc_class_code,
+                standard_type_id,
+                alias_possible,
+                write_access_group_name,
+                layout_color,
+                layout_icon
+            FROM model.openatlas_class;""")
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_classes() -> List[Dict[str, Any]]:
         g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count

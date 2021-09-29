@@ -80,10 +80,10 @@ def overview() -> str:
                 elif name == 'find':
                     url = url_for('index', view='artifact')
                 elif name in [
-                    'feature',
-                    'human_remains',
-                    'stratigraphic_unit',
-                    'source_translation']:
+                        'feature',
+                        'human_remains',
+                        'stratigraphic_unit',
+                        'source_translation']:
                     url = ''
                 tables['overview'].rows.append([
                     link(g.classes[name].label, url)
