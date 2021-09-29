@@ -192,6 +192,13 @@ def admin_index(
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
 def admin_content(item: str) -> Union[str, Response]:
+
+    # Needed for translations of content items
+    _('intro_for_frontend')
+    _('legal_notice_for_frontend')
+    _('contact_for_frontend')
+    _('site_name_for_frontend')
+
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(
