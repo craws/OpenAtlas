@@ -67,9 +67,9 @@ class Gis:
             JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
             LEFT JOIN model.link t ON object.id = t.domain_id
                 AND t.property_code = 'P2'
-            WHERE place.class_code = 'E53'
+            WHERE place.cidoc_class_code = 'E53'
                 AND l.property_code = 'P53'
-                AND (object.system_class = 'place'
+                AND (object.openatlas_class_name = 'place'
                 OR object.id IN %(extra_ids)s)
             GROUP BY object.id, {shape}.id;"""
         g.cursor.execute(sql, {'extra_ids': tuple(extra_ids)})

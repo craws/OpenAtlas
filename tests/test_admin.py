@@ -41,7 +41,7 @@ class ContentTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 id_ = DbEntity.insert({
                     'name': 'Invalid linked entity',
-                    'system_class': 'artifact',
+                    'openatlas_class_name': 'artifact',
                     'code': 'E13', 'description': ''})
                 DbLink.insert({
                     'property_code': 'P86',

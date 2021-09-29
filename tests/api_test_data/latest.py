@@ -29,12 +29,12 @@ test_latest = {'results': [{
         'when': {
             'timespans': [{'start': {'earliest': 'None', 'latest': 'None'},
                            'end': {'earliest': 'None', 'latest': 'None'}}]},
-        'types': [{'identifier': 'http://local.host/api/0.2/entity/72',
+        'types': [{'identifier': 'http://local.host/api/0.2/entity/70',
                    'label': 'Boundary Mark', 'description': None,
                    'hierarchy': 'Place', 'value': None, 'unit': None}],
         'relations': [
             {'label': 'Boundary Mark',
-             'relationTo': 'http://local.host/api/0.2/entity/72',
+             'relationTo': 'http://local.host/api/0.2/entity/70',
              'relationType': 'crm:P2 has type',
              'relationSystemClass': 'type',
              'relationDescription': None, 'type': None, 'when': {

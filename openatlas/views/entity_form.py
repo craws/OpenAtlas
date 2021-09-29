@@ -407,12 +407,12 @@ def insert_entity(
         elif origin and origin.class_.name == 'stratigraphic_unit':
             entity = Entity.insert('find', form.name.data)
         else:
-            system_class = 'place'
+            class_name = 'place'
             if origin and origin.class_.name == 'place':
-                system_class = 'feature'
+                class_name = 'feature'
             elif origin and origin.class_.name == 'feature':
-                system_class = 'stratigraphic_unit'
-            entity = Entity.insert(system_class, form.name.data)
+                class_name = 'stratigraphic_unit'
+            entity = Entity.insert(class_name, form.name.data)
         entity.link(
             'P53',
             Entity.insert('object_location', f'Location of {form.name.data}'))

@@ -10,9 +10,9 @@ class ReferenceSystem:
         g.cursor.execute("""
             SELECT
                 e.id, e.name,
-                e.class_code,
+                e.cidoc_class_code,
                 e.description,
-                e.system_class,
+                e.openatlas_class_name,
                 e.created,
                 e.modified,
                 rs.website_url,
@@ -36,9 +36,17 @@ class ReferenceSystem:
             LEFT JOIN model.link t ON e.id = t.domain_id
                 AND t.property_code = 'P2'
             GROUP BY
-                e.id, e.name, e.class_code, e.description, e.system_class,
-                e.created, e.modified, rs.website_url, rs.resolver_url,
-                rs.identifier_example, rs.system, rs.entity_id;""")
+                e.id, 
+                e.name, 
+                e.cidoc_class_code, 
+                e.description, 
+                e.openatlas_class_name, 
+                e.created, 
+                e.modified, 
+                rs.website_url, 
+                rs.resolver_url, 
+                rs.identifier_example, 
+                rs.system, rs.entity_id;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

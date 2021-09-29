@@ -14,9 +14,9 @@ class Network:
             SELECT l.id, l.domain_id, l.range_id
             FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id
-                AND e.system_class IN %(classes)s
+                AND e.openatlas_class_name IN %(classes)s
             JOIN model.entity e2 ON l.range_id = e2.id
-                AND e2.system_class IN %(classes)s
+                AND e2.openatlas_class_name IN %(classes)s
             WHERE property_code IN %(properties)s;""",
             {'classes': tuple(classes), 'properties': tuple(properties)})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -25,9 +25,9 @@ class Network:
     def get_entities(classes: List[str]) -> List[Dict[str, Union[int, str]]]:
         g.cursor.execute(
             """
-            SELECT e.id, e.name, e.system_class
+            SELECT e.id, e.name, e.openatlas_class_name
             FROM model.entity e
-            WHERE system_class IN %(classes)s """,
+            WHERE openatlas_class_name IN %(classes)s """,
             {'classes': tuple(classes)})
         return [dict(row) for row in g.cursor.fetchall()]
 

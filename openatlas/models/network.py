@@ -26,7 +26,7 @@ class Network:
                 'id': row['id'],
                 'label' if dimensions else
                 'name': Network.truncate(row['name'].replace("'", "")),
-                'color': form[row['system_class']].data})
+                'color': form[row['openatlas_class_name']].data})
             entities.add(row['id'])
         linked_entity_ids = set()
         edges = []

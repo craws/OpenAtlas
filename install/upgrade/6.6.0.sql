@@ -82,4 +82,34 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write
 
 ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
+-- Update trigger functions for deleting related entities at delete to avoid orphaned data
+DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
+CREATE FUNCTION model.delete_entity_related() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            -- Delete aliases (P1, P131)
+            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
+            END IF;
+
+            -- Delete location (E53) if it was a place, find or human remains
+            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
+            END IF;
+
+            -- Delete translations (E33) if it was a document
+            IF OLD.class_code = 'E33' THEN
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
+            END IF;
+
+            RETURN OLD;
+        END;
+
+    $$;
+ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
+CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.delete_entity_related();
+
+
+
 END;

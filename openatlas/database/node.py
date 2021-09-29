@@ -6,7 +6,7 @@ from flask import g
 class Node:
 
     @staticmethod
-    def get_nodes(system_class: str, property_: str) -> List[Dict[str, Any]]:
+    def get_nodes(class_: str, property_: str) -> List[Dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT
@@ -38,10 +38,10 @@ class Node:
                 AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
 
-            WHERE e.openatlas_class_name = %(system_class)s
+            WHERE e.openatlas_class_name = %(class)s
             GROUP BY e.id, es.id
             ORDER BY e.name;""",
-            {'system_class': system_class, 'property_code': property_})
+            {'class': class_, 'property_code': property_})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -154,7 +154,7 @@ class Node:
             JOIN model.entity e ON l.domain_id = e.id
                 AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2'
-                AND e.system_class = %(form_name)s;""",
+                AND e.openatlas_class_name = %(form_name)s;""",
             {'node_ids': tuple(node_ids), 'form_name': form_name})
         return g.cursor.fetchone()['count']
 

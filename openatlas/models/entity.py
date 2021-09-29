@@ -50,8 +50,8 @@ class Entity:
         self.description = data['description']
         self.created = data['created']
         self.modified = data['modified']
-        self.cidoc_class = g.cidoc_classes[data['class_code']]
-        self.class_ = g.classes[data['system_class']]
+        self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
+        self.class_ = g.classes[data['openatlas_class_name']]
         self.reference_systems: List[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
@@ -272,9 +272,9 @@ class Entity:
             aliases: bool = False) -> List[Entity]:
         if aliases:  # For performance: check classes if they can have an alias
             aliases_needed = False
-            for system_class in classes if isinstance(classes, list) \
+            for class_ in classes if isinstance(classes, list) \
                     else [classes]:
-                if g.classes[system_class].alias_possible:
+                if g.classes[class_].alias_possible:
                     aliases_needed = True
                     break
             aliases = aliases_needed
@@ -309,7 +309,7 @@ class Entity:
         id_ = Db.insert({
             'name': str(name).strip(),
             'code': g.classes[class_name].cidoc_class.code,
-            'system_class': class_name,
+            'openatlas_class_name': class_name,
             'description':
                 sanitize(description, 'text') if description else None})
         return Entity.get_by_id(id_)
