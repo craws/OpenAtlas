@@ -18,7 +18,6 @@ ALTER TABLE model.entity RENAME COLUMN system_class to openatlas_class_name;
 -- Adding missing constraint for wewb.group table
 ALTER TABLE ONLY web."group" ADD CONSTRAINT group_name_key UNIQUE (name);
 
-
 -- New table model.openatlas_class
 CREATE TABLE model.openatlas_class (
     id integer NOT NULL,
@@ -110,6 +109,11 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
 ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
 CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.delete_entity_related();
 
-
+-- Merge web.hierarchy fields
+ALTER TABLE web.hierarchy ADD COLUMN category text DEFAULT 'standard' NOT NULL;
+UPDATE web.hierarchy SET category = 'custom' WHERE standard IS false;
+UPDATE web.hierarchy SET category = 'value' WHERE value_type IS true;
+UPDATE web.hierarchy SET category = 'system' WHERE locked IS true;
+ALTER TABLE web.hierarchy DROP standard, DROP value_type, DROP locked;
 
 END;
