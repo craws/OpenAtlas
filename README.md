@@ -1,13 +1,12 @@
 # About
 
 [OpenAtlas](https://openatlas.eu) is an open source, web based database system
-for complex archaeological, historical and prosopographical data.
-
-The information is mapped as a network using classes and properties of the
-[CIDOC CRM](http://www.cidoc-crm.org/).
+for complex archaeological, historical and prosopographical data. The
+information is mapped as a network using classes and properties of the
+[CIDOC CRM](http://www.cidoc-crm.org).
 
 Documentation:
-[Manual](https://demo.openatlas.eu/static/manual/),
+[Manual](https://demo.openatlas.eu/static/manual),
 [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),
 [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
