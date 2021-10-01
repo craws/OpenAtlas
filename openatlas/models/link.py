@@ -282,7 +282,7 @@ class Link:
         from openatlas.util.util import link
         data = []
         for node in g.nodes.values():
-            if node.root or node.multiple or node.value_type:
+            if node.root or node.multiple or node.category == 'value':
                 continue  # pragma: no cover
             node_ids = Node.get_all_sub_ids(node)
             if not node_ids:

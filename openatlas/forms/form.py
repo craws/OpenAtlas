@@ -87,7 +87,7 @@ def build_form(
         if class_ == 'type':  # Change description field if value type
             node = entity if entity else origin
             root = g.nodes[node.root[-1]] if node.root else node
-            if root.value_type:
+            if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
     if 'map' in FORMS[class_]:
@@ -122,7 +122,7 @@ def populate_form(
         if root.id not in node_data:
             node_data[root.id] = []
         node_data[root.id].append(node.id)
-        if root.value_type:
+        if root.category == 'value':
             getattr(form, str(node.id)).data = node_value
     for root_id, nodes_ in node_data.items():
         if hasattr(form, str(root_id)):
@@ -257,7 +257,7 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 def add_types(form: Any, class_: str) -> None:
     types = OrderedDict(Node.get_nodes_for_form(class_))
     for node in types.values():  # Move standard type to top
-        if node.standard and node.class_.name == 'type':
+        if node.category == 'standard' and node.class_.name == 'type':
             types.move_to_end(node.id, last=False)
             break
 
@@ -266,7 +266,7 @@ def add_types(form: Any, class_: str) -> None:
             setattr(form, str(node.id), TreeMultiField(str(node.id)))
         else:
             setattr(form, str(node.id), TreeField(str(node.id)))
-        if node.value_type:
+        if node.category == 'value':
             add_value_type_fields(form, node.subs)
 
 
@@ -308,7 +308,7 @@ def add_fields(
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if code == 'custom' or (entity and not entity.value_type):
+        if code == 'custom' or (entity and entity.category != 'value'):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))

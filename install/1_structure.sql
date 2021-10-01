@@ -302,17 +302,17 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     AS $$
         BEGIN
             -- Delete aliases (P1, P131)
-            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place, find or human remains
-            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
             -- Delete translations (E33) if it was a document
-            IF OLD.class_code = 'E33' THEN
+            IF OLD.cidoc_class_code = 'E33' THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
             END IF;
 
@@ -1042,7 +1042,7 @@ ALTER SEQUENCE web.group_id_seq OWNED BY web."group".id;
 CREATE TABLE web.hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
-    category text DEFAULT 'standard'::text NOT NULL
+    category text DEFAULT 'standard'::text NOT NULL,
     multiple boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,

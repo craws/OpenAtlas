@@ -251,7 +251,7 @@ def get_entity_data(
     from openatlas.models.reference_system import ReferenceSystem
     if isinstance(entity, Node):
         data[_('super')] = link(g.nodes[entity.root[0]])
-        if g.nodes[entity.root[0]].value_type:
+        if g.nodes[entity.root[0]].category == 'value':
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
     elif isinstance(entity, ReferenceSystem):
@@ -743,7 +743,7 @@ def get_type_data(entity: 'Entity') -> Dict[str, Any]:
             continue  # Standard type is already added
         title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
         html = f'<span title="{title}">{link(node)}</span>'
-        if root.value_type:
+        if root.category == 'value':
             html += f' {float(value):g} {node.description}'
         data[root.name].append(html)
     return {key: data[key] for key in sorted(data.keys())}
@@ -864,11 +864,11 @@ def display_form(
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
-            if node.standard and node.class_.name == 'type':
+            if node.category == 'standard' and node.class_.name == 'type':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
-            if node.value_type and 'is_node_form' not in form:
+            if node.category == 'value' and 'is_node_form' not in form:
                 field.description = node.description
                 html += add_form_row(
                     field,

@@ -53,13 +53,7 @@ class Node:
     @staticmethod
     def get_hierarchies() -> List[Dict[str, Any]]:
         g.cursor.execute("""
-            SELECT
-                h.id, h.name,
-                h.multiple,
-                h.standard,
-                h.directional,
-                h.value_type,
-                h.locked,
+            SELECT h.id, h.name, h.category, h.multiple, h.directional,
                 (SELECT ARRAY(
                     SELECT f.id
                     FROM web.form f
@@ -70,8 +64,7 @@ class Node:
 
     @staticmethod
     def get_nodes_for_form(form_name: str) -> List[int]:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             SELECT h.id FROM web.hierarchy h
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
@@ -80,8 +73,7 @@ class Node:
 
     @staticmethod
     def get_form_choices() -> List[Dict[str, Union[int, str]]]:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             SELECT f.id, f.name
             FROM web.form f
             WHERE f.extendable = True
@@ -92,8 +84,8 @@ class Node:
     def insert_hierarchy(data: Dict[str, Any]) -> None:
         g.cursor.execute(
             """
-            INSERT INTO web.hierarchy (id, name, multiple, value_type)
-            VALUES (%(id)s, %(name)s, %(multiple)s, %(value_type)s);""", data)
+            INSERT INTO web.hierarchy (id, name, multiple, category)
+            VALUES (%(id)s, %(name)s, %(multiple)s, %(category)s);""", data)
 
     @staticmethod
     def update_hierarchy(data: Dict[str, Any]) -> None:

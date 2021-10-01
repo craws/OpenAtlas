@@ -8,10 +8,11 @@
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="true" href="#menu-tab-standard">{{ _('standard types')|uc_first }}</a></li>
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-custom">{{ _('custom types')|uc_first }}</a></li>
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-value">{{ _('value types')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-places">{{ _('places')|uc_first }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-place">{{ _('places')|uc_first }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-system">{{ _('system')|uc_first }}</a></li>
         </ul>
         <div class="tab-content" id="menuTabContent">
-            {% for type_ in ['standard', 'custom', 'value', 'places'] %}
+            {% for type_ in ['standard', 'custom', 'value', 'place', 'system'] %}
                 <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ type_ }}" style="padding: 0;">
                     <div class="accordion" id="TypeAccordion">
                         {% for node, tree in nodes[type_].items() %}
@@ -36,7 +37,7 @@
                                                       name="name_search"
                                                       style="width:8em;"
                                                       type="text">
-                                                    {% if 'editor'|is_authorized and not node.locked %}
+                                                    {% if 'editor'|is_authorized and node.category != 'system' %}
                                                       {{ ''|button(url_for('insert', class_='type' if type_ != 'places' else 'administrative_unit', origin_id=node.id)) }}
                                                     {% endif %}
                                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
@@ -50,7 +51,7 @@
                                                 {{ tree|safe }}
                                             </div>
                                             <div class="col-5 contentbox">
-                                                {% if not node.value_type %}
+                                                {% if node.category != 'value' %}
                                                     <p>
                                                         <strong>{{ _('selection')|uc_first }}</strong>:
                                                         {{ _('multiple') if node.multiple else _('single') }}

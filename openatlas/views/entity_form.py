@@ -117,7 +117,7 @@ def update(id_: int) -> Union[str, Response]:
         abort(403)  # pragma: no cover
     elif isinstance(entity, Node):
         root = g.nodes[entity.root[-1]] if entity.root else None
-        if not root and (entity.standard or entity.locked):
+        if not root and entity.category in ('standard', 'system'):
             abort(403)  # pragma: no cover
 
     geonames_module = False

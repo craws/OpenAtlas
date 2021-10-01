@@ -39,7 +39,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
 @required_group('manager')
 def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.nodes[id_]
-    if hierarchy.standard:
+    if hierarchy.category in ('standard', 'system'):
         abort(403)
     form = build_form('hierarchy', hierarchy)
     form.forms.choices = Node.get_form_choices(hierarchy)
@@ -51,7 +51,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         else:
             save(form, hierarchy)
             flash(_('info update'), 'info')
-        tab = 'value' if g.nodes[id_].value_type else 'custom'
+        tab = 'value' if g.nodes[id_].category == 'value' else 'custom'
         return redirect(
             f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
     form.multiple = hierarchy.multiple
@@ -91,7 +91,7 @@ def remove_form(id_: int, form_id: int) -> Response:
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     node = g.nodes[id_]
-    if node.standard or node.subs or node.count:
+    if node.category in ('standard', 'system') or node.subs or node.count:
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
@@ -108,7 +108,7 @@ def save(
             Node.update_hierarchy(node, form)
         else:
             node = Entity.insert('type', sanitize(form.name.data))
-            Node.insert_hierarchy(node, form, value_type=(param == 'value'))
+            Node.insert_hierarchy(node, form, param)
         node.update(form)
         Transaction.commit()
     except Exception as e:  # pragma: no cover

@@ -33,15 +33,9 @@ def entity_view(id_: int) -> Union[str, Response]:
     if id_ in g.nodes:  # Nodes have their own view
         entity = g.nodes[id_]
         if not entity.root:
-            if entity.class_.name == 'administrative_unit':
-                tab_hash = '#menu-tab-places_collapse-'
-            elif entity.standard:
-                tab_hash = '#menu-tab-standard_collapse-'
-            elif entity.value_type:
-                tab_hash = '#menu-tab-value_collapse-'
-            else:
-                tab_hash = '#menu-tab-custom_collapse-'
-            return redirect(f"{url_for('node_index')}{tab_hash}{id_}")
+            return redirect(
+                f"{url_for('node_index')}"
+                f"#menu-tab-{entity.category}_collapse-{id_}")
     elif id_ in g.reference_systems:
         entity = g.reference_systems[id_]
     else:
@@ -57,7 +51,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         tabs['subs'] = Tab('subs', entity=entity)
         tabs['entities'] = Tab('entities', entity=entity)
         root = g.nodes[entity.root[-1]] if entity.root else None
-        if root and root.value_type:  # pragma: no cover
+        if root and root.category == 'value':  # pragma: no cover
             tabs['entities'].table.header = [
                 _('name'), _('value'), _('class'), _('info')]
         for item in entity.get_linked_entities(
@@ -69,7 +63,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if item.class_.name == 'object_location':  # pragma: no cover
                 item = item.get_linked_entity_safe('P53', inverse=True)
             data = [link(item)]
-            if root and root.value_type:  # pragma: no cover
+            if root and root.category == 'value':  # pragma: no cover
                 data.append(format_number(item.nodes[entity]))
             data.append(item.class_.label)
             data.append(item.description)
@@ -534,9 +528,11 @@ def add_buttons(entity: Entity) -> List[str]:
         return []  # pragma: no cover
     buttons = []
     if isinstance(entity, Node):
-        if entity.root and not g.nodes[entity.root[0]].locked:
+        if entity.root and entity.category != 'system':
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            if not entity.locked and entity.count < 1 and not entity.subs:
+            if entity.category != 'system' \
+                    and entity.count < 1 \
+                    and not entity.subs:
                 buttons.append(display_delete_link(entity))
     elif isinstance(entity, ReferenceSystem):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))

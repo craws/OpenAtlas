@@ -88,17 +88,17 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     AS $$
         BEGIN
             -- Delete aliases (P1, P131)
-            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place, find or human remains
-            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
             -- Delete translations (E33) if it was a document
-            IF OLD.class_code = 'E33' THEN
+            IF OLD.cidoc_class_code = 'E33' THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
             END IF;
 
@@ -114,6 +114,7 @@ ALTER TABLE web.hierarchy ADD COLUMN category text DEFAULT 'standard' NOT NULL;
 UPDATE web.hierarchy SET category = 'custom' WHERE standard IS false;
 UPDATE web.hierarchy SET category = 'value' WHERE value_type IS true;
 UPDATE web.hierarchy SET category = 'system' WHERE locked IS true;
+UPDATE web.hierarchy SET category = 'place' WHERE name IN ('Administrative unit', 'Historical place');
 ALTER TABLE web.hierarchy DROP standard, DROP value_type, DROP locked;
 
 END;

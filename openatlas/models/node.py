@@ -14,10 +14,8 @@ from openatlas.models.entity import Entity
 class Node(Entity):
     count = 0
     count_subs = 0
-    locked = False
+    category = ''
     multiple = False
-    standard = False
-    value_type = False
     directional = False
 
     def __init__(self, row: Dict[str, Any]) -> None:
@@ -37,7 +35,6 @@ class Node(Entity):
             node.count = row['count'] if row['count'] else row['count_property']
             node.count_subs = 0
             node.subs = []
-            node.locked = False
             node.root = [row['super_id']] if row['super_id'] else []
         Node.populate_subs(nodes)
         return nodes
@@ -60,15 +57,12 @@ class Node(Entity):
                     node,
                     node.root[0],
                     node.root)
-                node.standard = False
-                node.locked = nodes[node.root[0]].locked
+                node.category = nodes[node.root[0]].category
             else:
                 hierarchy = hierarchies[node.id]
-                node.value_type = hierarchy['value_type']
-                node.directional = hierarchy['directional']
+                node.category = hierarchy['category']
                 node.multiple = hierarchy['multiple']
-                node.standard = hierarchy['standard']
-                node.locked = hierarchy['locked']
+                node.directional = hierarchy['directional']
                 node.forms = {
                     form_id: forms[form_id]
                     for form_id in hierarchy['form_ids']}
@@ -171,9 +165,9 @@ class Node(Entity):
                     entity.link('P2', range_)
 
     @staticmethod
-    def insert_hierarchy(node: Node, form: FlaskForm, value_type: bool) -> None:
+    def insert_hierarchy(node: Node, form: FlaskForm, category: str) -> None:
         multiple = False
-        if value_type or (
+        if category == 'value' or (
                 hasattr(form, 'multiple')
                 and form.multiple
                 and form.multiple.data):
@@ -182,7 +176,7 @@ class Node(Entity):
             'id': node.id,
             'name': node.name,
             'multiple': multiple,
-            'value_type': value_type})
+            'category': category})
         Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
