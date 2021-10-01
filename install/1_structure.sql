@@ -299,24 +299,26 @@ COMMENT ON SCHEMA web IS 'User interface and user account related information';
 
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
-    AS $$ BEGIN
-    -- Delete aliases (P1, P131)
-    IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
-        DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
-    END IF;
+    AS $$
+        BEGIN
+            -- Delete aliases (P1, P131)
+            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
+            END IF;
 
-    -- Delete location (E53) if it was a place, find or human remains
-    IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
-        DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
-    END IF;
+            -- Delete location (E53) if it was a place, find or human remains
+            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
+            END IF;
 
-    -- Delete translations (E33) if it was a document
-    IF OLD.cidoc_class_code = 'E33' THEN
-        DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
-    END IF;
+            -- Delete translations (E33) if it was a document
+            IF OLD.class_code = 'E33' THEN
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
+            END IF;
 
-    RETURN OLD;
-END;
+            RETURN OLD;
+        END;
+
     $$;
 
 
@@ -1040,13 +1042,11 @@ ALTER SEQUENCE web.group_id_seq OWNED BY web."group".id;
 CREATE TABLE web.hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
+    category text DEFAULT 'standard'::text NOT NULL
     multiple boolean DEFAULT false NOT NULL,
-    standard boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    value_type boolean DEFAULT false NOT NULL,
-    locked boolean DEFAULT false NOT NULL
+    modified timestamp without time zone
 );
 
 
@@ -1064,20 +1064,6 @@ COMMENT ON COLUMN web.hierarchy.id IS 'same as model.entity.id';
 --
 
 COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure unique root type names';
-
-
---
--- Name: COLUMN hierarchy.value_type; Type: COMMENT; Schema: web; Owner: openatlas
---
-
-COMMENT ON COLUMN web.hierarchy.value_type IS 'True if links to this type can have numeric values';
-
-
---
--- Name: COLUMN hierarchy.locked; Type: COMMENT; Schema: web; Owner: openatlas
---
-
-COMMENT ON COLUMN web.hierarchy.locked IS 'True if these types are not editable';
 
 
 --
@@ -2678,4 +2664,3 @@ ALTER TABLE ONLY web.user_settings
 --
 -- PostgreSQL database dump complete
 --
-
