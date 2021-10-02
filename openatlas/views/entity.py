@@ -50,10 +50,12 @@ def entity_view(id_: int) -> Union[str, Response]:
     if isinstance(entity, Node):
         tabs['subs'] = Tab('subs', entity=entity)
         tabs['entities'] = Tab('entities', entity=entity)
-        root = g.nodes[entity.root[-1]] if entity.root else None
-        if root and root.category == 'value':  # pragma: no cover
+        if entity.category == 'value':
             tabs['entities'].table.header = [
-                _('name'), _('value'), _('class'), _('info')]
+                _('name'),
+                _('value'),
+                _('class'),
+                _('info')]
         for item in entity.get_linked_entities(
                 ['P2', 'P89'],
                 inverse=True,
@@ -63,7 +65,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             if item.class_.name == 'object_location':  # pragma: no cover
                 item = item.get_linked_entity_safe('P53', inverse=True)
             data = [link(item)]
-            if root and root.category == 'value':  # pragma: no cover
+            if entity.category == 'value':  # pragma: no cover
                 data.append(format_number(item.nodes[entity]))
             data.append(item.class_.label)
             data.append(item.description)
@@ -530,9 +532,7 @@ def add_buttons(entity: Entity) -> List[str]:
     if isinstance(entity, Node):
         if entity.root and entity.category != 'system':
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            if entity.category != 'system' \
-                    and entity.count < 1 \
-                    and not entity.subs:
+            if not entity.count and not entity.subs:
                 buttons.append(display_delete_link(entity))
     elif isinstance(entity, ReferenceSystem):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))

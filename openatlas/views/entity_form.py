@@ -116,8 +116,8 @@ def update(id_: int) -> Union[str, Response]:
     elif not is_authorized(entity.class_.write_access):
         abort(403)  # pragma: no cover
     elif isinstance(entity, Node):
-        root = g.nodes[entity.root[-1]] if entity.root else None
-        if not root and entity.category in ('standard', 'system'):
+        if entity.category == 'system' \
+                or (entity.category == 'standard' and not entity.root):
             abort(403)  # pragma: no cover
 
     geonames_module = False

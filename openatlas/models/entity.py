@@ -35,7 +35,7 @@ class Entity:
             for item in data['nodes']:
                 node = g.nodes[item['f1']]  # f1 = node id, f2 = value
                 self.nodes[node] = item['f2']
-                if node.root and g.nodes[node.root[-1]].category in ['standard', 'system']:
+                if node.category == 'standard':
                     self.standard_type = node
 
         self.aliases: Dict[int, str] = {}

@@ -257,10 +257,9 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 def add_types(form: Any, class_: str) -> None:
     types = OrderedDict(Node.get_nodes_for_form(class_))
     for node in types.values():  # Move standard type to top
-        if node.category == 'standard' and node.class_.name == 'type':
+        if node.category == 'standard':
             types.move_to_end(node.id, last=False)
             break
-
     for node in types.values():
         if node.multiple:
             setattr(form, str(node.id), TreeMultiField(str(node.id)))

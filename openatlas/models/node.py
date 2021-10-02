@@ -57,15 +57,14 @@ class Node(Entity):
                     node,
                     node.root[0],
                     node.root)
-                node.category = nodes[node.root[0]].category
+                node.category = nodes[node.root[-1]].category
             else:
-                hierarchy = hierarchies[node.id]
-                node.category = hierarchy['category']
-                node.multiple = hierarchy['multiple']
-                node.directional = hierarchy['directional']
+                node.category = hierarchies[node.id]['category']
+                node.multiple = hierarchies[node.id]['multiple']
+                node.directional = hierarchies[node.id]['directional']
                 node.forms = {
                     form_id: forms[form_id]
-                    for form_id in hierarchy['form_ids']}
+                    for form_id in hierarchies[node.id]['form_ids']}
 
     @staticmethod
     def get_root_path(

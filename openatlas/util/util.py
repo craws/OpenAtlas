@@ -251,7 +251,7 @@ def get_entity_data(
     from openatlas.models.reference_system import ReferenceSystem
     if isinstance(entity, Node):
         data[_('super')] = link(g.nodes[entity.root[0]])
-        if g.nodes[entity.root[0]].category == 'value':
+        if entity.category == 'value':
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
     elif isinstance(entity, ReferenceSystem):
@@ -738,14 +738,13 @@ def get_type_data(entity: 'Entity') -> Dict[str, Any]:
         entity.nodes.update(entity.location.nodes)  # Add location types
     data: Dict[str, Any] = defaultdict(list)
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
-        root = g.nodes[node.root[-1]]
         if entity.standard_type and node.id == entity.standard_type.id:
             continue  # Standard type is already added
         title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
         html = f'<span title="{title}">{link(node)}</span>'
-        if root.category == 'value':
+        if node.category == 'value':
             html += f' {float(value):g} {node.description}'
-        data[root.name].append(html)
+        data[g.nodes[node.root[-1]].name].append(html)
     return {key: data[key] for key in sorted(data.keys())}
 
 
@@ -864,7 +863,7 @@ def display_form(
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
-            if node.category == 'standard' and node.class_.name == 'type':
+            if node.category == 'standard':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))

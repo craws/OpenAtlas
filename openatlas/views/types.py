@@ -55,7 +55,7 @@ def node_index() -> str:
 def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
-    if node.category in ('standard', 'system') or node.subs or node.count:
+    if node.category == 'system' or node.subs or node.count:
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
