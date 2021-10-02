@@ -271,8 +271,21 @@ def admin_check_link_duplicates(
         duplicates = True
     else:  # If no exact duplicates check single types for multiple use
         table = Table(
-            ['entity', 'class', 'base type', 'incorrect multiple types'],
-            rows=Link.check_single_type_duplicates())
+            ['entity', 'class', 'base type', 'incorrect multiple types'])
+        for row in Link.check_single_type_duplicates():
+            remove_links = []
+            for node in row['offending_nodes']:
+                url = url_for(
+                    'admin_delete_single_type_duplicate',
+                    entity_id=row['entity'].id,
+                    node_id=node.id)
+                remove_links.append(
+                    f'<a href="{url}">{uc_first(_("remove"))}</a> {node.name}')
+            table.rows.append([
+                link(row['entity']),
+                row['entity'].class_.name,
+                link(g.nodes[row['node'].id]),
+                '<br><br><br><br><br>'.join(remove_links)])
     return render_template(
         'admin/check_link_duplicates.html',
         table=table,

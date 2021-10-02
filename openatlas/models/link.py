@@ -2,15 +2,15 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
-from flask import abort, flash, g, url_for
+from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas import logger
-from openatlas.database.link import Link as Db
 from openatlas.database.date import Date
+from openatlas.database.link import Link as Db
 from openatlas.models.date import (
-    timestamp_to_datetime64, form_to_datetime64, datetime64_to_timestamp)
+    datetime64_to_timestamp, form_to_datetime64, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -275,11 +275,9 @@ class Link:
         return Db.delete_link_duplicates()
 
     @staticmethod
-    def check_single_type_duplicates() -> List[List[str]]:
+    def check_single_type_duplicates() -> Dict[str: Any]:
         from openatlas.models.node import Node
         from openatlas.models.entity import Entity
-        from openatlas.util.util import uc_first
-        from openatlas.util.util import link
         data = []
         for node in g.nodes.values():
             if node.root or node.multiple or node.category == 'value':
@@ -293,16 +291,9 @@ class Link:
                 for entity_node in entity.nodes:
                     if g.nodes[entity_node.root[-1]].id != node.id:
                         continue  # pragma: no cover
-                    url = url_for(
-                        'admin_delete_single_type_duplicate',
-                        entity_id=entity.id,
-                        node_id=entity_node.id)
-                    offending_nodes.append(
-                        f'<a href="{url}">{uc_first(_("remove"))}</a> '
-                        f'{entity_node.name}')
-                data.append([
-                    link(entity),
-                    entity.class_.name,
-                    link(g.nodes[node.id]),
-                    '<br><br><br><br><br>'.join(offending_nodes)])
+                    offending_nodes.append(entity_node)
+                data.append({
+                    'entity': entity,
+                    'node': node,
+                    'offending_nodes': offending_nodes})
         return data
