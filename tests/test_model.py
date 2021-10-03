@@ -38,7 +38,7 @@ class ModelTests(TestBaseCase):
                 actor = Entity.insert('person', 'King Arthur')
                 event = Entity.insert('activity', 'Battle of Camlann')
                 source = Entity.insert('source', 'The source')
-                actor.link('P11', event)
+                event.link('P11', actor)
                 source.link('P67', event)
             self.app.get(url_for('model_network', dimensions=2))
             rv = self.app.get(url_for('model_network'))

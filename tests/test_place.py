@@ -145,7 +145,6 @@ class PlaceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 event = Entity.insert('acquisition', 'Valhalla rising')
                 event.link('P7', location)
-                event.link('P24', location)
             rv = self.app.get(url_for('entity_view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
 
