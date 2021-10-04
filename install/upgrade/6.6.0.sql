@@ -117,4 +117,10 @@ UPDATE web.hierarchy SET category = 'system' WHERE locked IS true;
 UPDATE web.hierarchy SET category = 'place' WHERE name IN ('Administrative unit', 'Historical place');
 ALTER TABLE web.hierarchy DROP standard, DROP value_type, DROP locked;
 
+-- Remodel web.hierarchy_form to web.hierarchy_openatlas_class
+-- ALTER TABLE web.hierarchy_form RENAME TO hierarchy_openatlas_class;
+-- ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN openatlas_class_id int;
+-- UPDATE web.hierarchy_openatlas_class h
+--    SET openatlas_class_id = (SELECT c.id FROM model.openatlas_class c WHERE c.name = (SELECT name FROM web.form WHERE id = h.form_id));
+
 END;
