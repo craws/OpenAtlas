@@ -263,7 +263,7 @@ class ApiTests(TestBaseCase):
                 api_data.api_entities_linked_entity)
 
             # Path Tests
-            rv = self.app.get(url_for('api.class', class_code='E31'))
+            rv = self.app.get(url_for('api.cidoc_class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(url_for(
                 'api.system_class',
@@ -271,16 +271,16 @@ class ApiTests(TestBaseCase):
                 type_id=102))
             assert b'Nostromos' in rv.data
             rv = self.app.get(
-                url_for('api.class', class_code='E31', format='geojson'))
+                url_for('api.cidoc_class', class_code='E31', format='geojson'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(
                 url_for('api.entity', id_=location.id, format='geojson'))
             assert b'' in rv.data
             rv = self.app.get(
-                url_for('api.class', class_code='E31', download=True))
+                url_for('api.cidoc_class', class_code='E31', download=True))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(
-                url_for('api.class', class_code='E18', export='csv'))
+                url_for('api.cidoc_class', class_code='E18', export='csv'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api.latest', latest=10))
             assert b'Datei' in rv.data
@@ -382,34 +382,34 @@ class ApiTests(TestBaseCase):
             # Parameter: filter
 
             rv = self.app.get(url_for(
-                'api.class',
+                'api.cidoc_class',
                 class_code='E18',
                 filter='or|name|like|Nostr'))
             assert b'Nostromos' in rv.data
 
             # Parameter: last
             rv = self.app.get(
-                url_for('api.class', class_code='E18', last=place.id))
+                url_for('api.cidoc_class', class_code='E18', last=place.id))
             assert b'entities' in rv.data
             # Parameter: first
             rv = self.app.get(
-                url_for('api.class', class_code='E18', first=place.id))
+                url_for('api.cidoc_class', class_code='E18', first=place.id))
             assert b'entities' in rv.data
 
             # Parameter: show
             rv = self.app.get(
-                url_for('api.class', class_code='E31', show='types'))
+                url_for('api.cidoc_class', class_code='E31', show='types'))
             assert b'https://openatlas.eu' in rv.data
             rv = self.app.get(
-                url_for('api.class', class_code='E18', show='when'))
+                url_for('api.cidoc_class', class_code='E18', show='when'))
             assert b'Nostromos' in rv.data
             rv = self.app.get(
-                url_for('api.class', class_code='E31', show='none'))
+                url_for('api.cidoc_class', class_code='E31', show='none'))
             assert b'https://openatlas.eu' in rv.data
 
             # Parameter: count
             rv = self.app.get(
-                url_for('api.class', class_code='E31', count=True))
+                url_for('api.cidoc_class', class_code='E31', count=True))
             assert b'3' in rv.data
 
             rv = self.app.get(url_for(
@@ -437,7 +437,7 @@ class ApiTests(TestBaseCase):
     def error_class_entity(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
             self.app.get(
-                url_for('api.class', class_code='E18', last=1231223121321))
+                url_for('api.cidoc_class', class_code='E18', last=1231223121321))
 
     @raises(QueryEmptyError)
     def error_query_query(self) -> None:  # pragma: no cover
@@ -457,7 +457,7 @@ class ApiTests(TestBaseCase):
     @raises(InvalidCidocClassCode)
     def error_class_invalid(self) -> None:  # pragma: no cover
         with app.app_context():  # type: ignore
-            self.app.get(url_for('api.class', class_code='e99999999'))
+            self.app.get(url_for('api.cidoc_class', class_code='e99999999'))
 
     @raises(InvalidCodeError)
     def error_code_invalid(self) -> None:  # pragma: no cover
