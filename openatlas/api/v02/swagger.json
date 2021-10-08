@@ -1,62 +1,11 @@
 {
-  "openapi": "3.0.2",
-  "info": {
-    "title": "OpenAtlas API",
-    "version": "0.2",
-    "description": "A documentation of the OpenAtlas API",
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "contact": {
-      "name": "Bernhard Koschiček-Krombholz",
-      "email": "bernhard.koschicek-krombholz@oeaw.ac.at"
-    }
-  },
-  "servers": [
-    {
-      "url": "https://demo.openatlas.eu",
-      "description": "Demo Server"
-    },
-    {
-      "url": "https://demo-dev.openatlas.eu",
-      "description": "Demo Dev Server"
-    },
-    {
-      "url": "https://connec.acdh.oeaw.ac.at",
-      "description": "Connec Production Server"
-    }
-  ],
-  "tags": [
-    {
-      "name": "Entities",
-      "description": "Requesting entities through different means."
-    },
-    {
-      "name": "Nodes",
-      "description": "Requesting nodes and subunits"
-    },
-    {
-      "name": "Content",
-      "description": "Requesting content of the OpenAtlas instance."
-    }
-  ],
   "components": {
     "parameters": {
-      "limitParam": {
-        "name": "limit",
-        "in": "query",
-        "description": "Number of entities returned per page",
-        "schema": {
-          "type": "number"
-        }
-      },
       "columnParam": {
-        "name": "column",
-        "in": "query",
         "description": "The result will be sorted by the given column",
+        "in": "query",
+        "name": "column",
         "schema": {
-          "type": "string",
           "enum": [
             "id",
             "classCode",
@@ -69,67 +18,115 @@
             "beginTo",
             "endFrom",
             "endTo"
-          ]
-        }
-      },
-      "sortParam": {
-        "name": "sort",
-        "in": "query",
-        "description": "Result will be sorted asc/desc (default column is name)",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "asc",
-            "desc"
-          ]
-        }
-      },
-      "filterParam": {
-        "name": "filter",
-        "in": "query",
-        "description": "Specify request with custom SQL filter method. ",
-        "schema": {
+          ],
           "type": "string"
         }
       },
-      "firstParam": {
-        "name": "first",
-        "in": "query",
-        "description": "List of results start with given ID",
-        "schema": {
-          "type": "number"
-        }
-      },
-      "lastParam": {
-        "name": "last",
-        "in": "query",
-        "description": "List of results start with entity after given ID",
-        "schema": {
-          "type": "number"
-        }
-      },
       "countParam": {
-        "name": "count",
-        "in": "query",
         "description": "Returns a number which represents the total count of the result",
+        "in": "query",
+        "name": "count",
         "schema": {
           "type": "boolean"
         }
       },
       "downloadParam": {
-        "name": "download",
-        "in": "query",
         "description": "Triggers the file download of the given request",
+        "in": "query",
+        "name": "download",
         "schema": {
           "type": "boolean"
         }
       },
-      "showParam": {
-        "name": "show",
+      "exportParam": {
+        "description": "Select to which format the output is downloaded",
         "in": "query",
-        "description": "Select which key should be shown. If 'not' is used, no other keys will be shown",
+        "name": "export",
         "schema": {
-          "type": "string",
+          "enum": [
+            "csv"
+          ],
+          "type": "string"
+        }
+      },
+      "filterParam": {
+        "description": "Specify request with custom SQL filter method. ",
+        "in": "query",
+        "name": "filter",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "firstParam": {
+        "description": "List of results start with given ID",
+        "in": "query",
+        "name": "first",
+        "schema": {
+          "type": "number"
+        }
+      },
+      "formatParam": {
+        "description": "Select to which output format is prefered",
+        "in": "query",
+        "name": "format",
+        "schema": {
+          "enum": [
+            "linked_places",
+            "geojson"
+          ],
+          "type": "string"
+        }
+      },
+      "geometryParam": {
+        "description": "Select geometry types.",
+        "in": "query",
+        "name": "geometry",
+        "schema": {
+          "enum": [
+            "gisAll",
+            "gisPointAll",
+            "gisPointSupers",
+            "gisPointSubs",
+            "gisPointSibling",
+            "gisLineAll",
+            "gisPolygonAll"
+          ],
+          "type": "string"
+        }
+      },
+      "langParam": {
+        "description": "Select output language",
+        "in": "query",
+        "name": "language",
+        "schema": {
+          "enum": [
+            "en",
+            "de"
+          ],
+          "type": "string"
+        }
+      },
+      "lastParam": {
+        "description": "List of results start with entity after given ID",
+        "in": "query",
+        "name": "last",
+        "schema": {
+          "type": "number"
+        }
+      },
+      "limitParam": {
+        "description": "Number of entities returned per page",
+        "in": "query",
+        "name": "limit",
+        "schema": {
+          "type": "number"
+        }
+      },
+      "showParam": {
+        "description": "Select which key should be shown. If 'not' is used, no other keys will be shown",
+        "in": "query",
+        "name": "show",
+        "schema": {
           "enum": [
             "when",
             "types",
@@ -139,76 +136,67 @@
             "geometry",
             "depictions",
             "not"
-          ]
+          ],
+          "type": "string"
         }
       },
-      "langParam": {
-        "name": "language",
+      "sortParam": {
+        "description": "Result will be sorted asc/desc (default column is name)",
         "in": "query",
-        "description": "Select output language",
+        "name": "sort",
         "schema": {
-          "type": "string",
           "enum": [
-            "en",
-            "de"
-          ]
-        }
-      },
-      "exportParam": {
-        "name": "export",
-        "in": "query",
-        "description": "Select to which format the output is downloaded",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "csv"
-          ]
-        }
-      },
-      "formatParam": {
-        "name": "format",
-        "in": "query",
-        "description": "Select to which output format is prefered",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "linked_places",
-            "geojson"
-          ]
-        }
-      },
-      "geometryParam": {
-        "name": "geometry",
-        "in": "query",
-        "description": "Select geometry types.",
-        "schema": {
-          "type": "string",
-          "enum": [
-            "gisAll",
-            "gisPointAll",
-            "gisPointSupers",
-            "gisPointSubs",
-            "gisPointSibling",
-            "gisLineAll",
-            "gisPolygonAll"
-          ]
+            "asc",
+            "desc"
+          ],
+          "type": "string"
         }
       },
       "typeParam": {
-        "name": "type_id",
-        "in": "query",
         "description": "The output will be filtered by the type_id. Only entities with this type ids will be display. The relation is in logical OR.",
+        "in": "query",
+        "name": "type_id",
         "schema": {
           "type": "number"
         }
       }
     },
     "schemas": {
+      "ClassMappingModel": {
+        "properties": {
+          "crmClass": {
+            "type": "string"
+          },
+          "en": {
+            "type": "string"
+          },
+          "icon": {
+            "type": "string"
+          },
+          "systemClass": {
+            "type": "string"
+          },
+          "view": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
       "ContentModel": {
-        "type": "object",
         "properties": {
           "contact": {
             "type": "string"
+          },
+          "imageSized": {
+            "properties": {
+              "table": {
+                "type": "string"
+              },
+              "thumbnail": {
+                "type": "string"
+              }
+            },
+            "type": "object"
           },
           "intro": {
             "type": "string"
@@ -218,109 +206,358 @@
           },
           "siteName": {
             "type": "string"
-          },
-          "imageSized": {
-            "type": "object",
-            "properties": {
-              "thumbnail": {
-                "type": "string"
-              },
-              "table": {
-                "type": "string"
-              }
-            }
           }
-        }
+        },
+        "type": "object"
       },
-      "SystemClassCountModel": {
-        "type": "object",
+      "DepictionModel": {
         "properties": {
-          "move": {
-            "type": "number"
-          },
-          "bibliography": {
-            "type": "number"
-          },
-          "person": {
-            "type": "number"
-          },
-          "acquisition": {
-            "type": "number"
-          },
-          "reference_system": {
-            "type": "number"
-          },
-          "feature": {
-            "type": "number"
-          },
-          "file": {
-            "type": "number"
-          },
-          "activity": {
-            "type": "number"
-          },
-          "type": {
-            "type": "number"
-          },
-          "administrative_unit": {
-            "type": "number"
-          },
-          "artifact": {
-            "type": "number"
-          },
-          "source_translation": {
-            "type": "number"
-          },
-          "place": {
-            "type": "number"
-          },
-          "stratigraphic_unit": {
-            "type": "number"
-          },
-          "edition": {
-            "type": "number"
-          },
-          "group": {
-            "type": "number"
-          },
-          "source": {
-            "type": "number"
-          }
-        }
-      },
-      "OverviewCountModel": {
-        "type": "object",
-        "properties": {
-          "systemClass": {
+          "@id": {
             "type": "string"
           },
-          "count": {
-            "type": "number"
+          "license": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
           }
-        }
+        },
+        "type": "object"
       },
-      "ClassMappingModel": {
-        "type": "object",
+      "DescriptionModel": {
         "properties": {
-          "systemClass": {
+          "value": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "FeatureGeoJSON": {
+        "properties": {
+          "@id": {
             "type": "string"
           },
           "crmClass": {
             "type": "string"
           },
-          "view": {
+          "depictions": {
+            "items": {
+              "$ref": "#/components/schemas/DepictionModel"
+            },
+            "type": "array"
+          },
+          "description": {
+            "items": {
+              "$ref": "#/components/schemas/DescriptionModel"
+            },
+            "type": "array"
+          },
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/LinkModel"
+            },
+            "type": "array"
+          },
+          "names": {
+            "items": {
+              "$ref": "#/components/schemas/NamesModel"
+            },
+            "type": "array"
+          },
+          "properties": {
+            "properties": {
+              "title": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "relations": {
+            "items": {
+              "$ref": "#/components/schemas/RelationModel"
+            },
+            "type": "array"
+          },
+          "systemClass": {
             "type": "string"
           },
-          "icon": {
+          "type": {
             "type": "string"
           },
-          "en": {
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/TypeModel"
+            },
+            "type": "array"
+          },
+          "when": {
+            "items": {
+              "$ref": "#/components/schemas/WhenModel"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "@id",
+          "geometry",
+          "type"
+        ],
+        "type": "object"
+      },
+      "GeometricEntries": {
+        "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/GeometricEntry"
+            },
+            "type": "array"
+          },
+          "type": {
             "type": "string"
           }
-        }
+        },
+        "type": "object"
+      },
+      "GeometricEntry": {
+        "properties": {
+          "geometry": {
+            "properties": {
+              "coordinates": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "properties": {
+            "properties": {
+              "description": {
+                "type": "string"
+              },
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "objectDescription": {
+                "type": "string"
+              },
+              "objectId": {
+                "type": "integer"
+              },
+              "objectName": {
+                "type": "string"
+              },
+              "objectType": {
+                "type": "string"
+              },
+              "shapeType": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "Geometries": {
+        "properties": {
+          "geometry": {
+            "properties": {
+              "coordinates": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "properties": {
+            "properties": {
+              "begin_from": {
+                "type": "string"
+              },
+              "begin_to": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "end_from": {
+                "type": "string"
+              },
+              "end_to": {
+                "type": "string"
+              },
+              "id": {
+                "type": "number"
+              },
+              "name": {
+                "type": "string"
+              },
+              "place": {
+                "properties": {
+                  "id": {
+                    "type": "number"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "types": {
+                    "items": {
+                      "properties": {
+                        "id": {
+                          "type": "number"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "type": "object"
+              },
+              "type": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "GeometryModel": {
+        "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/Geometries"
+            },
+            "type": "array"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LatestModel": {
+        "items": {
+          "$ref": "#/components/schemas/LinkedPlaceModel"
+        },
+        "type": "array"
+      },
+      "LinkModel": {
+        "properties": {
+          "identifier": {
+            "type": "string"
+          },
+          "referenceSystem": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "LinkedPlaceModel": {
+        "properties": {
+          "@context": {
+            "type": "string"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/FeatureGeoJSON"
+            },
+            "type": "array"
+          },
+          "type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "features"
+        ],
+        "type": "object"
+      },
+      "NamesModel": {
+        "properties": {
+          "alias": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "NodeAllModel": {
+        "properties": {
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/NodeModel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "NodeCategoryModel": {
+        "properties": {
+          "custom": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "places": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "standard": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "value": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
       },
       "NodeModel": {
-        "type": "object",
         "properties": {
           "id": {
             "type": "number"
@@ -331,562 +568,324 @@
           "url": {
             "type": "string"
           }
-        }
-      },
-      "NodeAllModel": {
-        "type": "object",
-        "properties": {
-          "nodes": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NodeModel"
-            }
-          }
-        }
-      },
-      "NodeCategoryModel": {
-        "type": "object",
-        "properties": {
-          "standard": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "places": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "custom": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "value": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
+        },
+        "type": "object"
       },
       "NodeOverviewModel": {
-        "type": "object",
         "properties": {
           "types": {
-            "type": "array",
             "items": {
               "$ref": "#/components/schemas/NodeCategoryModel"
-            }
-          }
-        }
-      },
-      "OutputModelLPF": {
-        "type": "object",
-        "properties": {
-          "results": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/LinkedPlaceModel"
-            }
-          },
-          "pagination": {
-            "$ref": "#/components/schemas/PaginationModel"
-          }
-        }
-      }
-    },
-    "OutputModelGeojson": {
-      "type": "object",
-      "properties": {
-        "results": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/GeometryModel"
+            },
+            "type": "array"
           }
         },
-        "pagination": {
-          "$ref": "#/components/schemas/PaginationModel"
-        }
-      }
-    }
-  },
-  "PaginationModel": {
-    "type": "object",
-    "properties": {
-      "entities": {
-        "type": "number"
+        "type": "object"
       },
-      "entitiesPerPage": {
-        "type": "number"
-      },
-      "totalPages": {
-        "type": "number"
-      },
-      "index": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/PaginationIndexModel"
-        }
-      }
-    }
-  },
-  "PaginationIndexModel": {
-    "type": "object",
-    "properties": {
-      "page": {
-        "type": "number"
-      },
-      "startId": {
-        "type": "number"
-      }
-    }
-  },
-  "LatestModel": {
-    "type": "array",
-    "items": {
-      "$ref": "#/components/schemas/LinkedPlaceModel"
-    }
-  },
-  "LinkedPlaceModel": {
-    "type": "object",
-    "required": [
-      "type",
-      "features"
-    ],
-    "properties": {
-      "features": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/FeatureGeoJSON"
-        }
-      },
-      "type": {
-        "type": "string"
-      },
-      "@context": {
-        "type": "string"
-      }
-    }
-  },
-  "FeatureGeoJSON": {
-    "type": "object",
-    "required": [
-      "@id",
-      "geometry",
-      "type"
-    ],
-    "properties": {
-      "@id": {
-        "type": "string"
-      },
-      "crmClass": {
-        "type": "string"
-      },
-      "systemClass": {
-        "type": "string"
-      },
-      "type": {
-        "type": "string"
-      },
-      "depictions": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/DepictionModel"
-        }
-      },
-      "description": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/DescriptionModel"
-        }
-      },
-      "links": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/LinkModel"
-        }
-      },
-      "names": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/NamesModel"
-        }
-      },
-      "properties": {
-        "type": "object",
+      "OutputModelGeojson": {
         "properties": {
-          "title": {
-            "type": "string"
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationModel"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/GeometryModel"
+            },
+            "type": "array"
           }
-        }
+        },
+        "type": "object"
       },
-      "relations": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/RelationModel"
-        }
-      },
-      "types": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/TypeModel"
-        }
-      },
-      "when": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/WhenModel"
-        }
-      }
-    }
-  },
-  "DepictionModel": {
-    "type": "object",
-    "properties": {
-      "@id": {
-        "type": "string"
-      },
-      "license": {
-        "type": "string"
-      },
-      "title": {
-        "type": "string"
-      },
-      "url": {
-        "type": "string"
-      }
-    }
-  },
-  "DescriptionModel": {
-    "type": "object",
-    "properties": {
-      "value": {
-        "type": "string"
-      }
-    }
-  },
-  "LinkModel": {
-    "type": "object",
-    "properties": {
-      "identifier": {
-        "type": "string"
-      },
-      "type": {
-        "type": "string"
-      },
-      "referenceSystem": {
-        "type": "string"
-      }
-    }
-  },
-  "NamesModel": {
-    "type": "object",
-    "properties": {
-      "alias": {
-        "type": "string"
-      }
-    }
-  },
-  "RelationModel": {
-    "type": "object",
-    "properties": {
-      "label": {
-        "type": "string"
-      },
-      "relationTo": {
-        "type": "string"
-      },
-      "relationType": {
-        "type": "string"
-      },
-      "type": {
-        "type": "string"
-      },
-      "when": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/WhenModel"
-        }
-      }
-    }
-  },
-  "TypeModel": {
-    "type": "object",
-    "properties": {
-      "hierarchy": {
-        "type": "string"
-      },
-      "identifier": {
-        "type": "string"
-      },
-      "label": {
-        "type": "string"
-      }
-    }
-  },
-  "TimeDetailModel": {
-    "type": "object",
-    "properties": {
-      "earliest": {
-        "type": "string"
-      },
-      "latest": {
-        "type": "string"
-      }
-    }
-  },
-  "TimespansModel": {
-    "type": "object",
-    "properties": {
-      "end": {
-        "$ref": "#/components/schemas/TimeDetailModel"
-      },
-      "first": {
-        "$ref": "#/components/schemas/TimeDetailModel"
-      }
-    }
-  },
-  "WhenModel": {
-    "type": "object",
-    "properties": {
-      "timespans": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/TimespansModel"
-        }
-      }
-    }
-  },
-  "TypeTreeSubModel": {
-    "type": "object",
-    "properties": {
-      "Type_IDs": {
-        "type": "object",
+      "OutputModelLPF": {
         "properties": {
-          "id": {
-            "type": "integer"
+          "pagination": {
+            "$ref": "#/components/schemas/PaginationModel"
           },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "note": {
-            "type": "string"
-          },
-          "origin_id": {
-            "type": "integer"
-          },
-          "first": {
-            "type": "integer"
-          },
-          "last": {
-            "type": "integer"
-          },
-          "root": {
-            "type": "array",
+          "results": {
             "items": {
-              "type": "integer"
-            }
-          },
-          "subs": {
-            "type": "array",
-            "items": {
-              "type": "integer"
-            }
-          },
+              "$ref": "#/components/schemas/LinkedPlaceModel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "OverviewCountModel": {
+        "properties": {
           "count": {
-            "type": "integer"
-          },
-          "count_subs": {
-            "type": "integer"
-          },
-          "locked": {
-            "type": "boolean"
-          },
-          "standard": {
-            "type": "boolean"
-          }
-        }
-      }
-    }
-  },
-  "TypeTreeModel": {
-    "type": "object",
-    "properties": {
-      "type_tree": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/TypeTreeSubModel"
-        }
-      }
-    }
-  },
-  "GeometryModel": {
-    "type": "object",
-    "properties": {
-      "type": {
-        "type": "string"
-      },
-      "features": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/Geometries"
-        }
-      }
-    }
-  },
-  "GeometricEntries": {
-    "type": "object",
-    "properties": {
-      "type": {
-        "type": "string"
-      },
-      "features": {
-        "type": "array",
-        "items": {
-          "$ref": "#/components/schemas/GeometricEntry"
-        }
-      }
-    }
-  },
-  "Geometries": {
-    "type": "object",
-    "properties": {
-      "type": {
-        "type": "string"
-      },
-      "geometry": {
-        "type": "object",
-        "properties": {
-          "coordinates": {
-            "type": "array",
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          },
-          "type": {
-            "type": "string"
-          }
-        }
-      },
-      "properties": {
-        "type": "object",
-        "properties": {
-          "id": {
             "type": "number"
           },
-          "name": {
+          "systemClass": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "PaginationIndexModel": {
+        "properties": {
+          "page": {
+            "type": "number"
+          },
+          "startId": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "PaginationModel": {
+        "properties": {
+          "entities": {
+            "type": "number"
+          },
+          "entitiesPerPage": {
+            "type": "number"
+          },
+          "index": {
+            "items": {
+              "$ref": "#/components/schemas/PaginationIndexModel"
+            },
+            "type": "array"
+          },
+          "totalPages": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "RelationModel": {
+        "properties": {
+          "label": {
             "type": "string"
           },
-          "description": {
+          "relationTo": {
             "type": "string"
           },
-          "begin_from": {
-            "type": "string"
-          },
-          "begin_to": {
-            "type": "string"
-          },
-          "end_from": {
-            "type": "string"
-          },
-          "end_to": {
+          "relationType": {
             "type": "string"
           },
           "type": {
             "type": "string"
           },
+          "when": {
+            "items": {
+              "$ref": "#/components/schemas/WhenModel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "SystemClassCountModel": {
+        "properties": {
+          "acquisition": {
+            "type": "number"
+          },
+          "activity": {
+            "type": "number"
+          },
+          "administrative_unit": {
+            "type": "number"
+          },
+          "artifact": {
+            "type": "number"
+          },
+          "bibliography": {
+            "type": "number"
+          },
+          "edition": {
+            "type": "number"
+          },
+          "feature": {
+            "type": "number"
+          },
+          "file": {
+            "type": "number"
+          },
+          "group": {
+            "type": "number"
+          },
+          "move": {
+            "type": "number"
+          },
+          "person": {
+            "type": "number"
+          },
           "place": {
-            "type": "object",
+            "type": "number"
+          },
+          "reference_system": {
+            "type": "number"
+          },
+          "source": {
+            "type": "number"
+          },
+          "source_translation": {
+            "type": "number"
+          },
+          "stratigraphic_unit": {
+            "type": "number"
+          },
+          "type": {
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "TimeDetailModel": {
+        "properties": {
+          "earliest": {
+            "type": "string"
+          },
+          "latest": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TimespansModel": {
+        "properties": {
+          "end": {
+            "$ref": "#/components/schemas/TimeDetailModel"
+          },
+          "first": {
+            "$ref": "#/components/schemas/TimeDetailModel"
+          }
+        },
+        "type": "object"
+      },
+      "TypeModel": {
+        "properties": {
+          "hierarchy": {
+            "type": "string"
+          },
+          "identifier": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "TypeTreeModel": {
+        "properties": {
+          "type_tree": {
+            "items": {
+              "$ref": "#/components/schemas/TypeTreeSubModel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TypeTreeSubModel": {
+        "properties": {
+          "Type_IDs": {
             "properties": {
+              "count": {
+                "type": "integer"
+              },
+              "count_subs": {
+                "type": "integer"
+              },
+              "description": {
+                "type": "string"
+              },
+              "first": {
+                "type": "integer"
+              },
               "id": {
-                "type": "number"
+                "type": "integer"
+              },
+              "last": {
+                "type": "integer"
+              },
+              "locked": {
+                "type": "boolean"
               },
               "name": {
                 "type": "string"
               },
-              "types": {
-                "type": "array",
+              "note": {
+                "type": "string"
+              },
+              "origin_id": {
+                "type": "integer"
+              },
+              "root": {
                 "items": {
-                  "type": "object",
-                  "properties": {
-                    "id": {
-                      "type": "number"
-                    },
-                    "name": {
-                      "type": "string"
-                    }
-                  }
-                }
+                  "type": "integer"
+                },
+                "type": "array"
+              },
+              "standard": {
+                "type": "boolean"
+              },
+              "subs": {
+                "items": {
+                  "type": "integer"
+                },
+                "type": "array"
               }
-            }
+            },
+            "type": "object"
           }
-        }
+        },
+        "type": "object"
+      },
+      "WhenModel": {
+        "properties": {
+          "timespans": {
+            "items": {
+              "$ref": "#/components/schemas/TimespansModel"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
       }
     }
   },
-  "GeometricEntry": {
-    "type": "object",
-    "properties": {
-      "type": {
-        "type": "string"
-      },
-      "geometry": {
-        "type": "object",
-        "properties": {
-          "coordinates": {
-            "type": "array",
-            "items": {
-              "type": "array",
-              "items": {
-                "type": "number"
-              }
-            }
-          },
-          "type": {
-            "type": "string"
-          }
-        }
-      },
-      "properties": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "number"
-          },
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "objectId": {
-            "type": "integer"
-          },
-          "objectDescription": {
-            "type": "string"
-          },
-          "objectName": {
-            "type": "string"
-          },
-          "objectType": {
-            "type": "string"
-          },
-          "shapeType": {
-            "type": "string"
-          }
-        }
-      }
+  "info": {
+    "contact": {
+      "email": "bernhard.koschicek-krombholz@oeaw.ac.at",
+      "name": "Bernhard Koschiček-Krombholz"
+    },
+    "description": "A documentation of the OpenAtlas API",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "title": "OpenAtlas API",
+    "version": "0.2"
+  },
+  "openapi": "3.0.2",
+  "servers": [
+    {
+      "description": "Demo Server",
+      "url": "https://demo.openatlas.eu"
+    },
+    {
+      "description": "Demo Dev Server",
+      "url": "https://demo-dev.openatlas.eu"
+    },
+    {
+      "description": "Connec Production Server",
+      "url": "https://connec.acdh.oeaw.ac.at"
     }
-  }
+  ],
+  "tags": [
+    {
+      "description": "Requesting entities through different means.",
+      "name": "Entities"
+    },
+    {
+      "description": "Requesting nodes and subunits",
+      "name": "Nodes"
+    },
+    {
+      "description": "Requesting content of the OpenAtlas instance.",
+      "name": "Content"
+    }
+  ]
 }
-
