@@ -1,3 +1,10 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
+
 test_subunit = {'nodes': [{
     'id': 108, 'label': 'Home of Baggins',
     'url': 'http://local.host/api/0.2/entity/108'}]}

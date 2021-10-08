@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
 test_type_tree = {'typeTree': [{
     '18': {
         'id': 18, 'name': 'Abbot', 'description': None,

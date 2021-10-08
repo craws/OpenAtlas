@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
 test_node_entities = {'nodes': [
     {'id': 84,
      'label': 'Austria',
