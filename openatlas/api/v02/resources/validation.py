@@ -33,24 +33,24 @@ class Validation:
     @staticmethod
     def check_filter_input(values: List[str]) -> None:
         if values[0] not in Validation.logical_operators.keys():
-            raise FilterLogicalOperatorError  # pragma: no cover
+            raise FilterLogicalOperatorError
         if values[1] not in Validation.valid_columns:
-            raise FilterColumnError  # pragma: no cover
+            raise FilterColumnError
         if values[2] not in Validation.compare_operators.keys():
-            raise FilterOperatorError  # pragma: no cover
+            raise FilterOperatorError
         if len(values) < 4 or values[3] == '':
-            raise NoSearchStringError  # pragma: no cover
+            raise NoSearchStringError
 
     @staticmethod
     def test_date(term: str) -> None:
         try:
             datetime.datetime.strptime(term, "%Y-%m-%d")
-        except InvalidSearchDateError:  # pragma: no cover
+        except ValueError:
             raise InvalidSearchDateError
 
     @staticmethod
     def test_id(term: str) -> None:
         try:
             int(term)
-        except InvalidSearchNumberError:  # pragma: no cover
+        except Exception:
             raise InvalidSearchNumberError

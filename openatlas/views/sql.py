@@ -43,6 +43,7 @@ def sql_execute() -> str:
                 pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')
+            logger.log('info', 'database', 'SQL executed', form.statement.data)
         except Exception as e:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)

@@ -22,7 +22,7 @@ class GetNodeEntitiesAll(Resource):  # type: ignore
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
-            raise InvalidSubunitError  # pragma: no cover
+            raise InvalidSubunitError
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])
 
     @staticmethod
