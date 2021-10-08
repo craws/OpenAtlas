@@ -27,13 +27,11 @@ class IndexTests(TestBaseCase):
             assert b'first' in rv.data
 
             # Translations
-            rv = self.app.get(
-                url_for('set_locale', language='de'),
-                follow_redirects=True)
+            self.app.get(url_for('set_locale', language='de'))
+            rv = self.app.get(url_for('overview'))
             assert b'Quelle' in rv.data
-            rv = self.app.get(
-                url_for('set_locale', language='en'),
-                follow_redirects=True)
+            self.app.get(url_for('set_locale', language='en'))
+            rv = self.app.get(url_for('overview'))
             assert b'Source' in rv.data
 
             rv = self.app.get(
