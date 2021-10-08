@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
 test_query = {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection',
@@ -493,7 +499,7 @@ test_query_geojson = {'results': [{
                         'types': None}},
         {'type': 'Feature',
          'geometry': None,
-         'properties': {'@id': 118,
+         'properties': {'@id': test_ids["sam_id"],
                         'systemClass': 'person',
                         'name': 'Sam',
                         'description': 'That is Sam',
@@ -1573,7 +1579,7 @@ test_query_first = {'results': [{
             {'page': 1, 'startId': 105},
             {'page': 2, 'startId': 116},
             {'page': 3, 'startId': 113},
-            {'page': 4, 'startId': 118},
+            {'page': 4, 'startId': test_ids["sam_id"]},
             {'page': 5, 'startId': 108},
             {'page': 6, 'startId': 110},
             {'page': 7, 'startId': 120},
@@ -1631,7 +1637,7 @@ test_query_last = {'results': [{
             {'page': 1, 'startId': 105},
             {'page': 2, 'startId': 116},
             {'page': 3, 'startId': 113},
-            {'page': 4, 'startId': 118},
+            {'page': 4, 'startId': test_ids["sam_id"]},
             {'page': 5, 'startId': 108},
             {'page': 6, 'startId': 110},
             {'page': 7, 'startId': 120},

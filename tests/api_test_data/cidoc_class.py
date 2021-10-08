@@ -1,3 +1,9 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
 test_cidoc_class = {
     'results': [{
         '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
@@ -14,7 +20,8 @@ test_cidoc_class = {
              'types': None,
              'relations': [
                  {'label': 'Sam',
-                  'relationTo': 'http://local.host/api/0.2/entity/118',
+                  'relationTo':
+                      f'http://local.host/api/0.2/entity/{test_ids["sam_id"]}',
                   'relationType': 'crm:OA7 has relationship to',
                   'relationSystemClass': 'person',
                   'relationDescription': None, 'type': 'Economical',
