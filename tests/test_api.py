@@ -174,11 +174,11 @@ class ApiTests(TestBaseCase):
 
             # /class
             rv = self.app.get(url_for(
-                'api.class',
+                'api.cidoc_class',
                 class_code='E21'))
             self.assertDictEqual(rv.get_json(), cidoc_class.test_cidoc_class)
             rv = self.app.get(url_for(
-                'api.class',
+                'api.cidoc_class',
                 class_code='E21',
                 show='none'))
             self.assertDictEqual(
@@ -459,7 +459,7 @@ class ApiTests(TestBaseCase):
 
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
-                    'api.class',
+                    'api.cidoc_class',
                     class_code='E18',
                     last=1231))
             with self.assertRaises(TypeIDError):
@@ -473,7 +473,7 @@ class ApiTests(TestBaseCase):
                     entities=12345))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
-                    'api.class',
+                    'api.cidoc_class',
                     class_code='E68',
                     last=1231))
             with self.assertRaises(InvalidSystemClassError):
@@ -500,7 +500,7 @@ class ApiTests(TestBaseCase):
                     id_=1234))
             with self.assertRaises(InvalidCidocClassCode):
                 self.app.get(url_for(
-                    'api.class',
+                    'api.cidoc_class',
                     class_code='e99999999'))
             with self.assertRaises(InvalidCodeError):
                 self.app.get(url_for(
