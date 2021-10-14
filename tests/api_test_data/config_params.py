@@ -14,6 +14,7 @@ test_ids = {
 
     'place_id': 65,
     'height_id': 102,
+    'weight_id': 103,
     'suza_id': 106,
     'geonames_id': 1,
     'lotr_id': 107,
@@ -30,6 +31,13 @@ test_ids = {
     'czech_id': 89,
     'slovakia_id': 90,
     'slovenia_id': 91,
+    'marcha_id': 94,
+    'comitatus_id': 95,
+    'carantinia_id': 93,
+    'serbia_id': 96,
+    'historical_place_id': 92,
+
+
 
     'actor_function_id': 16,
     'actor_r_id': 53,
@@ -44,6 +52,12 @@ test_ids = {
     'enemy_id': 58,
     'friend_id': 57,
     'mentor_id': 59,
+    'victim_id': 29,
+    'involvement_id': 26,
+    'sponsor_id': 28,
+    'offender_id': 30,
+
+
 
     'abbot_id': 18,
     'bishop_id': 17,
@@ -51,7 +65,8 @@ test_ids = {
     'count_id': 21,
     'creator_id': 27,
     'deposit_id': 79,
-
+    'pope_id': 19,
+    'king_id': 22,
 
     'article_id': 5,
     'artifact_id': 23,
@@ -67,6 +82,10 @@ test_ids = {
     'stratigraphic_id': 77,
     'feature_id': 74,
     'inbook_id': 4,
+    'source_translation_id': 97,
+    'transliteration_id': 100,
+    'original_text_id': 98,
+    'translation_id': 99,
 
 
     'battle_id': 40,
@@ -78,6 +97,9 @@ test_ids = {
     'cc_by_sa_id': 52,
     'cc_by_id': 51,
     'license_id': 47,
+    'public_domain_id': 50,
+    'open_license_id': 49,
+    'proprietary_id': 48,
     'change_id': 35,
     'coin_id': 24,
     'conflict_id': 39,
@@ -87,8 +109,22 @@ test_ids = {
     'donation_id': 36,
     'exchange_id': 38,
     'female_id': 32,
+    'male_id': 33,
+    'sex_id': 31,
     'grave_id': 75,
     'human_remains_id': 80,
+    'infrastructure_id': 70,
+    'link_id': 12,
+    'letter_id': 45,
+    'lower_body_id': 82,
+    'military_facility_id': 67,
+    'statue_id': 25,
+    'pit_id': 76,
+    'raid_id': 41,
+    'settlement_id': 66,
+    'testament_id': 44,
+    'topographical_id': 73,
+    'upper_body_id': 81,
 
 
 
