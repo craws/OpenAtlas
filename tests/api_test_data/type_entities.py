@@ -135,7 +135,7 @@ test_type_entities = {'results': [{
     'pagination': {
         'entities': 1,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': {test_ids["shire_id"]}}],
+        'index': [{'page': 1, 'startId': test_ids["shire_id"]}],
         'totalPages': 1}}
 test_type_entities_all_special = {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
@@ -284,7 +284,7 @@ test_type_entities_all_special = {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection',
     'features': [{
-        '@id': 'http://local.host/entity/{test_ids["slovakia_id"]}',
+        '@id': f'http://local.host/entity/{test_ids["slovakia_id"]}',
         'type': 'Feature',
         'crmClass': 'crm:E53 Place',
         'systemClass': 'administrative_unit',
@@ -386,7 +386,7 @@ test_type_entities_all_special = {'results': [{
         'types': None,
         'relations': [{
             'label': 'Austria',
-            'relationTo': f'http://local.host/api/0.2/entity/{test_ids["_austria_id"]}',
+            'relationTo': f'http://local.host/api/0.2/entity/{test_ids["austria_id"]}',
             'relationType': 'crm:P89 falls within',
             'relationSystemClass': 'administrative_unit',
             'relationDescription': None,
@@ -404,5 +404,5 @@ test_type_entities_all_special = {'results': [{
         'entitiesPerPage': 20,
         'index': [{
             'page': 1,
-            'startId': {test_ids["austria_id"]}}],
+            'startId': test_ids["austria_id"]}],
         'totalPages': 1}}

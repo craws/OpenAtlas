@@ -5,12 +5,13 @@ test_ids = {
     'travel_id': 119,
     'home_id': 108,
     'kitchen_id': 110,
+    'location_kitchen_id': 111,
     'location_home_id': 109,
     'shire_id': 104,
-    'location_kitchen_id': 111,
+    'location_shire_id': 105,
     'mordor_id': 120,
-    'boundary_id': 72,
     'location_mordor_id': 121,
+
     'place_id': 65,
     'height_id': 102,
     'suza_id': 106,
@@ -18,7 +19,6 @@ test_ids = {
     'lotr_id': 107,
     'picture_id': 112,
     'file_without_id': 115,
-    'location_shire_id': 105,
     'silmarillion_id': 122,
 
     'administrative_id': 83,
@@ -30,4 +30,76 @@ test_ids = {
     'czech_id': 89,
     'slovakia_id': 90,
     'slovenia_id': 91,
+
+    'actor_function_id': 16,
+    'actor_r_id': 53,
+    'economical_id': 63,
+    'provider_id': 64,
+    'kindredship_id': 54,
+    'parent_id': 55,
+    'political_id': 60,
+    'ally_id': 61,
+    'leader_id': 62,
+    'social_id': 56,
+    'enemy_id': 58,
+    'friend_id': 57,
+    'mentor_id': 59,
+
+    'abbot_id': 18,
+    'bishop_id': 17,
+    'emperor_id': 20,
+    'count_id': 21,
+    'creator_id': 27,
+    'deposit_id': 79,
+
+
+    'article_id': 5,
+    'artifact_id': 23,
+    'bibliography_id': 3,
+    'book_id': 6,
+    'charter_id': 43,
+    'source_id': 42,
+    'charter_edition_id': 8,
+    'edition_id': 7,
+    'letter_edition_id': 9,
+    'chronicle_edition_id': 10,
+    'event_id': 34,
+    'stratigraphic_id': 77,
+    'feature_id': 74,
+    'inbook_id': 4,
+
+
+    'battle_id': 40,
+    'boundary_id': 72,
+    'burial_id': 78,
+    'burial_site_id': 69,
+    'economic_site_id': 71,
+    'ritual_site_id': 68,
+    'cc_by_sa_id': 52,
+    'cc_by_id': 51,
+    'license_id': 47,
+    'change_id': 35,
+    'coin_id': 24,
+    'conflict_id': 39,
+    'sale_id': 37,
+    'contract_id': 46,
+    'dimensions_id': 101,
+    'donation_id': 36,
+    'exchange_id': 38,
+    'female_id': 32,
+    'grave_id': 75,
+    'human_remains_id': 80,
+
+
+
+
+
+
+    'close_match_id': 15,
+    'exact_match_id': 14,
+    'external_match_id': 13,
+    'external_reference_id': 11,
+
+
+
 }

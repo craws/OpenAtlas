@@ -173,7 +173,7 @@ test_code = {'results': [{
          'relations': [{
              'label': 'Height',
              'relationTo':
-                 'http://local.host/api/0.2/entity/{test_ids["height_id"]}',
+                 f'http://local.host/api/0.2/entity/{test_ids["height_id"]}',
              'relationType': 'crm:P2 has type',
              'relationSystemClass': 'type',
              'relationDescription': '23.0',
@@ -193,7 +193,7 @@ test_code = {'results': [{
                      'start': {'earliest': 'None', 'latest': 'None'},
                      'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
              'label': 'Location of Shire',
-             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["shire_id"]}',
+             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["location_shire_id"]}',
              'relationType': 'crm:P53 has former or current location',
              'relationSystemClass': 'object_location',
              'relationDescription': None,
@@ -203,7 +203,7 @@ test_code = {'results': [{
                      'start': {'earliest': 'None', 'latest': 'None'},
                      'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
              'label': 'Place',
-             'relationTo': 'http://local.host/api/0.2/entity/{test_ids["place_id"]}',
+             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["place_id"]}',
              'relationType': 'crm:P2 has type',
              'relationSystemClass': 'type',
              'relationDescription': None,
@@ -236,7 +236,7 @@ test_code = {'results': [{
                      'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
              'label': 'https://lotr.fandom.com/',
              'relationTo':
-                 'http://local.host/api/0.2/entity/{test_ids["lotr_id"]}',
+                 f'http://local.host/api/0.2/entity/{test_ids["lotr_id"]}',
              'relationType': 'crm:P67i is referred to by',
              'relationSystemClass': 'external_reference',
              'relationDescription': 'Fandom Wiki of lord of the rings',
@@ -247,7 +247,7 @@ test_code = {'results': [{
                      'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
              'label': 'Picture with a License',
              'relationTo':
-                 'http://local.host/api/0.2/entity/{test_ids["picture_id"]}',
+                 f'http://local.host/api/0.2/entity/{test_ids["picture_id"]}',
              'relationType': 'crm:P67i is referred to by',
              'relationSystemClass': 'file',
              'relationDescription': None,
@@ -273,5 +273,5 @@ test_code = {'results': [{
     'pagination': {
         'entities': 4,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': {test_ids["home_id"]}}],
+        'index': [{'page': 1, 'startId': test_ids["home_id"]}],
         'totalPages': 1}}

@@ -7,30 +7,36 @@ from config_params import test_ids
 test_node_overview = {'types': [{
     'standard': {
         'Actor actor relation': [
-            {'id': 63, 'url': 'http://local.host/api/0.2/entity/63',
+            {'id': test_ids["economical_id"],
+             'url': f'http://local.host/api/0.2/entity/{test_ids["economical_id"]}',
              'label': 'Economical', 'children': [
-                {'id': 64, 'url': 'http://local.host/api/0.2/entity/64',
+                {'id': test_ids["provider_id"],
+                 'url': f'http://local.host/api/0.2/entity/{test_ids["provider_id"]}',
                  'label': 'Provider of (Customer of)', 'children': []}]},
-            {'id': 54, 'url': 'http://local.host/api/0.2/entity/54',
+            {'id': test_ids["kindredship_id"],
+             'url': f'http://local.host/api/0.2/entity/{test_ids["kindredship_id"]}',
              'label': 'Kindredship', 'children': [
-                {'id': 55, 'url': 'http://local.host/api/0.2/entity/55',
+                {'id': test_ids["parent_id"],
+                 'url': f'http://local.host/api/0.2/entity/{test_ids["parent_id"]}',
                  'label': 'Parent of (Child of)', 'children': []}]},
-            {'id': 60, 'url': 'http://local.host/api/0.2/entity/60',
+            {'id': test_ids["political_id"],
+             'url': f'http://local.host/api/0.2/entity/{test_ids["political_id"]}',
              'label': 'Political', 'children': [
-                {'id': 61, 'url': 'http://local.host/api/0.2/entity/61',
+                {'id': test_ids["ally_id"],
+                 'url': f'http://local.host/api/0.2/entity/{test_ids["ally_id"]}',
                  'label': 'Ally of', 'children': []},
-                {'id': 62, 'url': 'http://local.host/api/0.2/entity/62',
+                {'id':  test_ids["leader_id"], 'url': f'http://local.host/api/0.2/entity/{ test_ids["leader_id"]}',
                  'label': 'Leader of (Retinue of)', 'children': []}]},
-            {'id': 56, 'url': 'http://local.host/api/0.2/entity/56',
+            {'id':  test_ids["social_id"], 'url': f'http://local.host/api/0.2/entity/{ test_ids["social_id"]}',
              'label': 'Social', 'children': [
-                {'id': 58, 'url': 'http://local.host/api/0.2/entity/58',
+                {'id':  test_ids["enemy_id"], 'url': f'http://local.host/api/0.2/entity/{ test_ids["enemy_id"]}',
                  'label': 'Enemy of', 'children': []},
-                {'id': 57, 'url': 'http://local.host/api/0.2/entity/57',
+                {'id':  test_ids["friend_id"], 'url': f'http://local.host/api/0.2/entity/{ test_ids["friend_id"]}',
                  'label': 'Friend of', 'children': []},
-                {'id': 59, 'url': 'http://local.host/api/0.2/entity/59',
+                {'id':  test_ids["mentor_id"], 'url': f'http://local.host/api/0.2/entity/ test_ids["mentor_id"]',
                  'label': 'Mentor of (Student of)', 'children': []}]}],
         'Actor function': [
-            {'id': 18, 'url': 'http://local.host/api/0.2/entity/18',
+            {'id': 18, 'url': 'http://local.host/api/0.2/entity/18', # todo: further and further
              'label': 'Abbot', 'children': []},
             {'id': 17, 'url': 'http://local.host/api/0.2/entity/17',
              'label': 'Bishop', 'children': []},

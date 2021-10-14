@@ -4,6 +4,10 @@ import sys
 sys.path.append(os.path.dirname(__file__))
 from config_params import test_ids
 
+
+# todo: further
+
+
 test_query = {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection',

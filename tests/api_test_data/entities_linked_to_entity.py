@@ -31,7 +31,7 @@ test_entities_linked_to = {'results': [{
                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
             'label': 'File without license',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["file_eithout_id"]}',
+                f'http://local.host/api/0.2/entity/{test_ids["file_without_id"]}',
             'relationType': 'crm:P67i is referred to by',
             'relationSystemClass': 'file',
             'relationDescription': None,
@@ -67,7 +67,7 @@ test_entities_linked_to = {'results': [{
         'geometry': None,
         'depictions': [{
             '@id':
-                'http://local.host/api/0.2/entity/{test_ids["file_without_id"]}',
+                f'http://local.host/api/0.2/entity/{test_ids["file_without_id"]}',
             'title': 'File without license',
             'license': None,
             'url': 'N/A'}]}]}, {
@@ -99,7 +99,7 @@ test_entities_linked_to = {'results': [{
                         'earliest': '2019-01-31',
                         'latest': '2019-03-01'}}]}},
             {'label': 'Travel to Mordor',
-             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["mordor_id"]}',
+             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["travel_id"]}',
              'relationType': 'crm:P7i witnessed',
              'relationSystemClass': 'activity',
              'relationDescription': None,
@@ -133,7 +133,7 @@ test_entities_linked_to = {'results': [{
         'relations': [{
             'label': 'Frodo',
             'relationTo':
-                'http://local.host/api/0.2/entity/{test_ids["frodo_id"]}',
+                f'http://local.host/api/0.2/entity/{test_ids["frodo_id"]}',
             'relationType': 'crm:OA7 has relationship to',
             'relationSystemClass': 'person',
             'relationDescription': None,
@@ -160,5 +160,5 @@ test_entities_linked_to = {'results': [{
     'pagination': {
         'entities': 3,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': {test_ids["frodo_id"]}}],
+        'index': [{'page': 1, 'startId': test_ids["frodo_id"]}],
         'totalPages': 1}}

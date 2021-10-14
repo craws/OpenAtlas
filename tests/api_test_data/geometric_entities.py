@@ -13,7 +13,7 @@ test_geometric_entity = {
             'id': 1,
             'name': '',
             'description': '',
-            'objectId': {test_ids["shire_id"]},
+            'objectId': test_ids["shire_id"],
             'objectDescription': 'The Shire was the homeland of the hobbits.',
             'objectName': 'Shire',
             'objectType': None,

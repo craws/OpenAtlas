@@ -44,7 +44,7 @@ test_latest = {'results': [{
             'hierarchy': 'Place', 'value': None, 'unit': None}],
         'relations': [{
             'label': 'Boundary Mark',
-            'relationTo': 'http://local.host/api/0.2/entity/{test_ids["boundary_id"]}',
+            'relationTo': f'http://local.host/api/0.2/entity/{test_ids["boundary_id"]}',
             'relationType': 'crm:P2 has type',
             'relationSystemClass': 'type',
             'relationDescription': None,
@@ -71,5 +71,5 @@ test_latest = {'results': [{
     'pagination': {
         'entities': 2,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': {test_ids["silmarillion_id"]}}],
+        'index': [{'page': 1, 'startId': test_ids["silmarillion_id"]}],
         'totalPages': 1}}

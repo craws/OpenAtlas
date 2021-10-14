@@ -146,7 +146,7 @@ test_geojson = {
             'title': '',
             'description': ''},
         'properties': {
-            '@id': {test_ids["shire_id"]},
+            '@id': test_ids["shire_id"],
             'systemClass': 'place',
             'name': 'Shire',
             'description': 'The Shire was the homeland of the hobbits.',
