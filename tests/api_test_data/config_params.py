@@ -40,6 +40,17 @@ test_ids = {
 
 
     'actor_function_id': 16,
+'abbot_id': 18,
+    'bishop_id': 17,
+    'count_id': 21,
+    'emperor_id': 20,
+    'king_id': 22,
+    'pope_id': 19,
+
+
+    'coin_id': 24,
+
+
     'actor_r_id': 53,
     'economical_id': 63,
     'provider_id': 64,
@@ -59,14 +70,12 @@ test_ids = {
 
 
 
-    'abbot_id': 18,
-    'bishop_id': 17,
-    'emperor_id': 20,
-    'count_id': 21,
+
+
+
+
     'creator_id': 27,
     'deposit_id': 79,
-    'pope_id': 19,
-    'king_id': 22,
 
     'article_id': 5,
     'artifact_id': 23,
@@ -101,7 +110,6 @@ test_ids = {
     'open_license_id': 49,
     'proprietary_id': 48,
     'change_id': 35,
-    'coin_id': 24,
     'conflict_id': 39,
     'sale_id': 37,
     'contract_id': 46,
