@@ -38,7 +38,7 @@ test_node_overview = {'types': [{
                 'url': f'http://local.host/api/0.2/entity/{test_ids["friend_id"]}',
                 'label': 'Friend of', 'children': []}, {
                 'id': test_ids["mentor_id"],
-                'url': f'http://local.host/api/0.2/entity/ test_ids["mentor_id"]',
+                'url': f'http://local.host/api/0.2/entity/{test_ids["mentor_id"]}',
                 'label': 'Mentor of (Student of)', 'children': []}]}],
         'Actor function': [{
             'id': test_ids["abbot_id"],
@@ -217,11 +217,11 @@ test_node_overview = {'types': [{
                 'id': test_ids["wien_id"],
                 'url': f'http://local.host/api/0.2/entity/{test_ids["wien_id"]}',
                 'label': 'Wien', 'children': []}]}, {
+            'id': test_ids["czech_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["czech_id"]}',
+            'label': 'Czech Republic', 'children': []}, {
             'id': test_ids["germany_id"],
             'url': f'http://local.host/api/0.2/entity/{test_ids["germany_id"]}',
-            'label': 'Czech Republic', 'children': []}, {
-            'id': test_ids["leader_id"],
-            'url': f'http://local.host/api/0.2/entity/{test_ids["social_id"]}',
             'label': 'Germany', 'children': []}, {
             'id': test_ids["italy_id"],
             'url': f'http://local.host/api/0.2/entity/{test_ids["italy_id"]}',
@@ -261,12 +261,12 @@ test_node_overview = {'types': [{
             'url': f'http://local.host/api/0.2/entity/{test_ids["translation_id"]}',
             'label': 'Translation', 'children': []}, {
             'id': test_ids["transliteration_id"],
-            'url': f'http://local.host/api/0.2/entity/{test_ids["transliteration_id"]}0',
+            'url': f'http://local.host/api/0.2/entity/{test_ids["transliteration_id"]}',
             'label': 'Transliteration', 'children': []}]},
     'value': {
         'Dimensions': [{
             'id': test_ids["height_id"],
-            'url': f'http://local.host/api/0.2/entity/{test_ids["height_id"]}2',
+            'url': f'http://local.host/api/0.2/entity/{test_ids["height_id"]}',
             'label': 'Height', 'children': []}, {
             'id': test_ids["weight_id"],
             'url': f'http://local.host/api/0.2/entity/{test_ids["weight_id"]}',
