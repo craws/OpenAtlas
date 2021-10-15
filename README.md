@@ -30,13 +30,17 @@ Please refer to [install.md](install.md) for requirements and installation.
 **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
 
-**Bernhard Koschiček-Krombholz** - Software Development
+**Bernhard Koschiček-Krombholz** - Software Development, API
+([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 
 **Christoph Hoffmann** - Frontend Development
+([christoph.hoffmann@oeaw.ac.at](mailto:christoph.hoffmann@oeaw.ac.at))
 
 **Nina Brundke** - Bioarchaeological Expertise
+([nina.brundke@oeaw.ac.at](mailto:nina.brundke@oeaw.ac.at))
 
 **Jan Belik** - Logo Design and Design Consulting
+([buero@janbelik.com](mailto:buero@janbelik.com))
 
 # Licensing
 

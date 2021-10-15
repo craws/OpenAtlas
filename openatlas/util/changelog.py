@@ -8,11 +8,16 @@ class Changelog:
                 '1562': 'Update manual overlay',
                 '1184': 'API: add additional output format RDFS',
                 '1551':
-                    'API: Relation type adaptions, adding relationDescription'},
+                    'API: Relation type adaptions, adding relationDescription',
+                '1561': 'Refactor'},
             'fix': {
                 '1557': 'Save buttons blocked by map',
                 '1580': 'Hidden error messages for reference systems',
-                '1570': 'API: Wrong type signature in OpenApi',}}],
+                '1570': 'API: Wrong type signature in OpenApi'}}],
+        '6.4.1': ['2021-08-11', {
+            'fix': {
+                '1559':
+                    'Installation problem because of missing upload folder'}}],
         '6.4.0': ['2021-08-10', {
             'feature': {
                 '1280': 'Picture Preview',
@@ -22,6 +27,7 @@ class Changelog:
                 '1531': 'Map overlay improved',
                 '1523': 'Performance issues while linking pictures',
                 '1558': 'Manual entry profession',
+                '1536': 'Refactor',
                 '1426': 'API: Display image smaller size',
                 '1495': 'API: Additional Geojson output for QGIS imports',
                 '1529': 'API: Increase request performance',
@@ -40,8 +46,10 @@ class Changelog:
                 '1527': 'Improved tab system',
                 '1502': 'Show count of finds when entering additional',
                 '1509': 'Manual - examples for use cases',
+                '1512': 'Refactor',
                 '1478': 'API: latest with pagination',
-                '1516': 'API: implement Google JSON style'},
+                '1516': 'API: implement Google JSON style',
+                '1526': 'API: Refactor'},
             'fix': {
                 '1515': 'API: Paging count faulty'}}],
         '6.2.1': ['2021-05-12', {
@@ -53,7 +61,9 @@ class Changelog:
                 '1284': 'Show image when editing a place or artifact',
                 '1428': 'Configuration of frontend site name',
                 '1476': 'Show/hide button for multiple reference systems',
-                '1496': 'API: Endpoints for entities of type'}}],
+                '1494': 'Refactor',
+                '1496': 'API: Endpoints for entities of type',
+                '1490': 'API: Refactor'}}],
         '6.1.0': ['2021-04-05', {
             'feature': {
                 '1215': 'Time spans for types',
@@ -80,7 +90,8 @@ class Changelog:
                 '1274': 'API: Automatic documentation for code',
                 '1390': 'API: Swagger file in OpenAtlas repository',
                 '1479': 'API: get by view name and system class',
-                '1484': 'API: Add new functions'},
+                '1484': 'API: Add new functions',
+                '1447': 'Refactor'},
             'fix': {
                 '1477': 'Unable to select an entity with single quote in name',
                 '1452': 'API: "type" is empty if more entities are requested',
@@ -113,7 +124,8 @@ class Changelog:
                 '1350': 'API: Pagination in an extra array',
                 '1375': 'API: Download result of request path',
                 '1401': 'API: file access',
-                '1377': 'API: IP restrictions'},
+                '1377': 'API: IP restrictions',
+                '1348': 'Refactor'},
             'fix': {
                 '1383': 'Map in tab views too big',
                 '1408': 'Link checker broken'}}],
