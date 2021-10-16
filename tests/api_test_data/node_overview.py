@@ -1,168 +1,273 @@
+import os
+import sys
+
+sys.path.append(os.path.dirname(__file__))
+from config_params import test_ids
+
 test_node_overview = {'types': [{
     'standard': {
-        'Actor actor relation': [
-            {'id': 63, 'url': 'http://local.host/api/0.2/entity/63',
-             'label': 'Economical', 'children': [
-                {'id': 64, 'url': 'http://local.host/api/0.2/entity/64',
-                 'label': 'Provider of (Customer of)', 'children': []}]},
-            {'id': 54, 'url': 'http://local.host/api/0.2/entity/54',
-             'label': 'Kindredship', 'children': [
-                {'id': 55, 'url': 'http://local.host/api/0.2/entity/55',
-                 'label': 'Parent of (Child of)', 'children': []}]},
-            {'id': 60, 'url': 'http://local.host/api/0.2/entity/60',
-             'label': 'Political', 'children': [
-                {'id': 61, 'url': 'http://local.host/api/0.2/entity/61',
-                 'label': 'Ally of', 'children': []},
-                {'id': 62, 'url': 'http://local.host/api/0.2/entity/62',
-                 'label': 'Leader of (Retinue of)', 'children': []}]},
-            {'id': 56, 'url': 'http://local.host/api/0.2/entity/56',
-             'label': 'Social', 'children': [
-                {'id': 58, 'url': 'http://local.host/api/0.2/entity/58',
-                 'label': 'Enemy of', 'children': []},
-                {'id': 57, 'url': 'http://local.host/api/0.2/entity/57',
-                 'label': 'Friend of', 'children': []},
-                {'id': 59, 'url': 'http://local.host/api/0.2/entity/59',
-                 'label': 'Mentor of (Student of)', 'children': []}]}],
-        'Actor function': [
-            {'id': 18, 'url': 'http://local.host/api/0.2/entity/18',
-             'label': 'Abbot', 'children': []},
-            {'id': 17, 'url': 'http://local.host/api/0.2/entity/17',
-             'label': 'Bishop', 'children': []},
-            {'id': 21, 'url': 'http://local.host/api/0.2/entity/21',
-             'label': 'Count', 'children': []},
-            {'id': 20, 'url': 'http://local.host/api/0.2/entity/20',
-             'label': 'Emperor', 'children': []},
-            {'id': 22, 'url': 'http://local.host/api/0.2/entity/22',
-             'label': 'King', 'children': []},
-            {'id': 19, 'url': 'http://local.host/api/0.2/entity/19',
-             'label': 'Pope', 'children': []}], 'Artifact': [
-            {'id': 24, 'url': 'http://local.host/api/0.2/entity/24',
-             'label': 'Coin', 'children': []},
-            {'id': 25, 'url': 'http://local.host/api/0.2/entity/25',
-             'label': 'Statue', 'children': []}], 'Bibliography': [
-            {'id': 5, 'url': 'http://local.host/api/0.2/entity/5',
-             'label': 'Article', 'children': []},
-            {'id': 6, 'url': 'http://local.host/api/0.2/entity/6',
-             'label': 'Book', 'children': []},
-            {'id': 4, 'url': 'http://local.host/api/0.2/entity/4',
-             'label': 'Inbook', 'children': []}], 'Edition': [
-            {'id': 8, 'url': 'http://local.host/api/0.2/entity/8',
-             'label': 'Charter Edition', 'children': []},
-            {'id': 10, 'url': 'http://local.host/api/0.2/entity/10',
-             'label': 'Chronicle Edition', 'children': []},
-            {'id': 9, 'url': 'http://local.host/api/0.2/entity/9',
-             'label': 'Letter Edition', 'children': []}], 'Event': [
-            {'id': 35, 'url': 'http://local.host/api/0.2/entity/35',
-             'label': 'Change of Property', 'children': [
-                {'id': 36, 'url': 'http://local.host/api/0.2/entity/36',
-                 'label': 'Donation', 'children': []},
-                {'id': 38, 'url': 'http://local.host/api/0.2/entity/38',
-                 'label': 'Exchange', 'children': []},
-                {'id': 37, 'url': 'http://local.host/api/0.2/entity/37',
-                 'label': 'Sale', 'children': []}]},
-            {'id': 39, 'url': 'http://local.host/api/0.2/entity/39',
-             'label': 'Conflict', 'children': [
-                {'id': 40, 'url': 'http://local.host/api/0.2/entity/40',
-                 'label': 'Battle', 'children': []},
-                {'id': 41, 'url': 'http://local.host/api/0.2/entity/41',
-                 'label': 'Raid', 'children': []}]}], 'External reference': [
-            {'id': 12, 'url': 'http://local.host/api/0.2/entity/12',
-             'label': 'Link', 'children': []}], 'External reference match': [
-            {'id': 15, 'url': 'http://local.host/api/0.2/entity/15',
-             'label': 'close match', 'children': []},
-            {'id': 14, 'url': 'http://local.host/api/0.2/entity/14',
-             'label': 'exact match', 'children': []}], 'Feature': [
-            {'id': 75, 'url': 'http://local.host/api/0.2/entity/75',
-             'label': 'Grave', 'children': []},
-            {'id': 76, 'url': 'http://local.host/api/0.2/entity/76',
-             'label': 'Pit', 'children': []}], 'Human remains': [
-            {'id': 82, 'url': 'http://local.host/api/0.2/entity/82',
-             'label': 'Lower Body', 'children': []},
-            {'id': 81, 'url': 'http://local.host/api/0.2/entity/81',
-             'label': 'Upper Body', 'children': []}], 'Involvement': [
-            {'id': 27, 'url': 'http://local.host/api/0.2/entity/27',
-             'label': 'Creator', 'children': []},
-            {'id': 30, 'url': 'http://local.host/api/0.2/entity/30',
-             'label': 'Offender', 'children': []},
-            {'id': 28, 'url': 'http://local.host/api/0.2/entity/28',
-             'label': 'Sponsor', 'children': []},
-            {'id': 29, 'url': 'http://local.host/api/0.2/entity/29',
-             'label': 'Victim', 'children': []}], 'License': [
-            {'id': 49, 'url': 'http://local.host/api/0.2/entity/49',
-             'label': 'Open license', 'children': [
-                {'id': 52, 'url': 'http://local.host/api/0.2/entity/52',
-                 'label': 'CC BY-SA 4.0', 'children': []},
-                {'id': 51, 'url': 'http://local.host/api/0.2/entity/51',
-                 'label': 'CC BY 4.0', 'children': []},
-                {'id': 50, 'url': 'http://local.host/api/0.2/entity/50',
-                 'label': 'Public domain', 'children': []}]},
-            {'id': 48, 'url': 'http://local.host/api/0.2/entity/48',
-             'label': 'Proprietary license', 'children': []}], 'Place': [
-            {'id': 72, 'url': 'http://local.host/api/0.2/entity/72',
-             'label': 'Boundary Mark', 'children': []},
-            {'id': 69, 'url': 'http://local.host/api/0.2/entity/69',
-             'label': 'Burial Site', 'children': []},
-            {'id': 71, 'url': 'http://local.host/api/0.2/entity/71',
-             'label': 'Economic Site', 'children': []},
-            {'id': 70, 'url': 'http://local.host/api/0.2/entity/70',
-             'label': 'Infrastructure', 'children': []},
-            {'id': 67, 'url': 'http://local.host/api/0.2/entity/67',
-             'label': 'Military Facility', 'children': []},
-            {'id': 68, 'url': 'http://local.host/api/0.2/entity/68',
-             'label': 'Ritual Site', 'children': []},
-            {'id': 66, 'url': 'http://local.host/api/0.2/entity/66',
-             'label': 'Settlement', 'children': []},
-            {'id': 73, 'url': 'http://local.host/api/0.2/entity/73',
-             'label': 'Topographical Entity', 'children': []}], 'Source': [
-            {'id': 43, 'url': 'http://local.host/api/0.2/entity/43',
-             'label': 'Charter', 'children': []},
-            {'id': 46, 'url': 'http://local.host/api/0.2/entity/46',
-             'label': 'Contract', 'children': []},
-            {'id': 45, 'url': 'http://local.host/api/0.2/entity/45',
-             'label': 'Letter', 'children': []},
-            {'id': 44, 'url': 'http://local.host/api/0.2/entity/44',
-             'label': 'Testament', 'children': []}], 'Stratigraphic unit': [
-            {'id': 78, 'url': 'http://local.host/api/0.2/entity/78',
-             'label': 'Burial', 'children': []},
-            {'id': 79, 'url': 'http://local.host/api/0.2/entity/79',
-             'label': 'Deposit', 'children': []}]}, 'places': {
-        'Administrative unit': [
-            {'id': 84, 'url': 'http://local.host/api/0.2/entity/84',
-             'label': 'Austria', 'children': [
-                {'id': 86, 'url': 'http://local.host/api/0.2/entity/86',
-                 'label': 'Niederösterreich', 'children': []},
-                {'id': 85, 'url': 'http://local.host/api/0.2/entity/85',
-                 'label': 'Wien', 'children': []}]},
-            {'id': 89, 'url': 'http://local.host/api/0.2/entity/89',
-             'label': 'Czech Republic', 'children': []},
-            {'id': 87, 'url': 'http://local.host/api/0.2/entity/87',
-             'label': 'Germany', 'children': []},
-            {'id': 88, 'url': 'http://local.host/api/0.2/entity/88',
-             'label': 'Italy', 'children': []},
-            {'id': 90, 'url': 'http://local.host/api/0.2/entity/90',
-             'label': 'Slovakia', 'children': []},
-            {'id': 91, 'url': 'http://local.host/api/0.2/entity/91',
-             'label': 'Slovenia', 'children': []}], 'Historical place': [
-            {'id': 93, 'url': 'http://local.host/api/0.2/entity/93',
-             'label': 'Carantania', 'children': []},
-            {'id': 95, 'url': 'http://local.host/api/0.2/entity/95',
-             'label': 'Comitatus Iauntal', 'children': []},
-            {'id': 96, 'url': 'http://local.host/api/0.2/entity/96',
-             'label': 'Kingdom of Serbia', 'children': []},
-            {'id': 94, 'url': 'http://local.host/api/0.2/entity/94',
-             'label': 'Marcha Orientalis', 'children': []}]}, 'custom': {
-        'Sex': [{'id': 32, 'url': 'http://local.host/api/0.2/entity/32',
-                 'label': 'Female', 'children': []},
-                {'id': 33, 'url': 'http://local.host/api/0.2/entity/33',
-                 'label': 'Male', 'children': []}], 'Source translation': [
-            {'id': 98, 'url': 'http://local.host/api/0.2/entity/98',
-             'label': 'Original Text', 'children': []},
-            {'id': 99, 'url': 'http://local.host/api/0.2/entity/99',
-             'label': 'Translation', 'children': []},
-            {'id': 100, 'url': 'http://local.host/api/0.2/entity/100',
-             'label': 'Transliteration', 'children': []}]}, 'value': {
-        'Dimensions': [
-            {'id': 102, 'url': 'http://local.host/api/0.2/entity/102',
-             'label': 'Height', 'children': []},
-            {'id': 103, 'url': 'http://local.host/api/0.2/entity/103',
-             'label': 'Weight', 'children': []}]}}]}
+        'Actor actor relation': [{
+            'id': test_ids["economical_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["economical_id"]}',
+            'label': 'Economical', 'children': [{
+                'id': test_ids["provider_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["provider_id"]}',
+                'label': 'Provider of (Customer of)', 'children': []}]}, {
+            'id': test_ids["kindredship_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["kindredship_id"]}',
+            'label': 'Kindredship', 'children': [{
+                'id': test_ids["parent_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["parent_id"]}',
+                'label': 'Parent of (Child of)', 'children': []}]}, {
+            'id': test_ids["political_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["political_id"]}',
+            'label': 'Political', 'children': [{
+                'id': test_ids["ally_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["ally_id"]}',
+                'label': 'Ally of', 'children': []}, {
+                'id': test_ids["leader_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["leader_id"]}',
+                'label': 'Leader of (Retinue of)', 'children': []}]}, {
+            'id': test_ids["social_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["social_id"]}',
+            'label': 'Social', 'children': [{
+                'id': test_ids["enemy_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["enemy_id"]}',
+                'label': 'Enemy of', 'children': []}, {
+                'id': test_ids["friend_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["friend_id"]}',
+                'label': 'Friend of', 'children': []}, {
+                'id': test_ids["mentor_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["mentor_id"]}',
+                'label': 'Mentor of (Student of)', 'children': []}]}],
+        'Actor function': [{
+            'id': test_ids["abbot_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["abbot_id"]}',
+            'label': 'Abbot', 'children': []}, {
+            'id': test_ids["bishop_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["bishop_id"]}',
+            'label': 'Bishop', 'children': []}, {
+            'id': test_ids["count_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["count_id"]}',
+            'label': 'Count', 'children': []}, {
+            'id': test_ids["emperor_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["emperor_id"]}',
+            'label': 'Emperor', 'children': []}, {
+            'id': test_ids["king_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["king_id"]}',
+            'label': 'King', 'children': []}, {
+            'id': test_ids["pope_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["pope_id"]}',
+            'label': 'Pope', 'children': []}],
+        'Artifact': [{
+            'id': test_ids["coin_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["coin_id"]}',
+            'label': 'Coin', 'children': []}, {
+            'id': test_ids["statue_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["statue_id"]}',
+            'label': 'Statue', 'children': []}],
+        'Bibliography': [{
+            'id': test_ids["article_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["article_id"]}',
+            'label': 'Article', 'children': []}, {
+            'id': test_ids["book_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["book_id"]}',
+            'label': 'Book', 'children': []}, {
+            'id': test_ids["inbook_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["inbook_id"]}',
+            'label': 'Inbook', 'children': []}],
+        'Edition': [{
+            'id': test_ids["charter_edition_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["charter_edition_id"]}',
+            'label': 'Charter Edition', 'children': []}, {
+            'id': test_ids["chronicle_edition_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["chronicle_edition_id"]}',
+            'label': 'Chronicle Edition', 'children': []}, {
+            'id': test_ids["letter_edition_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["letter_edition_id"]}',
+            'label': 'Letter Edition', 'children': []}],
+        'Event': [{
+            'id': test_ids["change_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["change_id"]}',
+            'label': 'Change of Property', 'children': [{
+                'id': test_ids["donation_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["donation_id"]}',
+                'label': 'Donation', 'children': []}, {
+                'id': test_ids["exchange_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["exchange_id"]}',
+                'label': 'Exchange', 'children': []}, {
+                'id': test_ids["sale_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["sale_id"]}',
+                'label': 'Sale', 'children': []}]}, {
+            'id': test_ids["conflict_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["conflict_id"]}',
+            'label': 'Conflict', 'children': [{
+                'id': test_ids["battle_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["battle_id"]}',
+                'label': 'Battle', 'children': []}, {
+                'id': test_ids["raid_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["raid_id"]}',
+                'label': 'Raid', 'children': []}]}],
+        'External reference': [{
+            'id': test_ids["link_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["link_id"]}',
+            'label': 'Link', 'children': []}],
+        'External reference match': [{
+            'id': test_ids["close_match_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["close_match_id"]}',
+            'label': 'close match', 'children': []}, {
+            'id': test_ids["exact_match_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["exact_match_id"]}',
+            'label': 'exact match', 'children': []}],
+        'Feature': [{
+            'id': test_ids["grave_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["grave_id"]}',
+            'label': 'Grave', 'children': []}, {
+            'id': test_ids["pit_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["pit_id"]}',
+            'label': 'Pit', 'children': []}],
+        'Human remains': [{
+            'id': test_ids["lower_body_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["lower_body_id"]}',
+            'label': 'Lower Body', 'children': []}, {
+            'id': test_ids["upper_body_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["upper_body_id"]}',
+            'label': 'Upper Body', 'children': []}],
+        'Involvement': [{
+            'id': test_ids["creator_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["creator_id"]}',
+            'label': 'Creator', 'children': []}, {
+            'id': test_ids["offender_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["offender_id"]}',
+            'label': 'Offender', 'children': []}, {
+            'id': test_ids["sponsor_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["sponsor_id"]}',
+            'label': 'Sponsor', 'children': []}, {
+            'id': test_ids["victim_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["victim_id"]}',
+            'label': 'Victim', 'children': []}],
+        'License': [{
+            'id': test_ids["open_license_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["open_license_id"]}',
+            'label': 'Open license', 'children': [{
+                'id': test_ids["cc_by_sa_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["cc_by_sa_id"]}',
+                'label': 'CC BY-SA 4.0', 'children': []}, {
+                'id': test_ids["cc_by_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["cc_by_id"]}',
+                'label': 'CC BY 4.0', 'children': []}, {
+                'id': test_ids["public_domain_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["public_domain_id"]}',
+                'label': 'Public domain', 'children': []}]}, {
+            'id': test_ids["proprietary_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["proprietary_id"]}',
+            'label': 'Proprietary license', 'children': []}],
+        'Place': [{
+            'id': test_ids["boundary_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["boundary_id"]}',
+            'label': 'Boundary Mark', 'children': []}, {
+            'id': test_ids["burial_site_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["burial_site_id"]}',
+            'label': 'Burial Site', 'children': []}, {
+            'id': test_ids["economic_site_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["economic_site_id"]}',
+            'label': 'Economic Site', 'children': []}, {
+            'id': test_ids["infrastructure_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["infrastructure_id"]}',
+            'label': 'Infrastructure', 'children': []}, {
+            'id': test_ids["military_facility_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["military_facility_id"]}',
+            'label': 'Military Facility', 'children': []}, {
+            'id': test_ids["ritual_site_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["ritual_site_id"]}',
+            'label': 'Ritual Site', 'children': []}, {
+            'id': test_ids["settlement_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["settlement_id"]}',
+            'label': 'Settlement', 'children': []}, {
+            'id': test_ids["topographical_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["topographical_id"]}',
+            'label': 'Topographical Entity', 'children': []}],
+        'Source': [{
+            'id': test_ids["charter_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["charter_id"]}',
+            'label': 'Charter', 'children': []}, {
+            'id': test_ids["contract_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["contract_id"]}',
+            'label': 'Contract', 'children': []}, {
+            'id': test_ids["letter_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["letter_id"]}',
+            'label': 'Letter', 'children': []}, {
+            'id': test_ids["testament_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["testament_id"]}',
+            'label': 'Testament', 'children': []}],
+        'Stratigraphic unit': [{
+            'id': test_ids["burial_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["burial_id"]}',
+            'label': 'Burial', 'children': []}, {
+            'id': test_ids["deposit_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["deposit_id"]}',
+            'label': 'Deposit', 'children': []}]}, 'places': {
+        'Administrative unit': [{
+            'id': test_ids["austria_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["austria_id"]}',
+            'label': 'Austria', 'children': [{
+                'id': test_ids["nieder_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["nieder_id"]}',
+                'label': 'Niederösterreich', 'children': []}, {
+                'id': test_ids["wien_id"],
+                'url': f'http://local.host/api/0.2/entity/{test_ids["wien_id"]}',
+                'label': 'Wien', 'children': []}]}, {
+            'id': test_ids["czech_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["czech_id"]}',
+            'label': 'Czech Republic', 'children': []}, {
+            'id': test_ids["germany_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["germany_id"]}',
+            'label': 'Germany', 'children': []}, {
+            'id': test_ids["italy_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["italy_id"]}',
+            'label': 'Italy', 'children': []}, {
+            'id': test_ids["slovakia_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["slovakia_id"]}',
+            'label': 'Slovakia', 'children': []}, {
+            'id': test_ids["slovenia_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["slovenia_id"]}',
+            'label': 'Slovenia', 'children': []}],
+        'Historical place': [{
+            'id': test_ids["carantinia_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["carantinia_id"]}',
+            'label': 'Carantania', 'children': []}, {
+            'id': test_ids["comitatus_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["comitatus_id"]}',
+            'label': 'Comitatus Iauntal', 'children': []}, {
+            'id': test_ids["serbia_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["serbia_id"]}',
+            'label': 'Kingdom of Serbia', 'children': []}, {
+            'id': test_ids["marcha_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["marcha_id"]}',
+            'label': 'Marcha Orientalis', 'children': []}]},
+    'custom': {
+        'Sex': [{
+            'id': test_ids["female_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["female_id"]}',
+            'label': 'Female', 'children': []}, {
+            'id': test_ids["male_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["male_id"]}',
+            'label': 'Male', 'children': []}],
+        'Source translation': [{
+            'id': test_ids["original_text_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["original_text_id"]}',
+            'label': 'Original Text', 'children': []}, {
+            'id': test_ids["translation_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["translation_id"]}',
+            'label': 'Translation', 'children': []}, {
+            'id': test_ids["transliteration_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["transliteration_id"]}',
+            'label': 'Transliteration', 'children': []}]},
+    'value': {
+        'Dimensions': [{
+            'id': test_ids["height_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["height_id"]}',
+            'label': 'Height', 'children': []}, {
+            'id': test_ids["weight_id"],
+            'url': f'http://local.host/api/0.2/entity/{test_ids["weight_id"]}',
+            'label': 'Weight', 'children': []}]}}]}
