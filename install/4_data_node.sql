@@ -323,7 +323,6 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write
     ('actor_appellation',    'E82', false, 'contributor', NULL,      NULL),
     ('actor_actor_relation', NULL,  false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor actor relation' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('actor_function',       NULL,  false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor function' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('administrative_unit',  'E53', false, 'contributor', NULL,      NULL),
     ('appellation',          'E41', false, 'contributor', NULL,      NULL),
     ('artifact',             'E22', false, 'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('bibliography',         'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -342,8 +341,7 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write
     ('reference_system',     'E32', false, 'manager',     NULL,      NULL),
     ('source',               'E33', false, 'contributor', '#FFA500', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('source_translation',   'E33', false, 'contributor', NULL,      NULL),
-    ('stratigraphic_unit',   'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('type',                 'E55', false, 'editor',      NULL,      NULL);
+    ('stratigraphic_unit',   'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
 
 -- External Reference Systems
 INSERT INTO model.entity (name, cidoc_class_code, description, openatlas_class_name) VALUES
