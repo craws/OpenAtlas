@@ -759,7 +759,7 @@ ALTER SEQUENCE model.link_id_seq OWNED BY model.link.id;
 CREATE TABLE model.openatlas_class (
     id integer NOT NULL,
     name text NOT NULL,
-    cidoc_class_code text NOT NULL,
+    cidoc_class_code text,
     standard_type_id integer,
     alias_possible boolean DEFAULT false,
     write_access_group_name text,
@@ -2664,3 +2664,4 @@ ALTER TABLE ONLY web.user_settings
 --
 -- PostgreSQL database dump complete
 --
+
