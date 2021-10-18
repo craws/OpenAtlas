@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="row">
-        <div class="col">
-            <div class="toolbar">
-                {{ ('entity/' + class_)|manual }}
-                {% for button in buttons %}
-                    {{ button }}
-                {% endfor %}
-            </div>
-            {{ table.display() }}
-        </div>
-        {% if gis_data %}
-            <div class="col">
-                <div id="map"></div>
-            </div>
-        {% endif %}
+  <div class="row">
+    <div class="col">
+      <div class="toolbar">
+        {{ ('entity/' + class_)|manual }}
+        {% for button in buttons %}
+          {{ button }}
+        {% endfor %}
+      </div>
+      {{ table.display() }}
     </div>
-    {% if class_ == 'place' %}
-        <script src="/static/js/map/map.js"></script>
+    {% if gis_data %}
+      <div class="col">
+        <div id="map"></div>
+      </div>
     {% endif %}
+  </div>
+  {% if class_ == 'place' %}
+    <script src="/static/js/map/map.js"></script>
+  {% endif %}
 {% endblock %}
