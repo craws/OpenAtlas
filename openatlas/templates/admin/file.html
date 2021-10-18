@@ -1,37 +1,37 @@
 <div style="float:left;">
-    {% for dir, value in writeable_dirs.items() %}
-        {% if not value %}
-            <p>
-                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
-            </p>
-        {% endif %}
-    {% endfor %}
-    {{ info|display_info }}
-    {% if disk_space_info %}
-        <div id="disk-size"></div>
-        <p>
-            {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
-            {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
-        </p>
-        <script>
-            $( function() {
-                $("#disk-size").progressbar({
-                    value: {{ disk_space_info.percent }}
-                });
-            });
-        </script>
+  {% for dir, value in writeable_dirs.items() %}
+    {% if not value %}
+      <p>
+        <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
+      </p>
     {% endif %}
+  {% endfor %}
+  {{ info|display_info }}
+  {% if disk_space_info %}
+    <div id="disk-size"></div>
+    <p>
+      {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
+      {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
+    </p>
+    <script>
+      $(function() {
+        $("#disk-size").progressbar({
+            value: {{ disk_space_info.percent }}
+        });
+      });
+    </script>
+  {% endif %}
 </div>
 {% if 'manager'|is_authorized %}
-    <div style="float:left;margin-left:2em;">
-        <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
-        <div class="toolbar">
-            {% if settings.logo_file_id %}
-                {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
-            {% else %}
-                {{  _('choose custom logo')|button(url_for('admin_logo')) }}
-            {% endif %}
-        </div>
+  <div style="float:left;margin-left:2em;">
+    <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+    <div class="toolbar">
+      {% if settings.logo_file_id %}
+        {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
+      {% else %}
+        {{ _('choose custom logo')|button(url_for('admin_logo')) }}
+      {% endif %}
     </div>
+  </div>
 {% endif %}
 <div style="clear:both;"></div>
