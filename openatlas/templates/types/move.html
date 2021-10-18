@@ -1,24 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
-    <form class="table" id="checkbox-form" method="post">
-        {{ form.csrf_token }}
-        {{ form.checkbox_values }}
-        <p>{{ root.name }} {{ form[root.id|string] }}</p>
-        <div class="toolbar">
-            {{ _('select all')|button(id_='select-all') }}
-            {{ _('deselect all')|button(id_='select-none') }}
-        </div>
-        {{ table.display('move') }}
-        {{ form.save(class_=config.CSS.button.primary) }}
-    </form>
-    <script>
-        $('#select-all').click(function() {
-            var checkboxes = $(this).closest('form').find(':checkbox');
-            checkboxes.prop('checked', true);
-        });
-        $('#select-none').click(function() {
-            var checkboxes = $(this).closest('form').find(':checkbox');
-            checkboxes.prop('checked', false);
-        });
-    </script>
+  <form class="table" id="checkbox-form" method="post">
+    {{ form.csrf_token }}
+    {{ form.checkbox_values }}
+    <p>
+      {{ root.name }} {{ form[root.id|string] }}
+    </p>
+    <div class="toolbar">
+      {{ _('select all')|button(id_='select-all') }}
+      {{ _('deselect all')|button(id_='select-none') }}
+    </div>
+    {{ table.display('move') }}
+    {{ form.save(class_=config.CSS.button.primary) }}
+  </form>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(document).ready(function () {
+      $('#select-all').click(function() {
+        var checkboxes = $(this).closest('form').find(':checkbox');
+        checkboxes.prop('checked', true);
+      });
+      $('#select-none').click(function() {
+        var checkboxes = $(this).closest('form').find(':checkbox');
+        checkboxes.prop('checked', false);
+      });
+    })
+  </script>
 {% endblock %}
