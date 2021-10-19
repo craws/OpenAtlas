@@ -36,12 +36,12 @@ class Latest:
                     'end': {'earliest': 'None', 'latest': 'None'}}]},
             'types': [{
                 'identifier':
-                    f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                    f'http://local.host/api/0.2/entity/{params["boundary_mark_id"]}',
                 'label': 'Boundary Mark', 'description': None,
                 'hierarchy': 'Place', 'value': None, 'unit': None}],
             'relations': [{
                 'label': 'Boundary Mark',
-                'relationTo': f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                'relationTo': f'http://local.host/api/0.2/entity/{params["boundary_mark_id"]}',
                 'relationType': 'crm:P2 has type',
                 'relationSystemClass': 'type',
                 'relationDescription': None,
@@ -52,7 +52,7 @@ class Latest:
                         'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                 'label': 'Location of Mordor',
                 'relationTo':
-                    f'http://local.host/api/entity/{params["location_mordor_id"]}',
+                    f'http://local.host/api/0.2/entity/{params["location_mordor_id"]}',
                 'relationType': 'crm:P53 has former or current location',
                 'relationSystemClass': 'object_location',
                 'relationDescription': None,

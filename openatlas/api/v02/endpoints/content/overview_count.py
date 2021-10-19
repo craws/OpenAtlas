@@ -9,8 +9,8 @@ from openatlas.models.entity import Entity
 
 # Deprecated
 class OverviewCount(Resource):  # type: ignore
-    @staticmethod
-    def get() -> Union[Tuple[Resource, int], Response]:
+
+    def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
             [{'systemClass': name, 'count': count} for name, count in
              Entity.get_overview_counts().items()],

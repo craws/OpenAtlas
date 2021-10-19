@@ -19,7 +19,7 @@ class CidocClass:
                     'relations': [{
                         'label': 'Sam',
                         'relationTo':
-                            f'http://local.host/api/entity/{params["sam_id"]}',
+                            f'http://local.host/api/0.2/entity/{params["sam_id"]}',
                         'relationType': 'crm:OA7 has relationship to',
                         'relationSystemClass': 'person',
                         'relationDescription': None, 'type': 'Economical',
@@ -29,7 +29,7 @@ class CidocClass:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'File without license',
-                        'relationTo': 'http://local.host/api/entity/115',
+                        'relationTo': 'http://local.host/api/0.2/entity/115',
                         'relationType': 'crm:P67i is referred to by',
                         'relationSystemClass': 'file',
                         'relationDescription': None, 'type': None,
@@ -43,7 +43,7 @@ class CidocClass:
                                     'latest': 'None'}}]}}, {
                         'label': 'The One Ring',
                         'relationTo':
-                            f'http://local.host/api/entity/{params["ring_id"]}',
+                            f'http://local.host/api/0.2/entity/{params["ring_id"]}',
                         'relationType': 'crm:P52i is current owner of',
                         'relationSystemClass': 'artifact',
                         'relationDescription': None, 'type': None,
@@ -57,7 +57,7 @@ class CidocClass:
                                     'latest': 'None'}}]}}, {
                         'label': 'Travel to Mordor',
                         'relationTo':
-                            f'http://local.host/api/entity/{params["travel_id"]}',
+                            f'http://local.host/api/0.2/entity/{params["travel_id"]}',
                         'relationType': 'crm:P11i participated in',
                         'relationSystemClass': 'activity',
                         'relationDescription': None, 'type': None,
@@ -73,7 +73,7 @@ class CidocClass:
                     'links': None,
                     'geometry': None,
                     'depictions': [{
-                        '@id': 'http://local.host/api/entity/115',
+                        '@id': 'http://local.host/api/0.2/entity/115',
                         'title': 'File without license',
                         'license': None,
                         'url': 'N/A'}]}]}, {
@@ -98,7 +98,7 @@ class CidocClass:
                     'relations': [{
                         'label': 'Frodo',
                         'relationTo':
-                            f'http://local.host/api/entity/{params["frodo_id"]}',
+                            f'http://local.host/api/0.2/entity/{params["frodo_id"]}',
                         'relationType': 'crm:OA7 has relationship to',
                         'relationSystemClass': 'person',
                         'relationDescription': None,
@@ -110,7 +110,7 @@ class CidocClass:
                                         'latest': 'None'}}]}}, {
                         'label': 'Travel to Mordor',
                         'relationTo':
-                            f'http://local.host/api/entity/{params["travel_id"]}',
+                            f'http://local.host/api/0.2/entity/{params["travel_id"]}',
                         'relationType': 'crm:P14i performed',
                         'relationSystemClass': 'activity',
                         'relationDescription': None,

@@ -3,15 +3,17 @@ from typing import Any, Dict, List, Tuple, Union
 from flask import Response, json, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import gis
+from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.geometries import GeometriesTemplate
 from openatlas.models.gis import Gis
 
 
 class GetGeometricEntities(Resource):  # type: ignore
-    @staticmethod
-    def get() -> Union[int, Response, Tuple[Any, int]]:
+
+    endpoint = "api_02.geometric_entities")
+
+    def get(self) -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
         output = {
             'type': 'FeatureCollection',
@@ -26,6 +28,7 @@ class GetGeometricEntities(Resource):  # type: ignore
         return marshal(output, GeometriesTemplate.geometries_template()), 200
 
     @staticmethod
+
     def get_geometries(parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         choices = [
             'gisPointAll', 'gisPointSupers', 'gisPointSubs',

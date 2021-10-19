@@ -5,7 +5,7 @@ tags:
 description: Retrieves a json with a list of entities, which are linked to the entered entity. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
-    name: linked_entities
+    name: id_
     description: ID must be an entity
     required: true
     schema:
@@ -26,6 +26,8 @@ responses:
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/OutputModel'
+          oneOf:
+            - $ref: '#/components/schemas/OutputModelLPF'
+            - $ref: '#/components/schemas/OutputModelGeojson'
   '404':
     description: Something went wrong. Please consult the error message.

@@ -3,13 +3,12 @@ System Class Count endpoint
 tags:
   - Content
 summary: Provides a count of entities based on the system class
-deprecated: True
 responses:
   '200':
     description: Count of all entities
     content:
       application/ld+json:
         schema:
-          $ref: '#/components/schemas/OverviewCountModel'
+          $ref: '#/components/schemas/SystemClassCountModel'
   '404':
     description: Something went wrong. Please consult the error message.

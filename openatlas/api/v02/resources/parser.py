@@ -25,6 +25,8 @@ language.add_argument(
     choices=app.config['LANGUAGES'].keys())
 
 entity_ = default.copy()
+# Todo: Add a warning and deprecation notice if this is used.
+#  https://docs.python.org/3/library/warnings.html
 entity_.add_argument(
     'sort',
     choices=('desc', 'asc'),
@@ -32,6 +34,8 @@ entity_.add_argument(
     default='asc',
     case_sensitive=False,
     help='{error_msg}. Only "desc" or "asc" will work.')
+# Todo: Add a warning and deprecation notice if this is used.
+#  https://docs.python.org/3/library/warnings.html
 entity_.add_argument(
     'column',
     type=str,
@@ -40,8 +44,25 @@ entity_.add_argument(
     case_sensitive=False,
     help='{error_msg}',
     choices=(
-        'id', 'class_code', 'name', 'description', 'created', 'modified',
-        'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
+        'id',
+        'standard_type',
+        'name',
+        'description',
+        'created',
+        'modified',
+        'cidoc_class',
+        'class_',
+        'begin_from',
+        'begin_to',
+        'begin_comment',
+        'end_from',
+        'end_to',
+        'end_comment',
+        'first',
+        'last'))
+
+# Todo: Add a warning and deprecation notice if this is used.
+#  https://docs.python.org/3/library/warnings.html
 entity_.add_argument(
     'filter',
     type=str,

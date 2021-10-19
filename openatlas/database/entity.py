@@ -74,9 +74,12 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(
-            code: Union[str, List[str]]) -> List[Dict[str, Any]]:
+            code: Union[str, List[str]],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql() + 'WHERE class_code IN %(codes)s;',
+            Entity.build_sql(nodes, aliases) +
+            'WHERE class_code IN %(codes)s GROUP BY e.id;',
             {'codes': tuple(code if isinstance(code, list) else [code])})
         return [dict(row) for row in g.cursor.fetchall()]
 

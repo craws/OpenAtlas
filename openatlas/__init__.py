@@ -30,7 +30,7 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.api.v02 import routes  # New routes
+from openatlas.api import api  # New routes
 from openatlas.util import processor
 from openatlas.util.util import get_file_stats
 from openatlas.views import (

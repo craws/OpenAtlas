@@ -17,7 +17,7 @@ class EntitiesLinked:
                 'types': None,
                 'relations': [{
                     'label': 'Sam',
-                    'relationTo': f'http://local.host/api/entity/{params["sam_id"]}',
+                    'relationTo': f'http://local.host/api/0.2/entity/{params["sam_id"]}',
                     'relationType': 'crm:OA7 has relationship to',
                     'relationSystemClass': 'person',
                     'relationDescription': None,
@@ -28,7 +28,7 @@ class EntitiesLinked:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'File without license',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["file_without_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["file_without_id"]}',
                     'relationType': 'crm:P67i is referred to by',
                     'relationSystemClass': 'file',
                     'relationDescription': None,
@@ -39,7 +39,7 @@ class EntitiesLinked:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'The One Ring',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["ring_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["ring_id"]}',
                     'relationType': 'crm:P52i is current owner of',
                     'relationSystemClass': 'artifact',
                     'relationDescription': None,
@@ -50,7 +50,7 @@ class EntitiesLinked:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Travel to Mordor',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["travel_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["travel_id"]}',
                     'relationType': 'crm:P11i participated in',
                     'relationSystemClass': 'activity',
                     'relationDescription': None,
@@ -64,7 +64,7 @@ class EntitiesLinked:
                 'geometry': None,
                 'depictions': [{
                     '@id':
-                        f'http://local.host/api/entity/{params["file_without_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["file_without_id"]}',
                     'title': 'File without license',
                     'license': None,
                     'url': 'N/A'}]}]}, {
@@ -84,7 +84,7 @@ class EntitiesLinked:
                 'relations': [{
                     'label': 'Shire',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["shire_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["shire_id"]}',
                     'relationType': 'crm:P53i is former or current location of',
                     'relationSystemClass': 'place',
                     'relationDescription': None,
@@ -97,7 +97,7 @@ class EntitiesLinked:
                                 'earliest': '2019-01-31',
                                 'latest': '2019-03-01'}}]}},
                     {'label': 'Travel to Mordor',
-                     'relationTo': f'http://local.host/api/entity/{params["travel_id"]}',
+                     'relationTo': f'http://local.host/api/0.2/entity/{params["travel_id"]}',
                      'relationType': 'crm:P7i witnessed',
                      'relationSystemClass': 'activity',
                      'relationDescription': None,
@@ -131,7 +131,7 @@ class EntitiesLinked:
                 'relations': [{
                     'label': 'Frodo',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["frodo_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["frodo_id"]}',
                     'relationType': 'crm:OA7 has relationship to',
                     'relationSystemClass': 'person',
                     'relationDescription': None,
@@ -142,7 +142,7 @@ class EntitiesLinked:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Travel to Mordor',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["travel_id"]}',
+                        f'http://local.host/api/0.2/entity/{params["travel_id"]}',
                     'relationType': 'crm:P14i performed',
                     'relationSystemClass': 'activity',
                     'relationDescription': None,
