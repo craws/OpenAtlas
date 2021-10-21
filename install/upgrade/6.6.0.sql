@@ -121,9 +121,30 @@ UPDATE web.hierarchy SET category = 'place' WHERE name IN ('Administrative unit'
 ALTER TABLE web.hierarchy DROP standard, DROP value_type, DROP locked;
 
 -- Remodel web.hierarchy_form to web.hierarchy_openatlas_class
--- ALTER TABLE web.hierarchy_form RENAME TO hierarchy_openatlas_class;
--- ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN openatlas_class_id int;
--- UPDATE web.hierarchy_openatlas_class h
---    SET openatlas_class_id = (SELECT c.id FROM model.openatlas_class c WHERE c.name = (SELECT name FROM web.form WHERE id = h.form_id));
+ALTER TABLE web.hierarchy_form RENAME TO hierarchy_openatlas_class;
+ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN openatlas_class_id int;
+UPDATE web.hierarchy_openatlas_class h
+   SET openatlas_class_id =
+    (SELECT c.id FROM model.openatlas_class c WHERE c.name =
+      (SELECT name FROM web.form WHERE id = h.form_id));
+ALTER TABLE web.hierarchy_openatlas_class DROP COLUMN form_id;
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key
+    UNIQUE (hierarchy_id, openatlas_class_id);
+
+-- Remodel web.reference_system_form to web.reference_system_openatlas_class
+ALTER TABLE web.reference_system_form RENAME TO reference_system_openatlas_class;
+ALTER TABLE web.reference_system_openatlas_class ADD COLUMN openatlas_class_id int;
+UPDATE web.reference_system_openatlas_class h
+   SET openatlas_class_id =
+    (SELECT c.id FROM model.openatlas_class c WHERE c.name =
+      (SELECT name FROM web.form WHERE id = h.form_id));
+ALTER TABLE web.reference_system_openatlas_class DROP COLUMN form_id;
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_cl_reference_system_id_openatlas_key
+    UNIQUE (reference_system_id, openatlas_class_id);
+
+DROP TABLE web.form;
+
 
 END;
