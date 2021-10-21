@@ -22,15 +22,13 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
@@ -63,10 +61,9 @@ DROP TRIGGER IF EXISTS update_modified ON web."user";
 DROP TRIGGER IF EXISTS update_modified ON web.reference_system;
 DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
-DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
+DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
-DROP TRIGGER IF EXISTS update_modified ON web.form;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
@@ -94,22 +91,20 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_cl_reference_system_id_openatlas_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_form_id_key;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_place_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_form_id_key;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
-ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
-ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
@@ -142,13 +137,12 @@ ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.reference_system_form ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.reference_system_openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.map_overlay ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.hierarchy_openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."group" ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.form ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
@@ -177,7 +171,7 @@ DROP TABLE IF EXISTS web."user";
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
-DROP TABLE IF EXISTS web.reference_system_form;
+DROP TABLE IF EXISTS web.reference_system_openatlas_class;
 DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
 DROP TABLE IF EXISTS web.map_overlay;
@@ -187,12 +181,10 @@ DROP SEQUENCE IF EXISTS web.i18n_id_seq;
 DROP TABLE IF EXISTS web.i18n;
 DROP SEQUENCE IF EXISTS web.hierarchy_id_seq;
 DROP SEQUENCE IF EXISTS web.hierarchy_form_id_seq;
-DROP TABLE IF EXISTS web.hierarchy_form;
+DROP TABLE IF EXISTS web.hierarchy_openatlas_class;
 DROP TABLE IF EXISTS web.hierarchy;
 DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
-DROP SEQUENCE IF EXISTS web.form_id_seq;
-DROP TABLE IF EXISTS web.form;
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
@@ -965,42 +957,6 @@ ALTER SEQUENCE web.entity_profile_image_id_seq OWNED BY web.entity_profile_image
 
 
 --
--- Name: form; Type: TABLE; Schema: web; Owner: openatlas
---
-
-CREATE TABLE web.form (
-    id integer NOT NULL,
-    name text NOT NULL,
-    extendable boolean DEFAULT false NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
-);
-
-
-ALTER TABLE web.form OWNER TO openatlas;
-
---
--- Name: form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
---
-
-CREATE SEQUENCE web.form_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE web.form_id_seq OWNER TO openatlas;
-
---
--- Name: form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
---
-
-ALTER SEQUENCE web.form_id_seq OWNED BY web.form.id;
-
-
---
 -- Name: group; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1067,19 +1023,19 @@ COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure un
 
 
 --
--- Name: hierarchy_form; Type: TABLE; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class; Type: TABLE; Schema: web; Owner: openatlas
 --
 
-CREATE TABLE web.hierarchy_form (
+CREATE TABLE web.hierarchy_openatlas_class (
     id integer NOT NULL,
     hierarchy_id integer NOT NULL,
-    form_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    openatlas_class_id integer
 );
 
 
-ALTER TABLE web.hierarchy_form OWNER TO openatlas;
+ALTER TABLE web.hierarchy_openatlas_class OWNER TO openatlas;
 
 --
 -- Name: hierarchy_form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -1099,7 +1055,7 @@ ALTER TABLE web.hierarchy_form_id_seq OWNER TO openatlas;
 -- Name: hierarchy_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
 --
 
-ALTER SEQUENCE web.hierarchy_form_id_seq OWNED BY web.hierarchy_form.id;
+ALTER SEQUENCE web.hierarchy_form_id_seq OWNED BY web.hierarchy_openatlas_class.id;
 
 
 --
@@ -1269,17 +1225,17 @@ COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the appl
 
 
 --
--- Name: reference_system_form; Type: TABLE; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class; Type: TABLE; Schema: web; Owner: openatlas
 --
 
-CREATE TABLE web.reference_system_form (
+CREATE TABLE web.reference_system_openatlas_class (
     id integer NOT NULL,
     reference_system_id integer NOT NULL,
-    form_id integer NOT NULL
+    openatlas_class_id integer
 );
 
 
-ALTER TABLE web.reference_system_form OWNER TO openatlas;
+ALTER TABLE web.reference_system_openatlas_class OWNER TO openatlas;
 
 --
 -- Name: reference_system_form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -1300,7 +1256,7 @@ ALTER TABLE web.reference_system_form_id_seq OWNER TO openatlas;
 -- Name: reference_system_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
 --
 
-ALTER SEQUENCE web.reference_system_form_id_seq OWNED BY web.reference_system_form.id;
+ALTER SEQUENCE web.reference_system_form_id_seq OWNED BY web.reference_system_openatlas_class.id;
 
 
 --
@@ -1637,13 +1593,6 @@ ALTER TABLE ONLY web.entity_profile_image ALTER COLUMN id SET DEFAULT nextval('w
 
 
 --
--- Name: form id; Type: DEFAULT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.form ALTER COLUMN id SET DEFAULT nextval('web.form_id_seq'::regclass);
-
-
---
 -- Name: group id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1658,10 +1607,10 @@ ALTER TABLE ONLY web.hierarchy ALTER COLUMN id SET DEFAULT nextval('web.hierarch
 
 
 --
--- Name: hierarchy_form id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form ALTER COLUMN id SET DEFAULT nextval('web.hierarchy_form_id_seq'::regclass);
+ALTER TABLE ONLY web.hierarchy_openatlas_class ALTER COLUMN id SET DEFAULT nextval('web.hierarchy_form_id_seq'::regclass);
 
 
 --
@@ -1679,10 +1628,10 @@ ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_ov
 
 
 --
--- Name: reference_system_form id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form ALTER COLUMN id SET DEFAULT nextval('web.reference_system_form_id_seq'::regclass);
+ALTER TABLE ONLY web.reference_system_openatlas_class ALTER COLUMN id SET DEFAULT nextval('web.reference_system_form_id_seq'::regclass);
 
 
 --
@@ -1935,22 +1884,6 @@ ALTER TABLE ONLY web.entity_profile_image
 
 
 --
--- Name: form form_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.form
-    ADD CONSTRAINT form_name_key UNIQUE (name);
-
-
---
--- Name: form form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.form
-    ADD CONSTRAINT form_pkey PRIMARY KEY (id);
-
-
---
 -- Name: group group_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -1967,18 +1900,10 @@ ALTER TABLE ONLY web."group"
 
 
 --
--- Name: hierarchy_form hierarchy_form_hierarchy_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form
-    ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
-
-
---
--- Name: hierarchy_form hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.hierarchy_form
+ALTER TABLE ONLY web.hierarchy_openatlas_class
     ADD CONSTRAINT hierarchy_form_pkey PRIMARY KEY (id);
 
 
@@ -1988,6 +1913,14 @@ ALTER TABLE ONLY web.hierarchy_form
 
 ALTER TABLE ONLY web.hierarchy
     ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+
+
+--
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key UNIQUE (hierarchy_id, openatlas_class_id);
 
 
 --
@@ -2039,19 +1972,11 @@ ALTER TABLE ONLY web.map_overlay
 
 
 --
--- Name: reference_system_form reference_system_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form
+ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_form_pkey PRIMARY KEY (id);
-
-
---
--- Name: reference_system_form reference_system_form_reference_system_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.reference_system_form
-    ADD CONSTRAINT reference_system_form_reference_system_id_form_id_key UNIQUE (reference_system_id, form_id);
 
 
 --
@@ -2060,6 +1985,14 @@ ALTER TABLE ONLY web.reference_system_form
 
 ALTER TABLE ONLY web.reference_system
     ADD CONSTRAINT reference_system_name_key UNIQUE (name);
+
+
+--
+-- Name: reference_system_openatlas_class reference_system_openatlas_cl_reference_system_id_openatlas_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_cl_reference_system_id_openatlas_key UNIQUE (reference_system_id, openatlas_class_id);
 
 
 --
@@ -2265,13 +2198,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR E
 
 
 --
--- Name: form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
 -- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
@@ -2286,10 +2212,10 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy FOR EACH ROW EXECU
 
 
 --
--- Name: hierarchy_form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2542,18 +2468,10 @@ ALTER TABLE ONLY web.entity_profile_image
 
 
 --
--- Name: hierarchy_form hierarchy_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form
-    ADD CONSTRAINT hierarchy_form_form_id_fkey FOREIGN KEY (form_id) REFERENCES web.form(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hierarchy_form hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.hierarchy_form
+ALTER TABLE ONLY web.hierarchy_openatlas_class
     ADD CONSTRAINT hierarchy_form_hierarchy_id_fkey FOREIGN KEY (hierarchy_id) REFERENCES web.hierarchy(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
@@ -2598,18 +2516,10 @@ ALTER TABLE ONLY web.reference_system
 
 
 --
--- Name: reference_system_form reference_system_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form
-    ADD CONSTRAINT reference_system_form_form_id_fkey FOREIGN KEY (form_id) REFERENCES web.form(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: reference_system_form reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.reference_system_form
+ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_form_reference_system_id_fkey FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
