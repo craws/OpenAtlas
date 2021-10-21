@@ -45,20 +45,15 @@ class Node:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_web_forms() -> List[Dict[str, Any]]:
-        g.cursor.execute(
-            "SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
-        return [dict(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
     def get_hierarchies() -> List[Dict[str, Any]]:
         g.cursor.execute("""
             SELECT h.id, h.name, h.category, h.multiple, h.directional,
                 (SELECT ARRAY(
-                    SELECT f.id
-                    FROM web.form f
-                    JOIN web.hierarchy_form hf ON f.id = hf.form_id
-                        AND hf.hierarchy_id = h.id)) AS form_ids
+                    SELECT c.name
+                    FROM model.openatlas_class c
+                    JOIN web.hierarchy_openatlas_class hc 
+                        ON c.id = hc.openatlas_class_id
+                        AND hc.hierarchy_id = h.id)) AS class_names
             FROM web.hierarchy h;""")
         return [dict(row) for row in g.cursor.fetchall()]
 

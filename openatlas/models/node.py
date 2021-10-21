@@ -41,12 +41,7 @@ class Node(Entity):
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
-        forms = {}
-        for row in Db.get_web_forms():
-            forms[row['id']] = {
-                'id': row['id'],
-                'name': row['name'],
-                'extendable': row['extendable']}
+        classes = {}
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for node in nodes.values():
             if node.root:
@@ -62,9 +57,9 @@ class Node(Entity):
                 node.category = hierarchies[node.id]['category']
                 node.multiple = hierarchies[node.id]['multiple']
                 node.directional = hierarchies[node.id]['directional']
-                node.forms = {
-                    form_id: forms[form_id]
-                    for form_id in hierarchies[node.id]['form_ids']}
+                node.classes = {
+                    id_: g.classes[id_]
+                    for id_ in hierarchies[node.id]['class_names']}
 
     @staticmethod
     def get_root_path(

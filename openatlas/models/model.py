@@ -35,6 +35,7 @@ class OpenatlasClass:
             self,
             name: str,
             cidoc_class: str,
+            hierarchies: List[int],
             standard_type_id: Optional[int] = None,
             alias_possible: Optional[bool] = False,
             color: Optional[str] = None,
@@ -62,7 +63,8 @@ class OpenatlasClass:
                 standard_type_id=row['standard_type_id'],
                 alias_possible=row['alias_possible'],
                 write_access=row['write_access_group_name'],
-                color=row['layout_color'])
+                color=row['layout_color'],
+                hierarchies=row['hierarchies'])
         return classes
 
     @staticmethod

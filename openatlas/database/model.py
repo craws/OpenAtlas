@@ -9,15 +9,21 @@ class Model:
     def get_openatlas_classes() -> List[Dict[str, Any]]:
         g.cursor.execute("""
             SELECT
-                id,
-                name,
-                cidoc_class_code,
-                standard_type_id,
-                alias_possible,
-                write_access_group_name,
-                layout_color,
-                layout_icon
-            FROM model.openatlas_class;""")
+                c.id,
+                c.name,
+                c.cidoc_class_code,
+                c.standard_type_id,
+                c.alias_possible,
+                c.write_access_group_name,
+                c.layout_color,
+                c.layout_icon,
+                array_to_json(
+                    array_agg(hc.hierarchy_id)
+                ) as hierarchies
+            FROM model.openatlas_class c
+            LEFT JOIN web.hierarchy_openatlas_class hc 
+                ON c.id = hc.openatlas_class_id
+            GROUP by c.id;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
