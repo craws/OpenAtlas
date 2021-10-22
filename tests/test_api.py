@@ -16,13 +16,14 @@ from openatlas.models.reference_system import ReferenceSystem
 from tests.api_test_data import entity, cidoc_class, code, \
     entities_linked_to_entity, latest, system_class, type_entities, query, \
     content, geometric_entities, system_class_count, node_entities, \
-    subunit, overview_count, node_overview, type_tree
+    subunit, overview_count, node_overview, type_tree, config_params
 from tests.base import TestBaseCase, insert_entity
 
 
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
+        params = {}
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -95,6 +96,8 @@ class ApiTests(TestBaseCase):
                 actor = insert_entity(
                     'Frodo', 'person',
                     description='That is Frodo')
+
+                params['frodo_id'] = actor.id
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
 
@@ -176,7 +179,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21'))
-            self.assertDictEqual(rv.get_json(), cidoc_class.test_cidoc_class)
+            self.assertDictEqual(rv.get_json(), cidoc_class.get_test_cidoc_class(params))
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21',
