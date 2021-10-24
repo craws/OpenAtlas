@@ -25,7 +25,7 @@ class ReferenceSystem(Entity):
         super().__init__(row)
         self.website_url = row['website_url']
         self.resolver_url = row['resolver_url']
-        self.forms = row['form_ids']
+        # self.forms = row['form_ids']
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
             list(self.nodes.keys())[0].id if self.nodes else None
@@ -46,7 +46,9 @@ class ReferenceSystem(Entity):
         Db.add_forms(self.id, form.forms.data)
 
     def remove_form(self, form_id: int) -> None:
-        forms = self.get_forms()
+        # Todo: add types to forms
+        forms = {}
+        # forms = self.get_forms()
         for link_ in self.get_links('P67'):
             if link_.range.class_.name == \
                     forms[form_id]['name']:  # pragma: no cover

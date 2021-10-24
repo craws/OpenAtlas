@@ -76,7 +76,8 @@ def build_form(
             Form,
             'alias',
             FieldList(StringField(''), description=_('tooltip alias')))
-    add_types(Form, class_)
+    # Todo: add types to forms
+    # add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
@@ -255,7 +256,9 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 
 
 def add_types(form: Any, class_: str) -> None:
-    types = OrderedDict(Node.get_nodes_for_form(class_))
+    # Todo: add types to forms
+    # types = OrderedDict(Node.get_nodes_for_form(class_))
+    types = OrderedDict()
     for node in types.values():  # Move standard type to top
         if node.category == 'standard':
             types.move_to_end(node.id, last=False)

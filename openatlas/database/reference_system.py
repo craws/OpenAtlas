@@ -7,6 +7,12 @@ class ReferenceSystem:
 
     @staticmethod
     def get_all() -> List[Dict[str, Any]]:
+        # Todo: add types to forms
+        """(SELECT ARRAY(
+                    SELECT f.id FROM web.form f
+                    JOIN web.reference_system_form rfs ON f.id = rfs.form_id
+                        AND rfs.reference_system_id = rs.entity_id))
+                        AS form_ids,"""
         g.cursor.execute("""
             SELECT
                 e.id, e.name,
@@ -19,12 +25,7 @@ class ReferenceSystem:
                 rs.resolver_url,
                 rs.identifier_example,
                 rs.system,
-                COUNT(l.id) AS count,
-                (SELECT ARRAY(
-                    SELECT f.id FROM web.form f
-                    JOIN web.reference_system_form rfs ON f.id = rfs.form_id
-                        AND rfs.reference_system_id = rs.entity_id))
-                        AS form_ids,
+                COUNT(l.id) AS count,                
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)

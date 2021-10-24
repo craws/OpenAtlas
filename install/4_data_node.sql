@@ -246,29 +246,6 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
     ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
 
-INSERT INTO web.form (name, extendable) VALUES
-    ('acquisition', True),
-    ('activity', True),
-    ('actor_actor_relation', False),
-    ('artifact', True),
-    ('bibliography', True),
-    ('edition', True),
-    ('external_reference', True),
-    ('feature', True),
-    ('file', True),
-    ('find', True),
-    ('group', True),
-    ('human_remains', True),
-    ('involvement', False),
-    ('member', False),
-    ('move', True),
-    ('source', True),
-    ('person', True),
-    ('place', True),
-    ('stratigraphic_unit', True),
-    ('source_translation', False),
-    ('type', True);
-
 INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM entity WHERE name='Actor function'), 'Actor function', 'standard', False, False),
     ((SELECT id FROM entity WHERE name='Actor actor relation'), 'Actor actor relation', 'standard', False, True),
@@ -291,31 +268,31 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', 'value', True, False),
     ((SELECT id FROM entity WHERE name='Sex'), 'Sex', 'custom', False, False);
 
-INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-    ((SELECT id FROM web.hierarchy WHERE name='Actor function'), (SELECT id FROM web.form WHERE name='member')),
-    ((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'), (SELECT id FROM web.form WHERE name='actor_actor_relation')),
-    ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), (SELECT id FROM web.form WHERE name='place')),
-    ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM web.form WHERE name='artifact')),
-    ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM web.form WHERE name='find')),
-    ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), (SELECT id FROM web.form WHERE name='bibliography')),
-    ((SELECT id FROM web.hierarchy WHERE name='Edition'), (SELECT id FROM web.form WHERE name='edition')),
-    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM web.form WHERE name='acquisition')),
-    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM web.form WHERE name='activity')),
-    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM web.form WHERE name='move')),
-    ((SELECT id FROM web.hierarchy WHERE name='External reference'), (SELECT id FROM web.form WHERE name='external_reference')),
-    ((SELECT id FROM web.hierarchy WHERE name='Feature'), (SELECT id FROM web.form WHERE name='feature')),
-    ((SELECT id FROM web.hierarchy WHERE name='Historical place'), (SELECT id FROM web.form WHERE name='place')),
-    ((SELECT id FROM web.hierarchy WHERE name='Human remains'), (SELECT id FROM web.form WHERE name='human_remains')),
-    ((SELECT id FROM web.hierarchy WHERE name='Involvement'), (SELECT id FROM web.form WHERE name='involvement')),
-    ((SELECT id FROM web.hierarchy WHERE name='License'), (SELECT id FROM web.form WHERE name='file')),
-    ((SELECT id FROM web.hierarchy WHERE name='Place'), (SELECT id FROM web.form WHERE name='place')),
-    ((SELECT id FROM web.hierarchy WHERE name='Source'), (SELECT id FROM web.form WHERE name='source')),
-    ((SELECT id FROM web.hierarchy WHERE name='Source translation'), (SELECT id FROM web.form WHERE name='source_translation')),
-    ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'), (SELECT id FROM web.form WHERE name='stratigraphic_unit')),
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_id) VALUES
+    ((SELECT id FROM web.hierarchy WHERE name='Actor function'), (SELECT id FROM model.openatlas_class WHERE name='member')),
+    ((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'), (SELECT id FROM model.openatlas_class WHERE name='actor_actor_relation')),
+    ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), (SELECT id FROM model.openatlas_class WHERE name='place')),
+    ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM model.openatlas_class WHERE name='artifact')),
+    ((SELECT id FROM web.hierarchy WHERE name='Artifact'), (SELECT id FROM model.openatlas_class WHERE name='find')),
+    ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), (SELECT id FROM model.openatlas_class WHERE name='bibliography')),
+    ((SELECT id FROM web.hierarchy WHERE name='Edition'), (SELECT id FROM model.openatlas_class WHERE name='edition')),
+    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM model.openatlas_class WHERE name='acquisition')),
+    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM model.openatlas_class WHERE name='activity')),
+    ((SELECT id FROM web.hierarchy WHERE name='Event'), (SELECT id FROM model.openatlas_class WHERE name='move')),
+    ((SELECT id FROM web.hierarchy WHERE name='External reference'), (SELECT id FROM model.openatlas_class WHERE name='external_reference')),
+    ((SELECT id FROM web.hierarchy WHERE name='Feature'), (SELECT id FROM model.openatlas_class WHERE name='feature')),
+    ((SELECT id FROM web.hierarchy WHERE name='Historical place'), (SELECT id FROM model.openatlas_class WHERE name='place')),
+    ((SELECT id FROM web.hierarchy WHERE name='Human remains'), (SELECT id FROM model.openatlas_class WHERE name='human_remains')),
+    ((SELECT id FROM web.hierarchy WHERE name='Involvement'), (SELECT id FROM model.openatlas_class WHERE name='involvement')),
+    ((SELECT id FROM web.hierarchy WHERE name='License'), (SELECT id FROM model.openatlas_class WHERE name='file')),
+    ((SELECT id FROM web.hierarchy WHERE name='Place'), (SELECT id FROM model.openatlas_class WHERE name='place')),
+    ((SELECT id FROM web.hierarchy WHERE name='Source'), (SELECT id FROM model.openatlas_class WHERE name='source')),
+    ((SELECT id FROM web.hierarchy WHERE name='Source translation'), (SELECT id FROM model.openatlas_class WHERE name='source_translation')),
+    ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'), (SELECT id FROM model.openatlas_class WHERE name='stratigraphic_unit')),
 
-    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='artifact')),
-    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='find')),
-    ((SELECT id FROM web.hierarchy WHERE name='Sex'),(SELECT id FROM web.form WHERE name='person'));
+    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), (SELECT id FROM model.openatlas_class WHERE name='artifact')),
+    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), (SELECT id FROM model.openatlas_class WHERE name='find')),
+    ((SELECT id FROM web.hierarchy WHERE name='Sex'), (SELECT id FROM model.openatlas_class WHERE name='person'));
 
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write_access_group_name, layout_color, standard_type_id) VALUES
     ('acquisition',          'E8',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -364,8 +341,8 @@ VALUES (
             'https://www.wikidata.org',
             'Q123');
 
-INSERT INTO web.reference_system_form (reference_system_id, form_id) VALUES
-    ((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM web.form WHERE name='place')),
-    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='place')),
-    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='person')),
-    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM web.form WHERE name='group'));
+INSERT INTO web.reference_system_openatlas_class (reference_system_id, openatlas_class_id) VALUES
+    ((SELECT entity_id FROM web.reference_system WHERE name='GeoNames'), (SELECT id FROM model.openatlas_class WHERE name='place')),
+    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM model.openatlas_class WHERE name='place')),
+    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM model.openatlas_class WHERE name='person')),
+    ((SELECT entity_id FROM web.reference_system WHERE name='Wikidata'), (SELECT id FROM model.openatlas_class WHERE name='group'));

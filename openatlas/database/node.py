@@ -58,24 +58,6 @@ class Node:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_nodes_for_form(form_name: str) -> List[int]:
-        g.cursor.execute("""
-            SELECT h.id FROM web.hierarchy h
-            JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
-            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
-            ORDER BY h.name;""", {'form_name': form_name})
-        return [row['id'] for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def get_form_choices() -> List[Dict[str, Union[int, str]]]:
-        g.cursor.execute("""
-            SELECT f.id, f.name
-            FROM web.form f
-            WHERE f.extendable = True
-            ORDER BY name ASC;""")
-        return [dict(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
     def insert_hierarchy(data: Dict[str, Any]) -> None:
         g.cursor.execute(
             """
@@ -131,19 +113,21 @@ class Node:
 
     @staticmethod
     def get_form_count(form_id: int, node_ids: List[int]) -> int:
-        g.cursor.execute(
-            "SELECT name FROM web.form WHERE id = %(form_id)s;",
-            {'form_id': form_id})
-        form_name = g.cursor.fetchone()['name']
-        g.cursor.execute(
-            """
-            SELECT COUNT(*) FROM model.link l
-            JOIN model.entity e ON l.domain_id = e.id
-                AND l.range_id IN %(node_ids)s
-            WHERE l.property_code = 'P2'
-                AND e.openatlas_class_name = %(form_name)s;""",
-            {'node_ids': tuple(node_ids), 'form_name': form_name})
-        return g.cursor.fetchone()['count']
+        # Todo: add types to forms
+        return 0
+        # g.cursor.execute(
+        #     "SELECT name FROM web.form WHERE id = %(form_id)s;",
+        #     {'form_id': form_id})
+        # form_name = g.cursor.fetchone()['name']
+        # g.cursor.execute(
+        #     """
+        #     SELECT COUNT(*) FROM model.link l
+        #     JOIN model.entity e ON l.domain_id = e.id
+        #         AND l.range_id IN %(node_ids)s
+        #     WHERE l.property_code = 'P2'
+        #         AND e.openatlas_class_name = %(form_name)s;""",
+        #     {'node_ids': tuple(node_ids), 'form_name': form_name})
+        # return g.cursor.fetchone()['count']
 
     @staticmethod
     def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:

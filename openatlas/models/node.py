@@ -116,17 +116,13 @@ class Node(Entity):
         return items
 
     @staticmethod
-    def get_nodes_for_form(form_name: str) -> Dict[int, Node]:
-        return {
-            id_: g.nodes[id_] for id_ in Db.get_nodes_for_form(form_name)}
-
-    @staticmethod
     def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices():
-            if g.classes[row['name']].view != 'type' \
-                    and (not root or row['id'] not in root.forms):
-                choices.append((row['id'], g.classes[row['name']].label))
+        # Todo: add types to forms
+        #for row in Db.get_form_choices():
+        #    if g.classes[row['name']].view != 'type' \
+        #            and (not root or row['id'] not in root.forms):
+        #        choices.append((row['id'], g.classes[row['name']].label))
         return choices
 
     @staticmethod
