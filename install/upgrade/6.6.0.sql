@@ -147,17 +147,29 @@ ALTER TABLE web.hierarchy_openatlas_class ALTER COLUMN openatlas_class_name SET 
 
 -- Remodel web.reference_system_form to web.reference_system_openatlas_class
 ALTER TABLE web.reference_system_form RENAME TO reference_system_openatlas_class;
-ALTER TABLE web.reference_system_openatlas_class ADD COLUMN openatlas_class_id int;
-UPDATE web.reference_system_openatlas_class h
-   SET openatlas_class_id =
-    (SELECT c.id FROM model.openatlas_class c WHERE c.name =
-      (SELECT name FROM web.form WHERE id = h.form_id));
+ALTER TABLE web.reference_system_openatlas_class ADD COLUMN reference_system_name text;
+ALTER TABLE web.reference_system_openatlas_class ADD COLUMN openatlas_class_name text;
+UPDATE web.reference_system_openatlas_class rc
+   SET openatlas_class_name = (SELECT name FROM web.form WHERE id = rc.form_id);
+UPDATE web.reference_system_openatlas_class rc
+   SET reference_system_name = (SELECT name FROM web.reference_system WHERE entity_id = rc.reference_system_id);
 ALTER TABLE web.reference_system_openatlas_class DROP COLUMN form_id;
+ALTER TABLE web.reference_system_openatlas_class DROP COLUMN reference_system_id;
 ALTER TABLE ONLY web.reference_system_openatlas_class
-    ADD CONSTRAINT reference_system_openatlas_cl_reference_system_id_openatlas_key
-    UNIQUE (reference_system_id, openatlas_class_id);
+    ADD CONSTRAINT reference_system_openatlas_class_reference_system_name_openatlas_class_name_key
+    UNIQUE (reference_system_name, openatlas_class_name);
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_class_reference_system_name_fkey
+    FOREIGN KEY (reference_system_name)
+    REFERENCES web.reference_system(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey
+    FOREIGN KEY (openatlas_class_name)
+    REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE web.reference_system_openatlas_class ALTER COLUMN reference_system_name SET NOT NULL;
+ALTER TABLE web.reference_system_openatlas_class ALTER COLUMN openatlas_class_name SET NOT NULL;
 
+-- Drop obsolete web.form table
 DROP TABLE web.form;
-
 
 END;
