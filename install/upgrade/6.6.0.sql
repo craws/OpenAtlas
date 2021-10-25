@@ -132,7 +132,7 @@ ALTER TABLE ONLY web.hierarchy_openatlas_class
     ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key
     UNIQUE (hierarchy_id, openatlas_class_id);
 ALTER TABLE ONLY web.hierarchy_openatlas_class
-    ADD CONSTRAINT hierarchy_form_hierarchy_id_fkey
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_fkey
     FOREIGN KEY (hierarchy_id)
     REFERENCES web.hierarchy(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
