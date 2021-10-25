@@ -121,20 +121,29 @@ UPDATE web.hierarchy SET category = 'place' WHERE name IN ('Administrative unit'
 ALTER TABLE web.hierarchy DROP standard, DROP value_type, DROP locked;
 
 -- Remodel web.hierarchy_form to web.hierarchy_openatlas_class
+UPDATE web.form SET name = 'actor_function' WHERE name = 'member';
 ALTER TABLE web.hierarchy_form RENAME TO hierarchy_openatlas_class;
-ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN openatlas_class_id int;
-UPDATE web.hierarchy_openatlas_class h
-   SET openatlas_class_id =
-    (SELECT c.id FROM model.openatlas_class c WHERE c.name =
-      (SELECT name FROM web.form WHERE id = h.form_id));
+ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN hierarchy_name text;
+UPDATE web.hierarchy_openatlas_class hc SET hierarchy_name =
+    (SELECT name FROM web.hierarchy WHERE id = hc.hierarchy_id);
+ALTER TABLE web.hierarchy_openatlas_class ADD COLUMN openatlas_class_name text;
+UPDATE web.hierarchy_openatlas_class hc SET openatlas_class_name =
+    (SELECT name FROM web.form WHERE id = hc.form_id);
 ALTER TABLE web.hierarchy_openatlas_class DROP COLUMN form_id;
+ALTER TABLE web.hierarchy_openatlas_class DROP COLUMN hierarchy_id;
 ALTER TABLE ONLY web.hierarchy_openatlas_class
-    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key
-    UNIQUE (hierarchy_id, openatlas_class_id);
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_name_openatlas_class_name_key
+    UNIQUE (hierarchy_name, openatlas_class_name);
 ALTER TABLE ONLY web.hierarchy_openatlas_class
-    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_fkey
-    FOREIGN KEY (hierarchy_id)
-    REFERENCES web.hierarchy(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_name_fkey
+    FOREIGN KEY (hierarchy_name)
+    REFERENCES web.hierarchy(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_openatlas_class_name_fkey
+    FOREIGN KEY (openatlas_class_name)
+    REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE web.hierarchy_openatlas_class ALTER COLUMN hierarchy_name SET NOT NULL;
+ALTER TABLE web.hierarchy_openatlas_class ALTER COLUMN openatlas_class_name SET NOT NULL;
 
 -- Remodel web.reference_system_form to web.reference_system_openatlas_class
 ALTER TABLE web.reference_system_form RENAME TO reference_system_openatlas_class;

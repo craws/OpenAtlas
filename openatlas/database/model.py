@@ -18,11 +18,11 @@ class Model:
                 c.layout_color,
                 c.layout_icon,
                 array_to_json(
-                    array_agg(hc.hierarchy_id)
+                    array_agg(hc.hierarchy_name)
                 ) as hierarchies
             FROM model.openatlas_class c
             LEFT JOIN web.hierarchy_openatlas_class hc 
-                ON c.id = hc.openatlas_class_id
+                ON c.name = hc.openatlas_class_name
             GROUP by c.id;""")
         return [dict(row) for row in g.cursor.fetchall()]
 

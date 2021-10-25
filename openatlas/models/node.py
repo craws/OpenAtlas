@@ -57,9 +57,10 @@ class Node(Entity):
                 node.category = hierarchies[node.id]['category']
                 node.multiple = hierarchies[node.id]['multiple']
                 node.directional = hierarchies[node.id]['directional']
-                node.classes = {
-                    id_: g.classes[id_]
-                    for id_ in hierarchies[node.id]['class_names']}
+                # Todo: add types to forms
+                #node.classes = {
+                #    id_: g.classes[id_]
+                #    for id_ in hierarchies[node.id]['class_names']}
 
     @staticmethod
     def get_root_path(

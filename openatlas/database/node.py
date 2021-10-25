@@ -46,15 +46,8 @@ class Node:
 
     @staticmethod
     def get_hierarchies() -> List[Dict[str, Any]]:
-        g.cursor.execute("""
-            SELECT h.id, h.name, h.category, h.multiple, h.directional,
-                (SELECT ARRAY(
-                    SELECT c.name
-                    FROM model.openatlas_class c
-                    JOIN web.hierarchy_openatlas_class hc 
-                        ON c.id = hc.openatlas_class_id
-                        AND hc.hierarchy_id = h.id)) AS class_names
-            FROM web.hierarchy h;""")
+        g.cursor.execute(
+            "SELECT h.id, h.name, h.category, h.multiple, h.directional FROM web.hierarchy h;")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
