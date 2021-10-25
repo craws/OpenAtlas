@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.12 (Debian 11.12-0+deb10u1)
--- Dumped by pg_dump version 11.12 (Debian 11.12-0+deb10u1)
+-- Dumped from database version 11.13 (Debian 11.13-0+deb10u1)
+-- Dumped by pg_dump version 11.13 (Debian 11.13-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,13 +22,15 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_reference_system_name_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_openatlas_class_name_fkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_hierarchy_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
@@ -91,7 +93,7 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_cl_reference_system_id_openatlas_key;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_reference_system_name_openatla;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
@@ -100,7 +102,7 @@ ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_hierarchy_name_openatlas_class_name_k;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
@@ -998,11 +1000,11 @@ ALTER SEQUENCE web.group_id_seq OWNED BY web."group".id;
 CREATE TABLE web.hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
-    category text DEFAULT 'standard'::text NOT NULL,
     multiple boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    category text DEFAULT 'standard'::text NOT NULL
 );
 
 
@@ -1028,10 +1030,10 @@ COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure un
 
 CREATE TABLE web.hierarchy_openatlas_class (
     id integer NOT NULL,
-    hierarchy_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    openatlas_class_id integer
+    hierarchy_name text NOT NULL,
+    openatlas_class_name text NOT NULL
 );
 
 
@@ -1230,8 +1232,8 @@ COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the appl
 
 CREATE TABLE web.reference_system_openatlas_class (
     id integer NOT NULL,
-    reference_system_id integer NOT NULL,
-    openatlas_class_id integer
+    reference_system_name text NOT NULL,
+    openatlas_class_name text NOT NULL
 );
 
 
@@ -1916,11 +1918,11 @@ ALTER TABLE ONLY web.hierarchy
 
 
 --
--- Name: hierarchy_openatlas_class hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_hierarchy_name_openatlas_class_name_k; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.hierarchy_openatlas_class
-    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_id_key UNIQUE (hierarchy_id, openatlas_class_id);
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_name_openatlas_class_name_k UNIQUE (hierarchy_name, openatlas_class_name);
 
 
 --
@@ -1988,11 +1990,11 @@ ALTER TABLE ONLY web.reference_system
 
 
 --
--- Name: reference_system_openatlas_class reference_system_openatlas_cl_reference_system_id_openatlas_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_reference_system_name_openatla; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.reference_system_openatlas_class
-    ADD CONSTRAINT reference_system_openatlas_cl_reference_system_id_openatlas_key UNIQUE (reference_system_id, openatlas_class_id);
+    ADD CONSTRAINT reference_system_openatlas_class_reference_system_name_openatla UNIQUE (reference_system_name, openatlas_class_name);
 
 
 --
@@ -2468,19 +2470,27 @@ ALTER TABLE ONLY web.entity_profile_image
 
 
 --
--- Name: hierarchy_openatlas_class hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.hierarchy_openatlas_class
-    ADD CONSTRAINT hierarchy_form_hierarchy_id_fkey FOREIGN KEY (hierarchy_id) REFERENCES web.hierarchy(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: hierarchy hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.hierarchy
     ADD CONSTRAINT hierarchy_id_fkey FOREIGN KEY (id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_hierarchy_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_name_fkey FOREIGN KEY (hierarchy_name) REFERENCES web.hierarchy(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2516,11 +2526,19 @@ ALTER TABLE ONLY web.reference_system
 
 
 --
--- Name: reference_system_openatlas_class reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.reference_system_openatlas_class
-    ADD CONSTRAINT reference_system_form_reference_system_id_fkey FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_reference_system_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_class_reference_system_name_fkey FOREIGN KEY (reference_system_name) REFERENCES web.reference_system(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
