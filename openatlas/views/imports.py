@@ -219,7 +219,7 @@ def import_data(project_id: int, class_: str) -> str:
                     value = row[item]
                     if item == 'type_ids':  # pragma: no cover
                         type_ids = []
-                        for type_id in value.split():
+                        for type_id in str(value).split():
                             if Import.check_type_id(type_id, class_):
                                 type_ids.append(type_id)
                             else:
@@ -282,7 +282,8 @@ def import_data(project_id: int, class_: str) -> str:
                         f"{_('possible duplicates')}: {', '.join(duplicates)}")
             if messages['error']:
                 raise Exception()
-        except Exception:  # pragma: no cover
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'import', str(e))
             flash(_('error at import'), 'error')
             return render_template(
                 'import/import_data.html',
