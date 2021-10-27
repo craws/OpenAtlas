@@ -283,7 +283,7 @@ def import_data(project_id: int, class_: str) -> str:
             if messages['error']:
                 raise Exception()
         except Exception as e:  # pragma: no cover
-            logger.log('error', 'import', str(e))
+            logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
                 'import/import_data.html',
