@@ -106,7 +106,7 @@ class Import:
 
             # Types
             if 'type_ids' in row and row['type_ids']:  # pragma: no cover
-                for type_id in row['type_ids'].split():
+                for type_id in str(row['type_ids']).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
                     entity.link('P2', g.nodes[int(type_id)])
