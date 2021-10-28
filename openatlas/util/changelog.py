@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '6.5.1': ['2021-10-28', {
+            'fix': {
+                '#1592:': 'Error at import when using type ids'}}],
         '6.5.0': ['2021-09-19', {
             'feature': {
                 '1462': 'Current owner of artifacts',
