@@ -13,16 +13,19 @@ class Model:
                 c.name,
                 c.cidoc_class_code,
                 c.standard_type_id,
-                c.alias_possible,
+                c.alias,
+                c.reference_system,
                 c.write_access_group_name,
                 c.layout_color,
                 c.layout_icon,
-                array_to_json(
-                    array_agg(hc.hierarchy_name)
-                ) as hierarchies
+                array_to_json(array_agg(hc.hierarchy_name)) AS hierarchies,
+                array_to_json(array_agg(ro.reference_system_name)) 
+                    AS reference_systems
             FROM model.openatlas_class c
-            LEFT JOIN web.hierarchy_openatlas_class hc 
+            LEFT JOIN web.hierarchy_openatlas_class hc
                 ON c.name = hc.openatlas_class_name
+            LEFT JOIN web.reference_system_openatlas_class ro
+                ON c.name = ro.openatlas_class_name
             GROUP by c.id;""")
         return [dict(row) for row in g.cursor.fetchall()]
 

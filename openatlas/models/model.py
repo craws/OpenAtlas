@@ -36,8 +36,10 @@ class OpenatlasClass:
             name: str,
             cidoc_class: str,
             hierarchies: List[int],
+            alias: bool,
+            reference_system: bool,
+            reference_systems: List[str],
             standard_type_id: Optional[int] = None,
-            alias_possible: Optional[bool] = False,
             color: Optional[str] = None,
             write_access: Optional[str] = 'contributor') -> None:
         self.name = name
@@ -45,10 +47,12 @@ class OpenatlasClass:
         if cidoc_class:
             self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.standard_type = standard_type_id
-        self.color = color  # Specifies color of entity in network visualisation
+        self.color = color  # Color of entity in network visualisation
         self.write_access = write_access
         self.view = None
-        self.alias_possible = alias_possible
+        self.alias = alias  # Aliases allowed
+        self.reference_system = reference_system  # Reference systems allowed
+        self.reference_systems = reference_systems  # Linked reference systems
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
@@ -61,7 +65,9 @@ class OpenatlasClass:
                 name=row['name'],
                 cidoc_class=row['cidoc_class_code'],
                 standard_type_id=row['standard_type_id'],
-                alias_possible=row['alias_possible'],
+                alias=row['alias'],
+                reference_system=row['reference_system'],
+                reference_systems=row['reference_systems'],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
                 hierarchies=row['hierarchies'])

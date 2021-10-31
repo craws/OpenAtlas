@@ -24,7 +24,8 @@ CREATE TABLE model.openatlas_class (
     name text NOT NULL,
     cidoc_class_code text,
     standard_type_id integer,
-    alias_possible boolean DEFAULT false,
+    alias boolean DEFAULT false,
+    reference_system boolean DEFAULT false,
     write_access_group_name text,
     layout_color text,
     layout_icon text,
@@ -33,8 +34,10 @@ CREATE TABLE model.openatlas_class (
 );
 ALTER TABLE model.openatlas_class OWNER TO openatlas;
 COMMENT ON TABLE model.openatlas_class IS 'A more fine grained use of CIDOC classes';
+COMMENT ON COLUMN model.openatlas_class.alias IS 'If aliases are supported for entities with this class';
+COMMENT ON COLUMN model.openatlas_class.reference_system IS 'If links to external reference systems are supported for entities with this class';
 COMMENT ON COLUMN model.openatlas_class.layout_color IS 'For e.g. network vizualistaion';
-COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'for Bootstrap icons';
+COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'For Bootstrap icons';
 
 CREATE SEQUENCE model.openatlas_class_id_seq
     AS integer
@@ -54,33 +57,33 @@ ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_standard_t
 ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_write_access_group_name_fkey FOREIGN KEY (write_access_group_name) REFERENCES web."group"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
-INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_possible, write_access_group_name, layout_color, standard_type_id) VALUES
-    ('acquisition',          'E8',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('activity',             'E7',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('actor_appellation',    'E82', false, 'contributor', NULL,      NULL),
-    ('actor_actor_relation', NULL,  false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor actor relation' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('actor_function',       NULL,  false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor function' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('administrative_unit',  'E53', false, 'contributor', NULL,      NULL),
-    ('appellation',          'E41', false, 'contributor', NULL,      NULL),
-    ('artifact',             'E22', false, 'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('bibliography',         'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('edition',              'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('external_reference',   'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('feature',              'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('file',                 'E31', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('find',                 'E22', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('group',                'E74', true,  'contributor', '#34623C', NULL),
-    ('human_remains',        'E20', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('involvement',          NULL,  false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Involvement' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('move',                 'E9',  false, 'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('object_location',      'E53', false, 'contributor', '#00FF00', NULL),
-    ('person',               'E21', true,  'contributor', '#34B522', NULL),
-    ('place',                'E18', true,  'contributor', '#FF0000', (SELECT id FROM model.entity WHERE name = 'Place' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('reference_system',     'E32', false, 'manager',     NULL,      NULL),
-    ('source',               'E33', false, 'contributor', '#FFA500', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('source_translation',   'E33', false, 'contributor', NULL,      NULL),
-    ('stratigraphic_unit',   'E18', false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('type',                 'E55', false, 'editor',      NULL,      NULL);
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias, reference_system, write_access_group_name, layout_color, standard_type_id) VALUES
+    ('acquisition',          'E8',  false, true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('activity',             'E7',  false, true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('actor_appellation',    'E82', false, false, 'contributor', NULL,      NULL),
+    ('actor_actor_relation', NULL,  false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor actor relation' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('actor_function',       NULL,  false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor function' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('administrative_unit',  'E53', false, false, 'contributor', NULL,      NULL),
+    ('appellation',          'E41', false, false, 'contributor', NULL,      NULL),
+    ('artifact',             'E22', false, true,  'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('bibliography',         'E31', false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('edition',              'E31', false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('external_reference',   'E31', false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('feature',              'E18', false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('file',                 'E31', false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('find',                 'E22', false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('group',                'E74', true,  true,  'contributor', '#34623C', NULL),
+    ('human_remains',        'E20', false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('involvement',          NULL,  false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Involvement' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('move',                 'E9',  false, true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('object_location',      'E53', false, false, 'contributor', '#00FF00', NULL),
+    ('person',               'E21', true,  true,  'contributor', '#34B522', NULL),
+    ('place',                'E18', true,  true,  'contributor', '#FF0000', (SELECT id FROM model.entity WHERE name = 'Place' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('reference_system',     'E32', false, false, 'manager',     NULL,      NULL),
+    ('source',               'E33', false, true,  'contributor', '#FFA500', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('source_translation',   'E33', false, false, 'contributor', NULL,      NULL),
+    ('stratigraphic_unit',   'E18', false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Stratigraphic unit' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('type',                 'E55', false, true,  'editor',      NULL,      NULL);
 
 ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 

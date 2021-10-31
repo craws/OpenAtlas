@@ -25,7 +25,6 @@ class ReferenceSystem(Entity):
         super().__init__(row)
         self.website_url = row['website_url']
         self.resolver_url = row['resolver_url']
-        # self.forms = row['form_ids']
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
             list(self.nodes.keys())[0].id if self.nodes else None
