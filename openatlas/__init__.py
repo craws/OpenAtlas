@@ -64,12 +64,12 @@ def before_request() -> None:
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
-    g.table_headers = OpenatlasClass.get_table_headers()
-    g.classes = OpenatlasClass.get_openatlas_classes()
-    g.view_class_mapping = view_class_mapping
-    g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
+    g.classes = OpenatlasClass.get_all()
     g.nodes = Node.get_all_nodes()
     g.reference_systems = ReferenceSystem.get_all()
+    g.view_class_mapping = view_class_mapping
+    g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
+    g.table_headers = OpenatlasClass.get_table_headers()
     g.file_stats = get_file_stats()
 
     # Set max file upload in MB

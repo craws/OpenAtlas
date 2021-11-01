@@ -45,9 +45,11 @@ class Tab:
             id_ = entity.id
             view = entity.class_.view
             class_ = entity.class_
-            self.table.header = g.table_headers[name]
+            if not self.table:
+                self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']
+
         buttons = buttons if buttons else []
         self.add_buttons(name, buttons, view, id_, class_)
         self.buttons = buttons \

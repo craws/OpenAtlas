@@ -38,7 +38,7 @@ class OpenatlasClass:
             hierarchies: List[int],
             alias: bool,
             reference_system: bool,
-            reference_systems: List[str],
+            reference_system_ids: List[int],
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
             write_access: Optional[str] = 'contributor') -> None:
@@ -52,13 +52,13 @@ class OpenatlasClass:
         self.view = None
         self.alias = alias  # Aliases allowed
         self.reference_system = reference_system  # Reference systems allowed
-        self.reference_systems = reference_systems  # Linked reference systems
+        self.reference_systems = reference_system_ids
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
 
     @staticmethod
-    def get_openatlas_classes() -> Dict[str, OpenatlasClass]:
+    def get_all() -> Dict[str, OpenatlasClass]:
         classes = {}
         for row in Db.get_openatlas_classes():
             classes[row['name']] = OpenatlasClass(
@@ -67,7 +67,8 @@ class OpenatlasClass:
                 standard_type_id=row['standard_type_id'],
                 alias=row['alias'],
                 reference_system=row['reference_system'],
-                reference_systems=row['reference_systems'],
+                reference_system_ids=row['reference_system_ids']
+                if row['reference_system_ids'] else [],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
                 hierarchies=row['hierarchies'])

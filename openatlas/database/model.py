@@ -19,8 +19,8 @@ class Model:
                 c.layout_color,
                 c.layout_icon,
                 array_to_json(array_agg(hc.hierarchy_name)) AS hierarchies,
-                array_to_json(array_agg(ro.reference_system_name)) 
-                    AS reference_systems
+                array_remove(array_agg(ro.reference_system_id), NULL)
+                    AS reference_system_ids
             FROM model.openatlas_class c
             LEFT JOIN web.hierarchy_openatlas_class hc
                 ON c.name = hc.openatlas_class_name

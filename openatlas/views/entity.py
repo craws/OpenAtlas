@@ -84,34 +84,31 @@ def entity_view(id_: int) -> Union[str, Response]:
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
     elif isinstance(entity, ReferenceSystem):
-        for class_ in g.classes.values():
-            if entity.name in class_.reference_systems:
-                tabs[class_.name] = Tab(
-                    class_.name,
-                    entity=entity,
-                    table=Table([_('entity'), 'id', _('precision')]))
+        for name in entity.classes:
+            tabs[name] = Tab(
+                name,
+                entity=entity,
+                table=Table([_('entity'), 'id', _('precision')]))
         for link_ in entity.get_links('P67'):
             name = link_.description
             if entity.resolver_url:
                 name = \
                     f'<a href="{entity.resolver_url}{name}"' \
                     f' target="_blank" rel="noopener noreferrer">{name}</a>'
-            tabs[link_.range.class_.name].table.rows.append([
-                link(link_.range),
-                name,
-                link_.type.name])
-        for class_ in g.classes.values():
-            if entity.name in class_.reference_systems:
-                tabs[class_.name].buttons = []
-                if not tabs[class_.name].table.rows \
-                        and is_authorized('manager'):
-                    tabs[class_.name].buttons = [
-                        button(
-                            _('remove'),
-                            url_for(
-                                'reference_system_remove_form',
-                                system_id=entity.id,
-                                class_=class_.name))]
+            tabs[
+                link_.range.class_.name].table.rows.append([
+                    link(link_.range),
+                    name,
+                    link_.type.name])
+        for name in entity.classes:
+            tabs[name].buttons = []
+            if not tabs[name].table.rows and is_authorized('manager'):
+                tabs[name].buttons = [button(
+                    _('remove'),
+                    url_for(
+                        'reference_system_remove_form',
+                        system_id=entity.id,
+                        class_=name))]
     elif entity.class_.view == 'actor':
         for name in [
                 'source', 'event', 'relation', 'member_of', 'member',

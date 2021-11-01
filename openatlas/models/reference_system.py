@@ -11,14 +11,10 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem(Entity):
 
+    classes = []
     EXTERNAL_REFERENCES_FORMS = [
         'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
         'human_remains', 'move', 'person', 'place', 'source', 'type']
-
-    website_url = None
-    resolver_url = None
-    placeholder = None
-    system = False
 
     def __init__(self, row: Dict[str, Any]) -> None:
 
@@ -33,7 +29,11 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
-        return {row['id']: ReferenceSystem(row) for row in Db.get_all()}
+        systems = {row['id']: ReferenceSystem(row) for row in Db.get_all()}
+        for class_ in g.classes.values():
+            for system_id in class_.reference_systems:
+                systems[system_id].classes.append(class_.name)
+        return systems
 
     @staticmethod
     def get_by_name(name: str) -> ReferenceSystem:
