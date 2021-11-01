@@ -43,7 +43,7 @@ def insert(
     if origin:
         populate_insert_form(form, view_name, class_, origin)
     else:
-        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').forms)
+        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').classes)
 
     # Archaeological sub units
     structure = None
@@ -122,7 +122,7 @@ def update(id_: int) -> Union[str, Response]:
 
     geonames_module = False
     if entity.class_.name == 'place' \
-            and ReferenceSystem.get_by_name('GeoNames').forms:
+            and ReferenceSystem.get_by_name('GeoNames').classes:
         geonames_module = True
 
     # Archaeological sub units
@@ -341,8 +341,8 @@ def save(
             entity.placeholder = form.placeholder.data \
                 if form.placeholder.data else None
             entity.update_system(form)
-            if hasattr(form, 'forms'):
-                entity.add_forms(form)
+            if hasattr(form, 'classes'):
+                entity.add_classes(form)
         else:
             entity.update(form)
             class_ = entity.class_.name
@@ -428,7 +428,7 @@ def update_links(
         form: FlaskForm,
         action: str,
         origin: Union[Entity, None]) -> None:
-    if entity.class_.name in ReferenceSystem.EXTERNAL_REFERENCES_FORMS:
+    if entity.class_.reference_systems:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':
         if action == 'update':

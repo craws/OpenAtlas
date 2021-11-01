@@ -106,9 +106,9 @@ def entity_view(id_: int) -> Union[str, Response]:
                 tabs[name].buttons = [button(
                     _('remove'),
                     url_for(
-                        'reference_system_remove_form',
+                        'reference_system_remove_class',
                         system_id=entity.id,
-                        class_=name))]
+                        class_name=name))]
     elif entity.class_.view == 'actor':
         for name in [
                 'source', 'event', 'relation', 'member_of', 'member',
@@ -536,7 +536,7 @@ def add_buttons(entity: Entity) -> List[str]:
                 buttons.append(display_delete_link(entity))
     elif isinstance(entity, ReferenceSystem):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-        if not entity.reference_systems and not entity.system:
+        if not entity.classes and not entity.system:
             buttons.append(display_delete_link(entity))
     elif entity.class_.name == 'source_translation':
         buttons.append(

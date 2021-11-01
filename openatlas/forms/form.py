@@ -79,7 +79,7 @@ def build_form(
     # Todo: add types to forms
     # add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
-    # add_reference_systems(Form, class_)
+    add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
         date.add_date_fields(Form)
     if 'description' in FORMS[class_]:
@@ -361,13 +361,12 @@ def add_fields(
         setattr(form, precision_id, TreeField(precision_id))
         choices = ReferenceSystem.get_class_choices(entity)
         if choices:
-            setattr(form, 'forms', SelectMultipleField(
+            setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False),
-                coerce=int))
+                widget=widgets.ListWidget(prefix_label=False)))
     elif class_ == 'source':
         setattr(
             form,

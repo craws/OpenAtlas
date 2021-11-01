@@ -119,9 +119,10 @@ def delete_entity(id_: int) -> Optional[str]:
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
-        if entity.forms:
-            flash(_('Deletion not possible if forms are attached'), 'error')
+        if entity.classes:
+            flash(_('Deletion not possible if classes are attached'), 'error')
             return url_for('entity_view', id_=id_)
+        url = url_for('index', view='reference_system')
     if entity.class_.view in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')

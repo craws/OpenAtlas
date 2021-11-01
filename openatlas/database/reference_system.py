@@ -51,22 +51,22 @@ class ReferenceSystem:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def add_forms(entity_id: int, form_ids: List[int]) -> None:
-        for form_id in form_ids:
+    def add_classes(entity_id: int, class_names: List[str]) -> None:
+        for name in class_names:
             sql = """
-                INSERT INTO web.reference_system_form (
-                    reference_system_id, form_id)
-                VALUES (%(entity_id)s, %(form_id)s);"""
-            g.cursor.execute(sql, {'entity_id': entity_id, 'form_id': form_id})
+                INSERT INTO web.reference_system_openatlas_class (
+                    reference_system_id, openatlas_class_name)
+                VALUES (%(entity_id)s, %(name)s);"""
+            g.cursor.execute(sql, {'entity_id': entity_id, 'name': name})
 
     @staticmethod
-    def remove_form(entity_id: int, form_id: int) -> None:
+    def remove_class(entity_id: int, class_name: str) -> None:
         g.cursor.execute(
             """
-            DELETE FROM web.reference_system_form
+            DELETE FROM web.reference_system_openatlas_class
             WHERE reference_system_id = %(reference_system_id)s
-                AND form_id = %(form_id)s;""",
-            {'reference_system_id': entity_id, 'form_id': form_id})
+                AND openatlas_class_name = %(class_name)s;""",
+            {'reference_system_id': entity_id, 'class_name': class_name})
 
     @staticmethod
     def update_system(data: Dict[str, Any]) -> None:

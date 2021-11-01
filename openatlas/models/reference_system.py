@@ -11,11 +11,6 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem(Entity):
 
-
-    EXTERNAL_REFERENCES_FORMS = [
-        'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
-        'human_remains', 'move', 'person', 'place', 'source', 'type']
-
     def __init__(self, row: Dict[str, Any]) -> None:
 
         super().__init__(row)
@@ -42,18 +37,17 @@ class ReferenceSystem(Entity):
             if system.name == name:
                 return system
 
-    def add_forms(self, form: FlaskForm) -> None:
-        Db.add_forms(self.id, form.forms.data)
+    def add_classes(self, form: FlaskForm) -> None:
+        Db.add_classes(self.id, form.classes.data)
 
-    def remove_form(self, form_id: int) -> None:
+    def remove_class(self, class_name: str) -> None:
         # Todo: add types to forms
         forms = {}
         # forms = self.get_forms()
         for link_ in self.get_links('P67'):
-            if link_.range.class_.name == \
-                    forms[form_id]['name']:  # pragma: no cover
+            if link_.range.class_.name == class_name:  # pragma: no cover
                 return  # Abort if there are linked entities
-        Db.remove_form(self.id, form_id)
+        Db.remove_class(self.id, class_name)
 
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
