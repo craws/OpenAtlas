@@ -24,8 +24,8 @@ CREATE TABLE model.openatlas_class (
     name text NOT NULL,
     cidoc_class_code text,
     standard_type_id integer,
-    alias boolean DEFAULT false,
-    reference_system boolean DEFAULT false,
+    alias_allowed boolean DEFAULT false,
+    reference_system_allowed boolean DEFAULT false,
     write_access_group_name text,
     layout_color text,
     layout_icon text,
@@ -34,8 +34,6 @@ CREATE TABLE model.openatlas_class (
 );
 ALTER TABLE model.openatlas_class OWNER TO openatlas;
 COMMENT ON TABLE model.openatlas_class IS 'A more fine grained use of CIDOC classes';
-COMMENT ON COLUMN model.openatlas_class.alias IS 'If aliases are supported for entities with this class';
-COMMENT ON COLUMN model.openatlas_class.reference_system IS 'If links to external reference systems are supported for entities with this class';
 COMMENT ON COLUMN model.openatlas_class.layout_color IS 'For e.g. network vizualistaion';
 COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'For Bootstrap icons';
 
@@ -57,7 +55,7 @@ ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_standard_t
 ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_write_access_group_name_fkey FOREIGN KEY (write_access_group_name) REFERENCES web."group"(name) ON UPDATE CASCADE ON DELETE CASCADE;
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
-INSERT INTO model.openatlas_class (name, cidoc_class_code, alias, reference_system, write_access_group_name, layout_color, standard_type_id) VALUES
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, write_access_group_name, layout_color, standard_type_id) VALUES
     ('acquisition',          'E8',  false, true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('activity',             'E7',  false, true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('actor_appellation',    'E82', false, false, 'contributor', NULL,      NULL),

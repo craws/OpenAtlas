@@ -36,8 +36,8 @@ class OpenatlasClass:
             name: str,
             cidoc_class: str,
             hierarchies: List[int],
-            alias: bool,
-            reference_system: bool,
+            alias_allowed: bool,
+            reference_system_allowed: bool,
             reference_system_ids: List[int],
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
@@ -50,8 +50,8 @@ class OpenatlasClass:
         self.color = color  # Color of entity in network visualisation
         self.write_access = write_access
         self.view = None
-        self.alias = alias  # Aliases allowed
-        self.reference_system = reference_system  # Reference systems allowed
+        self.alias_allowed = alias_allowed
+        self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
         for item, classes in view_class_mapping.items():
             if name in classes:
@@ -65,10 +65,10 @@ class OpenatlasClass:
                 name=row['name'],
                 cidoc_class=row['cidoc_class_code'],
                 standard_type_id=row['standard_type_id'],
-                alias=row['alias'],
-                reference_system=row['reference_system'],
-                reference_system_ids=row['reference_system_ids']
-                if row['reference_system_ids'] else [],
+                alias_allowed=row['alias_allowed'],
+                reference_system_allowed=row['reference_system_allowed'],
+                reference_system_ids=row['system_ids']
+                if row['system_ids'] else [],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
                 hierarchies=row['hierarchies'])

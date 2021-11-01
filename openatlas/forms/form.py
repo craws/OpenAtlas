@@ -79,7 +79,7 @@ def build_form(
     # Todo: add types to forms
     # add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
-    add_reference_systems(Form, class_)
+    # add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
         date.add_date_fields(Form)
     if 'description' in FORMS[class_]:
@@ -216,15 +216,14 @@ def add_buttons(
     return form
 
 
-def add_reference_systems(form: Any, form_name: str) -> None:
+def add_reference_systems(form: Any, class_: str) -> None:
     precision_nodes = Node.get_hierarchy('External reference match').subs
     precisions = [('', '')] + [
         (str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
-        if form_name \
-                not in [form_['name'] for form_ in system.get_forms().values()]:
+        if class_ not in system.classes:
             continue
         setattr(
             form,
@@ -360,7 +359,7 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        choices = ReferenceSystem.get_form_choices(entity)
+        choices = ReferenceSystem.get_class_choices(entity)
         if choices:
             setattr(form, 'forms', SelectMultipleField(
                 _('classes'),

@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem(Entity):
 
-    classes = []
+
     EXTERNAL_REFERENCES_FORMS = [
         'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
         'human_remains', 'move', 'person', 'place', 'source', 'type']
@@ -26,6 +26,7 @@ class ReferenceSystem(Entity):
             list(self.nodes.keys())[0].id if self.nodes else None
         self.count = row['count']
         self.system = row['system']
+        self.classes = []
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
@@ -54,10 +55,6 @@ class ReferenceSystem(Entity):
                 return  # Abort if there are linked entities
         Db.remove_form(self.id, form_id)
 
-    def get_forms(self) -> Dict[int, Dict[str, Any]]:
-        return {
-            row['id']: {'name': row['name']} for row in Db.get_forms(self.id)}
-
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
         Db.update_system({
@@ -85,16 +82,18 @@ class ReferenceSystem(Entity):
                         type_id=precision_field.data)
 
     @staticmethod
-    def get_form_choices(
+    def get_class_choices(
             entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices(
-                ReferenceSystem.EXTERNAL_REFERENCES_FORMS):
-            if not entity or row['id'] not in entity.forms:
-                if entity and entity.name == 'GeoNames' \
-                        and row['name'] != 'Place':
-                    continue
-                choices.append((row['id'], g.classes[row['name']].label))
+        for class_ in g.classes.values():
+            if not class_.reference_system_allowed \
+                    or (entity and class_.name in entity.classes)\
+                    or (
+                        entity
+                        and entity.name == 'GeoNames'
+                        and class_.name != 'Place'):
+                continue
+            choices.append((class_.name, g.classes[class_.name].label))
         return choices
 
     @staticmethod

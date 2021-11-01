@@ -69,15 +69,6 @@ class ReferenceSystem:
             {'reference_system_id': entity_id, 'form_id': form_id})
 
     @staticmethod
-    def get_forms(form_id: int) -> List[Dict[str, Union[int, str]]]:
-        g.cursor.execute(
-            """
-            SELECT f.id, f.name FROM web.form f
-            JOIN web.reference_system_form rsf ON f.id = rsf.form_id
-                AND rsf.reference_system_id = %(id)s;""", {'id': form_id})
-        return [dict(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
     def update_system(data: Dict[str, Any]) -> None:
         g.cursor.execute(
             """
