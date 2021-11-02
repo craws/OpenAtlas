@@ -293,7 +293,7 @@ def insert_file(
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')  # type: ignore
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
-            file.save(f"{app.config['UPLOAD_DIR']}/{new_name}")
+            file.save(str(app.config['UPLOAD_DIR'] / new_name))
             filenames.append(new_name)
             if session['settings']['image_processing']:
                 ImageProcessing.resize_image(new_name)

@@ -1,11 +1,15 @@
 {% extends 'layout.html' %}
+
 {% block content %}
-    {{ form|display_form(manual_page='admin/user') }}
-    <script>
-        $(document).ready(function () {
-            $("#show_passwords").after(function() {
-                return '<span class="{{ config.CSS.button.primary }}" id="generate-password">{{ _('generate password')|uc_first }}</span>';
-            });
-        });
-    </script>
+  {{ form|display_form(manual_page='admin/user') }}
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(document).ready(function () {
+      $("#show_passwords").after(function() {
+        return '<span class="{{ config.CSS.button.primary }}" id="generate-password">{{ _('generate password')|uc_first }}</span>';
+      });
+    });
+  </script>
 {% endblock %}
