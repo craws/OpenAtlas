@@ -47,7 +47,9 @@ class Node:
     @staticmethod
     def get_hierarchies() -> List[Dict[str, Any]]:
         g.cursor.execute(
-            "SELECT h.id, h.name, h.category, h.multiple, h.directional FROM web.hierarchy h;")
+            """
+            SELECT h.id, h.name, h.category, h.multiple, h.directional
+            FROM web.hierarchy h;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -105,30 +107,25 @@ class Node:
             {'type_id': type_id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_form_count(form_id: int, node_ids: List[int]) -> int:
-        # Todo: add types to forms
-        return 0
-        # g.cursor.execute(
-        #     "SELECT name FROM web.form WHERE id = %(form_id)s;",
-        #     {'form_id': form_id})
-        # form_name = g.cursor.fetchone()['name']
-        # g.cursor.execute(
-        #     """
-        #     SELECT COUNT(*) FROM model.link l
-        #     JOIN model.entity e ON l.domain_id = e.id
-        #         AND l.range_id IN %(node_ids)s
-        #     WHERE l.property_code = 'P2'
-        #         AND e.openatlas_class_name = %(form_name)s;""",
-        #     {'node_ids': tuple(node_ids), 'form_name': form_name})
-        # return g.cursor.fetchone()['count']
-
-    @staticmethod
-    def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:
+    def get_form_count(class_name: str, node_ids: List[int]) -> int:
         g.cursor.execute(
             """
-            DELETE FROM web.hierarchy_form
-            WHERE hierarchy_id = %(hierarchy_id)s AND form_id = %(form_id)s;""",
-            {'hierarchy_id': hierarchy_id, 'form_id': form_id})
+            SELECT COUNT(*) FROM model.link l
+            JOIN model.entity e ON l.domain_id = e.id
+                AND l.range_id IN %(node_ids)s
+            WHERE l.property_code = 'P2'
+                AND e.openatlas_class_name = %(class_name)s;""",
+            {'node_ids': tuple(node_ids), 'class_name': class_name})
+        return g.cursor.fetchone()['count']
+
+    @staticmethod
+    def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
+        g.cursor.execute(
+            """
+            DELETE FROM web.hierarchy_openatlas_class
+            WHERE hierarchy_id = %(hierarchy_id)s
+                AND openatlas_class_name = %(class_name)s;""",
+            {'hierarchy_id': hierarchy_id, 'class_name': class_name})
 
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:

@@ -148,9 +148,9 @@ class Entity:
     def get_profile_image_id(id_: int) -> Optional[int]:
         g.cursor.execute(
             """
-                SELECT i.image_id
-                FROM web.entity_profile_image i
-                WHERE i.entity_id = %(id_)s;""",
+            SELECT i.image_id
+            FROM web.entity_profile_image i
+            WHERE i.entity_id = %(id_)s;""",
             {'id_': id_})
         return g.cursor.fetchone()['image_id'] if g.cursor.rowcount else None
 

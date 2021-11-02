@@ -44,8 +44,10 @@ class OpenatlasClass:
             write_access: Optional[str] = 'contributor') -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))
+        self.cidoc_class = None
         if cidoc_class:
             self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
+        self.hierarchies = hierarchies
         self.standard_type = standard_type_id
         self.color = color  # Color of entity in network visualisation
         self.write_access = write_access

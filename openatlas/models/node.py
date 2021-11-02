@@ -22,7 +22,7 @@ class Node(Entity):
         super().__init__(row)
         self.root: List[int] = []
         self.subs: List[int] = []
-        self.forms: Dict[int, Any] = {}
+        self.classes: List[str] = []
 
     @staticmethod
     def get_all_nodes() -> Dict[int, Node]:
@@ -41,7 +41,6 @@ class Node(Entity):
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
-        classes = {}
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for node in nodes.values():
             if node.root:
@@ -57,10 +56,9 @@ class Node(Entity):
                 node.category = hierarchies[node.id]['category']
                 node.multiple = hierarchies[node.id]['multiple']
                 node.directional = hierarchies[node.id]['directional']
-                # Todo: add types to forms
-                #node.classes = {
-                #    id_: g.classes[id_]
-                #    for id_ in hierarchies[node.id]['class_names']}
+                for class_ in g.classes.values():
+                    if class_.hierarchies and node.name in class_.hierarchies:
+                        node.classes.append(class_.name)
 
     @staticmethod
     def get_root_path(
@@ -117,13 +115,14 @@ class Node(Entity):
         return items
 
     @staticmethod
-    def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
+    def get_class_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         choices = []
-        # Todo: add types to forms
-        #for row in Db.get_form_choices():
-        #    if g.classes[row['name']].view != 'type' \
-        #            and (not root or row['id'] not in root.forms):
-        #        choices.append((row['id'], g.classes[row['name']].label))
+        for class_ in g.classes.values():
+            if class_.view != 'type' and class_.cidoc_class and (
+                    not root or class_.name not in root.classes):
+                print()
+                print(root.classes)
+                choices.append((class_, class_.label))
         return choices
 
     @staticmethod
@@ -242,16 +241,16 @@ class Node(Entity):
         return subs
 
     @staticmethod
-    def get_form_count(root_node: Node, form_id: int) -> Optional[int]:
-        # Check if nodes linked to entities before offering to remove from form
+    def get_form_count(root_node: Node, class_name: str) -> Optional[int]:
+        # Check if nodes linked to entities before offering to remove them
         node_ids = Node.get_all_sub_ids(root_node)
         if not node_ids:
             return None
-        return Db.get_form_count(form_id, node_ids)
+        return Db.get_form_count(class_name, node_ids)
 
     @staticmethod
-    def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:
-        Db.remove_form_from_hierarchy(form_id, hierarchy_id)
+    def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
+        Db.remove_class_from_hierarchy(class_name, hierarchy_id)
 
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:

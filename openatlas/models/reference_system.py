@@ -41,9 +41,6 @@ class ReferenceSystem(Entity):
         Db.add_classes(self.id, form.classes.data)
 
     def remove_class(self, class_name: str) -> None:
-        # Todo: add types to forms
-        forms = {}
-        # forms = self.get_forms()
         for link_ in self.get_links('P67'):
             if link_.range.class_.name == class_name:  # pragma: no cover
                 return  # Abort if there are linked entities

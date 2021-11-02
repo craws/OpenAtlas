@@ -42,7 +42,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     if hierarchy.category in ('standard', 'system'):
         abort(403)
     form = build_form('hierarchy', hierarchy)
-    form.forms.choices = Node.get_form_choices(hierarchy)
+    form.classes.choices = Node.get_class_choices(hierarchy)
     if hasattr(form, 'multiple') and form.multiple.data:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
@@ -56,13 +56,16 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             f"{url_for('node_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
     form.multiple = hierarchy.multiple
     table = Table(paging=False)
-    for form_id, form_ in hierarchy.forms.items():
-        count = Node.get_form_count(hierarchy, form_id)
+    for class_name in hierarchy.classes:
+        count = Node.get_form_count(hierarchy, class_name)
         table.rows.append([
-            g.classes[form_['name']].label,
+            g.classes[class_name].label,
             format_number(count) if count else link(
                 _('remove'),
-                url_for('remove_form', id_=hierarchy.id, form_id=form_id))])
+                url_for(
+                    'remove_class',
+                    id_=hierarchy.id,
+                    class_name=class_name))])
     return render_template(
         'display_form.html',
         form=form,
@@ -72,17 +75,17 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         crumbs=[[_('types'), url_for('node_index')], hierarchy, _('edit')])
 
 
-@app.route('/hierarchy/remove_form/<int:id_>/<int:form_id>')
+@app.route('/hierarchy/remove_class/<int:id_>/<class_name>')
 @required_group('manager')
-def remove_form(id_: int, form_id: int) -> Response:
+def remove_class(id_: int, class_name: str) -> Response:
     root = g.nodes[id_]
-    if Node.get_form_count(root, form_id):
+    if Node.get_form_count(root, class_name):
         abort(403)  # pragma: no cover
     try:
-        Node.remove_form_from_hierarchy(form_id, root.id)
+        Node.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'remove form from hierarchy failed', e)
+        logger.log('error', 'database', 'remove class from hierarchy failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 

@@ -7,12 +7,6 @@ class ReferenceSystem:
 
     @staticmethod
     def get_all() -> List[Dict[str, Any]]:
-        # Todo: add types to forms
-        """(SELECT ARRAY(
-                    SELECT f.id FROM web.form f
-                    JOIN web.reference_system_form rfs ON f.id = rfs.form_id
-                        AND rfs.reference_system_id = rs.entity_id))
-                        AS form_ids,"""
         g.cursor.execute("""
             SELECT
                 e.id, e.name,

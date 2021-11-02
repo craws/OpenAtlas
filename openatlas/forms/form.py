@@ -313,14 +313,13 @@ def add_fields(
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
-        setattr(form, 'forms', SelectMultipleField(
+        setattr(form, 'classes', SelectMultipleField(
             _('classes'),
             render_kw={'disabled': True},
             description=_('tooltip hierarchy forms'),
             choices=[],
             option_widget=widgets.CheckboxInput(),
-            widget=widgets.ListWidget(prefix_label=False),
-            coerce=int))
+            widget=widgets.ListWidget(prefix_label=False)))
     elif class_ == 'involvement':
         if not entity and origin:
             involved_with = 'actor' \
