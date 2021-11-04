@@ -1,5 +1,5 @@
 import json
-from typing import Any, Dict, List, Tuple, Union, Iterable
+from typing import Any, Dict, Iterable, List, Tuple, Union
 
 from flask import Response, jsonify, url_for
 from flask_restful import marshal

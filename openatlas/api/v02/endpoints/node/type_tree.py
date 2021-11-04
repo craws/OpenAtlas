@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
-from flask import Response, jsonify
+from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas.api.v02.resources.enpoints_util import download
