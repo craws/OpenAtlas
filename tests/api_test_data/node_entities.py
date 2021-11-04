@@ -1,9 +1,11 @@
-def get_test_node_entities(params):
-    return {'nodes': [
-        {'id': params['austria_id'],
+class NodeEntities:
+    @staticmethod
+    def get_test_node_entities(params):
+        return {'nodes': [
+            {'id': params['austria_id'],
          'label': 'Austria',
          'url': 'http://local.host/api/0.2/entity/84'},
-        {'id': params['czech_id'],
+        {'id': params['czech_republic_id'],
          'label': 'Czech Republic',
          'url': 'http://local.host/api/0.2/entity/89'},
         {'id': params['germany_id'],
@@ -19,13 +21,13 @@ def get_test_node_entities(params):
          'label': 'Slovenia',
          'url': 'http://local.host/api/0.2/entity/91'}]}
 
-
-def get_test_node_entities_all(params):
-    return {'nodes': [
+    @staticmethod
+    def get_test_node_entities_all(params):
+        return {'nodes': [
         {'id': params['austria_id'],
          'label': 'Austria',
          'url': 'http://local.host/api/0.2/entity/84'},
-        {'id': params['czech_id'],
+        {'id': params['czech_republic_id'],
          'label': 'Czech Republic',
          'url': 'http://local.host/api/0.2/entity/89'},
         {'id': params['germany_id'],
@@ -40,7 +42,7 @@ def get_test_node_entities_all(params):
         {'id': params['slovenia_id'],
          'label': 'Slovenia',
          'url': 'http://local.host/api/0.2/entity/91'},
-        {'id': params['nieder_id'],
+        {'id': params['niederösterreich_id'],
          'label': 'Niederösterreich',
          'url': 'http://local.host/api/0.2/entity/86'},
         {'id': params['wien_id'],

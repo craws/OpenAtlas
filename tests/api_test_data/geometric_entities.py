@@ -1,6 +1,8 @@
-def get_test_geometric_entity(params):
-    return {
-        'type': 'FeatureCollection',
+class GeometricEntity:
+    @staticmethod
+    def get_test_geometric_entity(params):
+        return {
+            'type': 'FeatureCollection',
         'features': [{
             'type': 'Feature',
             'geometry': {'coordinates': [9, 17], 'type': 'Point'},
