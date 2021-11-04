@@ -1,24 +1,4 @@
-
 test_ids = {
-    # Test IDs
-    'frodo_id': 113,
-    'sam_id': 118,
-    'ring_id': 116,
-    'location_ring_id': 117,
-    'travel_id': 119,
-    'home_id': 108,
-    'kitchen_id': 110,
-    'location_kitchen_id': 111,
-    'location_home_id': 109,
-    'shire_id': 104,
-    'location_shire_id': 105,
-    'mordor_id': 120,
-    'location_mordor_id': 121,
-    'lotr_id': 107,
-    'picture_id': 112,
-    'file_without_id': 115,
-    'silmarillion_id': 122,
-    'suza_id': 106,
 
     'geonames_id': 1,
 

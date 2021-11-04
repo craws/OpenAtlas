@@ -2,28 +2,55 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.v02.resources.error import (
-    EntityDoesNotExistError, FilterOperatorError, InvalidCidocClassCode,
-    InvalidCodeError, InvalidLimitError, InvalidSearchDateError,
-    InvalidSearchNumberError, InvalidSubunitError, QueryEmptyError,
-    FilterLogicalOperatorError, FilterColumnError,
-    InvalidSystemClassError, NoEntityAvailable, TypeIDError,
-    NoSearchStringError)
+from openatlas.api.v02.resources.error import (EntityDoesNotExistError,
+                                               FilterColumnError,
+                                               FilterLogicalOperatorError,
+                                               FilterOperatorError,
+                                               InvalidCidocClassCode,
+                                               InvalidCodeError,
+                                               InvalidLimitError,
+                                               InvalidSearchDateError,
+                                               InvalidSearchNumberError,
+                                               InvalidSubunitError,
+                                               InvalidSystemClassError,
+                                               NoEntityAvailable,
+                                               NoSearchStringError,
+                                               QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
-from tests.api_test_data import entity, cidoc_class, code, \
-    entities_linked_to_entity, latest, system_class, type_entities, query, \
-    content, geometric_entities, system_class_count, node_entities, \
-    subunit, overview_count, node_overview, type_tree, config_params
+from tests.api_test_data import config_params, content, overview_count, \
+    system_class_count
+from tests.api_test_data.cidoc_class import get_test_cidoc_class, \
+    get_test_cidoc_class_show_none
+from tests.api_test_data.code import get_test_code
+from tests.api_test_data.entities_linked_to_entity import \
+    get_test_entities_linked_to
+from tests.api_test_data.entity import get_test_entity_geojson, \
+    get_test_entity_lpf
+from tests.api_test_data.geometric_entities import get_test_geometric_entity
+from tests.api_test_data.latest import get_test_latest
+from tests.api_test_data.node_entities import get_test_node_entities, \
+    get_test_node_entities_all
+from tests.api_test_data.node_overview import get_test_node_overview
+from tests.api_test_data.query import get_test_query, get_test_query_filter, \
+    get_test_query_filter_date, get_test_query_first, \
+    get_test_query_geojson, get_test_query_last, get_test_query_type
+from tests.api_test_data.subunit import get_test_subunit, \
+    get_test_subunit_hierarchy
+from tests.api_test_data.system_class import test_system_class
+from tests.api_test_data.type_entities import get_test_type_entities, \
+    get_test_type_entities_all_special
+from tests.api_test_data.type_tree import get_test_type_tree
 from tests.base import TestBaseCase, insert_entity
 
 
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
-        params = {}
+        params = config_params.test_ids
+
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -34,6 +61,7 @@ class ApiTests(TestBaseCase):
                     description='The Shire was the homeland of the hobbits.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['shire_id'] = place.id
 
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
@@ -46,6 +74,7 @@ class ApiTests(TestBaseCase):
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
+                params['location_shire_id'] = location.id
 
                 # Adding Type Place
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -53,6 +82,7 @@ class ApiTests(TestBaseCase):
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
                 place.link('P1', alias)
+                params['suza_id'] = alias.id
 
                 # Adding External Reference
                 external_reference = insert_entity(
@@ -62,12 +92,17 @@ class ApiTests(TestBaseCase):
                     'P67',
                     place,
                     description='Fandom Wiki of lord of the rings')
+                params['lotr_id'] = external_reference.id
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
+                params['home_id'] = feature.id
+                params['location_home_id'] = feature.id + 1
 
                 # Adding stratigraphic to place
-                insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                params['kitchen_id'] = strati.id
+                params['location_kitchen_id'] = strati.id + 1
 
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative unit')
@@ -76,6 +111,7 @@ class ApiTests(TestBaseCase):
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                params['picture_id'] = file.id
 
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
@@ -96,10 +132,9 @@ class ApiTests(TestBaseCase):
                 actor = insert_entity(
                     'Frodo', 'person',
                     description='That is Frodo')
-
-                params['frodo_id'] = actor.id
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['frodo_id'] = actor.id
 
                 alias2 = insert_entity('The ring bearer', 'appellation')
                 actor.link('P131', alias2)
@@ -107,10 +142,13 @@ class ApiTests(TestBaseCase):
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
                 file2.link('P67', actor)
+                params['file_without_id'] = file2.id
 
                 # Adding artefact to actor
                 artifact = insert_entity('The One Ring', 'artifact')
                 artifact.link('P52', actor)
+                params['ring_id'] = artifact.id
+                params['location_ring_id'] = artifact.id + 1
 
                 # Creation of second actor (Sam)
                 actor2 = insert_entity(
@@ -118,6 +156,7 @@ class ApiTests(TestBaseCase):
                     description='That is Sam')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['sam_id'] = actor2.id
 
                 # Adding residence
                 actor2.link('P74', place)
@@ -132,6 +171,7 @@ class ApiTests(TestBaseCase):
                 event.link('P11', actor)
                 event.link('P14', actor2)
                 event.link('P7', location)
+                params['travel_id'] = event.id
 
                 # Creation of Mordor (place)
                 place2 = insert_entity(
@@ -139,12 +179,15 @@ class ApiTests(TestBaseCase):
                     description='The heart of evil.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['mordor_id'] = place2.id
+                params['location_mordor_id'] = place2.id + 1
 
                 # Adding Type Settlement
                 place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
 
                 # Creation of Silmarillion (source)
-                insert_entity('Silmarillion', 'source')
+                source = insert_entity('Silmarillion', 'source')
+                params['silmarillion_id'] = source.id
 
             self.maxDiff = None
 
@@ -153,7 +196,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id))
-            self.assertDictEqual(rv.get_json(), entity.test_lpf)
+            self.assertDictEqual(rv.get_json(), get_test_entity_lpf(params))
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id,
@@ -163,7 +206,7 @@ class ApiTests(TestBaseCase):
                 'api.entity',
                 id_=place.id,
                 download=True))
-            self.assertDictEqual(rv.get_json(), entity.test_lpf)
+            self.assertDictEqual(rv.get_json(), get_test_entity_lpf(params))
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id,
@@ -173,26 +216,26 @@ class ApiTests(TestBaseCase):
                 'api.entity',
                 id_=place.id,
                 format='geojson'))
-            self.assertDictEqual(rv.get_json(), entity.test_geojson)
+            self.assertDictEqual(rv.get_json(), get_test_entity_geojson(params))
 
             # /class
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21'))
-            self.assertDictEqual(rv.get_json(), cidoc_class.get_test_cidoc_class(params))
+            self.assertDictEqual(rv.get_json(), get_test_cidoc_class(params))
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21',
                 show='none'))
             self.assertDictEqual(
                 rv.get_json(),
-                cidoc_class.test_cidoc_class_show_none)
+                get_test_cidoc_class_show_none(params))
 
             # /code
             rv = self.app.get(url_for(
                 'api.code',
                 code='place'))
-            self.assertDictEqual(rv.get_json(), code.test_code)
+            self.assertDictEqual(rv.get_json(), get_test_code(params))
 
             # /entities_linked_to_entity
             rv = self.app.get(url_for(
@@ -200,19 +243,19 @@ class ApiTests(TestBaseCase):
                 id_=event.id))
             self.assertDictEqual(
                 rv.get_json(),
-                entities_linked_to_entity.test_entities_linked_to)
+                get_test_entities_linked_to(params))
 
             # /latest
             rv = self.app.get(url_for(
                 'api.latest',
                 latest=2))
-            self.assertDictEqual(rv.get_json(), latest.test_latest)
+            self.assertDictEqual(rv.get_json(), get_test_latest(params))
 
             # /system_class
             rv = self.app.get(url_for(
                 'api.system_class',
                 system_class='artifact'))
-            self.assertDictEqual(rv.get_json(), system_class.test_system_class)
+            self.assertDictEqual(rv.get_json(), test_system_class(params))
 
             # /type_entities
             rv = self.app.get(url_for(
@@ -220,13 +263,13 @@ class ApiTests(TestBaseCase):
                 id_=Node.get_hierarchy('Place').id))
             self.assertDictEqual(
                 rv.get_json(),
-                type_entities.test_type_entities)
+                get_test_type_entities(params))
             rv = self.app.get(url_for(
                 'api.type_entities',
                 id_=relation_sub_id))
             self.assertDictEqual(
                 rv.get_json(),
-                cidoc_class.test_cidoc_class)
+                get_test_cidoc_class(params))
 
             # /type_entities_all
             rv = self.app.get(url_for(
@@ -234,13 +277,13 @@ class ApiTests(TestBaseCase):
                 id_=relation_sub_id))
             self.assertDictEqual(
                 rv.get_json(),
-                cidoc_class.test_cidoc_class)
+                get_test_cidoc_class(params))
             rv = self.app.get(url_for(
                 'api.type_entities_all',
                 id_=unit_node.id))
             self.assertDictEqual(
                 rv.get_json(),
-                type_entities.test_type_entities_all_special)
+                get_test_type_entities_all_special(params))
 
             # /query
             rv = self.app.get(url_for(
@@ -249,7 +292,7 @@ class ApiTests(TestBaseCase):
                 classes='E18',
                 codes='artifact',
                 system_classes='person'))
-            self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(rv.get_json(), get_test_query(params))
 
             # /query with different parameter
             rv = self.app.get(url_for(
@@ -259,7 +302,7 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 type_id=Node.get_nodes('Place')[0]))
-            self.assertDictEqual(rv.get_json(), query.test_query_type)
+            self.assertDictEqual(rv.get_json(), get_test_query_type(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -268,7 +311,7 @@ class ApiTests(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 first=actor2.id))
-            self.assertDictEqual(rv.get_json(), query.test_query_first)
+            self.assertDictEqual(rv.get_json(), get_test_query_first(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -277,7 +320,7 @@ class ApiTests(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 last=actor2.id))
-            self.assertDictEqual(rv.get_json(), query.test_query_last)
+            self.assertDictEqual(rv.get_json(), get_test_query_last(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -285,7 +328,7 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 download=True))
-            self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(rv.get_json(), get_test_query(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -317,7 +360,7 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 format='geojson'))
-            self.assertDictEqual(rv.get_json(), query.test_query_geojson)
+            self.assertDictEqual(rv.get_json(), get_test_query_geojson(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -327,7 +370,7 @@ class ApiTests(TestBaseCase):
                 filter='and|name|like|Shire',
                 sort='desc',
                 column='id'))
-            self.assertDictEqual(rv.get_json(), query.test_query_filter)
+            self.assertDictEqual(rv.get_json(), get_test_query_filter(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -337,7 +380,9 @@ class ApiTests(TestBaseCase):
                 filter='or|begin_from|ge|2018-1-1',
                 sort='desc',
                 column='id'))
-            self.assertDictEqual(rv.get_json(), query.test_query_filter_date)
+            self.assertDictEqual(
+                rv.get_json(),
+                get_test_query_filter_date(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -345,7 +390,7 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 filter='and|id|gt|100'))
-            self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(rv.get_json(), get_test_query(params))
 
             # ---Content Endpoints---
 
@@ -368,7 +413,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api.geometric_entities'))
             self.assertDictEqual(
                 rv.get_json(),
-                geometric_entities.test_geometric_entity)
+                get_test_geometric_entity(params))
             rv = self.app.get(url_for(
                 'api.geometric_entities',
                 count=True))
@@ -378,7 +423,7 @@ class ApiTests(TestBaseCase):
                 download=True))
             self.assertDictEqual(
                 rv.get_json(),
-                geometric_entities.test_geometric_entity)
+                get_test_geometric_entity(params))
 
             # system_class_count/
             rv = self.app.get(url_for('api.system_class_count'))
@@ -400,7 +445,7 @@ class ApiTests(TestBaseCase):
                 id_=unit_node.id))
             self.assertDictEqual(
                 rv.get_json(),
-                node_entities.test_node_entities)
+                get_test_node_entities(params))
 
             # node_entities_all/
             rv = self.app.get(url_for(
@@ -408,39 +453,40 @@ class ApiTests(TestBaseCase):
                 id_=unit_node.id))
             self.assertDictEqual(
                 rv.get_json(),
-                node_entities.test_node_entities_all)
+                get_test_node_entities_all(params))
 
             # node_overview/
             rv = self.app.get(url_for('api.node_overview'))
-#            self.assertDictEqual(
-#               rv.get_json(),
-#               node_overview.test_node_overview)
+            self.assertDictEqual(
+                rv.get_json(),
+                get_test_node_overview(params))
             rv = self.app.get(url_for(
                 'api.node_overview',
                 download=True))
-#            self.assertDictEqual(
-#               rv.get_json(),
-#               node_overview.test_node_overview)
+            self.assertDictEqual(
+                rv.get_json(),
+                get_test_node_overview(params))
 
             # type_tree/
             rv = self.app.get(url_for('api.type_tree'))
-#            self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
+            self.assertDictEqual(rv.get_json(), get_test_type_tree(params))
             rv = self.app.get(url_for(
                 'api.type_tree',
                 download=True))
-#            self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
+            self.assertDictEqual(rv.get_json(), get_test_type_tree(params))
 
             # subunit/
             rv = self.app.get(url_for(
                 'api.subunit',
                 id_=place.id))
-            self.assertDictEqual(rv.get_json(), subunit.test_subunit)
+            self.assertDictEqual(rv.get_json(), get_test_subunit(params))
 
             # subunit_hierarchy/
             rv = self.app.get(url_for(
                 'api.subunit_hierarchy',
                 id_=place.id))
-            self.assertDictEqual(rv.get_json(), subunit.test_subunit_hierarchy)
+            self.assertDictEqual(rv.get_json(),
+                                 get_test_subunit_hierarchy(params))
 
             # node_entities/ with parameters
             rv = self.app.get(url_for(
@@ -454,7 +500,7 @@ class ApiTests(TestBaseCase):
                 download=True))
             self.assertDictEqual(
                 rv.get_json(),
-                node_entities.test_node_entities)
+                get_test_node_entities(params))
 
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(

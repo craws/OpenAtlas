@@ -1,14 +1,9 @@
-import os
-import sys
-
-sys.path.append(os.path.dirname(__file__))
-from config_params import test_ids
-
-test_system_class = {'results': [{
+def test_system_class(params):
+    return {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection',
     'features': [{
-        '@id': f'http://local.host/entity/{test_ids["ring_id"]}',
+        '@id': f'http://local.host/entity/{params["ring_id"]}',
         'type': 'Feature',
         'crmClass': 'crm:E22 Man-Made Object',
         'systemClass': 'artifact',
@@ -48,5 +43,5 @@ test_system_class = {'results': [{
     'pagination': {
         'entities': 1,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': test_ids["ring_id"]}],
+        'index': [{'page': 1, 'startId': params["ring_id"]}],
         'totalPages': 1}}

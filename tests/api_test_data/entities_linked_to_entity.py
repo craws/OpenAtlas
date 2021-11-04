@@ -1,13 +1,8 @@
-import os
-import sys
-
-sys.path.append(os.path.dirname(__file__))
-from config_params import test_ids
-
-test_entities_linked_to = {'results': [{
+def get_test_entities_linked_to(params):
+    return {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection', 'features': [{
-        '@id': f'http://local.host/entity/{test_ids["frodo_id"]}',
+        '@id': f'http://local.host/entity/{params["frodo_id"]}',
         'type': 'Feature',
         'crmClass': 'crm:E21 Person',
         'systemClass': 'person',
@@ -20,7 +15,7 @@ test_entities_linked_to = {'results': [{
         'types': None,
         'relations': [{
             'label': 'Sam',
-            'relationTo': f'http://local.host/api/0.2/entity/{test_ids["sam_id"]}',
+            'relationTo': f'http://local.host/api/0.2/entity/{params["sam_id"]}',
             'relationType': 'crm:OA7 has relationship to',
             'relationSystemClass': 'person',
             'relationDescription': None,
@@ -31,7 +26,7 @@ test_entities_linked_to = {'results': [{
                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
             'label': 'File without license',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["file_without_id"]}',
+                f'http://local.host/api/0.2/entity/{params["file_without_id"]}',
             'relationType': 'crm:P67i is referred to by',
             'relationSystemClass': 'file',
             'relationDescription': None,
@@ -42,7 +37,7 @@ test_entities_linked_to = {'results': [{
                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
             'label': 'The One Ring',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["ring_id"]}',
+                f'http://local.host/api/0.2/entity/{params["ring_id"]}',
             'relationType': 'crm:P52i is current owner of',
             'relationSystemClass': 'artifact',
             'relationDescription': None,
@@ -53,7 +48,7 @@ test_entities_linked_to = {'results': [{
                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
             'label': 'Travel to Mordor',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["travel_id"]}',
+                f'http://local.host/api/0.2/entity/{params["travel_id"]}',
             'relationType': 'crm:P11i participated in',
             'relationSystemClass': 'activity',
             'relationDescription': None,
@@ -67,13 +62,13 @@ test_entities_linked_to = {'results': [{
         'geometry': None,
         'depictions': [{
             '@id':
-                f'http://local.host/api/0.2/entity/{test_ids["file_without_id"]}',
+                f'http://local.host/api/0.2/entity/{params["file_without_id"]}',
             'title': 'File without license',
             'license': None,
             'url': 'N/A'}]}]}, {
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection', 'features': [{
-        '@id': f'http://local.host/entity/{test_ids["location_shire_id"]}',
+        '@id': f'http://local.host/entity/{params["location_shire_id"]}',
         'type': 'Feature',
         'crmClass': 'crm:E53 Place',
         'systemClass': 'object_location',
@@ -87,7 +82,7 @@ test_entities_linked_to = {'results': [{
         'relations': [{
             'label': 'Shire',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["shire_id"]}',
+                f'http://local.host/api/0.2/entity/{params["shire_id"]}',
             'relationType': 'crm:P53i is former or current location of',
             'relationSystemClass': 'place',
             'relationDescription': None,
@@ -99,7 +94,7 @@ test_entities_linked_to = {'results': [{
                         'earliest': '2019-01-31',
                         'latest': '2019-03-01'}}]}},
             {'label': 'Travel to Mordor',
-             'relationTo': f'http://local.host/api/0.2/entity/{test_ids["travel_id"]}',
+             'relationTo': f'http://local.host/api/0.2/entity/{params["travel_id"]}',
              'relationType': 'crm:P7i witnessed',
              'relationSystemClass': 'activity',
              'relationDescription': None,
@@ -119,7 +114,7 @@ test_entities_linked_to = {'results': [{
     '@context': 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld',
     'type': 'FeatureCollection',
     'features': [{
-        '@id': f'http://local.host/entity/{test_ids["sam_id"]}',
+        '@id': f'http://local.host/entity/{params["sam_id"]}',
         'type': 'Feature',
         'crmClass': 'crm:E21 Person',
         'systemClass': 'person',
@@ -133,7 +128,7 @@ test_entities_linked_to = {'results': [{
         'relations': [{
             'label': 'Frodo',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["frodo_id"]}',
+                f'http://local.host/api/0.2/entity/{params["frodo_id"]}',
             'relationType': 'crm:OA7 has relationship to',
             'relationSystemClass': 'person',
             'relationDescription': None,
@@ -144,7 +139,7 @@ test_entities_linked_to = {'results': [{
                     'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
             'label': 'Travel to Mordor',
             'relationTo':
-                f'http://local.host/api/0.2/entity/{test_ids["travel_id"]}',
+                f'http://local.host/api/0.2/entity/{params["travel_id"]}',
             'relationType': 'crm:P14i performed',
             'relationSystemClass': 'activity',
             'relationDescription': None,
@@ -160,5 +155,5 @@ test_entities_linked_to = {'results': [{
     'pagination': {
         'entities': 3,
         'entitiesPerPage': 20,
-        'index': [{'page': 1, 'startId': test_ids["frodo_id"]}],
+        'index': [{'page': 1, 'startId': params["frodo_id"]}],
         'totalPages': 1}}
