@@ -15,7 +15,6 @@ from openatlas.models.place import get_structure
 
 class GetSubunitHierarchy(Resource):  # type: ignore
 
-    endpoint = "api_02.subunit_hierarchy")
 
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

@@ -10,7 +10,6 @@ from openatlas.models.entity import Entity
 
 class SystemClassCount(Resource):  # type: ignore
 
-    endpoint = "api.system_class_count")
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(

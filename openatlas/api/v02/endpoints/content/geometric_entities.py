@@ -11,7 +11,6 @@ from openatlas.models.gis import Gis
 
 class GetGeometricEntities(Resource):  # type: ignore
 
-    endpoint = "api_02.geometric_entities")
 
     def get(self) -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()

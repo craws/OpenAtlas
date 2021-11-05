@@ -13,7 +13,6 @@ from openatlas.models.link import Link
 
 class GetTypeEntitiesAll(Resource):  # type: ignore
 
-    endpoint = "api_02.type_entities_all")
 
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

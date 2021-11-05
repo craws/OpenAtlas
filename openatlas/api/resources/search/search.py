@@ -44,56 +44,69 @@ def prepare_parameters(entity: Entity, parameter: Dict[str, Any]) -> bool:
         for i in v:
             logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
             parameter_validation(
-                category=k,
+                entity_values=k,
                 operator_=i['operator'],
-                values=i["values"],
+                search_values=i["values"],
                 logical_operator=logical_o)
             if search_entity(
-                    category=value_to_be_searched(entity, k),
+                    entity_values=value_to_be_searched(entity, k),
                     operator_=i['operator'],
-                    values=i["values"],
+                    search_values=i["values"],
                     logical_operator=logical_o):
                 return True
     return False
 
 
 def search_entity(
-        category: Any,
+        entity_values: Any,
         operator_: str,
-        values: List[Any],
+        search_values: List[Any],
         logical_operator: str) -> bool:
-    return_value = []
-    for v in values:
-        for ele in category:
-            if search_operator(v, ele, operator_):
-                return_value.append(True)
-            else:
-                return_value.append(False)
-    return logical_operation(logical_operator, return_value)
+    if operator_ == 'equal':
+        if logical_operator == 'or':
+            return True if any(item in entity_values for item in
+                               search_values) else False
+        if logical_operator == 'and':
+            return True if all(item in entity_values for item in
+                               search_values) else False
 
+    if operator_ == 'notEqual':
+        if logical_operator == 'or':
+            return False if any(item in entity_values for item in
+                                search_values) else True
+        if logical_operator == 'and':
+            return False if all(item in entity_values for item in
+                                search_values) else True
 
-def logical_operation(operator_: str, return_value: List[bool]) -> bool:
-    if operator_ == 'or':
-        return True if any(return_value) else False
-    if operator_ == 'and':
-        return True if all(return_value) else False
+    if operator_ == 'like':
+        if logical_operator == 'or':
+            list = [item for item in entity_values if any(values in item for values in search_values)]
+            return True if list else False
+
+        if logical_operator == 'and':
+            list = [item for item in entity_values if
+                    any(values in item for values in search_values)]
+            print(list)
+            print(search_values)
+            return True if search_values in list else False
+    return False
 
 
 def search_operator(value: Any, element: Any, operator_: str):
-    if operator_ == 'like' and element in value:
-        return True
+    # if operator_ == 'like' and element in value:
+    #     return True
     if operator_ == 'equal' and element == value:
         return True
     if operator_ == 'notEqual' and element != value:
         return True
-    if operator_ == 'greater' and element > value:
-        return True
-    if operator_ == 'greaterEqual' and element >= value:
-        return True
-    if operator_ == 'lesser' and element < value:
-        return True
-    if operator_ == 'lesserEqual' and element <= value:
-        return True
+    # if operator_ == 'greater' and element > value:
+    #     return True
+    # if operator_ == 'greaterEqual' and element >= value:
+    #     return True
+    # if operator_ == 'lesser' and element < value:
+    #     return True
+    # if operator_ == 'lesserEqual' and element <= value:
+    #     return True
     return False
 
 
@@ -119,15 +132,15 @@ def value_to_be_searched(entity: Entity, k: str) -> Any:
 
 
 def parameter_validation(
-        category: Any,
+        entity_values: Any,
         operator_: str,
-        values: List[Any],
+        search_values: List[Any],
         logical_operator: str) -> None:
     if logical_operator not in logical_operators:
         raise FilterLogicalOperatorError
-    if category not in entity_categories:
+    if entity_values not in entity_categories:
         raise FilterColumnError
     if operator_ not in compare_operators:
         raise FilterOperatorError
-    if values is None:
+    if search_values is None:
         raise NoSearchStringError

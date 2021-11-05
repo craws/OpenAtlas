@@ -3,18 +3,12 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.resources.error import (EntityDoesNotExistError,
-                                           FilterColumnError,
-                                           FilterLogicalOperatorError,
-                                           FilterOperatorError,
                                            InvalidCidocClassCode,
                                            InvalidCodeError,
                                            InvalidLimitError,
-                                           InvalidSearchDateError,
-                                           InvalidSearchNumberError,
                                            InvalidSubunitError,
                                            InvalidSystemClassError,
                                            NoEntityAvailable,
-                                           NoSearchStringError,
                                            QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -378,7 +372,6 @@ class ApiTests(TestBaseCase):
                 rv.get_json(),
                 Query.get_test_query_geojson(params))
 
-
             # ---Content Endpoints---
 
             # /classes
@@ -565,4 +558,3 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api.subunit_hierarchy',
                     id_=actor.id))
-
