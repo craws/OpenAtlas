@@ -15,6 +15,7 @@ class Model:
                 c.standard_type_id,
                 c.alias_allowed,
                 c.reference_system_allowed,
+                c.new_types_allowed,
                 c.write_access_group_name,
                 c.layout_color,
                 c.layout_icon,
@@ -22,8 +23,8 @@ class Model:
                 system_ids
             FROM model.openatlas_class c,
             LATERAL (
-                SELECT json_agg(hierarchy_name) AS hierarchies FROM (
-                    SELECT hierarchy_name
+                SELECT json_agg(hierarchy_id) AS hierarchies FROM (
+                    SELECT hierarchy_id
                     FROM web.hierarchy_openatlas_class hc
                     WHERE c.name = hc.openatlas_class_name) x) x,
             LATERAL (

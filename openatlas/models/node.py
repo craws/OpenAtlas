@@ -57,7 +57,7 @@ class Node(Entity):
                 node.multiple = hierarchies[node.id]['multiple']
                 node.directional = hierarchies[node.id]['directional']
                 for class_ in g.classes.values():
-                    if class_.hierarchies and node.name in class_.hierarchies:
+                    if class_.hierarchies and node.id in class_.hierarchies:
                         node.classes.append(class_.name)
 
     @staticmethod
@@ -118,11 +118,9 @@ class Node(Entity):
     def get_class_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
-            if class_.view != 'type' and class_.cidoc_class and (
-                    not root or class_.name not in root.classes):
-                print()
-                print(root.classes)
-                choices.append((class_, class_.label))
+            if class_.new_types_allowed \
+                    and (not root or class_.name not in root.classes):
+                choices.append((class_.name, class_.label))
         return choices
 
     @staticmethod
@@ -167,7 +165,7 @@ class Node(Entity):
             'name': node.name,
             'multiple': multiple,
             'category': category})
-        Node.add_forms_to_hierarchy(node, form)
+        Db.add_classes_to_hierarchy(node.id, form.classes.data)
 
     @staticmethod
     def update_hierarchy(node: Node, form: FlaskForm) -> None:
@@ -181,11 +179,7 @@ class Node(Entity):
             'id': node.id,
             'name': form.name.data,
             'multiple': multiple})
-        Node.add_forms_to_hierarchy(node, form)
-
-    @staticmethod
-    def add_forms_to_hierarchy(node: Node, form: FlaskForm) -> None:
-        Db.add_form_to_hierarchy(node.id, form.forms.data)
+        Db.add_classes_to_hierarchy(node.id, form.classes.data)
 
     @staticmethod
     def get_node_orphans() -> List[Node]:
@@ -259,8 +253,7 @@ class Node(Entity):
     @staticmethod
     def get_untyped(hierarchy_id: int) -> List[Entity]:
         hierarchy = g.nodes[hierarchy_id]
-        classes = [
-            class_['name'] for class_ in g.nodes[hierarchy_id].forms.values()]
+        classes = hierarchy.classes
         if hierarchy.name in ('Administrative unit', 'Historical place'):
             classes = 'object_location'  # pragma: no cover
         untyped = []

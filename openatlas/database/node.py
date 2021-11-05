@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g
 
@@ -68,13 +68,14 @@ class Node:
             WHERE id = %(id)s;""", data)
 
     @staticmethod
-    def add_form_to_hierarchy(node_id: int, form_ids: List[int]) -> None:
-        for form_id in form_ids:
+    def add_classes_to_hierarchy(node_id: int, class_names: List[str]) -> None:
+        for class_name in class_names:
             g.cursor.execute(
                 """
-                INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
-                VALUES (%(node_id)s, %(form_id)s);""",
-                {'node_id': node_id, 'form_id': form_id})
+                INSERT INTO web.hierarchy_openatlas_class
+                    (hierarchy_id, openatlas_class_name)
+                VALUES (%(node_id)s, %(class_name)s);""",
+                {'node_id': node_id, 'class_name': class_name})
 
     @staticmethod
     def move_link_type(data: Dict[str, int]) -> None:

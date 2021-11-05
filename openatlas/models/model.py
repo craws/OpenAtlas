@@ -39,6 +39,7 @@ class OpenatlasClass:
             alias_allowed: bool,
             reference_system_allowed: bool,
             reference_system_ids: List[int],
+            new_types_allowed: bool,
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
             write_access: Optional[str] = 'contributor') -> None:
@@ -55,6 +56,7 @@ class OpenatlasClass:
         self.alias_allowed = alias_allowed
         self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
+        self.new_types_allowed = new_types_allowed
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
@@ -71,6 +73,7 @@ class OpenatlasClass:
                 reference_system_allowed=row['reference_system_allowed'],
                 reference_system_ids=row['system_ids']
                 if row['system_ids'] else [],
+                new_types_allowed=row['new_types_allowed'],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
                 hierarchies=row['hierarchies'])
