@@ -22,7 +22,7 @@ def member_insert(
         origin_id: int,
         code: Optional[str] = 'member') -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form('member', code=code)
+    form = build_form('actor_function', code=code)
     form.member_origin_id.data = origin.id
     if form.validate_on_submit():
         Transaction.begin()
@@ -66,7 +66,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    form = build_form('member', link_)
+    form = build_form('actor_function', link_)
     if form.validate_on_submit():
         Transaction.begin()
         try:

@@ -12,7 +12,7 @@ class HierarchyTest(TestBaseCase):
             # Custom types
             data = {
                 'name': 'Geronimo',
-                'forms': [1, 2, 5, 6, 7, 8],
+                'forms': ['human_remains', 'files', 'person', 'group'],
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(
@@ -45,7 +45,7 @@ class HierarchyTest(TestBaseCase):
                 data=data)
             node_id = rv.location.split('/')[-1]
             rv = self.app.get(
-                url_for('remove_form', id_=hierarchy.id, form_id=5),
+                url_for('remove_class', id_=hierarchy.id, class_name='person'),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
             rv = self.app.get(

@@ -27,6 +27,7 @@ from openatlas.util.util import get_base_table_data, uc_first
 FORMS = {
     'acquisition': ['name', 'date', 'description', 'continue'],
     'activity': ['name', 'date', 'description', 'continue'],
+    'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'administrative_unit': ['name', 'description', 'continue'],
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
@@ -40,7 +41,6 @@ FORMS = {
     'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
-    'member': ['date', 'description', 'continue'],
     'move': ['name', 'date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
@@ -76,7 +76,7 @@ def build_form(
             Form,
             'alias',
             FieldList(StringField(''), description=_('tooltip alias')))
-    if class_ != 'hierarchy':
+    if class_ in g.classes and g.classes[class_].hierarchies:
         add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
@@ -255,7 +255,8 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 
 
 def add_types(form: Any, class_: str) -> None:
-    types = OrderedDict({id_: g.nodes[id_] for id_ in g.classes[class_].hierarchies})
+    types = OrderedDict(
+        {id_: g.nodes[id_] for id_ in g.classes[class_].hierarchies})
     for node in types.values():  # Move standard type to top
         if node.category == 'standard':
             types.move_to_end(node.id, last=False)
@@ -327,7 +328,7 @@ def add_fields(
                 involved_with,
                 TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
-    elif class_ == 'member' and not entity:
+    elif class_ == 'actor_function' and not entity:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(
             form,
@@ -368,9 +369,8 @@ def add_fields(
         setattr(
             form,
             'artifact',
-            TableMultiField(
-                description=
-                _('Link artifacts as the information carrier of the source')))
+            TableMultiField(description=_(
+                'Link artifacts as the information carrier of the source')))
 
 
 def build_add_reference_form(class_: str) -> FlaskForm:
