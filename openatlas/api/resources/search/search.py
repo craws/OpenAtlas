@@ -40,6 +40,7 @@ def iterate_through_parameters(
 
 
 def prepare_parameters(entity: Entity, parameter: Dict[str, Any]) -> bool:
+    check = []
     for k, v in parameter.items():
         for i in v:
             logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
@@ -48,13 +49,14 @@ def prepare_parameters(entity: Entity, parameter: Dict[str, Any]) -> bool:
                 operator_=i['operator'],
                 search_values=i["values"],
                 logical_operator=logical_o)
-            if search_entity(
+            check.append(True if search_entity(
                     entity_values=value_to_be_searched(entity, k),
                     operator_=i['operator'],
                     search_values=i["values"],
-                    logical_operator=logical_o):
-                return True
-    return False
+                    logical_operator=logical_o) else False)
+
+    print(check)
+    return True if all(check) else False
 
 
 def search_entity(
@@ -80,25 +82,17 @@ def search_entity(
 
     if operator_ == 'like':
         if logical_operator == 'or':
-            list = [item for item in entity_values if any(values in item for values in search_values)]
-            return True if list else False
+            return True if [item for item in entity_values if any(
+                values in item for values in search_values)] else False
 
         if logical_operator == 'and':
-            list = [item for item in entity_values if
-                    any(values in item for values in search_values)]
-            print(list)
-            print(search_values)
-            return True if search_values in list else False
+            return True if len(search_values) == len(
+                [item for item in entity_values if
+                 any(values in item for values in search_values)]) else False
     return False
 
 
 def search_operator(value: Any, element: Any, operator_: str):
-    # if operator_ == 'like' and element in value:
-    #     return True
-    if operator_ == 'equal' and element == value:
-        return True
-    if operator_ == 'notEqual' and element != value:
-        return True
     # if operator_ == 'greater' and element > value:
     #     return True
     # if operator_ == 'greaterEqual' and element >= value:
