@@ -7,13 +7,12 @@ from openatlas.models.entity import Entity
 
 logical_operators: List[str] = [
     'and',
-    'or',
-    'onot',
-    'anot']
+    'or']
 
 entity_categories: List[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription"]
+    "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
+    "valueTypeID", "valueTypeName"]
 
 compare_operators: List[str] = [
     'like', 'equal', 'notEqual', 'lesser', 'lesserEqual', 'greater',
@@ -50,12 +49,10 @@ def prepare_parameters(entity: Entity, parameter: Dict[str, Any]) -> bool:
                 search_values=i["values"],
                 logical_operator=logical_o)
             check.append(True if search_entity(
-                    entity_values=value_to_be_searched(entity, k),
-                    operator_=i['operator'],
-                    search_values=i["values"],
-                    logical_operator=logical_o) else False)
-
-    print(check)
+                entity_values=value_to_be_searched(entity, k),
+                operator_=i['operator'],
+                search_values=i["values"],
+                logical_operator=logical_o) else False)
     return True if all(check) else False
 
 
@@ -91,7 +88,7 @@ def search_entity(
                  any(values in item for values in search_values)]) else False
     return False
 
-
+# Todo: Delete, but it will stay here as reminder for value types for the moment
 def search_operator(value: Any, element: Any, operator_: str):
     # if operator_ == 'greater' and element > value:
     #     return True
@@ -121,6 +118,13 @@ def value_to_be_searched(entity: Entity, k: str) -> Any:
         return [node.name for node in entity.nodes]
     if k == "typeID":
         return [node.id for node in entity.nodes]
+    # Todo: Value Types need links to get the value. This will slow down the
+    #  process immensely. Even if we get the links in a whole, this will take
+    #  so much time in bigger databases (Thanados)
+    # if k == "valueTypeName":
+    # return [node.name for node
+    # in entity.nodes] if k == "valueTypeID": return [node.id for node in
+    # entity.nodes]
     if k == "typeDescription":
         return [node.description for node in entity.nodes]
 
