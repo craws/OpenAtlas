@@ -26,7 +26,7 @@ language.add_argument(
 
 entity_ = default.copy()
 entity_.add_argument(
-    'sort_results',
+    'sort',
     choices=('desc', 'asc'),
     type=str,
     default='asc',
@@ -34,7 +34,7 @@ entity_.add_argument(
     help='{error_msg}. Only "desc" or "asc" will work.')
 # Todo: Edit the choices of sort column and map it to model.entity or lpf?
 entity_.add_argument(
-    'sort_column',
+    'column',
     type=str,
     default='name',
     case_sensitive=False,

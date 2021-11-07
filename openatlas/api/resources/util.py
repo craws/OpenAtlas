@@ -1,4 +1,5 @@
-from typing import List, Optional, Union
+import ast
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 
@@ -42,3 +43,7 @@ def get_license(entity: Entity) -> Optional[str]:
 
 def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
+
+
+def parser_str_to_dict(parser: List[str]) -> List[Dict[str, Any]]:
+    return [ast.literal_eval(p) for p in parser]

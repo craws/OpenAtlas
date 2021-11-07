@@ -2,11 +2,9 @@ import itertools
 from typing import Any, Dict, List
 
 from openatlas.api.resources.error import EntityDoesNotExistError, \
-    NoEntityAvailable, TypeIDError
+    NoEntityAvailable
 from openatlas.api.resources.formats.geojson import Geojson
 from openatlas.api.resources.formats.linked_places import LinkedPlaces
-from openatlas.api.resources.search.search import search_iterate_entities, \
-    search_str_to_dict
 from openatlas.api.resources.util import get_all_links, \
     get_all_links_inverse, get_entity_by_id
 from openatlas.models.entity import Entity
@@ -35,17 +33,6 @@ class Pagination:
             parser: Dict[str, Any]) -> Dict[str, Any]:
         if not entities:
             raise NoEntityAvailable
-        # Todo: type_id and search don't belong here, make a new function.
-        #  Maybe also get it to resolve_endpoints.
-        if parser['type_id']:
-            entities = Pagination.get_entities_by_type(entities, parser)
-            if not entities:
-                raise TypeIDError
-        if parser['search']:
-            entities = search_iterate_entities(entities, search_str_to_dict(
-                parser['search']))
-            if not entities:
-                raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]
         count = len(total)

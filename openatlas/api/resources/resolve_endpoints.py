@@ -7,8 +7,12 @@ from flask_restful import marshal
 
 from openatlas import app
 from openatlas.api.export.csv_export import ApiExportCSV
+from openatlas.api.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.resources.formats.rdf import rdf_output
 from openatlas.api.resources.pagination import Pagination
+from openatlas.api.resources.search.search import search
+from openatlas.api.resources.util import parser_str_to_dict
+from openatlas.api.resources.search.search_validation import iterate_parameters_for_validation
 from openatlas.api.templates.geojson import GeojsonTemplate
 from openatlas.api.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.templates.nodes import NodeTemplate
@@ -28,8 +32,16 @@ def resolve_entities(
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
-    # Todo: sorting has to be done at very last I think. So maybe make type_id
-    #  and search and then give pagination the sorted entities
+    if parser['type_id']:
+        entities = Pagination.get_entities_by_type(entities, parser)
+        if not entities:
+            raise TypeIDError
+    search_parser = parser_str_to_dict(parser['search'])
+    if parser['search']:
+        iterate_parameters_for_validation(search_parser)
+        entities = search(entities, search_parser)
+        if not entities:
+            raise NoEntityAvailable
     result = Pagination.pagination(sorting(entities, parser), parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
@@ -75,5 +87,5 @@ def sorting(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
     return entities if 'latest' in request.path else \
         sorted(
             entities,
-            key=operator.attrgetter(parser['sort_column']),
-            reverse=True if parser['sort_results'] == 'desc' else False)
+            key=operator.attrgetter(parser['column']),
+            reverse=True if parser['sort'] == 'desc' else False)

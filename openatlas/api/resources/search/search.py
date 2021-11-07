@@ -1,53 +1,25 @@
-import ast
 from typing import Any, Dict, List
 
-from openatlas.api.resources.error import FilterColumnError, \
-    FilterLogicalOperatorError, FilterOperatorError, NoSearchStringError
 from openatlas.models.entity import Entity
 
-logical_operators: List[str] = [
-    'and',
-    'or']
 
-entity_categories: List[str] = [
-    "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
-    "valueTypeID", "valueTypeName"]
-
-compare_operators: List[str] = [
-    'like', 'equal', 'notEqual', 'lesser', 'lesserEqual', 'greater',
-    'greaterEqual']
-
-
-def search_str_to_dict(parser: List[str]) -> List[Dict[str, Any]]:
-    return [ast.literal_eval(p) for p in parser]
-
-
-def search_iterate_entities(
+def search(
         entities: List[Entity],
         parser: List[Dict[str, Any]]) -> List[Entity]:
-    return [e for e in entities if (iterate_through_parameters(e, parser))]
+    return [e for e in entities if (iterate_through_entities(e, parser))]
 
 
-def iterate_through_parameters(
+def iterate_through_entities(
         entity: Entity,
-        parameters: List[Dict[str, Any]]) -> bool:
-    for p in parameters:
-        if prepare_parameters(entity, p):
-            return True
-    return False
+        parser: List[Dict[str, Any]]) -> bool:
+    return True if [p for p in parser if search_result(entity, p)] else False
 
 
-def prepare_parameters(entity: Entity, parameter: Dict[str, Any]) -> bool:
+def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
     check = []
     for k, v in parameter.items():
         for i in v:
             logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
-            parameter_validation(
-                entity_values=k,
-                operator_=i['operator'],
-                search_values=i["values"],
-                logical_operator=logical_o)
             check.append(True if search_entity(
                 entity_values=value_to_be_searched(entity, k),
                 operator_=i['operator'],
@@ -88,18 +60,6 @@ def search_entity(
                  any(values in item for values in search_values)]) else False
     return False
 
-# Todo: Delete, but it will stay here as reminder for value types for the moment
-def search_operator(value: Any, element: Any, operator_: str):
-    # if operator_ == 'greater' and element > value:
-    #     return True
-    # if operator_ == 'greaterEqual' and element >= value:
-    #     return True
-    # if operator_ == 'lesser' and element < value:
-    #     return True
-    # if operator_ == 'lesserEqual' and element <= value:
-    #     return True
-    return False
-
 
 def value_to_be_searched(entity: Entity, k: str) -> Any:
     if k == "entityID":
@@ -118,27 +78,5 @@ def value_to_be_searched(entity: Entity, k: str) -> Any:
         return [node.name for node in entity.nodes]
     if k == "typeID":
         return [node.id for node in entity.nodes]
-    # Todo: Value Types need links to get the value. This will slow down the
-    #  process immensely. Even if we get the links in a whole, this will take
-    #  so much time in bigger databases (Thanados)
-    # if k == "valueTypeName":
-    # return [node.name for node
-    # in entity.nodes] if k == "valueTypeID": return [node.id for node in
-    # entity.nodes]
     if k == "typeDescription":
         return [node.description for node in entity.nodes]
-
-
-def parameter_validation(
-        entity_values: Any,
-        operator_: str,
-        search_values: List[Any],
-        logical_operator: str) -> None:
-    if logical_operator not in logical_operators:
-        raise FilterLogicalOperatorError
-    if entity_values not in entity_categories:
-        raise FilterColumnError
-    if operator_ not in compare_operators:
-        raise FilterOperatorError
-    if search_values is None:
-        raise NoSearchStringError
