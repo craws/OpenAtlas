@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g
 
@@ -84,16 +84,6 @@ class ReferenceSystem:
                 AND domain_id = %(system_id)s
                 AND range_id = %(entity_id)s;""",
             {'system_id': system_id, 'entity_id': entity_id})
-
-    @staticmethod
-    def get_form_choices(forms: List[str]) -> List[Dict[str, Union[str, int]]]:
-        g.cursor.execute(
-            """
-            SELECT f.id, f.name FROM web.form f
-            WHERE f.name IN %(forms)s
-            ORDER BY name ASC;""",
-            {'forms': tuple(forms)})
-        return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def insert_system(data: Dict[str, Any]) -> None:

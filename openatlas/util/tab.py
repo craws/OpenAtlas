@@ -45,7 +45,7 @@ class Tab:
             id_ = entity.id
             view = entity.class_.view
             class_ = entity.class_
-            if not self.table:
+            if not self.table.header:
                 self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']

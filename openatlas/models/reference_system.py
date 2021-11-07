@@ -97,7 +97,7 @@ class ReferenceSystem(Entity):
             'entity_id': entity.id,
             'name': entity.name,
             'website_url': form.website_url.data
-                if form.website_url.data else None,
+            if form.website_url.data else None,
             'resolver_url': form.resolver_url.data
             if form.resolver_url.data else None})
         return ReferenceSystem.get_all()[entity.id]
