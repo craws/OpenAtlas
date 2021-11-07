@@ -204,8 +204,9 @@ def index_unsubscribe(code: str) -> str:
         user.unsubscribe_code = ''
         user.update()
         user.remove_newsletter()
-        text = _('You have successfully unsubscribed. '
-                 'You can subscribe again in your Profile.')
+        text = _(
+            'You have successfully unsubscribed. '
+            'You can subscribe again in your Profile.')
     return render_template(
         'index/unsubscribe.html',
         text=text,
