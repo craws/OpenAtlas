@@ -91,8 +91,12 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     return Markup(html)
 
 
+@contextfilter
 @app.template_filter()
-def is_authorized(group: str) -> bool:
+def is_authorized(context, group: Optional[str] = None) -> bool:
+    # Using context filter to prevent Jinja2 context caching
+    if not group:  # In case it wasn't called from a template
+        group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
         return False  # pragma: no cover - AnonymousUserMixin has no group
     if current_user.group == 'admin' \
