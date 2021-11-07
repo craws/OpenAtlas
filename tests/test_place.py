@@ -297,9 +297,9 @@ class PlaceTest(TestBaseCase):
                     'insert',
                     class_='stratigraphic_unit',
                     origin_id=place.id))
-            assert b'Insert and add find' in rv.data
+            assert b'Insert and add artifact' in rv.data
             rv = self.app.post(
-                url_for('insert', class_='place', origin_id=place.id),
+                url_for('insert', class_='feature', origin_id=place.id),
                 data=data)
             feat_id = rv.location.split('/')[-1]
             self.app.get(url_for('insert', class_='place', origin_id=feat_id))
@@ -307,12 +307,17 @@ class PlaceTest(TestBaseCase):
             self.app.post(url_for('update', id_=feat_id), data=data)
             data['name'] = "I'm a stratigraphic unit"
             rv = self.app.post(
-                url_for('insert', class_='place', origin_id=feat_id),
+                url_for(
+                    'insert',
+                    class_='stratigraphic_unit',
+                    origin_id=feat_id),
                 data=data)
             stratigraphic_id = rv.location.split('/')[-1]
+            # Create a stratigraphic unit "sibling"
             self.app.get(
                 url_for('insert', class_='place', origin_id=stratigraphic_id))
             self.app.get(url_for('update', id_=stratigraphic_id))
+
             self.app.post(
                 url_for('update', id_=stratigraphic_id),
                 data={'name': "I'm a stratigraphic unit"})
@@ -323,7 +328,10 @@ class PlaceTest(TestBaseCase):
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
-                url_for('insert', class_='find', origin_id=stratigraphic_id),
+                url_for(
+                    'insert',
+                    class_='artifact',
+                    origin_id=stratigraphic_id),
                 data=data)
             find_id = rv.location.split('/')[-1]
             rv = self.app.post(

@@ -2,7 +2,7 @@ System_Class endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their OpenAtlas system class. Available categories are **acquisition**, **activity**, **actor_appellation**, **administrative_unit**, **appellation**, **artifact**, **bibliography**, **edition**, **external_reference**, **feature**, **file**, **find**, **group**, **human_remains**, **move**, **object_location**, **person**, **place**, **source**, **reference_system**, **stratigraphic_unit**, **source_translation**, **type**,  The result can also be filtered, ordered and manipulated through different parameters.  By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities based on their OpenAtlas system class. Available categories are **acquisition**, **activity**, **actor_appellation**, **administrative_unit**, **appellation**, **artifact**, **bibliography**, **edition**, **external_reference**, **feature**, **file**, **group**, **human_remains**, **move**, **object_location**, **person**, **place**, **source**, **reference_system**, **stratigraphic_unit**, **source_translation**, **type**,  The result can also be filtered, ordered and manipulated through different parameters.  By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
     name: system_class

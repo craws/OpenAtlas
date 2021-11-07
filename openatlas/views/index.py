@@ -77,8 +77,6 @@ def overview() -> str:
                     url = f"{url_for('node_index')}#menu-tab-place"
                 elif name == 'type':
                     url = url_for('node_index')
-                elif name == 'find':
-                    url = url_for('index', view='artifact')
                 elif name in [
                         'feature',
                         'human_remains',

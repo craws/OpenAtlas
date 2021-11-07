@@ -289,7 +289,7 @@ def entity_view(id_: int) -> Union[str, Response]:
                 'stratigraphic_unit',
                 entity=entity)
         elif entity.class_.name == 'stratigraphic_unit':
-            tabs['find'] = Tab('find', entity=entity)
+            tabs['artifact'] = Tab('artifact', entity=entity)
             tabs['human_remains'] = Tab('human_remains', entity=entity)
         entity.location = entity.get_linked_entity_safe('P53', nodes=True)
         event_ids = []  # Keep track of inserted events to prevent doubles

@@ -3,8 +3,11 @@
 
 BEGIN;
 
--- #1563: OpenAtlas model to database
+-- ##1597 Join artifacts and finds
+UPDATE model.entity SET system_class = 'artifact' WHERE system_class = 'find';
+DELETE FROM web.form WHERE name = 'find';
 
+-- #1563: OpenAtlas model to database
 -- Renaming
 ALTER TABLE model.class RENAME TO cidoc_class;
 ALTER TABLE model.class_i18n RENAME TO cidoc_class_i18n;
@@ -65,12 +68,11 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
     ('administrative_unit',  'E53', false, false, false, 'contributor', NULL,      NULL),
     ('appellation',          'E41', false, false, false, 'contributor', NULL,      NULL),
     ('artifact',             'E22', false, true,  true,  'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('bibliography',         'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('bibliography',         'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Bibliography' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('edition',              'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('external_reference',   'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('feature',              'E18', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('file',                 'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('find',                 'E22', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('group',                'E74', true,  true,  true,  'contributor', '#34623C', NULL),
     ('human_remains',        'E20', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('involvement',          NULL,  false, false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Involvement' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -97,7 +99,7 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
-            -- Delete location (E53) if it was a place, find or human remains
+            -- Delete location (E53) if it was an artifact, human remains or place
             IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;

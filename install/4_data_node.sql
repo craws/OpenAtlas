@@ -276,12 +276,11 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
     ('actor_function',       NULL,  false, false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Actor function' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('appellation',          'E41', false, false, false, 'contributor', NULL,      NULL),
     ('artifact',             'E22', false, true,  true,  'contributor', '#EE82EE', (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('bibliography',         'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('bibliography',         'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Bibliography' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('edition',              'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Edition' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('external_reference',   'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'External reference' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('feature',              'E18', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Feature' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('file',                 'E31', false, false, true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'License' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('find',                 'E22', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('group',                'E74', true,  true,  true,  'contributor', '#34623C', NULL),
     ('human_remains',        'E20', false, true,  true,  'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Human remains' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('involvement',          NULL,  false, false, false, 'contributor', NULL,      (SELECT id FROM model.entity WHERE name = 'Involvement' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -299,7 +298,6 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
     ((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'), 'actor_actor_relation'),
     ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
     ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'artifact'),
-    ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'find'),
     ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), 'bibliography'),
     ((SELECT id FROM web.hierarchy WHERE name='Edition'), 'edition'),
     ((SELECT id FROM web.hierarchy WHERE name='Event'), 'acquisition'),
@@ -317,7 +315,6 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
     ((SELECT id FROM web.hierarchy WHERE name='Stratigraphic unit'), 'stratigraphic_unit'),
 
     ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'artifact'),
-    ((SELECT id FROM web.hierarchy WHERE name='Dimensions'), 'find'),
     ((SELECT id FROM web.hierarchy WHERE name='Sex'), 'person');
 
 -- External Reference Systems

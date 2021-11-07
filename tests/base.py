@@ -64,7 +64,7 @@ def insert_entity(
         origin: Optional[Entity] = None,
         description: Optional[str] = None) -> Entity:
     entity = Entity.insert(class_, name, description)
-    if class_ in ['place', 'feature', 'stratigraphic_unit', 'find', 'artifact']:
+    if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
         location = Entity.insert('object_location', 'Location of ' + name)
         entity.link('P53', location)
         if origin:

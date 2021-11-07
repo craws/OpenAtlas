@@ -57,7 +57,8 @@ class Overlay:
 
         ids = [object_.id]
         # Get overlays of parents
-        if object_.class_.name == 'find':
+        if object_.class_.name == 'artifact' \
+                and object_.get_linked_entity('P46', True):
             stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
             ids.append(stratigraphic_unit.id)
             feature = stratigraphic_unit.get_linked_entity_safe('P46', True)

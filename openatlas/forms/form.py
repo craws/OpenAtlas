@@ -36,7 +36,6 @@ FORMS = {
     'external_reference': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
-    'find': ['name', 'date', 'description', 'continue', 'map'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
     'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
@@ -171,7 +170,7 @@ def add_buttons(
     if entity:
         return form
     if 'continue' in FORMS[name] and (
-            name in ['involvement', 'find', 'human_remains', 'type']
+            name in ['involvement', 'artifact', 'human_remains', 'type']
             or not origin):
         setattr(
             form,
@@ -208,7 +207,7 @@ def add_buttons(
         setattr(
             form,
             'insert_continue_sub',
-            SubmitField(insert_add + _('find')))
+            SubmitField(insert_add + _('artifact')))
         setattr(
             form,
             'insert_continue_human_remains',

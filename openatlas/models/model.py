@@ -12,7 +12,7 @@ view_class_mapping = {
     'actor': ['person', 'group'],
     'event': ['activity', 'acquisition', 'move'],
     'file': ['file'],
-    'artifact': ['artifact', 'find'],
+    'artifact': ['artifact'],
     'place': ['feature', 'human_remains', 'place', 'stratigraphic_unit'],
     'reference': ['bibliography', 'edition', 'external_reference'],
     'reference_system': ['reference_system'],

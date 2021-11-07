@@ -98,13 +98,15 @@ class Tab:
                     g.classes[item].label,
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
+            if class_.name != 'stratigraphic_unit':
+                buttons += [
+                    button(
+                        'link',
+                        url_for('link_insert', id_=id_, view='artifact'))]
             buttons += [
                 button(
-                    'link',
-                    url_for('link_insert', id_=id_, view='artifact')),
-                button(
-                    g.classes['artifact'].label,
-                    url_for('insert', class_='artifact', origin_id=id_))]
+                    g.classes[name].label,
+                    url_for('insert', class_=name, origin_id=id_))]
         elif name == 'entities':
             if id_:
                 buttons += [button(
@@ -144,12 +146,6 @@ class Tab:
         elif name == 'feature':
             if current_user.settings['module_sub_units'] \
                     and class_.name == 'place':
-                buttons += [button(
-                    g.classes[name].label,
-                    url_for('insert', class_=name, origin_id=id_))]
-        elif name == 'find':
-            if current_user.settings['module_sub_units'] \
-                    and class_.name == 'stratigraphic_unit':
                 buttons += [button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_))]

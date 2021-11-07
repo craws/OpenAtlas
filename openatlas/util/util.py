@@ -179,8 +179,7 @@ def get_base_table_data(
         entity: 'Entity',
         show_links: Optional[bool] = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
-            entity.class_.name == 'find':
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -191,7 +190,7 @@ def get_base_table_data(
         data.append(
             g.file_stats[entity.id]['ext']
             if entity.id in g.file_stats else 'N/A')
-    if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
