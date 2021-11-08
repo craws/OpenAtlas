@@ -154,7 +154,7 @@ ALTER TABLE ONLY web.reference_system_openatlas_class
     FOREIGN KEY (openatlas_class_name)
     REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY web.reference_system_openatlas_class
-    ADD CONSTRAINT reference_system_openatlas_class_reference_system_id_openatlas_class_name_key
+    ADD CONSTRAINT reference_system_openatlas_class_system_id_class_name_key
     UNIQUE (reference_system_id, openatlas_class_name);
 
 ALTER TABLE web.reference_system_openatlas_class ALTER COLUMN openatlas_class_name SET NOT NULL;

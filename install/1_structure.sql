@@ -93,7 +93,7 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_reference_system_id_openatlas_;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_system_id_class_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
@@ -1992,11 +1992,11 @@ ALTER TABLE ONLY web.reference_system
 
 
 --
--- Name: reference_system_openatlas_class reference_system_openatlas_class_reference_system_id_openatlas_; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_system_id_class_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY web.reference_system_openatlas_class
-    ADD CONSTRAINT reference_system_openatlas_class_reference_system_id_openatlas_ UNIQUE (reference_system_id, openatlas_class_name);
+    ADD CONSTRAINT reference_system_openatlas_class_system_id_class_name_key UNIQUE (reference_system_id, openatlas_class_name);
 
 
 --
@@ -2594,4 +2594,3 @@ ALTER TABLE ONLY web.user_settings
 --
 -- PostgreSQL database dump complete
 --
-
