@@ -1,7 +1,12 @@
 class Changelog:
 
     versions = {
-        '6.6.0': ['TBA', {}],
+        '6.6.0': ['TBA', {
+            'feature': {
+                '1563': 'OpenAtlas model to database',
+                '1597': 'Join artifacts and finds',
+                '1584': 'Track needed and actual database version',
+                '1583': 'Refactor'}}],
         '6.5.2': ['2021-11-07', {
             'fix': {
                 '#1596:': 'Sometimes unavailable add custom type button'}}],
