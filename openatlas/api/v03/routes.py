@@ -1,4 +1,4 @@
-from openatlas.api.v03.v03.endpoints.content.class_mapping import ClassMapping
+from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v03.endpoints.content.content import GetContent
 from openatlas.api.v03.endpoints.content.geometric_entities import \
     GetGeometricEntities
@@ -7,7 +7,7 @@ from openatlas.api.v03.endpoints.content.systemclass_count import \
     SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
 from openatlas.api.v03.endpoints.entity.cidoc_class import GetByClass
-from openatlas.api.v03.v03.endpoints.entity.entity import GetEntity
+from openatlas.api.v03.endpoints.entity.entity import GetEntity
 from openatlas.api.v03.endpoints.entity.latest import GetLatest
 from openatlas.api.v03.endpoints.entity.linked_entities import GetLinkedEntities
 from openatlas.api.v03.endpoints.entity.query import GetQuery

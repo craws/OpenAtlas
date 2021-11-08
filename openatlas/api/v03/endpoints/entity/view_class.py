@@ -22,4 +22,7 @@ class GetByCode(Resource):  # type: ignore
     def get_by_view(code_: str) -> List[Entity]:
         if code_ not in g.view_class_mapping:
             raise InvalidCodeError
-        return Entity.get_by_class(g.view_class_mapping[code_], nodes=True)
+        return Entity.get_by_class(
+            g.view_class_mapping[code_],
+            nodes=True,
+            aliases=True)

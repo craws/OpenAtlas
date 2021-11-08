@@ -2,14 +2,18 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.resources.error import (EntityDoesNotExistError,
-                                           InvalidCidocClassCode,
-                                           InvalidCodeError,
-                                           InvalidLimitError,
-                                           InvalidSubunitError,
-                                           InvalidSystemClassError,
-                                           NoEntityAvailable,
-                                           QueryEmptyError, TypeIDError)
+from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
+                                               FilterColumnError,
+                                               FilterLogicalOperatorError,
+                                               FilterOperatorError,
+                                               InvalidCidocClassCode,
+                                               InvalidCodeError,
+                                               InvalidLimitError,
+                                               InvalidSubunitError,
+                                               InvalidSystemClassError,
+                                               NoEntityAvailable,
+                                               NoSearchStringError,
+                                               QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -25,6 +29,7 @@ from tests.api_test_data.latest import Latest
 from tests.api_test_data.node_entities import NodeEntities
 from tests.api_test_data.node_overview import NodeOverview
 from tests.api_test_data.query import Query
+from tests.api_test_data.search import Search
 from tests.api_test_data.subunit import Subunits
 from tests.api_test_data.system_class import SystemClass
 from tests.api_test_data.type_entities import TypeEntities
@@ -489,6 +494,108 @@ class ApiTests(TestBaseCase):
                 rv.get_json(),
                 NodeEntities.get_test_node_entities(params))
 
+            # search parameter
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeID":[{{"operator":"equal",'
+                       f'"values":[{params["boundary_mark_id"]},{params["height_id"]}],'
+                       f'"logicalOperator":"or"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_1(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                system_classes='place',
+                search=f'{{"entityName":[{{"operator":"notEqual",'
+                       f'"values":["Mordor"],'
+                       f'"logicalOperator":"or"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_2(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeName":[{{"operator":"equal",'
+                       f'"values":["Place", "Height"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_2(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeName":[{{"operator":"notEqual",'
+                       f'"values":["Place", "Height"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityID":[{{"operator":"notEqual",'
+                       f'"values":[{place.id}],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityAliases":[{{"operator":"notEqual",'
+                       f'"values":["Sûza"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityCidocClass":[{{"operator":"equal",'
+                       f'"values":["E21"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_4(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entitySystemClass":[{{"operator":"equal",'
+                       f'"values":["person"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_4(params))
+
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
                     'api.class',
@@ -558,3 +665,43 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api.subunit_hierarchy',
                     id_=actor.id))
+            with self.assertRaises(NoEntityAvailable ):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"equal",'
+                           f'"values":["Place", "Height", "Dimension"],'
+                           f'"logicalOperator":"and"}}]}}'))
+            with self.assertRaises(FilterOperatorError):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"notEqualT",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"and"}}]}}'))
+            with self.assertRaises(FilterLogicalOperatorError):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"notEqual",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"xor"}}]}}'))
+            with self.assertRaises(FilterColumnError):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"All":[{{"operator":"notEqual",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"or"}}]}}'))
+            with self.assertRaises(NoSearchStringError):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"notEqual",'
+                           f'"values":[],'
+                           f'"logicalOperator":"or"}}]}}'))

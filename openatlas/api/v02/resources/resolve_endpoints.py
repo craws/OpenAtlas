@@ -5,7 +5,7 @@ from flask import Response, jsonify, url_for
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.export.csv_export import ApiExportCSV
+from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.formats.rdf import rdf_output
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate

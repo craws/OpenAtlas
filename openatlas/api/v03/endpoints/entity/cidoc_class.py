@@ -22,5 +22,5 @@ class GetByClass(Resource):  # type: ignore
     @staticmethod
     def get_by_class(class_code: str) -> List[Entity]:
         if class_code not in g.cidoc_classes:
-            raise InvalidCidocClassCode  # pragma: no cover
-        return Entity.get_by_cidoc_class(class_code, nodes=True)
+            raise InvalidCidocClassCode
+        return Entity.get_by_cidoc_class(class_code, nodes=True, aliases=True)

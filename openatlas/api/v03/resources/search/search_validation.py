@@ -41,5 +41,5 @@ def parameter_validation(
         raise FilterColumnError
     if operator_ not in compare_operators:
         raise FilterOperatorError
-    if search_values is None:
+    if not search_values:
         raise NoSearchStringError

@@ -11,8 +11,9 @@ from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.pagination import Pagination
 from openatlas.api.v03.resources.search.search import search
+from openatlas.api.v03.resources.search.search_validation import \
+    iterate_parameters_for_validation
 from openatlas.api.v03.resources.util import parser_str_to_dict
-from openatlas.api.v03.resources.search.search_validation import iterate_parameters_for_validation
 from openatlas.api.v03.templates.geojson import GeojsonTemplate
 from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v03.templates.nodes import NodeTemplate
@@ -83,7 +84,15 @@ def download(
         headers={'Content-Disposition': f'attachment;filename={name}.json'})
 
 
+def remove_duplicate_entities(entities: List[Entity]) -> List[Entity]:
+    seen = set()
+    seen_add = seen.add  # Do not change, fast than always call seen.add(e.id)
+    return [entity for entity in entities if
+            not (entity.id in seen or seen_add(entity.id))]
+
+
 def sorting(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
+    entities = remove_duplicate_entities(entities)
     return entities if 'latest' in request.path else \
         sorted(
             entities,
