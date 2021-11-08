@@ -4,8 +4,8 @@ from flask_cors import CORS
 from flask_restful import Api
 
 from openatlas import app
-from openatlas.api.resources.error import errors
-from openatlas.api.routes import add_routes
+from openatlas.api.v03.resources.error import errors
+from openatlas.api.v03.routes import add_routes
 from openatlas.api.v02.resources.error import errors as error_v02
 from openatlas.api.v02.routes_02 import add_routes_v02
 

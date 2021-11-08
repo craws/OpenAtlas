@@ -1,21 +1,7 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.resources.error import (EntityDoesNotExistError,
-                                               FilterColumnError,
-                                               FilterLogicalOperatorError,
-                                               FilterOperatorError,
-                                               InvalidCidocClassCode,
-                                               InvalidCodeError,
-                                               InvalidLimitError,
-                                               InvalidSearchDateError,
-                                               InvalidSearchNumberError,
-                                               InvalidSubunitError,
-                                               InvalidSystemClassError,
-                                               NoEntityAvailable,
-                                               NoSearchStringError,
-                                               QueryEmptyError, TypeIDError)
+from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
