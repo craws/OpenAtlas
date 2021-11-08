@@ -159,4 +159,7 @@ ALTER TABLE web.reference_system_openatlas_class ALTER COLUMN openatlas_class_na
 -- Drop obsolete web.form table
 DROP TABLE web.form;
 
+-- Move source translation to standard type which seemed to have gone wrong in one of the last versions
+UPDATE web.hierarchy SET category = 'standard' WHERE name = 'Source translation';
+
 END;
