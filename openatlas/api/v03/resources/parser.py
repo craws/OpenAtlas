@@ -40,21 +40,9 @@ entity_.add_argument(
     help='{error_msg}',
     choices=(
         'id',
-        'standard_type',
         'name',
-        'description',
-        'created',
-        'modified',
         'cidoc_class',
-        'class_',
-        'begin_from',
-        'begin_to',
-        'begin_comment',
-        'end_from',
-        'end_to',
-        'end_comment',
-        'first',
-        'last'))
+        'system_class',))
 entity_.add_argument(
     'search',
     type=str,
