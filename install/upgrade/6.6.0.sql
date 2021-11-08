@@ -3,9 +3,12 @@
 
 BEGIN;
 
--- ##1597 Join artifacts and finds
+-- #1597 Join artifacts and finds
 UPDATE model.entity SET system_class = 'artifact' WHERE system_class = 'find';
 DELETE FROM web.form WHERE name = 'find';
+
+-- #1584: Track needed and actual database version
+INSERT INTO web.settings (name, value) VALUES ('database_version', '6.6.0');
 
 -- #1563: OpenAtlas model to database
 -- Renaming
