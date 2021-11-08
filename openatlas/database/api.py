@@ -4,10 +4,6 @@ from flask import g
 
 from openatlas.database.entity import Entity
 
-
-# Todo: Add a warning and deprecation notice if this is used.
-#  https://docs.python.org/3/library/warnings.html
-
 class Api:
 
     @staticmethod

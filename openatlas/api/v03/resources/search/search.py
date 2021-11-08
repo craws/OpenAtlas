@@ -49,15 +49,6 @@ def search_entity(
             return False if all(item in entity_values for item in
                                 search_values) else True
 
-    # if operator_ == 'like':
-    #     if logical_operator == 'or':
-    #         return True if [item for item in entity_values if any(
-    #             values in item for values in search_values)] else False
-    #     if logical_operator == 'and':
-    #         return True if len(search_values) == len(
-    #             [item for item in entity_values if
-    #              any(values in item for values in search_values)]) else False
-
 
 def value_to_be_searched(entity: Entity, k: str) -> Any:
     if k == "entityID":

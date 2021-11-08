@@ -32,7 +32,6 @@ entity_.add_argument(
     default='asc',
     case_sensitive=False,
     help='{error_msg}. Only "desc" or "asc" will work.')
-# Todo: Edit the choices of sort column and map it to model.entity or lpf?
 entity_.add_argument(
     'column',
     type=str,

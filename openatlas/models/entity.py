@@ -319,15 +319,6 @@ class Entity:
             code: Union[str, List[str]],
             nodes: bool = False,
             aliases: bool = False) -> List[Entity]:
-        # Todo: Make alias check
-        # if aliases:  # For performance: check classes if they can have an alias
-        #     aliases_needed = False
-        #     for cidoc_class in code if isinstance(code, list) \
-        #             else [code]:
-        #         if g.classes[cidoc_class].alias_possible:
-        #             aliases_needed = True
-        #             break
-        #     aliases = aliases_needed
         return [Entity(row) for row in
                 Db.get_by_cidoc_class(code, nodes, aliases)]
 

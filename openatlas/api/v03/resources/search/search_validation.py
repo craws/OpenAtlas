@@ -10,9 +10,7 @@ entity_categories: List[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
     "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
     "valueTypeID", "valueTypeName"]
-compare_operators: List[str] = [
-    'like', 'equal', 'notEqual', 'lesser', 'lesserEqual', 'greater',
-    'greaterEqual']
+compare_operators: List[str] = ['equal', 'notEqual']
 
 
 def iterate_parameters_for_validation(parameters: List[Dict[str, Any]]) -> None:
