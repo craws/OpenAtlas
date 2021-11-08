@@ -28,8 +28,10 @@ def uc_first(string: str) -> str:
 class OpenatlasClass:
 
     # Needed for translations of class labels
-    _('source_translation')
+    _('appellation')
     _('actor_appellation')
+    _('actor_function')
+    _('source_translation')
 
     def __init__(
             self,
@@ -49,7 +51,7 @@ class OpenatlasClass:
         if cidoc_class:
             self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
         self.hierarchies = hierarchies
-        self.standard_type = standard_type_id
+        self.standard_type_id = standard_type_id
         self.color = color  # Color of entity in network visualisation
         self.write_access = write_access
         self.view = None
@@ -60,6 +62,10 @@ class OpenatlasClass:
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
+
+    @staticmethod
+    def get_openatlas_class_count() -> Dict[str, int]:
+        return Db.get_openatlas_class_count()
 
     @staticmethod
     def get_all() -> Dict[str, OpenatlasClass]:
@@ -83,22 +89,22 @@ class OpenatlasClass:
     def get_table_headers() -> Dict[str, List[str]]:
         headers = {
             'actor': ['name', 'class', 'begin', 'end', 'description'],
-            'artifact': ['name', 'class', 'type', 'begin', 'end',
-                         'description'],
+            'artifact': [
+                'name', 'class', 'type', 'begin', 'end', 'description'],
             'entities': ['name', 'class', 'info'],
             'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
             'file': ['name', 'license', 'size', 'extension', 'description'],
             'member': ['member', 'function', 'first', 'last', 'description'],
-            'member_of': ['member of', 'function', 'first', 'last',
-                          'description'],
+            'member_of': [
+                'member of', 'function', 'first', 'last', 'description'],
             'note': ['date', 'visibility', 'user', 'note'],
             'type': ['name', 'description'],
             'place': ['name', 'type', 'begin', 'end', 'description'],
             'relation': ['relation', 'actor', 'first', 'last', 'description'],
             'reference': ['name', 'class', 'type', 'description'],
-            'reference_system':
-                ['name', 'count', 'website URL', 'resolver URL', 'example ID',
-                 'default precision', 'description'],
+            'reference_system': [
+                'name', 'count', 'website URL', 'resolver URL', 'example ID',
+                'default precision', 'description'],
             'source': ['name', 'type', 'description'],
             'subs': ['name', 'count', 'info'],
             'text': ['text', 'type', 'content']}

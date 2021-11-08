@@ -181,7 +181,7 @@ def get_base_table_data(
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
-    if entity.class_.standard_type:
+    if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
         data.append(
@@ -640,7 +640,9 @@ def link(
             class_='' if object_.active else 'inactive',
             uc_first_=False)
     if isinstance(object_, CidocClass):
-        return link(object_.code, url_for('class_view', code=object_.code))
+        return link(
+            object_.code,
+            url_for('cidoc_class_view', code=object_.code))
     if isinstance(object_, CidocProperty):
         return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Entity):

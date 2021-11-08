@@ -35,6 +35,16 @@ class Model:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_openatlas_class_count() -> Dict[str, int]:
+        g.cursor.execute(
+            """
+            SELECT oc.name, COUNT(e.id) AS count
+            FROM model.openatlas_class oc
+            LEFT JOIN model.entity e ON oc.name = e.openatlas_class_name
+            GROUP BY oc.name;""")
+        return {row['name']: row['count'] for row in g.cursor.fetchall()}
+
+    @staticmethod
     def get_classes() -> List[Dict[str, Any]]:
         g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
