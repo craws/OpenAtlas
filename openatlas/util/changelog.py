@@ -1,7 +1,10 @@
 class Changelog:
 
     versions = {
-	'6.6.0': ['TBA', {}],
+        '6.6.0': ['TBA', {}],
+        '6.5.2': ['2021-11-07', {
+            'fix': {
+                '#1596:': 'Sometimes unavailable add custom type button'}}],
         '6.5.1': ['2021-10-28', {
             'fix': {
                 '#1592:': 'Error at import when using type ids'}}],
