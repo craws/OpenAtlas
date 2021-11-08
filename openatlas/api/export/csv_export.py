@@ -88,8 +88,7 @@ class ApiExportCSV:  # pragma: no cover
     @staticmethod
     def get_geom_entry(entity: Entity) -> Dict[str, None]:
         geom = {'type': None, 'coordinates': None}
-        if entity.class_.view == 'place' \
-                or entity.class_.name in ['find', 'artifact']:
+        if entity.class_.view == 'place' or entity.class_.name == 'artifact':
             geom = ApiExportCSV.get_geometry(
                 Link.get_linked_entity(entity.id, 'P53'))
         elif entity.class_.name == 'object_location':

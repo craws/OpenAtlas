@@ -28,9 +28,11 @@ def get_structure(
     elif not object_:
         return None
     else:
-        if object_.class_.name not in ['find', 'human_remains']:
+        if object_.class_.name not in ['artifact', 'human_remains']:
             subunits = object_.get_linked_entities('P46', nodes=True)
-        if object_.class_.name in ['find', 'human_remains']:
+        if object_.class_.name == 'human_remains' or (
+                object_.class_.name == 'artifact'
+                and object_.get_linked_entity('P46', inverse=True)):
             stratigraphic_unit = \
                 object_.get_linked_entity_safe('P46', inverse=True)
             super_id = stratigraphic_unit.id

@@ -14,17 +14,15 @@ from openatlas.models.entity import Entity
 class Node(Entity):
     count = 0
     count_subs = 0
-    locked = False
+    category = ''
     multiple = False
-    standard = False
-    value_type = False
     directional = False
 
     def __init__(self, row: Dict[str, Any]) -> None:
         super().__init__(row)
         self.root: List[int] = []
         self.subs: List[int] = []
-        self.forms: Dict[int, Any] = {}
+        self.classes: List[str] = []
 
     @staticmethod
     def get_all_nodes() -> Dict[int, Node]:
@@ -37,19 +35,12 @@ class Node(Entity):
             node.count = row['count'] if row['count'] else row['count_property']
             node.count_subs = 0
             node.subs = []
-            node.locked = False
             node.root = [row['super_id']] if row['super_id'] else []
         Node.populate_subs(nodes)
         return nodes
 
     @staticmethod
     def populate_subs(nodes: Dict[int, Node]) -> None:
-        forms = {}
-        for row in Db.get_web_forms():
-            forms[row['id']] = {
-                'id': row['id'],
-                'name': row['name'],
-                'extendable': row['extendable']}
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for node in nodes.values():
             if node.root:
@@ -60,18 +51,14 @@ class Node(Entity):
                     node,
                     node.root[0],
                     node.root)
-                node.standard = False
-                node.locked = nodes[node.root[0]].locked
+                node.category = nodes[node.root[-1]].category
             else:
-                hierarchy = hierarchies[node.id]
-                node.value_type = hierarchy['value_type']
-                node.directional = hierarchy['directional']
-                node.multiple = hierarchy['multiple']
-                node.standard = hierarchy['standard']
-                node.locked = hierarchy['locked']
-                node.forms = {
-                    form_id: forms[form_id]
-                    for form_id in hierarchy['form_ids']}
+                node.category = hierarchies[node.id]['category']
+                node.multiple = hierarchies[node.id]['multiple']
+                node.directional = hierarchies[node.id]['directional']
+                for class_ in g.classes.values():
+                    if class_.hierarchies and node.id in class_.hierarchies:
+                        node.classes.append(class_.name)
 
     @staticmethod
     def get_root_path(
@@ -128,17 +115,12 @@ class Node(Entity):
         return items
 
     @staticmethod
-    def get_nodes_for_form(form_name: str) -> Dict[int, Node]:
-        return {
-            id_: g.nodes[id_] for id_ in Db.get_nodes_for_form(form_name)}
-
-    @staticmethod
-    def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
+    def get_class_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices():
-            if g.classes[row['name']].view != 'type' \
-                    and (not root or row['id'] not in root.forms):
-                choices.append((row['id'], g.classes[row['name']].label))
+        for class_ in g.classes.values():
+            if class_.new_types_allowed \
+                    and (not root or class_.name not in root.classes):
+                choices.append((class_.name, class_.label))
         return choices
 
     @staticmethod
@@ -171,9 +153,9 @@ class Node(Entity):
                     entity.link('P2', range_)
 
     @staticmethod
-    def insert_hierarchy(node: Node, form: FlaskForm, value_type: bool) -> None:
+    def insert_hierarchy(node: Node, form: FlaskForm, category: str) -> None:
         multiple = False
-        if value_type or (
+        if category == 'value' or (
                 hasattr(form, 'multiple')
                 and form.multiple
                 and form.multiple.data):
@@ -182,8 +164,8 @@ class Node(Entity):
             'id': node.id,
             'name': node.name,
             'multiple': multiple,
-            'value_type': value_type})
-        Node.add_forms_to_hierarchy(node, form)
+            'category': category})
+        Db.add_classes_to_hierarchy(node.id, form.classes.data)
 
     @staticmethod
     def update_hierarchy(node: Node, form: FlaskForm) -> None:
@@ -197,11 +179,7 @@ class Node(Entity):
             'id': node.id,
             'name': form.name.data,
             'multiple': multiple})
-        Node.add_forms_to_hierarchy(node, form)
-
-    @staticmethod
-    def add_forms_to_hierarchy(node: Node, form: FlaskForm) -> None:
-        Db.add_form_to_hierarchy(node.id, form.forms.data)
+        Db.add_classes_to_hierarchy(node.id, form.classes.data)
 
     @staticmethod
     def get_node_orphans() -> List[Node]:
@@ -257,16 +235,16 @@ class Node(Entity):
         return subs
 
     @staticmethod
-    def get_form_count(root_node: Node, form_id: int) -> Optional[int]:
-        # Check if nodes linked to entities before offering to remove from form
+    def get_form_count(root_node: Node, class_name: str) -> Optional[int]:
+        # Check if nodes linked to entities before offering to remove them
         node_ids = Node.get_all_sub_ids(root_node)
         if not node_ids:
             return None
-        return Db.get_form_count(form_id, node_ids)
+        return Db.get_form_count(class_name, node_ids)
 
     @staticmethod
-    def remove_form_from_hierarchy(form_id: int, hierarchy_id: int) -> None:
-        Db.remove_form_from_hierarchy(form_id, hierarchy_id)
+    def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
+        Db.remove_class_from_hierarchy(class_name, hierarchy_id)
 
     @staticmethod
     def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
@@ -275,8 +253,7 @@ class Node(Entity):
     @staticmethod
     def get_untyped(hierarchy_id: int) -> List[Entity]:
         hierarchy = g.nodes[hierarchy_id]
-        classes = [
-            class_['name'] for class_ in g.nodes[hierarchy_id].forms.values()]
+        classes = hierarchy.classes
         if hierarchy.name in ('Administrative unit', 'Historical place'):
             classes = 'object_location'  # pragma: no cover
         untyped = []

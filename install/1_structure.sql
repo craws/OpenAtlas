@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.11 (Debian 11.11-0+deb10u1)
--- Dumped by pg_dump version 11.11 (Debian 11.11-0+deb10u1)
+-- Dumped from database version 11.13 (Debian 11.13-0+deb10u1)
+-- Dumped by pg_dump version 11.13 (Debian 11.13-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,15 +22,15 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
@@ -38,14 +38,18 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_write_access_group_name_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_standard_type_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
@@ -59,18 +63,18 @@ DROP TRIGGER IF EXISTS update_modified ON web."user";
 DROP TRIGGER IF EXISTS update_modified ON web.reference_system;
 DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
-DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
+DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
-DROP TRIGGER IF EXISTS update_modified ON web.form;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
+DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
-DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.class;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -89,21 +93,20 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_system_id_class_name_key;
 ALTER TABLE IF EXISTS ONLY web.reference_system DROP CONSTRAINT IF EXISTS reference_system_name_key;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_reference_system_id_form_id_key;
-ALTER TABLE IF EXISTS ONLY web.reference_system_form DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
+ALTER TABLE IF EXISTS ONLY web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_form_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_place_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_openatlas_class_hierarchy_id_openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
-ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_form_id_key;
+ALTER TABLE IF EXISTS ONLY web.hierarchy_openatlas_class DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
-ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
-ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
+ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_name_key;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
@@ -111,15 +114,17 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_pkey;
+ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_pkey;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_name_key;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
-ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
+ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_code_key;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
@@ -134,22 +139,22 @@ ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.reference_system_form ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.reference_system_openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.map_overlay ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.hierarchy_openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."group" ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS web.form ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class_i18n ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.class ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class_inheritance ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class_i18n ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.cidoc_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.polygon ALTER COLUMN id DROP DEFAULT;
@@ -168,7 +173,7 @@ DROP TABLE IF EXISTS web."user";
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
 DROP SEQUENCE IF EXISTS web.reference_system_form_id_seq;
-DROP TABLE IF EXISTS web.reference_system_form;
+DROP TABLE IF EXISTS web.reference_system_openatlas_class;
 DROP TABLE IF EXISTS web.reference_system;
 DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
 DROP TABLE IF EXISTS web.map_overlay;
@@ -178,12 +183,10 @@ DROP SEQUENCE IF EXISTS web.i18n_id_seq;
 DROP TABLE IF EXISTS web.i18n;
 DROP SEQUENCE IF EXISTS web.hierarchy_id_seq;
 DROP SEQUENCE IF EXISTS web.hierarchy_form_id_seq;
-DROP TABLE IF EXISTS web.hierarchy_form;
+DROP TABLE IF EXISTS web.hierarchy_openatlas_class;
 DROP TABLE IF EXISTS web.hierarchy;
 DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
-DROP SEQUENCE IF EXISTS web.form_id_seq;
-DROP TABLE IF EXISTS web.form;
 DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
 DROP TABLE IF EXISTS web.entity_profile_image;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
@@ -192,16 +195,18 @@ DROP SEQUENCE IF EXISTS model.property_id_seq;
 DROP SEQUENCE IF EXISTS model.property_i18n_id_seq;
 DROP TABLE IF EXISTS model.property_i18n;
 DROP TABLE IF EXISTS model.property;
+DROP SEQUENCE IF EXISTS model.openatlas_class_id_seq;
+DROP TABLE IF EXISTS model.openatlas_class;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
-DROP SEQUENCE IF EXISTS model.class_inheritance_id_seq;
-DROP TABLE IF EXISTS model.class_inheritance;
-DROP SEQUENCE IF EXISTS model.class_id_seq;
-DROP SEQUENCE IF EXISTS model.class_i18n_id_seq;
-DROP TABLE IF EXISTS model.class_i18n;
-DROP TABLE IF EXISTS model.class;
+DROP SEQUENCE IF EXISTS model.cidoc_class_inheritance_id_seq;
+DROP TABLE IF EXISTS model.cidoc_class_inheritance;
+DROP SEQUENCE IF EXISTS model.cidoc_class_id_seq;
+DROP SEQUENCE IF EXISTS model.cidoc_class_i18n_id_seq;
+DROP TABLE IF EXISTS model.cidoc_class_i18n;
+DROP TABLE IF EXISTS model.cidoc_class;
 DROP SEQUENCE IF EXISTS import.project_id_seq;
 DROP TABLE IF EXISTS import.project;
 DROP SEQUENCE IF EXISTS import.entity_id_seq;
@@ -291,22 +296,23 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     AS $$
         BEGIN
             -- Delete aliases (P1, P131)
-            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place, find or human remains
-            IF OLD.class_code IN ('E18', 'E20', 'E22') THEN
+            IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
             -- Delete translations (E33) if it was a document
-            IF OLD.class_code = 'E33' THEN
+            IF OLD.cidoc_class_code = 'E33' THEN
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
             END IF;
 
             RETURN OLD;
         END;
+
     $$;
 
 
@@ -527,10 +533,10 @@ ALTER SEQUENCE import.project_id_seq OWNED BY import.project.id;
 
 
 --
--- Name: class; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: cidoc_class; Type: TABLE; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class (
+CREATE TABLE model.cidoc_class (
     id integer NOT NULL,
     code text NOT NULL,
     name text NOT NULL,
@@ -540,27 +546,27 @@ CREATE TABLE model.class (
 );
 
 
-ALTER TABLE model.class OWNER TO openatlas;
+ALTER TABLE model.cidoc_class OWNER TO openatlas;
 
 --
--- Name: COLUMN class.code; Type: COMMENT; Schema: model; Owner: openatlas
+-- Name: COLUMN cidoc_class.code; Type: COMMENT; Schema: model; Owner: openatlas
 --
 
-COMMENT ON COLUMN model.class.code IS 'e.g. E21';
-
-
---
--- Name: COLUMN class.name; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON COLUMN model.class.name IS 'e.g. Person';
+COMMENT ON COLUMN model.cidoc_class.code IS 'e.g. E21';
 
 
 --
--- Name: class_i18n; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: COLUMN cidoc_class.name; Type: COMMENT; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class_i18n (
+COMMENT ON COLUMN model.cidoc_class.name IS 'e.g. Person';
+
+
+--
+-- Name: cidoc_class_i18n; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.cidoc_class_i18n (
     id integer NOT NULL,
     class_code text NOT NULL,
     language_code text NOT NULL,
@@ -570,13 +576,13 @@ CREATE TABLE model.class_i18n (
 );
 
 
-ALTER TABLE model.class_i18n OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_i18n OWNER TO openatlas;
 
 --
--- Name: class_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_i18n_id_seq
+CREATE SEQUENCE model.cidoc_class_i18n_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -584,20 +590,20 @@ CREATE SEQUENCE model.class_i18n_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_i18n_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_i18n_id_seq OWNER TO openatlas;
 
 --
--- Name: class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_i18n_id_seq OWNED BY model.class_i18n.id;
+ALTER SEQUENCE model.cidoc_class_i18n_id_seq OWNED BY model.cidoc_class_i18n.id;
 
 
 --
--- Name: class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_id_seq
+CREATE SEQUENCE model.cidoc_class_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -605,20 +611,20 @@ CREATE SEQUENCE model.class_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_id_seq OWNER TO openatlas;
 
 --
--- Name: class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_id_seq OWNED BY model.class.id;
+ALTER SEQUENCE model.cidoc_class_id_seq OWNED BY model.cidoc_class.id;
 
 
 --
--- Name: class_inheritance; Type: TABLE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance; Type: TABLE; Schema: model; Owner: openatlas
 --
 
-CREATE TABLE model.class_inheritance (
+CREATE TABLE model.cidoc_class_inheritance (
     id integer NOT NULL,
     super_code text NOT NULL,
     sub_code text NOT NULL,
@@ -627,13 +633,13 @@ CREATE TABLE model.class_inheritance (
 );
 
 
-ALTER TABLE model.class_inheritance OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_inheritance OWNER TO openatlas;
 
 --
--- Name: class_inheritance_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
-CREATE SEQUENCE model.class_inheritance_id_seq
+CREATE SEQUENCE model.cidoc_class_inheritance_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -641,13 +647,13 @@ CREATE SEQUENCE model.class_inheritance_id_seq
     CACHE 1;
 
 
-ALTER TABLE model.class_inheritance_id_seq OWNER TO openatlas;
+ALTER TABLE model.cidoc_class_inheritance_id_seq OWNER TO openatlas;
 
 --
--- Name: class_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
 --
 
-ALTER SEQUENCE model.class_inheritance_id_seq OWNED BY model.class_inheritance.id;
+ALTER SEQUENCE model.cidoc_class_inheritance_id_seq OWNED BY model.cidoc_class_inheritance.id;
 
 
 --
@@ -656,7 +662,7 @@ ALTER SEQUENCE model.class_inheritance_id_seq OWNED BY model.class_inheritance.i
 
 CREATE TABLE model.entity (
     id integer NOT NULL,
-    class_code text NOT NULL,
+    cidoc_class_code text NOT NULL,
     name text NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
@@ -668,7 +674,7 @@ CREATE TABLE model.entity (
     end_from timestamp without time zone,
     end_to timestamp without time zone,
     end_comment text,
-    system_class text NOT NULL
+    openatlas_class_name text NOT NULL
 );
 
 
@@ -738,6 +744,71 @@ ALTER TABLE model.link_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE model.link_id_seq OWNED BY model.link.id;
+
+
+--
+-- Name: openatlas_class; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.openatlas_class (
+    id integer NOT NULL,
+    name text NOT NULL,
+    cidoc_class_code text,
+    standard_type_id integer,
+    alias_allowed boolean DEFAULT false,
+    reference_system_allowed boolean DEFAULT false,
+    new_types_allowed boolean DEFAULT false,
+    write_access_group_name text,
+    layout_color text,
+    layout_icon text,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE model.openatlas_class OWNER TO openatlas;
+
+--
+-- Name: TABLE openatlas_class; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON TABLE model.openatlas_class IS 'A more fine grained use of CIDOC classes';
+
+
+--
+-- Name: COLUMN openatlas_class.layout_color; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON COLUMN model.openatlas_class.layout_color IS 'For e.g. network vizualistaion';
+
+
+--
+-- Name: COLUMN openatlas_class.layout_icon; Type: COMMENT; Schema: model; Owner: openatlas
+--
+
+COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'For Bootstrap icons';
+
+
+--
+-- Name: openatlas_class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.openatlas_class_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE model.openatlas_class_id_seq OWNER TO openatlas;
+
+--
+-- Name: openatlas_class_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE model.openatlas_class_id_seq OWNED BY model.openatlas_class.id;
 
 
 --
@@ -890,42 +961,6 @@ ALTER SEQUENCE web.entity_profile_image_id_seq OWNED BY web.entity_profile_image
 
 
 --
--- Name: form; Type: TABLE; Schema: web; Owner: openatlas
---
-
-CREATE TABLE web.form (
-    id integer NOT NULL,
-    name text NOT NULL,
-    extendable boolean DEFAULT false NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
-);
-
-
-ALTER TABLE web.form OWNER TO openatlas;
-
---
--- Name: form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
---
-
-CREATE SEQUENCE web.form_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE web.form_id_seq OWNER TO openatlas;
-
---
--- Name: form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
---
-
-ALTER SEQUENCE web.form_id_seq OWNED BY web.form.id;
-
-
---
 -- Name: group; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -968,12 +1003,10 @@ CREATE TABLE web.hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
     multiple boolean DEFAULT false NOT NULL,
-    standard boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    value_type boolean DEFAULT false NOT NULL,
-    locked boolean DEFAULT false NOT NULL
+    category text DEFAULT 'standard'::text NOT NULL
 );
 
 
@@ -994,33 +1027,19 @@ COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure un
 
 
 --
--- Name: COLUMN hierarchy.value_type; Type: COMMENT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class; Type: TABLE; Schema: web; Owner: openatlas
 --
 
-COMMENT ON COLUMN web.hierarchy.value_type IS 'True if links to this type can have numeric values';
-
-
---
--- Name: COLUMN hierarchy.locked; Type: COMMENT; Schema: web; Owner: openatlas
---
-
-COMMENT ON COLUMN web.hierarchy.locked IS 'True if these types are not editable';
-
-
---
--- Name: hierarchy_form; Type: TABLE; Schema: web; Owner: openatlas
---
-
-CREATE TABLE web.hierarchy_form (
+CREATE TABLE web.hierarchy_openatlas_class (
     id integer NOT NULL,
     hierarchy_id integer NOT NULL,
-    form_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    openatlas_class_name text NOT NULL
 );
 
 
-ALTER TABLE web.hierarchy_form OWNER TO openatlas;
+ALTER TABLE web.hierarchy_openatlas_class OWNER TO openatlas;
 
 --
 -- Name: hierarchy_form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -1040,7 +1059,7 @@ ALTER TABLE web.hierarchy_form_id_seq OWNER TO openatlas;
 -- Name: hierarchy_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
 --
 
-ALTER SEQUENCE web.hierarchy_form_id_seq OWNED BY web.hierarchy_form.id;
+ALTER SEQUENCE web.hierarchy_form_id_seq OWNED BY web.hierarchy_openatlas_class.id;
 
 
 --
@@ -1210,17 +1229,17 @@ COMMENT ON COLUMN web.reference_system.system IS 'True if integrated in the appl
 
 
 --
--- Name: reference_system_form; Type: TABLE; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class; Type: TABLE; Schema: web; Owner: openatlas
 --
 
-CREATE TABLE web.reference_system_form (
+CREATE TABLE web.reference_system_openatlas_class (
     id integer NOT NULL,
     reference_system_id integer NOT NULL,
-    form_id integer NOT NULL
+    openatlas_class_name text NOT NULL
 );
 
 
-ALTER TABLE web.reference_system_form OWNER TO openatlas;
+ALTER TABLE web.reference_system_openatlas_class OWNER TO openatlas;
 
 --
 -- Name: reference_system_form_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -1241,7 +1260,7 @@ ALTER TABLE web.reference_system_form_id_seq OWNER TO openatlas;
 -- Name: reference_system_form_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
 --
 
-ALTER SEQUENCE web.reference_system_form_id_seq OWNED BY web.reference_system_form.id;
+ALTER SEQUENCE web.reference_system_form_id_seq OWNED BY web.reference_system_openatlas_class.id;
 
 
 --
@@ -1508,24 +1527,24 @@ ALTER TABLE ONLY import.project ALTER COLUMN id SET DEFAULT nextval('import.proj
 
 
 --
--- Name: class id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: cidoc_class id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class ALTER COLUMN id SET DEFAULT nextval('model.class_id_seq'::regclass);
-
-
---
--- Name: class_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.class_i18n ALTER COLUMN id SET DEFAULT nextval('model.class_i18n_id_seq'::regclass);
+ALTER TABLE ONLY model.cidoc_class ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_id_seq'::regclass);
 
 
 --
--- Name: class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance ALTER COLUMN id SET DEFAULT nextval('model.class_inheritance_id_seq'::regclass);
+ALTER TABLE ONLY model.cidoc_class_i18n ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_i18n_id_seq'::regclass);
+
+
+--
+-- Name: cidoc_class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.cidoc_class_inheritance ALTER COLUMN id SET DEFAULT nextval('model.cidoc_class_inheritance_id_seq'::regclass);
 
 
 --
@@ -1540,6 +1559,13 @@ ALTER TABLE ONLY model.entity ALTER COLUMN id SET DEFAULT nextval('model.entity_
 --
 
 ALTER TABLE ONLY model.link ALTER COLUMN id SET DEFAULT nextval('model.link_id_seq'::regclass);
+
+
+--
+-- Name: openatlas_class id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class ALTER COLUMN id SET DEFAULT nextval('model.openatlas_class_id_seq'::regclass);
 
 
 --
@@ -1571,13 +1597,6 @@ ALTER TABLE ONLY web.entity_profile_image ALTER COLUMN id SET DEFAULT nextval('w
 
 
 --
--- Name: form id; Type: DEFAULT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.form ALTER COLUMN id SET DEFAULT nextval('web.form_id_seq'::regclass);
-
-
---
 -- Name: group id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1592,10 +1611,10 @@ ALTER TABLE ONLY web.hierarchy ALTER COLUMN id SET DEFAULT nextval('web.hierarch
 
 
 --
--- Name: hierarchy_form id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form ALTER COLUMN id SET DEFAULT nextval('web.hierarchy_form_id_seq'::regclass);
+ALTER TABLE ONLY web.hierarchy_openatlas_class ALTER COLUMN id SET DEFAULT nextval('web.hierarchy_form_id_seq'::regclass);
 
 
 --
@@ -1613,10 +1632,10 @@ ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_ov
 
 
 --
--- Name: reference_system_form id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form ALTER COLUMN id SET DEFAULT nextval('web.reference_system_form_id_seq'::regclass);
+ALTER TABLE ONLY web.reference_system_openatlas_class ALTER COLUMN id SET DEFAULT nextval('web.reference_system_form_id_seq'::regclass);
 
 
 --
@@ -1725,58 +1744,58 @@ ALTER TABLE ONLY import.project
 
 
 --
--- Name: class class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_code_key UNIQUE (code);
 
 
 --
--- Name: class_i18n class_i18n_class_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_class_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
+ALTER TABLE ONLY model.cidoc_class_i18n
     ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
 
 
 --
--- Name: class_i18n class_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
+ALTER TABLE ONLY model.cidoc_class_i18n
     ADD CONSTRAINT class_i18n_pkey PRIMARY KEY (id);
 
 
 --
--- Name: class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
+ALTER TABLE ONLY model.cidoc_class_inheritance
     ADD CONSTRAINT class_inheritance_pkey PRIMARY KEY (id);
 
 
 --
--- Name: class_inheritance class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
+ALTER TABLE ONLY model.cidoc_class_inheritance
     ADD CONSTRAINT class_inheritance_super_id_sub_id_key UNIQUE (super_code, sub_code);
 
 
 --
--- Name: class class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_name_key UNIQUE (name);
 
 
 --
--- Name: class class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class
+ALTER TABLE ONLY model.cidoc_class
     ADD CONSTRAINT class_pkey PRIMARY KEY (id);
 
 
@@ -1794,6 +1813,22 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: openatlas_class openatlas_class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_name_key UNIQUE (name);
+
+
+--
+-- Name: openatlas_class openatlas_class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_pkey PRIMARY KEY (id);
 
 
 --
@@ -1853,19 +1888,11 @@ ALTER TABLE ONLY web.entity_profile_image
 
 
 --
--- Name: form form_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: group group_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.form
-    ADD CONSTRAINT form_name_key UNIQUE (name);
-
-
---
--- Name: form form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.form
-    ADD CONSTRAINT form_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY web."group"
+    ADD CONSTRAINT group_name_key UNIQUE (name);
 
 
 --
@@ -1877,18 +1904,10 @@ ALTER TABLE ONLY web."group"
 
 
 --
--- Name: hierarchy_form hierarchy_form_hierarchy_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form
-    ADD CONSTRAINT hierarchy_form_hierarchy_id_form_id_key UNIQUE (hierarchy_id, form_id);
-
-
---
--- Name: hierarchy_form hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.hierarchy_form
+ALTER TABLE ONLY web.hierarchy_openatlas_class
     ADD CONSTRAINT hierarchy_form_pkey PRIMARY KEY (id);
 
 
@@ -1898,6 +1917,14 @@ ALTER TABLE ONLY web.hierarchy_form
 
 ALTER TABLE ONLY web.hierarchy
     ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+
+
+--
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_hierarchy_id_openatlas_class_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_hierarchy_id_openatlas_class_name_key UNIQUE (hierarchy_id, openatlas_class_name);
 
 
 --
@@ -1949,19 +1976,11 @@ ALTER TABLE ONLY web.map_overlay
 
 
 --
--- Name: reference_system_form reference_system_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form
+ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_form_pkey PRIMARY KEY (id);
-
-
---
--- Name: reference_system_form reference_system_form_reference_system_id_form_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.reference_system_form
-    ADD CONSTRAINT reference_system_form_reference_system_id_form_id_key UNIQUE (reference_system_id, form_id);
 
 
 --
@@ -1970,6 +1989,14 @@ ALTER TABLE ONLY web.reference_system_form
 
 ALTER TABLE ONLY web.reference_system
     ADD CONSTRAINT reference_system_name_key UNIQUE (name);
+
+
+--
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_system_id_class_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_class_system_id_class_name_key UNIQUE (reference_system_id, openatlas_class_name);
 
 
 --
@@ -2112,24 +2139,24 @@ CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECU
 
 
 --
--- Name: class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: cidoc_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: cidoc_class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2144,6 +2171,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUT
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: openatlas_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2168,13 +2202,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR E
 
 
 --
--- Name: form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
 -- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
@@ -2189,10 +2216,10 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy FOR EACH ROW EXECU
 
 
 --
--- Name: hierarchy_form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2293,27 +2320,27 @@ ALTER TABLE ONLY import.entity
 
 
 --
--- Name: class_i18n class_i18n_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_i18n class_i18n_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_i18n
-    ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: class_inheritance class_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.class_inheritance
-    ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_i18n
+    ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: class_inheritance class_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: cidoc_class_inheritance class_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
-ALTER TABLE ONLY model.class_inheritance
-    ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance
+    ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: cidoc_class_inheritance class_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.cidoc_class_inheritance
+    ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2321,7 +2348,15 @@ ALTER TABLE ONLY model.class_inheritance
 --
 
 ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity entity_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.entity
+    ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2357,11 +2392,35 @@ ALTER TABLE ONLY model.link
 
 
 --
+-- Name: openatlas_class openatlas_class_cidoc_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: openatlas_class openatlas_class_standard_type_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_standard_type_id_fkey FOREIGN KEY (standard_type_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: openatlas_class openatlas_class_write_access_group_name_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.openatlas_class
+    ADD CONSTRAINT openatlas_class_write_access_group_name_fkey FOREIGN KEY (write_access_group_name) REFERENCES web."group"(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: property property_domain_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.property
-    ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2393,7 +2452,7 @@ ALTER TABLE ONLY model.property_inheritance
 --
 
 ALTER TABLE ONLY model.property
-    ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2413,18 +2472,10 @@ ALTER TABLE ONLY web.entity_profile_image
 
 
 --
--- Name: hierarchy_form hierarchy_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_openatlas_class hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.hierarchy_form
-    ADD CONSTRAINT hierarchy_form_form_id_fkey FOREIGN KEY (form_id) REFERENCES web.form(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: hierarchy_form hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.hierarchy_form
+ALTER TABLE ONLY web.hierarchy_openatlas_class
     ADD CONSTRAINT hierarchy_form_hierarchy_id_fkey FOREIGN KEY (hierarchy_id) REFERENCES web.hierarchy(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
@@ -2434,6 +2485,14 @@ ALTER TABLE ONLY web.hierarchy_form
 
 ALTER TABLE ONLY web.hierarchy
     ADD CONSTRAINT hierarchy_id_fkey FOREIGN KEY (id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: hierarchy_openatlas_class hierarchy_openatlas_class_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.hierarchy_openatlas_class
+    ADD CONSTRAINT hierarchy_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2469,19 +2528,19 @@ ALTER TABLE ONLY web.reference_system
 
 
 --
--- Name: reference_system_form reference_system_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: reference_system_openatlas_class reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY web.reference_system_form
-    ADD CONSTRAINT reference_system_form_form_id_fkey FOREIGN KEY (form_id) REFERENCES web.form(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: reference_system_form reference_system_form_reference_system_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.reference_system_form
+ALTER TABLE ONLY web.reference_system_openatlas_class
     ADD CONSTRAINT reference_system_form_reference_system_id_fkey FOREIGN KEY (reference_system_id) REFERENCES web.reference_system(entity_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: reference_system_openatlas_class reference_system_openatlas_class_openatlas_class_name_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.reference_system_openatlas_class
+    ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -2535,4 +2594,3 @@ ALTER TABLE ONLY web.user_settings
 --
 -- PostgreSQL database dump complete
 --
-

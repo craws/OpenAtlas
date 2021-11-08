@@ -4,7 +4,7 @@ from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.models.system import SystemClass
+from openatlas.models.model import OpenatlasClass
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 
@@ -21,12 +21,6 @@ _('unlinked')
 _('missing files')
 _('orphaned files')
 _('circular dependencies')
-
-# Needed for translations of content items
-_('intro_for_frontend')
-_('legal_notice_for_frontend')
-_('contact_for_frontend')
-_('site_name_for_frontend')
 
 
 class Tab:
@@ -51,9 +45,11 @@ class Tab:
             id_ = entity.id
             view = entity.class_.view
             class_ = entity.class_
-            self.table.header = g.table_headers[name]
+            if not self.table.header:
+                self.table.header = g.table_headers[name]
         if name == 'reference' or entity and entity.class_.view == 'reference':
             self.table.header = self.table.header + ['page']
+
         buttons = buttons if buttons else []
         self.add_buttons(name, buttons, view, id_, class_)
         self.buttons = buttons \
@@ -65,7 +61,7 @@ class Tab:
             buttons: List[str],
             view: Union[None, str],
             id_: Union[None, int],
-            class_: Union[None, SystemClass]) -> None:
+            class_: Union[None, OpenatlasClass]) -> None:
 
         if name == 'actor':
             if view == 'place':
@@ -102,13 +98,15 @@ class Tab:
                     g.classes[item].label,
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
+            if class_.name != 'stratigraphic_unit':
+                buttons += [
+                    button(
+                        'link',
+                        url_for('link_insert', id_=id_, view='artifact'))]
             buttons += [
                 button(
-                    'link',
-                    url_for('link_insert', id_=id_, view='artifact')),
-                button(
-                    g.classes['artifact'].label,
-                    url_for('insert', class_='artifact', origin_id=id_))]
+                    g.classes[name].label,
+                    url_for('insert', class_=name, origin_id=id_))]
         elif name == 'entities':
             if id_:
                 buttons += [button(
@@ -148,12 +146,6 @@ class Tab:
         elif name == 'feature':
             if current_user.settings['module_sub_units'] \
                     and class_.name == 'place':
-                buttons += [button(
-                    g.classes[name].label,
-                    url_for('insert', class_=name, origin_id=id_))]
-        elif name == 'find':
-            if current_user.settings['module_sub_units'] \
-                    and class_.name == 'stratigraphic_unit':
                 buttons += [button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_))]

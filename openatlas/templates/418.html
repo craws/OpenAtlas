@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="container" style="text-align:center;">
-        <h1>418 - I’m a teapot</h1>
+        <h1 class="error">
+            {{ e }}
+        </h1>
         <p>
             {{ _("This entry doesn't exist. Maybe you followed an obsolete link.") }}
         </p>

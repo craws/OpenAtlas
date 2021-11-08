@@ -179,10 +179,9 @@ def get_base_table_data(
         entity: 'Entity',
         show_links: Optional[bool] = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] or \
-            entity.class_.name == 'find':
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
-    if entity.class_.standard_type:
+    if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
     if entity.class_.name == 'file':
         data.append(
@@ -191,7 +190,7 @@ def get_base_table_data(
         data.append(
             g.file_stats[entity.id]['ext']
             if entity.id in g.file_stats else 'N/A')
-    if entity.class_.view in ['actor', 'artifact', 'event', 'find', 'place']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
@@ -255,7 +254,7 @@ def get_entity_data(
     from openatlas.models.reference_system import ReferenceSystem
     if isinstance(entity, Node):
         data[_('super')] = link(g.nodes[entity.root[0]])
-        if g.nodes[entity.root[0]].value_type:
+        if entity.category == 'value':
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
     elif isinstance(entity, ReferenceSystem):
@@ -641,7 +640,9 @@ def link(
             class_='' if object_.active else 'inactive',
             uc_first_=False)
     if isinstance(object_, CidocClass):
-        return link(object_.code, url_for('class_view', code=object_.code))
+        return link(
+            object_.code,
+            url_for('cidoc_class_view', code=object_.code))
     if isinstance(object_, CidocProperty):
         return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Entity):
@@ -742,14 +743,13 @@ def get_type_data(entity: 'Entity') -> Dict[str, Any]:
         entity.nodes.update(entity.location.nodes)  # Add location types
     data: Dict[str, Any] = defaultdict(list)
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
-        root = g.nodes[node.root[-1]]
         if entity.standard_type and node.id == entity.standard_type.id:
             continue  # Standard type is already added
         title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
         html = f'<span title="{title}">{link(node)}</span>'
-        if root.value_type:
+        if node.category == 'value':
             html += f' {float(value):g} {node.description}'
-        data[root.name].append(html)
+        data[g.nodes[node.root[-1]].name].append(html)
     return {key: data[key] for key in sorted(data.keys())}
 
 
@@ -868,11 +868,11 @@ def display_form(
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
-            if node.standard and node.class_.name == 'type':
+            if node.category == 'standard':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
-            if node.value_type and 'is_node_form' not in form:
+            if node.category == 'value' and 'is_node_form' not in form:
                 field.description = node.description
                 html += add_form_row(
                     field,

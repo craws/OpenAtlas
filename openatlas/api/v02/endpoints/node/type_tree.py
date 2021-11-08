@@ -39,5 +39,4 @@ class GetTypeTree(Resource):  # type: ignore
             'subs': node.subs,
             'count': node.count,
             'count_subs': node.count_subs,
-            'locked': node.locked,
-            'standard': node.standard}
+            'category': node.category}

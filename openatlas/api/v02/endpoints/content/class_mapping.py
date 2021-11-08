@@ -82,12 +82,6 @@ class ClassMapping(Resource):  # type: ignore
             "icon": "mdi-text-box",
             "en": "Document"},
         {
-            "systemClass": "find",
-            "crmClass": "E22",
-            "view": "place",
-            "icon": "mdi-map-marker",
-            "en": "Man-Made Object"},
-        {
             "systemClass": "group",
             "crmClass": "E74",
             "view": "actor",

@@ -21,13 +21,18 @@
       </a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-places">
+      <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-place">
         {{ _('places')|uc_first }}
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#menu-tab-system">
+        {{ _('system')|uc_first }}
       </a>
     </li>
   </ul>
   <div class="tab-content" id="menuTabContent">
-    {% for type_ in ['standard', 'custom', 'value', 'places'] %}
+    {% for type_ in ['standard', 'custom', 'value', 'place', 'system'] %}
       <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ type_ }}" style="padding: 0;">
         <div class="accordion" id="TypeAccordion">
           {% for node, tree in nodes[type_].items() %}
@@ -55,7 +60,7 @@
                             name="name_search"
                             style="width:8em;"
                             type="text">
-                        {% if 'editor'|is_authorized and not node.locked %}
+                        {% if 'editor'|is_authorized and node.category != 'system' %}
                           {{ ''|button(url_for('insert', class_='type' if type_ != 'places' else 'administrative_unit', origin_id=node.id)) }}
                         {% endif %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
@@ -76,16 +81,15 @@
                           {{ _('multiple') if node.multiple else _('single') }}
                         </p>
                       {% endif %}
-                      {% if node.forms %}
+                      {% if node.classes %}
                         <p style="margin-top:0;">
                           <strong>{{ _('classes')|uc_first }}</strong>:
-                          {% for form in node.forms.values() %}
-                            {{ g.classes[form.name].label if form.name in g.classes else
-                            _(form.name|replace('_', ' '))|uc_first }}{{ "," if not loop.last }}
+                          {% for class_ in node.classes %}
+                            {{ g.classes[class_].label }}{{ "," if not loop.last }}
                           {% endfor %}
                         </p>
                       {% endif %}
-                      {% if node.forms and node.name not in config.PROPERTY_TYPES %}
+                      {% if node.classes and node.name not in config.PROPERTY_TYPES %}
                         {{ _('untyped entities')|uc_first }}:
                         <a href="{{ url_for('show_untyped_entities', id_=node.id) }}">{{ _('show') }}</a>
                       {% endif %}

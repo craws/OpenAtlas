@@ -26,19 +26,13 @@ class GetNodeOverview(Resource):  # type: ignore
         nodes: Dict[str, Any] = {
             'standard': {},
             'custom': {},
-            'places': {},
-            'value': {}}
+            'place': {},
+            'value': {},
+            'system': {}}
         for node in g.nodes.values():
             if node.root:
                 continue
-            type_ = 'custom'
-            if node.class_.name == 'administrative_unit':
-                type_ = 'places'
-            elif node.standard:
-                type_ = 'standard'
-            elif node.value_type:
-                type_ = 'value'
-            nodes[type_][node.name] = GetNodeOverview.walk_tree(
+            nodes[node.category][node.name] = GetNodeOverview.walk_tree(
                 Node.get_nodes(node.name))
         return nodes
 

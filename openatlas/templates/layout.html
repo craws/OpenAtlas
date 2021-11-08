@@ -171,9 +171,6 @@
     </div>
   </div>
 </nav>
-<noscript>
-  <div class="error">{{ _('warning no js') }}</div>
-</noscript>
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
@@ -186,6 +183,15 @@
 <main>
   <div id="content">
     <div style="float:left" class="container-fluid">
+      {% if 'manager'|is_authorized and config.DATABASE_VERSION != session.settings.database_version %}
+        <p class="error">
+          Warning: database version {{ config.DATABASE_VERSION }} is needed
+          but current version is {{ session.settings.database_version }}
+        </p>
+      {% endif %}
+      <noscript>
+        <p class="error">{{ _('warning no js') }}</p>
+      </noscript>
       {% block content %}{% endblock %}
     </div>
   </div>

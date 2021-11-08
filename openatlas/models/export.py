@@ -28,8 +28,8 @@ def csv_export(form: FlaskForm) -> None:
             shutil.rmtree(path)  # pragma: no cover
         path.mkdir()
     tables = {
-        'model_class': ['id', 'name', 'code'],
-        'model_class_inheritance': ['id', 'super_code', 'sub_code'],
+        'model_cidoc_class': ['id', 'name', 'code'],
+        'model_cidoc_class_inheritance': ['id', 'super_code', 'sub_code'],
         'model_entity': [
             'id',
             'name',
