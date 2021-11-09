@@ -83,6 +83,7 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
     ('object_location',      'E53', false, false, false, 'contributor', '#00FF00', NULL),
     ('person',               'E21', true,  true,  true,  'contributor', '#34B522', NULL),
     ('place',                'E18', true,  true,  true,  'contributor', '#FF0000', (SELECT id FROM model.entity WHERE name = 'Place' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('production',           'E12', false, true,  true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('reference_system',     'E32', false, false, false, 'manager',     NULL,      NULL),
     ('source',               'E33', false, true,  true,  'contributor', '#FFA500', (SELECT id FROM model.entity WHERE name = 'Source' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('source_translation',   'E33', false, false, false, 'contributor', NULL,      NULL),
