@@ -1,50 +1,50 @@
 class NodeEntities:
     @staticmethod
     def get_test_node_entities(params):
-        return {'nodes': [
-            {'id': params['austria_id'],
-         'label': 'Austria',
-         'url': 'http://local.host/api/0.2/entity/84'},
-        {'id': params['czech_republic_id'],
-         'label': 'Czech Republic',
-         'url': 'http://local.host/api/0.2/entity/89'},
-        {'id': params['germany_id'],
-         'label': 'Germany',
-         'url': 'http://local.host/api/0.2/entity/87'},
-        {'id': params['italy_id'],
-         'label': 'Italy',
-         'url': 'http://local.host/api/0.2/entity/88'},
-        {'id': params['slovakia_id'],
-         'label': 'Slovakia',
-         'url': 'http://local.host/api/0.2/entity/90'},
-        {'id': params['slovenia_id'],
-         'label': 'Slovenia',
-         'url': 'http://local.host/api/0.2/entity/91'}]}
+        return {'nodes': [{
+            'id': params['austria_id'],
+            'label': 'Austria',
+            'url': f'http://local.host/api/0.2/entity/{params["austria_id"]}'}, {
+            'id': params['czech_republic_id'],
+            'label': 'Czech Republic',
+            'url': f'http://local.host/api/0.2/entity/{params["czech_republic_id"]}'}, {
+            'id': params['germany_id'],
+            'label': 'Germany',
+            'url': f'http://local.host/api/0.2/entity/{params["germany_id"]}'}, {
+            'id': params['italy_id'],
+            'label': 'Italy',
+            'url': f'http://local.host/api/0.2/entity/{params["italy_id"]}'}, {
+            'id': params['slovakia_id'],
+            'label': 'Slovakia',
+            'url': f'http://local.host/api/0.2/entity/{params["slovakia_id"]}'}, {
+            'id': params['slovenia_id'],
+            'label': 'Slovenia',
+            'url': f'http://local.host/api/0.2/entity/{params["slovenia_id"]}'}]}
 
     @staticmethod
     def get_test_node_entities_all(params):
         return {'nodes': [
-        {'id': params['austria_id'],
-         'label': 'Austria',
-         'url': 'http://local.host/api/0.2/entity/84'},
-        {'id': params['czech_republic_id'],
-         'label': 'Czech Republic',
-         'url': 'http://local.host/api/0.2/entity/89'},
-        {'id': params['germany_id'],
-         'label': 'Germany',
-         'url': 'http://local.host/api/0.2/entity/87'},
-        {'id': params['italy_id'],
-         'label': 'Italy',
-         'url': 'http://local.host/api/0.2/entity/88'},
-        {'id': params['slovakia_id'],
-         'label': 'Slovakia',
-         'url': 'http://local.host/api/0.2/entity/90'},
-        {'id': params['slovenia_id'],
-         'label': 'Slovenia',
-         'url': 'http://local.host/api/0.2/entity/91'},
-        {'id': params['niederösterreich_id'],
-         'label': 'Niederösterreich',
-         'url': 'http://local.host/api/0.2/entity/86'},
-        {'id': params['wien_id'],
-         'label': 'Wien',
-         'url': 'http://local.host/api/0.2/entity/85'}]}
+            {'id': params['austria_id'],
+             'label': 'Austria',
+             'url': f'http://local.host/api/0.2/entity/{params["austria_id"]}'},
+            {'id': params['czech_republic_id'],
+             'label': 'Czech Republic',
+             'url': f'http://local.host/api/0.2/entity/{params["czech_republic_id"]}'},
+            {'id': params['germany_id'],
+             'label': 'Germany',
+             'url': f'http://local.host/api/0.2/entity/{params["germany_id"]}'},
+            {'id': params['italy_id'],
+             'label': 'Italy',
+             'url': f'http://local.host/api/0.2/entity/{params["italy_id"]}'},
+            {'id': params['slovakia_id'],
+             'label': 'Slovakia',
+             'url': f'http://local.host/api/0.2/entity/{params["slovakia_id"]}'},
+            {'id': params['slovenia_id'],
+             'label': 'Slovenia',
+             'url': f'http://local.host/api/0.2/entity/{params["slovenia_id"]}'},
+            {'id': params['niederösterreich_id'],
+             'label': 'Niederösterreich',
+             'url': f'http://local.host/api/0.2/entity/{params["niederösterreich_id"]}'},
+            {'id': params['wien_id'],
+             'label': 'Wien',
+             'url': f'http://local.host/api/0.2/entity/{params["wien_id"]}'}]}

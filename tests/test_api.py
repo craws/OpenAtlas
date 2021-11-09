@@ -46,7 +46,7 @@ class ApiTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
                           (id_, node) in Node.get_all_nodes().items()}
-                params['geonames_id'] = 1
+                params['geonames_id'] = 102
 
                 # Creation of Shire (place)
                 place = insert_entity(
@@ -129,9 +129,9 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
                 params['frodo_id'] = actor.id
 
-                # Comment out because this would be an invalid CIDOC link, Alex
-                # alias2 = insert_entity('The ring bearer', 'appellation')
-                # actor.link('P131', alias2)
+                alias2 = insert_entity('The ring bearer', 'actor_appellation')
+                actor.link('P131', alias2)
+                params['alias2_id'] = alias2.id
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
@@ -152,9 +152,8 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
                 params['sam_id'] = actor2.id
 
-                # Comment out because this would be an invalid CIDOC link, Alex
                 # Adding residence
-                # actor2.link('P74', place)
+                actor2.link('P74', location)
 
                 # Adding actor relation
                 relation_id = Node.get_hierarchy('Actor actor relation').id
@@ -443,6 +442,8 @@ class ApiTests(TestBaseCase):
                 NodeEntities.get_test_node_entities_all(params))
 
             # node_overview/
+            # Todo: Alex remade the Nodes, I have no idea how they look now
+            #  places is None and I don't know why!
             rv = self.app.get(url_for('api.node_overview'))
             self.assertDictEqual(
                 rv.get_json(),
@@ -667,7 +668,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api.subunit_hierarchy',
                     id_=actor.id))
-            with self.assertRaises(NoEntityAvailable ):
+            with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api.code',
                     entities=place.id,

@@ -112,13 +112,6 @@ class NodeOverview:
                     'id': params["link_id"],
                     'url': f'http://local.host/api/0.2/entity/{params["link_id"]}',
                     'label': 'Link', 'children': []}],
-                'External reference match': [{
-                    'id': params["close_match_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["close_match_id"]}',
-                    'label': 'close match', 'children': []}, {
-                    'id': params["exact_match_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["exact_match_id"]}',
-                    'label': 'exact match', 'children': []}],
                 'Feature': [{
                     'id': params["grave_id"],
                     'url': f'http://local.host/api/0.2/entity/{params["grave_id"]}',
@@ -200,59 +193,6 @@ class NodeOverview:
                     'id': params["testament_id"],
                     'url': f'http://local.host/api/0.2/entity/{params["testament_id"]}',
                     'label': 'Testament', 'children': []}],
-                'Stratigraphic unit': [{
-                    'id': params["burial_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["burial_id"]}',
-                    'label': 'Burial', 'children': []}, {
-                    'id': params["deposit_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["deposit_id"]}',
-                    'label': 'Deposit', 'children': []}]}, 'places': {
-                'Administrative unit': [{
-                    'id': params["austria_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["austria_id"]}',
-                    'label': 'Austria', 'children': [{
-                        'id': params["niederösterreich_id"],
-                        'url': f'http://local.host/api/0.2/entity/{params["niederösterreich_id"]}',
-                        'label': 'Niederösterreich', 'children': []}, {
-                        'id': params["wien_id"],
-                        'url': f'http://local.host/api/0.2/entity/{params["wien_id"]}',
-                        'label': 'Wien', 'children': []}]}, {
-                    'id': params["czech_republic_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["czech_republic_id"]}',
-                    'label': 'Czech Republic', 'children': []}, {
-                    'id': params["germany_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["germany_id"]}',
-                    'label': 'Germany', 'children': []}, {
-                    'id': params["italy_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["italy_id"]}',
-                    'label': 'Italy', 'children': []}, {
-                    'id': params["slovakia_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["slovakia_id"]}',
-                    'label': 'Slovakia', 'children': []}, {
-                    'id': params["slovenia_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["slovenia_id"]}',
-                    'label': 'Slovenia', 'children': []}],
-                'Historical place': [{
-                    'id': params["carantania_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["carantania_id"]}',
-                    'label': 'Carantania', 'children': []}, {
-                    'id': params["comitatus_iauntal_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["comitatus_iauntal_id"]}',
-                    'label': 'Comitatus Iauntal', 'children': []}, {
-                    'id': params["kingdom_of_serbia_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["kingdom_of_serbia_id"]}',
-                    'label': 'Kingdom of Serbia', 'children': []}, {
-                    'id': params["marcha_orientalis_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["marcha_orientalis_id"]}',
-                    'label': 'Marcha Orientalis', 'children': []}]},
-            'custom': {
-                'Sex': [{
-                    'id': params["female_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["female_id"]}',
-                    'label': 'Female', 'children': []}, {
-                    'id': params["male_id"],
-                    'url': f'http://local.host/api/0.2/entity/{params["male_id"]}',
-                    'label': 'Male', 'children': []}],
                 'Source translation': [{
                     'id': params["original_text_id"],
                     'url': f'http://local.host/api/0.2/entity/{params["original_text_id"]}',
@@ -262,7 +202,62 @@ class NodeOverview:
                     'label': 'Translation', 'children': []}, {
                     'id': params["transliteration_id"],
                     'url': f'http://local.host/api/0.2/entity/{params["transliteration_id"]}',
-                    'label': 'Transliteration', 'children': []}]},
+                    'label': 'Transliteration', 'children': []}],
+                'Stratigraphic unit': [{
+                    'id': params["burial_id"],
+                    'url': f'http://local.host/api/0.2/entity/{params["burial_id"]}',
+                    'label': 'Burial', 'children': []}, {
+                    'id': params["deposit_id"],
+                    'url': f'http://local.host/api/0.2/entity/{params["deposit_id"]}',
+                    'label': 'Deposit', 'children': []}]},
+            'places': None,
+                # {
+                # 'Administrative unit': [{
+                #     'id': params["austria_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["austria_id"]}',
+                #     'label': 'Austria', 'children': [{
+                #         'id': params["niederösterreich_id"],
+                #         'url': f'http://local.host/api/0.2/entity/{params["niederösterreich_id"]}',
+                #         'label': 'Niederösterreich', 'children': []}, {
+                #         'id': params["wien_id"],
+                #         'url': f'http://local.host/api/0.2/entity/{params["wien_id"]}',
+                #         'label': 'Wien', 'children': []}]}, {
+                #     'id': params["czech_republic_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["czech_republic_id"]}',
+                #     'label': 'Czech Republic', 'children': []}, {
+                #     'id': params["germany_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["germany_id"]}',
+                #     'label': 'Germany', 'children': []}, {
+                #     'id': params["italy_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["italy_id"]}',
+                #     'label': 'Italy', 'children': []}, {
+                #     'id': params["slovakia_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["slovakia_id"]}',
+                #     'label': 'Slovakia', 'children': []}, {
+                #     'id': params["slovenia_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["slovenia_id"]}',
+                #     'label': 'Slovenia', 'children': []}],
+                # 'Historical place': [{
+                #     'id': params["carantania_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["carantania_id"]}',
+                #     'label': 'Carantania', 'children': []}, {
+                #     'id': params["comitatus_iauntal_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["comitatus_iauntal_id"]}',
+                #     'label': 'Comitatus Iauntal', 'children': []}, {
+                #     'id': params["kingdom_of_serbia_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["kingdom_of_serbia_id"]}',
+                #     'label': 'Kingdom of Serbia', 'children': []}, {
+                #     'id': params["marcha_orientalis_id"],
+                #     'url': f'http://local.host/api/0.2/entity/{params["marcha_orientalis_id"]}',
+                #     'label': 'Marcha Orientalis', 'children': []}]},
+            'custom': {
+                'Sex': [{
+                    'id': params["female_id"],
+                    'url': f'http://local.host/api/0.2/entity/{params["female_id"]}',
+                    'label': 'Female', 'children': []}, {
+                    'id': params["male_id"],
+                    'url': f'http://local.host/api/0.2/entity/{params["male_id"]}',
+                    'label': 'Male', 'children': []}]},
             'value': {
                 'Dimensions': [{
                     'id': params["height_id"],

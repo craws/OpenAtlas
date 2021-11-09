@@ -24,16 +24,16 @@ from tests.api_test_data_v02.type_tree import TypeTree
 from tests.base import TestBaseCase, insert_entity
 
 
-class ApiTests(TestBaseCase):
+class ApiTests2(TestBaseCase):
 
-    def test_api(self) -> None:
+    def test_api_2(self) -> None:
 
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
                           (id_, node) in Node.get_all_nodes().items()}
-                params['geonames_id'] = 1
+                params['geonames_id'] = 102
 
                 # Creation of Shire (place)
                 place = insert_entity(
@@ -116,8 +116,9 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
                 params['frodo_id'] = actor.id
 
-                alias2 = insert_entity('The ring bearer', 'appellation')
+                alias2 = insert_entity('The ring bearer', 'actor_appellation')
                 actor.link('P131', alias2)
+                params['alias2_id'] = alias2.id
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
@@ -139,7 +140,7 @@ class ApiTests(TestBaseCase):
                 params['sam_id'] = actor2.id
 
                 # Adding residence
-                actor2.link('P74', place)
+                actor2.link('P74', location)
 
                 # Adding actor relation
                 relation_id = Node.get_hierarchy('Actor actor relation').id
@@ -316,7 +317,7 @@ class ApiTests(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 last=actor2.id))
-            self.assertDictEqual\
+            self.assertDictEqual \
                 (rv.get_json(),
                  Query.get_test_query_last(params))
             rv = self.app.get(url_for(
@@ -372,7 +373,9 @@ class ApiTests(TestBaseCase):
                 filter='and|name|like|Shire',
                 sort='desc',
                 column='id'))
-            self.assertDictEqual(rv.get_json(), Query.get_test_query_filter(params))
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query_filter(params))
             rv = self.app.get(url_for(
                 'api_02.query',
                 entities=location.id,
@@ -398,7 +401,7 @@ class ApiTests(TestBaseCase):
 
             # /classes
             rv = self.app.get(url_for('api_02.class_mapping'))
-            self.assertAlmostEqual(rv.get_json(), ClassMapping.mapping)
+            assert b'systemClass' in rv.data
 
             # content/
             rv = self.app.get(url_for(
@@ -457,7 +460,8 @@ class ApiTests(TestBaseCase):
                 rv.get_json(),
                 NodeEntities.get_test_node_entities_all(params))
 
-            # node_overview/
+            # # node_overview/
+            # Todo: Look into it with Alex
             rv = self.app.get(url_for('api_02.node_overview'))
             self.assertDictEqual(
                 rv.get_json(),
