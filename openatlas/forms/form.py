@@ -19,6 +19,7 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.model import view_class_mapping
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
@@ -44,6 +45,7 @@ FORMS = {
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
+    'production': ['name', 'date', 'description', 'continue'],
     'reference_system': ['name', 'description'],
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
@@ -285,19 +287,20 @@ def add_fields(
             setattr(form, 'relation_origin_id', HiddenField())
     elif class_ == 'artifact':
         setattr(form, 'actor', TableField(_('owned by')))
-    elif class_ in ['activity', 'acquisition', 'move']:
+    elif class_ in view_class_mapping['event']:
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
-        if class_ == 'activity':
+        if class_ in ['activity', 'acquisition', 'production']:
             setattr(form, 'place', TableField(_('location')))
         if class_ == 'acquisition':
-            setattr(form, 'place', TableField(_('location')))
             setattr(form, 'given_place', TableMultiField(_('given place')))
         elif class_ == 'move':
             setattr(form, 'place_from', TableField(_('from')))
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'artifact', TableMultiField())
             setattr(form, 'person', TableMultiField())
+        elif class_ == 'production':
+            setattr(form, 'artifact', TableMultiField())
     elif class_ == 'file' and not entity:
         setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
         if origin and origin.class_.view == 'reference':
