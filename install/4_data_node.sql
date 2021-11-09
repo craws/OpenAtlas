@@ -304,6 +304,7 @@ INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) V
     ((SELECT id FROM web.hierarchy WHERE name='Event'), 'acquisition'),
     ((SELECT id FROM web.hierarchy WHERE name='Event'), 'activity'),
     ((SELECT id FROM web.hierarchy WHERE name='Event'), 'move'),
+    ((SELECT id FROM web.hierarchy WHERE name='Event'), 'production'),
     ((SELECT id FROM web.hierarchy WHERE name='External reference'), 'external_reference'),
     ((SELECT id FROM web.hierarchy WHERE name='Feature'), 'feature'),
     ((SELECT id FROM web.hierarchy WHERE name='Historical place'), 'place'),

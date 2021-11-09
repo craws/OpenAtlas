@@ -166,4 +166,8 @@ DROP TABLE web.form;
 -- Move source translation to standard type which seemed to have gone wrong in one of the last versions
 UPDATE web.hierarchy SET category = 'standard' WHERE name = 'Source translation';
 
+-- #1500 Creation of artifacts - add event type to production
+INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+    ((SELECT id FROM web.hierarchy WHERE name='Event'), 'production');
+
 END;
