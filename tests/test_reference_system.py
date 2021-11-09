@@ -23,7 +23,7 @@ class ReferenceSystemTest(TestBaseCase):
                 'name': 'Wikipedia',
                 'website_url': 'https://wikipedia.org',
                 'resolver_url': 'https://wikipedia.org',
-                'forms': [geonames.forms[0]]}
+                'classes': ['place']}
             rv = self.app.post(
                 url_for('insert', class_='reference_system'),
                 follow_redirects=True,
@@ -36,19 +36,20 @@ class ReferenceSystemTest(TestBaseCase):
                     view='reference_system',
                     delete_id=wikipedia_id),
                 follow_redirects=True)
-            assert b'Deletion not possible if forms are attached' in rv.data
+            assert b'Deletion not possible if classes are attached' in rv.data
             rv = self.app.get(
                 url_for(
-                    'reference_system_remove_form',
+                    'reference_system_remove_class',
                     system_id=wikipedia_id,
-                    form_id=geonames.forms[0]),
+                    class_name='place'),
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             rv = self.app.get(
                 url_for(
                     'index',
                     view='reference_system',
-                    delete_id=wikipedia_id))
+                    delete_id=wikipedia_id),
+                follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
 
             rv = self.app.post(url_for('update', id_=geonames.id))
@@ -124,9 +125,9 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Wrong id format' in rv.data
             rv = self.app.get(
                 url_for(
-                    'reference_system_remove_form',
+                    'reference_system_remove_class',
                     system_id=geonames.id,
-                    form_id=geonames.forms[0]),
+                    class_name='place'),
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             rv = self.app.get(

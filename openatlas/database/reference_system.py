@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g
 
@@ -10,21 +10,16 @@ class ReferenceSystem:
         g.cursor.execute("""
             SELECT
                 e.id, e.name,
-                e.class_code,
+                e.cidoc_class_code,
                 e.description,
-                e.system_class,
+                e.openatlas_class_name,
                 e.created,
                 e.modified,
                 rs.website_url,
                 rs.resolver_url,
                 rs.identifier_example,
                 rs.system,
-                COUNT(l.id) AS count,
-                (SELECT ARRAY(
-                    SELECT f.id FROM web.form f
-                    JOIN web.reference_system_form rfs ON f.id = rfs.form_id
-                        AND rfs.reference_system_id = rs.entity_id))
-                        AS form_ids,
+                COUNT(l.id) AS count,                
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
@@ -36,37 +31,36 @@ class ReferenceSystem:
             LEFT JOIN model.link t ON e.id = t.domain_id
                 AND t.property_code = 'P2'
             GROUP BY
-                e.id, e.name, e.class_code, e.description, e.system_class,
-                e.created, e.modified, rs.website_url, rs.resolver_url,
-                rs.identifier_example, rs.system, rs.entity_id;""")
+                e.id, 
+                e.name, 
+                e.cidoc_class_code, 
+                e.description, 
+                e.openatlas_class_name, 
+                e.created, 
+                e.modified, 
+                rs.website_url, 
+                rs.resolver_url, 
+                rs.identifier_example, 
+                rs.system, rs.entity_id;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def add_forms(entity_id: int, form_ids: List[int]) -> None:
-        for form_id in form_ids:
+    def add_classes(entity_id: int, class_names: List[str]) -> None:
+        for name in class_names:
             sql = """
-                INSERT INTO web.reference_system_form (
-                    reference_system_id, form_id)
-                VALUES (%(entity_id)s, %(form_id)s);"""
-            g.cursor.execute(sql, {'entity_id': entity_id, 'form_id': form_id})
+                INSERT INTO web.reference_system_openatlas_class (
+                    reference_system_id, openatlas_class_name)
+                VALUES (%(entity_id)s, %(name)s);"""
+            g.cursor.execute(sql, {'entity_id': entity_id, 'name': name})
 
     @staticmethod
-    def remove_form(entity_id: int, form_id: int) -> None:
+    def remove_class(entity_id: int, class_name: str) -> None:
         g.cursor.execute(
             """
-            DELETE FROM web.reference_system_form
+            DELETE FROM web.reference_system_openatlas_class
             WHERE reference_system_id = %(reference_system_id)s
-                AND form_id = %(form_id)s;""",
-            {'reference_system_id': entity_id, 'form_id': form_id})
-
-    @staticmethod
-    def get_forms(form_id: int) -> List[Dict[str, Union[int, str]]]:
-        g.cursor.execute(
-            """
-            SELECT f.id, f.name FROM web.form f
-            JOIN web.reference_system_form rsf ON f.id = rsf.form_id
-                AND rsf.reference_system_id = %(id)s;""", {'id': form_id})
-        return [dict(row) for row in g.cursor.fetchall()]
+                AND openatlas_class_name = %(class_name)s;""",
+            {'reference_system_id': entity_id, 'class_name': class_name})
 
     @staticmethod
     def update_system(data: Dict[str, Any]) -> None:
@@ -90,16 +84,6 @@ class ReferenceSystem:
                 AND domain_id = %(system_id)s
                 AND range_id = %(entity_id)s;""",
             {'system_id': system_id, 'entity_id': entity_id})
-
-    @staticmethod
-    def get_form_choices(forms: List[str]) -> List[Dict[str, Union[str, int]]]:
-        g.cursor.execute(
-            """
-            SELECT f.id, f.name FROM web.form f
-            WHERE f.name IN %(forms)s
-            ORDER BY name ASC;""",
-            {'forms': tuple(forms)})
-        return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def insert_system(data: Dict[str, Any]) -> None:

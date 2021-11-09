@@ -35,18 +35,11 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
 @required_group('readonly')
 def node_index() -> str:
     nodes: Dict[str, Dict[Entity, str]] = \
-        {'standard': {}, 'custom': {}, 'places': {}, 'value': {}}
+        {'standard': {}, 'custom': {}, 'place': {}, 'value': {}, 'system': {}}
     for node in g.nodes.values():
         if node.root:
             continue
-        type_ = 'custom'
-        if node.class_.name == 'administrative_unit':
-            type_ = 'places'
-        elif node.standard:
-            type_ = 'standard'
-        elif node.value_type:
-            type_ = 'value'
-        nodes[type_][node] = render_template(
+        nodes[node.category][node] = render_template(
             'forms/tree_select_item.html',
             name=sanitize(node.name),
             data=walk_tree(Node.get_nodes(node.name)))
@@ -62,7 +55,7 @@ def node_index() -> str:
 def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
-    if node.standard or node.subs or node.count or (root and root.locked):
+    if node.category == 'system' or node.subs or node.count:
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
@@ -75,7 +68,7 @@ def node_delete(id_: int) -> Response:
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    if root.value_type:  # pragma: no cover
+    if root.category == 'value':  # pragma: no cover
         abort(403)
     form = build_move_form(node)
     if form.validate_on_submit():
@@ -86,16 +79,9 @@ def node_move_entities(id_: int) -> Union[str, Response]:
             form.checkbox_values.data)
         Transaction.commit()
         flash(_('Entities were updated'), 'success')
-        if node.class_.name == 'administrative_unit':
-            tab = 'places'
-        elif root.standard:
-            tab = 'standard'
-        elif node.value_type:  # pragma: no cover
-            tab = 'value'
-        else:
-            tab = 'custom'
         return redirect(
-            f"{url_for('node_index')}#menu-tab-{tab}_collapse-{root.id}")
+            f"{url_for('node_index')}"
+            f"#menu-tab-{node.category}_collapse-{root.id}")
     getattr(form, str(root.id)).data = node.id
     return render_template(
         'types/move.html',

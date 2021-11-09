@@ -6,25 +6,64 @@ from flask import g
 class Model:
 
     @staticmethod
+    def get_openatlas_classes() -> List[Dict[str, Any]]:
+        g.cursor.execute("""
+            SELECT
+                c.id,
+                c.name,
+                c.cidoc_class_code,
+                c.standard_type_id,
+                c.alias_allowed,
+                c.reference_system_allowed,
+                c.new_types_allowed,
+                c.write_access_group_name,
+                c.layout_color,
+                c.layout_icon,
+                hierarchies,
+                system_ids
+            FROM model.openatlas_class c,
+            LATERAL (
+                SELECT json_agg(hierarchy_id) AS hierarchies FROM (
+                    SELECT hierarchy_id
+                    FROM web.hierarchy_openatlas_class hc
+                    WHERE c.name = hc.openatlas_class_name) x) x,
+            LATERAL (
+                SELECT json_agg(reference_system_id) AS system_ids FROM (
+                    SELECT reference_system_id
+                    FROM web.reference_system_openatlas_class ro
+                    WHERE c.name = ro.openatlas_class_name) y) y""")
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_openatlas_class_count() -> Dict[str, int]:
+        g.cursor.execute(
+            """
+            SELECT oc.name, COUNT(e.id) AS count
+            FROM model.openatlas_class oc
+            LEFT JOIN model.entity e ON oc.name = e.openatlas_class_name
+            GROUP BY oc.name;""")
+        return {row['name']: row['count'] for row in g.cursor.fetchall()}
+
+    @staticmethod
     def get_classes() -> List[Dict[str, Any]]:
         g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
-            FROM model.class c
-            LEFT JOIN model.entity e ON c.code = e.class_code
+            FROM model.cidoc_class c
+            LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
             GROUP BY (c.id, c.name, c.comment);""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_class_hierarchy() -> List[Dict[str, Any]]:
         g.cursor.execute(
-            "SELECT super_code, sub_code FROM model.class_inheritance;")
+            "SELECT super_code, sub_code FROM model.cidoc_class_inheritance;")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_class_translations(
             language_codes: List[str]) -> List[Dict[str, Any]]:
         sql = """
-            SELECT class_code, language_code, text FROM model.class_i18n
+            SELECT class_code, language_code, text FROM model.cidoc_class_i18n
             WHERE language_code IN %(language_codes)s;"""
         g.cursor.execute(sql, {'language_codes': tuple(language_codes)})
         return [dict(row) for row in g.cursor.fetchall()]

@@ -129,8 +129,9 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
                 params['frodo_id'] = actor.id
 
-                alias2 = insert_entity('The ring bearer', 'appellation')
-                actor.link('P131', alias2)
+                # Comment out because this would be an invalid CIDOC link, Alex
+                # alias2 = insert_entity('The ring bearer', 'appellation')
+                # actor.link('P131', alias2)
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
@@ -151,8 +152,9 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
                 params['sam_id'] = actor2.id
 
+                # Comment out because this would be an invalid CIDOC link, Alex
                 # Adding residence
-                actor2.link('P74', place)
+                # actor2.link('P74', place)
 
                 # Adding actor relation
                 relation_id = Node.get_hierarchy('Actor actor relation').id

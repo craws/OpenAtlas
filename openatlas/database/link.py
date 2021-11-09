@@ -152,8 +152,8 @@ class Link:
         g.cursor.execute("""
             SELECT DISTINCT
                 l.property_code,
-                d.class_code AS domain_code,
-                r.class_code AS range_code
+                d.cidoc_class_code AS domain_code,
+                r.cidoc_class_code AS range_code
             FROM model.link l
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id;""")
@@ -174,8 +174,8 @@ class Link:
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id
             WHERE l.property_code = %(property_code)s
-                AND d.class_code = %(domain_code)s
-                AND r.class_code = %(range_code)s;""",
+                AND d.cidoc_class_code = %(domain_code)s
+                AND r.cidoc_class_code = %(range_code)s;""",
             data)
         return [dict(row) for row in g.cursor.fetchall()]
 

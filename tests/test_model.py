@@ -11,9 +11,11 @@ class ModelTests(TestBaseCase):
         with app.app_context():  # type: ignore
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
-            rv = self.app.get(url_for('class_index'))
+            rv = self.app.get(url_for('openatlas_class_index'))
+            assert b'Involvement' in rv.data
+            rv = self.app.get(url_for('cidoc_class_index'))
             assert b'E1' in rv.data
-            rv = self.app.get(url_for('class_view', code='E4'))
+            rv = self.app.get(url_for('cidoc_class_view', code='E4'))
             assert b'Domain for' in rv.data
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
@@ -38,7 +40,7 @@ class ModelTests(TestBaseCase):
                 actor = Entity.insert('person', 'King Arthur')
                 event = Entity.insert('activity', 'Battle of Camlann')
                 source = Entity.insert('source', 'The source')
-                actor.link('P11', event)
+                event.link('P11', actor)
                 source.link('P67', event)
             self.app.get(url_for('model_network', dimensions=2))
             rv = self.app.get(url_for('model_network'))
@@ -59,7 +61,7 @@ class ModelTests(TestBaseCase):
             self.app.get('/index/setlocale/de')
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'verweist auf' in rv.data
-            rv = self.app.get(url_for('class_view', code='E18'))
+            rv = self.app.get(url_for('cidoc_class_view', code='E18'))
             assert b'Materielles' in rv.data
             rv = self.app.get(url_for('property_view', code='P166'))
             assert b'was a presence of' in rv.data

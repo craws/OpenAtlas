@@ -11,6 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
+from openatlas.models.model import OpenatlasClass
 from openatlas.models.network import Network
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, uc_first
@@ -27,9 +28,9 @@ class LinkCheckForm(FlaskForm):  # type: ignore
 @required_group('readonly')
 def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = \
-        {code: f'{code} {class_.name}'
-         for code, class_ in g.cidoc_classes.items()}
+    form_classes = {
+        code: f'{code} {class_.name}'
+        for code, class_ in g.cidoc_classes.items()}
     form.cidoc_domain.choices = form_classes
     form.cidoc_range.choices = form_classes
     form.cidoc_property.choices = {
@@ -70,14 +71,50 @@ def class_entities(code: str) -> str:
         title=_('model'),
         crumbs=[
             [_('model'), url_for('model_index')],
-            [_('classes'), url_for('class_index')],
+            [_('classes'), url_for('cidoc_class_index')],
             link(g.cidoc_classes[code]),
             _('entities')])
 
 
-@app.route('/overview/model/class')
+@app.route('/overview/model/openatlas_class_index')
 @required_group('readonly')
-def class_index() -> str:
+def openatlas_class_index() -> str:
+    table = Table([
+        'name',
+        f"CIDOC {_('class')}",
+        _('standard type'),
+        _('write access'),
+        'alias',
+        'reference system',
+        'add type',
+        _('color'),
+        'count'])
+    class_count = OpenatlasClass.get_openatlas_class_count()
+    for class_ in g.classes.values():
+        table.rows.append([
+            class_.label,
+            link(class_.cidoc_class),
+            link(g.nodes[class_.standard_type_id])
+            if class_.standard_type_id else '',
+            class_.write_access,
+            _('allowed') if class_.alias_allowed else '',
+            _('allowed') if class_.reference_system_allowed else '',
+            _('allowed') if class_.new_types_allowed else '',
+            class_.color,
+            format_number(class_count[class_.name])
+            if class_count[class_.name] else ''])
+    return render_template(
+        'table.html',
+        table=table,
+        title=_('model'),
+        crumbs=[
+            [_('model'), url_for('model_index')],
+            f"OpenAtlas {_('classes')}"])
+
+
+@app.route('/overview/model/cidoc_class_index')
+@required_group('readonly')
+def cidoc_class_index() -> str:
     table = Table(
         ['code', 'name', 'count'],
         defs=[
@@ -130,9 +167,9 @@ def property_index() -> str:
         crumbs=[[_('model'), url_for('model_index')], _('properties')])
 
 
-@app.route('/overview/model/class_view/<code>')
+@app.route('/overview/model/cidoc_class_view/<code>')
 @required_group('readonly')
-def class_view(code: str) -> str:
+def cidoc_class_view(code: str) -> str:
     class_ = g.cidoc_classes[code]
     tables = {}
     for table in ['super', 'sub']:
@@ -154,7 +191,7 @@ def class_view(code: str) -> str:
         elif class_.code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
     return render_template(
-        'model/class_view.html',
+        'model/cidoc_class_view.html',
         class_=class_,
         tables=tables,
         info={'code': class_.code, 'name': class_.name},
@@ -162,7 +199,7 @@ def class_view(code: str) -> str:
         crumbs=[
             [_('model'),
              url_for('model_index')],
-            [_('classes'), url_for('class_index')],
+            [_('classes'), url_for('cidoc_class_index')],
             class_.code])
 
 

@@ -15,7 +15,7 @@ class Api:
                 'codes': tuple(code if isinstance(code, list) else [code])},
             parser=parser)
         sql = Entity.build_sql(nodes=True) + f"""
-            WHERE class_code IN %(codes)s {sql_parts['clause']} 
+            WHERE cidoc_class_code IN %(codes)s {sql_parts['clause']} 
             GROUP BY e.id
             ORDER BY {', '.join(parser['column'])} {parser['sort']};"""
         g.cursor.execute(sql, sql_parts['parameters'])
@@ -31,7 +31,7 @@ class Api:
                     classes if isinstance(classes, list) else [classes])},
             parser=parser)
         sql = Entity.build_sql(nodes=True, aliases=True) + f"""
-            WHERE e.system_class IN %(class)s {sql_parts['clause']}
+            WHERE e.openatlas_class_name IN %(class)s {sql_parts['clause']}
             GROUP BY e.id
             ORDER BY {', '.join(parser['column'])} {parser['sort']};"""
         g.cursor.execute(sql, sql_parts['parameters'])
@@ -43,7 +43,7 @@ class Filter:
         'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT'}
     valid_columns: Dict[str, str] = {
         'id': 'e.id', 'class_code': 'e.class_code', 'name': 'e.name',
-        'description': 'e.description', 'system_class': 'e.system_class',
+        'description': 'e.description', 'system_class': 'e.openatlas_class_name',
         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
         'created': 'e.created', 'modified': 'e.modified', 'end_to': 'e.end_to',
         'end_from': 'e.end_from'}

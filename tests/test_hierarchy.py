@@ -12,7 +12,8 @@ class HierarchyTest(TestBaseCase):
             # Custom types
             data = {
                 'name': 'Geronimo',
-                'forms': [1, 2, 5, 6, 7, 8],
+                'classes':
+                    ['file', 'group', 'move', 'person', 'place', 'source'],
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(
@@ -29,7 +30,7 @@ class HierarchyTest(TestBaseCase):
                 hierarchy = Node.get_hierarchy('Geronimo')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
             assert b'Geronimo' in rv.data
-            data['forms'] = [4]
+            data['classes'] = ['acquisition']
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy.id),
                 data=data,
@@ -45,7 +46,7 @@ class HierarchyTest(TestBaseCase):
                 data=data)
             node_id = rv.location.split('/')[-1]
             rv = self.app.get(
-                url_for('remove_form', id_=hierarchy.id, form_id=5),
+                url_for('remove_class', id_=hierarchy.id, class_name='person'),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
             rv = self.app.get(
@@ -71,7 +72,7 @@ class HierarchyTest(TestBaseCase):
                 follow_redirects=True,
                 data={
                     'name': 'A valued value',
-                    'forms': [1],
+                    'classes': ['file'],
                     'description': ''})
             assert b'An entry has been created' in rv.data
             with app.test_request_context():

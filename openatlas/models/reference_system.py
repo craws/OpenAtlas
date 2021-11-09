@@ -11,30 +11,25 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem(Entity):
 
-    EXTERNAL_REFERENCES_FORMS = [
-        'acquisition', 'activity', 'artifact', 'feature', 'find', 'group',
-        'human_remains', 'move', 'person', 'place', 'source', 'type']
-
-    website_url = None
-    resolver_url = None
-    placeholder = None
-    system = False
-
     def __init__(self, row: Dict[str, Any]) -> None:
 
         super().__init__(row)
         self.website_url = row['website_url']
         self.resolver_url = row['resolver_url']
-        self.forms = row['form_ids']
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
             list(self.nodes.keys())[0].id if self.nodes else None
         self.count = row['count']
         self.system = row['system']
+        self.classes = []
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
-        return {row['id']: ReferenceSystem(row) for row in Db.get_all()}
+        systems = {row['id']: ReferenceSystem(row) for row in Db.get_all()}
+        for class_ in g.classes.values():
+            for system_id in class_.reference_systems:
+                systems[system_id].classes.append(class_.name)
+        return systems
 
     @staticmethod
     def get_by_name(name: str) -> ReferenceSystem:
@@ -42,20 +37,14 @@ class ReferenceSystem(Entity):
             if system.name == name:
                 return system
 
-    def add_forms(self, form: FlaskForm) -> None:
-        Db.add_forms(self.id, form.forms.data)
+    def add_classes(self, form: FlaskForm) -> None:
+        Db.add_classes(self.id, form.classes.data)
 
-    def remove_form(self, form_id: int) -> None:
-        forms = self.get_forms()
+    def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
-            if link_.range.class_.name == \
-                    forms[form_id]['name']:  # pragma: no cover
+            if link_.range.class_.name == class_name:  # pragma: no cover
                 return  # Abort if there are linked entities
-        Db.remove_form(self.id, form_id)
-
-    def get_forms(self) -> Dict[int, Dict[str, Any]]:
-        return {
-            row['id']: {'name': row['name']} for row in Db.get_forms(self.id)}
+        Db.remove_class(self.id, class_name)
 
     def update_system(self, form: FlaskForm) -> None:
         self.update(form)
@@ -84,16 +73,18 @@ class ReferenceSystem(Entity):
                         type_id=precision_field.data)
 
     @staticmethod
-    def get_form_choices(
+    def get_class_choices(
             entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
         choices = []
-        for row in Db.get_form_choices(
-                ReferenceSystem.EXTERNAL_REFERENCES_FORMS):
-            if not entity or row['id'] not in entity.forms:
-                if entity and entity.name == 'GeoNames' \
-                        and row['name'] != 'Place':
-                    continue
-                choices.append((row['id'], g.classes[row['name']].label))
+        for class_ in g.classes.values():
+            if not class_.reference_system_allowed \
+                    or (entity and class_.name in entity.classes)\
+                    or (
+                        entity
+                        and entity.name == 'GeoNames'
+                        and class_.name != 'Place'):
+                continue
+            choices.append((class_.name, g.classes[class_.name].label))
         return choices
 
     @staticmethod
@@ -106,7 +97,7 @@ class ReferenceSystem(Entity):
             'entity_id': entity.id,
             'name': entity.name,
             'website_url': form.website_url.data
-                if form.website_url.data else None,
+            if form.website_url.data else None,
             'resolver_url': form.resolver_url.data
             if form.resolver_url.data else None})
         return ReferenceSystem.get_all()[entity.id]

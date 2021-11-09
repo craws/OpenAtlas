@@ -13,7 +13,7 @@ class SqlForm(FlaskForm):  # type: ignore
     statement = TextAreaField(
         '',
         [InputRequired()],
-        render_kw={'placeholder': 'SELECT code FROM model.class;'})
+        render_kw={'placeholder': 'SELECT code FROM model.cidoc_class;'})
     save = SubmitField(_('execute'))
 
 

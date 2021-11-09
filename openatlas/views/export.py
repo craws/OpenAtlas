@@ -29,9 +29,9 @@ class ExportCsvForm(FlaskForm):  # type: ignore
             ('coordinates', _('coordinates')),
             ('wkt', 'WKT'),
             ('postgis', 'PostGIS Geometry')])
-    model_class = BooleanField('model.class', default=True)
-    model_class_inheritance = BooleanField(
-        'model.class_inheritance',
+    model_cidoc_class = BooleanField('model.cidoc_class', default=True)
+    model_cidoc_class_inheritance = BooleanField(
+        'model.cidoc_class_inheritance',
         default=True)
     model_entity = BooleanField('model.entity', default=True)
     model_link = BooleanField('model.link', default=True)

@@ -13,6 +13,13 @@ is working.
 
     service apache2 restart
 
+### 6.5.0 to 6.6.0
+
+There were quiet some changes in database and model (#1563). In case you depend
+on direct database access for other application be sure to test these first.
+
+Execute **install/upgrade/6.6.0.sql** after making backups.
+
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):
 

@@ -27,6 +27,7 @@ from openatlas.util.util import get_base_table_data, uc_first
 FORMS = {
     'acquisition': ['name', 'date', 'description', 'continue'],
     'activity': ['name', 'date', 'description', 'continue'],
+    'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'administrative_unit': ['name', 'description', 'continue'],
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
@@ -35,12 +36,10 @@ FORMS = {
     'external_reference': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
-    'find': ['name', 'date', 'description', 'continue', 'map'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
     'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
-    'member': ['date', 'description', 'continue'],
     'move': ['name', 'date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
@@ -76,7 +75,8 @@ def build_form(
             Form,
             'alias',
             FieldList(StringField(''), description=_('tooltip alias')))
-    add_types(Form, class_)
+    if class_ in g.classes and g.classes[class_].hierarchies:
+        add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
@@ -87,7 +87,7 @@ def build_form(
         if class_ == 'type':  # Change description field if value type
             node = entity if entity else origin
             root = g.nodes[node.root[-1]] if node.root else node
-            if root.value_type:
+            if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
     if 'map' in FORMS[class_]:
@@ -122,7 +122,7 @@ def populate_form(
         if root.id not in node_data:
             node_data[root.id] = []
         node_data[root.id].append(node.id)
-        if root.value_type:
+        if root.category == 'value':
             getattr(form, str(node.id)).data = node_value
     for root_id, nodes_ in node_data.items():
         if hasattr(form, str(root_id)):
@@ -170,7 +170,7 @@ def add_buttons(
     if entity:
         return form
     if 'continue' in FORMS[name] and (
-            name in ['involvement', 'find', 'human_remains', 'type']
+            name in ['involvement', 'artifact', 'human_remains', 'type']
             or not origin):
         setattr(
             form,
@@ -207,7 +207,7 @@ def add_buttons(
         setattr(
             form,
             'insert_continue_sub',
-            SubmitField(insert_add + _('find')))
+            SubmitField(insert_add + _('artifact')))
         setattr(
             form,
             'insert_continue_human_remains',
@@ -215,15 +215,14 @@ def add_buttons(
     return form
 
 
-def add_reference_systems(form: Any, form_name: str) -> None:
+def add_reference_systems(form: Any, class_: str) -> None:
     precision_nodes = Node.get_hierarchy('External reference match').subs
     precisions = [('', '')] + [
         (str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
-        if form_name \
-                not in [form_['name'] for form_ in system.get_forms().values()]:
+        if class_ not in system.classes:
             continue
         setattr(
             form,
@@ -255,18 +254,18 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 
 
 def add_types(form: Any, class_: str) -> None:
-    types = OrderedDict(Node.get_nodes_for_form(class_))
+    types = OrderedDict(
+        {id_: g.nodes[id_] for id_ in g.classes[class_].hierarchies})
     for node in types.values():  # Move standard type to top
-        if node.standard and node.class_.name == 'type':
+        if node.category == 'standard':
             types.move_to_end(node.id, last=False)
             break
-
     for node in types.values():
         if node.multiple:
             setattr(form, str(node.id), TreeMultiField(str(node.id)))
         else:
             setattr(form, str(node.id), TreeField(str(node.id)))
-        if node.value_type:
+        if node.category == 'value':
             add_value_type_fields(form, node.subs)
 
 
@@ -308,18 +307,17 @@ def add_fields(
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if code == 'custom' or (entity and not entity.value_type):
+        if code == 'custom' or (entity and entity.category != 'value'):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
-        setattr(form, 'forms', SelectMultipleField(
+        setattr(form, 'classes', SelectMultipleField(
             _('classes'),
             render_kw={'disabled': True},
             description=_('tooltip hierarchy forms'),
             choices=[],
             option_widget=widgets.CheckboxInput(),
-            widget=widgets.ListWidget(prefix_label=False),
-            coerce=int))
+            widget=widgets.ListWidget(prefix_label=False)))
     elif class_ == 'involvement':
         if not entity and origin:
             involved_with = 'actor' \
@@ -329,7 +327,7 @@ def add_fields(
                 involved_with,
                 TableMultiField(_(involved_with), [InputRequired()]))
         setattr(form, 'activity', SelectField(_('activity')))
-    elif class_ == 'member' and not entity:
+    elif class_ == 'actor_function' and not entity:
         setattr(form, 'member_origin_id', HiddenField())
         setattr(
             form,
@@ -358,22 +356,20 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Node.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        choices = ReferenceSystem.get_form_choices(entity)
+        choices = ReferenceSystem.get_class_choices(entity)
         if choices:
-            setattr(form, 'forms', SelectMultipleField(
+            setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False),
-                coerce=int))
+                widget=widgets.ListWidget(prefix_label=False)))
     elif class_ == 'source':
         setattr(
             form,
             'artifact',
-            TableMultiField(
-                description=
-                _('Link artifacts as the information carrier of the source')))
+            TableMultiField(description=_(
+                'Link artifacts as the information carrier of the source')))
 
 
 def build_add_reference_form(class_: str) -> FlaskForm:

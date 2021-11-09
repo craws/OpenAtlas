@@ -1,10 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
     <div class="container" style="text-align:center;">
-        <h1>400 - Bad Request</h1>
-        <p>
-            {{ _('The request had bad syntax or was inherently impossible to solve.') }}
-        </p>
+        <h1 class="error">
+            {{ e }}
+        </h1>
         <p>
             {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
         </p>

@@ -57,9 +57,9 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
             form.desc.data,
             form.own.data,
             current_user.id):
-        if row['system_class'] == 'actor_appellation':  # Found in actor alias
+        if row['openatlas_class_name'] == 'actor_appellation':  # Actor alias
             entity = Link.get_linked_entity(row['id'], 'P131', True)
-        elif row['system_class'] == 'appellation':  # Found in place alias
+        elif row['openatlas_class_name'] == 'appellation':  # Place alias
             entity = Link.get_linked_entity(row['id'], 'P1', True)
         else:
             entity = Entity(row)

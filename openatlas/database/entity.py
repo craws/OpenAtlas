@@ -33,12 +33,12 @@ class Entity:
     def get_by_link_property(code: str, class_: str) -> List[Dict[str, Any]]:
         sql = """
             SELECT
-                e.id, e.class_code, e.name, e.system_class, e.description,
-                e.created, e.modified
+                e.id, e.cidoc_class_code, e.name, e.openatlas_class_name,
+                e.description, e.created, e.modified
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
                 AND l.property_code = %(code)s
-            WHERE e.system_class = %(class)s"""
+            WHERE e.openatlas_class_name = %(class)s"""
         g.cursor.execute(sql, {'code': code, 'class': class_})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -46,8 +46,8 @@ class Entity:
     def get_by_project_id(project_id: int) -> List[Dict[str, Any]]:
         sql = """
             SELECT
-                e.id, ie.origin_id, e.class_code, e.name, e.description,
-                e.created, e.modified, e.system_class,
+                e.id, ie.origin_id, e.cidoc_class_code, e.name, e.description,
+                e.created, e.modified, e.openatlas_class_name,
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
@@ -67,7 +67,7 @@ class Entity:
             aliases: bool = False) -> List[Dict[str, Any]]:
         g.cursor.execute(
             Entity.build_sql(nodes, aliases) +
-            ' WHERE e.system_class IN %(class)s GROUP BY e.id;',
+            ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
             {'class': tuple(
                 classes if isinstance(classes, list) else [classes])})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -79,7 +79,7 @@ class Entity:
             aliases: bool = False) -> List[Dict[str, Any]]:
         g.cursor.execute(
             Entity.build_sql(nodes, aliases) +
-            'WHERE e.class_code IN %(codes)s GROUP BY e.id;',
+            'WHERE e.cidoc_class_code IN %(codes)s;',
             {'codes': tuple(code if isinstance(code, list) else [code])})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -87,13 +87,14 @@ class Entity:
     def get_overview_counts(classes: List[str]) -> Dict[str, int]:
         g.cursor.execute(
             """
-            SELECT system_class, COUNT(system_class)
+            SELECT openatlas_class_name, COUNT(openatlas_class_name)
             FROM model.entity
-            WHERE system_class IN %(classes)s
-            GROUP BY system_class;""",
+            WHERE openatlas_class_name IN %(classes)s
+            GROUP BY openatlas_class_name;""",
             {'classes': tuple(classes)})
         return {
-            row['system_class']: row['count'] for row in g.cursor.fetchall()}
+            row['openatlas_class_name']:
+                row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_orphans() -> List[Dict[str, Any]]:
@@ -101,16 +102,16 @@ class Entity:
             SELECT e.id FROM model.entity e
             LEFT JOIN model.link l1 on e.id = l1.domain_id
                 AND l1.range_id NOT IN
-                (SELECT id FROM model.entity WHERE class_code = 'E55')
+                (SELECT id FROM model.entity WHERE cidoc_class_code = 'E55')
             LEFT JOIN model.link l2 on e.id = l2.range_id
             WHERE l1.domain_id IS NULL
-                AND l2.range_id IS NULL AND e.class_code != 'E55'""")
+                AND l2.range_id IS NULL AND e.cidoc_class_code != 'E55'""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_latest(classes: List[str], limit: int) -> List[Dict[str, Any]]:
         sql = Entity.build_sql() + """
-            WHERE e.system_class IN %(codes)s GROUP BY e.id
+            WHERE e.openatlas_class_name IN %(codes)s GROUP BY e.id
             ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(classes), 'limit': limit})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -126,9 +127,9 @@ class Entity:
         g.cursor.execute(
             """
             INSERT INTO model.entity
-                (name, system_class, class_code, description)
+                (name, openatlas_class_name, cidoc_class_code, description)
             VALUES
-                (%(name)s, %(system_class)s, %(code)s, %(description)s)
+                (%(name)s, %(openatlas_class_name)s, %(code)s, %(description)s)
             RETURNING id;""",
             data)
         return g.cursor.fetchone()['id']
@@ -150,9 +151,9 @@ class Entity:
     def get_profile_image_id(id_: int) -> Optional[int]:
         g.cursor.execute(
             """
-                SELECT i.image_id
-                FROM web.entity_profile_image i
-                WHERE i.entity_id = %(id_)s;""",
+            SELECT i.image_id
+            FROM web.entity_profile_image i
+            WHERE i.entity_id = %(id_)s;""",
             {'id_': id_})
         return g.cursor.fetchone()['image_id'] if g.cursor.rowcount else None
 
@@ -182,12 +183,12 @@ class Entity:
         sql = """
             SELECT
                 e.id,
-                e.class_code,
+                e.cidoc_class_code,
                 e.name,
                 e.description,
                 e.created,
                 e.modified,
-                e.system_class,
+                e.openatlas_class_name,
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '')
                     AS begin_from,
                 e.begin_comment,
@@ -230,7 +231,7 @@ class Entity:
             WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
             {description_clause})
             {user_clause2}
-            AND e.system_class IN %(classes)s
+            AND e.openatlas_class_name IN %(classes)s
             GROUP BY e.id ORDER BY e.name;""".format(
                 user_clause="LEFT JOIN web.user_log ul ON e.id = ul.entity_id "
                 if own else '',

@@ -43,7 +43,7 @@ def insert(
     if origin:
         populate_insert_form(form, view_name, class_, origin)
     else:
-        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').forms)
+        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').classes)
 
     # Archaeological sub units
     structure = None
@@ -77,10 +77,11 @@ def add_crumbs(
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
     crumbs = [
-        [label,
-         url_for('index', view=origin.class_.view if origin else view_name)],
+        [
+            label,
+            url_for('index', view=origin.class_.view if origin else view_name)],
         link(origin)]
-    if structure and (not origin or not origin.class_.name == 'artifact'):
+    if structure:
         crumbs = [
             [_('place'), url_for('index', view='place')],
             structure['place']
@@ -116,13 +117,13 @@ def update(id_: int) -> Union[str, Response]:
     elif not is_authorized(entity.class_.write_access):
         abort(403)  # pragma: no cover
     elif isinstance(entity, Node):
-        root = g.nodes[entity.root[-1]] if entity.root else None
-        if not root and (entity.standard or entity.locked):
+        if entity.category == 'system' \
+                or (entity.category == 'standard' and not entity.root):
             abort(403)  # pragma: no cover
 
     geonames_module = False
     if entity.class_.name == 'place' \
-            and ReferenceSystem.get_by_name('GeoNames').forms:
+            and ReferenceSystem.get_by_name('GeoNames').classes:
         geonames_module = True
 
     # Archaeological sub units
@@ -328,7 +329,7 @@ def save(
     try:
         if not entity:
             action = 'insert'
-            entity = insert_entity(form, class_, origin)
+            entity = insert_entity(form, class_)
         if isinstance(entity, ReferenceSystem):
             entity.name = entity.name \
                 if hasattr(entity, 'system') and entity.system \
@@ -341,8 +342,8 @@ def save(
             entity.placeholder = form.placeholder.data \
                 if form.placeholder.data else None
             entity.update_system(form)
-            if hasattr(form, 'forms'):
-                entity.add_forms(form)
+            if hasattr(form, 'classes'):
+                entity.add_classes(form)
         else:
             entity.update(form)
             class_ = entity.class_.name
@@ -384,42 +385,15 @@ def save(
     return url
 
 
-def insert_entity(
-        form: FlaskForm,
-        class_: str,
-        origin: Optional[Union[Entity, Node]] = None) \
+def insert_entity(form: FlaskForm, class_: str) \
         -> Union[Entity, Node, ReferenceSystem]:
-    if class_ == 'artifact':
-        entity = Entity.insert(class_, form.name.data)
-        location = Entity.insert(
-            'object_location',
-            f'Location of {form.name.data}')
-        entity.link('P53', location)
-    elif class_ in [
-            'place',
-            'human_remains',
-            'stratigraphic_unit',
-            'feature',
-            'find',
-            'artifact']:
-        if class_ == 'human_remains':
-            entity = Entity.insert(class_, form.name.data)
-        elif origin and origin.class_.name == 'stratigraphic_unit':
-            entity = Entity.insert('find', form.name.data)
-        else:
-            system_class = 'place'
-            if origin and origin.class_.name == 'place':
-                system_class = 'feature'
-            elif origin and origin.class_.name == 'feature':
-                system_class = 'stratigraphic_unit'
-            entity = Entity.insert(system_class, form.name.data)
+    if class_ == 'reference_system':
+        return ReferenceSystem.insert_system(form)
+    entity = Entity.insert(class_, form.name.data)
+    if class_ == 'artifact' or g.classes[class_].view == 'place':
         entity.link(
             'P53',
             Entity.insert('object_location', f'Location of {form.name.data}'))
-    elif class_ == 'reference_system':
-        entity = ReferenceSystem.insert_system(form)
-    else:
-        entity = Entity.insert(class_, form.name.data)
     return entity
 
 
@@ -428,7 +402,7 @@ def update_links(
         form: FlaskForm,
         action: str,
         origin: Union[Entity, None]) -> None:
-    if entity.class_.name in ReferenceSystem.EXTERNAL_REFERENCES_FORMS:
+    if entity.class_.reference_systems:
         ReferenceSystem.update_links(form, entity)
     if entity.class_.view == 'actor':
         if action == 'update':
@@ -523,7 +497,8 @@ def link_and_get_redirect_url(
                 link_id=link_id,
                 origin_id=origin.id)
         elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
-            if entity.class_.view == 'place' or entity.class_.name == 'find':
+            if entity.class_.view == 'place' \
+                    or entity.class_.name == 'artifact':
                 origin.link('P46', entity)
                 url = url_for('entity_view', id_=entity.id)
         elif origin.class_.view in ['source', 'file']:
@@ -568,6 +543,6 @@ def link_and_get_redirect_url(
             elif entity.class_.name == 'feature':
                 class_ = 'stratigraphic_unit'
             elif entity.class_.name == 'stratigraphic_unit':
-                class_ = 'find'
+                class_ = 'artifact'
         url = url_for('insert', class_=class_, origin_id=entity.id)
     return url
