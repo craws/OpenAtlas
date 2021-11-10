@@ -9,6 +9,12 @@ from openatlas.api.v03.templates.class_mapping import ClassMappingTemplate
 class ClassMapping(Resource):  # type: ignore
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
+        return marshal(
+            ClassMapping.get_mapping(),
+            ClassMappingTemplate.class_template()), 200
+
+    @staticmethod
+    def get_mapping():
         mapping = []
         for class_ in g.classes.values():
             if class_.cidoc_class:
@@ -18,5 +24,4 @@ class ClassMapping(Resource):  # type: ignore
                     "view": class_.view,
                     "icon": class_.icon,
                     "en": class_.label})
-
-        return marshal(mapping, ClassMappingTemplate.class_template()), 200
+        return mapping

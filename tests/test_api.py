@@ -385,7 +385,7 @@ class ApiTests(TestBaseCase):
 
             # /classes
             rv = self.app.get(url_for('api.class_mapping'))
-            self.assertAlmostEqual(rv.get_json(), ClassMapping.mapping)
+            self.assertAlmostEqual(rv.get_json(), ClassMapping.get_mapping())
 
             # content/
             rv = self.app.get(url_for(
