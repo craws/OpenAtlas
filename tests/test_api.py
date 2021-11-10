@@ -46,7 +46,8 @@ class ApiTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
                           (id_, node) in Node.get_all_nodes().items()}
-                params['geonames_id'] = 102
+                params['geonames_id'] = ReferenceSystem.get_by_name(
+                    'GeoNames').id
 
                 # Creation of Shire (place)
                 place = insert_entity(
