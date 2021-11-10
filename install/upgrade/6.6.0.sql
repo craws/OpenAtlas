@@ -1,6 +1,12 @@
 -- Upgrade 6.5.0 to 6.6.0
 -- Be sure to backup the database and read the upgrade notes before executing!
 
+-- For devs: if you already run it and just miss the production feature (#1500):
+-- INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, standard_type_id) VALUES
+--     ('production',           'E12', false, true,  true,  'contributor', '#0000FF', (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1));
+-- INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
+--     ((SELECT id FROM web.hierarchy WHERE name='Event'), 'production');
+
 BEGIN;
 
 -- #1597 Join artifacts and finds
@@ -21,7 +27,7 @@ ALTER SEQUENCE model.class_inheritance_id_seq RENAME TO cidoc_class_inheritance_
 ALTER TABLE model.entity RENAME COLUMN class_code TO cidoc_class_code;
 ALTER TABLE model.entity RENAME COLUMN system_class to openatlas_class_name;
 
--- Adding missing constraint for wewb.group table
+-- Adding missing constraint for web.group table
 ALTER TABLE ONLY web."group" ADD CONSTRAINT group_name_key UNIQUE (name);
 
 -- New table model.openatlas_class
