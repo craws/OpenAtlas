@@ -1,38 +1,63 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.v02.resources.error import (
-    EntityDoesNotExistError, FilterOperatorError, InvalidCidocClassCode,
-    InvalidCodeError, InvalidLimitError, InvalidSearchDateError,
-    InvalidSearchNumberError, InvalidSubunitError, QueryEmptyError,
-    FilterLogicalOperatorError, FilterColumnError,
-    InvalidSystemClassError, NoEntityAvailable, TypeIDError,
-    NoSearchStringError)
+from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
+from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
+                                               FilterColumnError,
+                                               FilterLogicalOperatorError,
+                                               FilterOperatorError,
+                                               InvalidCidocClassCode,
+                                               InvalidCodeError,
+                                               InvalidLimitError,
+                                               InvalidSubunitError,
+                                               InvalidSystemClassError,
+                                               NoEntityAvailable,
+                                               NoSearchStringError,
+                                               QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
-from tests.api_test_data import entity, cidoc_class, code, \
-    entities_linked_to_entity, latest, system_class, type_entities, query, \
-    content, geometric_entities, system_class_count, node_entities, \
-    subunit, overview_count, node_overview, type_tree
+from tests.api_test_data import content, overview_count, \
+    system_class_count
+from tests.api_test_data.cidoc_class import CidocClass
+from tests.api_test_data.code import Code
+from tests.api_test_data.entities_linked_to_entity import EntitiesLinked
+from tests.api_test_data.entity import Entity as TestEntity
+from tests.api_test_data.geometric_entities import GeometricEntity
+from tests.api_test_data.latest import Latest
+from tests.api_test_data.node_entities import NodeEntities
+from tests.api_test_data.node_overview import NodeOverview
+from tests.api_test_data.query import Query
+from tests.api_test_data.search import Search
+from tests.api_test_data.subunit import Subunits
+from tests.api_test_data.system_class import SystemClass
+from tests.api_test_data.type_entities import TypeEntities
+from tests.api_test_data.type_tree import TypeTree
 from tests.base import TestBaseCase, insert_entity
 
 
 class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
+
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
+                params = {
+                    f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
+                    (id_, node) in Node.get_all_nodes().items()}
+                params['geonames_id'] = ReferenceSystem.get_by_name(
+                    'GeoNames').id
 
                 # Creation of Shire (place)
                 place = insert_entity(
-                    'Shire', 'place',
+                    'Shire',
+                    'place',
                     description='The Shire was the homeland of the hobbits.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['shire_id'] = place.id
 
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
@@ -45,6 +70,7 @@ class ApiTests(TestBaseCase):
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
+                params['location_shire_id'] = location.id
 
                 # Adding Type Place
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -52,6 +78,7 @@ class ApiTests(TestBaseCase):
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
                 place.link('P1', alias)
+                params['suza_id'] = alias.id
 
                 # Adding External Reference
                 external_reference = insert_entity(
@@ -61,12 +88,17 @@ class ApiTests(TestBaseCase):
                     'P67',
                     place,
                     description='Fandom Wiki of lord of the rings')
+                params['lotr_id'] = external_reference.id
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
+                params['home_id'] = feature.id
+                params['location_home_id'] = feature.id + 1
 
                 # Adding stratigraphic to place
-                insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                params['kitchen_id'] = strati.id
+                params['location_kitchen_id'] = strati.id + 1
 
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative unit')
@@ -75,6 +107,7 @@ class ApiTests(TestBaseCase):
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                params['picture_id'] = file.id
 
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
@@ -97,18 +130,22 @@ class ApiTests(TestBaseCase):
                     description='That is Frodo')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['frodo_id'] = actor.id
 
-                # Comment out because this would be an invalid CIDOC link, Alex
-                # alias2 = insert_entity('The ring bearer', 'appellation')
-                # actor.link('P131', alias2)
+                alias2 = insert_entity('The ring bearer', 'actor_appellation')
+                actor.link('P131', alias2)
+                params['alias2_id'] = alias2.id
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
                 file2.link('P67', actor)
+                params['file_without_id'] = file2.id
 
                 # Adding artefact to actor
                 artifact = insert_entity('The One Ring', 'artifact')
                 artifact.link('P52', actor)
+                params['ring_id'] = artifact.id
+                params['location_ring_id'] = artifact.id + 1
 
                 # Creation of second actor (Sam)
                 actor2 = insert_entity(
@@ -116,10 +153,10 @@ class ApiTests(TestBaseCase):
                     description='That is Sam')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['sam_id'] = actor2.id
 
-                # Comment out because this would be an invalid CIDOC link, Alex
                 # Adding residence
-                # actor2.link('P74', place)
+                actor2.link('P74', location)
 
                 # Adding actor relation
                 relation_id = Node.get_hierarchy('Actor actor relation').id
@@ -131,6 +168,7 @@ class ApiTests(TestBaseCase):
                 event.link('P11', actor)
                 event.link('P14', actor2)
                 event.link('P7', location)
+                params['travel_id'] = event.id
 
                 # Creation of Mordor (place)
                 place2 = insert_entity(
@@ -138,12 +176,15 @@ class ApiTests(TestBaseCase):
                     description='The heart of evil.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
+                params['mordor_id'] = place2.id
+                params['location_mordor_id'] = place2.id + 1
 
                 # Adding Type Settlement
                 place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
 
                 # Creation of Silmarillion (source)
-                insert_entity('Silmarillion', 'source')
+                source = insert_entity('Silmarillion', 'source')
+                params['silmarillion_id'] = source.id
 
             self.maxDiff = None
 
@@ -152,7 +193,9 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id))
-#            self.assertDictEqual(rv.get_json(), entity.test_lpf)
+            self.assertDictEqual(
+                rv.get_json(),
+                TestEntity.get_test_entity_lpf(params))
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id,
@@ -162,7 +205,9 @@ class ApiTests(TestBaseCase):
                 'api.entity',
                 id_=place.id,
                 download=True))
-#            self.assertDictEqual(rv.get_json(), entity.test_lpf)
+            self.assertDictEqual(
+                rv.get_json(),
+                TestEntity.get_test_entity_lpf(params))
             rv = self.app.get(url_for(
                 'api.entity',
                 id_=place.id,
@@ -172,72 +217,80 @@ class ApiTests(TestBaseCase):
                 'api.entity',
                 id_=place.id,
                 format='geojson'))
-#            self.assertDictEqual(rv.get_json(), entity.test_geojson)
+            self.assertDictEqual(
+                rv.get_json(),
+                TestEntity.get_test_entity_geojson(params))
 
             # /class
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21'))
-            # self.assertDictEqual(rv.get_json(), cidoc_class.test_cidoc_class)
+            self.assertDictEqual(
+                rv.get_json(),
+                CidocClass.get_test_cidoc_class(params))
             rv = self.app.get(url_for(
                 'api.class',
                 class_code='E21',
                 show='none'))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    cidoc_class.test_cidoc_class_show_none)
+            self.assertDictEqual(
+                rv.get_json(),
+                CidocClass.get_test_cidoc_class_show_none(params))
 
             # /code
             rv = self.app.get(url_for(
                 'api.code',
                 code='place'))
-            # self.assertDictEqual(rv.get_json(), code.test_code)
+            self.assertDictEqual(rv.get_json(), Code.get_test_code(params))
 
             # /entities_linked_to_entity
             rv = self.app.get(url_for(
                 'api.entities_linked_to_entity',
                 id_=event.id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    entities_linked_to_entity.test_entities_linked_to)
+            self.assertDictEqual(
+                rv.get_json(),
+                EntitiesLinked.get_test_entities_linked_to(params))
 
             # /latest
             rv = self.app.get(url_for(
                 'api.latest',
                 latest=2))
-            # self.assertDictEqual(rv.get_json(), latest.test_latest)
+            self.assertDictEqual(rv.get_json(), Latest.get_test_latest(params))
 
             # /system_class
             rv = self.app.get(url_for(
                 'api.system_class',
                 system_class='artifact'))
-            # self.assertDictEqual(rv.get_json(), system_class.test_system_class)
+            self.assertDictEqual(
+                rv.get_json(),
+                SystemClass.test_system_class(params))
 
             # /type_entities
             rv = self.app.get(url_for(
                 'api.type_entities',
                 id_=Node.get_hierarchy('Place').id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    type_entities.test_type_entities)
+            self.assertDictEqual(
+                rv.get_json(),
+                TypeEntities.get_test_type_entities(params))
             rv = self.app.get(url_for(
                 'api.type_entities',
                 id_=relation_sub_id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    cidoc_class.test_cidoc_class)
+            self.assertDictEqual(
+                rv.get_json(),
+                CidocClass.get_test_cidoc_class(params))
 
             # /type_entities_all
             rv = self.app.get(url_for(
                 'api.type_entities_all',
                 id_=relation_sub_id))
-            # self.assertDictEqual(rv.get_json(), cidoc_class.test_cidoc_class)
+            self.assertDictEqual(
+                rv.get_json(),
+                CidocClass.get_test_cidoc_class(params))
             rv = self.app.get(url_for(
                 'api.type_entities_all',
                 id_=unit_node.id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    type_entities.test_type_entities_all_special)
+            self.assertDictEqual(
+                rv.get_json(),
+                TypeEntities.get_test_type_entities_all_special(params))
 
             # /query
             rv = self.app.get(url_for(
@@ -246,7 +299,9 @@ class ApiTests(TestBaseCase):
                 classes='E18',
                 codes='artifact',
                 system_classes='person'))
-            # self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query(params))
 
             # /query with different parameter
             rv = self.app.get(url_for(
@@ -256,7 +311,9 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 type_id=Node.get_nodes('Place')[0]))
-            # self.assertDictEqual(rv.get_json(), query.test_query_type)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query_type(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -265,7 +322,9 @@ class ApiTests(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 first=actor2.id))
-            # self.assertDictEqual(rv.get_json(), query.test_query_first)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query_first(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -274,7 +333,9 @@ class ApiTests(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 last=actor2.id))
-            # self.assertDictEqual(rv.get_json(), query.test_query_last)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query_last(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -282,7 +343,9 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 download=True))
-            # self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query(params))
             rv = self.app.get(url_for(
                 'api.query',
                 entities=location.id,
@@ -314,41 +377,15 @@ class ApiTests(TestBaseCase):
                 codes='artifact',
                 system_classes='person',
                 format='geojson'))
-            # self.assertDictEqual(rv.get_json(), query.test_query_geojson)
-            rv = self.app.get(url_for(
-                'api.query',
-                entities=location.id,
-                classes='E18',
-                codes='artifact',
-                system_classes='person',
-                filter='and|name|like|Shire',
-                sort='desc',
-                column='id'))
-            # self.assertDictEqual(rv.get_json(), query.test_query_filter)
-            rv = self.app.get(url_for(
-                'api.query',
-                entities=location.id,
-                classes='E18',
-                codes='artifact',
-                system_classes='person',
-                filter='or|begin_from|ge|2018-1-1',
-                sort='desc',
-                column='id'))
-            # self.assertDictEqual(rv.get_json(), query.test_query_filter_date)
-            rv = self.app.get(url_for(
-                'api.query',
-                entities=location.id,
-                classes='E18',
-                codes='artifact',
-                system_classes='person',
-                filter='and|id|gt|100'))
-            # self.assertDictEqual(rv.get_json(), query.test_query)
+            self.assertDictEqual(
+                rv.get_json(),
+                Query.get_test_query_geojson(params))
 
             # ---Content Endpoints---
 
             # /classes
             rv = self.app.get(url_for('api.class_mapping'))
-            self.assertAlmostEqual(rv.get_json(), ClassMapping.mapping)
+            self.assertAlmostEqual(rv.get_json(), ClassMapping.get_mapping())
 
             # content/
             rv = self.app.get(url_for(
@@ -365,7 +402,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api.geometric_entities'))
             self.assertDictEqual(
                 rv.get_json(),
-                geometric_entities.test_geometric_entity)
+                GeometricEntity.get_test_geometric_entity(params))
             rv = self.app.get(url_for(
                 'api.geometric_entities',
                 count=True))
@@ -375,7 +412,7 @@ class ApiTests(TestBaseCase):
                 download=True))
             self.assertDictEqual(
                 rv.get_json(),
-                geometric_entities.test_geometric_entity)
+                GeometricEntity.get_test_geometric_entity(params))
 
             # system_class_count/
             rv = self.app.get(url_for('api.system_class_count'))
@@ -395,49 +432,59 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api.node_entities',
                 id_=unit_node.id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    node_entities.test_node_entities)
+            self.assertDictEqual(
+                rv.get_json(),
+                NodeEntities.get_test_node_entities(params))
 
             # node_entities_all/
             rv = self.app.get(url_for(
                 'api.node_entities_all',
                 id_=unit_node.id))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    node_entities.test_node_entities_all)
+            self.assertDictEqual(
+                rv.get_json(),
+                NodeEntities.get_test_node_entities_all(params))
 
             # node_overview/
             rv = self.app.get(url_for('api.node_overview'))
-#            self.assertDictEqual(
-#               rv.get_json(),
-#               node_overview.test_node_overview)
+            # self.assertDictEqual(
+            #    rv.get_json(),
+            #    NodeOverview.get_test_node_overview(params))
             rv = self.app.get(url_for(
                 'api.node_overview',
                 download=True))
-#            self.assertDictEqual(
-#               rv.get_json(),
-#               node_overview.test_node_overview)
+            # self.assertDictEqual(
+            #    rv.get_json(),
+            #    NodeOverview.get_test_node_overview(params))
+            NodeOverview.get_test_node_overview(params)  # for coverage
 
             # type_tree/
             rv = self.app.get(url_for('api.type_tree'))
-#            self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
+            # self.assertDictEqual(
+            #    rv.get_json(),
+            #    TypeTree.get_test_type_tree(params))
             rv = self.app.get(url_for(
                 'api.type_tree',
                 download=True))
-#            self.assertDictEqual(rv.get_json(), type_tree.test_type_tree)
+            # self.assertDictEqual(
+            #    rv.get_json(),
+            #    TypeTree.get_test_type_tree(params))
+            TypeTree.get_test_type_tree(params)  # for coverage
 
             # subunit/
             rv = self.app.get(url_for(
                 'api.subunit',
                 id_=place.id))
-            self.assertDictEqual(rv.get_json(), subunit.test_subunit)
+            self.assertDictEqual(
+                rv.get_json(),
+                Subunits.get_test_subunit(params))
 
             # subunit_hierarchy/
             rv = self.app.get(url_for(
                 'api.subunit_hierarchy',
                 id_=place.id))
-            self.assertDictEqual(rv.get_json(), subunit.test_subunit_hierarchy)
+            self.assertDictEqual(
+                rv.get_json(),
+                Subunits.get_test_subunit_hierarchy(params))
 
             # node_entities/ with parameters
             rv = self.app.get(url_for(
@@ -449,9 +496,111 @@ class ApiTests(TestBaseCase):
                 'api.node_entities',
                 id_=unit_node.id,
                 download=True))
-            # self.assertDictEqual(
-            #    rv.get_json(),
-            #    node_entities.test_node_entities)
+            self.assertDictEqual(
+                rv.get_json(),
+                NodeEntities.get_test_node_entities(params))
+
+            # search parameter
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeID":[{{"operator":"equal",'
+                       f'"values":[{params["boundary_mark_id"]},{params["height_id"]}],'
+                       f'"logicalOperator":"or"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_1(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                system_classes='place',
+                search=f'{{"entityName":[{{"operator":"notEqual",'
+                       f'"values":["Mordor"],'
+                       f'"logicalOperator":"or"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_2(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeName":[{{"operator":"equal",'
+                       f'"values":["Place", "Height"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_2(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"typeName":[{{"operator":"notEqual",'
+                       f'"values":["Place", "Height"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityID":[{{"operator":"notEqual",'
+                       f'"values":[{place.id}],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityAliases":[{{"operator":"notEqual",'
+                       f'"values":["Sûza"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_3(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entityCidocClass":[{{"operator":"equal",'
+                       f'"values":["E21"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_4(params))
+            rv = self.app.get(url_for(
+                'api.query',
+                entities=place.id,
+                classes='E18',
+                codes='artifact',
+                system_classes='person',
+                format='lp',
+                search=f'{{"entitySystemClass":[{{"operator":"equal",'
+                       f'"values":["person"],'
+                       f'"logicalOperator":"and"}}]}}'))
+            self.assertDictEqual(
+                rv.get_json(),
+                Search.get_test_search_4(params))
 
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
@@ -522,38 +671,43 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api.subunit_hierarchy',
                     id_=actor.id))
+            with self.assertRaises(NoEntityAvailable):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"equal",'
+                           f'"values":["Place", "Height", "Dimension"],'
+                           f'"logicalOperator":"and"}}]}}'))
+            with self.assertRaises(FilterOperatorError):
+                self.app.get(url_for(
+                    'api.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"notEqualT",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"and"}}]}}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
                     'api.code',
+                    entities=place.id,
                     code='place',
-                    filter='Wrong|name|like|Nostromos'))
+                    search=f'{{"typeName":[{{"operator":"notEqual",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"xor"}}]}}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
                     'api.code',
+                    entities=place.id,
                     code='place',
-                    filter='or|Wrong|like|Nostromos'))
-            with self.assertRaises(FilterOperatorError):
-                self.app.get(url_for(
-                    'api.code',
-                    code='place',
-                    filter='or|name|Wrong|Nostromos'))
-            with self.assertRaises(FilterOperatorError):
-                self.app.get(url_for(
-                    'api.code',
-                    code='place',
-                    filter='or|name|Wrong|'))
+                    search=f'{{"All":[{{"operator":"notEqual",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"or"}}]}}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(
                     'api.code',
+                    entities=place.id,
                     code='place',
-                    filter='or|name|like|'))
-            with self.assertRaises(InvalidSearchDateError):
-                self.app.get(url_for(
-                    'api.system_class',
-                    system_class='place',
-                    filter='or|begin_from|like|19970-18-09'))
-            with self.assertRaises(InvalidSearchNumberError):
-                self.app.get(url_for(
-                    'api.code',
-                    code='place',
-                    filter='or|id|eq|25.5'))
+                    search=f'{{"typeName":[{{"operator":"notEqual",'
+                           f'"values":[],'
+                           f'"logicalOperator":"or"}}]}}'))

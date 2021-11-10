@@ -40,8 +40,23 @@ entity_.add_argument(
     case_sensitive=False,
     help='{error_msg}',
     choices=(
-        'id', 'class_code', 'name', 'description', 'created', 'modified',
-        'system_class', 'begin_from', 'begin_to', 'end_from', 'end_to'))
+        'id',
+        'standard_type',
+        'name',
+        'description',
+        'created',
+        'modified',
+        'cidoc_class',
+        'class_',
+        'begin_from',
+        'begin_to',
+        'begin_comment',
+        'end_from',
+        'end_to',
+        'end_comment',
+        'first',
+        'last'))
+
 entity_.add_argument(
     'filter',
     type=str,

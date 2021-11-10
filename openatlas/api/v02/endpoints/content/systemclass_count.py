@@ -9,8 +9,9 @@ from openatlas.models.entity import Entity
 
 
 class SystemClassCount(Resource):  # type: ignore
-    @staticmethod
-    def get() -> Union[Tuple[Resource, int], Response]:
+
+
+    def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
             Entity.get_overview_counts(),
             SystemClsCountTemplate.overview_template()), 200
