@@ -44,13 +44,15 @@ class ApiTests(TestBaseCase):
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
-                          (id_, node) in Node.get_all_nodes().items()}
+                params = {
+                    f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
+                    (id_, node) in Node.get_all_nodes().items()}
                 params['geonames_id'] = 102
 
                 # Creation of Shire (place)
                 place = insert_entity(
-                    'Shire', 'place',
+                    'Shire',
+                    'place',
                     description='The Shire was the homeland of the hobbits.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
