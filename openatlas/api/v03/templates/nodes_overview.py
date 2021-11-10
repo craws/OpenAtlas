@@ -10,7 +10,8 @@ class NodesOverviewTemplate:
     def node_overview_template() -> Dict[str, RestList]:
         categories = {
             'standard': fields.Raw,
-            'places': fields.Raw,
+            'place': fields.Raw,
             'custom': fields.Raw,
-            'value': fields.Raw}
+            'value': fields.Raw,
+            'system': fields.Raw}
         return {"types": fields.List(fields.Nested(categories))}

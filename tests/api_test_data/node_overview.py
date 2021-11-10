@@ -210,46 +210,45 @@ class NodeOverview:
                     'id': params["deposit_id"],
                     'url': f'http://local.host/api/entity/{params["deposit_id"]}',
                     'label': 'Deposit', 'children': []}]},
-            'places': None,
-                # {
-                # 'Administrative unit': [{
-                #     'id': params["austria_id"],
-                #     'url': f'http://local.host/api/entity/{params["austria_id"]}',
-                #     'label': 'Austria', 'children': [{
-                #         'id': params["niederösterreich_id"],
-                #         'url': f'http://local.host/api/entity/{params["niederösterreich_id"]}',
-                #         'label': 'Niederösterreich', 'children': []}, {
-                #         'id': params["wien_id"],
-                #         'url': f'http://local.host/api/entity/{params["wien_id"]}',
-                #         'label': 'Wien', 'children': []}]}, {
-                #     'id': params["czech_republic_id"],
-                #     'url': f'http://local.host/api/entity/{params["czech_republic_id"]}',
-                #     'label': 'Czech Republic', 'children': []}, {
-                #     'id': params["germany_id"],
-                #     'url': f'http://local.host/api/entity/{params["germany_id"]}',
-                #     'label': 'Germany', 'children': []}, {
-                #     'id': params["italy_id"],
-                #     'url': f'http://local.host/api/entity/{params["italy_id"]}',
-                #     'label': 'Italy', 'children': []}, {
-                #     'id': params["slovakia_id"],
-                #     'url': f'http://local.host/api/entity/{params["slovakia_id"]}',
-                #     'label': 'Slovakia', 'children': []}, {
-                #     'id': params["slovenia_id"],
-                #     'url': f'http://local.host/api/entity/{params["slovenia_id"]}',
-                #     'label': 'Slovenia', 'children': []}],
-                # 'Historical place': [{
-                #     'id': params["carantania_id"],
-                #     'url': f'http://local.host/api/entity/{params["carantania_id"]}',
-                #     'label': 'Carantania', 'children': []}, {
-                #     'id': params["comitatus_iauntal_id"],
-                #     'url': f'http://local.host/api/entity/{params["comitatus_iauntal_id"]}',
-                #     'label': 'Comitatus Iauntal', 'children': []}, {
-                #     'id': params["kingdom_of_serbia_id"],
-                #     'url': f'http://local.host/api/entity/{params["kingdom_of_serbia_id"]}',
-                #     'label': 'Kingdom of Serbia', 'children': []}, {
-                #     'id': params["marcha_orientalis_id"],
-                #     'url': f'http://local.host/api/entity/{params["marcha_orientalis_id"]}',
-                #     'label': 'Marcha Orientalis', 'children': []}]},
+            'place': {
+                'Administrative unit': [{
+                    'id': params["austria_id"],
+                    'url': f'http://local.host/api/entity/{params["austria_id"]}',
+                    'label': 'Austria', 'children': [{
+                        'id': params["niederösterreich_id"],
+                        'url': f'http://local.host/api/entity/{params["niederösterreich_id"]}',
+                        'label': 'Niederösterreich', 'children': []}, {
+                        'id': params["wien_id"],
+                        'url': f'http://local.host/api/entity/{params["wien_id"]}',
+                        'label': 'Wien', 'children': []}]}, {
+                    'id': params["czech_republic_id"],
+                    'url': f'http://local.host/api/entity/{params["czech_republic_id"]}',
+                    'label': 'Czech Republic', 'children': []}, {
+                    'id': params["germany_id"],
+                    'url': f'http://local.host/api/entity/{params["germany_id"]}',
+                    'label': 'Germany', 'children': []}, {
+                    'id': params["italy_id"],
+                    'url': f'http://local.host/api/entity/{params["italy_id"]}',
+                    'label': 'Italy', 'children': []}, {
+                    'id': params["slovakia_id"],
+                    'url': f'http://local.host/api/entity/{params["slovakia_id"]}',
+                    'label': 'Slovakia', 'children': []}, {
+                    'id': params["slovenia_id"],
+                    'url': f'http://local.host/api/entity/{params["slovenia_id"]}',
+                    'label': 'Slovenia', 'children': []}],
+                'Historical place': [{
+                    'id': params["carantania_id"],
+                    'url': f'http://local.host/api/entity/{params["carantania_id"]}',
+                    'label': 'Carantania', 'children': []}, {
+                    'id': params["comitatus_iauntal_id"],
+                    'url': f'http://local.host/api/entity/{params["comitatus_iauntal_id"]}',
+                    'label': 'Comitatus Iauntal', 'children': []}, {
+                    'id': params["kingdom_of_serbia_id"],
+                    'url': f'http://local.host/api/entity/{params["kingdom_of_serbia_id"]}',
+                    'label': 'Kingdom of Serbia', 'children': []}, {
+                    'id': params["marcha_orientalis_id"],
+                    'url': f'http://local.host/api/entity/{params["marcha_orientalis_id"]}',
+                    'label': 'Marcha Orientalis', 'children': []}]},
             'custom': {
                 'Sex': [{
                     'id': params["female_id"],
@@ -258,6 +257,15 @@ class NodeOverview:
                     'id': params["male_id"],
                     'url': f'http://local.host/api/entity/{params["male_id"]}',
                     'label': 'Male', 'children': []}]},
+            'system': {'External reference match': [{
+                'children': [],
+                'id': params["close_match_id"],
+                'label': 'close match',
+                'url': f'http://local.host/api/entity/{params["close_match_id"]}'},
+                {'children': [],
+                 'id': params["exact_match_id"],
+                 'label': 'exact match',
+                 'url': f'http://local.host/api/entity/{params["exact_match_id"]}'}]},
             'value': {
                 'Dimensions': [{
                     'id': params["height_id"],

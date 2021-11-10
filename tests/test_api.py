@@ -445,8 +445,6 @@ class ApiTests(TestBaseCase):
                 NodeEntities.get_test_node_entities_all(params))
 
             # node_overview/
-            # Todo: Alex remade the Nodes, I have no idea how they look now
-            #  places is None and I don't know why!
             rv = self.app.get(url_for('api.node_overview'))
             self.assertDictEqual(
                 rv.get_json(),
