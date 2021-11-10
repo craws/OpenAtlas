@@ -4,6 +4,7 @@ from flask import g
 
 from openatlas.database.entity import Entity
 
+
 class Api:
 
     @staticmethod
@@ -42,10 +43,16 @@ class Filter:
     logical_operators: Dict[str, Any] = {
         'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT'}
     valid_columns: Dict[str, str] = {
-        'id': 'e.id', 'class_code': 'e.class_code', 'name': 'e.name',
-        'description': 'e.description', 'system_class': 'e.openatlas_class_name',
-        'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
-        'created': 'e.created', 'modified': 'e.modified', 'end_to': 'e.end_to',
+        'id': 'e.id',
+        'class_code': 'e.class_code',
+        'name': 'e.name',
+        'description': 'e.description',
+        'system_class': 'e.openatlas_class_name',
+        'begin_from': 'e.begin_from',
+        'begin_to': 'e.begin_to',
+        'created': 'e.created',
+        'modified': 'e.modified',
+        'end_to': 'e.end_to',
         'end_from': 'e.end_from'}
     compare_operators: Dict[str, Any] = {
         'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>', 'ge': '>=',
@@ -57,8 +64,9 @@ class Filter:
         'end_from': 'e.end_from'}
 
     @staticmethod
-    def get_filter(parameters: Dict[str, Any], parser: Dict[str, Any]) -> Dict[
-        str, Any]:
+    def get_filter(
+            parameters: Dict[str, Any],
+            parser: Dict[str, Any]) -> Dict[str, Any]:
         filters: List[Dict[str, Any]] = [
             {'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
         if parser['filter']:
@@ -96,7 +104,7 @@ class Filter:
         from openatlas.api.v02.resources.filter_validation import Validation
         # Check if search term is a valid date if needed
         if Filter.valid_columns[
-            filter_[1]] in Filter.valid_date_column.values():
+                filter_[1]] in Filter.valid_date_column.values():
             Validation.test_date(filter_[3])
         # Check if search term is an integer if column is id
         if Filter.valid_columns[filter_[1]] == 'e.id':
