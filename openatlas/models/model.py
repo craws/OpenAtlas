@@ -44,7 +44,8 @@ class OpenatlasClass:
             new_types_allowed: bool,
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
-            write_access: Optional[str] = 'contributor') -> None:
+            write_access: Optional[str] = 'contributor',
+            icon: Optional[str] = None) -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))
         self.cidoc_class = None
@@ -59,6 +60,7 @@ class OpenatlasClass:
         self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
+        self.icon = icon
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
@@ -82,7 +84,8 @@ class OpenatlasClass:
                 new_types_allowed=row['new_types_allowed'],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
-                hierarchies=row['hierarchies'])
+                hierarchies=row['hierarchies'],
+                icon=row['layout_icon'])
         return classes
 
     @staticmethod
