@@ -311,15 +311,17 @@ def get_entity_data(
             if place:
                 data[_('location')] = link(
                     place.get_linked_entity_safe('P53', True))
-
         if entity.class_.name == 'acquisition':
             data[_('recipient')] = [
                 link(recipient) for recipient
                 in entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [
-                link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [
-                link(place) for place in entity.get_linked_entities(['P24'])]
+            data[_('donor')] = \
+                [link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = \
+                [link(place) for place in entity.get_linked_entities(['P24'])]
+        if entity.class_.name == 'production':
+            data[_('creator')] = \
+                [link(actor) for actor in entity.get_linked_entities(['P108'])]
     elif entity.class_.view == 'file':
         data[_('size')] = g.file_stats[entity.id]['size'] \
             if entity.id in g.file_stats else 'N/A'

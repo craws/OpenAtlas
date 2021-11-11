@@ -259,8 +259,11 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
             form.place.data = place.get_linked_entity_safe('P53', True).id \
                 if place else ''
         if entity.class_.name == 'acquisition':
-            form.given_place.data = [
-                entity.id for entity in entity.get_linked_entities('P24')]
+            form.given_place.data = \
+                [entity.id for entity in entity.get_linked_entities('P24')]
+        if entity.class_.name == 'production':
+            form.artifact.data = \
+                [entity.id for entity in entity.get_linked_entities('P108')]
     elif isinstance(entity, Node):
         if hasattr(form, 'name_inverse'):  # Directional, e.g. actor relation
             name_parts = entity.name.split(' (')
@@ -418,20 +421,18 @@ def update_links(
             entity.link('OA9', object_.get_linked_entity_safe('P53'))
     if entity.class_.view == 'event':
         if action == 'update':
-            entity.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
-        if form.event.data:
-            entity.link_string('P117', form.event.data)
+            entity.delete_links(
+                ['P7', 'P24', 'P25', 'P26', 'P27', 'P108', 'P117'])
+        entity.link_string('P117', form.event.data)
         if hasattr(form, 'place') and form.place.data:
             entity.link(
                 'P7',
                 Link.get_linked_entity_safe(int(form.place.data), 'P53'))
-        if entity.class_.name == 'acquisition' and form.given_place.data:
+        if entity.class_.name == 'acquisition':
             entity.link_string('P24', form.given_place.data)
         if entity.class_.name == 'move':
-            if form.artifact.data:  # Moved objects
-                entity.link_string('P25', form.artifact.data)
-            if form.person.data:  # Moved persons
-                entity.link_string('P25', form.person.data)
+            entity.link_string('P25', form.artifact.data)  # Moved objects
+            entity.link_string('P25', form.person.data)  # Moved persons
             if form.place_from.data:  # Link place for move from
                 linked_place = Link.get_linked_entity_safe(
                     int(form.place_from.data),
@@ -441,6 +442,8 @@ def update_links(
                 entity.link(
                     'P26',
                     Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
+        elif entity.class_.name == 'production':
+            entity.link_string('P108', form.artifact.data)
     elif entity.class_.view in ['artifact', 'place']:
         location = entity.get_linked_entity_safe('P53')
         if action == 'update':
@@ -449,13 +452,11 @@ def update_links(
         Gis.insert(location, form)
         if entity.class_.name == 'artifact':
             entity.delete_links(['P52'])
-            if form.actor.data:
-                entity.link_string('P52', form.actor.data)
+            entity.link_string('P52', form.actor.data)
     elif entity.class_.view == 'source' and not origin:
         if action == 'update':
             entity.delete_links(['P128'], inverse=True)
-        if form.artifact.data:
-            entity.link_string('P128', form.artifact.data, inverse=True)
+        entity.link_string('P128', form.artifact.data, inverse=True)
     elif entity.class_.view == 'type':
         node = origin if isinstance(origin, Node) else entity
         root = g.nodes[node.root[-1]] if node.root else node
