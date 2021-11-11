@@ -15,8 +15,8 @@ is working.
 
 ### 6.5.0 to 6.6.0
 
-There were quiet some changes in database and model (#1563). In case you depend
-on direct database access for other application be sure to test these first.
+There were some changes in database and model (#1563). In case you depend on
+direct database access for other application be sure to test these first.
 
 Execute **install/upgrade/6.6.0.sql** after making backups.
 
