@@ -141,7 +141,7 @@ query.add_argument(
     case_sensitive=False,
     choices=(
         'acquisition', 'activity', 'actor_appellation', 'administrative_unit',
-        'appellation', 'artifact', 'bibliography', 'edition', 'find', 'file',
+        'appellation', 'artifact', 'bibliography', 'edition', 'file',
         'external_reference', 'feature', 'group', 'human_remains', 'move',
         'object_location', 'person', 'place', 'source', 'reference_system',
         'stratigraphic_unit', 'source_translation', 'type'))
