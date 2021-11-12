@@ -21,18 +21,18 @@ class TypeEntities:
                                 'latest': '2019-03-01'}}]},
                 'types': [{
                     'identifier':
-                        f'http://local.host/api/entity/{params["place_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["place_id"]}',
                     'label': 'Place', 'description': None, 'hierarchy': '',
                     'value': None, 'unit': None}, {
                     'identifier':
-                        f'http://local.host/api/entity/{params["height_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["height_id"]}',
                     'label': 'Height', 'description': None,
                     'hierarchy': 'Dimensions', 'value': 23.0,
                     'unit': 'centimeter'}],
                 'relations': [{
                     'label': 'Height',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["height_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["height_id"]}',
                     'relationType': 'crm:P2 has type',
                     'relationSystemClass': 'type',
                     'relationDescription': '23.0',
@@ -43,7 +43,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Home of Baggins',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["home_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["home_id"]}',
                     'relationType': 'crm:P46 is composed of',
                     'relationSystemClass': 'feature',
                     'relationDescription': None,
@@ -54,7 +54,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Location of Shire',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["location_shire_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["location_shire_id"]}',
                     'relationType': 'crm:P53 has former or current location',
                     'relationSystemClass': 'object_location',
                     'relationDescription': None,
@@ -65,7 +65,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Place',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["place_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["place_id"]}',
                     'relationType': 'crm:P2 has type',
                     'relationSystemClass': 'type',
                     'relationDescription': None,
@@ -76,7 +76,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Sûza',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["suza_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["suza_id"]}',
                     'relationType': 'crm:P1 is identified by',
                     'relationSystemClass': 'appellation',
                     'relationDescription': None,
@@ -87,7 +87,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'GeoNames',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["geonames_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["geonames_id"]}',
                     'relationType': 'crm:P67i is referred to by',
                     'relationSystemClass': 'reference_system',
                     'relationDescription': '2761369',
@@ -98,7 +98,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'https://lotr.fandom.com/',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["lotr_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["lotr_id"]}',
                     'relationType': 'crm:P67i is referred to by',
                     'relationSystemClass': 'external_reference',
                     'relationDescription': 'Fandom Wiki of lord of the rings',
@@ -109,7 +109,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Picture with a License',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["picture_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                     'relationType': 'crm:P67i is referred to by',
                     'relationSystemClass': 'file',
                     'relationDescription': None,
@@ -129,7 +129,7 @@ class TypeEntities:
                     'title': '',
                     'description': ''},
                 'depictions': [{
-                    '@id': f'http://local.host/api/entity/{params["picture_id"]}',
+                    '@id': f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                     'title': 'Picture with a License',
                     'license': 'Open license',
                     'url': 'N/A'}]}]}],
@@ -159,7 +159,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Administrative unit',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -170,7 +170,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Niederösterreich',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["niederösterreich_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["niederösterreich_id"]}',
                     'relationType': 'crm:P89i contains',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -181,7 +181,7 @@ class TypeEntities:
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Wien',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["wien_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["wien_id"]}',
                     'relationType': 'crm:P89i contains',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -211,7 +211,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Administrative unit',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -241,7 +241,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Administrative unit',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -272,7 +272,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Administrative unit',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -302,7 +302,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Austria',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["austria_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["austria_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -332,7 +332,7 @@ class TypeEntities:
                 'relations': [{
                     'label': 'Administrative unit',
                     'relationTo':
-                        f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                        f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -361,7 +361,7 @@ class TypeEntities:
                 'types': None,
                 'relations': [{
                     'label': 'Administrative unit',
-                    'relationTo': f'http://local.host/api/entity/{params["administrative_unit_id"]}',
+                    'relationTo': f'http://local.host/api/0.3/entity/{params["administrative_unit_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,
@@ -390,7 +390,7 @@ class TypeEntities:
                 'types': None,
                 'relations': [{
                     'label': 'Austria',
-                    'relationTo': f'http://local.host/api/entity/{params["austria_id"]}',
+                    'relationTo': f'http://local.host/api/0.3/entity/{params["austria_id"]}',
                     'relationType': 'crm:P89 falls within',
                     'relationSystemClass': 'administrative_unit',
                     'relationDescription': None,

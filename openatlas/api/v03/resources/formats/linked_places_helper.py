@@ -30,7 +30,7 @@ class LPHelper:
             'label': link_.domain.name if inverse else link_.range.name,
             'relationTo':
                 url_for(
-                    'api.entity',
+                    'api_03.entity',
                     id_=link_.domain.id if inverse else link_.range.id,
                     _external=True),
             'relationType': LPHelper.relation_type(link_, inverse),
@@ -60,7 +60,7 @@ class LPHelper:
                 continue
             path = get_file_path(link.domain.id)
             files.append({
-                '@id': url_for('api.entity', id_=link.domain.id,
+                '@id': url_for('api_03.entity', id_=link.domain.id,
                                _external=True),
                 'title': link.domain.name,
                 'license': get_license(link.domain),
@@ -77,7 +77,7 @@ class LPHelper:
         for node in entity.nodes:
             nodes_dict = {
                 'identifier': url_for(
-                    'api.entity',
+                    'api_03.entity',
                     id_=node.id,
                     _external=True),
                 'label': node.name}

@@ -39,7 +39,7 @@ A new path is established, which always points to the newest stable version:
     /api/<endpoint>
 
 Since version 0.3 is prone to changes and not stable, version 0.2 is the latest 
-stable version. Version 0.2 should be maintained until OpenAtlas 7.3.0.
+stable version. Version 0.2 will be maintained at least until OpenAtlas 7.3.0.
 Thereafter, the maintenance of version 0.2 can not be guaranteed.  
 
 ### 6.4.x to 6.5.0

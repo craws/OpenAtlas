@@ -1,29 +1,29 @@
-from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.v03.endpoints.content.content import GetContent
-from openatlas.api.v03.endpoints.content.geometric_entities import \
+from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
+from openatlas.api.v02.endpoints.content.content import GetContent
+from openatlas.api.v02.endpoints.content.geometric_entities import \
     GetGeometricEntities
-from openatlas.api.v03.endpoints.content.overview_count import OverviewCount
-from openatlas.api.v03.endpoints.content.systemclass_count import \
+from openatlas.api.v02.endpoints.content.overview_count import OverviewCount
+from openatlas.api.v02.endpoints.content.systemclass_count import \
     SystemClassCount
-from openatlas.api.v03.endpoints.display_image import DisplayImage
-from openatlas.api.v03.endpoints.entity.cidoc_class import GetByClass
-from openatlas.api.v03.endpoints.entity.entity import GetEntity
-from openatlas.api.v03.endpoints.entity.latest import GetLatest
-from openatlas.api.v03.endpoints.entity.linked_entities import GetLinkedEntities
-from openatlas.api.v03.endpoints.entity.query import GetQuery
-from openatlas.api.v03.endpoints.entity.system_class import GetBySystemClass
-from openatlas.api.v03.endpoints.entity.type_entities import GetTypeEntities
-from openatlas.api.v03.endpoints.entity.type_entities_all import \
+from openatlas.api.v02.endpoints.display_image import DisplayImage
+from openatlas.api.v02.endpoints.entity.class_ import GetByClass
+from openatlas.api.v02.endpoints.entity.entity import GetEntity
+from openatlas.api.v02.endpoints.entity.latest import GetLatest
+from openatlas.api.v02.endpoints.entity.linked_entities import GetLinkedEntities
+from openatlas.api.v02.endpoints.entity.query import GetQuery
+from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
+from openatlas.api.v02.endpoints.entity.type_entities import GetTypeEntities
+from openatlas.api.v02.endpoints.entity.type_entities_all import \
     GetTypeEntitiesAll
-from openatlas.api.v03.endpoints.entity.view_class import GetByCode
-from openatlas.api.v03.endpoints.node.node_entities import GetNodeEntities
-from openatlas.api.v03.endpoints.node.node_entities_all import \
+from openatlas.api.v02.endpoints.entity.code import GetByCode
+from openatlas.api.v02.endpoints.node.node_entities import GetNodeEntities
+from openatlas.api.v02.endpoints.node.node_entities_all import \
     GetNodeEntitiesAll
-from openatlas.api.v03.endpoints.node.node_overview import GetNodeOverview
-from openatlas.api.v03.endpoints.node.subunit import GetSubunit
-from openatlas.api.v03.endpoints.node.subunit_hierarchy import \
+from openatlas.api.v02.endpoints.node.node_overview import GetNodeOverview
+from openatlas.api.v02.endpoints.node.subunit import GetSubunit
+from openatlas.api.v02.endpoints.node.subunit_hierarchy import \
     GetSubunitHierarchy
-from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
+from openatlas.api.v02.endpoints.node.type_tree import GetTypeTree
 
 
 def add_routes(api):

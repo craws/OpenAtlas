@@ -11,10 +11,11 @@ from openatlas.models.link import Link
 class LinkedPlaces:
 
     @staticmethod
-    def get_entity(entity: Entity,
-                   links: List[Link],
-                   links_inverse: List[Link],
-                   parser: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity(
+            entity: Entity,
+            links: List[Link],
+            links_inverse: List[Link],
+            parser: Dict[str, Any]) -> Dict[str, Any]:
         return {
             'type': 'FeatureCollection',
             '@context': app.config['API_SCHEMA'],
@@ -95,7 +96,7 @@ class LinkedPlaces:
             parser: Dict[str, Any]) -> Union[Dict[str, Any], None]:
         if 'geometry' in parser['show']:
             if entity.class_.view == 'place' \
-                    or entity.class_.name in ['find', 'artifact']:
+                    or entity.class_.name in ['artifact']:
                 return LPHelper.get_geoms_by_entity(
                     LPHelper.get_location_id(links))
             if entity.class_.name == 'object_location':
