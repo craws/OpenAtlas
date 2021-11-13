@@ -289,8 +289,8 @@ def get_entity_data(
         data[_('residence')] = link(
             residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
-        data[_('source')] = [
-            link(source) for source in entity.get_linked_entities(['P128'])]
+        data[_('source')] = \
+            [link(source) for source in entity.get_linked_entities(['P128'])]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
@@ -320,7 +320,7 @@ def get_entity_data(
             data[_('given place')] = \
                 [link(place) for place in entity.get_linked_entities(['P24'])]
         if entity.class_.name == 'production':
-            data[_('creator')] = \
+            data[_('created')] = \
                 [link(actor) for actor in entity.get_linked_entities(['P108'])]
     elif entity.class_.view == 'file':
         data[_('size')] = g.file_stats[entity.id]['size'] \
