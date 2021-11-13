@@ -3,6 +3,7 @@ class Changelog:
     versions = {
         '6.6.0': ['TBA', {
             'feature': {
+                '1500': 'Production of artifacts',
                 '1563': 'OpenAtlas model to database',
                 '1597': 'Join artifacts and finds',
                 '1584': 'Track needed and actual database version',
