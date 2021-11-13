@@ -290,7 +290,7 @@ def get_entity_data(
             residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
         data[_('source')] = \
-            [link(source) for source in entity.get_linked_entities(['P128'])]
+            [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
@@ -299,7 +299,7 @@ def get_entity_data(
         if entity.class_.name == 'move':
             person_data = []
             artifact_data = []
-            for linked_entity in entity.get_linked_entities(['P25']):
+            for linked_entity in entity.get_linked_entities('P25'):
                 if linked_entity.class_.name == 'person':
                     person_data.append(linked_entity)
                 elif linked_entity.class_.view == 'artifact':
@@ -312,16 +312,15 @@ def get_entity_data(
                 data[_('location')] = link(
                     place.get_linked_entity_safe('P53', True))
         if entity.class_.name == 'acquisition':
-            data[_('recipient')] = [
-                link(recipient) for recipient
-                in entity.get_linked_entities(['P22'])]
+            data[_('recipient')] = \
+                [link(actor) for actor in entity.get_linked_entities('P22')]
             data[_('donor')] = \
-                [link(donor) for donor in entity.get_linked_entities(['P23'])]
+                [link(donor) for donor in entity.get_linked_entities('P23')]
             data[_('given place')] = \
-                [link(place) for place in entity.get_linked_entities(['P24'])]
+                [link(place) for place in entity.get_linked_entities('P24')]
         if entity.class_.name == 'production':
             data[_('created')] = \
-                [link(actor) for actor in entity.get_linked_entities(['P108'])]
+                [link(actor) for actor in entity.get_linked_entities('P108')]
     elif entity.class_.view == 'file':
         data[_('size')] = g.file_stats[entity.id]['size'] \
             if entity.id in g.file_stats else 'N/A'
@@ -329,8 +328,8 @@ def get_entity_data(
             if entity.id in g.file_stats else 'N/A'
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
-            link(artifact) for artifact
-            in entity.get_linked_entities(['P128'], inverse=True)]
+            link(artifact) for artifact in
+            entity.get_linked_entities('P128', inverse=True)]
     return add_system_data(entity, data)
 
 
