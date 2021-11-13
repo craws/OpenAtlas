@@ -16,12 +16,12 @@ class Search:
                         'start': {'earliest': 'None', 'latest': 'None'},
                         'end': {'earliest': 'None', 'latest': 'None'}}]},
                 'types': [{
-                    'identifier': f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                    'identifier': f'http://local.host/api/0.3/entity/{params["boundary_mark_id"]}',
                     'label': 'Boundary Mark', 'description': None,
                     'hierarchy': 'Place', 'value': None, 'unit': None}],
                 'relations': [{
                     'label': 'Boundary Mark',
-                    'relationTo': f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                    'relationTo': f'http://local.host/api/0.3/entity/{params["boundary_mark_id"]}',
                     'relationType': 'crm:P2 has type',
                     'relationSystemClass': 'type',
                     'relationDescription': None,
@@ -32,7 +32,7 @@ class Search:
                                 'earliest': 'None', 'latest': 'None'},
                             'end': {'earliest': 'None', 'latest': 'None'}}]}}, {
                     'label': 'Location of Mordor',
-                    'relationTo': f'http://local.host/api/entity/{params["location_mordor_id"]}',
+                    'relationTo': f'http://local.host/api/0.3/entity/{params["location_mordor_id"]}',
                     'relationType': 'crm:P53 has former or current location',
                     'relationSystemClass': 'object_location',
                     'relationDescription': None,
@@ -64,17 +64,17 @@ class Search:
                             'end': {'earliest': '2019-01-31',
                                     'latest': '2019-03-01'}}]},
                     'types': [{
-                        'identifier': f'http://local.host/api/entity/{params["place_id"]}',
+                        'identifier': f'http://local.host/api/0.3/entity/{params["place_id"]}',
                         'label': 'Place', 'description': None, 'hierarchy': '',
                         'value': None, 'unit': None}, {
-                        'identifier': f'http://local.host/api/entity/{params["height_id"]}',
+                        'identifier': f'http://local.host/api/0.3/entity/{params["height_id"]}',
                         'label': 'Height', 'description': None,
                         'hierarchy': 'Dimensions',
                         'value': 23.0,
                         'unit': 'centimeter'}],
                     'relations': [{
                         'label': 'Height',
-                        'relationTo': f'http://local.host/api/entity/{params["height_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["height_id"]}',
                         'relationType': 'crm:P2 has type',
                         'relationSystemClass': 'type',
                         'relationDescription': '23.0',
@@ -85,7 +85,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Home of Baggins',
-                        'relationTo': f'http://local.host/api/entity/{params["home_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["home_id"]}',
                         'relationType': 'crm:P46 is composed of',
                         'relationSystemClass': 'feature',
                         'relationDescription': None,
@@ -96,7 +96,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Location of Shire',
-                        'relationTo': f'http://local.host/api/entity/{params["location_shire_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["location_shire_id"]}',
                         'relationType': 'crm:P53 has former or current location',
                         'relationSystemClass': 'object_location',
                         'relationDescription': None,
@@ -107,7 +107,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Place',
-                        'relationTo': f'http://local.host/api/entity/{params["place_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["place_id"]}',
                         'relationType': 'crm:P2 has type',
                         'relationSystemClass': 'type',
                         'relationDescription': None,
@@ -118,7 +118,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Sûza',
-                        'relationTo': f'http://local.host/api/entity/{params["suza_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["suza_id"]}',
                         'relationType': 'crm:P1 is identified by',
                         'relationSystemClass': 'appellation',
                         'relationDescription': None,
@@ -129,7 +129,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'GeoNames',
-                        'relationTo': f'http://local.host/api/entity/{params["geonames_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["geonames_id"]}',
                         'relationType': 'crm:P67i is referred to by',
                         'relationSystemClass': 'reference_system',
                         'relationDescription': '2761369',
@@ -140,7 +140,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'https://lotr.fandom.com/',
-                        'relationTo': f'http://local.host/api/entity/{params["lotr_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["lotr_id"]}',
                         'relationType': 'crm:P67i is referred to by',
                         'relationSystemClass': 'external_reference',
                         'relationDescription': 'Fandom Wiki of lord of the rings',
@@ -151,7 +151,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Picture with a License',
-                        'relationTo': f'http://local.host/api/entity/{params["picture_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                         'relationType': 'crm:P67i is referred to by',
                         'relationSystemClass': 'file',
                         'relationDescription': None,
@@ -172,7 +172,7 @@ class Search:
                         'title': '',
                         'description': ''},
                     'depictions': [{
-                        '@id': f'http://local.host/api/entity/{params["picture_id"]}',
+                        '@id': f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                         'title': 'Picture with a License',
                         'license': 'Open license',
                         'url': 'N/A'}]}]}
@@ -213,18 +213,18 @@ class Search:
                                 'end': {'earliest': '2019-01-31',
                                         'latest': '2019-03-01'}}]},
                         'types': [{
-                            'identifier': f'http://local.host/api/entity/{params["place_id"]}',
+                            'identifier': f'http://local.host/api/0.3/entity/{params["place_id"]}',
                             'label': 'Place', 'description': None,
                             'hierarchy': '',
                             'value': None, 'unit': None}, {
-                            'identifier': f'http://local.host/api/entity/{params["height_id"]}',
+                            'identifier': f'http://local.host/api/0.3/entity/{params["height_id"]}',
                             'label': 'Height', 'description': None,
                             'hierarchy': 'Dimensions',
                             'value': 23.0,
                             'unit': 'centimeter'}],
                         'relations': [{
                             'label': 'Height',
-                            'relationTo': f'http://local.host/api/entity/{params["height_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["height_id"]}',
                             'relationType': 'crm:P2 has type',
                             'relationSystemClass': 'type',
                             'relationDescription': '23.0',
@@ -236,7 +236,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Home of Baggins',
-                            'relationTo': f'http://local.host/api/entity/{params["home_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["home_id"]}',
                             'relationType': 'crm:P46 is composed of',
                             'relationSystemClass': 'feature',
                             'relationDescription': None,
@@ -248,7 +248,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Location of Shire',
-                            'relationTo': f'http://local.host/api/entity/{params["location_shire_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["location_shire_id"]}',
                             'relationType': 'crm:P53 has former or current location',
                             'relationSystemClass': 'object_location',
                             'relationDescription': None,
@@ -260,7 +260,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Place',
-                            'relationTo': f'http://local.host/api/entity/{params["place_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["place_id"]}',
                             'relationType': 'crm:P2 has type',
                             'relationSystemClass': 'type',
                             'relationDescription': None,
@@ -272,7 +272,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Sûza',
-                            'relationTo': f'http://local.host/api/entity/{params["suza_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["suza_id"]}',
                             'relationType': 'crm:P1 is identified by',
                             'relationSystemClass': 'appellation',
                             'relationDescription': None,
@@ -284,7 +284,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'GeoNames',
-                            'relationTo': f'http://local.host/api/entity/{params["geonames_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["geonames_id"]}',
                             'relationType': 'crm:P67i is referred to by',
                             'relationSystemClass': 'reference_system',
                             'relationDescription': '2761369',
@@ -296,7 +296,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'https://lotr.fandom.com/',
-                            'relationTo': f'http://local.host/api/entity/{params["lotr_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["lotr_id"]}',
                             'relationType': 'crm:P67i is referred to by',
                             'relationSystemClass': 'external_reference',
                             'relationDescription': 'Fandom Wiki of lord of the rings',
@@ -308,7 +308,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Picture with a License',
-                            'relationTo': f'http://local.host/api/entity/{params["picture_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                             'relationType': 'crm:P67i is referred to by',
                             'relationSystemClass': 'file',
                             'relationDescription': None,
@@ -330,7 +330,7 @@ class Search:
                             'title': '',
                             'description': ''},
                         'depictions': [{
-                            '@id': f'http://local.host/api/entity/{params["picture_id"]}',
+                            '@id': f'http://local.host/api/0.3/entity/{params["picture_id"]}',
                             'title': 'Picture with a License',
                             'license': 'Open license',
                             'url': 'N/A'}]}]}
@@ -370,7 +370,7 @@ class Search:
                         'relations': [{
                             'label': 'Sam',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["sam_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["sam_id"]}',
                             'relationType': 'crm:OA7 has relationship to',
                             'relationSystemClass': 'person',
                             'relationDescription': None,
@@ -382,7 +382,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             "label": "The ring bearer",
-                            "relationTo": f'http://local.host/api/entity/{params["alias2_id"]}',
+                            "relationTo": f'http://local.host/api/0.3/entity/{params["alias2_id"]}',
                             "relationType": "crm:P131 is identified by",
                             "relationSystemClass": "actor_appellation",
                             "relationDescription": None,
@@ -396,7 +396,7 @@ class Search:
                                         "earliest": 'None',
                                         "latest": 'None'}}]}}, {
                             'label': 'File without license',
-                            'relationTo': 'http://local.host/api/entity/115',
+                            'relationTo': 'http://local.host/api/0.3/entity/115',
                             'relationType': 'crm:P67i is referred to by',
                             'relationSystemClass': 'file',
                             'relationDescription': None, 'type': None,
@@ -410,7 +410,7 @@ class Search:
                                         'latest': 'None'}}]}}, {
                             'label': 'The One Ring',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["ring_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["ring_id"]}',
                             'relationType': 'crm:P52i is current owner of',
                             'relationSystemClass': 'artifact',
                             'relationDescription': None, 'type': None,
@@ -424,7 +424,7 @@ class Search:
                                         'latest': 'None'}}]}}, {
                             'label': 'Travel to Mordor',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["travel_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["travel_id"]}',
                             'relationType': 'crm:P11i participated in',
                             'relationSystemClass': 'activity',
                             'relationDescription': None, 'type': None,
@@ -440,7 +440,7 @@ class Search:
                         'links': None,
                         'geometry': None,
                         'depictions': [{
-                            '@id': 'http://local.host/api/entity/115',
+                            '@id': 'http://local.host/api/0.3/entity/115',
                             'title': 'File without license',
                             'license': None,
                             'url': 'N/A'}]}]},
@@ -461,7 +461,7 @@ class Search:
                     'types': None,
                     'relations': [{
                         'label': 'Kitchen',
-                        'relationTo': f'http://local.host/api/entity/{params["kitchen_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["kitchen_id"]}',
                         'relationType': 'crm:P46 is composed of',
                         'relationSystemClass': 'stratigraphic_unit',
                         'relationDescription': None,
@@ -472,7 +472,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Location of Home of Baggins',
-                        'relationTo': f'http://local.host/api/entity/{params["location_home_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["location_home_id"]}',
                         'relationType': 'crm:P53 has former or current location',
                         'relationSystemClass': 'object_location',
                         'relationDescription': None,
@@ -483,7 +483,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Shire',
-                        'relationTo': f'http://local.host/api/entity/{params["shire_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["shire_id"]}',
                         'relationType': 'crm:P46i forms part of',
                         'relationSystemClass': 'place',
                         'relationDescription': None,
@@ -519,7 +519,7 @@ class Search:
                     'types': None,
                     'relations': [{
                         'label': 'Location of Kitchen',
-                        'relationTo': f'http://local.host/api/entity/{params["location_kitchen_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["location_kitchen_id"]}',
                         'relationType': 'crm:P53 has former or current location',
                         'relationSystemClass': 'object_location',
                         'relationDescription': None,
@@ -530,7 +530,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Home of Baggins',
-                        'relationTo': f'http://local.host/api/entity/{params["home_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["home_id"]}',
                         'relationType': 'crm:P46i forms part of',
                         'relationSystemClass': 'feature',
                         'relationDescription': None,
@@ -560,12 +560,12 @@ class Search:
                             'start': {'earliest': 'None', 'latest': 'None'},
                             'end': {'earliest': 'None', 'latest': 'None'}}]},
                     'types': [{
-                        'identifier': f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                        'identifier': f'http://local.host/api/0.3/entity/{params["boundary_mark_id"]}',
                         'label': 'Boundary Mark', 'description': None,
                         'hierarchy': 'Place', 'value': None, 'unit': None}],
                     'relations': [{
                         'label': 'Boundary Mark',
-                        'relationTo': f'http://local.host/api/entity/{params["boundary_mark_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["boundary_mark_id"]}',
                         'relationType': 'crm:P2 has type',
                         'relationSystemClass': 'type',
                         'relationDescription': None,
@@ -577,7 +577,7 @@ class Search:
                                 'end': {'earliest': 'None',
                                         'latest': 'None'}}]}}, {
                         'label': 'Location of Mordor',
-                        'relationTo': f'http://local.host/api/entity/{params["location_mordor_id"]}',
+                        'relationTo': f'http://local.host/api/0.3/entity/{params["location_mordor_id"]}',
                         'relationType': 'crm:P53 has former or current location',
                         'relationSystemClass': 'object_location',
                         'relationDescription': None,
@@ -614,7 +614,7 @@ class Search:
                         'relations': [
                             {
                                 'label': 'Location of Shire',
-                                'relationTo': f'http://local.host/api/entity/{params["location_shire_id"]}',
+                                'relationTo': f'http://local.host/api/0.3/entity/{params["location_shire_id"]}',
                                 'relationType': 'crm:P74 has current or former residence',
                                 'relationSystemClass': 'object_location',
                                 'relationDescription': None,
@@ -629,7 +629,7 @@ class Search:
                                             'latest': 'None'}}]}}, {
                                 'label': 'Frodo',
                                 'relationTo':
-                                    f'http://local.host/api/entity/{params["frodo_id"]}',
+                                    f'http://local.host/api/0.3/entity/{params["frodo_id"]}',
                                 'relationType': 'crm:OA7 has relationship to',
                                 'relationSystemClass': 'person',
                                 'relationDescription': None,
@@ -642,7 +642,7 @@ class Search:
                                                 'latest': 'None'}}]}}, {
                                 'label': 'Travel to Mordor',
                                 'relationTo':
-                                    f'http://local.host/api/entity/{params["travel_id"]}',
+                                    f'http://local.host/api/0.3/entity/{params["travel_id"]}',
                                 'relationType': 'crm:P14i performed',
                                 'relationSystemClass': 'activity',
                                 'relationDescription': None,
@@ -677,7 +677,7 @@ class Search:
                         'types': None,
                         'relations': [{
                             'label': 'Frodo',
-                            'relationTo': f'http://local.host/api/entity/{params["frodo_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["frodo_id"]}',
                             'relationType': 'crm:P52 has current owner',
                             'relationSystemClass': 'person',
                             'relationDescription': None,
@@ -689,7 +689,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             'label': 'Location of The One Ring',
-                            'relationTo': f'http://local.host/api/entity/{params["location_ring_id"]}',
+                            'relationTo': f'http://local.host/api/0.3/entity/{params["location_ring_id"]}',
                             'relationType': 'crm:P53 has former or current location',
                             'relationSystemClass': 'object_location',
                             'relationDescription': None,
@@ -737,7 +737,7 @@ class Search:
                         'relations': [{
                             'label': 'Sam',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["sam_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["sam_id"]}',
                             'relationType': 'crm:OA7 has relationship to',
                             'relationSystemClass': 'person',
                             'relationDescription': None,
@@ -749,7 +749,7 @@ class Search:
                                     'end': {'earliest': 'None',
                                             'latest': 'None'}}]}}, {
                             "label": "The ring bearer",
-                            "relationTo": f'http://local.host/api/entity/{params["alias2_id"]}',
+                            "relationTo": f'http://local.host/api/0.3/entity/{params["alias2_id"]}',
                             "relationType": "crm:P131 is identified by",
                             "relationSystemClass": "actor_appellation",
                             "relationDescription": None,
@@ -763,7 +763,7 @@ class Search:
                                         "earliest": 'None',
                                         "latest": 'None'}}]}}, {
                             'label': 'File without license',
-                            'relationTo': 'http://local.host/api/entity/115',
+                            'relationTo': 'http://local.host/api/0.3/entity/115',
                             'relationType': 'crm:P67i is referred to by',
                             'relationSystemClass': 'file',
                             'relationDescription': None, 'type': None,
@@ -777,7 +777,7 @@ class Search:
                                         'latest': 'None'}}]}}, {
                             'label': 'The One Ring',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["ring_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["ring_id"]}',
                             'relationType': 'crm:P52i is current owner of',
                             'relationSystemClass': 'artifact',
                             'relationDescription': None, 'type': None,
@@ -791,7 +791,7 @@ class Search:
                                         'latest': 'None'}}]}}, {
                             'label': 'Travel to Mordor',
                             'relationTo':
-                                f'http://local.host/api/entity/{params["travel_id"]}',
+                                f'http://local.host/api/0.3/entity/{params["travel_id"]}',
                             'relationType': 'crm:P11i participated in',
                             'relationSystemClass': 'activity',
                             'relationDescription': None, 'type': None,
@@ -807,7 +807,7 @@ class Search:
                         'links': None,
                         'geometry': None,
                         'depictions': [{
-                            '@id': 'http://local.host/api/entity/115',
+                            '@id': 'http://local.host/api/0.3/entity/115',
                             'title': 'File without license',
                             'license': None,
                             'url': 'N/A'}]}]},
@@ -833,7 +833,7 @@ class Search:
                         'relations': [
                             {
                                 'label': 'Location of Shire',
-                                'relationTo': f'http://local.host/api/entity/{params["location_shire_id"]}',
+                                'relationTo': f'http://local.host/api/0.3/entity/{params["location_shire_id"]}',
                                 'relationType': 'crm:P74 has current or former residence',
                                 'relationSystemClass': 'object_location',
                                 'relationDescription': None,
@@ -848,7 +848,7 @@ class Search:
                                             'latest': 'None'}}]}}, {
                                 'label': 'Frodo',
                                 'relationTo':
-                                    f'http://local.host/api/entity/{params["frodo_id"]}',
+                                    f'http://local.host/api/0.3/entity/{params["frodo_id"]}',
                                 'relationType': 'crm:OA7 has relationship to',
                                 'relationSystemClass': 'person',
                                 'relationDescription': None,
@@ -861,7 +861,7 @@ class Search:
                                                 'latest': 'None'}}]}}, {
                                 'label': 'Travel to Mordor',
                                 'relationTo':
-                                    f'http://local.host/api/entity/{params["travel_id"]}',
+                                    f'http://local.host/api/0.3/entity/{params["travel_id"]}',
                                 'relationType': 'crm:P14i performed',
                                 'relationSystemClass': 'activity',
                                 'relationDescription': None,

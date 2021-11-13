@@ -71,7 +71,7 @@ def get_node_dict(entity: Entity) -> Dict[str, Any]:
     return {
         'id': entity.id,
         'label': entity.name,
-        'url': url_for('api.entity', id_=entity.id, _external=True)}
+        'url': url_for('api_03.entity', id_=entity.id, _external=True)}
 
 
 def download(

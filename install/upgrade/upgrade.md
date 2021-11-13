@@ -20,6 +20,28 @@ direct database access for other application be sure to test these first.
 
 Execute **install/upgrade/6.6.0.sql** after making backups.
 
+#### Api changes
+
+##### System Class *find*
+
+System class ***find*** is merged with ***artifact***. Please be aware, that
+this has a major impact on some API operations (e.g. **/classes**, 
+**/system_class/find**, etc.)
+
+##### Versioning
+
+Version 0.3 is now released. It can be accessed through 
+
+    /api/0.3/<endpoint>
+
+A new path is established, which always points to the newest stable version: 
+
+    /api/<endpoint>
+
+Since version 0.3 is prone to changes and not stable, version 0.2 is the latest 
+stable version. Version 0.2 will be maintained at least until OpenAtlas 7.3.0.
+Thereafter, the maintenance of version 0.2 can not be guaranteed.  
+
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):
 

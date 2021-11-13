@@ -18,7 +18,7 @@ class SystemClass:
                 'types': None,
                 'relations': [{
                     'label': 'Frodo',
-                    'relationTo': 'http://local.host/api/entity/113',
+                    'relationTo': 'http://local.host/api/0.3/entity/113',
                     'relationType': 'crm:P52 has current owner',
                     'relationSystemClass': 'person',
                     'relationDescription': None,
@@ -29,7 +29,7 @@ class SystemClass:
                              'end': {'earliest': 'None', 'latest': 'None'}}]}},
                     {
                         'label': 'Location of The One Ring',
-                        'relationTo': 'http://local.host/api/entity/117',
+                        'relationTo': 'http://local.host/api/0.3/entity/117',
                         'relationType': 'crm:P53 has former or current location',
                         'relationSystemClass': 'object_location',
                         'relationDescription': None,
