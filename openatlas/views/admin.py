@@ -55,23 +55,16 @@ def admin_index(
         elif action == 'remove_logo':
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
-    dirs = {
-        'uploads': os.access(app.config['UPLOAD_DIR'], os.W_OK),
-        'export/sql': os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK),
-        'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK),
-        'processed_images/resized':
-            os.access(app.config['RESIZED_IMAGES'], os.W_OK)}
     tables = {
-        'user': Table(
-            [
-                'username',
-                'name',
-                'group',
-                'email',
-                'newsletter',
-                'created',
-                'last login',
-                'entities'],
+        'user': Table([
+            'username',
+            'name',
+            'group',
+            'email',
+            'newsletter',
+            'created',
+            'last login',
+            'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + [
             language for language in app.config['LANGUAGES'].keys()])}
@@ -123,7 +116,6 @@ def admin_index(
                 button(_('file'), url_for('insert', class_='file'))],
             content=render_template(
                 'admin/file.html',
-                writeable_dirs=dirs,
                 info=get_form_settings(FilesForm()),
                 settings=session['settings'],
                 disk_space_info=get_disk_space_info())),

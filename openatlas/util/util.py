@@ -395,6 +395,24 @@ def send_mail(
 
 
 @app.template_filter()
+def system_warnings(_empty_string: str) -> str:
+    if not is_authorized('manager'):
+        return ''
+    warnings = []
+    if app.config['DATABASE_VERSION'] != \
+            session['settings']['database_version']:
+        warnings.append(
+            f"Database version {app.config['DATABASE_VERSION']} is needed but "
+            f"current version is {session['settings']['database_version']}")
+    for item, path in app.config['WRITEABLE_DIRS'].items():
+        if not os.access(path, os.W_OK):
+            warnings.append(f"{uc_first(_('directory not writable'))}: /{item}")
+    if warnings:
+        return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
+    return ''
+
+
+@app.template_filter()
 def tooltip(text: str) -> str:
     if not text:
         return ''
