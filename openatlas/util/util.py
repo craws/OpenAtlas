@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
+from bcrypt import hashpw
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
@@ -32,6 +33,7 @@ from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util.image_processing import ImageProcessing
+
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -410,9 +412,18 @@ def system_warnings(_context, _unneeded_string: str) -> str:
             warnings.append(
                 f"{uc_first(_('directory not writable'))}: "
                 f"{str(path).replace(app.root_path, '')}")
+    if is_authorized('admin'):
+        from openatlas.models.user import User
+        user = User.get_by_username('OpenAtlas')
+        hash_ = hashpw(
+            'change_me_PLEASE!'.encode('utf-8'),
+            user.password.encode('utf-8'))
+        if user and user.active and hash_ == user.password.encode('utf-8'):
+            warnings.append(
+                "User OpenAtlas with default password is still active!")
     if warnings:
         return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
-    return ''
+    return ''  # pragma: no cover
 
 
 @app.template_filter()

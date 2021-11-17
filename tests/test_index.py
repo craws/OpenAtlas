@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import url_for
 
 from openatlas import app
@@ -43,6 +45,14 @@ class IndexTests(TestBaseCase):
 
             rv = self.app.get('/404')
             assert b'not found' in rv.data
+
+            # Test system warnings
+            app.config['WRITEABLE_DIRS'].append(Path(app.root_path) / 'error')
+            app.config['DATABASE_VERSION'] = 'error'
+            rv = self.app.get('/')
+            assert b'OpenAtlas with default password is still active' in rv.data
+            assert b'/error' in rv.data
+            assert b'Database version error is needed but current' in rv.data
 
             # Logout and test reset password, unsubscribe
             rv = self.app.get(url_for('logout'), follow_redirects=True)
