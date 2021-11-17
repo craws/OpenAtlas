@@ -41,11 +41,11 @@ ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
 
 # For system checks
-WRITEABLE_DIRS = {
-    'uploads': UPLOAD_DIR,
-    'export/sql': EXPORT_DIR / 'sql',
-    'export/csv': EXPORT_DIR / 'csv',
-    'processed_images/resized': RESIZED_IMAGES}
+WRITEABLE_DIRS = [
+    UPLOAD_DIR,
+    EXPORT_DIR / 'sql',
+    EXPORT_DIR / 'csv',
+    RESIZED_IMAGES]
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS

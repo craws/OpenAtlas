@@ -394,8 +394,9 @@ def send_mail(
     return True
 
 
+@contextfilter
 @app.template_filter()
-def system_warnings(_empty_string: str) -> str:
+def system_warnings(_context, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
         return ''
     warnings = []
@@ -404,9 +405,11 @@ def system_warnings(_empty_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {session['settings']['database_version']}")
-    for item, path in app.config['WRITEABLE_DIRS'].items():
+    for path in app.config['WRITEABLE_DIRS']:
         if not os.access(path, os.W_OK):
-            warnings.append(f"{uc_first(_('directory not writable'))}: /{item}")
+            warnings.append(
+                f"{uc_first(_('directory not writable'))}: "
+                f"{str(path).replace(app.root_path, '')}")
     if warnings:
         return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
     return ''
