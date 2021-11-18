@@ -8,6 +8,7 @@ class Changelog:
                 '1597': 'Join artifacts and finds',
                 '1584': 'Track needed and actual database version',
                 '1589': 'Additional and improved system warnings',
+                '1546': 'API: New search parameter',
                 '1583': 'Refactor'}}],
         '6.5.2': ['2021-11-07', {
             'fix': {

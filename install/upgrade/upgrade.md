@@ -13,7 +13,7 @@ is working.
 
     service apache2 restart
 
-### 6.5.0 to 6.6.0
+### 6.5.x to 6.6.0
 
 There were some changes in database and model (#1563). In case you depend on
 direct database access for other application be sure to test these first.
@@ -39,6 +39,12 @@ Version 0.3 was added. It is still in development and prone to changes but can
 be accessed via:
 
     /api/0.3/<endpoint>
+
+### 6.5.1 to 6.5.2
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
+### 6.5.0 to 6.5.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):
