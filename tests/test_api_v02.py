@@ -1,7 +1,6 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node

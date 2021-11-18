@@ -62,7 +62,7 @@ class Import:
         g.cursor.execute(
             """
             SELECT DISTINCT name FROM model.entity
-            WHERE openatlas_class_name = %(class_)s 
+            WHERE openatlas_class_name = %(class_)s
                 AND LOWER(name) IN %(names)s;""",
             {'class_': class_, 'names': tuple(names)})
         return [row['name'] for row in g.cursor.fetchall()]
