@@ -31,7 +31,7 @@ Value types
 -----------
 Value types can be created, deleted and renamed. The default installation comes with an example
 value type **Dimensions** with the sub types **Height** and **Weight** which are used in the form
-for finds.
+for artifacts.
 
 * Can be used for multiple classes
 * Values can be entered as decimals in forms

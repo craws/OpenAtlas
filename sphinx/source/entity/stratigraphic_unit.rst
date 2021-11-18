@@ -18,7 +18,7 @@ Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
 * :doc:`reference`
-* Find (see :doc:`artifact`)
+* :doc:`artifact`
 * :doc:`human_remains`
 * :doc:`file`
 
@@ -26,7 +26,7 @@ Super and subunits
 ------------------
 In the OpenAtlas database a Stratigraphic unit is a subunit of a :doc:`feature`. A Feature can consist of one or
 more Stratigraphic units (e.g. grave as feature can contain one or more burials, a backfilling, etc.). Stratigraphic
-units themselves are structured in the same way and can be connected to Finds (see: :doc:`artifact`) and
+units themselves are structured in the same way and can be connected to :doc:`artifact` and
 :doc:`human_remains` as their subunits.
 
 .. image:: sub_unit.jpg
