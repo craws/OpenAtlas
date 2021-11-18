@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 
@@ -15,7 +15,7 @@ class Import:
         LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
-    def insert_project(name: str, description: str) -> int:
+    def insert_project(name: str, description: Union[str, None]) -> int:
         g.cursor.execute(
             """
             INSERT INTO import.project (name, description)

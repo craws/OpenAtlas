@@ -110,7 +110,6 @@ class Filter:
         if Filter.valid_columns[filter_[1]] == 'e.id':
             Validation.test_id(filter_[3])
         # If operator is LIKE then % are needed
-        term = '%' + filter_[3] + '%' if Filter.compare_operators[
-                                             filter_[2]] == 'LIKE' else \
-            filter_[3]
+        term = '%' + filter_[3] + '%' \
+            if Filter.compare_operators[filter_[2]] == 'LIKE' else filter_[3]
         return term
