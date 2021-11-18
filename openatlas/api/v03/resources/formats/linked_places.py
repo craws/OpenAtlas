@@ -10,8 +10,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-
-
 def get_entity(
         entity: Entity,
         links: List[Link],
@@ -20,7 +18,7 @@ def get_entity(
     return {
         'type': 'FeatureCollection',
         '@context': app.config['API_SCHEMA'],
-        'features': [build_feature( entity, links,   links_inverse,  parser)]}
+        'features': [build_feature(entity, links, links_inverse, parser)]}
 
 
 def build_feature(
@@ -39,7 +37,8 @@ def build_feature(
             'links': get_reference_links(links_inverse, parser),
             'description': get_description(entity),
             'names': get_names(entity, parser),
-            'geometry': get_geometries(entity, links, parser),
+            'geometry': get_geometries(entity, links)
+            if 'geometry' in parser['show'] else None,
             'relations': get_relations(links, links_inverse, parser)}
 
 
@@ -65,7 +64,7 @@ def get_types(
 def get_depictions(
         links_inverse: List[Link],
         parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
-    return get_file(links_inverse)  if 'depictions' in parser['show'] else None
+    return get_file(links_inverse) if 'depictions' in parser['show'] else None
 
 
 def get_timespans(
@@ -84,14 +83,11 @@ def get_reference_links(
 
 def get_geometries(
         entity: Entity,
-        links: List[Link],
-        parser: Dict[str, Any]) -> Union[Dict[str, Any], None]:
-    if 'geometry' in parser['show']:
-        if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
-            return get_geoms_by_entity( get_location_id(links))
-        if entity.class_.name == 'object_location':
-            return get_geoms_by_entity(entity.id)
-    return None
+        links: List[Link]) -> Union[Dict[str, Any], None]:
+    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
+        return get_geoms_by_entity(get_location_id(links))
+    if entity.class_.name == 'object_location':
+        return get_geoms_by_entity(entity.id)
 
 
 def get_names(

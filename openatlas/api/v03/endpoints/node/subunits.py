@@ -3,6 +3,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 from flask import Response, g
 from flask_restful import Resource
 
+from openatlas.api.v03.resources.formats.linked_places import get_geometries
 from openatlas.api.v03.resources.formats.linked_places_helper import \
     get_geoms_by_entity, get_reference_systems
 from openatlas.api.v03.resources.parser import default
@@ -37,7 +38,7 @@ class GetSubunits(Resource):  # type: ignore
             'created': entity.created,
             'modified': entity.modified,
             'latestModRec': None,
-            'geometry': get_geoms_by_entity(entity.id),
+            'geometry': get_geometries(entity, links),
             'children': GetSubunits.get_children(struct),
             'properties': GetSubunits.get_properties(entity, links,
                                                      links_inverse)
@@ -76,15 +77,27 @@ class GetSubunits(Resource):  # type: ignore
                        links_inverse: List[Link]) -> Dict[str, Any]:
         return {
             'name': entity.name,
-            'aliases': [value for value in entity.aliases.values()],
+            'aliases': [value for value in entity.aliases.values()] if entity.aliases.values() else None,
             'description': entity.description,
             'standardType': entity.nodes.values(),
             'timespan': GetSubunits.get_timespans(entity),
             'externalReferences': get_reference_systems(links_inverse),
-            'references': None,
+            'references': GetSubunits.get_references(links_inverse),
             'files': GetSubunits.get_file(links_inverse),
             'types': GetSubunits.get_types(entity, links),
         }
+
+    @staticmethod
+    def get_references(links: List[Link]):
+        out = []
+        for link_ in links:
+            if link_.property.code == "P67" and link_.domain.class_.name in ['bibliography', 'edition', 'external_reference']:
+                out.append({
+                    'abbreviation': link_.domain.name,
+                    'id': link_.domain.id,
+                    'title': link_.domain.description,
+                    'pages': link_.description})
+        return out if out else None
 
     @staticmethod
     def get_timespans(entity: Entity) -> Dict[str, str]:
@@ -123,8 +136,7 @@ class GetSubunits(Resource):  # type: ignore
                         nodes_dict['unit'] = node.description
             hierarchy = [g.nodes[root].name for root in node.root]
             hierarchy.reverse()
-            hierarchy_id = [g.nodes[root].id for root in node.root]
-            nodes_dict['rootId'] = hierarchy_id[0]
             nodes_dict['path'] = ' > '.join(map(str, hierarchy))
+            nodes_dict['rootId'] = node.root[0]
             nodes.append(nodes_dict)
         return nodes if nodes else None

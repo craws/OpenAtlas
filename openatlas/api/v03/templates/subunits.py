@@ -31,6 +31,7 @@ class SubunitTemplate:
             'id': fields.Integer,
             'abbreviation': fields.String,
             'title': fields.String,
+            'pages': fields.String,
         }
         files = {
             'id': fields.Integer,
