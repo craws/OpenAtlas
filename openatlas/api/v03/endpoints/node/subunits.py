@@ -5,7 +5,7 @@ from flask_restful import Resource
 
 from openatlas.api.v03.resources.formats.linked_places import get_geometries
 from openatlas.api.v03.resources.formats.linked_places_helper import \
-    get_geoms_by_entity, get_reference_systems
+    get_reference_systems
 from openatlas.api.v03.resources.parser import default
 from openatlas.api.v03.resources.resolve_endpoints import resolve_subunit_parser
 from openatlas.api.v03.resources.util import get_all_links, \
@@ -77,7 +77,8 @@ class GetSubunits(Resource):  # type: ignore
                        links_inverse: List[Link]) -> Dict[str, Any]:
         return {
             'name': entity.name,
-            'aliases': [value for value in entity.aliases.values()] if entity.aliases.values() else None,
+            'aliases': [value for value in
+                        entity.aliases.values()] if entity.aliases.values() else None,
             'description': entity.description,
             'standardType': entity.nodes.values(),
             'timespan': GetSubunits.get_timespans(entity),
@@ -91,21 +92,22 @@ class GetSubunits(Resource):  # type: ignore
     def get_references(links: List[Link]):
         out = []
         for link_ in links:
-            if link_.property.code == "P67" and link_.domain.class_.name in ['bibliography', 'edition', 'external_reference']:
+            if link_.property.code == "P67" and link_.domain.class_.name in [
+                'bibliography', 'edition', 'external_reference']:
                 out.append({
                     'abbreviation': link_.domain.name,
                     'id': link_.domain.id,
                     'title': link_.domain.description,
-                    'pages': link_.description})
+                    'pages': link_.description if link_.description else None})
         return out if out else None
 
     @staticmethod
     def get_timespans(entity: Entity) -> Dict[str, str]:
         return {
-            'earliestBegin': str(entity.begin_from),
-            'latestBegin': str(entity.begin_to),
-            'earliestEnd': str(entity.end_from),
-            'latestEnd': str(entity.end_to), }
+            'earliestBegin': str(entity.begin_from) if entity.begin_from else None,
+            'latestBegin': str(entity.begin_to) if entity.begin_to else None,
+            'earliestEnd': str(entity.end_from) if entity.end_from else None,
+            'latestEnd': str(entity.end_to) if entity.end_to else None, }
 
     @staticmethod
     def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
@@ -119,7 +121,7 @@ class GetSubunits(Resource):  # type: ignore
                 'name': link.domain.name,
                 'fileName': path.name if path else None,
                 'license': get_license(link.domain),
-                'source': link.domain.description})
+                'source': link.domain.description if link.domain.description else None})
         return files if files else None
 
     @staticmethod
