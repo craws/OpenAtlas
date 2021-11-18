@@ -28,6 +28,9 @@ System class ***find*** is merged with ***artifact***. Please be aware, that
 this has a major impact on some API operations (e.g. **/classes**, 
 **/system_class/find**, etc.)
 
+The API can now be used with passes without the version which will than
+automatically point to the current version (0.2 at the moment).
+
 ##### Versioning
 
 Version 0.3 is now released. It can be accessed through 
