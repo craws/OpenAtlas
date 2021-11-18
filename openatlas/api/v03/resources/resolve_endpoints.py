@@ -17,6 +17,7 @@ from openatlas.api.v03.resources.util import parser_str_to_dict
 from openatlas.api.v03.templates.geojson import GeojsonTemplate
 from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v03.templates.nodes import NodeTemplate
+from openatlas.api.v03.templates.subunits import SubunitTemplate
 from openatlas.models.entity import Entity
 
 
@@ -65,6 +66,18 @@ def resolve_node_parser(
     if parser['download']:
         return download(node, NodeTemplate.node_template(), file_name)
     return marshal(node, NodeTemplate.node_template()), 200
+
+
+def resolve_subunit_parser(
+        subunit: Dict[str, Any],
+        parser: Dict[str, Any],
+        file_name: Union[int, str]) \
+        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+    if parser['count']:
+        return jsonify(subunit)  # Todo
+    if parser['download']:
+        return download(subunit, SubunitTemplate.subunit_template(), file_name)
+    return marshal(subunit, SubunitTemplate.subunit_template()), 200
 
 
 def get_node_dict(entity: Entity) -> Dict[str, Any]:

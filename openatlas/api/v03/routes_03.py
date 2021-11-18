@@ -23,6 +23,7 @@ from openatlas.api.v03.endpoints.node.node_overview import GetNodeOverview
 from openatlas.api.v03.endpoints.node.subunit import GetSubunit
 from openatlas.api.v03.endpoints.node.subunit_hierarchy import \
     GetSubunitHierarchy
+from openatlas.api.v03.endpoints.node.subunits import GetSubunits
 from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
 
 
@@ -79,6 +80,10 @@ def add_routes_v03(api):
         GetNodeOverview,
         '/node_overview/',
         endpoint="node_overview")
+    api.add_resource(
+        GetSubunits,
+        '/subunits/<int:id_>',
+        endpoint="subunits")
     api.add_resource(
         GetSubunit,
         '/subunit/<int:id_>',

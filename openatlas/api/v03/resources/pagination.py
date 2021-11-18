@@ -4,7 +4,7 @@ from typing import Any, Dict, List
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     NoEntityAvailable
 from openatlas.api.v03.resources.formats.geojson import Geojson
-from openatlas.api.v03.resources.formats.linked_places import LinkedPlaces
+from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.util import get_all_links, \
     get_all_links_inverse, get_entity_by_id
 
@@ -94,7 +94,7 @@ class Pagination:
             links: List[Link],
             links_inverse: List[Link]) -> List[Dict[str, Any]]:
         return [
-            LinkedPlaces.get_entity(
+            get_entity(
                 get_entity_by_id(entity.id) if 'names' in parser['show']
                 else entity,
                 [link_ for link_ in links if link_.domain.id == entity.id],
