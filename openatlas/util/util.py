@@ -415,12 +415,13 @@ def system_warnings(_context, _unneeded_string: str) -> str:
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
-        hash_ = hashpw(
-            'change_me_PLEASE!'.encode('utf-8'),
-            user.password.encode('utf-8'))
-        if user and user.active and hash_ == user.password.encode('utf-8'):
-            warnings.append(
-                "User OpenAtlas with default password is still active!")
+        if user and user.active:
+            hash_ = hashpw(
+                'change_me_PLEASE!'.encode('utf-8'),
+                user.password.encode('utf-8'))
+            if hash_ == user.password.encode('utf-8'):
+                warnings.append(
+                    "User OpenAtlas with default password is still active!")
     if warnings:
         return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
     return ''  # pragma: no cover
