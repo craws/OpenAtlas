@@ -24,26 +24,21 @@ Execute **install/upgrade/6.6.0.sql** after making backups.
 
 ##### System Class *find*
 
-System class ***find*** is merged with ***artifact***. Please be aware, that
-this has a major impact on some API operations (e.g. **/classes**, 
+System class ***find*** was merged with ***artifact***. Please be aware, that
+this can have an impact on some API operations (e.g. **/classes**,
 **/system_class/find**, etc.)
-
-The API can now be used with passes without the version which will than
-automatically point to the current version (0.2 at the moment).
 
 ##### Versioning
 
-Version 0.3 is now released. It can be accessed through 
-
-    /api/0.3/<endpoint>
-
-A new path is established, which always points to the newest stable version: 
+A new path, which always points to the newest stable version (currently 0.2),
+was added:
 
     /api/<endpoint>
 
-Since version 0.3 is prone to changes and not stable, version 0.2 is the latest 
-stable version. Version 0.2 will be maintained at least until OpenAtlas 7.3.0.
-Thereafter, the maintenance of version 0.2 can not be guaranteed.  
+Version 0.3 was added. It is still in development and prone to changes but can
+be accessed via:
+
+    /api/0.3/<endpoint>
 
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):

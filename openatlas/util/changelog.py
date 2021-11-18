@@ -1,7 +1,7 @@
 class Changelog:
 
     versions = {
-        '6.6.0': ['TBA', {
+        '6.6.0': ['2021-11-18', {
             'feature': {
                 '1500': 'Production of artifacts',
                 '1563': 'OpenAtlas model to database',
