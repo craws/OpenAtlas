@@ -28,10 +28,13 @@ def uc_first(string: str) -> str:
 class OpenatlasClass:
 
     # Needed for translations of class labels
+    _('acquisition')
+    _('actor actor relation')
+    _('actor appellation')
+    _('actor function')
     _('appellation')
-    _('actor_appellation')
-    _('actor_function')
-    _('source_translation')
+    _('external reference')
+    _('source translation')
 
     def __init__(
             self,
