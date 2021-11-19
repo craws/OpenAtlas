@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from flask import g
@@ -15,7 +16,8 @@ from openatlas.util.util import get_file_path
 def get_subunits(
         entity: Entity,
         links: List[Link],
-        links_inverse: List[Link]) -> Dict[str, Any]:
+        links_inverse: List[Link],
+        latest_mod_rec: datetime) -> Dict[str, Any]:
     struct = get_structure(entity)
     return {
         'id': entity.id,
@@ -25,7 +27,7 @@ def get_subunits(
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
         'modified': str(entity.modified),
-        'latestModRec': None,
+        'latestModRec': latest_mod_rec,
         'geometry': get_geometries(entity, links),
         'children': get_children(struct),
         'properties': get_properties(entity, links, links_inverse)}

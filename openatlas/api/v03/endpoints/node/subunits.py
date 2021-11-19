@@ -28,7 +28,8 @@ class GetSubunits(Resource):  # type: ignore
                 entity,
                 [link_ for link_ in links if link_.domain.id == entity.id],
                 [link_ for link_ in links_inverse if
-                 link_.range.id == entity.id])
+                 link_.range.id == entity.id],
+                max(entity.modified for entity in entities))
             for entity in entities]
 
     @staticmethod
