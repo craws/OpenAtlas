@@ -23,7 +23,6 @@ class GetSubunitHierarchy(Resource):  # type: ignore
             id_)
 
     @staticmethod
-
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
             entity = get_entity_by_id(id_)
@@ -43,8 +42,7 @@ class GetSubunitHierarchy(Resource):  # type: ignore
         if structure and structure['subunits']:
             for subunit in structure['subunits']:
                 data.append(get_node_dict(subunit))
-        node = get_structure(entity)
-        if node:
-            for sub_id in node['subunits']:
+        if structure:
+            for sub_id in structure['subunits']:
                 GetSubunitHierarchy.get_subunits_recursive(sub_id, data)
         return data

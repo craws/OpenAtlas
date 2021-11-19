@@ -47,3 +47,11 @@ def to_camel_case(i: str) -> str:
 
 def parser_str_to_dict(parser: List[str]) -> List[Dict[str, Any]]:
     return [ast.literal_eval(p) for p in parser]
+
+
+def link_builder(
+        new_entities: List[Entity],
+        inverse: bool = False) -> List[Link]:
+    entities = [e.id for e in new_entities]
+    return get_all_links_inverse(entities) \
+        if inverse else get_all_links(entities)

@@ -69,15 +69,16 @@ def resolve_node_parser(
 
 
 def resolve_subunit_parser(
-        subunit: Dict[str, Any],
+        subunit: List[Dict[str, Any]],
         parser: Dict[str, Any],
         file_name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+    out = {file_name: subunit}
     if parser['count']:
-        return jsonify(subunit)  # Todo
+        return jsonify(len(out[file_name]))
     if parser['download']:
-        return download(subunit, SubunitTemplate.subunit_template(), file_name)
-    return marshal(subunit, SubunitTemplate.subunit_template()), 200
+        return download(out, SubunitTemplate.subunit_template(file_name), file_name)
+    return marshal(out, SubunitTemplate.subunit_template(file_name)), 200
 
 
 def get_node_dict(entity: Entity) -> Dict[str, Any]:
@@ -89,7 +90,7 @@ def get_node_dict(entity: Entity) -> Dict[str, Any]:
 
 def download(
         data: Union[List[Dict[str, Any]], Dict[str, Any], List[Entity]],
-        template: Dict[str, Any],
+        template: Dict[Any, Any],
         name: Union[str, int]) -> Response:
     return Response(
         json.dumps(marshal(data, template)),

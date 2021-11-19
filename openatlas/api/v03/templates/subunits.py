@@ -7,7 +7,7 @@ from flask_restful.fields import List as RestList
 class SubunitTemplate:
 
     @staticmethod
-    def subunit_template() -> Dict[str, RestList]:
+    def subunit_template(id_: int) -> Dict[int, RestList]:
         standard_type = {
             'name': fields.String,
             'id': fields.Integer,
@@ -71,8 +71,7 @@ class SubunitTemplate:
             'modified': fields.String,
             'latestModRec': fields.String,
             'geometry': fields.Raw,
-           # 'children': fields.List(fields.Integer),
-            'children': fields.Raw,
+            'children': fields.List(fields.Integer),
             'properties': fields.Nested(properties)}
 
-        return json
+        return {id_: fields.List(fields.Nested(json))}
