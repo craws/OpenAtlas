@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '6.6.1': ['2021-11-20', {
+            'fix': {
+                '1607': 'Error at profile for readonly users'}}],
         '6.6.0': ['2021-11-18', {
             'feature': {
                 '1500': 'Production of artifacts',
