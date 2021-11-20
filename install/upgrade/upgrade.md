@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 6.6.0 to 6.6.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 6.5.x to 6.6.0
 
 There were some changes in database and model (#1563). In case you depend on
