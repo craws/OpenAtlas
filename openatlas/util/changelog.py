@@ -2,7 +2,8 @@ class Changelog:
 
     versions = {
         '7.0.0': ['TBA', {
-            'feature': {}}],
+            'feature': {
+                '1566': 'Update OpenAtlas software to Debian/bullseye'}}],
         '6.6.1': ['2021-11-20', {
             'fix': {
                 '1607': 'Error at profile for readonly users'}}],
