@@ -59,7 +59,7 @@ def build_form(
         code: Optional[str] = None,
         origin: Union[Entity, Node, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
-    class Form(FlaskForm):  # type: ignore
+    class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
 
@@ -376,7 +376,7 @@ def add_fields(
 
 
 def build_add_reference_form(class_: str) -> FlaskForm:
-    class Form(FlaskForm):  # type: ignore
+    class Form(FlaskForm):
         pass
 
     setattr(Form, class_, TableField(_(class_), [InputRequired()]))
@@ -409,7 +409,7 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
 
 
 def build_move_form(node: Node) -> FlaskForm:
-    class Form(FlaskForm):  # type: ignore
+    class Form(FlaskForm):
         is_node_form = HiddenField()
         checkbox_values = HiddenField()
         selection = SelectMultipleField(

@@ -634,7 +634,7 @@ def admin_log_delete() -> Response:
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
-    class NewsLetterForm(FlaskForm):  # type: ignore
+    class NewsLetterForm(FlaskForm):
         subject = StringField(
             '',
             [InputRequired()],

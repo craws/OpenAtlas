@@ -295,7 +295,7 @@ def insert_file(
             entity = Entity.insert('file', file.filename)
             url = link_and_get_redirect_url(form, entity, 'file', origin)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
-            filename = secure_filename(f'a{file.filename}')  # type: ignore
+            filename = secure_filename(f'a{file.filename}')
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(str(app.config['UPLOAD_DIR'] / new_name))
             filenames.append(new_name)

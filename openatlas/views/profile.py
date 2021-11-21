@@ -21,7 +21,7 @@ from openatlas.util.util import (
     button, display_info, is_authorized, manual, uc_first)
 
 
-class PasswordForm(FlaskForm):  # type: ignore
+class PasswordForm(FlaskForm):
     password_old = PasswordField(_('old password'), [InputRequired()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])

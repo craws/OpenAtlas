@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class ContentTests(TestBaseCase):
 
     def test_orphans_and_newsletter(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             self.app.post(
                 url_for('insert', class_='person'),
                 data={
@@ -26,7 +26,7 @@ class ContentTests(TestBaseCase):
             assert b'Newsletter' in rv.data
 
     def test_logs(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
             rv = self.app.get(
@@ -36,7 +36,7 @@ class ContentTests(TestBaseCase):
     def test_links(self) -> None:
         from openatlas.database.entity import Entity as DbEntity
         from openatlas.database.link import Link as DbLink
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 id_ = DbEntity.insert({
@@ -53,7 +53,7 @@ class ContentTests(TestBaseCase):
                 assert b'Invalid linked entity' in rv.data
 
     def test_dates(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 # Create invalid dates for an actor and a relation link
@@ -71,7 +71,7 @@ class ContentTests(TestBaseCase):
             assert b'<span class="tab-counter">' in rv.data
 
     def test_duplicates(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 event = Entity.insert('acquisition', 'Event Horizon')
@@ -96,7 +96,7 @@ class ContentTests(TestBaseCase):
             assert b'Congratulations, everything looks fine!' in rv.data
 
     def test_similar(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 Entity.insert('person', 'I have the same name!')
@@ -113,7 +113,7 @@ class ContentTests(TestBaseCase):
             assert b'No entries' in rv.data
 
     def test_settings(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
 

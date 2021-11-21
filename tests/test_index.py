@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class IndexTests(TestBaseCase):
 
     def test_index(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get('/some_missing_site')
             assert b'404' in rv.data
             rv = self.app.get(url_for('index_changelog'))

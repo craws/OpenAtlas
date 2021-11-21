@@ -7,7 +7,7 @@ from tests.base import TestBaseCase
 class DateTest(TestBaseCase):
 
     def test_date(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Dates insert (don't change year values - they test leap years too)
             data = {
                 'name': 'Date place',

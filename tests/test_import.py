@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Projects
             rv = self.app.get(url_for('import_project_insert'))
             assert b'Name *' in rv.data

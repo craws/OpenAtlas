@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('index', view='actor'))
             assert b'No entries' in rv.data
             rv = self.app.post(url_for('insert', class_='place'), data={

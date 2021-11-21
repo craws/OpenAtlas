@@ -41,7 +41,7 @@ class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
 
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 params = {

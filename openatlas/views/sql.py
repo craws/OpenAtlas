@@ -9,7 +9,7 @@ from openatlas.database.connect import Transaction
 from openatlas.util.util import get_backup_file_data, required_group
 
 
-class SqlForm(FlaskForm):  # type: ignore
+class SqlForm(FlaskForm):
     statement = TextAreaField(
         '',
         [InputRequired()],

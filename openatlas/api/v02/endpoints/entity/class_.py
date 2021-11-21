@@ -10,7 +10,7 @@ from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 
 
-class GetByClass(Resource):  # type: ignore
+class GetByClass(Resource):
 
     def get(self,
             class_code: str) \

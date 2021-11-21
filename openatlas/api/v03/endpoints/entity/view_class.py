@@ -9,7 +9,7 @@ from openatlas.api.v03.resources.resolve_endpoints import resolve_entities
 from openatlas.models.entity import Entity
 
 
-class GetByCode(Resource):  # type: ignore
+class GetByCode(Resource):
 
     def get(self,
             code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

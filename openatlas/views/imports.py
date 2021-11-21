@@ -23,7 +23,7 @@ from openatlas.util.util import (
     format_date, get_backup_file_data, link, required_group, uc_first)
 
 
-class ProjectForm(FlaskForm):  # type: ignore
+class ProjectForm(FlaskForm):
     project_id: Optional[int] = None
     name = StringField(
         _('name'),
@@ -143,7 +143,7 @@ def import_project_delete(id_: int) -> Response:
     return redirect(url_for('import_index'))
 
 
-class ImportForm(FlaskForm):  # type: ignore
+class ImportForm(FlaskForm):
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
@@ -175,9 +175,7 @@ def import_data(project_id: int, class_: str) -> str:
     class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = \
-            app.config['TMP_DIR'] \
-            / secure_filename(file_.filename)  # type: ignore
+        file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)
         columns: Dict[str, List[str]] = {
             'allowed': [
                 'name', 'id', 'description', 'begin_from', 'begin_to',

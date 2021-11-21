@@ -10,7 +10,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 
 
-class GetNodeOverview(Resource):  # type: ignore
+class GetNodeOverview(Resource):
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()

@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class RelationTests(TestBaseCase):
 
     def test_relation(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Connor MacLeod')

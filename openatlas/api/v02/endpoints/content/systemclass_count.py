@@ -8,7 +8,7 @@ from openatlas.api.v02.templates.systemclass_count import \
 from openatlas.models.entity import Entity
 
 
-class SystemClassCount(Resource):  # type: ignore
+class SystemClassCount(Resource):
 
 
     def get(self) -> Union[Tuple[Resource, int], Response]:

@@ -16,7 +16,7 @@ class ImageTest(TestBaseCase):
 
     def test_image(self) -> None:
         app.config['IMAGE_SIZE']['tmp'] = '1'
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place = insert_entity(

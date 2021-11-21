@@ -10,7 +10,7 @@ from openatlas.api.v02.resources.util import get_all_links, \
 from openatlas.models.entity import Entity
 
 
-class GetLinkedEntities(Resource):  # type: ignore
+class GetLinkedEntities(Resource):
 
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

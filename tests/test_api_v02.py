@@ -27,7 +27,7 @@ class ApiTests2(TestBaseCase):
 
     def test_api_2(self) -> None:
 
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for

@@ -10,7 +10,7 @@ from openatlas.api.v02.templates.content import ContentTemplate
 from openatlas.models.content import get_translation
 
 
-class GetContent(Resource):  # type: ignore
+class GetContent(Resource):
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = language.parse_args()

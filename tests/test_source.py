@@ -8,7 +8,7 @@ from tests.base import TestBaseCase
 class SourceTest(TestBaseCase):
 
     def test_source(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Source insert
             rv = self.app.get(url_for('insert', class_='source'))
             assert b'+ Source' in rv.data

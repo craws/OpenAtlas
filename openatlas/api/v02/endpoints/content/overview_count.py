@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 
 
 # Deprecated
-class OverviewCount(Resource):  # type: ignore
+class OverviewCount(Resource):
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(

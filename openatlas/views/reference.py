@@ -16,7 +16,7 @@ from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
 
 
-class AddReferenceForm(FlaskForm):  # type: ignore
+class AddReferenceForm(FlaskForm):
     reference = TableField(_('reference'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))

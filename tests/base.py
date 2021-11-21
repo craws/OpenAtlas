@@ -20,7 +20,7 @@ class TestBaseCase(unittest.TestCase):
         self.setup_database()
         self.app = app.test_client()
         self.login()  # Login on default because needed almost everywhere
-        with app.app_context():  # type: ignore
+        with app.app_context():
             self.app.get('/')  # Needed to initialise g
             self.precision_geonames = \
                 'reference_system_precision_' + \
@@ -30,7 +30,7 @@ class TestBaseCase(unittest.TestCase):
                 str(ReferenceSystem.get_by_name('Wikidata').id)
 
     def login(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             self.app.post(
                 '/login',
                 data={'username': 'Alice', 'password': 'test'})

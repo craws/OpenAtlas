@@ -9,7 +9,7 @@ from openatlas.api.v03.templates.type_tree import TypeTreeTemplate
 from openatlas.models.node import Node
 
 
-class GetTypeTree(Resource):  # type: ignore
+class GetTypeTree(Resource):
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = entity_.parse_args()

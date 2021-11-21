@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data
 
 
-class TableMultiSelect(HiddenInput):  # type: ignore
+class TableMultiSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and isinstance(field.data, str):
@@ -43,15 +43,15 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table=table)
 
 
-class TableMultiField(HiddenField):  # type: ignore
+class TableMultiField(HiddenField):
     widget = TableMultiSelect()
 
 
-class ValueFloatField(FloatField):  # type: ignore
+class ValueFloatField(FloatField):
     pass
 
 
-class TableSelect(HiddenInput):  # type: ignore
+class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
 
@@ -114,11 +114,11 @@ class TableSelect(HiddenInput):  # type: ignore
         return html
 
 
-class TableField(HiddenField):  # type: ignore
+class TableField(HiddenField):
     widget = TableSelect()
 
 
-class TreeMultiSelect(HiddenInput):  # type: ignore
+class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data: List[int] = []
@@ -133,11 +133,11 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             data=Node.get_tree_data(int(field.id), data))
 
 
-class TreeMultiField(HiddenField):  # type: ignore
+class TreeMultiField(HiddenField):
     widget = TreeMultiSelect()
 
 
-class TreeSelect(HiddenInput):  # type: ignore
+class TreeSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         selection = ''
@@ -154,5 +154,5 @@ class TreeSelect(HiddenInput):  # type: ignore
             data=Node.get_tree_data(int(field.id), selected_ids))
 
 
-class TreeField(HiddenField):  # type: ignore
+class TreeField(HiddenField):
     widget = TreeSelect()

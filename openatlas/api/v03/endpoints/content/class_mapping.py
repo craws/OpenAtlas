@@ -6,7 +6,7 @@ from flask_restful import Resource, marshal
 from openatlas.api.v03.templates.class_mapping import ClassMappingTemplate
 
 
-class ClassMapping(Resource):  # type: ignore
+class ClassMapping(Resource):
 
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(

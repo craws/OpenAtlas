@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # SQL export
             rv = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
