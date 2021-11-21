@@ -13,6 +13,17 @@ is working.
 
     service apache2 restart
 
+### 6.6.x to 7.0.0
+WARNING - this is a major release and requires software upgrades. If you are
+using Debian upgrade it to 11 (bullseye).
+
+Use packages from install.md after the upgrade to be sure to have the relevant
+packages for the update.
+
+If you upgrade a Debian system to bullseye be sure to have the new postgis
+packages installed (see install.md) before you upgrade database clusters.
+
+
 ### 6.6.0 to 6.6.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
