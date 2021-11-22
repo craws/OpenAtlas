@@ -10,7 +10,7 @@ from openatlas.api.v02.templates.type_tree import TypeTreeTemplate
 from openatlas.models.node import Node
 
 
-class GetTypeTree(Resource):  # type: ignore
+class GetTypeTree(Resource):
     @swag_from("../swagger/type_tree.yml", endpoint="api.type_tree")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = entity_.parse_args()

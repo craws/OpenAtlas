@@ -3,7 +3,8 @@ class Changelog:
     versions = {
         '7.0.0': ['TBA', {
             'feature': {
-                '1566': 'Update OpenAtlas software to Debian/bullseye'}}],
+                '1566': 'Update OpenAtlas software to Debian/bullseye',
+                '1579': 'API: Include Swagger documentation'}}],
         '6.6.1': ['2021-11-20', {
             'fix': {
                 '1607': 'Error at profile for readonly users'}}],

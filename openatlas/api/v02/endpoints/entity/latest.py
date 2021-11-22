@@ -10,7 +10,7 @@ from openatlas.api.v02.resources.resolve_endpoints import resolve_entities
 from openatlas.models.entity import Entity
 
 
-class GetLatest(Resource):  # type: ignore
+class GetLatest(Resource):
     @swag_from("../swagger/latest.yml", endpoint="api.latest")
     def get(self, latest: int) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

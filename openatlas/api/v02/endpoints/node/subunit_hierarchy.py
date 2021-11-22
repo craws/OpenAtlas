@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
 
 
-class GetSubunitHierarchy(Resource):  # type: ignore
+class GetSubunitHierarchy(Resource):
     @swag_from("../swagger/subunit_hierarchy.yml",
                endpoint="api.subunit_hierarchy")
     def get(self,

@@ -18,7 +18,7 @@ from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.models.entity import Entity
 
 
-class GetEntity(Resource):  # type: ignore
+class GetEntity(Resource):
     @swag_from("../swagger/entity.yml", endpoint="api.entity")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

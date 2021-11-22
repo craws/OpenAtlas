@@ -12,7 +12,7 @@ from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.models.place import get_structure
 
 
-class GetSubunit(Resource):  # type: ignore
+class GetSubunit(Resource):
     @swag_from("../swagger/subunit.yml", endpoint="api.subunit")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

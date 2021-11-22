@@ -14,7 +14,7 @@ from openatlas.api.v02.resources.util import get_entities_by_ids
 from openatlas.models.entity import Entity
 
 
-class GetQuery(Resource):  # type: ignore
+class GetQuery(Resource):
     @swag_from("../swagger/query.yml", endpoint="api.query")
     def get(self) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parser = query.parse_args()

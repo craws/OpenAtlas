@@ -11,7 +11,7 @@ from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 
 
-class GetByClass(Resource):  # type: ignore
+class GetByClass(Resource):
     @swag_from("../swagger/cidoc_class.yml", endpoint="api.cidoc_class")
     def get(self,
             class_code: str)\

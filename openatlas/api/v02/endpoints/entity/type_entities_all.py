@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-class GetTypeEntitiesAll(Resource):  # type: ignore
+class GetTypeEntitiesAll(Resource):
     @swag_from("../swagger/type_entities_all.yml",
                endpoint="api.type_entities_all")
     def get(self,

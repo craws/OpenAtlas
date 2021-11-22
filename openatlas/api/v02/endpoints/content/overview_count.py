@@ -9,7 +9,7 @@ from openatlas.models.entity import Entity
 
 
 # Deprecated
-class OverviewCount(Resource):  # type: ignore
+class OverviewCount(Resource):
     @swag_from("../swagger/overview_count.yml", endpoint="api.overview_count")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
