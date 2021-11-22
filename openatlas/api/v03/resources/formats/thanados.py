@@ -9,27 +9,27 @@ from openatlas.api.v03.resources.formats.linked_places_helper import \
 from openatlas.api.v03.resources.util import get_license
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.place import get_structure
 from openatlas.util.util import get_file_path
 
 
 def get_subunits(
         entity: Entity,
+        children: [Entity],
         links: List[Link],
         links_inverse: List[Link],
+        root_id: int,
         latest_mod_rec: datetime) -> Dict[str, Any]:
-    struct = get_structure(entity)
     return {
         'id': entity.id,
-        'rootId': get_root(struct),
-        'parentId': get_parent(struct),
+        'rootId': root_id,
+        'parentId': get_parent(entity) if entity.id != root_id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
         'modified': str(entity.modified),
         'latestModRec': latest_mod_rec,
         'geometry': get_geometries(entity, links),
-        'children': get_children(struct),
+        'children': [child.id for child in children] if children else None,
         'properties': get_properties(entity, links, links_inverse)}
 
 
@@ -51,14 +51,8 @@ def get_stratigraphic_unit(
         'stratigraphic_unit'] else None
 
 
-def get_parent(struct: Dict[str, Any]) -> Optional[List[dict[str, Any]]]:
-    if struct['stratigraphic_unit']:
-        return struct['stratigraphic_unit'].id
-    if struct['feature']:
-        return struct['feature'].id
-    if struct['place']:
-        return struct['place'].id
-    return None
+def get_parent(entity: Entity) -> int:
+    return entity.get_linked_entity_safe('P46', inverse=True).id
 
 
 def get_properties(

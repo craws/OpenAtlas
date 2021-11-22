@@ -20,25 +20,39 @@ class GetSubunits(Resource):  # type: ignore
 
     @staticmethod
     def iterate(entity: Entity):
-        entities = GetSubunits.get_all_subunits_recursive(entity, [entity])
+        root_id = entity.id
+        entities_dict = GetSubunits.get_all_subunits_recursive(
+            entity,
+            [{entity: []}])
+        # Todo: make List comprehension
+        entities = []
+        for entity_dict in entities_dict:
+            for entity in entity_dict.keys():
+                entities.append(entity)
         links = link_builder(entities)
         links_inverse = link_builder(entities, True)
         return [
             get_subunits(
-                entity,
-                [link_ for link_ in links if link_.domain.id == entity.id],
+                list(entity.keys())[0],
+                entity[(list(entity.keys())[0])],
+                [link_ for link_ in links if link_.domain.id == list(entity.keys())[0].id],
                 [link_ for link_ in links_inverse if
-                 link_.range.id == entity.id],
+                 link_.range.id == list(entity.keys())[0].id],
+                root_id,
                 max(entity.modified for entity in entities))
-            for entity in entities]
+            for entity in entities_dict]
 
     @staticmethod
-    def get_all_subunits_recursive(entity: Entity, data: List[Entity]):
+    def get_all_subunits_recursive(
+            entity: Entity,
+            data: List[Dict[Entity, List]]) -> List[Dict[Any, Any]]:
         if entity.class_.name not in ['artifact', 'human_remains']:
             sub_entities = entity.get_linked_entities('P46', nodes=True)
+            data[-1] = {entity: sub_entities if sub_entities else None}
             if sub_entities:
                 for e in sub_entities:
-                    data.append(e)
+                    data.append({e: []})
+            if sub_entities:
                 for e in sub_entities:
                     GetSubunits.get_all_subunits_recursive(e, data)
         return data
