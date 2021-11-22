@@ -2,7 +2,7 @@
 Some knowledge about package installation, web server and database configuration
 will be needed.
 
-This software was developed and tested on Linux/Debian 10 (codename "Buster")
+This software was developed and tested on Linux/Debian 10 (codename "bullseye")
 and the easiest way to install would be on a Debian 10 system following these
 instructions.
 
@@ -11,23 +11,23 @@ need substantially more knowledge about server administration.
 
 ## Requirements
 
-### Python 3.7 and Flask 1.0
+### Python 3.9 and Flask 1.1.2
 
     # apt install python3 python3-bcrypt python3-dateutil python3-psycopg2
     # apt install python3-fuzzywuzzy python3-flask python3-flask-babel
     # apt install python3-flask-login python3-flaskext.wtf python3-markdown
     # apt install python3-numpy python3-pandas python3-jinja2 python3-flask-cors
     # apt install python3-flask-restful p7zip-full python3-wand
-    # apt install python3-rdflib python3-rdflib-jsonld
+    # apt install python3-rdflib python3-rdflib-jsonld python3-flasgger
 
 ### Apache 2.4
 
     # apt install apache2 libapache2-mod-wsgi-py3
 
-### PostgreSQL 11 and PostGIS 2.5
+### PostgreSQL 13 and PostGIS 3
 
     # apt install postgresql
-    # apt install postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts
+    # apt install postgresql-13-postgis-3 postgresql-13-postgis-3-scripts
 
 ### gettext, pip, npm
 

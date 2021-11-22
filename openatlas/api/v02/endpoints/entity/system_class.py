@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
@@ -10,8 +11,8 @@ from openatlas.database.api import Api as Db
 from openatlas.models.entity import Entity
 
 
-class GetBySystemClass(Resource):  # type: ignore
-
+class GetBySystemClass(Resource):
+    @swag_from("../swagger/system_class.yml", endpoint="api.system_class")
     def get(self, system_class: str) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(

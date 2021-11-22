@@ -19,7 +19,7 @@ class SearchTest(TestBaseCase):
             object_ = Entity.insert('place', 'Waldorf')
             object_.link('P1', Entity.insert('appellation', 'Waldorf alias'))
             Entity.insert('person', 'Waldo without date')
-        with app.app_context():  # type: ignore
+        with app.app_context():
             self.app.post(url_for('search_index'), data={'global-term': ''})
             rv = self.app.post(
                 url_for('search_index'),

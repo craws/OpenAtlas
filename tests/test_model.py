@@ -8,7 +8,7 @@ from tests.base import TestBaseCase
 class ModelTests(TestBaseCase):
 
     def test_model(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('openatlas_class_index'))

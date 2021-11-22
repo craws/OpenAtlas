@@ -29,7 +29,7 @@ class UserTests(TestBaseCase):
             'name': 'Newt',
             'continue_': 'yes',
             'send_info': ''}
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 logged_in_user = User.get_by_username('Alice')

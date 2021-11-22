@@ -22,7 +22,7 @@ from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 
 
-class FeedbackForm(FlaskForm):  # type: ignore
+class FeedbackForm(FlaskForm):
     subject = SelectField(
         _('subject'),
         render_kw={'autofocus': True},

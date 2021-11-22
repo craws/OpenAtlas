@@ -8,7 +8,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 
 
-class DisplayImage(Resource):  # type: ignore
+class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
         from pathlib import Path as Pathlib_path

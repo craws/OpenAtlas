@@ -18,8 +18,8 @@ csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 instance_name = 'production' \
     if 'test_runner.py' not in sys.argv[0] else 'testing'
 
-app.config.from_object('config')  # type: ignore
-app.config.from_pyfile(instance_name + '.py')  # type: ignore
+app.config.from_object('config')
+app.config.from_pyfile(instance_name + '.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 if os.name == "posix":

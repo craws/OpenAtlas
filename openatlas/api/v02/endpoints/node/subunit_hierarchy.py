@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Optional, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
@@ -13,9 +14,9 @@ from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
 
 
-class GetSubunitHierarchy(Resource):  # type: ignore
-
-
+class GetSubunitHierarchy(Resource):
+    @swag_from("../swagger/subunit_hierarchy.yml",
+               endpoint="api.subunit_hierarchy")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser(

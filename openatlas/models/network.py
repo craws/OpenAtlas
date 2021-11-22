@@ -13,7 +13,7 @@ class Network:
             form: FlaskForm,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
-        classes = [class_.name for class_ in g.classes.values() if class_.color]
+        classes = [c.name for c in g.classes.values() if c.network_color]
         properties = [
             'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74',
             'P107', 'OA7', 'OA8', 'OA9']

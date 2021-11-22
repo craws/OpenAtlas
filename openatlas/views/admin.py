@@ -1,6 +1,5 @@
 import datetime
 import importlib
-import os
 from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
@@ -56,15 +55,16 @@ def admin_index(
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
     tables = {
-        'user': Table([
-            'username',
-            'name',
-            'group',
-            'email',
-            'newsletter',
-            'created',
-            'last login',
-            'entities'],
+        'user': Table(
+            [
+                'username',
+                'name',
+                'group',
+                'email',
+                'newsletter',
+                'created',
+                'last login',
+                'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + [
             language for language in app.config['LANGUAGES'].keys()])}
@@ -634,7 +634,7 @@ def admin_log_delete() -> Response:
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
-    class NewsLetterForm(FlaskForm):  # type: ignore
+    class NewsLetterForm(FlaskForm):
         subject = StringField(
             '',
             [InputRequired()],

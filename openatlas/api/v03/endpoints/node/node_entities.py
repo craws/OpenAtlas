@@ -9,7 +9,7 @@ from openatlas.api.v03.resources.resolve_endpoints import get_node_dict, \
     resolve_node_parser
 
 
-class GetNodeEntities(Resource):  # type: ignore
+class GetNodeEntities(Resource):
 
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:

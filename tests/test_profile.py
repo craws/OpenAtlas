@@ -7,7 +7,7 @@ from tests.base import TestBaseCase
 class ProfileTests(TestBaseCase):
 
     def test_profile(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('profile_index'))
             assert b'alice@example.com' in rv.data
             rv = self.app.get(url_for('profile_settings', category='profile'))

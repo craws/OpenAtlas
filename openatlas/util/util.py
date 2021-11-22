@@ -179,7 +179,7 @@ def get_backup_file_data() -> Dict[str, Any]:
 
 def get_base_table_data(
         entity: 'Entity',
-        show_links: Optional[bool] = True) -> List[Any]:
+        show_links: bool = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
@@ -212,7 +212,7 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 
 def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
+        path: Path = app.config['UPLOAD_DIR']) -> Dict[int, Dict[str, Any]]:
     stats: Dict[int, Dict[str, Any]] = {}
     for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
         stats[int(file.stem)] = {
@@ -415,12 +415,13 @@ def system_warnings(_context, _unneeded_string: str) -> str:
     if is_authorized('admin'):
         from openatlas.models.user import User
         user = User.get_by_username('OpenAtlas')
-        hash_ = hashpw(
-            'change_me_PLEASE!'.encode('utf-8'),
-            user.password.encode('utf-8'))
-        if user and user.active and hash_ == user.password.encode('utf-8'):
-            warnings.append(
-                "User OpenAtlas with default password is still active!")
+        if user and user.active:
+            hash_ = hashpw(
+                'change_me_PLEASE!'.encode('utf-8'),
+                user.password.encode('utf-8'))
+            if hash_ == user.password.encode('utf-8'):
+                warnings.append(
+                    "User OpenAtlas with default password is still active!")
     if warnings:
         return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
     return ''  # pragma: no cover

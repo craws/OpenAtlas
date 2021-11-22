@@ -8,7 +8,7 @@ from tests.base import TestBaseCase
 class ArtifactTest(TestBaseCase):
 
     def test_artifact(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 source = Entity.insert('source', 'Necronomicon')

@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class ReferenceSystemTest(TestBaseCase):
 
     def test_reference_system(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('index', view='reference_system'))
             assert b'GeoNames' in rv.data
             geonames = ReferenceSystem.get_by_name('GeoNames')

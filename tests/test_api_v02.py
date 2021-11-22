@@ -1,7 +1,6 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.node import Node
@@ -28,7 +27,7 @@ class ApiTests2(TestBaseCase):
 
     def test_api_2(self) -> None:
 
-        with app.app_context():  # type: ignore
+        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for

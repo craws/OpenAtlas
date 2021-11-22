@@ -21,8 +21,8 @@ responses:
       application/ld+json:
         schema:
           oneOf:
-            - $ref: '#/components/schemas/LinkedPlaceModel'
-            - $ref: '#/components/schemas/GeometryModel'
+           - $ref: '#/components/schemas/LinkedPlaceModel'
+           - $ref: '#/components/schemas/GeometryModel'
   '404':
     description: Something went wrong. Please consult the error message.
 

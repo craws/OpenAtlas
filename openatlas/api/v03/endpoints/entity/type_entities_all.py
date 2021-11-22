@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-class GetTypeEntitiesAll(Resource):  # type: ignore
+class GetTypeEntitiesAll(Resource):
 
 
     def get(self,

@@ -28,10 +28,13 @@ def uc_first(string: str) -> str:
 class OpenatlasClass:
 
     # Needed for translations of class labels
+    _('acquisition')
+    _('actor actor relation')
+    _('actor appellation')
+    _('actor function')
     _('appellation')
-    _('actor_appellation')
-    _('actor_function')
-    _('source_translation')
+    _('external reference')
+    _('source translation')
 
     def __init__(
             self,
@@ -50,10 +53,10 @@ class OpenatlasClass:
         self.label = uc_first(_(name.replace('_', ' ')))
         self.cidoc_class = None
         if cidoc_class:
-            self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
+            self.cidoc_class = g.cidoc_classes[cidoc_class]
         self.hierarchies = hierarchies
         self.standard_type_id = standard_type_id
-        self.color = color  # Color of entity in network visualisation
+        self.network_color = color
         self.write_access = write_access
         self.view = None
         self.alias_allowed = alias_allowed

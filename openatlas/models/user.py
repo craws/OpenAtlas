@@ -14,7 +14,7 @@ from openatlas.database.user import User as Db
 from openatlas.util.util import sanitize
 
 
-class User(UserMixin):  # type: ignore
+class User(UserMixin):
 
     def __init__(
             self,

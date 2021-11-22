@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Create entities for event
             place_name = 'Lewis and Clark'
             rv = self.app.post(

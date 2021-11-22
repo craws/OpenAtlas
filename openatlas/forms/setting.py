@@ -7,17 +7,17 @@ from wtforms.validators import Email, InputRequired
 from openatlas import app
 
 
-class ContentForm(FlaskForm):  # type: ignore
+class ContentForm(FlaskForm):
     pass
 
 
-class ModulesForm(FlaskForm):  # type: ignore
+class ModulesForm(FlaskForm):
     module_map_overlay = BooleanField(_('map overlay'))
     module_sub_units = BooleanField(_('sub units'))
     save = SubmitField(_('save'))
 
 
-class GeneralForm(FlaskForm):  # type: ignore
+class GeneralForm(FlaskForm):
     site_name = StringField(_('site name'), [InputRequired()])
     default_language = SelectField(
         _('default language'),
@@ -40,12 +40,12 @@ class GeneralForm(FlaskForm):  # type: ignore
     save = SubmitField(_('save'))
 
 
-class TestMailForm(FlaskForm):  # type: ignore
+class TestMailForm(FlaskForm):
     receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
     save = SubmitField(_('send test mail'))
 
 
-class MailForm(FlaskForm):  # type: ignore
+class MailForm(FlaskForm):
     mail = BooleanField(_('mail'))
     mail_transport_username = StringField(_('mail transport username'))
     mail_transport_host = StringField(_('mail transport host'))
@@ -56,7 +56,7 @@ class MailForm(FlaskForm):  # type: ignore
     save = SubmitField(_('save'))
 
 
-class LogForm(FlaskForm):  # type: ignore
+class LogForm(FlaskForm):
     limit = SelectField(
         _('limit'),
         choices=((0, _('all')), (100, 100), (500, 500)), default=100)
@@ -68,7 +68,7 @@ class LogForm(FlaskForm):  # type: ignore
     save = SubmitField(_('apply'))
 
 
-class MapForm(FlaskForm):  # type: ignore
+class MapForm(FlaskForm):
     map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
     map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
@@ -77,25 +77,25 @@ class MapForm(FlaskForm):  # type: ignore
     save = SubmitField(_('save'))
 
 
-class ApiForm(FlaskForm):  # type: ignore
+class ApiForm(FlaskForm):
     api_public = BooleanField('public')
     save = SubmitField(_('save'))
 
 
-class FilesForm(FlaskForm):  # type: ignore
+class FilesForm(FlaskForm):
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
     file_upload_allowed_extension = StringField(_('allowed file extensions'))
     save = SubmitField(_('save'))
 
 
-class SimilarForm(FlaskForm):  # type: ignore
+class SimilarForm(FlaskForm):
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     save = SubmitField(_('search'))
 
 
-class ProfileForm(FlaskForm):  # type: ignore
+class ProfileForm(FlaskForm):
     name = StringField(_('full name'), description=_('tooltip full name'))
     email = StringField(
         _('email'),
@@ -110,7 +110,7 @@ class ProfileForm(FlaskForm):  # type: ignore
     save = SubmitField(_('save'))
 
 
-class DisplayForm(FlaskForm):  # type: ignore
+class DisplayForm(FlaskForm):
     language = SelectField(
         _('language'),
         choices=list(app.config['LANGUAGES'].items()))

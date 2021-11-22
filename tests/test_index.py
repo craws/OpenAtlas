@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class IndexTests(TestBaseCase):
 
     def test_index(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get('/some_missing_site')
             assert b'404' in rv.data
             rv = self.app.get(url_for('index_changelog'))
@@ -29,13 +29,11 @@ class IndexTests(TestBaseCase):
             assert b'first' in rv.data
 
             # Translations
-            rv = self.app.get(
-                url_for('set_locale', language='de'),
-                follow_redirects=True)
+            self.app.get(url_for('set_locale', language='de'))
+            rv = self.app.get('/')
             assert b'Quelle' in rv.data
-            rv = self.app.get(
-                url_for('set_locale', language='en'),
-                follow_redirects=True)
+            self.app.get(url_for('set_locale', language='en'))
+            rv = self.app.get('/')
             assert b'Source' in rv.data
 
             rv = self.app.get(
@@ -51,7 +49,6 @@ class IndexTests(TestBaseCase):
             app.config['DATABASE_VERSION'] = 'error'
             rv = self.app.get('/')
             assert b'OpenAtlas with default password is still active' in rv.data
-            assert b'/error' in rv.data
             assert b'Database version error is needed but current' in rv.data
 
             # Logout and test reset password, unsubscribe

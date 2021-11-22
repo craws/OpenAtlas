@@ -27,7 +27,7 @@ def load_user(user_id: int) -> Optional[User]:
     return User.get_by_id(user_id, True)
 
 
-class LoginForm(FlaskForm):  # type: ignore
+class LoginForm(FlaskForm):
     username = StringField(
         _('username'),
         [InputRequired()],
@@ -37,7 +37,7 @@ class LoginForm(FlaskForm):  # type: ignore
     save = SubmitField(_('login'))
 
 
-class PasswordResetForm(FlaskForm):  # type: ignore
+class PasswordResetForm(FlaskForm):
     email = StringField(_('email'), [InputRequired(), Email()])
     save = SubmitField(_('submit'))
 

@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
-class SearchForm(FlaskForm):  # type: ignore
+class SearchForm(FlaskForm):
     term = StringField(
         _('search'),
         [InputRequired()],

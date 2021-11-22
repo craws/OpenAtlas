@@ -15,7 +15,7 @@ from tests.base import TestBaseCase
 class PlaceTest(TestBaseCase):
 
     def test_place(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             rv = self.app.get(url_for('insert', class_='place'))
             assert b'+ Place' in rv.data
             with app.test_request_context():

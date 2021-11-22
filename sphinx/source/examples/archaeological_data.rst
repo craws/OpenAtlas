@@ -9,7 +9,7 @@ The following elements are involved in the procedure:
 * :doc:`/entity/place`: the archaeological site itself (Level 1)
 * :doc:`/entity/feature`: a subunit of the place, e.g. graves, buildings, and pits. A place can consist of multiple subunits (Level 2)
 * :doc:`/entity/stratigraphic_unit`: a subunit of the feature, e.g. burial. A feature can consist of multiple subunits (Level 3)
-* Find (see :doc:`/entity/artifact`): an archaeological find, e.g. coin or knife (Level 4)
+* :doc:`/entity/artifact`: an archaeological artifact, e.g. coin or knife (Level 4)
 * :doc:`/entity/human_remains`: subunits of a burial, e.g. bones and teeth that carry anthropological information (Level 4)
 * :doc:`/entity/type`: used for classification, can be extended by users
 * :doc:`/entity/reference`: citation, e.g. book or article written a bout the site or any of the subunits
@@ -56,22 +56,22 @@ For a grave this would be the burial or a burial and the backfilling.
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list, e.g. burial or interface
 * Add additional information on the stratigraphic unit if available
-* Press **Insert and add find** or **Insert an add human remains** to go on with the workflow
+* Press **Insert and add artifact** or **Insert an add human remains** to go on with the workflow
 
-Adding a find to the stratigraphic unit
----------------------------------------
-The following steps add a find (see :doc:`/entity/artifact`) to the before created :doc:`/entity/stratigraphic_unit`. You can now add grave goods to a burial or
-finds to a certain layer of the feature.
+Adding an artifact to the stratigraphic unit
+--------------------------------------------
+The following steps add a :doc:`/entity/artifact` to the before created :doc:`/entity/stratigraphic_unit`. You can now add grave goods to a burial or
+artifacts to a certain layer of the feature.
 
-* By clicking Insert and add find in the before mentioned step, you can directly connect a find to the newly created stratigraphic unit
+* By clicking Insert and add artifact in the before mentioned step, you can directly connect an artifact to the newly created stratigraphic unit
 * Choose a descriptive name
 * Select an appropriate :doc:`/entity/type` from the list, e.g. pottery or a finger ring
 * Add additional information if available
 * Press **Insert** to save the entry
 * Add a file if desired by using the **File** tab
 
-You can also enter a find by going to the stratigraphic unit you want to link the find to. Click the **Find tab** and
-**+ Find** afterwards.
+You can also enter an artifact by going to the stratigraphic unit you want to link the artifact to. Click the **Artifact tab** and
+**+ Artifact** afterwards.
 
 Adding human remains to the stratigraphic unit
 ----------------------------------------------
