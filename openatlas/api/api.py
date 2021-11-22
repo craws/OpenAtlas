@@ -1,3 +1,4 @@
+from flasgger import Swagger
 from flask import Blueprint
 from flask_cors import CORS
 from flask_restful import Api
@@ -17,6 +18,7 @@ cors = CORS(
 api_bp = Blueprint('api', __name__, url_prefix='/api')
 api_bp_02 = Blueprint('api_02', __name__, url_prefix='/api/0.2')
 api_bp_03 = Blueprint('api_03', __name__, url_prefix='/api/0.3')
+swagger = Swagger(app, parse=False, template_file="api/swagger.json")
 
 api = Api(
     api_bp,
