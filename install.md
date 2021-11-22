@@ -74,7 +74,8 @@ Import the scripts: 1_structure.sql, 2_data_web.sql, 3_data_model.sql,
 A user with user name "OpenAtlas" is created with the password:
 **change_me_PLEASE!**
 
-**Important**: change this account immediately!
+**Important**: change this account immediately. A warning will be displayed
+for admins until this account is changed.
 
 ### Configuration
 

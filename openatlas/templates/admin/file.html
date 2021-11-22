@@ -1,11 +1,4 @@
 <div style="float:left;">
-  {% for dir, value in writeable_dirs.items() %}
-    {% if not value %}
-      <p>
-        <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
-      </p>
-    {% endif %}
-  {% endfor %}
   {{ info|display_info }}
   {% if disk_space_info %}
     <div id="disk-size"></div>

@@ -38,14 +38,16 @@ cors = CORS(
     app,
     resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
 api_bp = Blueprint('api', __name__, url_prefix='/api')
-api = Api(api_bp, catch_all_404s=False, errors=errors)  # Establish connection between API and APP
+api = Api(api_bp, catch_all_404s=False,
+          errors=errors)  # Establish connection between API and APP
 swagger = Swagger(app, parse=False, template_file="api/v02/swagger.json")
 # swagger = Swagger(app, parse=False, template=template)
 
 api.add_resource(GetByCode, '/0.2/code/<string:code>', endpoint="code")
-api.add_resource(GetByClass,
-                 '/0.2/class/<string:class_code>',
-                 endpoint="cidoc_class")
+api.add_resource(
+    GetByClass,
+    '/0.2/class/<string:class_code>',
+    endpoint="cidoc_class")
 api.add_resource(GetEntity, '/0.2/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetLatest, '/0.2/latest/<int:latest>', endpoint="latest")
 api.add_resource(GetQuery, '/0.2/query/', endpoint="query")
@@ -73,8 +75,10 @@ api.add_resource(
     GetNodeEntities,
     '/0.2/node_entities/<int:id_>',
     endpoint="node_entities")
-api.add_resource(GetNodeEntitiesAll, '/0.2/node_entities_all/<int:id_>',
-                 endpoint="node_entities_all")
+api.add_resource(
+    GetNodeEntitiesAll,
+    '/0.2/node_entities_all/<int:id_>',
+    endpoint="node_entities_all")
 api.add_resource(
     GetNodeOverview,
     '/0.2/node_overview/',

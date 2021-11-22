@@ -1,11 +1,20 @@
 class Changelog:
 
     versions = {
-        '6.6.0': ['TBA', {
+        '7.0.0': ['TBA', {
             'feature': {
+                '1566': 'Update OpenAtlas software to Debian/bullseye'}}],
+        '6.6.1': ['2021-11-20', {
+            'fix': {
+                '1607': 'Error at profile for readonly users'}}],
+        '6.6.0': ['2021-11-18', {
+            'feature': {
+                '1500': 'Production of artifacts',
                 '1563': 'OpenAtlas model to database',
                 '1597': 'Join artifacts and finds',
                 '1584': 'Track needed and actual database version',
+                '1589': 'Additional and improved system warnings',
+                '1546': 'API: New search parameter',
                 '1583': 'Refactor'}}],
         '6.5.2': ['2021-11-07', {
             'fix': {

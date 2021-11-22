@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openatlas import app
 
-VERSION = '6.6.0'
+VERSION = '7.0.0'
 DATABASE_VERSION = '6.6.0'
 DEMO_MODE = False  # If activated some options are disabled, login is pre filled
 IS_UNIT_TEST = False
@@ -39,6 +39,13 @@ IMAGE_SIZE = {
 NONE_DISPLAY_EXT = ['.tiff', '.tif']
 ALLOWED_IMAGE_EXT = DISPLAY_FILE_EXTENSIONS + NONE_DISPLAY_EXT
 PROCESSED_EXT = '.jpeg'
+
+# For system checks
+WRITEABLE_DIRS = [
+    UPLOAD_DIR,
+    EXPORT_DIR / 'sql',
+    EXPORT_DIR / 'csv',
+    RESIZED_IMAGES]
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be True in production.py if using HTTPS

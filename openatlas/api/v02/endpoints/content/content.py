@@ -5,8 +5,8 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import language
+from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.content import ContentTemplate
 from openatlas.models.content import get_translation
 

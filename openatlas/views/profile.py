@@ -21,7 +21,7 @@ from openatlas.util.util import (
     button, display_info, is_authorized, manual, uc_first)
 
 
-class PasswordForm(FlaskForm):  # type: ignore
+class PasswordForm(FlaskForm):
     password_old = PasswordField(_('old password'), [InputRequired()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
@@ -71,8 +71,11 @@ def profile_index() -> str:
         tabs['profile'].buttons += [
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
-        tabs['modules'].buttons.append(
-            button(_('edit'), url_for('profile_settings', category='modules')))
+        if is_authorized('contributor'):
+            tabs['modules'].buttons.append(
+                button(
+                    _('edit'),
+                    url_for('profile_settings', category='modules')))
         tabs['display'].buttons.append(
             button(_('edit'), url_for('profile_settings', category='display')))
     return render_template(

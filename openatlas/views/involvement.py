@@ -21,7 +21,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     form = build_form('involvement', origin=origin)
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
-    if origin.class_.name in ['acquisition', 'activity']:
+    if origin.class_.name in ['acquisition', 'activity', 'production']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
         if origin.class_.name == 'acquisition':
             form.activity.choices.append((

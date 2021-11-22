@@ -21,7 +21,7 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
-* :doc:`event` - when it was moved at a **Move** event
+* :doc:`event` - about movement with a **Move** event or creation with a **Production** event
 * :doc:`reference`
 * :doc:`file`
 

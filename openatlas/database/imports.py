@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 
@@ -15,7 +15,7 @@ class Import:
         LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
-    def insert_project(name: str, description: str) -> int:
+    def insert_project(name: str, description: Union[str, None]) -> int:
         g.cursor.execute(
             """
             INSERT INTO import.project (name, description)
@@ -62,7 +62,7 @@ class Import:
         g.cursor.execute(
             """
             SELECT DISTINCT name FROM model.entity
-            WHERE openatlas_class_name = %(class_)s 
+            WHERE openatlas_class_name = %(class_)s
                 AND LOWER(name) IN %(names)s;""",
             {'class_': class_, 'names': tuple(names)})
         return [row['name'] for row in g.cursor.fetchall()]

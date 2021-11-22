@@ -4,8 +4,8 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import default
+from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -43,7 +43,7 @@ class GetNodeOverview(Resource):  # type: ignore
             item = g.nodes[id_]
             items.append({
                 'id': item.id,
-                'url': url_for('api.entity', id_=item.id, _external=True),
+                'url': url_for('api_02.entity', id_=item.id, _external=True),
                 'label': item.name.replace("'", "&apos;"),
                 'children': GetNodeOverview.walk_tree(item.subs)})
         return items

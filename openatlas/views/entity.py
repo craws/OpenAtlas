@@ -362,7 +362,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.view == 'artifact':
             tabs['event'] = Tab('event', entity=entity)
-            for link_ in entity.get_links('P25', True):
+            for link_ in entity.get_links(['P25', 'P108'], True):
                 data = get_base_table_data(link_.domain)
                 tabs['event'].table.rows.append(data)
         tabs['file'] = Tab('file', entity=entity)

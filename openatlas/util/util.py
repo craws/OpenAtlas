@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
+from bcrypt import hashpw
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
@@ -32,6 +33,7 @@ from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util.image_processing import ImageProcessing
+
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -177,7 +179,7 @@ def get_backup_file_data() -> Dict[str, Any]:
 
 def get_base_table_data(
         entity: 'Entity',
-        show_links: Optional[bool] = True) -> List[Any]:
+        show_links: bool = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
@@ -210,7 +212,7 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 
 def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
+        path: Path = app.config['UPLOAD_DIR']) -> Dict[int, Dict[str, Any]]:
     stats: Dict[int, Dict[str, Any]] = {}
     for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
         stats[int(file.stem)] = {
@@ -289,8 +291,8 @@ def get_entity_data(
         data[_('residence')] = link(
             residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
-        data[_('source')] = [
-            link(source) for source in entity.get_linked_entities(['P128'])]
+        data[_('source')] = \
+            [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
         super_event = entity.get_linked_entity('P117')
@@ -299,7 +301,7 @@ def get_entity_data(
         if entity.class_.name == 'move':
             person_data = []
             artifact_data = []
-            for linked_entity in entity.get_linked_entities(['P25']):
+            for linked_entity in entity.get_linked_entities('P25'):
                 if linked_entity.class_.name == 'person':
                     person_data.append(linked_entity)
                 elif linked_entity.class_.view == 'artifact':
@@ -311,15 +313,16 @@ def get_entity_data(
             if place:
                 data[_('location')] = link(
                     place.get_linked_entity_safe('P53', True))
-
         if entity.class_.name == 'acquisition':
-            data[_('recipient')] = [
-                link(recipient) for recipient
-                in entity.get_linked_entities(['P22'])]
-            data[_('donor')] = [
-                link(donor) for donor in entity.get_linked_entities(['P23'])]
-            data[_('given place')] = [
-                link(place) for place in entity.get_linked_entities(['P24'])]
+            data[_('recipient')] = \
+                [link(actor) for actor in entity.get_linked_entities('P22')]
+            data[_('donor')] = \
+                [link(donor) for donor in entity.get_linked_entities('P23')]
+            data[_('given place')] = \
+                [link(place) for place in entity.get_linked_entities('P24')]
+        if entity.class_.name == 'production':
+            data[_('created')] = \
+                [link(actor) for actor in entity.get_linked_entities('P108')]
     elif entity.class_.view == 'file':
         data[_('size')] = g.file_stats[entity.id]['size'] \
             if entity.id in g.file_stats else 'N/A'
@@ -327,8 +330,8 @@ def get_entity_data(
             if entity.id in g.file_stats else 'N/A'
     elif entity.class_.view == 'source':
         data[_('artifact')] = [
-            link(artifact) for artifact
-            in entity.get_linked_entities(['P128'], inverse=True)]
+            link(artifact) for artifact in
+            entity.get_linked_entities('P128', inverse=True)]
     return add_system_data(entity, data)
 
 
@@ -391,6 +394,37 @@ def send_mail(
         flash(_('error mail send'), 'error')
         return False
     return True
+
+
+@contextfilter
+@app.template_filter()
+def system_warnings(_context, _unneeded_string: str) -> str:
+    if not is_authorized('manager'):
+        return ''
+    warnings = []
+    if app.config['DATABASE_VERSION'] != \
+            session['settings']['database_version']:
+        warnings.append(
+            f"Database version {app.config['DATABASE_VERSION']} is needed but "
+            f"current version is {session['settings']['database_version']}")
+    for path in app.config['WRITEABLE_DIRS']:
+        if not os.access(path, os.W_OK):
+            warnings.append(
+                f"{uc_first(_('directory not writable'))}: "
+                f"{str(path).replace(app.root_path, '')}")
+    if is_authorized('admin'):
+        from openatlas.models.user import User
+        user = User.get_by_username('OpenAtlas')
+        if user and user.active:
+            hash_ = hashpw(
+                'change_me_PLEASE!'.encode('utf-8'),
+                user.password.encode('utf-8'))
+            if hash_ == user.password.encode('utf-8'):
+                warnings.append(
+                    "User OpenAtlas with default password is still active!")
+    if warnings:
+        return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
+    return ''  # pragma: no cover
 
 
 @app.template_filter()

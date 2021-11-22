@@ -4,8 +4,8 @@ from flasgger import swag_from
 from flask import Response, json, jsonify
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.enpoints_util import download
 from openatlas.api.v02.resources.parser import gis
+from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.geometries import GeometriesTemplate
 from openatlas.models.gis import Gis
 

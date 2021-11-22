@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Create entities for event
             place_name = 'Lewis and Clark'
             rv = self.app.post(
@@ -102,6 +102,21 @@ class EventTest(TestBaseCase):
             assert b'Keep it moving' in rv.data
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
+
+            # Production
+            rv = self.app.post(
+                url_for('insert', class_='production'),
+                data={
+                    'name': 'A very productive event',
+                    'artifact': carrier.id,
+                    self.precision_wikidata: ''})
+            production_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('entity_view', id_=production_id))
+            assert b'Artifact' in rv.data
+            rv = self.app.get(url_for('entity_view', id_=carrier.id))
+            assert b'A very productive event' in rv.data
+            rv = self.app.get(url_for('update', id_=production_id))
+            assert b'A very productive event' in rv.data
 
             # Add another event and test if events are seen at place
             event_name3 = 'Third event'

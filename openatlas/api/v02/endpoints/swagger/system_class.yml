@@ -22,7 +22,6 @@ parameters:
         - external_reference
         - feature
         - file
-        - find
         - group
         - human_remains
         - move

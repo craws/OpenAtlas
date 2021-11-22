@@ -10,7 +10,7 @@ from openatlas.database.model import Model as Db
 
 view_class_mapping = {
     'actor': ['person', 'group'],
-    'event': ['activity', 'acquisition', 'move'],
+    'event': ['activity', 'acquisition', 'move', 'production'],
     'file': ['file'],
     'artifact': ['artifact'],
     'place': ['feature', 'human_remains', 'place', 'stratigraphic_unit'],
@@ -28,10 +28,13 @@ def uc_first(string: str) -> str:
 class OpenatlasClass:
 
     # Needed for translations of class labels
+    _('acquisition')
+    _('actor actor relation')
+    _('actor appellation')
+    _('actor function')
     _('appellation')
-    _('actor_appellation')
-    _('actor_function')
-    _('source_translation')
+    _('external reference')
+    _('source translation')
 
     def __init__(
             self,
@@ -44,21 +47,23 @@ class OpenatlasClass:
             new_types_allowed: bool,
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
-            write_access: Optional[str] = 'contributor') -> None:
+            write_access: Optional[str] = 'contributor',
+            icon: Optional[str] = None) -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))
         self.cidoc_class = None
         if cidoc_class:
-            self.cidoc_class: CidocClass = g.cidoc_classes[cidoc_class]
+            self.cidoc_class = g.cidoc_classes[cidoc_class]
         self.hierarchies = hierarchies
         self.standard_type_id = standard_type_id
-        self.color = color  # Color of entity in network visualisation
+        self.network_color = color
         self.write_access = write_access
         self.view = None
         self.alias_allowed = alias_allowed
         self.reference_system_allowed = reference_system_allowed
         self.reference_systems = reference_system_ids
         self.new_types_allowed = new_types_allowed
+        self.icon = icon
         for item, classes in view_class_mapping.items():
             if name in classes:
                 self.view = item
@@ -82,7 +87,8 @@ class OpenatlasClass:
                 new_types_allowed=row['new_types_allowed'],
                 write_access=row['write_access_group_name'],
                 color=row['layout_color'],
-                hierarchies=row['hierarchies'])
+                hierarchies=row['hierarchies'],
+                icon=row['layout_icon'])
         return classes
 
     @staticmethod

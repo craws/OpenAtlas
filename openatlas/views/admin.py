@@ -1,6 +1,5 @@
 import datetime
 import importlib
-import os
 from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
@@ -55,12 +54,6 @@ def admin_index(
         elif action == 'remove_logo':
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
-    dirs = {
-        'uploads': os.access(app.config['UPLOAD_DIR'], os.W_OK),
-        'export/sql': os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK),
-        'export/csv': os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK),
-        'processed_images/resized':
-            os.access(app.config['RESIZED_IMAGES'], os.W_OK)}
     tables = {
         'user': Table(
             [
@@ -123,7 +116,6 @@ def admin_index(
                 button(_('file'), url_for('insert', class_='file'))],
             content=render_template(
                 'admin/file.html',
-                writeable_dirs=dirs,
                 info=get_form_settings(FilesForm()),
                 settings=session['settings'],
                 disk_space_info=get_disk_space_info())),
@@ -642,7 +634,7 @@ def admin_log_delete() -> Response:
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_newsletter() -> Union[str, Response]:
-    class NewsLetterForm(FlaskForm):  # type: ignore
+    class NewsLetterForm(FlaskForm):
         subject = StringField(
             '',
             [InputRequired()],

@@ -183,12 +183,7 @@
 <main>
   <div id="content">
     <div style="float:left" class="container-fluid">
-      {% if 'manager'|is_authorized and config.DATABASE_VERSION != session.settings.database_version %}
-        <p class="error">
-          Warning: database version {{ config.DATABASE_VERSION }} is needed
-          but current version is {{ session.settings.database_version }}
-        </p>
-      {% endif %}
+      {{ ''|system_warnings }}
       <noscript>
         <p class="error">{{ _('warning no js') }}</p>
       </noscript>

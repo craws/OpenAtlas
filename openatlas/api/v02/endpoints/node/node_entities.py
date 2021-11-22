@@ -4,10 +4,10 @@ from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
-from openatlas.api.v02.resources.enpoints_util import get_node_dict, \
-    resolve_node_parser
 from openatlas.api.v02.resources.error import InvalidSubunitError
 from openatlas.api.v02.resources.parser import default
+from openatlas.api.v02.resources.resolve_endpoints import get_node_dict, \
+    resolve_node_parser
 
 
 class GetNodeEntities(Resource):  # type: ignore
@@ -20,6 +20,6 @@ class GetNodeEntities(Resource):  # type: ignore
     @staticmethod
     def get_node(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
-            raise InvalidSubunitError
+            raise InvalidSubunitError  # pragma: no cover
         return [get_node_dict(entity) for entity in
                 g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)]

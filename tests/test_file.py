@@ -11,7 +11,7 @@ from tests.base import TestBaseCase
 class FileTest(TestBaseCase):
 
     def test_event(self) -> None:
-        with app.app_context():  # type: ignore
+        with app.app_context():
             # Create entities for file
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

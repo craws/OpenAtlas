@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data
 
 
-class TableMultiSelect(HiddenInput):  # type: ignore
+class TableMultiSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and isinstance(field.data, str):
@@ -35,24 +35,23 @@ class TableMultiSelect(HiddenInput):  # type: ignore
                 <input type="checkbox" id="{e.id}" value="{e.name}"
                 {'checked' if field.data and e.id in field.data else ''}>""")
             table.rows.append(data)
-        html = render_template(
+        return super().__call__(field, **kwargs) + render_template(
             'forms/table_multi_select.html',
             field=field,
             selection=[
                 e.name for e in entities if field.data and e.id in field.data],
             table=table)
-        return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 
-class TableMultiField(HiddenField):  # type: ignore
+class TableMultiField(HiddenField):
     widget = TableMultiSelect()
 
 
-class ValueFloatField(FloatField):  # type: ignore
+class ValueFloatField(FloatField):
     pass
 
 
-class TableSelect(HiddenInput):  # type: ignore
+class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
 
@@ -95,12 +94,11 @@ class TableSelect(HiddenInput):  # type: ignore
                 data = get_base_table_data(entity, show_links=False)
                 data[0] = self.format_name_and_aliases(entity, field.id)
                 table.rows.append(data)
-        html = render_template(
+        return super().__call__(field, **kwargs) + render_template(
             'forms/table_select.html',
             field=field,
             table=table.display(field.id),
             selection=selection)
-        return super(TableSelect, self).__call__(field, **kwargs) + html
 
     @staticmethod
     def format_name_and_aliases(entity: Entity, field_id: str) -> str:
@@ -116,31 +114,30 @@ class TableSelect(HiddenInput):  # type: ignore
         return html
 
 
-class TableField(HiddenField):  # type: ignore
+class TableField(HiddenField):
     widget = TableSelect()
 
 
-class TreeMultiSelect(HiddenInput):  # type: ignore
+class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data: List[int] = []
         if field.data:
             data = ast.literal_eval(field.data) \
                 if isinstance(field.data, str) else field.data
-        html = render_template(
+        return super().__call__(field, **kwargs) + render_template(
             'forms/tree_multi_select.html',
             field=field,
             root=g.nodes[int(field.id)],
             selection=sorted([g.nodes[id_].name for id_ in data]),
             data=Node.get_tree_data(int(field.id), data))
-        return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
-class TreeMultiField(HiddenField):  # type: ignore
+class TreeMultiField(HiddenField):
     widget = TreeMultiSelect()
 
 
-class TreeSelect(HiddenInput):  # type: ignore
+class TreeSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         selection = ''
@@ -150,13 +147,12 @@ class TreeSelect(HiddenInput):  # type: ignore
                 if isinstance(field.data, list) else field.data
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
-        html = render_template(
+        return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
             data=Node.get_tree_data(int(field.id), selected_ids))
-        return super(TreeSelect, self).__call__(field, **kwargs) + html
 
 
-class TreeField(HiddenField):  # type: ignore
+class TreeField(HiddenField):
     widget = TreeSelect()

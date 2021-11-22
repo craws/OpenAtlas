@@ -15,7 +15,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.util.util import button, required_group, uc_first
 
 
-class OverlayForm(FlaskForm):  # type: ignore
+class OverlayForm(FlaskForm):
     top_left_easting = FloatField(
         '',
         [InputRequired()],

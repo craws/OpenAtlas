@@ -135,9 +135,10 @@ class Tab:
                     'link',
                     url_for('reference_add', id_=id_, view='event'))]
             if view == 'artifact':
-                buttons += [button(
-                    g.classes['move'].label,
-                    url_for('insert', class_='move', origin_id=id_))]
+                for item in ['move', 'production']:
+                    buttons += [button(
+                        g.classes[item].label,
+                        url_for('insert', class_=item, origin_id=id_))]
             else:
                 for item in g.view_class_mapping['event']:
                     buttons.append(button(

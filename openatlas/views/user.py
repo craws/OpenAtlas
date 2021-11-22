@@ -19,7 +19,7 @@ from openatlas.util.util import (
     format_date, is_authorized, link, required_group, send_mail, uc_first)
 
 
-class UserForm(FlaskForm):  # type: ignore
+class UserForm(FlaskForm):
     user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
     username = StringField(
@@ -65,7 +65,7 @@ class UserForm(FlaskForm):  # type: ignore
         return valid
 
 
-class ActivityForm(FlaskForm):  # type: ignore
+class ActivityForm(FlaskForm):
     action_choices = (
         ('all', _('all')),
         ('insert', _('insert')),

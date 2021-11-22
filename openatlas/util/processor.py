@@ -9,7 +9,7 @@ from openatlas import app
 from openatlas.util.util import get_file_extension
 
 
-class GlobalSearchForm(FlaskForm):  # type: ignore
+class GlobalSearchForm(FlaskForm):
     term = StringField('', render_kw={"placeholder": _('search term')})
 
 

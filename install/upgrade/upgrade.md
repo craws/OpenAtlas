@@ -13,7 +13,7 @@ is working.
 
     service apache2 restart
 
-### 6.6.0 to 7.0.0
+### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are
 using Debian upgrade it to 11 (bullseye).
 
@@ -23,12 +23,42 @@ packages for the update.
 If you upgrade a Debian system to bullseye be sure to have the new postgis
 packages installed (see install.md) before you upgrade database clusters.
 
-### 6.5.0 to 6.6.0
 
-There were quiet some changes in database and model (#1563). In case you depend
-on direct database access for other application be sure to test these first.
+### 6.6.0 to 6.6.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
+### 6.5.x to 6.6.0
+
+There were some changes in database and model (#1563). In case you depend on
+direct database access for other application be sure to test these first.
 
 Execute **install/upgrade/6.6.0.sql** after making backups.
+
+#### Api changes
+
+##### System Class *find*
+
+System class ***find*** was merged with ***artifact***. Please be aware, that
+this can have an impact on some API operations (e.g. **/classes**,
+**/system_class/find**, etc.)
+
+##### Versioning
+
+A new path, which always points to the newest stable version (currently 0.2),
+was added:
+
+    /api/<endpoint>
+
+Version 0.3 was added. It is still in development and prone to changes but can
+be accessed via:
+
+    /api/0.3/<endpoint>
+
+### 6.5.1 to 6.5.2
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
+### 6.5.0 to 6.5.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):

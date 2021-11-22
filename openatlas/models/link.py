@@ -271,7 +271,7 @@ class Link:
         return Db.delete_link_duplicates()
 
     @staticmethod
-    def check_single_type_duplicates() -> Dict[str: Any]:
+    def check_single_type_duplicates() -> List[Dict[str, Any]]:
         from openatlas.models.node import Node
         from openatlas.models.entity import Entity
         data = []

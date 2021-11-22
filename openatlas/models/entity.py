@@ -124,17 +124,14 @@ class Entity:
             code: str,
             range_: str,
             description: Optional[str] = None,
-            inverse: bool = False) -> List[int]:
+            inverse: bool = False) -> None:
+        if not range_:
+            return
         # range_ = string value from a form, can be empty, int or int list
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-        return Link.insert(
-            self,
-            code,
-            Entity.get_by_ids(ids),
-            description,
-            inverse)
+        Link.insert(self, code, Entity.get_by_ids(ids), description, inverse)
 
     def get_links(
             self,
@@ -314,8 +311,12 @@ class Entity:
         return Entity.get_by_id(id_)
 
     @staticmethod
-    def get_by_cidoc_class(code: Union[str, List[str]]) -> List[Entity]:
-        return [Entity(row) for row in Db.get_by_cidoc_class(code)]
+    def get_by_cidoc_class(
+            code: Union[str, List[str]],
+            nodes: bool = False,
+            aliases: bool = False) -> List[Entity]:
+        return [Entity(row) for row in
+                Db.get_by_cidoc_class(code, nodes, aliases)]
 
     @staticmethod
     def get_by_id(

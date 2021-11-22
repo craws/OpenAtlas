@@ -17,7 +17,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, uc_first
 
 
-class LinkCheckForm(FlaskForm):  # type: ignore
+class LinkCheckForm(FlaskForm):
     cidoc_domain = TableField('Domain', [InputRequired()])
     cidoc_property = TableField('Property', [InputRequired()])
     cidoc_range = TableField('Range', [InputRequired()])
@@ -85,7 +85,7 @@ def openatlas_class_index() -> str:
         _('standard type'),
         _('write access'),
         'alias',
-        'reference system',
+        'reference systems',
         'add type',
         _('color'),
         'count'])
@@ -100,7 +100,7 @@ def openatlas_class_index() -> str:
             _('allowed') if class_.alias_allowed else '',
             _('allowed') if class_.reference_system_allowed else '',
             _('allowed') if class_.new_types_allowed else '',
-            class_.color,
+            class_.network_color,
             format_number(class_count[class_.name])
             if class_count[class_.name] else ''])
     return render_template(
@@ -235,7 +235,7 @@ def property_view(code: str) -> str:
             property_.code])
 
 
-class NetworkForm(FlaskForm):  # type: ignore
+class NetworkForm(FlaskForm):
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-80, validators=[InputRequired()])
@@ -250,10 +250,10 @@ class NetworkForm(FlaskForm):  # type: ignore
 @app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network(dimensions: Optional[int] = None) -> str:
-    network_classes = [class_ for class_ in g.classes.values() if class_.color]
+    network_classes = [c for c in g.classes.values() if c.network_color]
     for class_ in network_classes:
         setattr(NetworkForm, class_.name, StringField(
-            default=class_.color,
+            default=class_.network_color,
             render_kw={'data-huebee': True, 'class': 'data-huebee'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
