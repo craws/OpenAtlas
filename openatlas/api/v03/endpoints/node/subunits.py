@@ -4,8 +4,8 @@ from flask import Response
 from flask_restful import Resource
 
 from openatlas.api.v03.resources.formats.thanados import get_subunits
-from openatlas.api.v03.resources.parser import default
-from openatlas.api.v03.resources.resolve_endpoints import resolve_subunit_parser
+from openatlas.api.v03.resources.parser import entity_
+from openatlas.api.v03.resources.resolve_endpoints import resolve_subunit
 from openatlas.api.v03.resources.util import get_entity_by_id, link_builder
 from openatlas.models.entity import Entity
 
@@ -13,13 +13,13 @@ from openatlas.models.entity import Entity
 class GetSubunits(Resource):  # type: ignore
     @staticmethod
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
-        return resolve_subunit_parser(
-            GetSubunits.iterate(get_entity_by_id(id_)),
-            default.parse_args(),
+        return resolve_subunit(
+            GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
+            entity_.parse_args(),
             id_)
 
     @staticmethod
-    def iterate(entity: Entity):
+    def iterate(entity: Entity, parser: Dict[str, Any]):
         root_id = entity.id
         entities_dict = GetSubunits.get_all_subunits_recursive(
             entity,
@@ -39,7 +39,8 @@ class GetSubunits(Resource):  # type: ignore
                 [link_ for link_ in links_inverse if
                  link_.range.id == list(entity.keys())[0].id],
                 root_id,
-                max(entity.modified for entity in entities))
+                max(entity.modified for entity in entities),
+                parser)
             for entity in entities_dict]
 
     @staticmethod

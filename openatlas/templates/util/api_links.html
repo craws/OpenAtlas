@@ -24,9 +24,9 @@
 
     <div class="btn-group mr-2">
         <a class="{{ config.CSS.button.primary }}"
-           href=" {{ url_for('api.entity', id_=entity.id, format='xml') }}"
+           href=" {{ url_for('api.entity', id_=entity.id, format='rdf-xml') }}"
            target="_blank">
-            XML
+            RDF-XML
         </a>
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='pretty-xml') }}"

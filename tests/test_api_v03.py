@@ -211,7 +211,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api_03.entity',
                 id_=place.id,
-                format='xml'))
+                format='rdf-xml'))
             assert b'Shire' in rv.data
             rv = self.app.get(url_for(
                 'api_03.entity',
@@ -360,7 +360,7 @@ class ApiTests(TestBaseCase):
                 classes='E18',
                 codes='artifact',
                 system_classes='person',
-                format='xml'))
+                format='rdf-xml'))
             assert b'Shire' in rv.data
             rv = self.app.get(url_for(
                 'api_03.query',

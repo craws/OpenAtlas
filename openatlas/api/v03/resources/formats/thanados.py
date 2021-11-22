@@ -18,42 +18,26 @@ def get_subunits(
         links: List[Link],
         links_inverse: List[Link],
         root_id: int,
-        latest_mod_rec: datetime) -> Dict[str, Any]:
+        latest_mod_rec: datetime,
+        parser: Dict[str, Any]) -> Dict[str, Any]:
     return {
         'id': entity.id,
         'rootId': root_id,
-        'parentId': get_parent(entity) if entity.id != root_id else None,
+        'parentId': entity.get_linked_entity_safe('P46', inverse=True).id
+        if entity.id != root_id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
         'modified': str(entity.modified),
         'latestModRec': latest_mod_rec,
         'geometry': get_geometries(entity, links),
-        'children': [child.id for child in children] if children else None,
+        'children': get_children(children, parser),
         'properties': get_properties(entity, links, links_inverse)}
 
-
-def get_children(struct: Dict[str, Any]) -> Optional[List[dict[str, Any]]]:
-    if struct['subunits']:
-        return [subunit.id for subunit in struct['subunits']]
-    return None
-
-
-def get_root(struct: Dict[str, Any]) -> Optional[List[dict[str, Any]]]:
-    if struct['place']:
-        return struct['place'].id
-    return None
-
-
-def get_stratigraphic_unit(
-        struct: Dict[str, Any]) -> Optional[List[dict[str, Any]]]:
-    return struct['stratigraphic_unit'].id if struct[
-        'stratigraphic_unit'] else None
-
-
-def get_parent(entity: Entity) -> int:
-    return entity.get_linked_entity_safe('P46', inverse=True).id
-
+def get_children(children: [Entity], parser: Dict[str, Any]):
+    if parser['format'] == 'xml':
+        return [{'child': child.id} for child in children] if children else None
+    return [child.id for child in children] if children else None
 
 def get_properties(
         entity: Entity,
@@ -76,7 +60,7 @@ def get_references(links: List[Link]):
     out = []
     for link_ in links:
         if link_.property.code == "P67" and link_.domain.class_.name in [
-                'bibliography', 'edition', 'external_reference']:
+            'bibliography', 'edition', 'external_reference']:
             out.append({
                 'abbreviation': link_.domain.name,
                 'id': link_.domain.id,

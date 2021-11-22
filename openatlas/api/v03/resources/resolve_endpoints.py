@@ -9,6 +9,7 @@ from openatlas import app
 from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.rdf import rdf_output
+from openatlas.api.v03.resources.formats.xml import subunit_xml
 from openatlas.api.v03.resources.pagination import Pagination
 from openatlas.api.v03.resources.search.search import search
 from openatlas.api.v03.resources.search.search_validation import \
@@ -68,14 +69,20 @@ def resolve_node_parser(
     return marshal(node, NodeTemplate.node_template()), 200
 
 
-def resolve_subunit_parser(
+def resolve_subunit(
         subunit: List[Dict[str, Any]],
         parser: Dict[str, Any],
         file_name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
-    out = {file_name: subunit}
+    out = {str(file_name): subunit}
+    # https://stackoverflow.com/questions/5236296/how-to-convert-list-of-dict-to-dict
+    # https://github.com/quandyfactory/dicttoxml
     if parser['count']:
         return jsonify(len(out[file_name]))
+    if parser['format'] == 'xml':
+        return Response(
+            subunit_xml({item['properties']['name']:item for item in out}, parser, file_name),
+            mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
         return download(out, SubunitTemplate.subunit_template(file_name), file_name)
     return marshal(out, SubunitTemplate.subunit_template(file_name)), 200
