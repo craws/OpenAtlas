@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 6.6.1 to 6.6.2
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 6.6.0 to 6.6.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 

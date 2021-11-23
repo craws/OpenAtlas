@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '6.6.2': ['2021-11-23', {
+            'fix': {
+                '1609': 'Problem with types'}}],
         '6.6.1': ['2021-11-20', {
             'fix': {
                 '1607': 'Error at profile for readonly users'}}],

@@ -51,7 +51,7 @@ class Node(Entity):
                     node,
                     node.root[0],
                     node.root)
-                node.category = nodes[node.root[-1]].category
+                node.category = hierarchies[node.root[-1]]['category']
             else:
                 node.category = hierarchies[node.id]['category']
                 node.multiple = hierarchies[node.id]['multiple']
