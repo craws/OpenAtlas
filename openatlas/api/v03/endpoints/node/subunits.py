@@ -20,7 +20,7 @@ class GetSubunits(Resource):  # type: ignore
 
     @staticmethod
     def iterate(entity: Entity, parser: Dict[str, Any]):
-        root_id = entity.id
+        root = entity
         entities_dict = GetSubunits.get_all_subunits_recursive(
             entity,
             [{entity: []}])
@@ -38,7 +38,7 @@ class GetSubunits(Resource):  # type: ignore
                 [link_ for link_ in links if link_.domain.id == list(entity.keys())[0].id],
                 [link_ for link_ in links_inverse if
                  link_.range.id == list(entity.keys())[0].id],
-                root_id,
+                root,
                 max(entity.modified for entity in entities),
                 parser)
             for entity in entities_dict]

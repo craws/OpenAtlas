@@ -17,14 +17,14 @@ def get_subunits(
         children: [Entity],
         links: List[Link],
         links_inverse: List[Link],
-        root_id: int,
+        root: Entity,
         latest_mod_rec: datetime,
         parser: Dict[str, Any]) -> Dict[str, Any]:
     return {
         'id': entity.id,
-        'rootId': root_id,
+        'rootId': root.id,
         'parentId': entity.get_linked_entity_safe('P46', inverse=True).id
-        if entity.id != root_id else None,
+        if entity.id != root.id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
@@ -85,8 +85,7 @@ def get_properties(
         parser: Dict[str, Any]) -> Dict[str, Any]:
     return {
         'name': entity.name,
-        'aliases': [value for value in
-                    entity.aliases.values()] if entity.aliases.values() else None,
+        'aliases': get_aliases(entity, parser),
         'description': entity.description,
         'standardType': None,
         'timespan': get_timespans(entity),
@@ -96,12 +95,20 @@ def get_properties(
         'types': get_types(entity, links, parser)}
 
 
+def get_aliases(entity: Entity, parser: Dict[str, Any]):
+    aliases = [value for value in entity.aliases.values()] \
+        if entity.aliases.values() else None
+    if parser['format'] == 'xml':
+        return [{'alias': alias} for alias in aliases] if aliases else None
+    return aliases
+
+
 def get_ref_system(
         links_inverse: List[Link],
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     ref_sys = get_reference_systems(links_inverse)
     if parser['format'] == 'xml':
-        return [{'reference': ref} for ref in ref_sys] if ref_sys else None
+        return [{'externalReference': ref} for ref in ref_sys] if ref_sys else None
     return ref_sys
 
 
