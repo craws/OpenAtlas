@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g
 
@@ -30,19 +30,56 @@ def get_subunits(
         'created': str(entity.created),
         'modified': str(entity.modified),
         'latestModRec': latest_mod_rec,
-        'geometry': get_geometries(entity, links),
+        'geometry': get_geometries_thanados(entity, links, parser),
         'children': get_children(children, parser),
-        'properties': get_properties(entity, links, links_inverse)}
+        'properties': get_properties(entity, links, links_inverse, parser)}
+
+
+def get_geometries_thanados(
+        entity: Entity,
+        links: List[Link],
+        parser: Dict[str, Any]) -> Union[
+    list[dict[str, Any]], None, list[list[dict[str, Any]]], list[
+        dict[str, Any]], dict[str, Any]]:
+    geom = get_geometries(entity, links)
+    if parser['format'] == 'xml' and geom:
+        if geom['type'] == 'GeometryCollection':
+            geometries = []
+            for item in geom['geometries']:
+                item['coordinates'] = check_geometries(item)
+                geometries.append(item)
+            geom['geometries'] = [{'geom': item} for item in geometries]
+            return geom
+        else:
+            geom['coordinates'] = check_geometries(geom)
+            return geom
+    return geom
+
+def check_geometries(
+        geom: Dict[str, Any]) -> Union[list[list[dict[str, Any]]], list[dict[str, Any]]]:
+    if geom['type'] == 'Polygon':
+        return [transform_coordinates(k) for i in geom['coordinates'] for k in i]
+    if geom['type'] == 'LineString':
+        return [transform_coordinates(k) for k in geom['coordinates']]
+    if geom['type'] == 'Point':
+        return transform_coordinates(geom['coordinates'])
+
+
+def transform_coordinates(coords: List[float]) -> List[Dict[str, Any]]:
+    return [{'coordinate': {'longitude': coords[0], 'latitude ': coords[1]}}]
+
 
 def get_children(children: [Entity], parser: Dict[str, Any]):
     if parser['format'] == 'xml':
         return [{'child': child.id} for child in children] if children else None
     return [child.id for child in children] if children else None
 
+
 def get_properties(
         entity: Entity,
         links: List[Link],
-        links_inverse: List[Link]) -> Dict[str, Any]:
+        links_inverse: List[Link],
+        parser: Dict[str, Any]) -> Dict[str, Any]:
     return {
         'name': entity.name,
         'aliases': [value for value in
@@ -50,23 +87,37 @@ def get_properties(
         'description': entity.description,
         'standardType': None,
         'timespan': get_timespans(entity),
-        'externalReferences': get_reference_systems(links_inverse),
-        'references': get_references(links_inverse),
-        'files': get_file(links_inverse),
-        'types': get_types(entity, links)}
+        'externalReferences': get_ref_system(links_inverse, parser),
+        'references': get_references(links_inverse, parser),
+        'files': get_file(links_inverse, parser),
+        'types': get_types(entity, links, parser)}
 
 
-def get_references(links: List[Link]):
-    out = []
+def get_ref_system(
+        links_inverse: List[Link],
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+    ref_sys = get_reference_systems(links_inverse)
+    if parser['format'] == 'xml':
+        return [{'reference': ref} for ref in ref_sys] if ref_sys else None
+    return ref_sys
+
+
+def get_references(
+        links: List[Link],
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+    references = []
     for link_ in links:
         if link_.property.code == "P67" and link_.domain.class_.name in [
             'bibliography', 'edition', 'external_reference']:
-            out.append({
+            references.append({
                 'abbreviation': link_.domain.name,
                 'id': link_.domain.id,
                 'title': link_.domain.description,
                 'pages': link_.description if link_.description else None})
-    return out if out else None
+    if parser['format'] == 'xml':
+        return [{'reference': ref} for ref in
+                references] if references else None
+    return references if references else None
 
 
 def get_timespans(entity: Entity) -> Dict[str, str]:
@@ -77,7 +128,9 @@ def get_timespans(entity: Entity) -> Dict[str, str]:
         'latestEnd': str(entity.end_to) if entity.end_to else None}
 
 
-def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+def get_file(
+        links_inverse: List[Link],
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':
@@ -89,10 +142,15 @@ def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
             'source': link.domain.description if link.domain.description else None})
+    if parser['format'] == 'xml':
+        return [{'file': file} for file in files] if files else None
     return files if files else None
 
 
-def get_types(entity: Entity, links: List[Link]) -> List[Dict[str, Any]]:
+def get_types(
+        entity: Entity,
+        links: List[Link],
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     nodes = []
     for node in entity.nodes:
         nodes_dict = {
@@ -108,4 +166,6 @@ def get_types(entity: Entity, links: List[Link]) -> List[Dict[str, Any]]:
         nodes_dict['path'] = ' > '.join(map(str, hierarchy))
         nodes_dict['rootId'] = node.root[0]
         nodes.append(nodes_dict)
+    if parser['format'] == 'xml':
+        return [{'type': node} for node in nodes] if nodes else None
     return nodes if nodes else None

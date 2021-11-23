@@ -74,17 +74,16 @@ def resolve_subunit(
         parser: Dict[str, Any],
         file_name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
-    out = {str(file_name): subunit}
-    # https://stackoverflow.com/questions/5236296/how-to-convert-list-of-dict-to-dict
-    # https://github.com/quandyfactory/dicttoxml
+    out = {str(file_name) if parser['format'] == 'xml' else file_name: subunit}
     if parser['count']:
         return jsonify(len(out[file_name]))
     if parser['format'] == 'xml':
         return Response(
-            subunit_xml({item['properties']['name']:item for item in out}, parser, file_name),
+            subunit_xml(out, parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, SubunitTemplate.subunit_template(file_name), file_name)
+        return download(out, SubunitTemplate.subunit_template(file_name),
+                        file_name)
     return marshal(out, SubunitTemplate.subunit_template(file_name)), 200
 
 

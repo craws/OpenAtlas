@@ -7,7 +7,7 @@ from flask_restful.fields import List as RestList
 class SubunitTemplate:
 
     @staticmethod
-    def subunit_template(id_: int) -> Dict[int, RestList]:
+    def subunit_template(id_: str) -> Dict[str, RestList]:
         standard_type = {
             'name': fields.String,
             'id': fields.Integer,

@@ -108,8 +108,8 @@ def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
     return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
-def get_reference_systems(links_inverse: List[Link]) \
-        -> Optional[List[Dict[str, Any]]]:
+def get_reference_systems(
+        links_inverse: List[Link]) -> Optional[List[Dict[str, Any]]]:
     ref = []
     for link_ in links_inverse:
         if not isinstance(link_.domain, ReferenceSystem):
