@@ -55,10 +55,13 @@ def get_geometries_thanados(
             return geom
     return geom
 
+
 def check_geometries(
-        geom: Dict[str, Any]) -> Union[list[list[dict[str, Any]]], list[dict[str, Any]]]:
+        geom: Dict[str, Any]) -> Union[
+    List[List[Dict[str, Any]]], List[Dict[str, Any]]]:
     if geom['type'] == 'Polygon':
-        return [transform_coordinates(k) for i in geom['coordinates'] for k in i]
+        return [transform_coordinates(k) for i in geom['coordinates'] for k in
+                i]
     if geom['type'] == 'LineString':
         return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':

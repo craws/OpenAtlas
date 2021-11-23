@@ -72,19 +72,25 @@ def resolve_node_parser(
 def resolve_subunit(
         subunit: List[Dict[str, Any]],
         parser: Dict[str, Any],
-        file_name: Union[int, str]) \
+        name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
-    out = {str(file_name) if parser['format'] == 'xml' else file_name: subunit}
+    out = {str(name) if parser['format'] == 'xml' else name: subunit}
     if parser['count']:
-        return jsonify(len(out[file_name]))
+        return jsonify(len(out[name]))
     if parser['format'] == 'xml':
+        if parser['download']:
+            return Response(
+                subunit_xml(out),
+                mimetype='application/xml',
+                headers={
+                    'Content-Disposition': f'attachment;filename={name}.xml'})
         return Response(
-            subunit_xml(out, parser),
+            subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, SubunitTemplate.subunit_template(file_name),
-                        file_name)
-    return marshal(out, SubunitTemplate.subunit_template(file_name)), 200
+        return download(out, SubunitTemplate.subunit_template(name),
+                        name)
+    return marshal(out, SubunitTemplate.subunit_template(name)), 200
 
 
 def get_node_dict(entity: Entity) -> Dict[str, Any]:
