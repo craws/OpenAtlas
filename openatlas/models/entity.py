@@ -30,6 +30,7 @@ class Entity:
         self.id = data['id']
         self.standard_type = None
         self.nodes: Dict['Node', str] = {}
+        self.name = data['name']
 
         if 'nodes' in data and data['nodes']:
             for item in data['nodes']:
@@ -46,7 +47,6 @@ class Entity:
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
                 key=lambda item_: item_[1])}
-        self.name = data['name']
         self.description = data['description']
         self.created = data['created']
         self.modified = data['modified']
