@@ -35,7 +35,7 @@ def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
 
 def get_license(entity: Entity) -> Optional[str]:
     for node in entity.nodes:
-        if g.nodes[node.root[-1]].name == 'License':
+        if g.nodes[node.root[0]].name == 'License':
             return node.name
     return None
 

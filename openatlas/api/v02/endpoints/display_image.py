@@ -15,7 +15,7 @@ class DisplayImage(Resource):
         entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
         license_ = None
         for node in entity.nodes:
-            if node.root and node.root[-1] == Node.get_hierarchy('License').id:
+            if node.root and node.root[0] == Node.get_hierarchy('License').id:
                 license_ = node.name
         if not license_:
             raise AccessDeniedError

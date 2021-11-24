@@ -515,7 +515,7 @@ def add_crumbs(
     elif isinstance(entity, Node):
         crumbs = [[_('types'), url_for('node_index')]]
         if entity.root:
-            crumbs += [g.nodes[node_id] for node_id in reversed(entity.root)]
+            crumbs += [g.nodes[node_id] for node_id in entity.root]
         crumbs += [entity.name]
     elif entity.class_.view == 'source_translation':
         crumbs = [

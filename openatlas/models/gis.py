@@ -86,7 +86,7 @@ class Gis:
                     nodes_list = ast.literal_eval('[' + row['types'] + ']')
                     for node_id in list(set(nodes_list)):
                         node = g.nodes[node_id]
-                        if node.root and node.root[-1] == place_root.id:
+                        if node.root and node.root[0] == place_root.id:
                             item['properties']['objectType'] = \
                                 node.name.replace('"', '\"')
                             break

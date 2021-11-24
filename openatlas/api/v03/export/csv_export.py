@@ -57,7 +57,6 @@ class ApiExportCSV:  # pragma: no cover
         nodes: Dict[str, Any] = defaultdict(list)
         for node in entity.nodes:
             hierarchy = [g.nodes[root].name for root in node.root]
-            hierarchy.reverse()
             value = ''
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:
