@@ -74,7 +74,7 @@ def resolve_subunit(
         parser: Dict[str, Any],
         name: Union[int, str]) \
         -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
-    out = {str(name) if parser['format'] == 'xml' else name: subunit}
+    out = {'collection' if parser['format'] == 'xml' else name: subunit}
     if parser['count']:
         return jsonify(len(out[name]))
     if parser['format'] == 'xml':

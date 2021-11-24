@@ -9,6 +9,7 @@ from openatlas.api.v03.resources.formats.linked_places_helper import \
 from openatlas.api.v03.resources.util import get_license
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.util import get_file_path
 
 
@@ -87,12 +88,23 @@ def get_properties(
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
-        'standardType': None,
+        'standardType': get_standard_type(entity.standard_type),
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),
         'files': get_file(links_inverse, parser),
         'types': get_types(entity, links, parser)}
+
+
+def get_standard_type(node: Node) -> Dict[str, Any]:
+    nodes_dict = {
+        'id': node.id,
+        'name': node.name}
+    hierarchy = [g.nodes[root].name for root in node.root]
+    hierarchy.reverse()
+    nodes_dict['path'] = ' > '.join(map(str, hierarchy))
+    nodes_dict['rootId'] = node.root[0]
+    return nodes_dict
 
 
 def get_aliases(entity: Entity, parser: Dict[str, Any]):
@@ -108,7 +120,8 @@ def get_ref_system(
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     ref_sys = get_reference_systems(links_inverse)
     if parser['format'] == 'xml':
-        return [{'externalReference': ref} for ref in ref_sys] if ref_sys else None
+        return [{'externalReference': ref} for ref in
+                ref_sys] if ref_sys else None
     return ref_sys
 
 
@@ -163,6 +176,8 @@ def get_types(
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     nodes = []
     for node in entity.nodes:
+        if node.category == 'standard':
+            continue
         nodes_dict = {
             'id': node.id,
             'name': node.name}
@@ -172,7 +187,6 @@ def get_types(
                 if link.range.id == node.id and node.description:
                     nodes_dict['unit'] = node.description
         hierarchy = [g.nodes[root].name for root in node.root]
-        hierarchy.reverse()
         nodes_dict['path'] = ' > '.join(map(str, hierarchy))
         nodes_dict['rootId'] = node.root[0]
         nodes.append(nodes_dict)
