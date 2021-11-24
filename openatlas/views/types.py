@@ -54,7 +54,7 @@ def node_index() -> str:
 @required_group('editor')
 def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
-    root = g.nodes[node.root[-1]] if node.root else None
+    root = g.nodes[node.root[0]] if node.root else None
     if node.category == 'system' or node.subs or node.count:
         abort(403)
     node.delete()
@@ -67,7 +67,7 @@ def node_delete(id_: int) -> Response:
 @required_group('editor')
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
-    root = g.nodes[node.root[-1]]
+    root = g.nodes[node.root[0]]
     if root.category == 'value':  # pragma: no cover
         abort(403)
     form = build_move_form(node)

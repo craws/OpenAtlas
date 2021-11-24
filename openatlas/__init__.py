@@ -51,8 +51,10 @@ def get_locale() -> str:
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.models.model import (
-        CidocClass, CidocProperty, OpenatlasClass, view_class_mapping)
+    from openatlas.models.openatlas_class import (
+        OpenatlasClass, view_class_mapping)
+    from openatlas.models.cidoc_property import CidocProperty
+    from openatlas.models.cidoc_class import CidocClass
     from openatlas.models.node import Node
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem

@@ -60,7 +60,7 @@ def insert(
         view_name=view_name,
         gis_data=gis_data,
         geonames_module=geonames_module,
-        writeable=os.access(app.config['UPLOAD_DIR'], os.W_OK),  # For files
+        writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=overlays,
         title=_(view_name),
         crumbs=add_crumbs(view_name, class_, origin, structure, insert_=True))
@@ -92,7 +92,7 @@ def add_crumbs(
     if view_name == 'type':
         crumbs = [[_('types'), url_for('node_index')]]
         if isinstance(origin, Node) and origin.root:
-            for node_id in reversed(origin.root):
+            for node_id in origin.root:
                 crumbs += [link(g.nodes[node_id])]
         crumbs += [origin]
     sibling_count = 0
@@ -153,7 +153,7 @@ def update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         if isinstance(entity, Node):
             valid = True
-            root = g.nodes[entity.root[-1]]
+            root = g.nodes[entity.root[0]]
             new_super_id = getattr(form, str(root.id)).data
             new_super = g.nodes[int(new_super_id)] if new_super_id else None
             if new_super:
@@ -211,7 +211,7 @@ def populate_insert_form(
     if view_name == 'source' and origin.class_.name == 'artifact':
         form.artifact.data = [origin.id]
     if view_name == 'type':
-        root_id = origin.root[-1] if origin.root else origin.id
+        root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None
 
@@ -270,9 +270,9 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
             form.name.data = name_parts[0]
             if len(name_parts) > 1:
                 form.name_inverse.data = name_parts[1][:-1]  # remove the ")"
-        root = g.nodes[entity.root[-1]] if entity.root else entity
+        root = g.nodes[entity.root[0]] if entity.root else entity
         if root:  # Set super if exists and is not same as root
-            super_ = g.nodes[entity.root[0]]
+            super_ = g.nodes[entity.root[-1]]
             getattr(
                 form,
                 str(root.id)).data = super_.id \
@@ -459,8 +459,8 @@ def update_links(
         entity.link_string('P128', form.artifact.data, inverse=True)
     elif entity.class_.view == 'type':
         node = origin if isinstance(origin, Node) else entity
-        root = g.nodes[node.root[-1]] if node.root else node
-        super_id = g.nodes[node.root[0]] if node.root else node
+        root = g.nodes[node.root[0]] if node.root else node
+        super_id = g.nodes[node.root[-1]] if node.root else node
         new_super_id = getattr(form, str(root.id)).data
         new_super = g.nodes[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
@@ -528,7 +528,7 @@ def link_and_get_redirect_url(
             class_=class_,
             origin_id=origin.id if origin else None)
         if class_ in ('administrative_unit', 'type'):
-            root_id = origin.root[-1] \
+            root_id = origin.root[0] \
                 if isinstance(origin, Node) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
             url = url_for(

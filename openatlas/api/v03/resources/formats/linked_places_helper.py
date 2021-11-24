@@ -83,7 +83,6 @@ def get_node(entity: Entity,
                 if link.range.id == node.id and node.description:
                     nodes_dict['unit'] = node.description
         hierarchy = [g.nodes[root].name for root in node.root]
-        hierarchy.reverse()
         nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
         nodes.append(nodes_dict)
     return nodes if nodes else None

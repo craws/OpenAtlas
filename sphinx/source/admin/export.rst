@@ -11,7 +11,7 @@ When clicking the **Export SQL** button a new SQL dump will be created with pg_d
 
 * Be aware, especially when sharing, that **user data**, e.g. email addresses, is included.
 * Existing files are shown in a list and can be downloaded or deleted (only admins can delete)
-* If the directory isn't writeable, a warning will be shown
+* If the directory isn't writable, a warning will be shown
 * SQL dumps are saved in the **export/sql** folder
 * File names begin with date and time e.g. 2018-08-23_1533_dump.sql.
 
@@ -21,7 +21,7 @@ Export CSV
 When clicking the **Export CSV** button a new CSV export file for all marked tables will be created.
 
 * Existing files are shown in a list and can be downloaded or deleted (only admins can delete)
-* If the directory isn't writeable, a warning will be shown
+* If the directory isn't writable, a warning will be shown
 * CSV exports are saved in the **export/csv** folder
 * File names are constructed from the date, database schema and table name e.g. 2018-08-23_1533_model_class.csv
 

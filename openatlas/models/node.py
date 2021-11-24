@@ -44,14 +44,14 @@ class Node(Entity):
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for node in nodes.values():
             if node.root:
-                super_ = nodes[node.root[0]]
+                super_ = nodes[node.root[-1]]
                 super_.subs.append(node.id)
                 node.root = Node.get_root_path(
                     nodes,
                     node,
-                    node.root[0],
+                    node.root[-1],
                     node.root)
-                node.category = hierarchies[node.root[-1]]['category']
+                node.category = hierarchies[node.root[0]]['category']
             else:
                 node.category = hierarchies[node.id]['category']
                 node.multiple = hierarchies[node.id]['multiple']
@@ -70,8 +70,8 @@ class Node(Entity):
         super_.count_subs += node.count
         if not super_.root:
             return root
-        node.root.append(super_.root[0])
-        return Node.get_root_path(nodes, node, super_.root[0], root)
+        node.root.insert(0, super_.root[-1])
+        return Node.get_root_path(nodes, node, super_.root[-1], root)
 
     @staticmethod
     def get_nodes(name: str) -> List[int]:
@@ -192,7 +192,7 @@ class Node(Entity):
             old_node: Node,
             new_type_id: int,
             checkbox_values: str) -> None:
-        root = g.nodes[old_node.root[-1]]
+        root = g.nodes[old_node.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
         if new_type_id:  # A new type was selected
@@ -260,7 +260,7 @@ class Node(Entity):
         for entity in Entity.get_by_class(classes, nodes=True):
             linked = False
             for node in entity.nodes:
-                if node.root[-1] == hierarchy_id:
+                if node.root[0] == hierarchy_id:
                     linked = True
                     break
             if not linked:

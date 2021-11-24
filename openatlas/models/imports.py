@@ -66,7 +66,7 @@ class Import:
             return False
         # Check if type is allowed (for corresponding form)
         valid_type = False
-        root = g.nodes[g.nodes[int(type_id)].root[0]]
+        root = g.nodes[g.nodes[int(type_id)].root[-1]]
         for form_object in root.forms.values():
             if form_object['name'] == class_:
                 valid_type = True

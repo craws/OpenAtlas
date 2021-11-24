@@ -19,7 +19,7 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.model import view_class_mapping
+from openatlas.models.openatlas_class import view_class_mapping
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
@@ -88,7 +88,7 @@ def build_form(
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
             node = entity if entity else origin
-            root = g.nodes[node.root[-1]] if node.root else node
+            root = g.nodes[node.root[0]] if node.root else node
             if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
@@ -120,7 +120,7 @@ def populate_form(
     form.opened.data = time.time()
     node_data: Dict[int, List[int]] = {}
     for node, node_value in nodes.items():
-        root = g.nodes[node.root[-1]] if node.root else node
+        root = g.nodes[node.root[0]] if node.root else node
         if root.id not in node_data:
             node_data[root.id] = []
         node_data[root.id].append(node.id)
@@ -159,7 +159,7 @@ def customize_labels(
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
         node = item if item else origin
-        root = g.nodes[node.root[-1]] if node.root else node
+        root = g.nodes[node.root[0]] if node.root else node
         getattr(form, str(root.id)).label.text = 'super'
 
 
@@ -339,7 +339,7 @@ def add_fields(
     elif class_ in g.classes and g.classes[class_].view == 'type':
         setattr(form, 'is_node_form', HiddenField())
         node = entity if entity else origin
-        root = g.nodes[node.root[-1]] if node.root else node
+        root = g.nodes[node.root[0]] if node.root else node
         setattr(form, str(root.id), TreeField(str(root.id)))
         if root.directional:
             setattr(form, 'name_inverse', StringField(_('inverse')))
@@ -420,7 +420,7 @@ def build_move_form(node: Node) -> FlaskForm:
             widget=widgets.ListWidget(prefix_label=False))
         save = SubmitField(uc_first(_('move entities')))
 
-    root = g.nodes[node.root[-1]]
+    root = g.nodes[node.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))
     form = Form(obj=node)
     choices = []

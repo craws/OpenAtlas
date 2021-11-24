@@ -285,7 +285,7 @@ class Link:
                 offending_nodes = []
                 entity = Entity.get_by_id(id_, nodes=True)
                 for entity_node in entity.nodes:
-                    if g.nodes[entity_node.root[-1]].id != node.id:
+                    if g.nodes[entity_node.root[0]].id != node.id:
                         continue  # pragma: no cover
                     offending_nodes.append(entity_node)
                 data.append({

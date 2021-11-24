@@ -31,7 +31,8 @@ from openatlas.models.content import get_translation
 from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
-from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
 
 
@@ -246,7 +247,7 @@ def get_entity_data(
     # Types
     if entity.standard_type:
         title = ' > '.join(
-            reversed([g.nodes[id_].name for id_ in entity.standard_type.root]))
+            [g.nodes[id_].name for id_ in entity.standard_type.root])
         data[_('type')] = \
             f'<span title="{title}">{link(entity.standard_type)}</span>'
     data.update(get_type_data(entity))
@@ -255,7 +256,7 @@ def get_entity_data(
     from openatlas.models.node import Node
     from openatlas.models.reference_system import ReferenceSystem
     if isinstance(entity, Node):
-        data[_('super')] = link(g.nodes[entity.root[0]])
+        data[_('super')] = link(g.nodes[entity.root[-1]])
         if entity.category == 'value':
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
@@ -407,7 +408,7 @@ def system_warnings(_context, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {session['settings']['database_version']}")
-    for path in app.config['WRITEABLE_DIRS']:
+    for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
                 f"{uc_first(_('directory not writable'))}: "
@@ -779,11 +780,13 @@ def get_type_data(entity: 'Entity') -> Dict[str, Any]:
     for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
         if entity.standard_type and node.id == entity.standard_type.id:
             continue  # Standard type is already added
-        title = ' > '.join(reversed([g.nodes[id_].name for id_ in node.root]))
-        html = f'<span title="{title}">{link(node)}</span>'
+        html = f"""
+            <span title="{" > ".join([g.nodes[i].name for i in node.root])}">
+                {link(node)}
+            </span>"""
         if node.category == 'value':
             html += f' {float(value):g} {node.description}'
-        data[g.nodes[node.root[-1]].name].append(html)
+        data[g.nodes[node.root[0]].name].append(html)
     return {key: data[key] for key in sorted(data.keys())}
 
 

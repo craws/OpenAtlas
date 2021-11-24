@@ -453,7 +453,7 @@ def admin_orphans() -> str:
         'unlinked': Tab('unlinked', table=Table(header)),
         'nodes': Tab('type', table=Table(
             ['name', 'root'],
-            [[link(node), link(g.nodes[node.root[-1]])]
+            [[link(node), link(g.nodes[node.root[0]])]
              for node in Node.get_node_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(

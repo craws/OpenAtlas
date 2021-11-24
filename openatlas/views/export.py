@@ -67,9 +67,9 @@ def download_csv(filename: str) -> Any:
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
     path = app.config['EXPORT_DIR'] / 'sql'
-    writeable = os.access(path, os.W_OK)
+    writable = os.access(path, os.W_OK)
     form = ExportSqlForm()
-    if form.validate_on_submit() and writeable:
+    if form.validate_on_submit() and writable:
         if sql_export():
             logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
@@ -80,8 +80,8 @@ def export_sql() -> Union[str, Response]:
     return render_template(
         'export.html',
         form=form,
-        table=get_table('sql', path, writeable),
-        writeable=writeable,
+        table=get_table('sql', path, writable),
+        writable=writable,
         title=_('export SQL'),
         crumbs=[
             [_('admin'),
@@ -92,9 +92,9 @@ def export_sql() -> Union[str, Response]:
 @required_group('manager')
 def export_csv() -> Union[str, Response]:
     path = app.config['EXPORT_DIR'] / 'csv'
-    writeable = os.access(path, os.W_OK)
+    writable = os.access(path, os.W_OK)
     form = ExportCsvForm()
-    if form.validate_on_submit() and writeable:
+    if form.validate_on_submit() and writable:
         csv_export(form)
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
@@ -102,15 +102,15 @@ def export_csv() -> Union[str, Response]:
     return render_template(
         'export.html',
         form=form,
-        table=get_table('csv', path, writeable),
-        writeable=writeable,
+        table=get_table('csv', path, writable),
+        writable=writable,
         title=_('export CSV'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
             _('export CSV')])
 
 
-def get_table(type_: str, path: Path, writeable: bool) -> Table:
+def get_table(type_: str, path: Path, writable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
             f for f in path.iterdir()
@@ -121,7 +121,7 @@ def get_table(type_: str, path: Path, writeable: bool) -> Table:
             link(
                 _('download'),
                 url_for(f'download_{type_}', filename=file.name))]
-        if is_authorized('admin') and writeable:
+        if is_authorized('admin') and writable:
             data.append(
                 delete_link(
                     file.name,
