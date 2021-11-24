@@ -60,7 +60,7 @@ def insert(
         view_name=view_name,
         gis_data=gis_data,
         geonames_module=geonames_module,
-        writeable=os.access(app.config['UPLOAD_DIR'], os.W_OK),  # For files
+        writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=overlays,
         title=_(view_name),
         crumbs=add_crumbs(view_name, class_, origin, structure, insert_=True))

@@ -408,7 +408,7 @@ def system_warnings(_context, _unneeded_string: str) -> str:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
             f"current version is {session['settings']['database_version']}")
-    for path in app.config['WRITEABLE_DIRS']:
+    for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
                 f"{uc_first(_('directory not writable'))}: "

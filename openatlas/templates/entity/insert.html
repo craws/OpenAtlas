@@ -10,7 +10,7 @@
                 <span style="font-weight: bold;">{{ ', '.join(session.settings.file_upload_allowed_extension) }}</span>
             </p>
         {% endif %}
-        {% if view_name == 'file' and not writeable %}
+        {% if view_name == 'file' and not writable %}
             <span class="error">{{ _('directory not writable')|uc_first }}</span>
         {% else %}
             {{ form|display_form(manual_page='entity/' + view_name) }}

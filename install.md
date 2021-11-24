@@ -99,7 +99,7 @@ Test Apache configuration and restart
 
 ### File Upload and Export
 
-Make these directories writeable for the Apache user:
+Make these directories writable for the Apache user:
 
     openatlas/uploads
     openatlas/export/csv
