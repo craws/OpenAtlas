@@ -31,7 +31,8 @@ from openatlas.models.content import get_translation
 from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
-from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.models.cidoc_property import CidocProperty
+from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
 
 

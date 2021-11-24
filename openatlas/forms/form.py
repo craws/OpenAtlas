@@ -19,7 +19,7 @@ from openatlas.forms.field import (
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.model import view_class_mapping
+from openatlas.models.openatlas_class import view_class_mapping
 from openatlas.models.node import Node
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table

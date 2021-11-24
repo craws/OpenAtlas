@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
-from openatlas.models.model import OpenatlasClass
+from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.network import Network
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, uc_first
@@ -89,7 +89,7 @@ def openatlas_class_index() -> str:
         'add type',
         _('color'),
         'count'])
-    class_count = OpenatlasClass.get_openatlas_class_count()
+    class_count = OpenatlasClass.get_class_count()
     for class_ in g.classes.values():
         table.rows.append([
             class_.label,
