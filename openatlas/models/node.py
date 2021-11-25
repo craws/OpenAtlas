@@ -265,8 +265,7 @@ class Node(Entity):
                     break
             if not linked:
                 if classes == 'object_location':  # pragma: no cover
-                    entity = entity.get_linked_entity('P53', True)
-                    if entity:
+                    if entity.get_linked_entity('P53', True):
                         untyped.append(entity)
                 else:
                     untyped.append(entity)
