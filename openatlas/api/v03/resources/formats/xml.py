@@ -16,8 +16,10 @@ def subunit_xml(out: Dict[str, Any]):
 
 
 def transform_output(out: Dict[str, Any]) -> Dict[str, Any]:
+    item_list = []
     new_dict = {}
     for k, v in out.items():
-        subunits = {item['openatlasClassName']: item for item in v}
-        new_dict[k] = subunits
+        item_list.append({item['openatlasClassName']: item} for item in v)
+        new_dict[k] = item_list
     return new_dict
+
