@@ -1,17 +1,17 @@
 from typing import Dict
 
 from flask_restful import fields
-from flask_restful.fields import List as RestList
+from flask_restful.fields import Nested
 
 
 class NodesOverviewTemplate:
 
     @staticmethod
-    def node_overview_template() -> Dict[str, RestList]:
+    def node_overview_template() -> Dict[str, Nested]:
         categories = {
             'standard': fields.Raw,
             'place': fields.Raw,
             'custom': fields.Raw,
             'value': fields.Raw,
             'system': fields.Raw}
-        return {"types": fields.List(fields.Nested(categories))}
+        return {"types": fields.Nested(categories)}

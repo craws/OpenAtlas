@@ -20,10 +20,9 @@ class GetTypeTree(Resource):
         return marshal(type_tree, template), 200
 
     @staticmethod
-    def get_type_tree() -> List[Dict[int, Dict[str, Any]]]:
-        return [
-            {id_: GetTypeTree.serialize_to_json(node)}
-            for id_, node in Node.get_all_nodes().items()]
+    def get_type_tree() -> Dict[str, Any]:
+        return {id_: GetTypeTree.serialize_to_json(node)
+            for id_, node in Node.get_all_nodes().items()}
 
     @staticmethod
     def serialize_to_json(node: Node) -> Dict[str, Any]:
