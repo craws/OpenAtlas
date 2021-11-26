@@ -2,7 +2,6 @@ from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v03.endpoints.content.content import GetContent
 from openatlas.api.v03.endpoints.content.geometric_entities import \
     GetGeometricEntities
-from openatlas.api.v03.endpoints.content.overview_count import OverviewCount
 from openatlas.api.v03.endpoints.content.systemclass_count import \
     SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
@@ -96,10 +95,6 @@ def add_routes_v03(api):
         GetContent,
         '/content/',
         endpoint="content")
-    api.add_resource(
-        OverviewCount,
-        '/overview_count/',
-        endpoint='overview_count')  # Deprecated
     api.add_resource(
         ClassMapping,
         '/classes/',
