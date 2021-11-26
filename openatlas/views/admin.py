@@ -23,7 +23,7 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
@@ -251,7 +251,7 @@ def admin_check_link_duplicates(
             link(Entity.get_by_id(row['range_id'])),
             link(g.properties[row['property_code']]),
             row['description'],
-            link(g.nodes[row['type_id']]) if row['type_id'] else '',
+            link(g.types[row['type_id']]) if row['type_id'] else '',
             format_date(row['begin_from']),
             format_date(row['begin_to']),
             row['begin_comment'],
@@ -267,17 +267,17 @@ def admin_check_link_duplicates(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
         for row in Link.check_single_type_duplicates():
             remove_links = []
-            for node in row['offending_nodes']:
+            for type_ in row['offending_types']:
                 url = url_for(
                     'admin_delete_single_type_duplicate',
                     entity_id=row['entity'].id,
-                    node_id=node.id)
+                    type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a> {node.name}')
+                    f'<a href="{url}">{uc_first(_("remove"))}</a> {type_.name}')
             table.rows.append([
                 link(row['entity']),
                 row['entity'].class_.name,
-                link(g.nodes[row['node'].id]),
+                link(g.types[row['type'].id]),
                 '<br><br><br><br><br>'.join(remove_links)])
     return render_template(
         'admin/check_link_duplicates.html',
@@ -289,12 +289,12 @@ def admin_check_link_duplicates(
             _('check link duplicates')])
 
 
-@app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
+@app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:type_id>')
 @required_group('contributor')
 def admin_delete_single_type_duplicate(
         entity_id: int,
-        node_id: int) -> Response:
-    Node.remove_by_entity_and_node(entity_id, node_id)
+        type_id: int) -> Response:
+    Type.remove_by_entity_and_type(entity_id, type_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
 
@@ -452,10 +452,10 @@ def admin_orphans() -> str:
     tabs = {
         'orphans': Tab('orphans', table=Table(header)),
         'unlinked': Tab('unlinked', table=Table(header)),
-        'nodes': Tab('type', table=Table(
+        'types': Tab('type', table=Table(
             ['name', 'root'],
-            [[link(node), link(g.nodes[node.root[0]])]
-             for node in Node.get_node_orphans()])),
+            [[link(type_), link(g.types[type_.root[0]])]
+             for type_ in Type.get_type_orphans()])),
         'missing_files': Tab('missing_files', table=Table(header)),
         'orphaned_files': Tab(
             'orphaned_files',
@@ -479,7 +479,7 @@ def admin_orphans() -> str:
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
-    for entity in Entity.get_by_class('file', nodes=True):
+    for entity in Entity.get_by_class('file', types=True):
         entity_file_ids.append(entity.id)
         if not get_file_path(entity):
             tabs['missing_files'].table.rows.append([

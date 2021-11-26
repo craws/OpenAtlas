@@ -74,7 +74,7 @@ class LPHelper:
     def get_node(entity: Entity,
                  links: List[Link]) -> Optional[List[Dict[str, Any]]]:
         nodes = []
-        for node in entity.nodes:
+        for node in entity.types:
             nodes_dict = {
                 'identifier': url_for(
                     'api_03.entity',
@@ -86,7 +86,7 @@ class LPHelper:
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
-            hierarchy = [g.nodes[root].name for root in node.root]
+            hierarchy = [g.types[root].name for root in node.root]
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
         return nodes if nodes else None
@@ -121,6 +121,6 @@ class LPHelper:
             identifier = system.resolver_url if system.resolver_url else ''
             ref.append({
                 'identifier': f"{identifier}{link_.description}",
-                'type': to_camel_case(g.nodes[link_.type.id].name),
+                'type': to_camel_case(g.types[link_.type.id].name),
                 'referenceSystem': system.name})
         return ref if ref else None

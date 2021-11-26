@@ -74,9 +74,9 @@ def overview() -> str:
             if count:
                 url = url_for('index', view=g.class_view_mapping[name])
                 if name == 'administrative_unit':
-                    url = f"{url_for('node_index')}#menu-tab-place"
+                    url = f"{url_for('type_index')}#menu-tab-place"
                 elif name == 'type':
-                    url = url_for('node_index')
+                    url = url_for('type_index')
                 elif name in [
                         'feature',
                         'human_remains',

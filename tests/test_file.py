@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -17,7 +17,7 @@ class FileTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'File keeper')
                 reference = Entity.insert('edition', 'Ancient Books')
-                node_id = Node.get_hierarchy('Sex').subs[0]
+                type_id = Type.get_hierarchy('Sex').subs[0]
 
             # Insert
             rv = self.app.get(
@@ -134,7 +134,7 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'File keeper' in rv.data
             rv = self.app.post(
-                url_for('entity_add_file', id_=node_id),
+                url_for('entity_add_file', id_=type_id),
                 data={'checkbox_values': str([file_id])},
                 follow_redirects=True)
             assert b'Updated file' in rv.data

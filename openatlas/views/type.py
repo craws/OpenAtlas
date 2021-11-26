@@ -9,15 +9,15 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, sanitize
 
 
-def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
+def walk_tree(types: List[int]) -> List[Dict[str, Any]]:
     items = []
-    for id_ in nodes:
-        item = g.nodes[id_]
+    for id_ in types:
+        item = g.types[id_]
         count_subs = f' ({format_number(item.count_subs)})' \
             if item.count_subs else ''
         items.append({
@@ -31,79 +31,79 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
     return items
 
 
-@app.route('/types')
+@app.route('/type')
 @required_group('readonly')
-def node_index() -> str:
-    nodes: Dict[str, Dict[Entity, str]] = \
+def type_index() -> str:
+    types: Dict[str, Dict[Entity, str]] = \
         {'standard': {}, 'custom': {}, 'place': {}, 'value': {}, 'system': {}}
-    for node in g.nodes.values():
-        if node.root:
+    for types_ in g.types.values():
+        if types_.root:
             continue
-        nodes[node.category][node] = render_template(
+        types[types_.category][types_] = render_template(
             'forms/tree_select_item.html',
-            name=sanitize(node.name),
-            data=walk_tree(Node.get_nodes(node.name)))
+            name=sanitize(types_.name),
+            data=walk_tree(Type.get_types(types_.name)))
     return render_template(
-        'types/index.html',
-        nodes=nodes,
+        'type/index.html',
+        types=types,
         title=_('types'),
         crumbs=[_('types')])
 
 
-@app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(id_: int) -> Response:
-    node = g.nodes[id_]
-    root = g.nodes[node.root[0]] if node.root else None
-    if node.category == 'system' or node.subs or node.count:
+def type_delete(id_: int) -> Response:
+    type_ = g.types[id_]
+    root = g.types[type_.root[0]] if type_.root else None
+    if type_.category == 'system' or type_.subs or type_.count:
         abort(403)
-    node.delete()
+    type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(
-        url_for('entity_view', id_=root.id) if root else url_for('node_index'))
+        url_for('entity_view', id_=root.id) if root else url_for('type_index'))
 
 
-@app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/move/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_move_entities(id_: int) -> Union[str, Response]:
-    node = g.nodes[id_]
-    root = g.nodes[node.root[0]]
+def type_move_entities(id_: int) -> Union[str, Response]:
+    type_ = g.types[id_]
+    root = g.types[type_.root[0]]
     if root.category == 'value':  # pragma: no cover
         abort(403)
-    form = build_move_form(node)
+    form = build_move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()
-        Node.move_entities(
-            node,
+        Type.move_entities(
+            type_,
             getattr(form, str(root.id)).data,
             form.checkbox_values.data)
         Transaction.commit()
         flash(_('Entities were updated'), 'success')
         return redirect(
-            f"{url_for('node_index')}"
-            f"#menu-tab-{node.category}_collapse-{root.id}")
-    getattr(form, str(root.id)).data = node.id
+            f"{url_for('type_index')}"
+            f"#menu-tab-{type_.category}_collapse-{root.id}")
+    getattr(form, str(root.id)).data = type_.id
     return render_template(
-        'types/move.html',
+        'type/move.html',
         table=Table(
             header=['#', _('selection')],
             rows=[[item, item.label.text] for item in form.selection]),
         root=root,
         form=form,
-        entity=node,
+        entity=type_,
         crumbs=[
-            [_('types'), url_for('node_index')],
+            [_('types'), url_for('type_index')],
             root,
-            node,
+            type_,
             _('move entities')])
 
 
-@app.route('/types/untyped/<int:id_>')
+@app.route('/type/untyped/<int:id_>')
 @required_group('editor')
 def show_untyped_entities(id_: int) -> str:
-    hierarchy = g.nodes[id_]
+    hierarchy = g.types[id_]
     table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in Node.get_untyped(hierarchy.id):
+    for entity in Type.get_untyped(hierarchy.id):
         table.rows.append([
             link(entity),
             entity.class_.label,
@@ -116,6 +116,6 @@ def show_untyped_entities(id_: int) -> str:
         table=table,
         crumbs=[
             [_('types'),
-             url_for('node_index')],
+             url_for('type_index')],
             link(hierarchy),
             _('untyped entities')])

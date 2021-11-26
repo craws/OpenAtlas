@@ -3,7 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -19,9 +19,9 @@ class RelationTests(TestBaseCase):
             # Add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor.id))
             assert b'Actor actor relation' in rv.data
-            relation_id = Node.get_hierarchy('Actor actor relation').id
-            relation_sub_id = g.nodes[relation_id].subs[0]
-            relation_sub_id2 = g.nodes[relation_id].subs[1]
+            relation_id = Type.get_hierarchy('Actor actor relation').id
+            relation_sub_id = g.types[relation_id].subs[0]
+            relation_sub_id2 = g.types[relation_id].subs[1]
             data = {
                 'actor': str([related.id]),
                 relation_id: relation_sub_id,
@@ -57,7 +57,7 @@ class RelationTests(TestBaseCase):
 
             # Relation types
             rv = self.app.get(
-                url_for('node_move_entities', id_=relation_sub_id))
+                url_for('type_move_entities', id_=relation_sub_id))
             assert b'The Kurgan' in rv.data
 
             # Update relationship
@@ -67,7 +67,7 @@ class RelationTests(TestBaseCase):
                 link_id2 = Link.get_links(actor.id, 'OA7', True)[0].id
 
             rv = self.app.post(
-                url_for('node_move_entities', id_=relation_sub_id),
+                url_for('type_move_entities', id_=relation_sub_id),
                 follow_redirects=True,
                 data={
                     relation_id: relation_sub_id2,
@@ -75,7 +75,7 @@ class RelationTests(TestBaseCase):
                     'checkbox_values': str([link_id])})
             assert b'Entities were updated' in rv.data
             rv = self.app.post(
-                url_for('node_move_entities', id_=relation_sub_id2),
+                url_for('type_move_entities', id_=relation_sub_id2),
                 data={
                     relation_id: '',
                     'selection': [link_id],

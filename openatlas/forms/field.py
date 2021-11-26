@@ -9,7 +9,7 @@ from wtforms import FloatField, HiddenField
 from wtforms.widgets import HiddenInput
 
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data
 
@@ -22,9 +22,9 @@ class TableMultiSelect(HiddenInput):
         class_ = field.id if field.id != 'given_place' else 'place'
         aliases = current_user.settings['table_show_aliases']
         if class_ in ['group', 'person', 'place']:
-            entities = Entity.get_by_class(class_, nodes=True, aliases=aliases)
+            entities = Entity.get_by_class(class_, types=True, aliases=aliases)
         else:
-            entities = Entity.get_by_view(class_, nodes=True, aliases=aliases)
+            entities = Entity.get_by_view(class_, types=True, aliases=aliases)
         table = Table(
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
@@ -78,13 +78,13 @@ class TableSelect(HiddenInput):
                 class_ = 'place'
                 entities = Entity.get_by_class(
                     'place',
-                    nodes=True,
+                    types=True,
                     aliases=aliases)
             else:
                 class_ = field.id
                 entities = Entity.get_by_view(
                     class_,
-                    nodes=True,
+                    types=True,
                     aliases=aliases)
             table = Table(g.table_headers[class_])
             selection = ''
@@ -128,9 +128,9 @@ class TreeMultiSelect(HiddenInput):
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_multi_select.html',
             field=field,
-            root=g.nodes[int(field.id)],
-            selection=sorted([g.nodes[id_].name for id_ in data]),
-            data=Node.get_tree_data(int(field.id), data))
+            root=g.types[int(field.id)],
+            selection=sorted([g.types[id_].name for id_ in data]),
+            data=Type.get_tree_data(int(field.id), data))
 
 
 class TreeMultiField(HiddenField):
@@ -145,13 +145,13 @@ class TreeSelect(HiddenInput):
         if field.data:
             field.data = field.data[0] \
                 if isinstance(field.data, list) else field.data
-            selection = g.nodes[int(field.data)].name
-            selected_ids.append(g.nodes[int(field.data)].id)
+            selection = g.types[int(field.data)].name
+            selected_ids.append(g.types[int(field.data)].id)
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
             field=field,
             selection=selection,
-            data=Node.get_tree_data(int(field.id), selected_ids))
+            data=Type.get_tree_data(int(field.id), selected_ids))
 
 
 class TreeField(HiddenField):

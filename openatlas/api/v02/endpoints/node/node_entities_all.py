@@ -21,16 +21,16 @@ class GetNodeEntitiesAll(Resource):
 
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
-        if id_ not in g.nodes:
+        if id_ not in g.types:
             raise InvalidSubunitError  # pragma: no cover
         return GetNodeEntitiesAll.get_recursive_node_entities(id_, [])
 
     @staticmethod
     def get_recursive_node_entities(id_: int, data: List[Dict[str, Any]]) \
             -> List[Dict[str, Any]]:
-        for entity in g.nodes[id_].get_linked_entities(['P2', 'P89'],
+        for entity in g.types[id_].get_linked_entities(['P2', 'P89'],
                                                        inverse=True):
             data.append(get_node_dict(entity))
-        for sub_id in g.nodes[id_].subs:
+        for sub_id in g.types[id_].subs:
             GetNodeEntitiesAll.get_recursive_node_entities(sub_id, data)
         return data

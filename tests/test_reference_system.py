@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase
 
@@ -15,7 +15,7 @@ class ReferenceSystemTest(TestBaseCase):
             geonames = ReferenceSystem.get_by_name('GeoNames')
             wikidata = ReferenceSystem.get_by_name('Wikidata')
             precision_id = \
-                Node.get_hierarchy('External reference match').subs[0]
+                Type.get_hierarchy('External reference match').subs[0]
 
             rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'Resolver URL' in rv.data
@@ -56,7 +56,7 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Website URL' in rv.data
             data = {
                 'name': 'GeoNames',
-                Node.get_hierarchy('External reference match').id: precision_id,
+                Type.get_hierarchy('External reference match').id: precision_id,
                 'website_url': 'https://www.geonames2.org/',
                 'resolver_url': 'https://www.geonames2.org/'}
             rv = self.app.post(

@@ -49,7 +49,7 @@ def translation_delete(id_: int) -> Response:
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_update(id_: int) -> Union[str, Response]:
-    translation = Entity.get_by_id(id_, nodes=True)
+    translation = Entity.get_by_id(id_, types=True)
     form = build_form('source_translation', translation)
     if form.validate_on_submit():
         save(form, translation)

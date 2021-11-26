@@ -3,7 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -78,9 +78,9 @@ class ContentTests(TestBaseCase):
                 source = Entity.insert('source', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
-                source_node = Node.get_hierarchy('Source')
-                source.link('P2', g.nodes[source_node.subs[0]])
-                source.link('P2', g.nodes[source_node.subs[1]])
+                source_type = Type.get_hierarchy('Source')
+                source.link('P2', g.types[source_type.subs[0]])
+                source.link('P2', g.types[source_type.subs[1]])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
             rv = self.app.get(
@@ -91,7 +91,7 @@ class ContentTests(TestBaseCase):
                 url_for(
                     'admin_delete_single_type_duplicate',
                     entity_id=source.id,
-                    node_id=source_node.subs[0]),
+                    type_id=source_type.subs[0]),
                 follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 

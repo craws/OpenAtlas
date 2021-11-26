@@ -6,7 +6,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import display_profile_image
 from tests.base import TestBaseCase, insert_entity
@@ -55,7 +55,7 @@ class ImageTest(TestBaseCase):
                 file_pathless = insert_entity('Pathless_File', 'file')
 
                 file = insert_entity('Test_File', 'file')
-                file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
                 file_name = f'{file.id}.jpeg'
                 src_png = \
                     pathlib.Path(app.root_path) \
@@ -65,7 +65,7 @@ class ImageTest(TestBaseCase):
                 copyfile(src_png, dst_png)
 
                 file2 = insert_entity('Test_File2', 'file')
-                file2.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                file2.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
                 file2_name = f'{file2.id}.jpeg'
                 src2_png = \
                     pathlib.Path(app.root_path) \

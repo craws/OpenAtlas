@@ -9,7 +9,7 @@
         {% else %}
             {{ link.description }}
         {% endif %}
-        ({{ g.nodes[link.type.id].name }} {{ _('at') }} {{ link.domain|link|safe }})
+        ({{ g.types[link.type.id].name }} {{ _('at') }} {{ link.domain|link|safe }})
         <br>
     {% endfor %}
 {% endif %}

@@ -29,7 +29,7 @@ def get_structure(
         return None
     else:
         if object_.class_.name not in ['artifact', 'human_remains']:
-            subunits = object_.get_linked_entities('P46', nodes=True)
+            subunits = object_.get_linked_entities('P46', types=True)
         if object_.class_.name == 'human_remains' or (
                 object_.class_.name == 'artifact'
                 and object_.get_linked_entity('P46', inverse=True)):

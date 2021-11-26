@@ -2,7 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase
 
@@ -67,7 +67,7 @@ class EventTest(TestBaseCase):
             wikidata = \
                 f"reference_system_id_" \
                 f"{ReferenceSystem.get_by_name('Wikidata').id}"
-            precision = Node.get_hierarchy('External reference match').subs[0]
+            precision = Type.get_hierarchy('External reference match').subs[0]
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={

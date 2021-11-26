@@ -8,10 +8,10 @@ class Entity:
     @staticmethod
     def get_by_id(
             id_: int,
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> Optional[Dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(nodes, aliases) +
+            Entity.build_sql(types, aliases) +
             ' WHERE e.id = %(id)s GROUP BY e.id;',
             {'id': id_})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
@@ -19,12 +19,12 @@ class Entity:
     @staticmethod
     def get_by_ids(
             ids: Iterable[int],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Dict[str, Any]]:
         if not ids:
             return []
         g.cursor.execute(
-            Entity.build_sql(nodes, aliases) +
+            Entity.build_sql(types, aliases) +
             ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name',
             {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -51,7 +51,7 @@ class Entity:
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
-                ) as nodes
+                ) as types
             FROM model.entity e
             LEFT JOIN model.link t ON e.id = t.domain_id
                 AND t.property_code IN ('P2', 'P89')
@@ -63,10 +63,10 @@ class Entity:
     @staticmethod
     def get_by_class(
             classes: Union[str, List[str]],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(nodes, aliases) +
+            Entity.build_sql(types, aliases) +
             ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
             {'class': tuple(
                 classes if isinstance(classes, list) else [classes])})
@@ -75,10 +75,10 @@ class Entity:
     @staticmethod
     def get_by_cidoc_class(
             code: Union[str, List[str]],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(nodes, aliases) +
+            Entity.build_sql(types, aliases) +
             'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
             {'codes': tuple(code if isinstance(code, list) else [code])})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -179,7 +179,7 @@ class Entity:
             {'ids': tuple(ids)})
 
     @staticmethod
-    def build_sql(nodes: bool = False, aliases: bool = False) -> str:
+    def build_sql(types: bool = False, aliases: bool = False) -> str:
         sql = """
             SELECT
                 e.id,
@@ -196,12 +196,12 @@ class Entity:
                 COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from,
                 e.end_comment,
                 COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to"""
-        if nodes:
+        if types:
             sql += """
                 ,array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
-                ) AS nodes """
+                ) AS types """
         if aliases:
             sql += """
                 ,array_to_json(
@@ -209,7 +209,7 @@ class Entity:
                         FILTER (WHERE alias.name IS NOT NULL)
                 ) AS aliases """
         sql += " FROM model.entity e "
-        if nodes:
+        if types:
             sql += """ LEFT JOIN model.link t
                 ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89') """
         if aliases:

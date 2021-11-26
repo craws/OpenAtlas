@@ -181,20 +181,20 @@ function selectFromTreeMulti(name, value_type = false) {
   var checkedNames = '';
   var ids = $('#' + name + '-tree').jstree('get_selected');
   ids.forEach(function (item, index, array) {
-    var node = $('#' + name + '-tree').jstree().get_node(item);
+    var type_ = $('#' + name + '-tree').jstree().get_node(item);
     if (value_type) {
-      $('#' + name + '-button').after('<span> ' + node['text'] + '</span>');
+      $('#' + name + '-button').after('<span> ' + type_['text'] + '</span>');
       $('#' + name + '-button').after(
           $('<input>').attr({
             type: 'text',
-            id: node.id,
-            name: node.id,
+            id: type_.id,
+            name: type_.id,
             value: '20',
             class: 'value_input'
           }));
       $('#' + name + '-button').after($('<br>'));
     } else {
-      checkedNames += node['text'] + "<br>";
+      checkedNames += type_['text'] + "<br>";
     }
   });
   $("#" + name + "-selection").html(checkedNames);

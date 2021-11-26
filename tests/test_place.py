@@ -6,7 +6,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase
@@ -20,22 +20,22 @@ class PlaceTest(TestBaseCase):
             assert b'+ Place' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_node = Node.get_hierarchy('Administrative unit')
-                unit_sub1 = g.nodes[unit_node.subs[0]]
-                unit_sub2 = g.nodes[unit_node.subs[1]]
+                unit_type = Type.get_hierarchy('Administrative unit')
+                unit_sub1 = g.types[unit_type.subs[0]]
+                unit_sub2 = g.types[unit_type.subs[1]]
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
-                place_node = Node.get_hierarchy('Place')
+                place_type = Type.get_hierarchy('Place')
                 source = Entity.insert('source', 'Necronomicon')
             geonames = \
                 f"reference_system_id_" \
                 f"{ReferenceSystem.get_by_name('GeoNames').id}"
-            precision = Node.get_hierarchy('External reference match').subs[0]
+            precision = Type.get_hierarchy('External reference match').subs[0]
             data = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
-                unit_node.id: str([unit_sub1.id, unit_sub2.id]),
+                unit_type.id: str([unit_sub1.id, unit_sub2.id]),
                 geonames: '123456',
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
@@ -85,7 +85,7 @@ class PlaceTest(TestBaseCase):
                     "name": "",
                     "description": "",
                     "shapeType": "shape"}}]"""
-            data[place_node.id] = place_node.subs
+            data[place_type.id] = place_type.subs
             data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=source.id),
@@ -256,25 +256,25 @@ class PlaceTest(TestBaseCase):
             assert b'777' in rv.data
 
             # Place types
-            rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
+            rv = self.app.get(url_for('type_move_entities', id_=unit_sub1.id))
             assert b'Asgard' in rv.data
 
-            # Test move entities of multiple node if link to new node exists
+            # Test move entities of multiple type if link to new type exists
             rv = self.app.post(
-                url_for('node_move_entities', id_=unit_sub1.id),
+                url_for('type_move_entities', id_=unit_sub1.id),
                 follow_redirects=True,
                 data={
-                    unit_node.id: unit_sub2.id,
+                    unit_type.id: unit_sub2.id,
                     'selection': location.id,
                     'checkbox_values': str([location.id])})
             assert b'Entities were updated' in rv.data
 
-            # Test move entities of multiple node
+            # Test move entities of multiple type
             rv = self.app.post(
-                url_for('node_move_entities', id_=unit_sub2.id),
+                url_for('type_move_entities', id_=unit_sub2.id),
                 follow_redirects=True,
                 data={
-                    unit_node.id: unit_sub1.id,
+                    unit_type.id: unit_sub1.id,
                     'selection': location.id,
                     'checkbox_values': str([location.id])})
             assert b'Entities were updated' in rv.data
@@ -321,10 +321,10 @@ class PlaceTest(TestBaseCase):
             self.app.post(
                 url_for('update', id_=stratigraphic_id),
                 data={'name': "I'm a stratigraphic unit"})
-            dimension_node_id = Node.get_hierarchy('Dimensions').subs[0]
+            dimension_type_id = Type.get_hierarchy('Dimensions').subs[0]
             data = {
                 'name': 'You never find me',
-                dimension_node_id: 50,
+                dimension_type_id: 50,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(

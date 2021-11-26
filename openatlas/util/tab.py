@@ -111,7 +111,7 @@ class Tab:
             if id_:
                 buttons += [button(
                     _('move entities'),
-                    url_for('node_move_entities', id_=id_))]
+                    url_for('type_move_entities', id_=id_))]
         elif name == 'event':
             if view == 'file':
                 buttons += [

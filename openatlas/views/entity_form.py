@@ -14,7 +14,7 @@ from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
@@ -90,10 +90,10 @@ def add_crumbs(
             structure['stratigraphic_unit'],
             link(origin)]
     if view_name == 'type':
-        crumbs = [[_('types'), url_for('node_index')]]
-        if isinstance(origin, Node) and origin.root:
-            for node_id in origin.root:
-                crumbs += [link(g.nodes[node_id])]
+        crumbs = [[_('types'), url_for('type_index')]]
+        if isinstance(origin, Type) and origin.root:
+            for type_id in origin.root:
+                crumbs += [link(g.types[type_id])]
         crumbs += [origin]
     sibling_count = 0
     if origin \
@@ -111,12 +111,12 @@ def add_crumbs(
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def update(id_: int) -> Union[str, Response]:
-    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    entity = Entity.get_by_id(id_, types=True, aliases=True)
     if not entity.class_.view:
         abort(422)  # pragma: no cover
     elif not is_authorized(entity.class_.write_access):
         abort(403)  # pragma: no cover
-    elif isinstance(entity, Node):
+    elif isinstance(entity, Type):
         if entity.category == 'system' \
                 or (entity.category == 'standard' and not entity.root):
             abort(403)  # pragma: no cover
@@ -133,7 +133,7 @@ def update(id_: int) -> Union[str, Response]:
     location = None
     if entity.class_.view in ['artifact', 'place']:
         structure = get_structure(entity)
-        location = entity.get_linked_entity_safe('P53', nodes=True)
+        location = entity.get_linked_entity_safe('P53', types=True)
         gis_data = Gis.get_all([entity], structure)
         overlays = Overlay.get_by_object(entity)
         entity.image_id = entity.get_profile_image_id()
@@ -151,17 +151,17 @@ def update(id_: int) -> Union[str, Response]:
     elif isinstance(entity, ReferenceSystem) and entity.system:
         form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
-        if isinstance(entity, Node):
+        if isinstance(entity, Type):
             valid = True
-            root = g.nodes[entity.root[0]]
+            root = g.types[entity.root[0]]
             new_super_id = getattr(form, str(root.id)).data
-            new_super = g.nodes[int(new_super_id)] if new_super_id else None
+            new_super = g.types[int(new_super_id)] if new_super_id else None
             if new_super:
                 if new_super.id == entity.id:
-                    flash(_('error node self as super'), 'error')
+                    flash(_('error type self as super'), 'error')
                     valid = False
                 if new_super.root and entity.id in new_super.root:
-                    flash(_('error node sub as super'), 'error')
+                    flash(_('error type sub as super'), 'error')
                     valid = False
             if not valid:
                 return redirect(url_for('entity_view', id_=entity.id))
@@ -195,7 +195,7 @@ def populate_insert_form(
         form: FlaskForm,
         view_name: str,
         class_: str,
-        origin: Union[Entity, Node]) -> None:
+        origin: Union[Entity, Type]) -> None:
     if view_name == 'actor' and origin.class_.name == 'place':
         form.residence.data = origin.id
     if view_name == 'artifact' and origin.class_.view == 'actor':
@@ -216,7 +216,7 @@ def populate_insert_form(
             if origin.id != root_id else None
 
 
-def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
+def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
     if hasattr(form, 'alias'):
         for alias in entity.aliases.values():
             form.alias.append_entry(alias)
@@ -264,15 +264,15 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Node]) -> None:
         if entity.class_.name == 'production':
             form.artifact.data = \
                 [entity.id for entity in entity.get_linked_entities('P108')]
-    elif isinstance(entity, Node):
+    elif isinstance(entity, Type):
         if hasattr(form, 'name_inverse'):  # Directional, e.g. actor relation
             name_parts = entity.name.split(' (')
             form.name.data = name_parts[0]
             if len(name_parts) > 1:
                 form.name_inverse.data = name_parts[1][:-1]  # remove the ")"
-        root = g.nodes[entity.root[0]] if entity.root else entity
+        root = g.types[entity.root[0]] if entity.root else entity
         if root:  # Set super if exists and is not same as root
-            super_ = g.nodes[entity.root[-1]]
+            super_ = g.types[entity.root[-1]]
             getattr(
                 form,
                 str(root.id)).data = super_.id \
@@ -384,12 +384,12 @@ def save(
         else:
             url = url_for('index', view=g.classes[class_].view)
             if class_ in ['administrative_unit', 'type']:
-                url = url_for('node_index')
+                url = url_for('type_index')
     return url
 
 
 def insert_entity(form: FlaskForm, class_: str) \
-        -> Union[Entity, Node, ReferenceSystem]:
+        -> Union[Entity, Type, ReferenceSystem]:
     if class_ == 'reference_system':
         return ReferenceSystem.insert_system(form)
     entity = Entity.insert(class_, form.name.data)
@@ -458,11 +458,11 @@ def update_links(
             entity.delete_links(['P128'], inverse=True)
         entity.link_string('P128', form.artifact.data, inverse=True)
     elif entity.class_.view == 'type':
-        node = origin if isinstance(origin, Node) else entity
-        root = g.nodes[node.root[0]] if node.root else node
-        super_id = g.nodes[node.root[-1]] if node.root else node
+        type_ = origin if isinstance(origin, Type) else entity
+        root = g.types[type_.root[0]] if type_.root else type_
+        super_id = g.types[type_.root[-1]] if type_.root else type_
         new_super_id = getattr(form, str(root.id)).data
-        new_super = g.nodes[int(new_super_id)] if new_super_id else root
+        new_super = g.types[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
             property_code = 'P127' if entity.class_.name == 'type' else 'P89'
             entity.delete_links([property_code])
@@ -529,7 +529,7 @@ def link_and_get_redirect_url(
             origin_id=origin.id if origin else None)
         if class_ in ('administrative_unit', 'type'):
             root_id = origin.root[0] \
-                if isinstance(origin, Node) and origin.root else origin.id
+                if isinstance(origin, Type) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
             url = url_for(
                 'insert',

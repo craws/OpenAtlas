@@ -18,7 +18,7 @@ class GetNodeEntities(Resource):
 
     @staticmethod
     def get_node(id_: int) -> List[Dict[str, Any]]:
-        if id_ not in g.nodes:
+        if id_ not in g.types:
             raise InvalidSubunitError
         return [get_node_dict(entity) for entity in
-                g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)]
+                g.types[id_].get_linked_entities(['P2', 'P89'], inverse=True)]

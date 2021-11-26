@@ -16,7 +16,7 @@ from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
                                                QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from tests.api_test_data_v03 import content, overview_count, \
     system_class_count
@@ -46,7 +46,7 @@ class ApiTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 params = {
                     f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
-                    (id_, node) in Node.get_all_nodes().items()}
+                    (id_, node) in Type.get_all().items()}
                 params['geonames_id'] = ReferenceSystem.get_by_name(
                     'GeoNames').id
 
@@ -73,7 +73,7 @@ class ApiTests(TestBaseCase):
                 params['location_shire_id'] = location.id
 
                 # Adding Type Place
-                place.link('P2', Node.get_hierarchy('Place'))
+                place.link('P2', Type.get_hierarchy('Place'))
 
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
@@ -101,22 +101,22 @@ class ApiTests(TestBaseCase):
                 params['location_kitchen_id'] = strati.id + 1
 
                 # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative unit')
+                unit_node = Type.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
-                file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
                 params['picture_id'] = file.id
 
                 # Adding Value Type
-                value_type = Node.get_hierarchy('Dimensions')
+                value_type = Type.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(
                     ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy(
+                precision_id = Type.get_hierarchy(
                     'External reference match').subs[0]
                 geonames.link(
                     'P67',
@@ -159,8 +159,8 @@ class ApiTests(TestBaseCase):
                 actor2.link('P74', location)
 
                 # Adding actor relation
-                relation_id = Node.get_hierarchy('Actor actor relation').id
-                relation_sub_id = g.nodes[relation_id].subs[0]
+                relation_id = Type.get_hierarchy('Actor actor relation').id
+                relation_sub_id = g.types[relation_id].subs[0]
                 actor.link('OA7', actor2, type_id=relation_sub_id)
 
                 # Creation of event
@@ -180,7 +180,7 @@ class ApiTests(TestBaseCase):
                 params['location_mordor_id'] = place2.id + 1
 
                 # Adding Type Settlement
-                place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
+                place2.link('P2', Entity.get_by_id(Type.get_types('Place')[0]))
 
                 # Creation of Silmarillion (source)
                 source = insert_entity('Silmarillion', 'source')
@@ -267,7 +267,7 @@ class ApiTests(TestBaseCase):
             # /type_entities
             rv = self.app.get(url_for(
                 'api_03.type_entities',
-                id_=Node.get_hierarchy('Place').id))
+                id_=Type.get_hierarchy('Place').id))
             self.assertDictEqual(
                 rv.get_json(),
                 TypeEntities.get_test_type_entities(params))
@@ -310,7 +310,7 @@ class ApiTests(TestBaseCase):
                 classes='E18',
                 codes='artifact',
                 system_classes='person',
-                type_id=Node.get_nodes('Place')[0]))
+                type_id=Type.get_types('Place')[0]))
             self.assertDictEqual(
                 rv.get_json(),
                 Query.get_test_query_type(params))
@@ -611,7 +611,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='person',
-                    type_id=Node.get_nodes('Place')[0]))
+                    type_id=Type.get_types('Place')[0]))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.query',

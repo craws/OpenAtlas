@@ -5,17 +5,17 @@ from openatlas import app
 from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.api.v02.resources.parser import image
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 
 
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
         from pathlib import Path as Pathlib_path
-        entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
+        entity = Entity.get_by_id(int(Pathlib_path(filename).stem), types=True)
         license_ = None
-        for node in entity.nodes:
-            if node.root and node.root[0] == Node.get_hierarchy('License').id:
+        for node in entity.types:
+            if node.root and node.root[0] == Type.get_hierarchy('License').id:
                 license_ = node.name
         if not license_:
             raise AccessDeniedError

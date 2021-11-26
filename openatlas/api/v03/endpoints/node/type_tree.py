@@ -6,7 +6,7 @@ from flask_restful import Resource, marshal
 from openatlas.api.v03.resources.parser import entity_
 from openatlas.api.v03.resources.resolve_endpoints import download
 from openatlas.api.v03.templates.type_tree import TypeTreeTemplate
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 
 
 class GetTypeTree(Resource):
@@ -23,10 +23,10 @@ class GetTypeTree(Resource):
     def get_type_tree() -> List[Dict[int, Dict[str, Any]]]:
         return [
             {id_: GetTypeTree.serialize_to_json(node)}
-            for id_, node in Node.get_all_nodes().items()]
+            for id_, node in Type.get_all().items()]
 
     @staticmethod
-    def serialize_to_json(node: Node) -> Dict[str, Any]:
+    def serialize_to_json(node: Type) -> Dict[str, Any]:
         return {
             'id': node.id,
             'name': node.name,
