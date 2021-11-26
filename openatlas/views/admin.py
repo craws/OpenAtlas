@@ -1,5 +1,6 @@
 import datetime
 import importlib
+import os
 from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
@@ -492,7 +493,9 @@ def admin_orphans() -> str:
 
     # Orphaned files with no corresponding entity
     for file in app.config['UPLOAD_DIR'].iterdir():
-        if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
+        if file.name != '.gitignore' \
+                and os.path.isfile(file) \
+                and int(file.stem) not in entity_file_ids:
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
