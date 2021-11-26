@@ -29,18 +29,15 @@ class ApiTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                params = {f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
-                          (id_, node) in Node.get_all_nodes().items()}
-                params['geonames_id'] = ReferenceSystem.get_by_name(
-                    'GeoNames').id
-
+                params = {
+                    f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
+                    (id_, node) in Node.get_all_nodes().items()}
                 # Creation of Shire (place)
                 place = insert_entity(
                     'Shire', 'place',
                     description='The Shire was the homeland of the hobbits.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
-                params['shire_id'] = place.id
 
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
@@ -53,7 +50,6 @@ class ApiTests(TestBaseCase):
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
-                params['location_shire_id'] = location.id
 
                 # Adding Type Place
                 place.link('P2', Node.get_hierarchy('Place'))
@@ -61,7 +57,6 @@ class ApiTests(TestBaseCase):
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
                 place.link('P1', alias)
-                params['suza_id'] = alias.id
 
                 # Adding External Reference
                 external_reference = insert_entity(
@@ -71,17 +66,12 @@ class ApiTests(TestBaseCase):
                     'P67',
                     place,
                     description='Fandom Wiki of lord of the rings')
-                params['lotr_id'] = external_reference.id
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
-                params['home_id'] = feature.id
-                params['location_home_id'] = feature.id + 1
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
-                params['kitchen_id'] = strati.id
-                params['location_kitchen_id'] = strati.id + 1
 
                 # Adding Administrative Unit Node
                 unit_node = Node.get_hierarchy('Administrative unit')
@@ -90,7 +80,6 @@ class ApiTests(TestBaseCase):
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
                 file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
-                params['picture_id'] = file.id
 
                 # Adding Value Type
                 value_type = Node.get_hierarchy('Dimensions')
@@ -113,22 +102,17 @@ class ApiTests(TestBaseCase):
                     description='That is Frodo')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
-                params['frodo_id'] = actor.id
 
                 alias2 = insert_entity('The ring bearer', 'actor_appellation')
                 actor.link('P131', alias2)
-                params['alias2_id'] = alias2.id
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
                 file2.link('P67', actor)
-                params['file_without_id'] = file2.id
 
                 # Adding artefact to actor
                 artifact = insert_entity('The One Ring', 'artifact')
                 artifact.link('P52', actor)
-                params['ring_id'] = artifact.id
-                params['location_ring_id'] = artifact.id + 1
 
                 # Creation of second actor (Sam)
                 actor2 = insert_entity(
@@ -136,7 +120,6 @@ class ApiTests(TestBaseCase):
                     description='That is Sam')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
-                params['sam_id'] = actor2.id
 
                 # Adding residence
                 actor2.link('P74', location)
@@ -151,7 +134,6 @@ class ApiTests(TestBaseCase):
                 event.link('P11', actor)
                 event.link('P14', actor2)
                 event.link('P7', location)
-                params['travel_id'] = event.id
 
                 # Creation of Mordor (place)
                 place2 = insert_entity(
@@ -159,15 +141,12 @@ class ApiTests(TestBaseCase):
                     description='The heart of evil.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
-                params['mordor_id'] = place2.id
-                params['location_mordor_id'] = place2.id + 1
 
                 # Adding Type Settlement
                 place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
 
                 # Creation of Silmarillion (source)
                 source = insert_entity('Silmarillion', 'source')
-                params['silmarillion_id'] = source.id
 
             self.maxDiff = None
 
