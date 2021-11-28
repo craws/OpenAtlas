@@ -37,7 +37,7 @@ class RelationTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=relation_sub_id))
+            rv = self.app.get(url_for('view', id_=relation_sub_id))
             assert b'Connor' in rv.data
             data['continue_'] = 'yes'
             data['inverse'] = True
@@ -46,7 +46,7 @@ class RelationTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=actor.id))
+            rv = self.app.get(url_for('view', id_=actor.id))
             assert b'The Kurgan' in rv.data
 
             rv = self.app.post(

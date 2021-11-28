@@ -84,11 +84,11 @@ class ImageTest(TestBaseCase):
                 display_profile_image(file_pathless)
 
             # Resizing images (don't change order!)
-            rv = self.app.get(url_for('entity_view', id_=file.id))
+            rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=file_py.id))
+            rv = self.app.get(url_for('view', id_=file_py.id))
             assert b'No preview available' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=file_pathless.id))
+            rv = self.app.get(url_for('view', id_=file_pathless.id))
             assert b'Missing file' in rv.data
             rv = self.app.get(url_for('index', view='file'))
             assert b'Test_File' in rv.data
@@ -116,12 +116,12 @@ class ImageTest(TestBaseCase):
             assert b'404' in rv.data
 
             # Make directory if not exist
-            rv = self.app.get(url_for('entity_view', id_=file.id))
+            rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
 
             # Exception
             app.config['IMAGE_SIZE']['tmp'] = '<'
-            rv = self.app.get(url_for('entity_view', id_=file.id))
+            rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
             app.config['IMAGE_SIZE']['tmp'] = '1'
 

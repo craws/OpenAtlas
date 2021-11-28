@@ -164,7 +164,7 @@ def update(id_: int) -> Union[str, Response]:
                     flash(_('error type sub as super'), 'error')
                     valid = False
             if not valid:
-                return redirect(url_for('entity_view', id_=entity.id))
+                return redirect(url_for('view', id_=entity.id))
         if was_modified(form, entity):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
@@ -304,7 +304,7 @@ def insert_file(
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:
-                    url = f"{url_for('entity_view', id_=origin.id)}#tab-file"
+                    url = f"{url_for('view', id_=origin.id)}#tab-file"
             entity.update(form)
             update_links(entity, form, 'insert', origin)
             logger.log_user(entity.id, 'insert')
@@ -474,11 +474,9 @@ def link_and_get_redirect_url(
         entity: Entity,
         class_: str,
         origin: Union[Entity, None] = None) -> str:
-    url = url_for('entity_view', id_=entity.id)
+    url = url_for('view', id_=entity.id)
     if origin and class_ not in ('administrative_unit', 'type'):
-        url = \
-            f"{url_for('entity_view', id_=origin.id)}" \
-            f"#tab-{entity.class_.view}"
+        url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
         if origin.class_.view == 'reference':
             if entity.class_.name == 'file':
                 origin.link('P67', entity, form.page.data)
@@ -490,7 +488,7 @@ def link_and_get_redirect_url(
                     origin_id=origin.id)
         elif entity.class_.name == 'file':
             entity.link('P67', origin)
-            url = url_for('entity_view', id_=origin.id) + '#tab-file'
+            url = f"{url_for('view', id_=origin.id)}#tab-file"
         elif entity.class_.view == 'reference':
             link_id = entity.link('P67', origin)[0]
             url = url_for(
@@ -501,7 +499,7 @@ def link_and_get_redirect_url(
             if entity.class_.view == 'place' \
                     or entity.class_.name == 'artifact':
                 origin.link('P46', entity)
-                url = url_for('entity_view', id_=entity.id)
+                url = url_for('view', id_=entity.id)
         elif origin.class_.view in ['source', 'file']:
             origin.link('P67', entity)
         elif entity.class_.view == 'source':

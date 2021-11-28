@@ -54,7 +54,7 @@ def note_set_private(id_: int) -> Union[str, Response]:
     note = User.get_note_by_id(id_)
     User.update_note(note['id'], note['text'], False)
     flash(_('note updated'), 'info')
-    return redirect(f"{url_for('entity_view', id_=note['entity_id'])}#tab-note")
+    return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")
 
 
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
@@ -65,7 +65,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
     if form.validate_on_submit():
         User.insert_note(entity_id, form.description.data, form.public.data)
         flash(_('note added'), 'info')
-        return redirect(f"{url_for('entity_view', id_=entity.id)}#tab-note")
+        return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(
         'display_form.html',
         form=form,
@@ -87,8 +87,7 @@ def note_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         User.update_note(note['id'], form.description.data, form.public.data)
         flash(_('note updated'), 'info')
-        return redirect(
-            f"{url_for('entity_view', id_=note['entity_id'])}#tab-note")
+        return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")
     form.save.label.text = _('save')
     form.description.data = note['text']
     form.public.data = note['public']
@@ -110,4 +109,4 @@ def note_delete(id_: int) -> Response:
         abort(403)  # pragma: no cover
     User.delete_note(note['id'])
     flash(_('note deleted'), 'info')
-    return redirect(f"{url_for('entity_view', id_=note['entity_id'])}#tab-note")
+    return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")

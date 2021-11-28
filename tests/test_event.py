@@ -82,7 +82,7 @@ class EventTest(TestBaseCase):
                     wikidata: 'Q123',
                     self.precision_wikidata: precision})
             event_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('entity_view', id_=event_id))
+            rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
 
             # Move
@@ -96,9 +96,9 @@ class EventTest(TestBaseCase):
                     'person': actor.id,
                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('entity_view', id_=move_id))
+            rv = self.app.get(url_for('view', id_=move_id))
             assert b'Keep it moving' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=carrier.id))
+            rv = self.app.get(url_for('view', id_=carrier.id))
             assert b'Keep it moving' in rv.data
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
@@ -111,9 +111,9 @@ class EventTest(TestBaseCase):
                     'artifact': carrier.id,
                     self.precision_wikidata: ''})
             production_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('entity_view', id_=production_id))
+            rv = self.app.get(url_for('view', id_=production_id))
             assert b'Artifact' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=carrier.id))
+            rv = self.app.get(url_for('view', id_=carrier.id))
             assert b'A very productive event' in rv.data
             rv = self.app.get(url_for('update', id_=production_id))
             assert b'A very productive event' in rv.data
@@ -125,9 +125,9 @@ class EventTest(TestBaseCase):
                 'given_place': [residence_id],
                 self.precision_geonames: '',
                 self.precision_wikidata: ''})
-            rv = self.app.get(url_for('entity_view', id_=residence_id))
+            rv = self.app.get(url_for('view', id_=residence_id))
             assert bytes(place_name, 'utf-8') in rv.data
-            rv = self.app.get(url_for('entity_view', id_=actor.id))
+            rv = self.app.get(url_for('view', id_=actor.id))
             assert bytes(actor_name, 'utf-8') in rv.data
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
@@ -140,7 +140,7 @@ class EventTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('index', view='event'))
             assert b'Event' in rv.data
-            self.app.get(url_for('entity_view', id_=activity_id))
+            self.app.get(url_for('view', id_=activity_id))
 
             # Add to event
             rv = self.app.get(url_for('entity_add_file', id_=event_id))

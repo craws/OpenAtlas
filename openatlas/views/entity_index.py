@@ -121,12 +121,12 @@ def delete_entity(id_: int) -> Optional[str]:
             abort(403)
         if entity.classes:
             flash(_('Deletion not possible if classes are attached'), 'error')
-            return url_for('entity_view', id_=id_)
+            return url_for('view', id_=id_)
         url = url_for('index', view='reference_system')
     if entity.class_.view in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
-            return url_for('entity_view', id_=id_)
+            return url_for('view', id_=id_)
         parent = None \
             if entity.class_.name == 'place' \
             else entity.get_linked_entity('P46', True)
@@ -135,7 +135,7 @@ def delete_entity(id_: int) -> Optional[str]:
         flash(_('entity deleted'), 'info')
         if parent:
             tab = f"#tab-{entity.class_.name.replace('_', '-')}"
-            url = url_for('entity_view', id_=parent.id) + tab
+            url = url_for('view', id_=parent.id) + tab
     else:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')

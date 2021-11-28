@@ -84,9 +84,9 @@ class FileTest(TestBaseCase):
             assert b'This field is required' in rv.data
 
             # View
-            rv = self.app.get(url_for('entity_view', id_=file_id))
+            rv = self.app.get(url_for('view', id_=file_id))
             assert b'OpenAtlas logo' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=file_id2))
+            rv = self.app.get(url_for('view', id_=file_id2))
             assert b'OpenAtlas logo' in rv.data
 
             with self.app.get(

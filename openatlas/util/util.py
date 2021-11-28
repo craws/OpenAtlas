@@ -456,7 +456,7 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     for link_ in event_links:
         event = link_.domain
         actor = link_.range
-        event_link = link(_('event'), url_for('entity_view', id_=event.id))
+        event_link = link(_('event'), url_for('view', id_=event.id))
         if not actor.first:
             if link_.first \
                     and (not first_year or int(link_.first) < int(first_year)):
@@ -683,7 +683,7 @@ def link(
     if isinstance(object_, Entity):
         return link(
             object_.name,
-            url_for('entity_view', id_=object_.id),
+            url_for('view', id_=object_.id),
             uc_first_=False)
     return ''
 

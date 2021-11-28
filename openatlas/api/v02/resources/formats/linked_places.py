@@ -30,7 +30,7 @@ class LinkedPlaces:
             links: List[Link],
             links_inverse: List[Link],
             parser: Dict[str, Any]) -> Dict[str, Any]:
-        return {'@id': url_for('entity_view', id_=entity.id, _external=True),
+        return {'@id': url_for('view', id_=entity.id, _external=True),
                 'type': 'Feature',
                 'crmClass': LinkedPlaces.get_crm_class(entity),
                 'systemClass': entity.class_.name,

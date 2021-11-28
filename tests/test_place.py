@@ -45,12 +45,10 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Asgard' in rv.data \
                    and b'An entry has been created' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=precision))
+            rv = self.app.get(url_for('view', id_=precision))
             assert b'Asgard' in rv.data
             rv = self.app.get(
-                url_for(
-                    'entity_view',
-                    id_=ReferenceSystem.get_by_name('GeoNames').id))
+                url_for('view', id_=ReferenceSystem.get_by_name('GeoNames').id))
             assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{
@@ -115,7 +113,7 @@ class PlaceTest(TestBaseCase):
             assert b'Val-hall' in rv.data
 
             # Test error when viewing the corresponding location
-            rv = self.app.get(url_for('entity_view', id_=place.id+1))
+            rv = self.app.get(url_for('view', id_=place.id+1))
             assert b'be viewed directly' in rv.data
 
             # Test with same GeoNames id
@@ -145,7 +143,7 @@ class PlaceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 event = Entity.insert('acquisition', 'Valhalla rising')
                 event.link('P7', location)
-            rv = self.app.get(url_for('entity_view', id_=place2.id))
+            rv = self.app.get(url_for('view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
 
             # Test invalid geom
@@ -356,11 +354,11 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get('/')
             assert b'My human remains' in rv.data
 
-            rv = self.app.get(url_for('entity_view', id_=feat_id))
+            rv = self.app.get(url_for('view', id_=feat_id))
             assert b'not a bug' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=stratigraphic_id))
+            rv = self.app.get(url_for('view', id_=stratigraphic_id))
             assert b'a stratigraphic unit' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=find_id))
+            rv = self.app.get(url_for('view', id_=find_id))
             assert b'You never' in rv.data
             rv = self.app.get(
                 url_for('index', view='place', delete_id=place.id),

@@ -76,13 +76,9 @@ class ReferenceSystemTest(TestBaseCase):
                     self.precision_geonames: '',
                     self.precision_wikidata: precision_id})
             person_id = rv.location.split('/')[-1]
-            rv = self.app.get(
-                url_for('entity_view', id_=wikidata.id),
-                follow_redirects=True)
+            rv = self.app.get(url_for('view', id_=wikidata.id))
             assert b'Actor test' in rv.data
-            rv = self.app.get(
-                url_for('entity_view', id_=person_id),
-                follow_redirects=True)
+            rv = self.app.get(url_for('view', id_=person_id))
             assert b'Wikidata' in rv.data
             rv = self.app.get(url_for('update', id_=person_id))
             assert b'Q123' in rv.data

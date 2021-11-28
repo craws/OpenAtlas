@@ -29,7 +29,7 @@ from openatlas.views.reference import AddReferenceForm
 
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
-def entity_view(id_: int) -> Union[str, Response]:
+def view(id_: int) -> Union[str, Response]:
     if id_ in g.types:  # Types have their own view
         entity = g.types[id_]
         if not entity.root:
@@ -157,13 +157,13 @@ def entity_view(id_: int) -> Union[str, Response]:
                 if link_.type:
                     type_ = link(
                         link_.type.get_name_directed(),
-                        url_for('entity_view', id_=link_.type.id))
+                        url_for('view', id_=link_.type.id))
             else:
                 related = link_.domain
                 if link_.type:
                     type_ = link(
                         link_.type.get_name_directed(True),
-                        url_for('entity_view', id_=link_.type.id))
+                        url_for('view', id_=link_.type.id))
             data = [
                 type_,
                 link(related),
@@ -561,7 +561,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             entity.link_string(
                 'P67',
                 request.form['checkbox_values'], inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-file")
+        return redirect(f"{url_for('view', id_=id_)}#tab-file")
     form = build_table_form(
         'file',
         entity.get_linked_entities('P67', inverse=True))
@@ -586,7 +586,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'],
                 inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-source")
+        return redirect(f"{url_for('view', id_=id_)}#tab-source")
     form = build_table_form(
         'source',
         entity.get_linked_entities('P67', inverse=True))
@@ -611,7 +611,7 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             form.reference.data,
             description=form.page.data,
             inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-reference")
+        return redirect(f"{url_for('view', id_=id_)}#tab-reference")
     form.page.label.text = uc_first(_('page / link text'))
     return render_template(
         'display_form.html',

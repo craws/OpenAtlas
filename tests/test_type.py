@@ -81,25 +81,24 @@ class TypeTest(TestBaseCase):
 
             # Custom type
             rv = self.app.get(
-                url_for('entity_view', id_=sex_type.id),
+                url_for('view', id_=sex_type.id),
                 follow_redirects=True)
             assert b'Male' in rv.data
 
             # Administrative unit
             rv = self.app.get(
                 url_for(
-                    'entity_view',
+                    'view',
                     id_=Type.get_hierarchy('Administrative unit').id),
                 follow_redirects=True)
             assert b'Austria' in rv.data
 
             # Value type
             rv = self.app.get(
-                url_for('entity_view', id_=dimension_type.id),
+                url_for('view', id_=dimension_type.id),
                 follow_redirects=True)
             assert b'Height' in rv.data
-            rv = self.app.get(
-                url_for('entity_view', id_=dimension_type.subs[0]))
+            rv = self.app.get(url_for('view', id_=dimension_type.subs[0]))
             assert b'Unit' in rv.data
             rv = self.app.get(url_for('update', id_=dimension_type.subs[0]))
             assert b'Dimensions' in rv.data

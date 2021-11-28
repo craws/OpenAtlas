@@ -36,9 +36,7 @@ class IndexTests(TestBaseCase):
             rv = self.app.get('/')
             assert b'Source' in rv.data
 
-            rv = self.app.get(
-                url_for('entity_view', id_=666),
-                follow_redirects=True)
+            rv = self.app.get(url_for('view', id_=666), follow_redirects=True)
             assert b'teapot' in rv.data  # Id not found error
 
             rv = self.app.get('/404')

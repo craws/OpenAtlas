@@ -22,8 +22,8 @@ def walk_tree(types: List[int]) -> List[Dict[str, Any]]:
             if item.count_subs else ''
         items.append({
             'id': item.id,
-            'href': url_for('entity_view', id_=item.id),
-            'a_attr': {'href': url_for('entity_view', id_=item.id)},
+            'href': url_for('view', id_=item.id),
+            'a_attr': {'href': url_for('view', id_=item.id)},
             'text':
                 item.name.replace("'", "&apos;") +
                 f' {format_number(item.count)}{count_subs}',
@@ -60,7 +60,7 @@ def type_delete(id_: int) -> Response:
     type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(
-        url_for('entity_view', id_=root.id) if root else url_for('type_index'))
+        url_for('view', id_=root.id) if root else url_for('type_index'))
 
 
 @app.route('/type/move/<int:id_>', methods=['POST', 'GET'])

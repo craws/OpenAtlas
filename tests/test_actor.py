@@ -56,7 +56,7 @@ class ActorTests(TestBaseCase):
             assert b'An entry has been created' in rv.data
 
             # Test actor types
-            rv = self.app.get(url_for('entity_view', id_=sex_type_sub_1.id))
+            rv = self.app.get(url_for('view', id_=sex_type_sub_1.id))
             assert b'Susan' in rv.data
             rv = self.app.get(
                 url_for('type_move_entities', id_=sex_type_sub_1.id))
