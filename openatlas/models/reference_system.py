@@ -21,7 +21,7 @@ class ReferenceSystem(Entity):
             list(self.types.keys())[0].id if self.types else None
         self.count = row['count']
         self.system = row['system']
-        self.classes: List[Dict[int, str]] = []
+        self.classes: List[str] = []
 
     @staticmethod
     def get_all() -> Dict[int, ReferenceSystem]:
