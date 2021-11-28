@@ -738,12 +738,13 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
             next_id = sibling.id
             position = counter
             break
-    return Markup(render_template(
-        'util/siblings_pager.html',
-        prev_id=prev_id,
-        next_id=next_id,
-        position=position,
-        structure=structure))
+    parts = []
+    if prev_id:  # pragma: no cover
+        parts.append(button('<', url_for('view', id_=prev_id)))
+    if next_id:
+        parts.append(button('>', url_for('view', id_=next_id)))
+    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
+    return Markup(' '.join(parts))
 
 
 @app.template_filter()
