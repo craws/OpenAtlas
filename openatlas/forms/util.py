@@ -16,7 +16,7 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
     # Returns base type of a link form, e.g. involvement between actor and event
     for field in form:
         if isinstance(field, TreeField) and field.data:
-            return g.nodes[int(field.data)]
+            return g.types[int(field.data)]
     return None
 
 

@@ -87,7 +87,7 @@ class SourceTest(TestBaseCase):
                 data={'checkbox_values': [actor.id]},
                 follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=source.id))
+            rv = self.app.get(url_for('view', id_=source.id))
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(
                 url_for('link_insert', id_=source.id, view='place'))
@@ -106,7 +106,7 @@ class SourceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Source updated' in rv.data
             assert b'Artifact with text' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=source.id))
+            rv = self.app.get(url_for('view', id_=source.id))
             assert b'some description' in rv.data
 
             # Add to source
@@ -129,7 +129,7 @@ class SourceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 translation_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('entity_view', id_=source.id))
+            rv = self.app.get(url_for('view', id_=source.id))
             assert b'Test translation' in rv.data
             self.app.get(
                 url_for(

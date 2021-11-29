@@ -55,8 +55,8 @@ class ApiExportCSV:  # pragma: no cover
     @staticmethod
     def get_node(entity: Entity) -> Dict[Any, List[Any]]:
         nodes: Dict[str, Any] = defaultdict(list)
-        for node in entity.nodes:
-            hierarchy = [g.nodes[root].name for root in node.root]
+        for node in entity.types:
+            hierarchy = [g.types[root].name for root in node.root]
             value = ''
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:

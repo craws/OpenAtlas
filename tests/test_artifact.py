@@ -64,7 +64,7 @@ class ArtifactTest(TestBaseCase):
                 data={'checkbox_values': [artifact.id]},
                 follow_redirects=True)
             assert b'A little hate' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=artifact.id))
+            rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'Owned by' in rv.data and b'Conan' in rv.data
             rv = self.app.get(
                 url_for('insert', class_='artifact', origin_id=actor.id))

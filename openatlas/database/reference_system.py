@@ -23,7 +23,7 @@ class ReferenceSystem:
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
-                ) AS nodes
+                ) AS types
             FROM model.entity e
             JOIN web.reference_system rs ON e.id = rs.entity_id
             LEFT JOIN model.link l ON e.id = l.domain_id

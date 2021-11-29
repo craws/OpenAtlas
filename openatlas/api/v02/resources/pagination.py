@@ -76,7 +76,7 @@ class Pagination:
             parser: Dict[str, Any]) -> List[Entity]:
         new_entities = []
         for entity in entities:
-            if any(ids in [key.id for key in entity.nodes]
+            if any(ids in [key.id for key in entity.types]
                    for ids in parser['type_id']):
                 new_entities.append(entity)
         return new_entities

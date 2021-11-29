@@ -58,7 +58,7 @@ def get_table(view: str) -> Table:
             header.insert(1, _('icon'))
     table = Table(header)
     if view == 'file':
-        for entity in Entity.get_by_class('file', nodes=True):
+        for entity in Entity.get_by_class('file', types=True):
             date = 'N/A'
             if entity.id in g.file_stats:
                 date = format_date(
@@ -86,12 +86,12 @@ def get_table(view: str) -> Table:
                 external_url(system.website_url),
                 external_url(system.resolver_url),
                 system.placeholder,
-                link(g.nodes[system.precision_default_id])
+                link(g.types[system.precision_default_id])
                 if system.precision_default_id else '',
                 system.description])
     else:
         classes = 'place' if view == 'place' else g.view_class_mapping[view]
-        entities = Entity.get_by_class(classes, nodes=True, aliases=True)
+        entities = Entity.get_by_class(classes, types=True, aliases=True)
         table.rows = [get_base_table_data(entity) for entity in entities]
     return table
 
@@ -121,12 +121,12 @@ def delete_entity(id_: int) -> Optional[str]:
             abort(403)
         if entity.classes:
             flash(_('Deletion not possible if classes are attached'), 'error')
-            return url_for('entity_view', id_=id_)
+            return url_for('view', id_=id_)
         url = url_for('index', view='reference_system')
     if entity.class_.view in ['artifact', 'place']:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
-            return url_for('entity_view', id_=id_)
+            return url_for('view', id_=id_)
         parent = None \
             if entity.class_.name == 'place' \
             else entity.get_linked_entity('P46', True)
@@ -135,7 +135,7 @@ def delete_entity(id_: int) -> Optional[str]:
         flash(_('entity deleted'), 'info')
         if parent:
             tab = f"#tab-{entity.class_.name.replace('_', '-')}"
-            url = url_for('entity_view', id_=parent.id) + tab
+            url = url_for('view', id_=parent.id) + tab
     else:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')

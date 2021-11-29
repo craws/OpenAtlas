@@ -17,7 +17,7 @@ from openatlas.util.util import required_group
 def link_delete(id_: int, origin_id: int) -> Response:
     Link.delete_(id_)
     flash(_('link removed'), 'info')
-    return redirect(url_for('entity_view', id_=origin_id))
+    return redirect(url_for('view', id_=origin_id))
 
 
 @app.route('/link/insert/<int:id_>/<view>', methods=['POST', 'GET'])
@@ -35,7 +35,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
                 property_code,
                 request.form['checkbox_values'],
                 inverse=inverse)
-        return redirect(f"{url_for('entity_view', id_=entity.id)}#tab-{view}")
+        return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     if entity.class_.view == 'actor' and view == 'artifact':
         excluded = Entity.get_by_link_property(property_code, 'artifact')
     else:

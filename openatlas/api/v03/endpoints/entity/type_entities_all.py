@@ -25,7 +25,7 @@ class GetTypeEntitiesAll(Resource):
     @staticmethod
 
     def get_node_all(id_: int) -> List[Entity]:
-        if id_ not in g.nodes:
+        if id_ not in g.types:
             raise InvalidSubunitError
         return GetTypeEntitiesAll.get_recursive_node_entities(id_, [])
 
@@ -33,19 +33,19 @@ class GetTypeEntitiesAll(Resource):
     def get_recursive_node_entities(
             id_: int,
             data: List[Entity]) -> List[Entity]:
-        for entity in g.nodes[id_].get_linked_entities(
+        for entity in g.types[id_].get_linked_entities(
                 ['P2', 'P89'],
                 inverse=True):
             data.append(entity)
-        for sub_id in g.nodes[id_].subs:
+        for sub_id in g.types[id_].subs:
             GetTypeEntitiesAll.get_recursive_node_entities(sub_id, data)
         return data
 
     @staticmethod
     def get_special_node(id_: int, data: List[int]) -> List[int]:
-        for link_ in Link.get_entities_by_node(g.nodes[id_]):
+        for link_ in Link.get_entities_by_type(g.types[id_]):
             data.append(link_['domain_id'])
             data.append(link_['range_id'])
-        for sub_id in g.nodes[id_].subs:
+        for sub_id in g.types[id_].subs:
             GetTypeEntitiesAll.get_special_node(sub_id, data)
         return data

@@ -24,5 +24,5 @@ class GetByCode(Resource):
             raise InvalidCodeError
         return Entity.get_by_class(
             g.view_class_mapping[code_],
-            nodes=True,
+            types=True,
             aliases=True)

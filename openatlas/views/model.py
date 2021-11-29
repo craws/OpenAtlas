@@ -94,7 +94,7 @@ def openatlas_class_index() -> str:
         table.rows.append([
             class_.label,
             link(class_.cidoc_class),
-            link(g.nodes[class_.standard_type_id])
+            link(g.types[class_.standard_type_id])
             if class_.standard_type_id else '',
             class_.write_access,
             _('allowed') if class_.alias_allowed else '',

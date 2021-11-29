@@ -20,7 +20,7 @@ from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import view_class_mapping
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
@@ -55,9 +55,9 @@ FORMS = {
 
 def build_form(
         class_: str,
-        entity: Optional[Union[Entity, Link, Node]] = None,
+        entity: Optional[Union[Entity, Link, Type]] = None,
         code: Optional[str] = None,
-        origin: Union[Entity, Node, None] = None,
+        origin: Union[Entity, Type, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
     class Form(FlaskForm):
         opened = HiddenField()
@@ -87,8 +87,8 @@ def build_form(
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
-            node = entity if entity else origin
-            root = g.nodes[node.root[0]] if node.root else node
+            type = entity if entity else origin
+            root = g.types[type.root[0]] if type.root else type
             if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
@@ -113,22 +113,22 @@ def populate_form(
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
 
-    # Nodes
-    nodes: Dict[Node, str] = item.nodes
-    if location:  # Needed for administrative unit and historical place nodes
-        nodes.update(location.nodes)
+    # Types
+    types: Dict[Type, str] = item.types
+    if location:  # Needed for administrative unit and historical place types
+        types.update(location.types)
     form.opened.data = time.time()
-    node_data: Dict[int, List[int]] = {}
-    for node, node_value in nodes.items():
-        root = g.nodes[node.root[0]] if node.root else node
-        if root.id not in node_data:
-            node_data[root.id] = []
-        node_data[root.id].append(node.id)
+    type_data: Dict[int, List[int]] = {}
+    for type_, value in types.items():
+        root = g.types[type_.root[0]] if type_.root else type
+        if root.id not in type_data:
+            type_data[root.id] = []
+        type_data[root.id].append(type_.id)
         if root.category == 'value':
-            getattr(form, str(node.id)).data = node_value
-    for root_id, nodes_ in node_data.items():
+            getattr(form, str(type_.id)).data = value
+    for root_id, types_ in type_data.items():
         if hasattr(form, str(root_id)):
-            getattr(form, str(root_id)).data = nodes_
+            getattr(form, str(root_id)).data = types_
     if isinstance(item, Entity):
         populate_reference_systems(form, item)
     return form
@@ -154,12 +154,12 @@ def customize_labels(
         name: str,
         form: FlaskForm,
         item: Optional[Union[Entity, Link]] = None,
-        origin: Union[Entity, Node, None] = None, ) -> None:
+        origin: Union[Entity, Type, None] = None, ) -> None:
     if name == 'source_translation':
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
-        node = item if item else origin
-        root = g.nodes[node.root[0]] if node.root else node
+        type_ = item if item else origin
+        root = g.types[type_.root[0]] if type_.root else type_
         getattr(form, str(root.id)).label.text = 'super'
 
 
@@ -218,9 +218,9 @@ def add_buttons(
 
 
 def add_reference_systems(form: Any, class_: str) -> None:
-    precision_nodes = Node.get_hierarchy('External reference match').subs
     precisions = [('', '')] + [
-        (str(g.nodes[id_].id), g.nodes[id_].name) for id_ in precision_nodes]
+        (str(g.types[id_].id), g.types[id_].name)
+        for id_ in Type.get_hierarchy('External reference match').subs]
     systems = list(g.reference_systems.values())
     systems.sort(key=lambda x: x.name.casefold())
     for system in systems:
@@ -247,7 +247,7 @@ def add_reference_systems(form: Any, class_: str) -> None:
 
 def add_value_type_fields(form: Any, subs: List[int]) -> None:
     for sub_id in subs:
-        sub = g.nodes[sub_id]
+        sub = g.types[sub_id]
         setattr(
             form,
             str(sub.id),
@@ -257,26 +257,26 @@ def add_value_type_fields(form: Any, subs: List[int]) -> None:
 
 def add_types(form: Any, class_: str) -> None:
     types = OrderedDict(
-        {id_: g.nodes[id_] for id_ in g.classes[class_].hierarchies})
-    for node in types.values():  # Move standard type to top
-        if node.category == 'standard':
-            types.move_to_end(node.id, last=False)
+        {id_: g.types[id_] for id_ in g.classes[class_].hierarchies})
+    for type_ in types.values():  # Move standard type to top
+        if type_.category == 'standard':
+            types.move_to_end(type_.id, last=False)
             break
-    for node in types.values():
-        if node.multiple:
-            setattr(form, str(node.id), TreeMultiField(str(node.id)))
+    for type_ in types.values():
+        if type_.multiple:
+            setattr(form, str(type_.id), TreeMultiField(str(type_.id)))
         else:
-            setattr(form, str(node.id), TreeField(str(node.id)))
-        if node.category == 'value':
-            add_value_type_fields(form, node.subs)
+            setattr(form, str(type_.id), TreeField(str(type_.id)))
+        if type_.category == 'value':
+            add_value_type_fields(form, type_.subs)
 
 
 def add_fields(
         form: Any,
         class_: str,
         code: Union[str, None],
-        entity: Union[Entity, Node, Link, None],
-        origin: Union[Entity, Node, None]) -> None:
+        entity: Union[Entity, Type, Link, None],
+        origin: Union[Entity, Type, None]) -> None:
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))
         if not entity:
@@ -337,9 +337,9 @@ def add_fields(
             'actor' if code == 'member' else 'group',
             TableMultiField(_('actor'), [InputRequired()]))
     elif class_ in g.classes and g.classes[class_].view == 'type':
-        setattr(form, 'is_node_form', HiddenField())
-        node = entity if entity else origin
-        root = g.nodes[node.root[0]] if node.root else node
+        setattr(form, 'is_type_form', HiddenField())
+        type_ = entity if entity else origin
+        root = g.types[type_.root[0]] if type_.root else type_
         setattr(form, str(root.id), TreeField(str(root.id)))
         if root.directional:
             setattr(form, 'name_inverse', StringField(_('inverse')))
@@ -357,7 +357,7 @@ def add_fields(
             'resolver_url',
             StringField(_('resolver URL'), [OptionalValidator(), URL()]))
         setattr(form, 'placeholder', StringField(_('example ID')))
-        precision_id = str(Node.get_hierarchy('External reference match').id)
+        precision_id = str(Type.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
         choices = ReferenceSystem.get_class_choices(entity)
         if choices:
@@ -388,9 +388,9 @@ def build_add_reference_form(class_: str) -> FlaskForm:
 def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     """Returns a form with a list of entities with checkboxes."""
     if class_ == 'place':
-        entities = Entity.get_by_class('place', nodes=True, aliases=True)
+        entities = Entity.get_by_class('place', types=True, aliases=True)
     else:
-        entities = Entity.get_by_view(class_, nodes=True, aliases=True)
+        entities = Entity.get_by_view(class_, types=True, aliases=True)
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
     for entity in entities:
@@ -408,9 +408,9 @@ def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
     return render_template('forms/form_table.html', table=table.display(class_))
 
 
-def build_move_form(node: Node) -> FlaskForm:
+def build_move_form(type_: Type) -> FlaskForm:
     class Form(FlaskForm):
-        is_node_form = HiddenField()
+        is_type_form = HiddenField()
         checkbox_values = HiddenField()
         selection = SelectMultipleField(
             '',
@@ -420,22 +420,22 @@ def build_move_form(node: Node) -> FlaskForm:
             widget=widgets.ListWidget(prefix_label=False))
         save = SubmitField(uc_first(_('move entities')))
 
-    root = g.nodes[node.root[0]]
+    root = g.types[type_.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))
-    form = Form(obj=node)
+    form = Form(obj=type_)
     choices = []
     if root.class_.name == 'administrative_unit':
-        for entity in node.get_linked_entities('P89', True):
+        for entity in type_.get_linked_entities('P89', True):
             place = entity.get_linked_entity('P53', True)
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in Link.get_entities_by_node(node):
+        for row in Link.get_entities_by_type(type_):
             domain = Entity.get_by_id(row['domain_id'])
             range_ = Entity.get_by_id(row['range_id'])
             choices.append((row['id'], domain.name + ' - ' + range_.name))
     else:
-        for entity in node.get_linked_entities('P2', True):
+        for entity in type_.get_linked_entities('P2', True):
             choices.append((entity.id, entity.name))
     form.selection.choices = choices
     return form

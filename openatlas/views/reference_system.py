@@ -18,4 +18,4 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
     except Exception as e:  # pragma: no cover
         logger.log('error', 'database', 'remove form failed', e)
         flash(_('error database'), 'error')
-    return redirect(url_for('entity_view', id_=system_id))
+    return redirect(url_for('view', id_=system_id))

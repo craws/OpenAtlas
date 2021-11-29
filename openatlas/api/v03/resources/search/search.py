@@ -62,6 +62,6 @@ def value_to_be_searched(entity: Entity, k: str) -> Any:
     if k == "entitySystemClass":
         return [entity.class_.name]
     if k == "typeName":
-        return [node.name for node in entity.nodes]
+        return [node.name for node in entity.types]
     if k == "typeID":
-        return [node.id for node in entity.nodes]
+        return [node.id for node in entity.types]

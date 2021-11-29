@@ -7,11 +7,11 @@ from flask import g
 from flask_wtf import FlaskForm
 
 from openatlas import app
-from openatlas.database.node import Node as Db
+from openatlas.database.type import Type as Db
 from openatlas.models.entity import Entity
 
 
-class Node(Entity):
+class Type(Entity):
     count = 0
     count_subs = 0
     category = ''
@@ -25,97 +25,98 @@ class Node(Entity):
         self.classes: List[str] = []
 
     @staticmethod
-    def get_all_nodes() -> Dict[int, Node]:
-        nodes = {}
+    def get_all() -> Dict[int, Type]:
+        types = {}
         for row in \
-                Db.get_nodes('type', 'P127') + \
-                Db.get_nodes('administrative_unit', 'P89'):
-            node = Node(row)
-            nodes[node.id] = node
-            node.count = row['count'] if row['count'] else row['count_property']
-            node.count_subs = 0
-            node.subs = []
-            node.root = [row['super_id']] if row['super_id'] else []
-        Node.populate_subs(nodes)
-        return nodes
+                Db.get_types('type', 'P127') + \
+                Db.get_types('administrative_unit', 'P89'):
+            type_ = Type(row)
+            types[type_.id] = type_
+            type_.count = row['count'] if row['count'] \
+                else row['count_property']
+            type_.count_subs = 0
+            type_.subs = []
+            type_.root = [row['super_id']] if row['super_id'] else []
+        Type.populate_subs(types)
+        return types
 
     @staticmethod
-    def populate_subs(nodes: Dict[int, Node]) -> None:
+    def populate_subs(types: Dict[int, Type]) -> None:
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
-        for node in nodes.values():
-            if node.root:
-                super_ = nodes[node.root[-1]]
-                super_.subs.append(node.id)
-                node.root = Node.get_root_path(
-                    nodes,
-                    node,
-                    node.root[-1],
-                    node.root)
-                node.category = hierarchies[node.root[0]]['category']
+        for type_ in types.values():
+            if type_.root:
+                super_ = types[type_.root[-1]]
+                super_.subs.append(type_.id)
+                type_.root = Type.get_root_path(
+                    types,
+                    type_,
+                    type_.root[-1],
+                    type_.root)
+                type_.category = hierarchies[type_.root[0]]['category']
             else:
-                node.category = hierarchies[node.id]['category']
-                node.multiple = hierarchies[node.id]['multiple']
-                node.directional = hierarchies[node.id]['directional']
+                type_.category = hierarchies[type_.id]['category']
+                type_.multiple = hierarchies[type_.id]['multiple']
+                type_.directional = hierarchies[type_.id]['directional']
                 for class_ in g.classes.values():
-                    if class_.hierarchies and node.id in class_.hierarchies:
-                        node.classes.append(class_.name)
+                    if class_.hierarchies and type_.id in class_.hierarchies:
+                        type_.classes.append(class_.name)
 
     @staticmethod
     def get_root_path(
-            nodes: Dict[int, Node],
-            node: Node,
+            types: Dict[int, Type],
+            type_: Type,
             super_id: int,
             root: List[int]) -> List[int]:
-        super_ = nodes[super_id]
-        super_.count_subs += node.count
+        super_ = types[super_id]
+        super_.count_subs += type_.count
         if not super_.root:
             return root
-        node.root.insert(0, super_.root[-1])
-        return Node.get_root_path(nodes, node, super_.root[-1], root)
+        type_.root.insert(0, super_.root[-1])
+        return Type.get_root_path(types, type_, super_.root[-1], root)
 
     @staticmethod
-    def get_nodes(name: str) -> List[int]:
-        for node in g.nodes.values():
-            if node.name == name and not node.root:
-                return node.subs
+    def get_types(name: str) -> List[int]:
+        for type_ in g.types.values():
+            if type_.name == name and not type_.root:
+                return type_.subs
         return []  # pragma: no cover
 
     @staticmethod
-    def check_hierarchy_exists(name: str) -> List[Node]:
+    def check_hierarchy_exists(name: str) -> List[Type]:
         hierarchies = [
-            root for root in g.nodes.values()
+            root for root in g.types.values()
             if root.name == name and not root.root]
         return hierarchies
 
     @staticmethod
-    def get_hierarchy(name: str) -> Node:
+    def get_hierarchy(name: str) -> Type:
         return [
-            root for root in g.nodes.values()
+            root for root in g.types.values()
             if root.name == name and not root.root][0]
 
     @staticmethod
     def get_tree_data(
-            node_id: int,
+            type_id: int,
             selected_ids: List[int]) -> List[Dict[str, Any]]:
-        return Node.walk_tree(g.nodes[node_id].subs, selected_ids)
+        return Type.walk_tree(g.types[type_id].subs, selected_ids)
 
     @staticmethod
     def walk_tree(
-            nodes: List[Node],
+            types: List[Type],
             selected_ids: List[int]) -> List[Dict[str, Any]]:
         items = []
-        for id_ in nodes:
-            item = g.nodes[id_]
+        for id_ in types:
+            item = g.types[id_]
             items.append({
                 'id': item.id,
                 'text': item.name.replace("'", "&apos;"),
                 'state':
                     {'selected': 'true'} if item.id in selected_ids else '',
-                'children': Node.walk_tree(item.subs, selected_ids)})
+                'children': Type.walk_tree(item.subs, selected_ids)})
         return items
 
     @staticmethod
-    def get_class_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
+    def get_class_choices(root: Optional[Type] = None) -> List[Tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
             if class_.new_types_allowed \
@@ -124,36 +125,36 @@ class Node(Entity):
         return choices
 
     @staticmethod
-    def save_entity_nodes(entity: Entity, form: Any) -> None:
+    def save_entity_types(entity: Entity, form: Any) -> None:
         from openatlas.forms.field import TreeField
         from openatlas.forms.field import TreeMultiField
         from openatlas.forms.field import ValueFloatField
         # Can't use isinstance checks for entity here because it is always a
         # Entity at this point. So entity.class_.name checks have to be used.
-        if hasattr(entity, 'nodes'):
+        if hasattr(entity, 'types'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
             if isinstance(field, ValueFloatField):
                 if entity.class_.name == 'object_location' \
-                        or isinstance(entity, Node):
+                        or isinstance(entity, Type):
                     continue  # pragma: no cover
                 if field.data is not None:  # Allow 0 (zero)
-                    entity.link('P2', g.nodes[int(field.name)], field.data)
+                    entity.link('P2', g.types[int(field.name)], field.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:
-                    range_ = [g.nodes[int(field.data)]]
+                    range_ = [g.types[int(field.data)]]
                 except ValueError:  # Form value was a list string e.g. '[8,27]'
                     range_ = [
-                        g.nodes[int(range_id)]
+                        g.types[int(range_id)]
                         for range_id in ast.literal_eval(field.data)]
-                if g.nodes[int(field.id)].class_.name == 'administrative_unit':
+                if g.types[int(field.id)].class_.name == 'administrative_unit':
                     if entity.class_.name == 'object_location':
                         entity.link('P89', range_)
                 elif entity.class_.name not in ['object_location', 'type']:
                     entity.link('P2', range_)
 
     @staticmethod
-    def insert_hierarchy(node: Node, form: FlaskForm, category: str) -> None:
+    def insert_hierarchy(type_: Type, form: FlaskForm, category: str) -> None:
         multiple = False
         if category == 'value' or (
                 hasattr(form, 'multiple')
@@ -161,53 +162,53 @@ class Node(Entity):
                 and form.multiple.data):
             multiple = True
         Db.insert_hierarchy({
-            'id': node.id,
-            'name': node.name,
+            'id': type_.id,
+            'name': type_.name,
             'multiple': multiple,
             'category': category})
-        Db.add_classes_to_hierarchy(node.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
 
     @staticmethod
-    def update_hierarchy(node: Node, form: FlaskForm) -> None:
+    def update_hierarchy(type_: Type, form: FlaskForm) -> None:
         multiple = False
-        if node.multiple or (
+        if type_.multiple or (
                 hasattr(form, 'multiple')
                 and form.multiple
                 and form.multiple.data):
             multiple = True
         Db.update_hierarchy({
-            'id': node.id,
+            'id': type_.id,
             'name': form.name.data,
             'multiple': multiple})
-        Db.add_classes_to_hierarchy(node.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
 
     @staticmethod
-    def get_node_orphans() -> List[Node]:
+    def get_type_orphans() -> List[Type]:
         return [
-            n for key, n in g.nodes.items()
+            n for key, n in g.types.items()
             if n.root and n.count < 1 and not n.subs]
 
     @staticmethod
     def move_entities(
-            old_node: Node,
+            old_type: Type,
             new_type_id: int,
             checkbox_values: str) -> None:
-        root = g.nodes[old_node.root[0]]
+        root = g.types[old_type.root[0]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
-                for entity in Entity.get_by_ids(entity_ids, nodes=True):
-                    if any(node.id == int(new_type_id)
-                           for node in entity.nodes):
+                for entity in Entity.get_by_ids(entity_ids, types=True):
+                    if any(type_.id == int(new_type_id)
+                           for type_ in entity.types):
                         delete_ids.append(entity.id)
                     else:
                         cleaned_entity_ids.append(entity.id)
                 entity_ids = cleaned_entity_ids
             if entity_ids:
                 data = {
-                    'old_type_id': old_node.id,
+                    'old_type_id': old_type.id,
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)}
                 if root.name in app.config['PROPERTY_TYPES']:
@@ -219,54 +220,53 @@ class Node(Entity):
 
         if delete_ids:
             if root.name in app.config['PROPERTY_TYPES']:
-                Db.remove_link_type(old_node.id, delete_ids)
+                Db.remove_link_type(old_type.id, delete_ids)
             else:
-                Db.remove_entity_type(old_node.id, delete_ids)
+                Db.remove_entity_type(old_type.id, delete_ids)
 
     @staticmethod
     def get_all_sub_ids(
-            node: Node,
+            type_: Type,
             subs: Optional[List[int]] = None) -> List[int]:
-        # Recursive function to return a list with all sub node ids
+        # Recursive function to return a list with all sub type ids
         subs = subs if subs else []
-        subs += node.subs
-        for sub_id in node.subs:
-            Node.get_all_sub_ids(g.nodes[sub_id], subs)
+        subs += type_.subs
+        for sub_id in type_.subs:
+            Type.get_all_sub_ids(g.types[sub_id], subs)
         return subs
 
     @staticmethod
-    def get_form_count(root_node: Node, class_name: str) -> Optional[int]:
-        # Check if nodes linked to entities before offering to remove them
-        node_ids = Node.get_all_sub_ids(root_node)
-        if not node_ids:
+    def get_form_count(root_type: Type, class_name: str) -> Optional[int]:
+        # Check if types linked to entities before offering to remove them
+        type_ids = Type.get_all_sub_ids(root_type)
+        if not type_ids:
             return None
-        return Db.get_form_count(class_name, node_ids)
+        return Db.get_form_count(class_name, type_ids)
 
     @staticmethod
     def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
         Db.remove_class_from_hierarchy(class_name, hierarchy_id)
 
     @staticmethod
-    def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
-        Db.remove_by_entity_and_node(entity_id, node_id)
+    def remove_by_entity_and_type(entity_id: int, type_id: int) -> None:
+        Db.remove_by_entity_and_type(entity_id, type_id)
 
     @staticmethod
     def get_untyped(hierarchy_id: int) -> List[Entity]:
-        hierarchy = g.nodes[hierarchy_id]
+        hierarchy = g.types[hierarchy_id]
         classes = hierarchy.classes
         if hierarchy.name in ('Administrative unit', 'Historical place'):
             classes = 'object_location'  # pragma: no cover
         untyped = []
-        for entity in Entity.get_by_class(classes, nodes=True):
+        for entity in Entity.get_by_class(classes, types=True):
             linked = False
-            for node in entity.nodes:
-                if node.root[0] == hierarchy_id:
+            for type_ in entity.types:
+                if type_.root[0] == hierarchy_id:
                     linked = True
                     break
             if not linked:
                 if classes == 'object_location':  # pragma: no cover
-                    entity = entity.get_linked_entity('P53', True)
-                    if entity:
+                    if entity.get_linked_entity('P53', True):
                         untyped.append(entity)
                 else:
                     untyped.append(entity)

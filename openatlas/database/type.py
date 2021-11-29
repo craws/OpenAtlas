@@ -3,10 +3,10 @@ from typing import Any, Dict, List
 from flask import g
 
 
-class Node:
+class Type:
 
     @staticmethod
-    def get_nodes(class_: str, property_: str) -> List[Dict[str, Any]]:
+    def get_types(class_: str, property_: str) -> List[Dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT
@@ -68,14 +68,14 @@ class Node:
             WHERE id = %(id)s;""", data)
 
     @staticmethod
-    def add_classes_to_hierarchy(node_id: int, class_names: List[str]) -> None:
+    def add_classes_to_hierarchy(type_id: int, class_names: List[str]) -> None:
         for class_name in class_names:
             g.cursor.execute(
                 """
                 INSERT INTO web.hierarchy_openatlas_class
                     (hierarchy_id, openatlas_class_name)
-                VALUES (%(node_id)s, %(class_name)s);""",
-                {'node_id': node_id, 'class_name': class_name})
+                VALUES (%(type_id)s, %(class_name)s);""",
+                {'type_id': type_id, 'class_name': class_name})
 
     @staticmethod
     def move_link_type(data: Dict[str, int]) -> None:
@@ -108,15 +108,15 @@ class Node:
             {'type_id': type_id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_form_count(class_name: str, node_ids: List[int]) -> int:
+    def get_form_count(class_name: str, type_ids: List[int]) -> int:
         g.cursor.execute(
             """
             SELECT COUNT(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id
-                AND l.range_id IN %(node_ids)s
+                AND l.range_id IN %(type_ids)s
             WHERE l.property_code = 'P2'
                 AND e.openatlas_class_name = %(class_name)s;""",
-            {'node_ids': tuple(node_ids), 'class_name': class_name})
+            {'type_ids': tuple(type_ids), 'class_name': class_name})
         return g.cursor.fetchone()['count']
 
     @staticmethod
@@ -129,11 +129,11 @@ class Node:
             {'hierarchy_id': hierarchy_id, 'class_name': class_name})
 
     @staticmethod
-    def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
+    def remove_by_entity_and_type(entity_id: int, type_id: int) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.link
             WHERE domain_id = %(entity_id)s
-                AND range_id = %(node_id)s
+                AND range_id = %(type_id)s
                 AND property_code = 'P2';""",
-            {'entity_id': entity_id, 'node_id': node_id})
+            {'entity_id': entity_id, 'type_id': type_id})

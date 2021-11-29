@@ -36,7 +36,7 @@ from openatlas.util.util import get_file_stats
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
     index, involvement, imports, link, login, member, model, note, overlay,
-    profile, reference, relation, reference_system, search, source, sql, types,
+    profile, reference, relation, reference_system, search, source, sql, type,
     user)
 
 
@@ -55,7 +55,7 @@ def before_request() -> None:
         OpenatlasClass, view_class_mapping)
     from openatlas.models.cidoc_property import CidocProperty
     from openatlas.models.cidoc_class import CidocClass
-    from openatlas.models.node import Node
+    from openatlas.models.type import Type
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
 
@@ -67,7 +67,7 @@ def before_request() -> None:
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
     g.classes = OpenatlasClass.get_all()
-    g.nodes = Node.get_all_nodes()
+    g.types = Type.get_all()
     g.reference_systems = ReferenceSystem.get_all()
     g.view_class_mapping = view_class_mapping
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()

@@ -42,7 +42,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('relation_insert', origin_id=origin_id))
-        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     return render_template(
         'display_form.html',
         form=form,
@@ -83,8 +83,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('entity_view', id_=origin.id)}#tab-relation")
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     if origin.id == range_.id:
         form.inverse.data = True
     return render_template(

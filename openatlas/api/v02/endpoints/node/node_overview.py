@@ -8,7 +8,7 @@ from openatlas.api.v02.resources.parser import default
 from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.nodes_overview import NodesOverviewTemplate
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 
 
 class GetNodeOverview(Resource):
@@ -29,18 +29,18 @@ class GetNodeOverview(Resource):
             'place': {},
             'value': {},
             'system': {}}
-        for node in g.nodes.values():
+        for node in g.types.values():
             if node.root:
                 continue
             nodes[node.category][node.name] = GetNodeOverview.walk_tree(
-                Node.get_nodes(node.name))
+                Type.get_types(node.name))
         return nodes
 
     @staticmethod
     def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
         items = []
         for id_ in nodes:
-            item = g.nodes[id_]
+            item = g.types[id_]
             items.append({
                 'id': item.id,
                 'url': url_for('api_02.entity', id_=item.id, _external=True),

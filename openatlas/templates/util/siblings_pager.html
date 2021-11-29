@@ -1,7 +1,0 @@
-{% if prev_id %}
-    {{ '<'|button(url_for('entity_view', id_=prev_id)) }}
-{% endif %}
-{% if next_id %}
-    {{ '>'|button(url_for('entity_view', id_=next_id)) }}
-{% endif %}
-{{ position }} {{ _('of') }} {{ structure.siblings|length }}

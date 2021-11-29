@@ -30,10 +30,10 @@ class Link:
         self.property = g.properties[row['property_code']]
         self.domain = domain if domain else Entity.get_by_id(row['domain_id'])
         self.range = range_ if range_ else Entity.get_by_id(row['range_id'])
-        self.type = g.nodes[row['type_id']] if row['type_id'] else None
-        self.nodes: Dict['Entity', None] = {}
+        self.type = g.types[row['type_id']] if row['type_id'] else None
+        self.types: Dict['Entity', None] = {}
         if 'type_id' in row and row['type_id']:
-            self.nodes[g.nodes[row['type_id']]] = None
+            self.types[g.types[row['type_id']]] = None
         if 'begin_from' in row:
             self.begin_from = timestamp_to_datetime64(row['begin_from'])
             self.begin_to = timestamp_to_datetime64(row['begin_to'])
@@ -140,12 +140,12 @@ class Link:
             id_: int,
             code: str,
             inverse: bool = False,
-            nodes: bool = False) -> 'Entity':
+            types: bool = False) -> 'Entity':
         result = Link.get_linked_entities(
             id_,
             code,
             inverse=inverse,
-            nodes=nodes)
+            types=types)
         if len(result) > 1:  # pragma: no cover
             logger.log(
                 'error',
@@ -159,19 +159,19 @@ class Link:
             id_: int,
             codes: Union[str, List[str]],
             inverse: bool = False,
-            nodes: bool = False) -> List['Entity']:
+            types: bool = False) -> List['Entity']:
         from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         return Entity.get_by_ids(
             Db.get_linked_entities(id_, codes, inverse),
-            nodes=nodes)
+            types=types)
 
     @staticmethod
     def get_linked_entity_safe(
             id_: int, code: str,
             inverse: bool = False,
-            nodes: bool = False) -> 'Entity':
-        entity = Link.get_linked_entity(id_, code, inverse, nodes)
+            types: bool = False) -> 'Entity':
+        entity = Link.get_linked_entity(id_, code, inverse, types)
         if not entity:  # pragma: no cover - should return an entity
             logger.log(
                 'error',
@@ -196,7 +196,7 @@ class Link:
             entity_ids.add(row['range_id'])
         entities = {
             entity.id: entity for entity
-            in Entity.get_by_ids(entity_ids, nodes=True)}
+            in Entity.get_by_ids(entity_ids, types=True)}
         links = []
         for row in result:
             links.append(Link(
@@ -217,8 +217,8 @@ class Link:
         return Link(Db.get_by_id(id_))
 
     @staticmethod
-    def get_entities_by_node(node: 'Entity') -> List[Dict[str, Any]]:
-        return Db.get_entities_by_node(node.id)
+    def get_entities_by_type(type_: 'Entity') -> List[Dict[str, Any]]:
+        return Db.get_entities_by_type(type_.id)
 
     @staticmethod
     def delete_(id_: int) -> None:
@@ -272,24 +272,24 @@ class Link:
 
     @staticmethod
     def check_single_type_duplicates() -> List[Dict[str, Any]]:
-        from openatlas.models.node import Node
+        from openatlas.models.type import Type
         from openatlas.models.entity import Entity
         data = []
-        for node in g.nodes.values():
-            if node.root or node.multiple or node.category == 'value':
+        for type_ in g.types.values():
+            if type_.root or type_.multiple or type_.category == 'value':
                 continue  # pragma: no cover
-            node_ids = Node.get_all_sub_ids(node)
-            if not node_ids:
+            type_ids = Type.get_all_sub_ids(type_)
+            if not type_ids:
                 continue  # pragma: no cover
-            for id_ in Db.check_single_type_duplicates(node_ids):
-                offending_nodes = []
-                entity = Entity.get_by_id(id_, nodes=True)
-                for entity_node in entity.nodes:
-                    if g.nodes[entity_node.root[0]].id != node.id:
+            for id_ in Db.check_single_type_duplicates(type_ids):
+                offending_types = []
+                entity = Entity.get_by_id(id_, types=True)
+                for entity_types in entity.types:
+                    if g.types[entity_types.root[0]].id != type_.id:
                         continue  # pragma: no cover
-                    offending_nodes.append(entity_node)
+                    offending_types.append(entity_types)
                 data.append({
                     'entity': entity,
-                    'node': node,
-                    'offending_nodes': offending_nodes})
+                    'type': type_,
+                    'offending_types': offending_types})
         return data

@@ -27,7 +27,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
         flash(_('entity created'), 'info')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))
-        return redirect(url_for('entity_view', id_=translation.id))
+        return redirect(url_for('view', id_=translation.id))
     return render_template(
         'display_form.html',
         form=form,
@@ -43,18 +43,18 @@ def translation_delete(id_: int) -> Response:
     source = Link.get_linked_entity_safe(id_, 'P73', inverse=True)
     Entity.delete_(id_)
     flash(_('entity deleted'), 'info')
-    return redirect(f"{url_for('entity_view', id_=source.id)}#tab-text")
+    return redirect(f"{url_for('view', id_=source.id)}#tab-text")
 
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_update(id_: int) -> Union[str, Response]:
-    translation = Entity.get_by_id(id_, nodes=True)
+    translation = Entity.get_by_id(id_, types=True)
     form = build_form('source_translation', translation)
     if form.validate_on_submit():
         save(form, translation)
         flash(_('info update'), 'info')
-        return redirect(url_for('entity_view', id_=translation.id))
+        return redirect(url_for('view', id_=translation.id))
     return render_template(
         'display_form.html',
         form=form,
