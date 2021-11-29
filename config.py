@@ -57,7 +57,7 @@ API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
 ALLOWED_IPS = ['127.0.0.1']
 RDF_FORMATS = {
-    'xml': 'application/rdf+xml',
+    'xml-rdf': 'application/rdf+xml',
     'pretty-xml': 'application/rdf+xml',
     'n3': 'text/rdf+n3',
     'turtle': 'application/x-turtle',

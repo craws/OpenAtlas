@@ -12,6 +12,7 @@ from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
                                                InvalidLimitError,
                                                InvalidSubunitError,
                                                InvalidSystemClassError,
+                                               LastEntityError,
                                                NoEntityAvailable,
                                                NoSearchStringError,
                                                QueryEmptyError, TypeIDError)
@@ -174,7 +175,13 @@ class ApiTests(TestBaseCase):
             # geometric_entities/
             for rv in [
                 self.app.get(url_for('api_02.geometric_entities')).get_json(),
-                self.app.get(url_for('api_03.geometric_entities')).get_json()]:
+                self.app.get(url_for(
+                    'api_02.geometric_entities',
+                    download=True)).get_json(),
+                self.app.get(url_for('api_03.geometric_entities')).get_json(),
+                self.app.get(url_for(
+                    'api_03.geometric_entities',
+                    download=True)).get_json()]:
                 assert True if rv['features'][0]['geometry'][
                     'coordinates'] else None
                 assert ApiTests.get_geom_properties(rv, 'id')
@@ -197,14 +204,13 @@ class ApiTests(TestBaseCase):
             # /entity
             # Test Entity
             for rv in [
-                self.app.get(url_for('api_02.entity', id_=place.id)).get_json(),
-                self.app.get(url_for('api_02.entity', id_=place.id,
-                                     download=True)).get_json(),
+                self.app.get(url_for('api_02.entity', id_=place.id)),
                 self.app.get(
-                    url_for('api_03.entity', id_=place.id)).get_json(),
+                    url_for('api_02.entity', id_=place.id, download=True)),
+                self.app.get(url_for('api_03.entity', id_=place.id)),
                 self.app.get(
-                    url_for('api_03.entity', id_=place.id,
-                            download=True)).get_json()]:
+                    url_for('api_03.entity', id_=place.id, download=True))]:
+                rv = rv.get_json()
                 rv = rv['features'][0]
                 assert ApiTests.get_bool(
                     rv,
@@ -357,12 +363,28 @@ class ApiTests(TestBaseCase):
                     rv['properties'],
                     'types')
 
-            # Test Entity export
+            # Test Entity export and RDFS
             for rv in [
+                self.app.get(url_for(
+                    'api_02.entity',
+                    id_=place.id,
+                    format='pretty-xml')),
+                self.app.get(url_for(
+                    'api_03.entity',
+                    id_=place.id,
+                    format='pretty-xml')),
                 self.app.get(
                     url_for('api_02.entity', id_=place.id, export='csv')),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, export='csv')),
+                self.app.get(url_for(
+                    'api_02.code',
+                    code='place',
+                    format='pretty-xml')),
+                self.app.get(url_for(
+                    'api_03.code',
+                    code='place',
+                    format='pretty-xml')),
                 self.app.get(
                     url_for('api_02.code', code='place', export='csv')),
                 self.app.get(
@@ -387,7 +409,10 @@ class ApiTests(TestBaseCase):
             # Test Entities endpoints
             for rv in [
                 self.app.get(url_for('api_02.class', class_code='E21')),
-                self.app.get(url_for('api_02.code', code='place')),
+                self.app.get(url_for(
+                    'api_02.code',
+                    code='place',
+                    type_id=Node.get_hierarchy('Place').id)),
                 self.app.get(url_for('api_02.latest', latest=2)),
                 self.app.get(
                     url_for('api_02.system_class', system_class='artifact')),
@@ -402,13 +427,17 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_02.type_entities_all',
                     id_=unit_node.id)),
+                self.app.get(url_for(
+                    'api_02.type_entities_all',
+                    id_=relation_sub_id)),
                 self.app.get(
                     url_for(
                         'api_02.query',
                         entities=location.id,
                         classes='E18',
                         codes='artifact',
-                        system_classes='person')),
+                        system_classes='person',
+                        last=actor.id)),
                 self.app.get(url_for(
                     'api_02.query',
                     entities=location.id,
@@ -417,9 +446,23 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     filter='and|name|like|Shire',
                     sort='desc',
-                    column='id')),
-                self.app.get(url_for('api_03.class', class_code='E21')),
-                self.app.get(url_for('api_03.code', code='place')),
+                    column='id',
+                    download=True)),
+                self.app.get(url_for(
+                    'api_02.code',
+                    code='place',
+                    filter=f"and|id|eq|{place.id}")),
+                self.app.get(url_for(
+                    'api_02.code',
+                    code='place',
+                    filter=f"and|begin_from|eq|{place.begin_from}")),
+                self.app.get(url_for(
+                    'api_03.class',
+                    class_code='E21')),
+                self.app.get(url_for(
+                    'api_03.code',
+                    code='place',
+                    type_id=Node.get_hierarchy('Place').id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
                 self.app.get(
                     url_for('api_03.system_class', system_class='artifact')),
@@ -434,13 +477,17 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.type_entities_all',
                     id_=unit_node.id)),
+                self.app.get(url_for(
+                    'api_03.type_entities_all',
+                    id_=relation_sub_id)),
                 self.app.get(
                     url_for(
                         'api_03.query',
                         entities=location.id,
                         classes='E18',
                         codes='artifact',
-                        system_classes='person')),
+                        system_classes='person',
+                        last=actor.id)),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
@@ -448,7 +495,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     sort='desc',
-                    column='id'))
+                    column='id',
+                    download=True,
+                    actor=place.id))
             ]:
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
@@ -531,6 +580,16 @@ class ApiTests(TestBaseCase):
                     count=True))]:
                 assert True if rv.get_json() == 8 else False
 
+            # Test Entities count
+            for rv in [
+                self.app.get(url_for(
+                    'api_02.geometric_entities',
+                    count=True)),
+                self.app.get(url_for(
+                    'api_03.geometric_entities',
+                    count=True))]:
+                assert True if rv.get_json() == 1 else False
+
             # Test entities with GeoJSON Format
             for rv in [
                 self.app.get(url_for(
@@ -562,10 +621,12 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for(
                     'api_02.node_entities',
-                    id_=unit_node.id)),
+                    id_=unit_node.id,
+                    download=True)),
                 self.app.get(url_for(
                     'api_03.node_entities',
-                    id_=unit_node.id))]:
+                    id_=unit_node.id,
+                    download=True))]:
                 rv = rv.get_json()
                 rv = rv['nodes'][0]
                 assert ApiTests.get_bool(rv, 'label')
@@ -606,7 +667,7 @@ class ApiTests(TestBaseCase):
 
             for rv in [
                 self.app.get(url_for('api_03.node_overview')),
-                self.app.get(url_for('api_03.node_overview', dowload=True))]:
+                self.app.get(url_for('api_03.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types']['place']['Administrative unit']
                 assert True if [True for i in rv if
@@ -615,14 +676,14 @@ class ApiTests(TestBaseCase):
             # Test Type Tree
             for rv in [
                 self.app.get(url_for('api_02.type_tree')),
-                self.app.get(url_for('api_02.type_tree', dowload=True))
+                self.app.get(url_for('api_02.type_tree', download=True))
             ]:
                 rv = rv.get_json()
                 assert True if rv['typeTree'][0] else False
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
-                self.app.get(url_for('api_03.type_tree', dowload=True)),
+                self.app.get(url_for('api_03.type_tree', download=True)),
             ]:
                 rv = rv.get_json()
                 assert True if rv['typeTree'] else False
@@ -738,10 +799,23 @@ class ApiTests(TestBaseCase):
             assert True if rv['nodes'][1]['label'] == 'Kitchen' else False
 
             with self.assertRaises(EntityDoesNotExistError):
+                self.app.get(url_for('api_03.entity', id_=233423424))
+            with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
                     'api_03.class',
                     class_code='E18',
                     last=1231))
+            with self.assertRaises(LastEntityError):
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    sort='desc',
+                    column='id',
+                    download=True,
+                    last=place.id))
             with self.assertRaises(TypeIDError):
                 self.app.get(url_for(
                     'api_03.query',

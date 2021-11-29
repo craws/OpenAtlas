@@ -2,7 +2,7 @@ import itertools
 from typing import Any, Dict, List
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
-    NoEntityAvailable, TypeIDError
+    LastEntityError, NoEntityAvailable, TypeIDError
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.util import get_all_links, \
@@ -16,10 +16,13 @@ class Pagination:
     @staticmethod
     def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
         if parser['last'] and int(parser['last']) in total:
-            return list(itertools.islice(
+            out = list(itertools.islice(
                 total,
                 total.index(int(parser['last'])) + 1,
                 None))
+            if not out:
+                raise LastEntityError  # pragma: no cover
+            return out
         if parser['first'] and int(parser['first']) in total:
             return list(itertools.islice(
                 total,
