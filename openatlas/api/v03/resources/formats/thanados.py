@@ -9,7 +9,7 @@ from openatlas.api.v03.resources.formats.linked_places_helper import \
 from openatlas.api.v03.resources.util import get_license
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.util.util import get_file_path
 
 
@@ -96,15 +96,15 @@ def get_properties(
         'types': get_types(entity, links, parser)}
 
 
-def get_standard_type(node: Node) -> Dict[str, Any]:
-    nodes_dict = {
-        'id': node.id,
-        'name': node.name}
-    hierarchy = [g.nodes[root].name for root in node.root]
+def get_standard_type(type_: Type) -> Dict[str, Any]:
+    types_dict = {
+        'id': type_.id,
+        'name': type_.name}
+    hierarchy = [g.types[root].name for root in type_.root]
     hierarchy.reverse()
-    nodes_dict['path'] = ' > '.join(map(str, hierarchy))
-    nodes_dict['rootId'] = node.root[0]
-    return nodes_dict
+    types_dict['path'] = ' > '.join(map(str, hierarchy))
+    types_dict['rootId'] = type_.root[0]
+    return types_dict
 
 
 def get_aliases(entity: Entity, parser: Dict[str, Any]):
@@ -174,22 +174,22 @@ def get_types(
         entity: Entity,
         links: List[Link],
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
-    nodes = []
-    for node in entity.nodes:
-        if node.category == 'standard':
+    types = []
+    for type_ in entity.types:
+        if type_.category == 'standard':
             continue
-        nodes_dict = {
-            'id': node.id,
-            'name': node.name}
+        types_dict = {
+            'id': type_.id,
+            'name': type_.name}
         for link in links:
-            if link.range.id == node.id and link.description:
-                nodes_dict['value'] = link.description
-                if link.range.id == node.id and node.description:
-                    nodes_dict['unit'] = node.description
-        hierarchy = [g.nodes[root].name for root in node.root]
-        nodes_dict['path'] = ' > '.join(map(str, hierarchy))
-        nodes_dict['rootId'] = node.root[0]
-        nodes.append(nodes_dict)
+            if link.range.id == type_.id and link.description:
+                types_dict['value'] = link.description
+                if link.range.id == type_.id and type_.description:
+                    types_dict['unit'] = type_.description
+        hierarchy = [g.types[root].name for root in type_.root]
+        types_dict['path'] = ' > '.join(map(str, hierarchy))
+        types_dict['rootId'] = type_.root[0]
+        types.append(types_dict)
     if parser['format'] == 'xml':
-        return [{'type': node} for node in nodes] if nodes else None
-    return nodes if nodes else None
+        return [{'type': type_} for type_ in types] if types else None
+    return types if types else None
