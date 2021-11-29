@@ -18,7 +18,7 @@ from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
                                                QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from tests.base import TestBaseCase, insert_entity
 
@@ -32,7 +32,7 @@ class ApiTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 params = {
                     f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
-                    (id_, node) in Node.get_all_nodes().items()}
+                    (id_, node) in Type.get_all().items()}
                 # Creation of Shire (place)
                 place = insert_entity(
                     'Shire', 'place',
@@ -53,7 +53,7 @@ class ApiTests(TestBaseCase):
                 Gis.add_example_geom(location)
 
                 # Adding Type Place
-                place.link('P2', Node.get_hierarchy('Place'))
+                place.link('P2', Type.get_hierarchy('Place'))
 
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
@@ -74,22 +74,22 @@ class ApiTests(TestBaseCase):
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
 
-                # Adding Administrative Unit Node
-                unit_node = Node.get_hierarchy('Administrative unit')
+                # Adding Administrative Unit Type
+                unit_node = Type.get_hierarchy('Administrative unit')
 
                 # Adding File to place
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
-                file.link('P2', g.nodes[Node.get_hierarchy('License').subs[0]])
+                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
 
                 # Adding Value Type
-                value_type = Node.get_hierarchy('Dimensions')
+                value_type = Type.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
 
                 # Adding Geonames
                 geonames = Entity.get_by_id(
                     ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Node.get_hierarchy(
+                precision_id = Type.get_hierarchy(
                     'External reference match').subs[0]
                 geonames.link(
                     'P67',
@@ -126,8 +126,8 @@ class ApiTests(TestBaseCase):
                 actor2.link('P74', location)
 
                 # Adding actor relation
-                relation_id = Node.get_hierarchy('Actor actor relation').id
-                relation_sub_id = g.nodes[relation_id].subs[0]
+                relation_id = Type.get_hierarchy('Actor actor relation').id
+                relation_sub_id = g.types[relation_id].subs[0]
                 actor.link('OA7', actor2, type_id=relation_sub_id)
 
                 # Creation of event
@@ -144,7 +144,7 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
 
                 # Adding Type Settlement
-                place2.link('P2', Entity.get_by_id(Node.get_nodes('Place')[0]))
+                place2.link('P2', Entity.get_by_id(Type.get_types('Place')[0]))
 
                 # Creation of Silmarillion (source)
                 source = insert_entity('Silmarillion', 'source')
@@ -412,7 +412,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_02.code',
                     code='place',
-                    type_id=Node.get_hierarchy('Place').id)),
+                    type_id=Type.get_hierarchy('Place').id)),
                 self.app.get(url_for('api_02.latest', latest=2)),
                 self.app.get(
                     url_for('api_02.system_class', system_class='artifact')),
@@ -420,7 +420,7 @@ class ApiTests(TestBaseCase):
                     url_for('api_02.entities_linked_to_entity', id_=event.id)),
                 self.app.get(url_for(
                     'api_02.type_entities',
-                    id_=Node.get_hierarchy('Place').id)),
+                    id_=Type.get_hierarchy('Place').id)),
                 self.app.get(url_for(
                     'api_02.type_entities',
                     id_=relation_sub_id)),
@@ -462,7 +462,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.code',
                     code='place',
-                    type_id=Node.get_hierarchy('Place').id)),
+                    type_id=Type.get_hierarchy('Place').id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
                 self.app.get(
                     url_for('api_03.system_class', system_class='artifact')),
@@ -470,7 +470,7 @@ class ApiTests(TestBaseCase):
                     url_for('api_03.entities_linked_to_entity', id_=event.id)),
                 self.app.get(url_for(
                     'api_03.type_entities',
-                    id_=Node.get_hierarchy('Place').id)),
+                    id_=Type.get_hierarchy('Place').id)),
                 self.app.get(url_for(
                     'api_03.type_entities',
                     id_=relation_sub_id)),
@@ -615,9 +615,9 @@ class ApiTests(TestBaseCase):
                     rv['properties'],
                     'systemClass')
 
-            # ---Node Endpoints---
+            # ---Type Endpoints---
 
-            # Test Node Entities
+            # Test Type Entities
             for rv in [
                 self.app.get(url_for(
                     'api_02.node_entities',
@@ -631,7 +631,7 @@ class ApiTests(TestBaseCase):
                 rv = rv['nodes'][0]
                 assert ApiTests.get_bool(rv, 'label')
 
-            # Test Node Entities All
+            # Test Type Entities All
             for rv in [
                 self.app.get(url_for(
                     'api_02.node_entities_all',
@@ -644,7 +644,7 @@ class ApiTests(TestBaseCase):
                 assert True if [True for i in rv if
                                 i['label'] == 'Wien'] else False
 
-            # Test Node Entities count
+            # Test Type Entities count
             for rv in [
                 self.app.get(url_for(
                     'api_02.node_entities',
@@ -656,7 +656,7 @@ class ApiTests(TestBaseCase):
                     count=True))]:
                 assert True if rv.get_json() == 6 else False
 
-                # Test Node Overview
+                # Test Type Overview
             for rv in [
                 self.app.get(url_for('api_02.node_overview')),
                 self.app.get(url_for('api_02.node_overview', download=True))]:
@@ -820,7 +820,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='person',
-                    type_id=Node.get_nodes('Place')[0]))
+                    type_id=Type.get_types('Place')[0]))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.query',
