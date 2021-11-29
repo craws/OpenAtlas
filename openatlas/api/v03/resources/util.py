@@ -10,14 +10,14 @@ from openatlas.models.link import Link
 
 def get_entity_by_id(id_: int) -> Entity:
     try:
-        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        entity = Entity.get_by_id(id_, types=True, aliases=True)
     except Exception:
         raise EntityDoesNotExistError
     return entity
 
 
 def get_entities_by_ids(ids: List[int]) -> List[Entity]:
-    return Entity.get_by_ids(ids, nodes=True, aliases=True)
+    return Entity.get_by_ids(ids, types=True, aliases=True)
 
 
 def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
@@ -35,8 +35,8 @@ def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
 
 
 def get_license(entity: Entity) -> Optional[str]:
-    for node in entity.nodes:
-        if g.nodes[node.root[0]].name == 'License':
+    for node in entity.types:
+        if g.types[node.root[0]].name == 'License':
             return node.name
     return None
 

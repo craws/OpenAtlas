@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from openatlas.database.gis import Gis as Db
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.util.util import sanitize
 
 
@@ -64,7 +64,7 @@ class Gis:
         object_ids = [x.id for x in objects] if objects else []
 
         for shape in ['point', 'polygon', 'linestring']:
-            place_root = Node.get_hierarchy('Place')
+            place_root = Type.get_hierarchy('Place')
             for row in Db.get_by_shape(shape, extra_ids):
                 description = row['description'].replace('"', '\"') \
                     if row['description'] else ''
@@ -83,12 +83,12 @@ class Gis:
                         'description': description,
                         'shapeType': row['type']}}
                 if 'types' in row and row['types']:
-                    nodes_list = ast.literal_eval('[' + row['types'] + ']')
-                    for node_id in list(set(nodes_list)):
-                        node = g.nodes[node_id]
-                        if node.root and node.root[0] == place_root.id:
+                    type_ids = ast.literal_eval(f"[{row['types']}]")
+                    for type_id in list(set(type_ids)):
+                        type_ = g.types[type_id]
+                        if type_.root and type_.root[0] == place_root.id:
                             item['properties']['objectType'] = \
-                                node.name.replace('"', '\"')
+                                type_.name.replace('"', '\"')
                             break
                 if structure and row['object_id'] == structure['super_id']:
                     extra['supers'].append(item)

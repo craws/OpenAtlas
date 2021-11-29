@@ -12,7 +12,7 @@ from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
@@ -29,17 +29,17 @@ from openatlas.views.reference import AddReferenceForm
 
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
-def entity_view(id_: int) -> Union[str, Response]:
-    if id_ in g.nodes:  # Nodes have their own view
-        entity = g.nodes[id_]
+def view(id_: int) -> Union[str, Response]:
+    if id_ in g.types:  # Types have their own view
+        entity = g.types[id_]
         if not entity.root:
             return redirect(
-                f"{url_for('node_index')}"
+                f"{url_for('type_index')}"
                 f"#menu-tab-{entity.category}_collapse-{id_}")
     elif id_ in g.reference_systems:
         entity = g.reference_systems[id_]
     else:
-        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        entity = Entity.get_by_id(id_, types=True, aliases=True)
         if not entity.class_.view:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
@@ -47,7 +47,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     event_links = None  # Needed for actor
     overlays = None  # Needed for place
     tabs = {'info': Tab('info')}
-    if isinstance(entity, Node):
+    if isinstance(entity, Type):
         tabs['subs'] = Tab('subs', entity=entity)
         tabs['entities'] = Tab('entities', entity=entity)
         if entity.category == 'value':
@@ -59,19 +59,19 @@ def entity_view(id_: int) -> Union[str, Response]:
         for item in entity.get_linked_entities(
                 ['P2', 'P89'],
                 inverse=True,
-                nodes=True):
+                types=True):
             if item.class_.name in ['location', 'reference_system']:
                 continue  # pragma: no cover
             if item.class_.name == 'object_location':  # pragma: no cover
                 item = item.get_linked_entity_safe('P53', inverse=True)
             data = [link(item)]
             if entity.category == 'value':  # pragma: no cover
-                data.append(format_number(item.nodes[entity]))
+                data.append(format_number(item.types[entity]))
             data.append(item.class_.label)
             data.append(item.description)
             tabs['entities'].table.rows.append(data)
         for sub_id in entity.subs:
-            sub = g.nodes[sub_id]
+            sub = g.types[sub_id]
             tabs['subs'].table.rows.append([
                 link(sub),
                 sub.count,
@@ -79,7 +79,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         if not tabs['entities'].table.rows:
             # If no entities available get links with this type_id
             tabs['entities'].table.header = [_('domain'), _('range')]
-            for row in Link.get_entities_by_node(entity):
+            for row in Link.get_entities_by_type(entity):
                 tabs['entities'].table.rows.append([
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
@@ -157,13 +157,13 @@ def entity_view(id_: int) -> Union[str, Response]:
                 if link_.type:
                     type_ = link(
                         link_.type.get_name_directed(),
-                        url_for('entity_view', id_=link_.type.id))
+                        url_for('view', id_=link_.type.id))
             else:
                 related = link_.domain
                 if link_.type:
                     type_ = link(
                         link_.type.get_name_directed(True),
-                        url_for('entity_view', id_=link_.type.id))
+                        url_for('view', id_=link_.type.id))
             data = [
                 type_,
                 link(related),
@@ -219,7 +219,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         for sub_event in entity.get_linked_entities(
                 'P117',
                 inverse=True,
-                nodes=True):
+                types=True):
             tabs['subs'].table.rows.append(get_base_table_data(sub_event))
         tabs['actor'].table.header.insert(5, _('activity'))  # Activity column
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -291,7 +291,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         elif entity.class_.name == 'stratigraphic_unit':
             tabs['artifact'] = Tab('artifact', entity=entity)
             tabs['human_remains'] = Tab('human_remains', entity=entity)
-        entity.location = entity.get_linked_entity_safe('P53', nodes=True)
+        entity.location = entity.get_linked_entity_safe('P53', types=True)
         event_ids = []  # Keep track of inserted events to prevent doubles
         for event in entity.location.get_linked_entities(
                 ['P7', 'P26', 'P27'],
@@ -340,10 +340,10 @@ def entity_view(id_: int) -> Union[str, Response]:
                 'actor', 'artifact', 'feature', 'event', 'human_remains',
                 'place', 'stratigraphic_unit', 'text']:
             tabs[name] = Tab(name, entity=entity)
-        for text in entity.get_linked_entities('P73', nodes=True):
+        for text in entity.get_linked_entities('P73', types=True):
             tabs['text'].table.rows.append([
                 link(text),
-                next(iter(text.nodes)).name if text.nodes else '',
+                next(iter(text.types)).name if text.types else '',
                 text.description])
         for link_ in entity.get_links('P67'):
             range_ = link_.range
@@ -358,7 +358,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
     if entity.class_.view in [
             'actor', 'artifact', 'event', 'place', 'source', 'type']:
-        if entity.class_.view != 'reference' and not isinstance(entity, Node):
+        if entity.class_.view != 'reference' and not isinstance(entity, Type):
             tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.view == 'artifact':
             tabs['event'] = Tab('event', entity=entity)
@@ -494,7 +494,7 @@ def get_profile_image_table_link(
 
 
 def add_crumbs(
-        entity: Union[Entity, Node],
+        entity: Union[Entity, Type],
         structure: Optional[Dict[str, Any]]) -> List[str]:
     crumbs = [
         [_(entity.class_.view.replace('_', ' ')),
@@ -512,10 +512,10 @@ def add_crumbs(
             structure['feature'],
             structure['stratigraphic_unit'],
             entity.name]
-    elif isinstance(entity, Node):
-        crumbs = [[_('types'), url_for('node_index')]]
+    elif isinstance(entity, Type):
+        crumbs = [[_('types'), url_for('type_index')]]
         if entity.root:
-            crumbs += [g.nodes[node_id] for node_id in entity.root]
+            crumbs += [g.types[type_id] for type_id in entity.root]
         crumbs += [entity.name]
     elif entity.class_.view == 'source_translation':
         crumbs = [
@@ -529,7 +529,7 @@ def add_buttons(entity: Entity) -> List[str]:
     if not is_authorized(entity.class_.write_access):
         return []  # pragma: no cover
     buttons = []
-    if isinstance(entity, Node):
+    if isinstance(entity, Type):
         if entity.root and entity.category != 'system':
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
             if not entity.count and not entity.subs:
@@ -561,7 +561,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
             entity.link_string(
                 'P67',
                 request.form['checkbox_values'], inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-file")
+        return redirect(f"{url_for('view', id_=id_)}#tab-file")
     form = build_table_form(
         'file',
         entity.get_linked_entities('P67', inverse=True))
@@ -586,7 +586,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'],
                 inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-source")
+        return redirect(f"{url_for('view', id_=id_)}#tab-source")
     form = build_table_form(
         'source',
         entity.get_linked_entities('P67', inverse=True))
@@ -611,7 +611,7 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             form.reference.data,
             description=form.page.data,
             inverse=True)
-        return redirect(f"{url_for('entity_view', id_=id_)}#tab-reference")
+        return redirect(f"{url_for('view', id_=id_)}#tab-reference")
     form.page.label.text = uc_first(_('page / link text'))
     return render_template(
         'display_form.html',

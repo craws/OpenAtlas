@@ -13,9 +13,7 @@ class GetGeometricEntities(Resource):
 
     def get(self) -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
-        output = {
-            'type': 'FeatureCollection',
-            'features': GetGeometricEntities.get_geometries(parser)}
+        output = GetGeometricEntities.get_geom_collection(parser)
         if parser['count']:
             return jsonify(len(output['features']))
         if parser['download']:
@@ -26,7 +24,12 @@ class GetGeometricEntities(Resource):
         return marshal(output, GeometriesTemplate.geometries_template()), 200
 
     @staticmethod
+    def get_geom_collection(parser: Dict[str, Any]) -> Dict[str, Any]:
+        return {
+            'type': 'FeatureCollection',
+            'features': GetGeometricEntities.get_geometries(parser)}
 
+    @staticmethod
     def get_geometries(parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         choices = [
             'gisPointAll', 'gisPointSupers', 'gisPointSubs',

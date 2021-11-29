@@ -37,14 +37,14 @@ def display_logo(filename: str) -> Any:  # File display function for public
 @app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
 def set_profile_image(id_: int, origin_id: int) -> Response:
     Entity.set_profile_image(id_, origin_id)
-    return redirect(url_for('entity_view', id_=origin_id))
+    return redirect(url_for('view', id_=origin_id))
 
 
 @app.route('/file/set_as_profile_image/<int:entity_id>')
 def file_remove_profile_image(entity_id: int) -> Response:
     entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
-    return redirect(url_for('entity_view', id_=entity.id))
+    return redirect(url_for('view', id_=entity.id))
 
 
 @app.route('/file/add/<int:id_>/<view>', methods=['POST', 'GET'])
@@ -54,7 +54,7 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
     if request.method == 'POST':
         if request.form['checkbox_values']:
             entity.link_string('P67', request.form['checkbox_values'])
-        return redirect(f"{url_for('entity_view', id_=entity.id)}#tab-{view}")
+        return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     return render_template(
         'form.html',
         form=build_table_form(view, entity.get_linked_entities('P67')),

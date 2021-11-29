@@ -49,7 +49,7 @@ def member_insert(
             return redirect(
                 url_for('member_insert', origin_id=origin_id, code=code))
         tab = '#tab-member' if code == 'member' else '#tab-member-of'
-        return redirect(url_for('entity_view', id_=origin.id) + tab)
+        return redirect(url_for('view', id_=origin.id) + tab)
     return render_template(
         'display_form.html',
         form=form,
@@ -82,7 +82,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
-        return redirect(url_for('entity_view', id_=origin.id) + tab)
+        return redirect(url_for('view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     related = range_ if origin_id == domain.id else domain
     return render_template(

@@ -22,15 +22,15 @@ class GetTypeEntities(Resource):
 
     @staticmethod
     def get_node(id_: int) -> List[Entity]:
-        if id_ not in g.nodes:
+        if id_ not in g.types:
             raise InvalidSubunitError
         return [e for e in
-                g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)]
+                g.types[id_].get_linked_entities(['P2', 'P89'], inverse=True)]
 
     @staticmethod
     def get_special_nodes(id_: int) -> List[Entity]:
         domain_ids = [link_['domain_id'] for link_ in
-                      Link.get_entities_by_node(g.nodes[id_])]
+                      Link.get_entities_by_type(g.types[id_])]
         range_ids = [link_['range_id'] for link_ in
-                     Link.get_entities_by_node(g.nodes[id_])]
+                     Link.get_entities_by_type(g.types[id_])]
         return get_entities_by_ids(range_ids + domain_ids)

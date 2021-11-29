@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import Response, g
 from flask_restful import Resource, marshal
@@ -14,14 +14,11 @@ class ClassMapping(Resource):
             ClassMappingTemplate.class_template()), 200
 
     @staticmethod
-    def get_mapping():
-        mapping = []
-        for class_ in g.classes.values():
-            if class_.cidoc_class:
-                mapping.append({
-                    "systemClass": class_.name,
-                    "crmClass": class_.cidoc_class.code,
-                    "view": class_.view,
-                    "icon": class_.icon,
-                    "en": class_.label})
-        return mapping
+    def get_mapping() -> List[Dict[str, Any]]:
+        return [{
+            "systemClass": class_.name,
+            "crmClass": class_.cidoc_class.code,
+            "view": class_.view,
+            "icon": class_.icon,
+            "en": class_.label}
+                for class_ in g.classes.values() if class_.cidoc_class]

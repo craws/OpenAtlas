@@ -62,11 +62,11 @@ class Import:
 
     @staticmethod
     def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
-        if not type_id.isdigit() or int(type_id) not in g.nodes:
+        if not type_id.isdigit() or int(type_id) not in g.types:
             return False
         # Check if type is allowed (for corresponding form)
         valid_type = False
-        root = g.nodes[g.nodes[int(type_id)].root[-1]]
+        root = g.types[g.types[int(type_id)].root[-1]]
         for form_object in root.forms.values():
             if form_object['name'] == class_:
                 valid_type = True
@@ -109,7 +109,7 @@ class Import:
                 for type_id in str(row['type_ids']).split():
                     if not Import.check_type_id(type_id, class_):
                         continue
-                    entity.link('P2', g.nodes[int(type_id)])
+                    entity.link('P2', g.types[int(type_id)])
 
             # GIS
             if class_ == 'place':

@@ -80,7 +80,7 @@ def validate(self: FlaskForm) -> bool:
             and hasattr(self, 'event_id') \
             and self.event.data \
             and str(self.event.data) == str(self.event_id.data):
-        self.event.errors.append(_('error node self as super'))
+        self.event.errors.append(_('error type self as super'))
         valid = False
 
     # External reference systems

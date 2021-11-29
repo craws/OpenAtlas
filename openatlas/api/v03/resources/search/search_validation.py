@@ -14,8 +14,8 @@ compare_operators: List[str] = ['equal', 'notEqual']
 
 
 def iterate_parameters_for_validation(parameters: List[Dict[str, Any]]) -> None:
-    for p in parameters:
-        for search_key, value_list in p.items():
+    for parameter in parameters:
+        for search_key, value_list in parameter.items():
             [call_validation(search_key, values) for values in value_list]
 
 

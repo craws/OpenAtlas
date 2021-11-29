@@ -32,71 +32,71 @@
     </li>
   </ul>
   <div class="tab-content" id="menuTabContent">
-    {% for type_ in ['standard', 'custom', 'value', 'place', 'system'] %}
-      <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ type_ }}" style="padding: 0;">
+    {% for category in ['standard', 'custom', 'value', 'place', 'system'] %}
+      <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}" style="padding: 0;">
         <div class="accordion" id="TypeAccordion">
-          {% for node, tree in nodes[type_].items() %}
+          {% for type_, tree in types[category].items() %}
             <div class="card">
-              <div class="card-header accordionheader" id="heading-{{ node.id }}">
+              <div class="card-header accordionheader" id="heading-{{ type_.id }}">
                 <button
                     class="btn btn-link collapsed"
                     type="button"
                     data-toggle="collapse"
-                    data-target="#collapse-{{ node.id }}"
+                    data-target="#collapse-{{ type_.id }}"
                     aria-expanded="true"
-                    aria-controls="collapse-{{ node.id }}">
-                  {{ node.name }}
+                    aria-controls="collapse-{{ type_.id }}">
+                  {{ type_.name }}
                 </button>
               </div>
-              <div id="collapse-{{ node.id }}" class="collapse" aria-labelledby="headingOne" data-parent="#TypeAccordion">
+              <div id="collapse-{{ type_.id }}" class="collapse" aria-labelledby="headingOne" data-parent="#TypeAccordion">
                 <div class="card-body">
                   <div class="row">
                     <div class="col-6 contentbox">
                       <div class="toolbar">
                         <input
                             class="tree-filter"
-                            id="{{ node.name|sanitize }}-tree-search"
+                            id="{{ type_.name|sanitize }}-tree-search"
                             placeholder="{{ _('type to search')|uc_first }}"
                             name="name_search"
                             style="width:8em;"
                             type="text">
-                        {% if 'editor'|is_authorized and node.category != 'system' %}
-                          {{ ''|button(url_for('insert', class_='type' if type_ != 'places' else 'administrative_unit', origin_id=node.id)) }}
+                        {% if 'editor'|is_authorized and type_.category != 'system' %}
+                          {{ ''|button(url_for('insert', class_='type' if category != 'places' else 'administrative_unit', origin_id=type_.id)) }}
                         {% endif %}
-                        {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                          {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}
-                          {% if not node.system and node.count < 1 and not node.subs %}
+                        {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+                          {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
+                          {% if not type_.system and type_.count < 1 and not type_.subs %}
                             {{ _('delete')|button(
-                              url_for('hierarchy_delete', id_=node.id),
-                              onclick="return confirm('" + _('delete')|uc_first + " " + node.name.replace("'", '').replace('"', '') + "?');") }}
+                              url_for('hierarchy_delete', id_=type_.id),
+                              onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');") }}
                           {% endif %}
                         {% endif %}
                       </div>
                       {{ tree|safe }}
                     </div>
                     <div class="col-5 contentbox">
-                      {% if not node.value_type %}
+                      {% if not type_.value_type %}
                         <p>
                           <strong>{{ _('selection')|uc_first }}</strong>:
-                          {{ _('multiple') if node.multiple else _('single') }}
+                          {{ _('multiple') if type_.multiple else _('single') }}
                         </p>
                       {% endif %}
-                      {% if node.classes %}
+                      {% if type_.classes %}
                         <p style="margin-top:0;">
                           <strong>{{ _('classes')|uc_first }}</strong>:
-                          {% for class_ in node.classes %}
+                          {% for class_ in type_.classes %}
                             {{ g.classes[class_].label }}{{ "," if not loop.last }}
                           {% endfor %}
                         </p>
                       {% endif %}
-                      {% if node.classes and node.name not in config.PROPERTY_TYPES %}
+                      {% if type_.classes and type_.name not in config.PROPERTY_TYPES %}
                         {{ _('untyped entities')|uc_first }}:
-                        <a href="{{ url_for('show_untyped_entities', id_=node.id) }}">{{ _('show') }}</a>
+                        <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
                       {% endif %}
-                      {% if node.description %}
+                      {% if type_.description %}
                         <div class="description">
                           <h2>{{ _('description')|uc_first }}</h2>
-                          <p>{{ node.description }}</p>
+                          <p>{{ type_.description }}</p>
                         </div>
                       {% endif %}
                     </div>
@@ -107,9 +107,9 @@
               {{ tree|safe }}
             </div>
           {% endfor %}
-          {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
+          {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
             <span style="margin:1em;">
-              {{ _('type')|button(url_for('hierarchy_insert', param=type_)) }}
+              {{ _('type')|button(url_for('hierarchy_insert', param=category)) }}
             </span>
           {% endif %}
         </div>

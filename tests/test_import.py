@@ -76,7 +76,7 @@ class ImportTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 place_id = Entity.get_by_class('place')[0].id
-            rv = self.app.get(url_for('entity_view', id_=place_id))
+            rv = self.app.get(url_for('view', id_=place_id))
             assert b'Yup' in rv.data
 
             rv = self.app.get(

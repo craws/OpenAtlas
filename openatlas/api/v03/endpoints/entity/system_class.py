@@ -22,4 +22,4 @@ class GetBySystemClass(Resource):
     def get_by_system(system_class: str) -> List[Entity]:
         if system_class not in g.classes:
             raise InvalidSystemClassError
-        return Entity.get_by_class(system_class, nodes=True, aliases=True)
+        return Entity.get_by_class(system_class, types=True, aliases=True)

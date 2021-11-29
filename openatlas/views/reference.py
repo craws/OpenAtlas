@@ -30,8 +30,7 @@ def reference_add(id_: int, view: str) -> Union[str, Response]:
     if form.validate_on_submit():
         entity = Entity.get_by_id(getattr(form, view).data)
         reference.link('P67', entity, form.page.data)
-        return redirect(
-            f"{url_for('entity_view', id_=reference.id)}#tab-{view}")
+        return redirect(f"{url_for('view', id_=reference.id)}#tab-{view}")
     if reference.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template(
@@ -59,7 +58,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
         flash(_('info update'), 'info')
         tab = link_.range.class_.view \
             if origin.class_.view == 'reference' else 'reference'
-        return redirect(f"{url_for('entity_view', id_=origin.id)}#tab-{tab}")
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
     form.save.label.text = _('save')
     form.page.data = link_.description
     if link_.domain.class_.name == 'external_reference':

@@ -49,11 +49,11 @@ class TestBaseCase(unittest.TestCase):
                 '1_structure',
                 '2_data_model',
                 '3_data_web',
-                '4_data_node',
+                '4_data_type',
                 'data_test']:
             with open(
                     pathlib.Path(app.root_path).parent / 'install' /
-                    (file_name + '.sql'),
+                    f'{file_name}.sql',
                     encoding='utf8') as sql_file:
                 cursor.execute(sql_file.read())
 
@@ -65,8 +65,9 @@ def insert_entity(
         description: Optional[str] = None) -> Entity:
     entity = Entity.insert(class_, name, description)
     if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
-        location = Entity.insert('object_location', 'Location of ' + name)
-        entity.link('P53', location)
+        entity.link(
+            'P53',
+            Entity.insert('object_location', f'Location of {name}'))
         if origin:
             origin.link('P46', entity)
     return entity

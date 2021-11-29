@@ -1,8 +1,9 @@
+from flask_restful import Api
+
 from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v03.endpoints.content.content import GetContent
 from openatlas.api.v03.endpoints.content.geometric_entities import \
     GetGeometricEntities
-from openatlas.api.v03.endpoints.content.overview_count import OverviewCount
 from openatlas.api.v03.endpoints.content.systemclass_count import \
     SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
@@ -27,7 +28,7 @@ from openatlas.api.v03.endpoints.node.subunits import GetSubunits
 from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
 
 
-def add_routes_v03(api):
+def add_routes_v03(api: Api):
     api.add_resource(
         GetByCode,
         '/code/<string:code>',
@@ -81,18 +82,6 @@ def add_routes_v03(api):
         '/node_overview/',
         endpoint="node_overview")
     api.add_resource(
-        GetSubunits,
-        '/subunits/<int:id_>',
-        endpoint="subunits")
-    api.add_resource(
-        GetSubunit,
-        '/subunit/<int:id_>',
-        endpoint="subunit")
-    api.add_resource(
-        GetSubunitHierarchy,
-        '/subunit_hierarchy/<int:id_>',
-        endpoint="subunit_hierarchy")
-    api.add_resource(
         GetTypeTree,
         '/type_tree/',
         endpoint="type_tree")
@@ -101,10 +90,6 @@ def add_routes_v03(api):
         GetContent,
         '/content/',
         endpoint="content")
-    api.add_resource(
-        OverviewCount,
-        '/overview_count/',
-        endpoint='overview_count')  # Deprecated
     api.add_resource(
         ClassMapping,
         '/classes/',

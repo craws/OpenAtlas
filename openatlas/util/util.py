@@ -38,7 +38,7 @@ from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
-    from openatlas.models.node import Node
+    from openatlas.models.type import Type
 
 
 @app.template_filter()
@@ -87,7 +87,7 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             or request.path.startswith('/insert/type') \
             or (entity and entity.class_.view == 'type'):
         active = 'active'
-    url = url_for('node_index')
+    url = url_for('type_index')
     html += \
         f'<a href="{url}" class="nav-item nav-link {active}">' \
         f'{uc_first(_("types"))}</a>'
@@ -117,7 +117,7 @@ def is_authorized(context, group: Optional[str] = None) -> bool:
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'node':  # Filter letters, numbers, minus, brackets and spaces
+    if mode == 'type':  # Filter letters, numbers, minus, brackets and spaces
         return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
@@ -247,16 +247,16 @@ def get_entity_data(
     # Types
     if entity.standard_type:
         title = ' > '.join(
-            [g.nodes[id_].name for id_ in entity.standard_type.root])
+            [g.types[id_].name for id_ in entity.standard_type.root])
         data[_('type')] = \
             f'<span title="{title}">{link(entity.standard_type)}</span>'
     data.update(get_type_data(entity))
 
     # Class specific information
-    from openatlas.models.node import Node
+    from openatlas.models.type import Type
     from openatlas.models.reference_system import ReferenceSystem
-    if isinstance(entity, Node):
-        data[_('super')] = link(g.nodes[entity.root[-1]])
+    if isinstance(entity, Type):
+        data[_('super')] = link(g.types[entity.root[-1]])
         if entity.category == 'value':
             data[_('unit')] = entity.description
         data[_('ID for imports')] = entity.id
@@ -456,7 +456,7 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     for link_ in event_links:
         event = link_.domain
         actor = link_.range
-        event_link = link(_('event'), url_for('entity_view', id_=event.id))
+        event_link = link(_('event'), url_for('view', id_=event.id))
         if not actor.first:
             if link_.first \
                     and (not first_year or int(link_.first) < int(first_year)):
@@ -639,8 +639,8 @@ def add_remove_link(
 def display_delete_link(entity: Entity) -> str:
     if entity.class_.name == 'source_translation':
         url = url_for('translation_delete', id_=entity.id)
-    elif entity.id in g.nodes:
-        url = url_for('node_delete', id_=entity.id)
+    elif entity.id in g.types:
+        url = url_for('type_delete', id_=entity.id)
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
     confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
@@ -683,7 +683,7 @@ def link(
     if isinstance(object_, Entity):
         return link(
             object_.name,
-            url_for('entity_view', id_=object_.id),
+            url_for('view', id_=object_.id),
             uc_first_=False)
     return ''
 
@@ -738,12 +738,13 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
             next_id = sibling.id
             position = counter
             break
-    return Markup(render_template(
-        'util/siblings_pager.html',
-        prev_id=prev_id,
-        next_id=next_id,
-        position=position,
-        structure=structure))
+    parts = []
+    if prev_id:  # pragma: no cover
+        parts.append(button('<', url_for('view', id_=prev_id)))
+    if next_id:
+        parts.append(button('>', url_for('view', id_=next_id)))
+    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
+    return Markup(' '.join(parts))
 
 
 @app.template_filter()
@@ -775,18 +776,18 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
 
 def get_type_data(entity: 'Entity') -> Dict[str, Any]:
     if entity.location:
-        entity.nodes.update(entity.location.nodes)  # Add location types
+        entity.types.update(entity.location.types)  # Add location types
     data: Dict[str, Any] = defaultdict(list)
-    for node, value in sorted(entity.nodes.items(), key=lambda x: x[0].name):
-        if entity.standard_type and node.id == entity.standard_type.id:
+    for type_, value in sorted(entity.types.items(), key=lambda x: x[0].name):
+        if entity.standard_type and type_.id == entity.standard_type.id:
             continue  # Standard type is already added
         html = f"""
-            <span title="{" > ".join([g.nodes[i].name for i in node.root])}">
-                {link(node)}
+            <span title="{" > ".join([g.types[i].name for i in type_.root])}">
+                {link(type_)}
             </span>"""
-        if node.category == 'value':
-            html += f' {float(value):g} {node.description}'
-        data[g.nodes[node.root[0]].name].append(html)
+        if type_.category == 'value':
+            html += f' {float(value):g} {type_.description}'
+        data[g.types[type_.root[0]].name].append(html)
     return {key: data[key] for key in sorted(data.keys())}
 
 
@@ -843,13 +844,13 @@ def display_content_translation(_context, text: str) -> str:
 
 @app.template_filter()
 def manual(site: str) -> str:
-    """If the manual page exists, return the link to it"""
+    """ If the manual page exists, return the link to it"""
     parts = site.split('/')
     if len(parts) < 2:
         return ''
-    first = parts[0]
-    second = (parts[1] if parts[1] != 'node' else 'type') + '.html'
-    path = Path(app.root_path) / 'static' / 'manual' / first / second
+    path = \
+        Path(app.root_path) / 'static' / 'manual' / parts[0] / \
+        (parts[1] + '.html')
     if not path.exists():
         # print(f'Missing manual link: {path}')
         return ''
@@ -903,26 +904,26 @@ def display_form(
 
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
-            node = g.nodes[hierarchy_id]
-            label = node.name
-            if node.category == 'standard':
+            type_ = g.types[hierarchy_id]
+            label = type_.name
+            if type_.category == 'standard':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
-            if node.category == 'value' and 'is_node_form' not in form:
-                field.description = node.description
+            if type_.category == 'value' and 'is_type_form' not in form:
+                field.description = type_.description
                 html += add_form_row(
                     field,
                     label,
                     button(
                         _('show'),
-                        onclick=f'switch_value_type({node.id})',
+                        onclick=f'switch_value_type({type_.id})',
                         css='secondary',
-                        id_=f'value-type-switcher-{node.id}'))
-                html += display_value_type_fields(form, node)
+                        id_=f'value-type-switcher-{type_.id}'))
+                html += display_value_type_fields(form, type_)
                 continue
             tooltip_ = '' \
-                if 'is_node_form' in form else f' {tooltip(node.description)}'
+                if 'is_type_form' in form else f' {tooltip(type_.description)}'
             html += add_form_row(field, label + tooltip_)
             continue
 
@@ -961,12 +962,12 @@ def display_form(
 
 def display_value_type_fields(
         form: Any,
-        node_: 'Node',
-        root: Optional['Node'] = None) -> str:
-    root = root if root else node_
+        type_: 'Type',
+        root: Optional['Type'] = None) -> str:
+    root = root if root else type_
     html = ''
-    for sub_id in node_.subs:
-        sub = g.nodes[sub_id]
+    for sub_id in type_.subs:
+        sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
         html += f"""
             <div class="table-row value-type-switch{root.id}">

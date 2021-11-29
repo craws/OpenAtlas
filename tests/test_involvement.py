@@ -3,7 +3,7 @@ from flask import url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -25,7 +25,7 @@ class InvolvementTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Captain Miller')
-                involvement = Node.get_hierarchy('Involvement')
+                involvement = Type.get_hierarchy('Involvement')
 
             # Add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor.id))
@@ -48,9 +48,9 @@ class InvolvementTests(TestBaseCase):
                     'activity': 'P22'},
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=event_id))
+            rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=actor.id))
+            rv = self.app.get(url_for('view', id_=actor.id))
             assert b'Appears first' in rv.data
 
             # Update involvement
@@ -67,7 +67,7 @@ class InvolvementTests(TestBaseCase):
                     'activity': 'P23'},
                 follow_redirects=True)
             assert b'Infinite Space - Infinite Terror' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=actor.id))
+            rv = self.app.get(url_for('view', id_=actor.id))
             assert b'Appears first' in rv.data
-            rv = self.app.get(url_for('entity_view', id_=event_id))
+            rv = self.app.get(url_for('view', id_=event_id))
             assert b'Infinite Space - Infinite Terror' in rv.data

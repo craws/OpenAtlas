@@ -111,8 +111,8 @@ def download(
 
 
 def remove_duplicate_entities(entities: List[Entity]) -> List[Entity]:
-    seen = set()
-    seen_add = seen.add  # Do not change, fast than always call seen.add(e.id)
+    seen: set = set()
+    seen_add = seen.add  # Do not change, faster than always call seen.add(e.id)
     return [entity for entity in entities if
             not (entity.id in seen or seen_add(entity.id))]
 
@@ -123,4 +123,4 @@ def sorting(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
         sorted(
             entities,
             key=operator.attrgetter(parser['column']),
-            reverse=True if parser['sort'] == 'desc' else False)
+            reverse=bool(parser['sort'] == 'desc'))

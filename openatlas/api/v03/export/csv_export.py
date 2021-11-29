@@ -12,7 +12,9 @@ from openatlas.models.link import Link
 class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
-    def export_entities(entities: List[Entity], name: str) -> Response:
+    def export_entities(
+            entities: List[Entity],
+            name: Union[int, str]) -> Response:
         frames = [ApiExportCSV.build_dataframe(entity) for entity in entities]
         return Response(
             pd.DataFrame(data=frames).to_csv(),
@@ -55,8 +57,8 @@ class ApiExportCSV:  # pragma: no cover
     @staticmethod
     def get_node(entity: Entity) -> Dict[Any, List[Any]]:
         nodes: Dict[str, Any] = defaultdict(list)
-        for node in entity.nodes:
-            hierarchy = [g.nodes[root].name for root in node.root]
+        for node in entity.types:
+            hierarchy = [g.types[root].name for root in node.root]
             value = ''
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:

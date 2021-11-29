@@ -6,26 +6,26 @@ from openatlas.models.entity import Entity
 def search(
         entities: List[Entity],
         parser: List[Dict[str, Any]]) -> List[Entity]:
-    return [e for e in entities if (iterate_through_entities(e, parser))]
+    return [e for e in entities if iterate_through_entities(e, parser)]
 
 
 def iterate_through_entities(
         entity: Entity,
         parser: List[Dict[str, Any]]) -> bool:
-    return True if [p for p in parser if search_result(entity, p)] else False
+    return bool([p for p in parser if search_result(entity, p)])
 
 
 def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
     check = []
-    for k, v in parameter.items():
-        for i in v:
+    for key, value in parameter.items():
+        for i in value:
             logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
-            check.append(True if search_entity(
-                entity_values=value_to_be_searched(entity, k),
+            check.append(bool(search_entity(
+                entity_values=value_to_be_searched(entity, key),
                 operator_=i['operator'],
                 search_values=i["values"],
-                logical_operator=logical_o) else False)
-    return True if all(check) else False
+                logical_operator=logical_o)))
+    return bool(all(check))
 
 
 def search_entity(
@@ -35,33 +35,31 @@ def search_entity(
         logical_operator: str) -> bool:
     if operator_ == 'equal':
         if logical_operator == 'or':
-            return True if any(item in entity_values for item in
-                               search_values) else False
+            return bool(any(item in entity_values for item in search_values))
         if logical_operator == 'and':
-            return True if all(item in entity_values for item in
-                               search_values) else False
+            return bool(all(item in entity_values for item in search_values))
 
     if operator_ == 'notEqual':
         if logical_operator == 'or':
-            return False if any(item in entity_values for item in
-                                search_values) else True
+            return bool(
+                not (any(item in entity_values for item in search_values)))
         if logical_operator == 'and':
-            return False if all(item in entity_values for item in
-                                search_values) else True
+            return bool(
+                not (all(item in entity_values for item in search_values)))
 
 
-def value_to_be_searched(entity: Entity, k: str) -> Any:
-    if k == "entityID":
+def value_to_be_searched(entity: Entity, key: str) -> Any:
+    if key == "entityID":
         return [entity.id]
-    if k == "entityName":
+    if key == "entityName":
         return entity.name
-    if k == "entityAliases":
+    if key == "entityAliases":
         return [value for value in entity.aliases.values()]
-    if k == "entityCidocClass":
+    if key == "entityCidocClass":
         return [entity.cidoc_class.code]
-    if k == "entitySystemClass":
+    if key == "entitySystemClass":
         return [entity.class_.name]
-    if k == "typeName":
-        return [node.name for node in entity.nodes]
-    if k == "typeID":
-        return [node.id for node in entity.nodes]
+    if key == "typeName":
+        return [node.name for node in entity.types]
+    if key == "typeID":
+        return [node.id for node in entity.types]

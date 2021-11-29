@@ -43,7 +43,7 @@ def overlay_insert(
             image_id=image_id,
             place_id=place_id,
             link_id=link_id)
-        return redirect(f"{url_for('entity_view', id_=place_id)}#tab-file")
+        return redirect(f"{url_for('view', id_=place_id)}#tab-file")
     return render_template(
         'overlay.html',
         form=form,
@@ -66,7 +66,7 @@ def overlay_update(id_: int) -> Union[str, Response]:
             place_id=overlay.place_id)
         flash(_('info update'), 'info')
         return redirect(
-            f"{url_for('entity_view', id_=overlay.place_id)}#tab-file")
+            f"{url_for('view', id_=overlay.place_id)}#tab-file")
     bounding = ast.literal_eval(overlay.bounding_box)
     if len(bounding) == 2:  # pragma no cover
         bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
@@ -97,4 +97,4 @@ def overlay_update(id_: int) -> Union[str, Response]:
 @required_group('editor')
 def overlay_remove(id_: int, place_id: int) -> Response:
     Overlay.remove(id_)
-    return redirect(f"{url_for('entity_view', id_=place_id)}#tab-file")
+    return redirect(f"{url_for('view', id_=place_id)}#tab-file")

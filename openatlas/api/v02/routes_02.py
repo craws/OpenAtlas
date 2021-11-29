@@ -1,3 +1,5 @@
+from flask_restful import Api
+
 from openatlas.api.v02.endpoints.content.class_mapping import ClassMapping
 from openatlas.api.v02.endpoints.content.content import GetContent
 from openatlas.api.v02.endpoints.content.geometric_entities import \
@@ -26,7 +28,7 @@ from openatlas.api.v02.endpoints.node.subunit_hierarchy import \
 from openatlas.api.v02.endpoints.node.type_tree import GetTypeTree
 
 
-def add_routes_v02(api):
+def add_routes_v02(api: Api):
     api.add_resource(
         GetByCode,
         '/code/<string:code>',

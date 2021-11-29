@@ -80,6 +80,9 @@ class FilterLogicalOperatorError(Exception):
 class TypeIDError(Exception):
     pass
 
+class LastEntityError(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -189,6 +192,11 @@ errors = {
     "TypeIDError": {
         "message": "One type ID is wrong.",
         "title": "Type ID Error",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "LastEntityError": {
+        "message": "The ID is the last entity, please choose another ID",
+        "title": "Last ID Error",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

@@ -19,7 +19,7 @@ from openatlas.models.link import Link
 from openatlas.util.util import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.node import Node
+    from openatlas.models.type import Type
     from openatlas.models.reference_system import ReferenceSystem
 
 
@@ -29,15 +29,15 @@ class Entity:
 
         self.id = data['id']
         self.standard_type = None
-        self.nodes: Dict['Node', str] = {}
+        self.types: Dict['Type', str] = {}
         self.name = data['name']
 
-        if 'nodes' in data and data['nodes']:
-            for item in data['nodes']:
-                node = g.nodes[item['f1']]  # f1 = node id, f2 = value
-                self.nodes[node] = item['f2']
-                if node.category == 'standard':
-                    self.standard_type = node
+        if 'types' in data and data['types']:
+            for item in data['types']:
+                type_ = g.types[item['f1']]  # f1 = type id, f2 = value
+                self.types[type_] = item['f2']
+                if type_.category == 'standard':
+                    self.standard_type = type_
 
         self.aliases: Dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
@@ -86,30 +86,30 @@ class Entity:
             self,
             code: str,
             inverse: bool = False,
-            nodes: bool = False) -> Optional[Entity]:
+            types: bool = False) -> Optional[Entity]:
         return Link.get_linked_entity(
             self.id,
             code,
             inverse=inverse,
-            nodes=nodes)
+            types=types)
 
     def get_linked_entity_safe(
             self,
             code: str,
             inverse: bool = False,
-            nodes: bool = False) -> Entity:
-        return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
+            types: bool = False) -> Entity:
+        return Link.get_linked_entity_safe(self.id, code, inverse, types)
 
     def get_linked_entities(
             self,
             code: Union[str, List[str]],
             inverse: bool = False,
-            nodes: bool = False) -> List[Entity]:
+            types: bool = False) -> List[Entity]:
         return Link.get_linked_entities(
             self.id,
             code,
             inverse=inverse,
-            nodes=nodes)
+            types=types)
 
     def link(self,
              code: str,
@@ -147,7 +147,7 @@ class Entity:
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms
-            self.save_nodes(form)
+            self.save_types(form)
             if self.class_.name != 'object_location':
                 self.set_dates(form)
                 self.update_aliases(form)
@@ -162,7 +162,7 @@ class Entity:
                         '(', '').replace(')', '').strip()
                     self.name += ' (' + inverse + ')'
         if self.class_.name == 'type':
-            self.name = sanitize(self.name, 'node')
+            self.name = sanitize(self.name, 'type')
         elif self.class_.name == 'object_location':
             self.name = 'Location of ' + self.name
             self.description = None
@@ -200,9 +200,9 @@ class Entity:
                 else:
                     self.link('P1', Entity.insert('appellation', alias))
 
-    def save_nodes(self, form: FlaskForm) -> None:
-        from openatlas.models.node import Node
-        Node.save_entity_nodes(self, form)
+    def save_types(self, form: FlaskForm) -> None:
+        from openatlas.models.type import Type
+        Type.save_entity_types(self, form)
 
     def set_dates(self, form: FlaskForm) -> None:
         if not hasattr(form, 'begin_year_from'):
@@ -247,13 +247,13 @@ class Entity:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
-            return sanitize(name_parts[1][:-1], 'node')  # remove close bracket
+            return sanitize(name_parts[1][:-1], 'type')  # remove close bracket
         return name_parts[0]
 
     @staticmethod
     def get_invalid_dates() -> List[Entity]:
         return [
-            Entity.get_by_id(row['id'], nodes=True)
+            Entity.get_by_id(row['id'], types=True)
             for row in Date.get_invalid_dates()]
 
     @staticmethod
@@ -265,7 +265,7 @@ class Entity:
     @staticmethod
     def get_by_class(
             classes: Union[str, List[str]],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Entity]:
         if aliases:  # For performance: check classes if they can have an alias
             aliases = False
@@ -274,19 +274,19 @@ class Entity:
                 if g.classes[class_].alias_allowed:
                     aliases = True
                     break
-        return [Entity(row) for row in Db.get_by_class(classes, nodes, aliases)]
+        return [Entity(row) for row in Db.get_by_class(classes, types, aliases)]
 
     @staticmethod
     def get_by_view(
             view: str,
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Entity]:
-        return Entity.get_by_class(g.view_class_mapping[view], nodes, aliases)
+        return Entity.get_by_class(g.view_class_mapping[view], types, aliases)
 
     @staticmethod
     def get_display_files() -> List[Entity]:
         entities = []
-        for row in Db.get_by_class('file', nodes=True):
+        for row in Db.get_by_class('file', types=True):
             ext = g.file_stats[row['id']]['ext'] \
                 if row['id'] in g.file_stats else 'N/A'
             if ext in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -297,7 +297,7 @@ class Entity:
     def insert(
             class_name: str,
             name: str,
-            description: Optional[str] = None) -> Union[Entity, Node]:
+            description: Optional[str] = None) -> Union[Entity, Type]:
         if not name:  # pragma: no cover
             from openatlas import logger
             logger.log('error', 'model', 'Insert entity without name')
@@ -313,21 +313,21 @@ class Entity:
     @staticmethod
     def get_by_cidoc_class(
             code: Union[str, List[str]],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Entity]:
         return [Entity(row) for row in
-                Db.get_by_cidoc_class(code, nodes, aliases)]
+                Db.get_by_cidoc_class(code, types, aliases)]
 
     @staticmethod
     def get_by_id(
             id_: int,
-            nodes: bool = False,
-            aliases: bool = False) -> Union[Entity, Node, 'ReferenceSystem']:
-        if id_ in g.nodes:
-            return g.nodes[id_]
+            types: bool = False,
+            aliases: bool = False) -> Union[Entity, Type, 'ReferenceSystem']:
+        if id_ in g.types:
+            return g.types[id_]
         if id_ in g.reference_systems:
             return g.reference_systems[id_]
-        data = Db.get_by_id(id_, nodes, aliases)
+        data = Db.get_by_id(id_, types, aliases)
         if not data:
             if 'activity' in request.path:  # Re-raise if in user activity view
                 raise AttributeError  # pragma: no cover
@@ -337,12 +337,12 @@ class Entity:
     @staticmethod
     def get_by_ids(
             ids: Iterable[int],
-            nodes: bool = False,
+            types: bool = False,
             aliases: bool = False) -> List[Entity]:
         entities = []
-        for row in Db.get_by_ids(ids, nodes, aliases):
-            if row['id'] in g.nodes:
-                entities.append(g.nodes[row['id']])
+        for row in Db.get_by_ids(ids, types, aliases):
+            if row['id'] in g.types:
+                entities.append(g.types[row['id']])
             elif row['id'] in g.reference_systems:
                 entities.append(g.reference_systems[row['id']])
             else:

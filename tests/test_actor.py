@@ -2,7 +2,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.node import Node
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -19,9 +19,9 @@ class ActorTests(TestBaseCase):
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                sex_node = Node.get_hierarchy('Sex')
-                sex_node_sub_1 = g.nodes[sex_node.subs[0]]
-                sex_node_sub_2 = g.nodes[sex_node.subs[1]]
+                sex_type = Type.get_hierarchy('Sex')
+                sex_type_sub_1 = g.types[sex_type.subs[0]]
+                sex_type_sub_2 = g.types[sex_type.subs[1]]
                 event = Entity.insert('acquisition', 'Event Horizon')
                 source = Entity.insert('source', 'Necronomicon')
 
@@ -31,7 +31,7 @@ class ActorTests(TestBaseCase):
             self.app.get(
                 url_for('insert', class_='person', origin_id=residence_id))
             data = {
-                sex_node.id: sex_node_sub_1.id,
+                sex_type.id: sex_type_sub_1.id,
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': residence_id,
@@ -55,25 +55,25 @@ class ActorTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            # Test actor nodes
-            rv = self.app.get(url_for('entity_view', id_=sex_node_sub_1.id))
+            # Test actor types
+            rv = self.app.get(url_for('view', id_=sex_type_sub_1.id))
             assert b'Susan' in rv.data
             rv = self.app.get(
-                url_for('node_move_entities', id_=sex_node_sub_1.id))
+                url_for('type_move_entities', id_=sex_type_sub_1.id))
             assert b'Sigourney' in rv.data
             rv = self.app.post(
-                url_for('node_move_entities', id_=sex_node_sub_1.id),
+                url_for('type_move_entities', id_=sex_type_sub_1.id),
                 follow_redirects=True,
                 data={
-                    sex_node.id: sex_node_sub_2.id,
+                    sex_type.id: sex_type_sub_2.id,
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data
             rv = self.app.post(
-                url_for('node_move_entities', id_=sex_node_sub_2.id),
+                url_for('type_move_entities', id_=sex_type_sub_2.id),
                 follow_redirects=True,
                 data={
-                    sex_node.id: '',
+                    sex_type.id: '',
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data

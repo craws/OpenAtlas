@@ -69,7 +69,7 @@ Import the scripts: 1_structure.sql, 2_data_web.sql, 3_data_model.sql,
 4_data_node.sql
 
     $ cd install
-    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_node.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql -d openatlas -f -
 
 A user with user name "OpenAtlas" is created with the password:
 **change_me_PLEASE!**
