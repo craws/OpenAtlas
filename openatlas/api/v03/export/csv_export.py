@@ -12,7 +12,9 @@ from openatlas.models.link import Link
 class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
-    def export_entities(entities: List[Entity], name: str) -> Response:
+    def export_entities(
+            entities: List[Entity],
+            name: Union[int, str]) -> Response:
         frames = [ApiExportCSV.build_dataframe(entity) for entity in entities]
         return Response(
             pd.DataFrame(data=frames).to_csv(),

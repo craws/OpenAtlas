@@ -13,9 +13,8 @@ from openatlas.util.util import get_file_path
 class LPHelper:
     @staticmethod
     def get_location_id(links: List[Link]) -> int:
-        for link_ in links:
-            if link_.property.code == 'P53':
-                return link_.range.id
+                return [link_.range.id for link_ in
+                        links if link_.property.code == 'P53'][0]
 
     @staticmethod
     def relation_type(link_: Link, inverse: bool = False) -> str:
@@ -35,7 +34,7 @@ class LPHelper:
                     _external=True),
             'relationType': LPHelper.relation_type(link_, inverse),
             'relationSystemClass': link_.domain.class_.name
-            if inverse else link_.range.class_.name,
+                if inverse else link_.range.class_.name,
             'type': to_camel_case(link_.type.name) if link_.type else None,
             'relationDescription': link_.description,
             'when': {'timespans': [

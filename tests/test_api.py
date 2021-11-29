@@ -18,8 +18,8 @@ from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
                                                QueryEmptyError, TypeIDError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -153,24 +153,21 @@ class ApiTests(TestBaseCase):
 
             # ---Content Endpoints---
             # ClassMapping
-            for rv in [
-                self.app.get(url_for('api_02.class_mapping')).get_json(),
-                self.app.get(url_for('api_03.class_mapping')).get_json()]:
+            for rv in [self.app.get(url_for('api_02.class_mapping')).get_json(),
+                       self.app.get(
+                           url_for('api_03.class_mapping')).get_json()]:
                 assert ApiTests.get_class_mapping(rv)
 
             # Content
-            for rv in [
-                self.app.get(
+            for rv in [self.app.get(
                     url_for('api_02.content', lang='de',
                             download=True)).get_json(),
-                self.app.get(url_for('api_03.content', lang='de',
-                                     download=True)).get_json()]:
-                assert True if rv['intro'] == 'Das ist Deutsch' else False
-            for rv in [
-                self.app.get(
-                    url_for('api_02.content')).get_json(),
-                self.app.get(url_for('api_03.content')).get_json()]:
-                assert True if rv['intro'] == 'This is English' else False
+                       self.app.get(url_for('api_03.content', lang='de',
+                                            download=True)).get_json()]:
+                assert bool(rv['intro'] == 'Das ist Deutsch')
+            for rv in [self.app.get(url_for('api_02.content')).get_json(),
+                       self.app.get(url_for('api_03.content')).get_json()]:
+                assert bool(rv['intro'] == 'This is English')
 
             # geometric_entities/
             for rv in [
@@ -182,8 +179,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.geometric_entities',
                     download=True)).get_json()]:
-                assert True if rv['features'][0]['geometry'][
-                    'coordinates'] else None
+                assert bool(rv['features'][0]['geometry'][
+                                'coordinates'])
                 assert ApiTests.get_geom_properties(rv, 'id')
                 assert ApiTests.get_geom_properties(rv, 'objectDescription')
                 assert ApiTests.get_geom_properties(rv, 'objectId')
@@ -194,11 +191,11 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.system_class_count')).get_json(),
                 self.app.get(url_for('api_03.system_class_count')).get_json()]:
-                assert True if rv['person'] else False
+                assert bool(rv['person'])
 
             # overview_count/
             rv = self.app.get(url_for('api_02.overview_count')).get_json()
-            assert True if rv[0]['systemClass'] else False
+            assert bool(rv[0]['systemClass'])
 
             # ---Entity Endpoints---
             # /entity
@@ -540,7 +537,7 @@ class ApiTests(TestBaseCase):
                     limit=1,
                     first=actor2.id))]:
                 rv = rv.get_json()
-                assert True if len(rv['results']) == 1 else False
+                assert bool(len(rv['results']) == 1)
 
             # Test if Query returns enough entities
             for rv in [
@@ -561,7 +558,7 @@ class ApiTests(TestBaseCase):
                     limit=1,
                     first=actor2.id))]:
                 rv = rv.get_json()
-                assert True if rv['pagination']['entities'] == 8 else False
+                assert bool(rv['pagination']['entities'] == 8)
 
             # Test Entities count
             for rv in [self.app.get(url_for(
@@ -578,7 +575,7 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     count=True))]:
-                assert True if rv.get_json() == 8 else False
+                assert bool(rv.get_json() == 8)
 
             # Test Entities count
             for rv in [
@@ -588,7 +585,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.geometric_entities',
                     count=True))]:
-                assert True if rv.get_json() == 1 else False
+                assert bool(rv.get_json() == 1)
 
             # Test entities with GeoJSON Format
             for rv in [
@@ -641,8 +638,8 @@ class ApiTests(TestBaseCase):
                     id_=unit_node.id))]:
                 rv = rv.get_json()
                 rv = rv['nodes']
-                assert True if [True for i in rv if
-                                i['label'] == 'Wien'] else False
+                assert bool([True for i in rv if
+                             i['label'] == 'Wien'])
 
             # Test Type Entities count
             for rv in [
@@ -654,7 +651,7 @@ class ApiTests(TestBaseCase):
                     'api_03.node_entities',
                     id_=unit_node.id,
                     count=True))]:
-                assert True if rv.get_json() == 6 else False
+                assert bool(rv.get_json() == 6)
 
                 # Test Type Overview
             for rv in [
@@ -662,16 +659,16 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for('api_02.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types'][0]['place']['Administrative unit']
-                assert True if [True for i in rv if
-                                i['label'] == 'Austria'] else False
+                assert bool([True for i in rv if
+                             i['label'] == 'Austria'])
 
             for rv in [
                 self.app.get(url_for('api_03.node_overview')),
                 self.app.get(url_for('api_03.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types']['place']['Administrative unit']
-                assert True if [True for i in rv if
-                                i['label'] == 'Austria'] else False
+                assert bool([True for i in rv if
+                             i['label'] == 'Austria'])
 
             # Test Type Tree
             for rv in [
@@ -679,14 +676,14 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for('api_02.type_tree', download=True))
             ]:
                 rv = rv.get_json()
-                assert True if rv['typeTree'][0] else False
+                assert bool(rv['typeTree'][0])
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
                 self.app.get(url_for('api_03.type_tree', download=True)),
             ]:
                 rv = rv.get_json()
-                assert True if rv['typeTree'] else False
+                assert bool(rv['typeTree'])
 
             # Test search parameter
             for rv in [self.app.get(url_for(
@@ -721,7 +718,7 @@ class ApiTests(TestBaseCase):
                            f'"values":["person"],'
                            f'"logicalOperator":"and"}}]}}'))]:
                 rv = rv.get_json()
-                assert True if rv['pagination']['entities'] == 2 else False
+                assert bool(rv['pagination']['entities'] == 2)
 
             # Test search parameter
             for rv in [self.app.get(url_for(
@@ -741,42 +738,42 @@ class ApiTests(TestBaseCase):
                            f'"values":["Place", "Height"],'
                            f'"logicalOperator":"and"}}]}}'))]:
                 rv = rv.get_json()
-                assert True if rv['pagination']['entities'] == 1 else False
+                assert bool(rv['pagination']['entities'] == 1)
 
-                # Test search parameter
-                for rv in [
-                    self.app.get(url_for(
-                        'api_03.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"typeName":[{{"operator":"notEqual",'
-                               f'"values":["Place", "Height"],'
-                               f'"logicalOperator":"and"}}]}}')),
-                    self.app.get(url_for(
-                        'api_03.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"entityID":[{{"operator":"notEqual",'
-                               f'"values":[{place.id}],'
-                               f'"logicalOperator":"and"}}]}}')),
-                    self.app.get(url_for(
-                        'api_03.query',
-                        entities=place.id,
-                        classes='E18',
-                        codes='artifact',
-                        system_classes='person',
-                        format='lp',
-                        search=f'{{"entityAliases":[{{"operator":"notEqual",'
-                               f'"values":["Sûza"],'
-                               f'"logicalOperator":"and"}}]}}'))]:
-                    rv = rv.get_json()
-                    assert True if rv['pagination']['entities'] == 6 else False
+            # Test search parameter
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeName":[{{"operator":"notEqual",'
+                           f'"values":["Place", "Height"],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"entityID":[{{"operator":"notEqual",'
+                           f'"values":[{place.id}],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"entityAliases":[{{"operator":"notEqual",'
+                           f'"values":["Sûza"],'
+                           f'"logicalOperator":"and"}}]}}'))]:
+                rv = rv.get_json()
+                assert bool(rv['pagination']['entities'] == 6)
 
             # Test search parameter
             rv = self.app.get(url_for(
@@ -785,18 +782,18 @@ class ApiTests(TestBaseCase):
                 search=f'{{"entityName":[{{"operator":"notEqual",'
                        f'"values":["Mordor"],'
                        f'"logicalOperator":"or"}}]}}')).get_json()
-            assert True if rv['pagination']['entities'] == 1 else False
+            assert bool(rv['pagination']['entities'] == 1)
 
             # subunit/
             rv = self.app.get(
                 url_for('api_02.subunit', id_=place.id)).get_json()
-            assert True if rv['nodes'][0][
-                               'label'] == 'Home of Baggins' else False
+            assert bool(rv['nodes'][0][
+                            'label'] == 'Home of Baggins')
 
             # subunit_hierarchy/
             rv = self.app.get(
                 url_for('api_02.subunit_hierarchy', id_=place.id)).get_json()
-            assert True if rv['nodes'][1]['label'] == 'Kitchen' else False
+            assert bool(rv['nodes'][1]['label'] == 'Kitchen')
 
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for('api_03.entity', id_=233423424))
@@ -908,27 +905,27 @@ class ApiTests(TestBaseCase):
     @staticmethod
     def get_bool(
             data: Dict[str, Any], key: str,
-            value: Optional[Union[str, List]] = None) -> bool:
+            value: Optional[Union[str, List[Any]]] = None) -> bool:
         if value:
-            return True if data[key] == value else False
-        return True if data[key] else False
+            return bool(data[key] == value)
+        return bool(data[key])
 
     @staticmethod
     def get_bool_inverse(data: Dict[str, Any], key: str) -> bool:
-        return True if not data[key] else False
+        return bool(not data[key])
 
     @staticmethod
     def get_no_key(data: Dict[str, Any], key: str) -> bool:
-        return True if key not in data.keys() else False
+        return bool(key not in data.keys())
 
     @staticmethod
     def get_geom_properties(geom: Dict[str, Any], key: str) -> bool:
-        return True if geom['features'][0]['properties'][key] else False
+        return bool(geom['features'][0]['properties'][key])
 
     @staticmethod
     def get_class_mapping(data: List[Dict[str, Any]]) -> bool:
-        return True if data[0]["systemClass"] and \
-                       data[0]["crmClass"] and \
-                       data[0]['view'] and \
-                       data[0]['icon'] and \
-                       data[0]['en'] else False
+        return bool(data[0]['systemClass']
+                    and data[0]['crmClass']
+                    and data[0]['view']
+                    and data[0]['icon']
+                    and data[0]['en'])

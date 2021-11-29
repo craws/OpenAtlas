@@ -22,7 +22,7 @@ class GetByClass(Resource):
             class_code)
 
     @staticmethod
-    def get_by_class(class_code: str, parser) -> List[Entity]:
+    def get_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
         if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode  # pragma: no cover
         return [Entity(row) for row in Db.get_by_class_code(class_code, parser)]

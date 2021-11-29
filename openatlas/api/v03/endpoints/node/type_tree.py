@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict,  Tuple, Union
 
 from flask import Response
 from flask_restful import Resource, marshal
@@ -22,7 +22,7 @@ class GetTypeTree(Resource):
     @staticmethod
     def get_type_tree() -> Dict[str, Any]:
         return {id_: GetTypeTree.serialize_to_json(node)
-            for id_, node in Type.get_all().items()}
+                for id_, node in Type.get_all().items()}
 
     @staticmethod
     def serialize_to_json(node: Type) -> Dict[str, Any]:
