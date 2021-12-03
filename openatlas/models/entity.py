@@ -165,13 +165,9 @@ class Entity:
 
     def update2(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms
-            self.save_types(form)
             if self.class_.name != 'object_location':
                 self.set_dates(form)
                 self.update_aliases(form)
-            for field in ['name', 'description']:
-                if hasattr(form, field):
-                    setattr(self, field, getattr(form, field).data)
             if hasattr(form, 'name_inverse'):
                 self.name = form.name.data.replace(
                     '(', '').replace(')', '').strip()
@@ -217,10 +213,6 @@ class Entity:
                     self.link('P131', Entity.insert('actor_appellation', alias))
                 else:
                     self.link('P1', Entity.insert('appellation', alias))
-
-    def save_types(self, form: FlaskForm) -> None:
-        from openatlas.models.type import Type
-        Type.save_entity_types(self, form)
 
     def set_dates(self, form: FlaskForm) -> None:
         if not hasattr(form, 'begin_year_from'):

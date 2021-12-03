@@ -30,102 +30,42 @@ from openatlas.util.util import (
 def insert(
         class_: str,
         origin_id: Optional[int] = None) -> Union[str, Response]:
-    if class_ not in g.classes or not g.classes[class_].view \
-            or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
+    check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(class_, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, class_=class_, origin=origin))
     if hasattr(form, 'alias'):
         form.alias.append_entry('')
-    view_name = g.classes[class_].view
-    geonames_module = False
     if origin:
-        populate_insert_form(form, view_name, class_, origin)
-    else:
-        geonames_module = bool(ReferenceSystem.get_by_name('GeoNames').classes)
-
+        populate_insert_form(form, class_, origin)
     # Archaeological sub units
     structure = None
     gis_data = None
     overlays = None
-    if view_name in ['artifact', 'place']:
+    if g.classes[class_].view in ['artifact', 'place']:
         structure = get_structure(super_=origin)
         gis_data = Gis.get_all([origin] if origin else None, structure)
         overlays = Overlay.get_by_object(origin) \
             if origin and origin.class_.view == 'place' else None
+
     return render_template(
         'entity/insert.html',
         form=form,
-        view_name=view_name,
+        view_name=g.classes[class_].view,
         gis_data=gis_data,
-        geonames_module=geonames_module,
+        geonames_module=check_geonames_module(class_),
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=overlays,
-        title=_(view_name),
-        crumbs=add_crumbs(view_name, class_, origin, structure, insert_=True))
-
-
-def add_crumbs(
-        view_name: str,
-        class_: str,
-        origin: Union[Entity, None],
-        structure: Optional[Dict[str, Any]],
-        insert_: Optional[bool] = False) -> List[Any]:
-    label = origin.class_.name if origin else view_name
-    if label in g.class_view_mapping:
-        label = g.class_view_mapping[label]
-    label = _(label.replace('_', ' '))
-    crumbs = [
-        [
-            label,
-            url_for('index', view=origin.class_.view if origin else view_name)],
-        link(origin)]
-    if structure:
-        crumbs = [
-            [_('place'), url_for('index', view='place')],
-            structure['place']
-            if origin and origin.class_.name != 'place' else '',
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            link(origin)]
-    if view_name == 'type':
-        crumbs = [[_('types'), url_for('type_index')]]
-        if isinstance(origin, Type) and origin.root:
-            for type_id in origin.root:
-                crumbs += [link(g.types[type_id])]
-        crumbs += [origin]
-    sibling_count = 0
-    if origin \
-            and origin.class_.name == 'stratigraphic_unit' \
-            and structure \
-            and insert_:
-        for item in structure['siblings']:
-            if item.class_.name == class_:  # pragma: no cover
-                sibling_count += 1
-    info = f" ({sibling_count} {_('exists')})" if sibling_count else ''
-    return crumbs + [
-        f'+ {g.classes[class_].label}{info}' if insert_ else _('edit')]
+        title=_(g.classes[class_].view),
+        crumbs=add_crumbs(class_, origin, structure, insert_=True))
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
-    if not entity.class_.view:
-        abort(422)  # pragma: no cover
-    elif not is_authorized(entity.class_.write_access):
-        abort(403)  # pragma: no cover
-    elif isinstance(entity, Type):
-        if entity.category == 'system' \
-                or (entity.category == 'standard' and not entity.root):
-            abort(403)  # pragma: no cover
-
-    geonames_module = False
-    if entity.class_.name == 'place' \
-            and ReferenceSystem.get_by_name('GeoNames').classes:
-        geonames_module = True
+    check_update_access(entity)
 
     # Archaeological sub units
     structure = None
@@ -146,11 +86,10 @@ def update(id_: int) -> Union[str, Response]:
                     if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
                         entity.image_id = domain.id
                         break
+
     form = build_form(entity.class_.name, entity, location=location)
     if entity.class_.view == 'event':
         form.event_id.data = entity.id
-    elif isinstance(entity, ReferenceSystem) and entity.system:
-        form.name.render_kw['readonly'] = 'readonly'
     if form.validate_on_submit():
         if isinstance(entity, Type):
             valid = True
@@ -176,6 +115,8 @@ def update(id_: int) -> Union[str, Response]:
                 modifier=link(
                     logger.get_log_for_advanced_view(entity.id)['modifier']))
         return redirect(save(form, entity))
+    if isinstance(entity, ReferenceSystem) and entity.system:
+        form.name.render_kw['readonly'] = 'readonly'
     populate_update_form(form, entity)
     return render_template(
         'entity/update.html',
@@ -183,25 +124,83 @@ def update(id_: int) -> Union[str, Response]:
         entity=entity,
         gis_data=gis_data,
         overlays=overlays,
-        geonames_module=geonames_module,
+        geonames_module=check_geonames_module(entity.class_.name),
         title=entity.name,
         crumbs=add_crumbs(
-            view_name=entity.class_.view,
             class_=entity.class_.name,
             origin=entity,
             structure=structure))
 
 
+def check_geonames_module(class_: str) -> bool:
+    return class_ == 'place' and ReferenceSystem.get_by_name('GeoNames').classes
+
+
+def check_update_access(entity: Entity) -> None:
+    check_insert_access(entity.class_.name)
+    if isinstance(entity, Type) and (
+            entity.category == 'system'
+            or entity.category == 'standard' and not entity.root):
+        abort(403)
+
+
+def check_insert_access(class_: str) -> None:
+    if class_ not in g.classes \
+            or not g.classes[class_].view \
+            or not is_authorized(g.classes[class_].write_access):
+        abort(403)  # pragma: no cover
+
+
+def add_crumbs(
+        class_: str,
+        origin: Union[Entity, None],
+        structure: Optional[Dict[str, Any]],
+        insert_: Optional[bool] = False) -> List[Any]:
+    view = g.classes[class_].view
+    label = origin.class_.name if origin else view
+    if label in g.class_view_mapping:
+        label = g.class_view_mapping[label]
+    label = _(label.replace('_', ' '))
+    crumbs = [
+        [label, url_for('index', view=origin.class_.view if origin else view)],
+        link(origin)]
+    if structure:
+        crumbs = [
+            [_('place'), url_for('index', view='place')],
+            structure['place']
+            if origin and origin.class_.name != 'place' else '',
+            structure['feature'],
+            structure['stratigraphic_unit'],
+            link(origin)]
+    if view == 'type':
+        crumbs = [[_('types'), url_for('type_index')]]
+        if isinstance(origin, Type) and origin.root:
+            for type_id in origin.root:
+                crumbs += [link(g.types[type_id])]
+        crumbs += [origin]
+    sibling_count = 0
+    if origin \
+            and origin.class_.name == 'stratigraphic_unit' \
+            and structure \
+            and insert_:
+        for item in structure['siblings']:
+            if item.class_.name == class_:  # pragma: no cover
+                sibling_count += 1
+    siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
+    return crumbs + \
+        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+
+
 def populate_insert_form(
         form: FlaskForm,
-        view_name: str,
         class_: str,
         origin: Union[Entity, Type]) -> None:
-    if view_name == 'actor' and origin.class_.name == 'place':
+    view = g.classes[class_].view
+    if view == 'actor' and origin.class_.name == 'place':
         form.residence.data = origin.id
-    if view_name == 'artifact' and origin.class_.view == 'actor':
+    if view == 'artifact' and origin.class_.view == 'actor':
         form.actor.data = origin.id
-    if view_name == 'event':
+    if view == 'event':
         if origin.class_.view == 'artifact':
             form.artifact.data = [origin.id]
         elif origin.class_.view in ['artifact', 'place']:
@@ -209,9 +208,9 @@ def populate_insert_form(
                 form.place_from.data = origin.id
             else:
                 form.place.data = origin.id
-    if view_name == 'source' and origin.class_.name == 'artifact':
+    if view == 'source' and origin.class_.name == 'artifact':
         form.artifact.data = [origin.id]
-    if view_name == 'type':
+    if view == 'type':
         root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None
@@ -458,16 +457,6 @@ def update_links(
         if action == 'update':
             entity.delete_links(['P128'], inverse=True)
         entity.link_string('P128', form.artifact.data, inverse=True)
-    elif entity.class_.view == 'type':
-        type_ = origin if isinstance(origin, Type) else entity
-        root = g.types[type_.root[0]] if type_.root else type_
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        if super_id != new_super.id:
-            property_code = 'P127' if entity.class_.name == 'type' else 'P89'
-            entity.delete_links([property_code])
-            entity.link(property_code, new_super)
 
 
 def link_and_get_redirect_url(
