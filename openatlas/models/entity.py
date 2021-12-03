@@ -145,7 +145,25 @@ class Entity:
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
         Link.delete_by_codes(self, codes, inverse)
 
-    def update(self, form: Optional[FlaskForm] = None) -> None:
+    def update(self, data: Dict[str, Any], new: Optional[bool] = False) -> None:
+        for key, value in data['attributes'].items():
+            setattr(self, key, value)
+        Db.update({
+            'id': self.id,
+            'name': str(self.name).strip(),
+            'begin_from': datetime64_to_timestamp(self.begin_from),
+            'begin_to': datetime64_to_timestamp(self.begin_to),
+            'end_from': datetime64_to_timestamp(self.end_from),
+            'end_to': datetime64_to_timestamp(self.end_to),
+            'begin_comment':
+                str(self.begin_comment).strip() if self.begin_comment else None,
+            'end_comment':
+                str(self.end_comment).strip() if self.end_comment else None,
+            'description':
+                sanitize(self.description, 'text') if self.description else None
+        })
+
+    def update2(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms
             self.save_types(form)
             if self.class_.name != 'object_location':

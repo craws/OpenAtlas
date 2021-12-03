@@ -1,10 +1,11 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, Optional as Optional_Type
+from typing import Any, Dict, Optional as Optional_Type, Optional
 
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
@@ -79,3 +80,37 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = ''  # In case of a missing setting after an update
             continue
         field.data = session['settings'][field.name]
+
+
+def process_form_data(
+        form: FlaskForm,
+        entity: Entity,
+        origin: Optional[Entity] = None) -> Dict[str, Any]:
+    data: Dict[str, Any] = {
+        'attributes': {},
+        'links': [],
+        'types': []}
+    for key, value in form.data.items():
+        # Data preparation
+        field_type = getattr(form, key).type
+        if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        #if key in ['address', 'inverse', 'latitude', 'longitude']:
+        #    continue  # These fields are processed elsewhere
+        #if field_type in [
+        #    'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
+        #    if value:
+        #        ids = ast.literal_eval(value)
+        #        value = ids if isinstance(ids, list) else [int(ids)]
+        #    else:
+        #        value = []
+
+        # Data mapping
+        if field_type in ['StringField', 'TextAreaField']:
+            if key in ['name', 'description']:
+                data['attributes'][key] = form.data[key]
+            else:  # pragma: no cover
+                print('unknown field: ', field_type, key, value)
+        else:  # pragma: no cover
+            print('unknown form field type', field_type, key, value)
+    return data

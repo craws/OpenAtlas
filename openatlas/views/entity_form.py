@@ -11,6 +11,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
+from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.link import Link
@@ -348,7 +349,7 @@ def save(
             if hasattr(form, 'classes'):
                 entity.add_classes(form)
         else:
-            entity.update(form)
+            entity.update(process_form_data(form, entity, origin))
             class_ = entity.class_.name
         update_links(entity, form, action, origin)
         url = link_and_get_redirect_url(form, entity, class_, origin)
