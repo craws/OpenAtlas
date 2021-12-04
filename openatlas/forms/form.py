@@ -20,8 +20,8 @@ from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import view_class_mapping
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
@@ -71,7 +71,6 @@ def build_form(
             [InputRequired(), URL()] if class_ == 'external_reference'
             else [InputRequired()],
             render_kw={'autofocus': True}))
-
     if 'alias' in FORMS[class_]:
         setattr(
             Form,
@@ -87,8 +86,8 @@ def build_form(
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
-            type = entity if entity else origin
-            root = g.types[type.root[0]] if type.root else type
+            type_ = entity if entity else origin
+            root = g.types[type_.root[0]] if type_.root else type_
             if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
