@@ -66,17 +66,10 @@ def insert(
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
+    place_info = get_place_info(entity)
 
-    # Archaeological sub units
-    structure = None
-    gis_data = None
-    overlays = None
-    location = None
+    # Getting profile images for places
     if entity.class_.view in ['artifact', 'place']:
-        structure = get_structure(entity)
-        location = entity.get_linked_entity_safe('P53', types=True)
-        gis_data = Gis.get_all([entity], structure)
-        overlays = Overlay.get_by_object(entity)
         entity.image_id = entity.get_profile_image_id()
         if not entity.image_id:
             for link_ in entity.get_links('P67', inverse=True):
@@ -87,9 +80,10 @@ def update(id_: int) -> Union[str, Response]:
                         entity.image_id = domain.id
                         break
 
-    form = build_form(entity.class_.name, entity, location=location)
-    if entity.class_.view == 'event':
-        form.event_id.data = entity.id
+    form = build_form(
+        entity.class_.name,
+        entity,
+        location=place_info['location'])
     if form.validate_on_submit():
         if isinstance(entity, Type):
             valid = True
@@ -115,21 +109,34 @@ def update(id_: int) -> Union[str, Response]:
                 modifier=link(
                     logger.get_log_for_advanced_view(entity.id)['modifier']))
         return redirect(save(form, entity))
-    if isinstance(entity, ReferenceSystem) and entity.system:
-        form.name.render_kw['readonly'] = 'readonly'
     populate_update_form(form, entity)
     return render_template(
         'entity/update.html',
         form=form,
         entity=entity,
-        gis_data=gis_data,
-        overlays=overlays,
+        gis_data=place_info['gis_data'],
+        overlays=place_info['overlays'],
         geonames_module=check_geonames_module(entity.class_.name),
         title=entity.name,
         crumbs=add_crumbs(
             class_=entity.class_.name,
             origin=entity,
-            structure=structure))
+            structure=place_info['structure']))
+
+
+def get_place_info(entity: Entity) -> Dict[str, Any]:
+    if entity.class_.view not in ['artifact', 'place']:
+        return {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None,
+            'location': None}
+    structure = get_structure(entity)
+    return {
+        'structure': structure,
+        'gis_data': Gis.get_all([entity], structure),
+        'overlays': Overlay.get_by_object(entity),
+        'location': entity.get_linked_entity_safe('P53', types=True)}
 
 
 def check_geonames_module(class_: str) -> bool:

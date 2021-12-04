@@ -109,15 +109,20 @@ def populate_form(
         form: FlaskForm,
         item: Union[Entity, Link],
         location: Union[Entity, None]) -> FlaskForm:
-    # Dates
+    form.opened.data = time.time()
     if hasattr(form, 'begin_year_from'):
         date.populate_dates(form, item)
+    if isinstance(item, Entity):
+        populate_reference_systems(form, item)
+    if isinstance(item, ReferenceSystem) and item.system:
+        form.name.render_kw['readonly'] = 'readonly'
+    if isinstance(item, Entity) and item.class_.view == 'event':
+        form.event_id.data = item.id
 
     # Types
     types: Dict[Type, str] = item.types
     if location:  # Needed for administrative unit and historical place types
         types.update(location.types)
-    form.opened.data = time.time()
     type_data: Dict[int, List[int]] = {}
     for type_, value in types.items():
         root = g.types[type_.root[0]] if type_.root else type
@@ -129,8 +134,6 @@ def populate_form(
     for root_id, types_ in type_data.items():
         if hasattr(form, str(root_id)):
             getattr(form, str(root_id)).data = types_
-    if isinstance(item, Entity):
-        populate_reference_systems(form, item)
     return form
 
 
