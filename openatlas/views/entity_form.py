@@ -39,26 +39,21 @@ def insert(
         form.alias.append_entry('')
     if origin:
         populate_insert_form(form, class_, origin)
-    # Archaeological sub units
-    structure = None
-    gis_data = None
-    overlays = None
-    if g.classes[class_].view in ['artifact', 'place']:
-        structure = get_structure(super_=origin)
-        gis_data = Gis.get_all([origin] if origin else None, structure)
-        overlays = Overlay.get_by_object(origin) \
-            if origin and origin.class_.view == 'place' else None
-
+    place_info = get_place_info_for_insert(g.classes[class_].view, origin)
     return render_template(
         'entity/insert.html',
         form=form,
         view_name=g.classes[class_].view,
-        gis_data=gis_data,
+        gis_data=place_info['gis_data'],
         geonames_module=check_geonames_module(class_),
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
-        overlays=overlays,
+        overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
-        crumbs=add_crumbs(class_, origin, structure, insert_=True))
+        crumbs=add_crumbs(
+            class_,
+            origin,
+            place_info['structure'],
+            insert_=True))
 
 
 @app.route('/update/<int:id_>', methods=['POST', 'GET'])
@@ -66,20 +61,7 @@ def insert(
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
-    place_info = get_place_info(entity)
-
-    # Getting profile images for places
-    if entity.class_.view in ['artifact', 'place']:
-        entity.image_id = entity.get_profile_image_id()
-        if not entity.image_id:
-            for link_ in entity.get_links('P67', inverse=True):
-                domain = link_.domain
-                if domain.class_.view == 'file':  # pragma: no cover
-                    data = get_base_table_data(domain)
-                    if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        entity.image_id = domain.id
-                        break
-
+    place_info = get_place_info_for_update(entity)
     form = build_form(
         entity.class_.name,
         entity,
@@ -110,6 +92,18 @@ def update(id_: int) -> Union[str, Response]:
                     logger.get_log_for_advanced_view(entity.id)['modifier']))
         return redirect(save(form, entity))
     populate_update_form(form, entity)
+
+    # Getting profile images for places
+    if entity.class_.view in ['artifact', 'place']:
+        entity.image_id = entity.get_profile_image_id()
+        if not entity.image_id:
+            for link_ in entity.get_links('P67', inverse=True):
+                domain = link_.domain
+                if domain.class_.view == 'file':  # pragma: no cover
+                    data = get_base_table_data(domain)
+                    if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
+                        entity.image_id = domain.id
+                        break
     return render_template(
         'entity/update.html',
         form=form,
@@ -124,7 +118,7 @@ def update(id_: int) -> Union[str, Response]:
             structure=place_info['structure']))
 
 
-def get_place_info(entity: Entity) -> Dict[str, Any]:
+def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
     if entity.class_.view not in ['artifact', 'place']:
         return {
             'structure': None,
@@ -137,6 +131,19 @@ def get_place_info(entity: Entity) -> Dict[str, Any]:
         'gis_data': Gis.get_all([entity], structure),
         'overlays': Overlay.get_by_object(entity),
         'location': entity.get_linked_entity_safe('P53', types=True)}
+
+
+def get_place_info_for_insert(
+        class_view: str,
+        origin: Optional[Entity]) -> Dict[str, Any]:
+    if class_view not in ['artifact', 'place']:
+        return {'structure': None, 'gis_data': None, 'overlays': None}
+    structure = get_structure(super_=origin)
+    return {
+        'structure': structure,
+        'gis_data': Gis.get_all([origin] if origin else None, structure),
+        'overlays': Overlay.get_by_object(origin)
+        if origin and origin.class_.view == 'place' else None}
 
 
 def check_geonames_module(class_: str) -> bool:
