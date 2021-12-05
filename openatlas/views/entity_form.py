@@ -259,7 +259,9 @@ def save(
             if hasattr(form, 'classes'):
                 entity.add_classes(form)
         else:
-            entity.update(process_form_data(form, entity, origin))
+            entity.update(
+                process_form_data(form, entity, origin),
+                action == 'insert')
             class_ = entity.class_.name
         update_links(entity, form, action, origin)
         logger.log_user(entity.id, action)
