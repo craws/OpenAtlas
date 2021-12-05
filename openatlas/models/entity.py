@@ -146,6 +146,8 @@ class Entity:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, data: Dict[str, Any], new: Optional[bool] = False) -> None:
+        if 'aliases' in data:
+            self.update_aliases(data['aliases'])
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         Db.update({
@@ -173,7 +175,6 @@ class Entity:
         if form:  # e.g. imports have no forms
             if self.class_.name != 'object_location':
                 self.set_dates(form)
-                self.update_aliases(form)
             if hasattr(form, 'name_inverse'):
                 self.name = form.name.data.replace(
                     '(', '').replace(')', '').strip()
@@ -201,19 +202,15 @@ class Entity:
                 sanitize(self.description, 'text') if self.description else None
         })
 
-    def update_aliases(self, form: FlaskForm) -> None:
-        if not hasattr(form, 'alias'):
-            return
-        old_aliases = self.aliases
-        new_aliases = form.alias.data
+    def update_aliases(self, aliases) -> None:
         delete_ids = []
-        for id_, alias in old_aliases.items():  # Compare old aliases with form
-            if alias in new_aliases:
-                new_aliases.remove(alias)
+        for id_, alias in self.aliases.items():
+            if alias in aliases:
+                aliases.remove(alias)
             else:
                 delete_ids.append(id_)
-        Entity.delete_(delete_ids)  # Delete obsolete aliases
-        for alias in new_aliases:  # Insert new aliases if not empty
+        Entity.delete_(delete_ids)
+        for alias in aliases:
             if alias.strip():
                 if self.class_.view == 'actor':
                     self.link('P131', Entity.insert('actor_appellation', alias))

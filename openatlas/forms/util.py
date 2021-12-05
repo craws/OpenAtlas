@@ -111,6 +111,8 @@ def process_form_data(
         # Data mapping
         if key in ['name', 'description']:
             data['attributes'][key] = form.data[key]
+        elif key == 'alias':
+            data['aliases'] = value
         elif field_type in ['TreeField', 'TreeMultiField']:
             if g.types[int(getattr(form, key).id)].class_.name \
                     == 'administrative_unit':
