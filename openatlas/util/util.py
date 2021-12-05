@@ -582,7 +582,7 @@ def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
-    info = logger.get_log_for_advanced_view(entity.id)
+    info = logger.get_log_info(entity.id)
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \

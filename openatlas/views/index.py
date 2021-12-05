@@ -94,7 +94,7 @@ def overview() -> str:
                 entity.class_.label,
                 entity.first,
                 entity.last,
-                link(logger.get_log_for_advanced_view(entity.id)['creator'])])
+                link(logger.get_log_info(entity.id)['creator'])])
     tabs['info'].content = render_template(
         'index/index.html',
         intro=get_translation('intro'),

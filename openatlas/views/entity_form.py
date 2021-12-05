@@ -22,7 +22,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.util import (
-    get_base_table_data, is_authorized, link, required_group, was_modified)
+    is_authorized, link, required_group, was_modified)
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
@@ -65,20 +65,8 @@ def update(id_: int) -> Union[str, Response]:
         entity,
         location=place_info['location'])
     if form.validate_on_submit():
-        if isinstance(entity, Type):
-            valid = True
-            root = g.types[entity.root[0]]
-            new_super_id = getattr(form, str(root.id)).data
-            new_super = g.types[int(new_super_id)] if new_super_id else None
-            if new_super:
-                if new_super.id == entity.id:
-                    flash(_('error type self as super'), 'error')
-                    valid = False
-                if new_super.root and entity.id in new_super.root:
-                    flash(_('error type sub as super'), 'error')
-                    valid = False
-            if not valid:
-                return redirect(url_for('view', id_=entity.id))
+        if isinstance(entity, Type) and not check_type(entity, form):
+            return redirect(url_for('view', id_=entity.id))
         if was_modified(form, entity):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
@@ -86,22 +74,11 @@ def update(id_: int) -> Union[str, Response]:
                 'entity/update.html',
                 form=form,
                 entity=entity,
-                modifier=link(
-                    logger.get_log_for_advanced_view(entity.id)['modifier']))
+                modifier=link(logger.get_log_info(entity.id)['modifier']))
         return redirect(save(form, entity))
     populate_update_form(form, entity)
-
-    # Getting profile images for places
     if entity.class_.view in ['artifact', 'place']:
-        entity.image_id = entity.get_profile_image_id()
-        if not entity.image_id:
-            for link_ in entity.get_links('P67', inverse=True):
-                domain = link_.domain
-                if domain.class_.view == 'file':  # pragma: no cover
-                    data = get_base_table_data(domain)
-                    if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        entity.image_id = domain.id
-                        break
+        entity.set_image_for_places()
     return render_template(
         'entity/update.html',
         form=form,
@@ -114,6 +91,21 @@ def update(id_: int) -> Union[str, Response]:
             class_=entity.class_.name,
             origin=entity,
             structure=place_info['structure']))
+
+
+def check_type(entity: Type, form: FlaskForm) -> bool:
+    valid = True
+    root = g.types[entity.root[0]]
+    new_super_id = getattr(form, str(root.id)).data
+    new_super = g.types[int(new_super_id)] if new_super_id else None
+    if new_super:
+        if new_super.id == entity.id:
+            flash(_('error type self as super'), 'error')
+            valid = False
+        if new_super.root and entity.id in new_super.root:
+            flash(_('error type sub as super'), 'error')
+            valid = False
+    return valid
 
 
 def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
