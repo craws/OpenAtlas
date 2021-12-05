@@ -1,5 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+import ast
 from typing import Any, Dict, Optional as Optional_Type, Optional, Union
 
 from flask import g, session
@@ -90,69 +91,42 @@ def process_form_data(
     data: Dict[str, Any] = {
         'attributes': {},
         'links': [],
-        'types': []}
+        'administrative_units': [],
+        'types': [],
+        'value_types': []}
     for key, value in form.data.items():
 
         # Data preparation
         field_type = getattr(form, key).type
         if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
+        if field_type in [
+                'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
+            if value:
+                ids = ast.literal_eval(value)
+                value = ids if isinstance(ids, list) else [int(ids)]
+            else:
+                value = []
 
         # Data mapping
         if key in ['name', 'description']:
             data['attributes'][key] = form.data[key]
+        elif field_type in ['TreeField', 'TreeMultiField']:
+            if g.types[int(getattr(form, key).id)].class_.name \
+                    == 'administrative_unit':
+                data['administrative_units'] += value
+            else:
+                data['types'] += value
+        elif field_type == 'ValueFloatField':
+            data['value_types'].append({'id': int(key), 'value': value})
         else:  # pragma: no cover # Todo: throw an exception and log it
             print('unknown form field type', field_type, key, value)
 
     return data
 
-    # if key in ['address', 'inverse', 'latitude', 'longitude']:
-    #    continue  # These fields are processed elsewhere
-    # if field_type in [
-    #    'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
-    #    if value:
-    #        ids = ast.literal_eval(value)
-    #        value = ids if isinstance(ids, list) else [int(ids)]
-    #    else:
-    #        value = []
-
-    #     @staticmethod
     #     def save_entity_types(entity: Entity, form: Any) -> None:
-    #         from openatlas.forms.field import TreeField
-    #         from openatlas.forms.field import TreeMultiField
-    #         from openatlas.forms.field import ValueFloatField
-    #         # Can't use isinstance checks for entity here because it is
-    #         always a
-    #         # Entity at this point. So entity.class_.name checks have to be
-    #         used.
-    #         if hasattr(entity, 'types'):
-    #             entity.delete_links(['P2', 'P89'])
-    #         for field in form:
-    #             if isinstance(field, ValueFloatField):
-    #                 if entity.class_.name == 'object_location' \
-    #                         or isinstance(entity, Type):
-    #                     continue  # pragma: no cover
-    #                 if field.data is not None:  # Allow 0 (zero)
-    #                     entity.link('P2', g.types[int(field.name)],
-    #                     field.data)
-    #             elif isinstance(field, (TreeField, TreeMultiField)) and
-    #             field.data:
-    #                 try:
-    #                     range_ = [g.types[int(field.data)]]
-    #                 except ValueError:  # Form value was a list string e.g.
-    #                 '[8,27]'
-    #                     range_ = [
-    #                         g.types[int(range_id)]
-    #                         for range_id in ast.literal_eval(field.data)]
-    #                 if g.types[int(field.id)].class_.name ==
-    #                 'administrative_unit':
-    #                     if entity.class_.name == 'object_location':
-    #                         entity.link('P89', range_)
-    #                 elif entity.class_.name not in ['object_location',
-    #                 'type']:
-    #                     entity.link('P2', range_)
-
-
+    #         entity_location.delete_links(['P89'])
+    #         entity.link('P89', range_)
     #     elif entity.class_.view == 'type':
     #         type_ = origin if isinstance(origin, Type) else entity
     #         root = g.types[type_.root[0]] if type_.root else type_

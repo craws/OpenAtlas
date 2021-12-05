@@ -162,6 +162,12 @@ class Entity:
             'description':
                 sanitize(self.description, 'text') if self.description else None
         })
+        if self.class_.name != 'type':
+            self.delete_links(['P2'])
+            self.link('P2', [g.types[id_] for id_ in data['types']])
+            for type_ in data['value_types']:
+                if type_['value'] is not None:  # Allow the number zero
+                    self.link('P2', g.types[type_['id']], type_['value'])
 
     def update2(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms

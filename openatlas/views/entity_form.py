@@ -240,10 +240,9 @@ def save(
     if class_ == 'file' and not entity:
         return insert_file(form, origin)
     Transaction.begin()
-    action = 'update'
+    action = 'update' if entity else 'insert'
     try:
         if not entity:
-            action = 'insert'
             entity = insert_entity(form, class_)
         if isinstance(entity, ReferenceSystem):
             entity.name = entity.name \
@@ -263,9 +262,9 @@ def save(
             entity.update(process_form_data(form, entity, origin))
             class_ = entity.class_.name
         update_links(entity, form, action, origin)
-        url = link_and_get_redirect_url(form, entity, class_, origin)
         logger.log_user(entity.id, action)
         Transaction.commit()
+        url = link_and_get_redirect_url(form, entity, class_, origin)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -277,13 +276,12 @@ def save(
             'transaction failed because of invalid geom',
             e)
         flash(_('Invalid geom entered'), 'error')
+        url = url_for('index', view=g.classes[class_].view)
         if action == 'update' and entity:
             url = url_for(
                 'update',
                 id_=entity.id,
                 origin_id=origin.id if origin else None)
-        else:
-            url = url_for('index', view=g.classes[class_].view)
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
@@ -360,7 +358,6 @@ def update_links(
         location = entity.get_linked_entity_safe('P53')
         if action == 'update':
             Gis.delete_by_entity(location)
-        location.update(form)
         Gis.insert(location, form)
         if entity.class_.name == 'artifact':
             entity.delete_links(['P52'])
