@@ -322,8 +322,8 @@ def get_entity_data(
             data[_('given place')] = \
                 [link(place) for place in entity.get_linked_entities('P24')]
         if entity.class_.name == 'production':
-            data[_('created')] = \
-                [link(actor) for actor in entity.get_linked_entities('P108')]
+            data[_('produced')] = \
+                [link(item) for item in entity.get_linked_entities('P108')]
     elif entity.class_.view == 'file':
         data[_('size')] = g.file_stats[entity.id]['size'] \
             if entity.id in g.file_stats else 'N/A'
