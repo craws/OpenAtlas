@@ -70,7 +70,7 @@ def check_geometries(
 
 
 def transform_coordinates(coords: List[float]) -> List[Dict[str, Any]]:
-    return [{'coordinate': {'longitude': coords[0], 'latitude ': coords[1]}}]
+    return [{'coordinate': {'longitude': coords[0], 'latitude': coords[1]}}]
 
 
 def get_children(children: [Entity], parser: Dict[str, Any]):
