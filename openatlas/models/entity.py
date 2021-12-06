@@ -169,8 +169,6 @@ class Entity:
 
     def update2(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms
-            if self.class_.name != 'object_location':
-                self.set_dates(form)
             if hasattr(form, 'name_inverse'):
                 self.name = form.name.data.replace(
                     '(', '').replace(')', '').strip()
@@ -220,39 +218,6 @@ class Entity:
                     self.link('P131', Entity.insert('actor_appellation', alias))
                 else:
                     self.link('P1', Entity.insert('appellation', alias))
-
-    def set_dates(self, form: FlaskForm) -> None:
-        if not hasattr(form, 'begin_year_from'):
-            return
-        self.begin_from = None
-        self.begin_to = None
-        self.begin_comment = None
-        self.end_from = None
-        self.end_to = None
-        self.end_comment = None
-        if form.begin_year_from.data:
-            self.begin_comment = form.begin_comment.data
-            self.begin_from = form_to_datetime64(
-                form.begin_year_from.data,
-                form.begin_month_from.data,
-                form.begin_day_from.data)
-            self.begin_to = form_to_datetime64(
-                form.begin_year_to.data,
-                form.begin_month_to.data,
-                form.begin_day_to.data,
-                to_date=True)
-
-        if form.end_year_from.data:
-            self.end_comment = form.end_comment.data
-            self.end_from = form_to_datetime64(
-                form.end_year_from.data,
-                form.end_month_from.data,
-                form.end_day_from.data)
-            self.end_to = form_to_datetime64(
-                form.end_year_to.data,
-                form.end_month_to.data,
-                form.end_day_to.data,
-                to_date=True)
 
     def set_image_for_places(self) -> None:
         self.image_id = self.get_profile_image_id()

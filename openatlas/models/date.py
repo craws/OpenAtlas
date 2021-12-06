@@ -1,9 +1,6 @@
-from typing import Any, Dict, Optional, TYPE_CHECKING
+from typing import Any, Dict, Optional
 
 import numpy
-
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
-    pass
 
 
 def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:

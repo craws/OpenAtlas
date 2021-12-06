@@ -10,6 +10,7 @@ from flask_wtf import FlaskForm
 
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
+from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
@@ -89,16 +90,15 @@ def process_form_data(
         entity: Entity,
         origin: Optional[Entity] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {
-        'attributes': {},
+        'attributes': process_form_dates(form),
         'links': [],
         'administrative_units': [],
         'types': [],
         'value_types': []}
     for key, value in form.data.items():
-
-        # Data preparation
         field_type = getattr(form, key).type
-        if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+        if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] \
+                or key.startswith(('begin_', 'end_')):
             continue
         if field_type in [
                 'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
@@ -140,6 +140,35 @@ def process_form_data(
     #             'P89'
     #             entity.delete_links([property_code])
     #             entity.link(property_code, new_super)
+
+
+def process_form_dates(form: FlaskForm) -> Dict[str, Any]:
+    data = {
+        'begin_from': None, 'begin_to': None, 'begin_comment': None,
+        'end_from': None, 'end_to': None, 'end_comment': None}
+    if form.begin_year_from.data:
+        data['begin_comment'] = form.begin_comment.data
+        data['begin_from'] = form_to_datetime64(
+            form.begin_year_from.data,
+            form.begin_month_from.data,
+            form.begin_day_from.data)
+        data['begin_to'] = form_to_datetime64(
+            form.begin_year_to.data,
+            form.begin_month_to.data,
+            form.begin_day_to.data,
+            to_date=True)
+    if form.end_year_from.data:
+        data['end_comment'] = form.end_comment.data
+        data['end_from'] = form_to_datetime64(
+            form.end_year_from.data,
+            form.end_month_from.data,
+            form.end_day_from.data)
+        data['end_to'] = form_to_datetime64(
+            form.end_year_to.data,
+            form.end_month_to.data,
+            form.end_day_to.data,
+            to_date=True)
+    return data
 
 
 def populate_insert_form(
