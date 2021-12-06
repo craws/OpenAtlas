@@ -6,7 +6,8 @@ from flask_restful import Resource
 from openatlas.api.v03.resources.formats.thanados import get_subunits
 from openatlas.api.v03.resources.parser import entity_
 from openatlas.api.v03.resources.resolve_endpoints import resolve_subunit
-from openatlas.api.v03.resources.util import   get_entity_by_id, link_builder
+from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
+    get_entity_by_id, link_builder
 from openatlas.models.entity import Entity
 
 
@@ -21,7 +22,7 @@ class GetSubunits(Resource):  # type: ignore
     @staticmethod
     def iterate(entity: Entity, parser: Dict[str, Any]):
         root = entity
-        hierarchy = GetSubunits.get_all_subunits_recursive(entity, [{entity: []}])
+        hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
         entities = [entity for dict_ in hierarchy for entity in dict_.keys()]
         links = link_builder(entities)
         links_inverse = link_builder(entities, True)
@@ -38,17 +39,5 @@ class GetSubunits(Resource):  # type: ignore
                 parser)
             for entity in hierarchy]
 
-    @staticmethod
-    def get_all_subunits_recursive(
-            entity: Entity,
-            data: List[Dict[Entity, List]]) -> List[Dict[Any, Any]]:
-        if entity.class_.name not in ['artifact', 'human_remains']:
-            sub_entities = entity.get_linked_entities('P46', types=True)
-            data[-1] = {entity: sub_entities if sub_entities else None}
-            if sub_entities:
-                for e in sub_entities:
-                    data.append({e: []})
-            if sub_entities:
-                for e in sub_entities:
-                    GetSubunits.get_all_subunits_recursive(e, data)
-        return data
+
+

@@ -55,3 +55,17 @@ def link_builder(
     entities = [e.id for e in new_entities]
     return get_all_links_inverse(entities) \
         if inverse else get_all_links(entities)
+
+def get_all_subunits_recursive(
+        entity: Entity,
+        data: List[Dict[Entity, List]]) -> List[Dict[Any, Any]]:
+    if entity.class_.name not in ['artifact', 'human_remains']:
+        sub_entities = entity.get_linked_entities('P46', types=True)
+        data[-1] = {entity: sub_entities if sub_entities else None}
+        if sub_entities:
+            for e in sub_entities:
+                data.append({e: []})
+        if sub_entities:
+            for e in sub_entities:
+                get_all_subunits_recursive(e, data)
+    return data
