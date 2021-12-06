@@ -21,10 +21,11 @@ from openatlas.api.v03.endpoints.node.node_entities import GetNodeEntities
 from openatlas.api.v03.endpoints.node.node_entities_all import \
     GetNodeEntitiesAll
 from openatlas.api.v03.endpoints.node.node_overview import GetNodeOverview
+from openatlas.api.v03.endpoints.node.subunits import GetSubunits
 from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
 
 
-def add_routes_v03(api: Api):
+def add_routes_v03(api: Api) -> None:
     api.add_resource(
         GetByCode,
         '/code/<string:code>',
@@ -81,6 +82,10 @@ def add_routes_v03(api: Api):
         GetTypeTree,
         '/type_tree/',
         endpoint="type_tree")
+    api.add_resource(
+        GetSubunits,
+        '/subunits/<int:id_>',
+        endpoint="subunits")
 
     api.add_resource(
         GetContent,

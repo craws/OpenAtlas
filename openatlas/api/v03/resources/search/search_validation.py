@@ -13,14 +13,14 @@ entity_categories: List[str] = [
 compare_operators: List[str] = ['equal', 'notEqual']
 
 
-def iterate_parameters_for_validation(parameters: List[Dict[str, Any]]) -> None:
-    for parameter in parameters:
-        for search_key, value_list in parameter.items():
-            [call_validation(search_key, values) for values in value_list]
+def iterate_validation(parameters: List[Dict[str, Any]]) -> List[List[bool]]:
+    return [[call_validation(search_key, values) for values in value_list]
+            for parameter in parameters
+            for search_key, value_list in parameter.items()]
 
 
-def call_validation(search_key: str, values: Dict[str, Any]) -> None:
-    parameter_validation(
+def call_validation(search_key: str, values: Dict[str, Any]) -> bool:
+    return parameter_validation(
         entity_values=search_key,
         operator_=values['operator'],
         search_values=values["values"],
@@ -32,7 +32,7 @@ def parameter_validation(
         entity_values: Any,
         operator_: str,
         search_values: List[Any],
-        logical_operator: str) -> None:
+        logical_operator: str) -> bool:
     if logical_operator not in logical_operators:
         raise FilterLogicalOperatorError
     if entity_values not in entity_categories:
@@ -41,3 +41,4 @@ def parameter_validation(
         raise FilterOperatorError
     if not search_values:
         raise NoSearchStringError
+    return True

@@ -17,8 +17,8 @@ need substantially more knowledge about server administration.
     # apt install python3-fuzzywuzzy python3-flask python3-flask-babel
     # apt install python3-flask-login python3-flaskext.wtf python3-markdown
     # apt install python3-numpy python3-pandas python3-jinja2 python3-flask-cors
-    # apt install python3-flask-restful p7zip-full python3-wand
-    # apt install python3-rdflib python3-rdflib-jsonld python3-flasgger
+    # apt install python3-flask-restful p7zip-full python3-wand python3-rdflib
+    # apt install python3-dicttoxml python3-rdflib-jsonld python3-flasgger
 
 ### Apache 2.4
 

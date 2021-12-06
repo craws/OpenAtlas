@@ -28,7 +28,7 @@ from openatlas.api.v02.endpoints.node.subunit_hierarchy import \
 from openatlas.api.v02.endpoints.node.type_tree import GetTypeTree
 
 
-def add_routes(api: Api):
+def add_routes(api: Api) -> None:
     api.add_resource(
         GetByCode,
         '/code/<string:code>',

@@ -10,8 +10,8 @@ from openatlas.models.entity import Entity
 
 
 class GetBySystemClass(Resource):
-
-    def get(self, system_class: str) \
+    @staticmethod
+    def get(system_class: str) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetBySystemClass.get_by_system(system_class),

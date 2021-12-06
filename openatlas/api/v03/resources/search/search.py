@@ -42,10 +42,11 @@ def search_entity(
     if operator_ == 'notEqual':
         if logical_operator == 'or':
             return bool(
-                not (any(item in entity_values for item in search_values)))
+                not any(item in entity_values for item in search_values))
         if logical_operator == 'and':
             return bool(
-                not (all(item in entity_values for item in search_values)))
+                not all(item in entity_values for item in search_values))
+    return False  # pragma: no cover
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:

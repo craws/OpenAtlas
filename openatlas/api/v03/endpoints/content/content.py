@@ -11,8 +11,8 @@ from openatlas.models.content import get_translation
 
 
 class GetContent(Resource):
-
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = language.parse_args()
         content = GetContent.get_content(parser)
         template = ContentTemplate.content_template()

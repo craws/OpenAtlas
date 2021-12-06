@@ -11,9 +11,8 @@ from openatlas.models.entity import Entity
 
 
 class GetLinkedEntities(Resource):
-
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetLinkedEntities.get_linked_entities(id_),
             entity_.parse_args(),

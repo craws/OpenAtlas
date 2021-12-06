@@ -2,12 +2,10 @@ import itertools
 from typing import Any, Dict, List
 
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    LastEntityError, NoEntityAvailable
+    LastEntityError
 from openatlas.api.v03.resources.formats.geojson import Geojson
-from openatlas.api.v03.resources.formats.linked_places import LinkedPlaces
-from openatlas.api.v03.resources.util import get_all_links, \
-    get_all_links_inverse, get_entity_by_id
-
+from openatlas.api.v03.resources.formats.linked_places import get_entity
+from openatlas.api.v03.resources.util import get_entity_by_id, link_builder
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -35,8 +33,6 @@ class Pagination:
     def pagination(
             entities: List[Entity],
             parser: Dict[str, Any]) -> Dict[str, Any]:
-        if not entities:
-            raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]
         count = len(total)
@@ -64,8 +60,12 @@ class Pagination:
         return Pagination.linked_places_result(
             new_entities[:int(parser['limit'])],
             parser,
-            Pagination.link_builder(new_entities, parser),
-            Pagination.link_builder(new_entities, parser, True))
+            Pagination.link_parser_check(
+                new_entities[:int(parser['limit'])],
+                parser),
+            Pagination.link_parser_check(
+                new_entities[:int(parser['limit'])],
+                parser, True))
 
     @staticmethod
     def get_entities_by_type(
@@ -79,15 +79,13 @@ class Pagination:
         return new_entities
 
     @staticmethod
-    def link_builder(
+    def link_parser_check(
             new_entities: List[Entity],
             parser: Dict[str, Any],
             inverse: bool = False) -> List[Link]:
         if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
                for i in parser['show']):
-            entities = [e.id for e in new_entities[:int(parser['limit'])]]
-            return get_all_links_inverse(entities) \
-                if inverse else get_all_links(entities)
+            return link_builder(new_entities, inverse)
         return []
 
     @staticmethod
@@ -97,7 +95,7 @@ class Pagination:
             links: List[Link],
             links_inverse: List[Link]) -> List[Dict[str, Any]]:
         return [
-            LinkedPlaces.get_entity(
+            get_entity(
                 get_entity_by_id(entity.id) if 'names' in parser['show']
                 else entity,
                 [link_ for link_ in links if link_.domain.id == entity.id],

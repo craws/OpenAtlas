@@ -6,7 +6,7 @@ from flask_restful import Resource, marshal
 from openatlas import app
 from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v03.resources.formats.geojson import Geojson
-from openatlas.api.v03.resources.formats.linked_places import LinkedPlaces
+from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.parser import entity_
 from openatlas.api.v03.resources.resolve_endpoints import download
@@ -18,9 +18,8 @@ from openatlas.models.entity import Entity
 
 
 class GetEntity(Resource):
-
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return GetEntity.resolve_entity(
             get_entity_by_id(id_),
             entity_.parse_args())
@@ -48,7 +47,7 @@ class GetEntity(Resource):
             -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         if parser['format'] == 'geojson':
             return Geojson.return_output(Geojson.get_geojson([entity]))
-        return LinkedPlaces.get_entity(
+        return get_entity(
             entity,
             get_all_links(entity.id),
             get_all_links_inverse(entity.id),
