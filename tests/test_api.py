@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from flask import g, url_for
@@ -40,6 +41,10 @@ class ApiTests(TestBaseCase):
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
 
+                # Adding Created and Modified
+                place.created = str(datetime.now())
+                place.modified = str(datetime.now())
+
                 # Adding Dates to place
                 place.begin_from = '2018-01-31'
                 place.begin_to = '2018-03-01'
@@ -53,7 +58,9 @@ class ApiTests(TestBaseCase):
                 Gis.add_example_geom(location)
 
                 # Adding Type Place
-                place.link('P2', Type.get_hierarchy('Place'))
+                boundary_mark = Entity.get_by_id(
+                    Type.get_hierarchy('Place').subs[0])
+                place.link('P2', boundary_mark)
 
                 # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
@@ -70,9 +77,13 @@ class ApiTests(TestBaseCase):
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
+                feature.created = str(datetime.now())
+                feature.modified = str(datetime.now())
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                strati.created = str(datetime.now())
+                strati.modified = str(datetime.now())
 
                 # Adding Administrative Unit Type
                 unit_node = Type.get_hierarchy('Administrative unit')
@@ -144,12 +155,10 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
 
                 # Adding Type Settlement
-                place2.link('P2', Entity.get_by_id(Type.get_types('Place')[0]))
+                place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
 
                 # Creation of Silmarillion (source)
                 source = insert_entity('Silmarillion', 'source')
-
-            self.maxDiff = None
 
             # ---Content Endpoints---
             # ClassMapping
@@ -253,9 +262,9 @@ class ApiTests(TestBaseCase):
                 assert ApiTests.get_bool(
                     rv['types'][0],
                     'label',
-                    'Place')
+                    'Boundary Mark')
                 assert ApiTests.get_bool(
-                    rv['relations'][0],
+                    rv['relations'][1],
                     'label',
                     'Height')
                 assert ApiTests.get_bool(
@@ -270,7 +279,7 @@ class ApiTests(TestBaseCase):
                     'relationSystemClass',
                     'type')
                 assert ApiTests.get_bool(
-                    rv['relations'][0],
+                    rv['relations'][1],
                     'relationDescription',
                     '23.0')
                 assert ApiTests.get_bool(
@@ -409,7 +418,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_02.code',
                     code='place',
-                    type_id=Type.get_hierarchy('Place').id)),
+                    type_id=boundary_mark.id)),
                 self.app.get(url_for('api_02.latest', latest=2)),
                 self.app.get(
                     url_for('api_02.system_class', system_class='artifact')),
@@ -417,7 +426,7 @@ class ApiTests(TestBaseCase):
                     url_for('api_02.entities_linked_to_entity', id_=event.id)),
                 self.app.get(url_for(
                     'api_02.type_entities',
-                    id_=Type.get_hierarchy('Place').id)),
+                    id_=boundary_mark.id)),
                 self.app.get(url_for(
                     'api_02.type_entities',
                     id_=relation_sub_id)),
@@ -459,7 +468,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.code',
                     code='place',
-                    type_id=Type.get_hierarchy('Place').id)),
+                    type_id=boundary_mark.id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
                 self.app.get(
                     url_for('api_03.system_class', system_class='artifact')),
@@ -467,7 +476,7 @@ class ApiTests(TestBaseCase):
                     url_for('api_03.entities_linked_to_entity', id_=event.id)),
                 self.app.get(url_for(
                     'api_03.type_entities',
-                    id_=Type.get_hierarchy('Place').id)),
+                    id_=boundary_mark.id)),
                 self.app.get(url_for(
                     'api_03.type_entities',
                     id_=relation_sub_id)),
@@ -686,17 +695,7 @@ class ApiTests(TestBaseCase):
                 assert bool(rv['typeTree'])
 
             # Test search parameter
-            for rv in [self.app.get(url_for(
-                    'api_03.query',
-                    entities=place.id,
-                    classes='E18',
-                    codes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search=f'{{"typeID":[{{"operator":"equal",'
-                           f'"values":[{params["boundary_mark_id"]},'
-                           f'{params["height_id"]}],'
-                           f'"logicalOperator":"or"}}]}}')),
+            for rv in [
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -721,7 +720,19 @@ class ApiTests(TestBaseCase):
                 assert bool(rv['pagination']['entities'] == 2)
 
             # Test search parameter
-            for rv in [self.app.get(url_for(
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeID":[{{"operator":"equal",'
+                           f'"values":[{params["boundary_mark_id"]},'
+                           f'{params["height_id"]}],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
                     'api_03.query',
                     system_classes='place',
                     search=f'{{"entityName":[{{"operator":"notEqual",'
@@ -735,7 +746,7 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Place", "Height"],'
+                           f'"values":["Boundary Mark", "Height"],'
                            f'"logicalOperator":"and"}}]}}'))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
@@ -750,7 +761,7 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Place", "Height"],'
+                           f'"values":["Boundary Mark", "Height"],'
                            f'"logicalOperator":"and"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
@@ -795,6 +806,41 @@ class ApiTests(TestBaseCase):
                 url_for('api_02.subunit_hierarchy', id_=place.id)).get_json()
             assert bool(rv['nodes'][1]['label'] == 'Kitchen')
 
+            # subunits/
+            for rv in [
+                self.app.get(
+                    url_for('api_03.subunits', id_=place.id)),
+                self.app.get(
+                    url_for('api_03.subunits', id_=place.id, download=True))]:
+                rv = rv.get_json()
+                rv = rv[str(place.id)][0]
+                assert bool(rv['id'] == place.id)
+                assert bool(rv['openatlasClassName'] == "place")
+                assert bool(rv['children'] == [feature.id])
+                rv = rv['properties']
+                assert bool(rv['name'] == place.name)
+                assert bool(rv['description'] == place.description)
+                assert bool(rv['aliases'] == [alias.name])
+                assert bool(rv['externalReferences'])
+                assert bool(rv['timespan'])
+                assert bool(rv['standardType'])
+                assert bool(rv['files'])
+                assert bool(rv['types'])
+
+            rv = self.app.get(
+                url_for('api_03.subunits', id_=place.id, count=True))
+            assert b'3' in rv.data
+
+            for rv in [
+                self.app.get(
+                    url_for('api_03.subunits', id_=place.id, format='xml')),
+                self.app.get(
+                    url_for('api_03.subunits',
+                            id_=place.id,
+                            format='xml',
+                            download=True))]:
+                assert b'Shire' in rv.data
+
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for('api_03.entity', id_=233423424))
             with self.assertRaises(EntityDoesNotExistError):
@@ -817,7 +863,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='person',
-                    type_id=Type.get_types('Place')[0]))
+                    type_id=boundary_mark.id))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.query',
@@ -867,7 +913,7 @@ class ApiTests(TestBaseCase):
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Place", "Height", "Dimension"],'
+                           f'"values":["Boundary Mark", "Height", "Dimension"],'
                            f'"logicalOperator":"and"}}]}}'))
             with self.assertRaises(FilterOperatorError):
                 self.app.get(url_for(
@@ -875,7 +921,7 @@ class ApiTests(TestBaseCase):
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqualT",'
-                           f'"values":["Place", "Height"],'
+                           f'"values":["Boundary Mark", "Height"],'
                            f'"logicalOperator":"and"}}]}}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
@@ -883,7 +929,7 @@ class ApiTests(TestBaseCase):
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Place", "Height"],'
+                           f'"values":["Boundary Mark", "Height"],'
                            f'"logicalOperator":"xor"}}]}}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
@@ -891,7 +937,7 @@ class ApiTests(TestBaseCase):
                     entities=place.id,
                     code='place',
                     search=f'{{"All":[{{"operator":"notEqual",'
-                           f'"values":["Place", "Height"],'
+                           f'"values":["Boundary Mark", "Height"],'
                            f'"logicalOperator":"or"}}]}}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(

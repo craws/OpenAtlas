@@ -46,7 +46,7 @@ def get_geometries_thanados(
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
-            for item in geom['geometries']:
+            for item in geom['geometries']:  # pragma: no cover
                 item['coordinates'] = check_geometries(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
@@ -60,10 +60,10 @@ def get_geometries_thanados(
 def check_geometries(
         geom: Dict[str, Any]) -> Union[
     List[List[Dict[str, Any]]], List[Dict[str, Any]]]:
-    if geom['type'] == 'Polygon':
+    if geom['type'] == 'Polygon':  # pragma: no cover
         return [transform_coordinates(k) for i in geom['coordinates'] for k in
                 i]
-    if geom['type'] == 'LineString':
+    if geom['type'] == 'LineString':  # pragma: no cover
         return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
         return transform_coordinates(geom['coordinates'])
@@ -88,7 +88,8 @@ def get_properties(
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
-        'standardType': get_standard_type(entity.standard_type),
+        'standardType': get_standard_type(entity.standard_type)
+        if entity.standard_type else None,
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),

@@ -84,7 +84,7 @@ def add_routes_v03(api: Api):
         endpoint="type_tree")
     api.add_resource(
         GetSubunits,
-        '/subunits/<int:id>',
+        '/subunits/<int:id_>',
         endpoint="subunits")
 
     api.add_resource(
