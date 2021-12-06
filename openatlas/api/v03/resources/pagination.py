@@ -2,7 +2,7 @@ import itertools
 from typing import Any, Dict, List
 
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    LastEntityError, NoEntityAvailable
+    LastEntityError
 from openatlas.api.v03.resources.formats.geojson import Geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.util import get_entity_by_id, link_builder
@@ -33,8 +33,6 @@ class Pagination:
     def pagination(
             entities: List[Entity],
             parser: Dict[str, Any]) -> Dict[str, Any]:
-        if not entities:
-            raise NoEntityAvailable
         index = []
         total = [e.id for e in entities]
         count = len(total)

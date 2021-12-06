@@ -46,7 +46,7 @@ def search_entity(
         if logical_operator == 'and':
             return bool(
                 not all(item in entity_values for item in search_values))
-    return False
+    return False  # pragma: no cover
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:

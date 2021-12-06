@@ -45,7 +45,17 @@ def resolve_entities(
             entities = search(entities, search_parser)
     if not entities:
         raise NoEntityAvailable
-    result = Pagination.pagination(sorting(entities, parser), parser)
+    return resolve_output(
+        Pagination.pagination(sorting(entities, parser), parser),
+        parser,
+        file_name)
+
+
+def resolve_output(
+        result: Dict[str, Any],
+        parser: Dict[str, Any],
+        file_name: Union[int, str]) \
+        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
             rdf_output(result['results'], parser),
