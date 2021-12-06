@@ -158,7 +158,7 @@ class ApiTests(TestBaseCase):
                 place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
 
                 # Creation of Silmarillion (source)
-                source = insert_entity('Silmarillion', 'source')
+                insert_entity('Silmarillion', 'source')
 
             # ---Content Endpoints---
             # ClassMapping

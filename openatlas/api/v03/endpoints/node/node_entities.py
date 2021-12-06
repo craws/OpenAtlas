@@ -10,9 +10,8 @@ from openatlas.api.v03.resources.resolve_endpoints import get_node_dict, \
 
 
 class GetNodeEntities(Resource):
-
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser(
             {"nodes": GetNodeEntities.get_node(id_)}, default.parse_args(), id_)
 

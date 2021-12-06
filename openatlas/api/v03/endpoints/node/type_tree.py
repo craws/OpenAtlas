@@ -1,4 +1,4 @@
-from typing import Any, Dict,  Tuple, Union
+from typing import Any, Dict, Tuple, Union
 
 from flask import Response
 from flask_restful import Resource, marshal
@@ -10,8 +10,8 @@ from openatlas.models.type import Type
 
 
 class GetTypeTree(Resource):
-
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         template = TypeTreeTemplate.type_tree_template()
@@ -20,9 +20,9 @@ class GetTypeTree(Resource):
         return marshal(type_tree, template), 200
 
     @staticmethod
-    def get_type_tree() -> Dict[str, Any]:
-        return {id_: GetTypeTree.serialize_to_json(node)
-                for id_, node in Type.get_all().items()}
+    def get_type_tree() -> Dict[int, Any]:
+        return {id_: GetTypeTree.serialize_to_json(type_)
+                for id_, type_ in Type.get_all().items()}
 
     @staticmethod
     def serialize_to_json(node: Type) -> Dict[str, Any]:

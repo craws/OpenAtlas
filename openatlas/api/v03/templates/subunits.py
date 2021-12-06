@@ -21,7 +21,7 @@ class SubunitTemplate:
             'latestEnd': fields.String,
         }
 
-        external_references= {
+        external_references = {
             'type': fields.String,
             'identifier': fields.String,
             'referenceSystem': fields.String
@@ -40,7 +40,7 @@ class SubunitTemplate:
             'license': fields.String,
             'source': fields.String,
         }
-        types ={
+        types = {
             'id': fields.Integer,
             'rootId': fields.Integer,
             'name': fields.String,
@@ -54,7 +54,8 @@ class SubunitTemplate:
             'description': fields.String,
             'standardType': fields.Nested(standard_type),
             'timespan': fields.Nested(timespan),
-            'externalReferences': fields.List(fields.Nested(external_references)),
+            'externalReferences': fields.List(
+                fields.Nested(external_references)),
             'references': fields.List(fields.Nested(references)),
             'files': fields.List(fields.Nested(files)),
             'types': fields.List(fields.Nested(types)),

@@ -1,6 +1,6 @@
 import json
 import operator
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, MutableSet, Tuple, Union
 
 from flask import Response, jsonify, request, url_for
 from flask_restful import marshal
@@ -13,7 +13,7 @@ from openatlas.api.v03.resources.formats.xml import subunit_xml
 from openatlas.api.v03.resources.pagination import Pagination
 from openatlas.api.v03.resources.search.search import search
 from openatlas.api.v03.resources.search.search_validation import \
-    iterate_parameters_for_validation
+    iterate_validation
 from openatlas.api.v03.resources.util import parser_str_to_dict
 from openatlas.api.v03.templates.geojson import GeojsonTemplate
 from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
@@ -41,10 +41,10 @@ def resolve_entities(
             raise TypeIDError
     if parser['search']:
         search_parser = parser_str_to_dict(parser['search'])
-        iterate_parameters_for_validation(search_parser)
-        entities = search(entities, search_parser)
-        if not entities:
-            raise NoEntityAvailable
+        if iterate_validation(search_parser):
+            entities = search(entities, search_parser)
+    if not entities:
+        raise NoEntityAvailable
     result = Pagination.pagination(sorting(entities, parser), parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
@@ -101,7 +101,7 @@ def get_node_dict(entity: Entity) -> Dict[str, Any]:
 
 
 def download(
-        data: Union[List[Dict[str, Any]], Dict[str, Any], List[Entity]],
+        data: Union[List[Any], Dict[Any, Any]],
         template: Dict[Any, Any],
         name: Union[str, int]) -> Response:
     return Response(
@@ -111,7 +111,7 @@ def download(
 
 
 def remove_duplicate_entities(entities: List[Entity]) -> List[Entity]:
-    seen: set = set()
+    seen: MutableSet = set()
     seen_add = seen.add  # Do not change, faster than always call seen.add(e.id)
     return [entity for entity in entities if
             not (entity.id in seen or seen_add(entity.id))]

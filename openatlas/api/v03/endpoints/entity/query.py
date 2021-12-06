@@ -14,8 +14,8 @@ from openatlas.models.entity import Entity
 
 
 class GetQuery(Resource):
-
-    def get(self) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parser = query.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \

@@ -11,8 +11,8 @@ from openatlas.models.type import Type
 
 
 class GetNodeOverview(Resource):
-
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = {"types": GetNodeOverview.get_node_overview()}
         template = NodesOverviewTemplate.node_overview_template()

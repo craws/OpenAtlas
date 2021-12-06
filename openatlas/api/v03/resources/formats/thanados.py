@@ -15,7 +15,7 @@ from openatlas.util.util import get_file_path
 
 def get_subunits(
         entity: Entity,
-        children: [Entity],
+        children: List[Entity],
         links: List[Link],
         links_inverse: List[Link],
         root: Entity,
@@ -39,9 +39,7 @@ def get_subunits(
 def get_geometries_thanados(
         entity: Entity,
         links: List[Link],
-        parser: Dict[str, Any]) -> Union[
-    list[dict[str, Any]], None, list[list[dict[str, Any]]], list[
-        dict[str, Any]], dict[str, Any]]:
+        parser: Dict[str, Any]) -> Union[List[Any], None, Dict[str, Any]]:
     geom = get_geometries(entity, links)
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
@@ -51,29 +49,31 @@ def get_geometries_thanados(
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
             return geom
-        else:
-            geom['coordinates'] = check_geometries(geom)
-            return geom
+        geom['coordinates'] = check_geometries(geom)
+        return geom
     return geom
 
 
 def check_geometries(
         geom: Dict[str, Any]) -> Union[
-    List[List[Dict[str, Any]]], List[Dict[str, Any]]]:
+    List[List[Dict[str, Any]]], List[Dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
-        return [transform_coordinates(k) for i in geom['coordinates'] for k in
-                i]
+        return [transform_coords(k) for i in geom['coordinates'] for k in i]
     if geom['type'] == 'LineString':  # pragma: no cover
-        return [transform_coordinates(k) for k in geom['coordinates']]
+        return [transform_coords(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
-        return transform_coordinates(geom['coordinates'])
+        return transform_coords(geom['coordinates'])
+    return None  # pragma: no cover
 
 
-def transform_coordinates(coords: List[float]) -> List[Dict[str, Any]]:
+def transform_coords(coords: List[float]) -> List[Dict[str, Any]]:
     return [{'coordinate': {'longitude': coords[0], 'latitude': coords[1]}}]
 
 
-def get_children(children: [Entity], parser: Dict[str, Any]):
+def get_children(
+        children: List[Entity],
+        parser: Dict[str, Any]) -> \
+        Optional[Union[List[int], List[Dict[str, Any]]]]:
     if parser['format'] == 'xml':
         return [{'child': child.id} for child in children] if children else None
     return [child.id for child in children] if children else None
@@ -108,7 +108,7 @@ def get_standard_type(type_: Type) -> Dict[str, Any]:
     return types_dict
 
 
-def get_aliases(entity: Entity, parser: Dict[str, Any]):
+def get_aliases(entity: Entity, parser: Dict[str, Any]) -> Optional[List[Any]]:
     aliases = [value for value in entity.aliases.values()] \
         if entity.aliases.values() else None
     if parser['format'] == 'xml':
@@ -131,8 +131,8 @@ def get_references(
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     references = []
     for link_ in links:
-        if link_.property.code == "P67" and link_.domain.class_.name in [
-            'bibliography', 'edition', 'external_reference']:
+        if link_.property.code == "P67" and link_.domain.class_.name in \
+                ['bibliography', 'edition', 'external_reference']:
             references.append({
                 'abbreviation': link_.domain.name,
                 'id': link_.domain.id,
@@ -144,7 +144,7 @@ def get_references(
     return references if references else None
 
 
-def get_timespans(entity: Entity) -> Dict[str, str]:
+def get_timespans(entity: Entity) -> Dict[str, Any]:
     return {
         'earliestBegin': str(entity.begin_from) if entity.begin_from else None,
         'latestBegin': str(entity.begin_to) if entity.begin_to else None,
@@ -165,7 +165,8 @@ def get_file(
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
-            'source': link.domain.description if link.domain.description else None})
+            'source': link.domain.description
+            if link.domain.description else None})
     if parser['format'] == 'xml':
         return [{'file': file} for file in files] if files else None
     return files if files else None

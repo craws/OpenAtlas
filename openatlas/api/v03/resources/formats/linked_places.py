@@ -83,7 +83,7 @@ def get_reference_links(
 
 def get_geometries(
         entity: Entity,
-        links: List[Link]) -> Union[Dict[str, Any], None]:
+        links: List[Link]) -> Dict[str, Any]:
     if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
         return get_geoms_by_entity(get_location_id(links))
     if entity.class_.name == 'object_location':

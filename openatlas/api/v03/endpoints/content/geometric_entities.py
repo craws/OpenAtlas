@@ -10,8 +10,8 @@ from openatlas.models.gis import Gis
 
 
 class GetGeometricEntities(Resource):
-
-    def get(self) -> Union[int, Response, Tuple[Any, int]]:
+    @staticmethod
+    def get() -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
         output = GetGeometricEntities.get_geom_collection(parser)
         if parser['count']:

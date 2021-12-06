@@ -18,9 +18,8 @@ from openatlas.models.entity import Entity
 
 
 class GetEntity(Resource):
-
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return GetEntity.resolve_entity(
             get_entity_by_id(id_),
             entity_.parse_args())

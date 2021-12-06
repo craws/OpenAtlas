@@ -20,10 +20,10 @@ class GetSubunits(Resource):  # type: ignore
             id_)
 
     @staticmethod
-    def iterate(entity: Entity, parser: Dict[str, Any]):
+    def iterate(entity: Entity, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
         root = entity
         hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
-        entities = [entity for dict_ in hierarchy for entity in dict_.keys()]
+        entities = [entity for dict_ in hierarchy for entity in dict_]
         links = link_builder(entities)
         links_inverse = link_builder(entities, True)
         return [
@@ -38,6 +38,3 @@ class GetSubunits(Resource):  # type: ignore
                 max(entity.modified for entity in entities if entity.modified),
                 parser)
             for entity in hierarchy]
-
-
-

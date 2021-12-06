@@ -10,8 +10,8 @@ from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):
-
-    def get(self, latest: int) \
+    @staticmethod
+    def get( latest: int) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetLatest.get_latest(latest),

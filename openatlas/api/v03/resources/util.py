@@ -58,7 +58,7 @@ def link_builder(
 
 def get_all_subunits_recursive(
         entity: Entity,
-        data: List[Dict[Entity, List]]) -> List[Dict[Any, Any]]:
+        data: List[Dict[Entity, List[Any]]]) -> List[Dict[Any, Any]]:
     if entity.class_.name not in ['artifact', 'human_remains']:
         sub_entities = entity.get_linked_entities('P46', types=True)
         data[-1] = {entity: sub_entities if sub_entities else None}
