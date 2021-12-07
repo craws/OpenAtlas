@@ -93,68 +93,6 @@ def update(id_: int) -> Union[str, Response]:
             structure=place_info['structure']))
 
 
-def check_type(entity: Type, form: FlaskForm) -> bool:
-    valid = True
-    root = g.types[entity.root[0]]
-    new_super_id = getattr(form, str(root.id)).data
-    new_super = g.types[int(new_super_id)] if new_super_id else None
-    if new_super:
-        if new_super.id == entity.id:
-            flash(_('error type self as super'), 'error')
-            valid = False
-        if new_super.root and entity.id in new_super.root:
-            flash(_('error type sub as super'), 'error')
-            valid = False
-    return valid
-
-
-def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
-    if entity.class_.view not in ['artifact', 'place']:
-        return {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None,
-            'location': None}
-    structure = get_structure(entity)
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([entity], structure),
-        'overlays': Overlay.get_by_object(entity),
-        'location': entity.get_linked_entity_safe('P53', types=True)}
-
-
-def get_place_info_for_insert(
-        class_view: str,
-        origin: Optional[Entity]) -> Dict[str, Any]:
-    if class_view not in ['artifact', 'place']:
-        return {'structure': None, 'gis_data': None, 'overlays': None}
-    structure = get_structure(super_=origin)
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([origin] if origin else None, structure),
-        'overlays': Overlay.get_by_object(origin)
-        if origin and origin.class_.view == 'place' else None}
-
-
-def check_geonames_module(class_: str) -> bool:
-    return class_ == 'place' and ReferenceSystem.get_by_name('GeoNames').classes
-
-
-def check_update_access(entity: Entity) -> None:
-    check_insert_access(entity.class_.name)
-    if isinstance(entity, Type) and (
-            entity.category == 'system'
-            or entity.category == 'standard' and not entity.root):
-        abort(403)
-
-
-def check_insert_access(class_: str) -> None:
-    if class_ not in g.classes \
-            or not g.classes[class_].view \
-            or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
-
-
 def add_crumbs(
         class_: str,
         origin: Union[Entity, None],
@@ -193,6 +131,68 @@ def add_crumbs(
     siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
     return crumbs + \
         [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+
+
+def check_geonames_module(class_: str) -> bool:
+    return class_ == 'place' and ReferenceSystem.get_by_name('GeoNames').classes
+
+
+def check_insert_access(class_: str) -> None:
+    if class_ not in g.classes \
+            or not g.classes[class_].view \
+            or not is_authorized(g.classes[class_].write_access):
+        abort(403)  # pragma: no cover
+
+
+def check_update_access(entity: Entity) -> None:
+    check_insert_access(entity.class_.name)
+    if isinstance(entity, Type) and (
+            entity.category == 'system'
+            or entity.category == 'standard' and not entity.root):
+        abort(403)
+
+
+def check_type(entity: Type, form: FlaskForm) -> bool:
+    valid = True
+    root = g.types[entity.root[0]]
+    new_super_id = getattr(form, str(root.id)).data
+    new_super = g.types[int(new_super_id)] if new_super_id else None
+    if new_super:
+        if new_super.id == entity.id:
+            flash(_('error type self as super'), 'error')
+            valid = False
+        if new_super.root and entity.id in new_super.root:
+            flash(_('error type sub as super'), 'error')
+            valid = False
+    return valid
+
+
+def get_place_info_for_insert(
+        class_view: str,
+        origin: Optional[Entity]) -> Dict[str, Any]:
+    if class_view not in ['artifact', 'place']:
+        return {'structure': None, 'gis_data': None, 'overlays': None}
+    structure = get_structure(super_=origin)
+    return {
+        'structure': structure,
+        'gis_data': Gis.get_all([origin] if origin else None, structure),
+        'overlays': Overlay.get_by_object(origin)
+        if origin and origin.class_.view == 'place' else None}
+
+
+def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
+    if entity.class_.view not in ['artifact', 'place']:
+        return {
+            'structure': None,
+            'gis_data': None,
+            'overlays': None,
+            'location': None}
+    structure = get_structure(entity)
+    return {
+        'structure': structure,
+        'gis_data': Gis.get_all([entity], structure),
+        'overlays': Overlay.get_by_object(entity),
+        'location': entity.get_linked_entity_safe('P53', types=True)}
 
 
 def insert_file(
