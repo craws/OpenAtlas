@@ -4,10 +4,10 @@ from flask_restful import fields
 from flask_restful.fields import Nested
 
 
-class NodesOverviewTemplate:
+class TypeOverviewTemplate:
 
     @staticmethod
-    def node_overview_template() -> Dict[str, Nested]:
+    def type_overview_template() -> Dict[str, Nested]:
         categories = {
             'standard': fields.Raw,
             'place': fields.Raw,

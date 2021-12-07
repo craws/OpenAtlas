@@ -4,7 +4,7 @@ from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.resources.parser import entity_
+from openatlas.api.v02.resources.parser import default
 from openatlas.api.v02.resources.resolve_endpoints import download
 from openatlas.api.v02.templates.type_tree import TypeTreeTemplate
 from openatlas.models.type import Type
@@ -13,7 +13,7 @@ from openatlas.models.type import Type
 class GetTypeTree(Resource):
     @swag_from("../swagger/type_tree.yml", endpoint="api.type_tree")
     def get(self) -> Union[Tuple[Resource, int], Response]:
-        parser = entity_.parse_args()
+        parser = default.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
