@@ -43,6 +43,7 @@ parameters:
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
+  - $ref: '#/components/parameters/pageParam'
 responses:
   '200':
     description: A dictionary with a result dictionary and pagination information

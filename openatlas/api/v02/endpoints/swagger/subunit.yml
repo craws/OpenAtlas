@@ -3,6 +3,7 @@ Node endpoint
 tags:
   - Nodes
 description: Todo
+deprecated: True
 parameters:
   - in: path
     name: id_
