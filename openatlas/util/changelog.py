@@ -4,7 +4,12 @@ class Changelog:
         '7.0.0': ['TBA', {
             'feature': {
                 '1566': 'Update OpenAtlas software to Debian/bullseye',
-                '1579': 'API: Include Swagger documentation'}}],
+                '1549': 'API: deprecation of node and subunit functions',
+                '1579': 'API: Include Swagger documentation',
+                '1598': 'API: Offset Pagination',
+                '1603': 'API: Specialized GeoJSON format, filter multiple ids'},
+            'fix': {
+                '1614': 'Custom folders in uploads causing errors'}}],
         '6.6.2': ['2021-11-23', {
             'fix': {
                 '1609': 'Problem with types'}}],
