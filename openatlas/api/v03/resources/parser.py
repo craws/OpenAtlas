@@ -62,6 +62,10 @@ entity_.add_argument(
     type=int,
     help="Not a valid ID")
 entity_.add_argument(
+    'page',
+    type=int,
+    help="Not a valid page number")
+entity_.add_argument(
     'show',
     type=str,
     help='{error_msg}.',

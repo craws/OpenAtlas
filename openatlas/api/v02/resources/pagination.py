@@ -15,6 +15,11 @@ class Pagination:
 
     @staticmethod
     def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
+        if parser['first'] and int(parser['first']) in total:
+            return list(itertools.islice(
+                total,
+                total.index(int(parser['first'])),
+                None))
         if parser['last'] and int(parser['last']) in total:
             out = list(itertools.islice(
                 total,
@@ -23,12 +28,15 @@ class Pagination:
             if not out:
                 raise LastEntityError  # pragma: no cover
             return out
-        if parser['first'] and int(parser['first']) in total:
-            return list(itertools.islice(
-                total,
-                total.index(int(parser['first'])),
-                None))
         raise EntityDoesNotExistError  # pragma: no cover
+
+    @staticmethod
+    def get_by_page(
+            index: List[Dict[str, Any]],
+            parser: Dict[str, Any]) -> Dict[str, Any]:
+        page = parser['page'] \
+            if parser['page'] < index[-1]['page'] else index[-1]['page']
+        return [entry['startId'] for entry in index if entry['page'] == page][0]
 
     @staticmethod
     def pagination(
@@ -40,14 +48,15 @@ class Pagination:
             entities = Pagination.get_entities_by_type(entities, parser)
             if not entities:
                 raise TypeIDError  # pragma: no cover
-        index = []
         total = [e.id for e in entities]
         count = len(total)
         e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
-        for num, i in enumerate(e_list):
-            index.append(({'page': num + 1, 'startId': i}))
-        if parser['last'] or parser['first']:
-            total = Pagination.get_start_entity(total, parser)
+        index = [{'page': num + 1, 'startId': i} for num, i in
+                 enumerate(e_list)]
+        parser['first'] = Pagination.get_by_page(index, parser) \
+            if parser['page'] else parser['first']
+        total = Pagination.get_start_entity(total, parser) \
+            if parser['last'] or parser['first'] else total
         j = [i for i, x in enumerate(entities) if x.id == total[0]]
         new_entities = [e for idx, e in enumerate(entities[j[0]:])]
         return {
