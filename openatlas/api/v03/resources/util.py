@@ -56,6 +56,7 @@ def link_builder(
     return get_all_links_inverse(entities) \
         if inverse else get_all_links(entities)
 
+
 def get_all_subunits_recursive(
         entity: Entity,
         data: List[Dict[Entity, List[Any]]]) -> List[Dict[Any, Any]]:

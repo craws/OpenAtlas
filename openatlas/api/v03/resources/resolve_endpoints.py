@@ -10,7 +10,8 @@ from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.formats.xml import subunit_xml
-from openatlas.api.v03.resources.pagination import Pagination
+from openatlas.api.v03.resources.pagination import get_entities_by_type, \
+    pagination
 from openatlas.api.v03.resources.search.search import search
 from openatlas.api.v03.resources.search.search_validation import \
     iterate_validation
@@ -36,7 +37,7 @@ def resolve_entities(
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     if parser['type_id']:
-        entities = Pagination.get_entities_by_type(entities, parser)
+        entities = get_entities_by_type(entities, parser)
         if not entities:
             raise TypeIDError
     if parser['search']:
@@ -46,7 +47,7 @@ def resolve_entities(
     if not entities:
         raise NoEntityAvailable
     return resolve_output(
-        Pagination.pagination(sorting(entities, parser), parser),
+        pagination(sorting(entities, parser), parser),
         parser,
         file_name)
 

@@ -10,103 +10,109 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-class Pagination:
+def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
+    if parser['first'] and int(parser['first']) in total:
+        return list(itertools.islice(
+            total,
+            total.index(int(parser['first'])),
+            None))
+    if parser['last'] and int(parser['last']) in total:
+        out = list(itertools.islice(
+            total,
+            total.index(int(parser['last'])) + 1,
+            None))
+        if not out:
+            raise LastEntityError
+        return out
+    raise EntityDoesNotExistError
 
-    @staticmethod
-    def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
-        if parser['last'] and int(parser['last']) in total:
-            out = list(itertools.islice(
-                total,
-                total.index(int(parser['last'])) + 1,
-                None))
-            if not out:
-                raise LastEntityError
-            return out
-        if parser['first'] and int(parser['first']) in total:
-            return list(itertools.islice(
-                total,
-                total.index(int(parser['first'])),
-                None))
-        raise EntityDoesNotExistError
 
-    @staticmethod
-    def pagination(
-            entities: List[Entity],
-            parser: Dict[str, Any]) -> Dict[str, Any]:
-        index = []
-        total = [e.id for e in entities]
-        count = len(total)
-        e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
-        for num, i in enumerate(e_list):
-            index.append(({'page': num + 1, 'startId': i}))
-        if parser['last'] or parser['first']:
-            total = Pagination.get_start_entity(total, parser)
-        j = [i for i, x in enumerate(entities) if x.id == total[0]]
-        new_entities = [e for idx, e in enumerate(entities[j[0]:])]
-        return {
-            "results": Pagination.get_results(new_entities, parser),
-            "pagination": {
-                'entitiesPerPage': int(parser['limit']),
-                'entities': count,
-                'index': index,
-                'totalPages': len(index)}}
+def get_by_page(
+        index: List[Dict[str, Any]],
+        parser: Dict[str, Any]) -> Dict[str, Any]:
+    page = parser['page'] \
+        if parser['page'] < index[-1]['page'] else index[-1]['page']
+    return [entry['startId'] for entry in index if entry['page'] == page][0]
 
-    @staticmethod
-    def get_results(
-            new_entities: List[Entity],
-            parser: Dict[str, Any]) -> List[Dict[str, Any]]:
-        if parser['format'] == 'geojson':
-            return [Pagination.get_geojson(new_entities, parser)]
-        return Pagination.linked_places_result(
+
+def pagination(
+        entities: List[Entity],
+        parser: Dict[str, Any]) -> Dict[str, Any]:
+    total = [e.id for e in entities]
+    count = len(total)
+    e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
+    index = [{'page': num + 1, 'startId': i} for num, i in
+             enumerate(e_list)]
+    parser['first'] = get_by_page(index, parser) \
+        if parser['page'] else parser['first']
+    total = get_start_entity(total, parser) \
+        if parser['last'] or parser['first'] else total
+    j = [i for i, x in enumerate(entities) if x.id == total[0]]
+    new_entities = [e for idx, e in enumerate(entities[j[0]:])]
+    return {
+        "results": get_results(new_entities, parser),
+        "pagination": {
+            'entitiesPerPage': int(parser['limit']),
+            'entities': count,
+            'index': index,
+            'totalPages': len(index)}}
+
+
+def get_results(
+        new_entities: List[Entity],
+        parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+    if parser['format'] == 'geojson':
+        return [get_geojson(new_entities, parser)]
+    return linked_places_result(
+        new_entities[:int(parser['limit'])],
+        parser,
+        link_parser_check(
             new_entities[:int(parser['limit'])],
-            parser,
-            Pagination.link_parser_check(
-                new_entities[:int(parser['limit'])],
-                parser),
-            Pagination.link_parser_check(
-                new_entities[:int(parser['limit'])],
-                parser, True))
+            parser),
+        link_parser_check(
+            new_entities[:int(parser['limit'])],
+            parser, True))
 
-    @staticmethod
-    def get_entities_by_type(
-            entities: List[Entity],
-            parser: Dict[str, Any]) -> List[Entity]:
-        new_entities = []
-        for entity in entities:
-            if any(ids in [key.id for key in entity.types]
-                   for ids in parser['type_id']):
-                new_entities.append(entity)
-        return new_entities
 
-    @staticmethod
-    def link_parser_check(
-            new_entities: List[Entity],
-            parser: Dict[str, Any],
-            inverse: bool = False) -> List[Link]:
-        if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-               for i in parser['show']):
-            return link_builder(new_entities, inverse)
-        return []
+def get_entities_by_type(
+        entities: List[Entity],
+        parser: Dict[str, Any]) -> List[Entity]:
+    new_entities = []
+    for entity in entities:
+        if any(ids in [key.id for key in entity.types]
+               for ids in parser['type_id']):
+            new_entities.append(entity)
+    return new_entities
 
-    @staticmethod
-    def linked_places_result(
-            entities: List[Entity],
-            parser: Dict[str, str],
-            links: List[Link],
-            links_inverse: List[Link]) -> List[Dict[str, Any]]:
-        return [
-            get_entity(
-                get_entity_by_id(entity.id) if 'names' in parser['show']
-                else entity,
-                [link_ for link_ in links if link_.domain.id == entity.id],
-                [link_ for link_ in links_inverse if
-                 link_.range.id == entity.id],
-                parser)
-            for entity in entities]
 
-    @staticmethod
-    def get_geojson(
-            entity_limit: List[Entity],
-            parser: Dict[str, str]) -> Dict[str, Any]:
-        return Geojson.return_output(
-            Geojson.get_geojson(entity_limit[:int(parser['limit'])]))
+def link_parser_check(
+        new_entities: List[Entity],
+        parser: Dict[str, Any],
+        inverse: bool = False) -> List[Link]:
+    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
+           for i in parser['show']):
+        return link_builder(new_entities, inverse)
+    return []
+
+
+def linked_places_result(
+        entities: List[Entity],
+        parser: Dict[str, str],
+        links: List[Link],
+        links_inverse: List[Link]) -> List[Dict[str, Any]]:
+    return [
+        get_entity(
+            get_entity_by_id(entity.id) if 'names' in parser['show']
+            else entity,
+            [link_ for link_ in links if link_.domain.id == entity.id],
+            [link_ for link_ in links_inverse if
+             link_.range.id == entity.id],
+            parser)
+        for entity in entities]
+
+
+def get_geojson(
+        entity_limit: List[Entity],
+        parser: Dict[str, str]) -> Dict[str, Any]:
+    return Geojson.return_output(
+        Geojson.get_geojson(entity_limit[:int(parser['limit'])]))
