@@ -374,11 +374,11 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_02.entity',
                     id_=place.id,
-                    format='pretty-xml')),
+                    format='xml')),
                 self.app.get(url_for(
                     'api_03.entity',
                     id_=place.id,
-                    format='pretty-xml')),
+                    format='xml')),
                 self.app.get(
                     url_for('api_02.entity', id_=place.id, export='csv')),
                 self.app.get(
@@ -386,11 +386,11 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_02.code',
                     code='place',
-                    format='pretty-xml')),
+                    format='xml')),
                 self.app.get(url_for(
                     'api_03.code',
                     code='place',
-                    format='pretty-xml')),
+                    format='xml')),
                 self.app.get(
                     url_for('api_02.code', code='place', export='csv')),
                 self.app.get(
@@ -646,45 +646,26 @@ class ApiTests(TestBaseCase):
             # ---Type Endpoints---
 
             # Test Type Entities
-            for rv in [
-                self.app.get(url_for(
-                    'api_02.node_entities',
-                    id_=unit_node.id,
-                    download=True)),
-                self.app.get(url_for(
-                    'api_03.node_entities',
-                    id_=unit_node.id,
-                    download=True))]:
-                rv = rv.get_json()
-                rv = rv['nodes'][0]
-                assert ApiTests.get_bool(rv, 'label')
+            rv = self.app.get(url_for(
+                'api_02.node_entities',
+                id_=unit_node.id,
+                download=True)).get_json()
+            assert ApiTests.get_bool(rv['nodes'][0], 'label')
 
             # Test Type Entities All
-            for rv in [
-                self.app.get(url_for(
-                    'api_02.node_entities_all',
-                    id_=unit_node.id)),
-                self.app.get(url_for(
-                    'api_03.node_entities_all',
-                    id_=unit_node.id))]:
-                rv = rv.get_json()
-                rv = rv['nodes']
-                assert bool([True for i in rv if
-                             i['label'] == 'Wien'])
+            rv = self.app.get(url_for(
+                'api_02.node_entities_all',
+                id_=unit_node.id)).get_json()
+            assert bool([True for i in rv['nodes'] if i['label'] == 'Wien'])
 
             # Test Type Entities count
-            for rv in [
-                self.app.get(url_for(
+            rv =self.app.get(url_for(
                     'api_02.node_entities',
                     id_=unit_node.id,
-                    count=True)),
-                self.app.get(url_for(
-                    'api_03.node_entities',
-                    id_=unit_node.id,
-                    count=True))]:
-                assert bool(rv.get_json() == 6)
+                    count=True))
+            assert bool(rv.get_json() == 6)
 
-                # Test Type Overview
+            # Test Type Overview
             for rv in [
                 self.app.get(url_for('api_02.node_overview')),
                 self.app.get(url_for('api_02.node_overview', download=True))]:
@@ -901,14 +882,6 @@ class ApiTests(TestBaseCase):
                     system_class='Wrong'))
             with self.assertRaises(QueryEmptyError):
                 self.app.get(url_for('api_03.query'))
-            with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for(
-                    'api_03.node_entities',
-                    id_=1234))
-            with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for(
-                    'api_03.node_entities_all',
-                    id_=1234))
             with self.assertRaises(InvalidSubunitError):
                 self.app.get(url_for(
                     'api_03.type_entities',

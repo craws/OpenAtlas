@@ -17,9 +17,6 @@ from openatlas.api.v03.endpoints.entity.type_entities import GetTypeEntities
 from openatlas.api.v03.endpoints.entity.type_entities_all import \
     GetTypeEntitiesAll
 from openatlas.api.v03.endpoints.entity.view_class import GetByCode
-from openatlas.api.v03.endpoints.node.node_entities import GetNodeEntities
-from openatlas.api.v03.endpoints.node.node_entities_all import \
-    GetNodeEntitiesAll
 from openatlas.api.v03.endpoints.node.node_overview import GetNodeOverview
 from openatlas.api.v03.endpoints.node.subunits import GetSubunits
 from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
@@ -66,14 +63,6 @@ def add_routes_v03(api: Api) -> None:
         GetLinkedEntities,
         '/entities_linked_to_entity/<int:id_>',
         endpoint="entities_linked_to_entity")
-    api.add_resource(
-        GetNodeEntities,
-        '/node_entities/<int:id_>',
-        endpoint="node_entities")
-    api.add_resource(
-        GetNodeEntitiesAll,
-        '/node_entities_all/<int:id_>',
-        endpoint="node_entities_all")
     api.add_resource(
         GetNodeOverview,
         '/node_overview/',

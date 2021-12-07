@@ -2,7 +2,7 @@ import json
 import operator
 from typing import Any, Dict, List, MutableSet, Tuple, Union
 
-from flask import Response, jsonify, request, url_for
+from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
@@ -18,7 +18,6 @@ from openatlas.api.v03.resources.search.search_validation import \
 from openatlas.api.v03.resources.util import parser_str_to_dict
 from openatlas.api.v03.templates.geojson import GeojsonTemplate
 from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
-from openatlas.api.v03.templates.nodes import NodeTemplate
 from openatlas.api.v03.templates.subunits import SubunitTemplate
 from openatlas.models.entity import Entity
 
@@ -68,18 +67,6 @@ def resolve_output(
     return marshal(result, get_template(parser)), 200
 
 
-def resolve_node_parser(
-        node: Dict[str, Any],
-        parser: Dict[str, Any],
-        file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
-    if parser['count']:
-        return jsonify(len(node['nodes']))
-    if parser['download']:
-        return download(node, NodeTemplate.node_template(), file_name)
-    return marshal(node, NodeTemplate.node_template()), 200
-
-
 def resolve_subunit(
         subunit: List[Dict[str, Any]],
         parser: Dict[str, Any],
@@ -102,13 +89,6 @@ def resolve_subunit(
         return download(out, SubunitTemplate.subunit_template(name),
                         name)
     return marshal(out, SubunitTemplate.subunit_template(name)), 200
-
-
-def get_node_dict(entity: Entity) -> Dict[str, Any]:
-    return {
-        'id': entity.id,
-        'label': entity.name,
-        'url': url_for('api_03.entity', id_=entity.id, _external=True)}
 
 
 def download(
