@@ -570,16 +570,26 @@ class ApiTests(TestBaseCase):
                 assert bool(rv['pagination']['entities'] == 8)
 
             # Test page parameter
-            rv = self.app.get(url_for(
-                'api_03.query',
-                entities=location.id,
-                classes='E18',
-                codes='artifact',
-                system_classes='person',
-                limit=1,
-                page=7)).get_json()
-            assert bool(rv['results'][0]['features'][0]['properties'][
-                            'title'] == place.name)
+            for rv in [
+                self.app.get(url_for(
+                    'api_02.query',
+                    entities=location.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    limit=1,
+                    page=8)),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    limit=1,
+                    page=7))]:
+                rv = rv.get_json()
+                assert bool(rv['results'][0]['features'][0]['properties'][
+                                'title'] == place.name)
 
             # Test Entities count
             for rv in [self.app.get(url_for(
