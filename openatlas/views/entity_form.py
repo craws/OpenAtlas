@@ -15,7 +15,6 @@ from openatlas.forms.util import (
     populate_insert_form, populate_update_form, process_form_data)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
@@ -218,7 +217,7 @@ def insert_file(
                 if origin:
                     url = f"{url_for('view', id_=origin.id)}#tab-file"
             entity.update(form)
-            update_links(entity, form, 'insert', origin)
+            # update_links(entity, form, 'insert', origin)
             logger.log_user(entity.id, 'insert')
         Transaction.commit()
         flash(_('entity created'), 'info')
@@ -258,12 +257,12 @@ def save(
             entity.update_system(form)
             if hasattr(form, 'classes'):
                 entity.add_classes(form)
+            ReferenceSystem.update_links(form, entity)
         else:
             entity.update(
                 process_form_data(form, entity, origin),
                 action == 'insert')
             class_ = entity.class_.name
-        update_links(entity, form, action, origin)
         logger.log_user(entity.id, action)
         Transaction.commit()
         url = link_and_get_redirect_url(form, entity, class_, origin)
@@ -310,64 +309,6 @@ def insert_entity(form: FlaskForm, class_: str) \
             'P53',
             Entity.insert('object_location', f'Location of {form.name.data}'))
     return entity
-
-
-def update_links(
-        entity: Entity,
-        form: FlaskForm,
-        action: str,
-        origin: Union[Entity, None]) -> None:
-    if entity.class_.reference_systems:
-        ReferenceSystem.update_links(form, entity)
-    if entity.class_.view == 'actor':
-        if action == 'update':
-            entity.delete_links(['P74', 'OA8', 'OA9'])
-        if form.residence.data:
-            object_ = Entity.get_by_id(form.residence.data)
-            entity.link('P74', object_.get_linked_entity_safe('P53'))
-        if form.begins_in.data:
-            object_ = Entity.get_by_id(form.begins_in.data)
-            entity.link('OA8', object_.get_linked_entity_safe('P53'))
-        if form.ends_in.data:
-            object_ = Entity.get_by_id(form.ends_in.data)
-            entity.link('OA9', object_.get_linked_entity_safe('P53'))
-    if entity.class_.view == 'event':
-        if action == 'update':
-            entity.delete_links(
-                ['P7', 'P24', 'P25', 'P26', 'P27', 'P108', 'P117'])
-        entity.link_string('P117', form.event.data)
-        if hasattr(form, 'place') and form.place.data:
-            entity.link(
-                'P7',
-                Link.get_linked_entity_safe(int(form.place.data), 'P53'))
-        if entity.class_.name == 'acquisition':
-            entity.link_string('P24', form.given_place.data)
-        if entity.class_.name == 'move':
-            entity.link_string('P25', form.artifact.data)  # Moved objects
-            entity.link_string('P25', form.person.data)  # Moved persons
-            if form.place_from.data:  # Link place for move from
-                linked_place = Link.get_linked_entity_safe(
-                    int(form.place_from.data),
-                    'P53')
-                entity.link('P27', linked_place)
-            if form.place_to.data:  # Link place for move to
-                entity.link(
-                    'P26',
-                    Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
-        elif entity.class_.name == 'production':
-            entity.link_string('P108', form.artifact.data)
-    elif entity.class_.view in ['artifact', 'place']:
-        location = entity.get_linked_entity_safe('P53')
-        if action == 'update':
-            Gis.delete_by_entity(location)
-        Gis.insert(location, form)
-        if entity.class_.name == 'artifact':
-            entity.delete_links(['P52'])
-            entity.link_string('P52', form.actor.data)
-    elif entity.class_.view == 'source' and not origin:
-        if action == 'update':
-            entity.delete_links(['P128'], inverse=True)
-        entity.link_string('P128', form.artifact.data, inverse=True)
 
 
 def link_and_get_redirect_url(

@@ -14,7 +14,7 @@ from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.forms.date import format_date
 from openatlas.models.date import (
-    datetime64_to_timestamp, form_to_datetime64, timestamp_to_datetime64)
+    datetime64_to_timestamp, timestamp_to_datetime64)
 from openatlas.models.link import Link
 from openatlas.util.util import get_base_table_data, sanitize
 
@@ -146,10 +146,18 @@ class Entity:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, data: Dict[str, Any], new: Optional[bool] = False) -> None:
+        if not new:
+            self.delete_links(['P2'] + data['links']['delete'])
+            if data['links_inverse']['delete']:
+                self.delete_links(data['links_inverse']['delete'], True)
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
         if self.class_.name != 'type':
-            self.self_update_types(data, new)
+            self.self_update_types(data)
+        for property_, entities in data['links']['insert'].items():
+            self.link(property_, entities)
+        for property_, entities in data['links_inverse']['insert'].items():
+            self.link(property_, entities, inverse=True)
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         Db.update({
@@ -196,9 +204,7 @@ class Entity:
                 sanitize(self.description, 'text') if self.description else None
         })
 
-    def self_update_types(self, data, new: bool):
-        if not new:
-            self.delete_links(['P2'])
+    def self_update_types(self, data):
         self.link('P2', [g.types[id_] for id_ in data['types']])
         for type_ in data['value_types']:
             if type_['value'] is not None:  # Allow the number zero

@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, Optional as Optional_Type, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, session
 from flask_babel import lazy_gettext as _
@@ -12,11 +12,12 @@ from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
 
 
-def get_link_type(form: Any) -> Optional_Type[Entity]:
+def get_link_type(form: Any) -> Optional[Entity]:
     # Returns base type of a link form, e.g. involvement between actor and event
     for field in form:
         if isinstance(field, TreeField) and field.data:
@@ -29,10 +30,10 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         return {
             _('name'): current_user.real_name,
             _('email'): current_user.email,
-            _('show email'): str(_('on') if current_user.settings['show_email']
-                                 else _('off')),
-            _('newsletter'): str(_('on') if current_user.settings['newsletter']
-                                 else _('off'))}
+            _('show email'): str(
+                _('on') if current_user.settings['show_email'] else _('off')),
+            _('newsletter'): str(
+                _('on') if current_user.settings['newsletter'] else _('off'))}
     settings = {}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
@@ -91,7 +92,8 @@ def process_form_data(
         origin: Optional[Entity] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {
         'attributes': process_form_dates(form),
-        'links': [],
+        'links': {'insert': {}, 'delete': []},
+        'links_inverse': {'insert': {}, 'delete': []},
         'administrative_units': [],
         'types': [],
         'value_types': []}
@@ -121,14 +123,78 @@ def process_form_data(
                 data['types'] += value
         elif field_type == 'ValueFloatField':
             data['value_types'].append({'id': int(key), 'value': value})
-        else:  # pragma: no cover # Todo: throw an exception and log it
+        else:  # pragma: no cover
+            # Todo: throw an exception and log it
             print('unknown form field type', field_type, key, value)
+
+    if entity.class_.view == 'actor':
+        data['links']['delete'] += ['P74', 'OA8', 'OA9']
+        if form.residence.data:
+            data['links']['insert']['P74'] = Entity.get_by_id(
+                int(form.residence.data)).get_linked_entity_safe('P53')
+        if form.begins_in.data:
+            data['links']['insert']['OA8'] = Entity.get_by_id(
+                int(form.begins_in.data)).get_linked_entity_safe('P53')
+        if form.ends_in.data:
+            data['links']['insert']['OA9'] = Entity.get_by_id(
+                int(form.ends_in.data)).get_linked_entity_safe('P53')
+    elif entity.class_.view == 'event':
+        data['links']['delete'] += \
+            ['P7', 'P24', 'P25', 'P26', 'P27', 'P108', 'P117']
+        if form.event.data:  # Super event
+            data['links']['insert']['P117'] = form.event.data
+        if form.place.data:
+            data['links']['insert']['P7'] = \
+                Link.get_linked_entity_safe(int(form.place.data), 'P53')
+        if entity.class_.name == 'acquisition':
+            if form.given_place.data:
+                data['links']['insert']['P24'] = form.given_place.data
+        elif entity.class_.name == 'move':
+            if form.artifact.data:
+                data['links']['insert']['P25'] = form.artifact.data
+            if form.person.data:
+                data['links']['insert']['P25'] = form.person.data
+            if form.place_from.data:
+                data['links']['insert']['P27'] = \
+                    Link.get_linked_entity_safe(
+                         int(form.place_from.data),
+                         'P53')
+            if form.place_to.data:
+                data['links']['insert']['P26'] = \
+                    Link.get_linked_entity_safe(
+                        int(form.place_to.data),
+                        'P53')
+        elif entity.class_.name == 'production':
+            if form.artifact.data:
+                data['links']['insert']['P108'] = form.artifact.data
+    elif entity.class_.view in ['artifact', 'place']:
+        # location = entity.get_linked_entity_safe('P53')
+        # if action == 'update':
+        #    Gis.delete_by_entity(location)
+        # Gis.insert(location, form)
+        if entity.class_.name == 'artifact':
+            data['links']['delete'].append('P52')
+            data['links']['insert']['P52'] = form.actor.data
+    elif entity.class_.view == 'source' and not origin:
+        data['links_inverse']['delete'].append('P128')
+        if form.artifact.data:
+            data['links_inverse']['insert']['P128'] = form.artifact.data
+    for key, value in data['links']['insert'].items():
+        if isinstance(value, str):
+            data['links']['insert'][key] = form_string_to_entity_list(value)
 
     return data
 
-    #     def save_entity_types(entity: Entity, form: Any) -> None:
-    #         entity_location.delete_links(['P89'])
-    #         entity.link('P89', range_)
+
+def form_string_to_entity_list(string: str) -> List[Entity]:
+    ids = ast.literal_eval(string)
+    ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
+    return Entity.get_by_ids(ids)
+
+
+#     def save_entity_types(entity: Entity, form: Any) -> None:
+#         entity_location.delete_links(['P89'])
+#         entity.link('P89', range_)
     #     elif entity.class_.view == 'type':
     #         type_ = origin if isinstance(origin, Type) else entity
     #         root = g.types[type_.root[0]] if type_.root else type_
