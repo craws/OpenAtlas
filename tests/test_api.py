@@ -675,8 +675,8 @@ class ApiTests(TestBaseCase):
                              i['label'] == 'Austria'])
 
             for rv in [
-                self.app.get(url_for('api_03.node_overview')),
-                self.app.get(url_for('api_03.node_overview', download=True))]:
+                self.app.get(url_for('api_03.type_overview')),
+                self.app.get(url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types']['place']['Administrative unit']
                 assert bool([True for i in rv if
@@ -685,15 +685,13 @@ class ApiTests(TestBaseCase):
             # Test Type Tree
             for rv in [
                 self.app.get(url_for('api_02.type_tree')),
-                self.app.get(url_for('api_02.type_tree', download=True))
-            ]:
+                self.app.get(url_for('api_02.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'][0])
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
-                self.app.get(url_for('api_03.type_tree', download=True)),
-            ]:
+                self.app.get(url_for('api_03.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'])
 

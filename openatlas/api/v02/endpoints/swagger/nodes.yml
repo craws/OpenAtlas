@@ -3,6 +3,7 @@ Node endpoint
 tags:
   - Nodes
 description: Retrieves a json list of all entities directly linked to one specific node.
+deprecated: True
 parameters:
   - in: path
     name: id_

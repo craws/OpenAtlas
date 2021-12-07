@@ -124,6 +124,7 @@ gis.add_argument(
         'gisPointSibling',
         'gisLineAll',
         'gisPolygonAll'))
+
 query = entity_.copy()
 query.add_argument(
     'entities',

@@ -5,17 +5,17 @@ from flask_restful import Resource, marshal
 
 from openatlas.api.v03.resources.parser import default
 from openatlas.api.v03.resources.resolve_endpoints import download
-from openatlas.api.v03.templates.nodes_overview import NodesOverviewTemplate
+from openatlas.api.v03.templates.types_overview import TypeOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
 
-class GetNodeOverview(Resource):
+class GetTypeOverview(Resource):
     @staticmethod
     def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
-        node = {"types": GetNodeOverview.get_node_overview()}
-        template = NodesOverviewTemplate.node_overview_template()
+        node = {"types": GetTypeOverview.get_node_overview()}
+        template = TypeOverviewTemplate.type_overview_template()
         if parser['download']:
             return download(node, template, 'types')
         return marshal(node, template), 200
@@ -31,7 +31,7 @@ class GetNodeOverview(Resource):
         for node in g.types.values():
             if node.root:
                 continue
-            nodes[node.category][node.name] = GetNodeOverview.walk_tree(
+            nodes[node.category][node.name] = GetTypeOverview.walk_tree(
                 Type.get_types(node.name))
         return nodes
 
@@ -44,5 +44,5 @@ class GetNodeOverview(Resource):
                 'id': item.id,
                 'url': url_for('api_03.entity', id_=item.id, _external=True),
                 'label': item.name.replace("'", "&apos;"),
-                'children': GetNodeOverview.walk_tree(item.subs)})
+                'children': GetTypeOverview.walk_tree(item.subs)})
         return items

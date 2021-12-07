@@ -51,6 +51,7 @@
       },
       "filterParam": {
         "description": "Specify request with custom SQL filter method. ",
+        "deprecated": true,
         "in": "query",
         "name": "filter",
         "schema": {
@@ -65,6 +66,14 @@
           "type": "number"
         }
       },
+      "pageParam": {
+        "description": "Jump to given page",
+        "in": "query",
+        "name": "page",
+        "schema": {
+          "type": "number"
+        }
+      },
       "formatParam": {
         "description": "Select to which output format is prefered",
         "in": "query",
@@ -73,6 +82,23 @@
           "enum": [
             "linked_places",
             "geojson"
+          ],
+          "type": "string"
+        }
+      },
+      "geometryParam": {
+        "description": "Filter, which geometric entities will be retrieved through /geometric_entities",
+        "in": "query",
+        "name": "geometry",
+        "schema": {
+          "enum": [
+            "gisAll",
+            "gisPointAll",
+            "gisPointSupers",
+            "gisPointSubs",
+            "gisPointSibling",
+            "gisLineAll",
+            "gisPolygonAll"
           ],
           "type": "string"
         }
