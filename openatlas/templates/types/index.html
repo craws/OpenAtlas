@@ -61,7 +61,7 @@
                             style="width:8em;"
                             type="text">
                         {% if 'editor'|is_authorized and node.category != 'system' %}
-                          {{ ''|button(url_for('insert', class_='type' if type_ != 'places' else 'administrative_unit', origin_id=node.id)) }}
+                          {{ ''|button(url_for('insert', class_='type' if type_ != 'place' else 'administrative_unit', origin_id=node.id)) }}
                         {% endif %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                           {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}
