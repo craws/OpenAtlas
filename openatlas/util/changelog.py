@@ -10,12 +10,12 @@ class Changelog:
                 '1603': 'API: Specialized GeoJSON format, filter multiple ids'},
             'fix': {
                 '1614': 'Custom folders in uploads causing errors'}}],
+        '6.6.3': ['2021-12-08', {
+            'fix': {'1616': 'Error at inserting an adminitrative unit'}}],
         '6.6.2': ['2021-11-23', {
-            'fix': {
-                '1609': 'Problem with types'}}],
+            'fix': {'1609': 'Problem with types'}}],
         '6.6.1': ['2021-11-20', {
-            'fix': {
-                '1607': 'Error at profile for readonly users'}}],
+            'fix': {'1607': 'Error at profile for readonly users'}}],
         '6.6.0': ['2021-11-18', {
             'feature': {
                 '1500': 'Production of artifacts',
@@ -26,11 +26,9 @@ class Changelog:
                 '1546': 'API: New search parameter',
                 '1583': 'Refactor'}}],
         '6.5.2': ['2021-11-07', {
-            'fix': {
-                '#1596:': 'Sometimes unavailable add custom type button'}}],
+            'fix': {'#1596:': 'Sometimes unavailable add custom type button'}}],
         '6.5.1': ['2021-10-28', {
-            'fix': {
-                '#1592:': 'Error at import when using type ids'}}],
+            'fix': {'#1592:': 'Error at import when using type ids'}}],
         '6.5.0': ['2021-09-19', {
             'feature': {
                 '1462': 'Current owner of artifacts',
