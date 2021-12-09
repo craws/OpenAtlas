@@ -6,6 +6,16 @@ very project-specific. Please keep in mind, that there are different ways to ent
 set of data. The following examples are suggestions, but please discuss the best workflow for your project within
 your team.
 
+General
+-------
+
+.. toctree::
+   :maxdepth: 1
+
+   artifacts
+   types
+
+
 Archaeological
 --------------
 
