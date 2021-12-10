@@ -11,8 +11,8 @@ class SearchTest(TestBaseCase):
         with app.test_request_context():
             app.preprocess_request()  # type: ignore
             person = Entity.insert('person', 'Waldo')
-            person.begin_to = '2018-01-01'
-            person.update()
+#            person.begin_to = '2018-01-01'
+#            person.update()
             person.link(
                 'P131',
                 Entity.insert('actor_appellation', 'Waldo alias'))

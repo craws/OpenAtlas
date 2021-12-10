@@ -204,7 +204,7 @@ def insert_file(
         entity_name = form.name.data.strip()
         for count, file in enumerate(form.file.data):
             entity = Entity.insert('file', file.filename)
-            url = link_and_get_redirect_url(form, entity, 'file', origin)
+            url = get_redirect_url(form, entity, 'file', origin)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
@@ -265,17 +265,13 @@ def save(
             class_ = entity.class_.name
         logger.log_user(entity.id, action)
         Transaction.commit()
-        url = link_and_get_redirect_url(form, entity, class_, origin)
+        url = get_redirect_url(form, entity, class_, origin)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
     except InvalidGeomException as e:  # pragma: no cover
         Transaction.rollback()
-        logger.log(
-            'error',
-            'database',
-            'transaction failed because of invalid geom',
-            e)
+        logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
         url = url_for('index', view=g.classes[class_].view)
         if action == 'update' and entity:
@@ -311,7 +307,7 @@ def insert_entity(form: FlaskForm, class_: str) \
     return entity
 
 
-def link_and_get_redirect_url(
+def get_redirect_url(
         form: FlaskForm,
         entity: Entity,
         class_: str,

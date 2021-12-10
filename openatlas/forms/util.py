@@ -92,7 +92,7 @@ def process_form_data(
         origin: Optional[Entity] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {
         'attributes': process_form_dates(form),
-        'links': {'insert': {}, 'delete': []},
+        'links': {'insert': [], 'delete': []},
         'links_inverse': {'insert': {}, 'delete': []},
         'administrative_units': [],
         'types': [],
@@ -130,43 +130,63 @@ def process_form_data(
     if entity.class_.view == 'actor':
         data['links']['delete'] += ['P74', 'OA8', 'OA9']
         if form.residence.data:
-            data['links']['insert']['P74'] = Entity.get_by_id(
-                int(form.residence.data)).get_linked_entity_safe('P53')
+            residence = Entity.get_by_id(int(form.residence.data))
+            data['links']['insert'].append({
+                'property': 'P74',
+                'range': residence.get_linked_entity_safe('P53')})
         if form.begins_in.data:
-            data['links']['insert']['OA8'] = Entity.get_by_id(
-                int(form.begins_in.data)).get_linked_entity_safe('P53')
+            begin_place = Entity.get_by_id(int(form.begins_in.data))
+            data['links']['insert'].append({
+                'property': 'OA8',
+                'range': begin_place.get_linked_entity_safe('P53')})
         if form.ends_in.data:
-            data['links']['insert']['OA9'] = Entity.get_by_id(
-                int(form.ends_in.data)).get_linked_entity_safe('P53')
+            end_place = Entity.get_by_id(int(form.ends_in.data))
+            data['links']['insert'].append({
+                'property': 'OA9',
+                'range': end_place.get_linked_entity_safe('P53')})
     elif entity.class_.view == 'event':
         data['links']['delete'] += \
             ['P7', 'P24', 'P25', 'P26', 'P27', 'P108', 'P117']
         if form.event.data:  # Super event
-            data['links']['insert']['P117'] = form.event.data
-        if form.place.data:
-            data['links']['insert']['P7'] = \
-                Link.get_linked_entity_safe(int(form.place.data), 'P53')
+            data['links']['insert'].append({
+                'property': 'P117',
+                'range': form.event.data})
+        if hasattr(form, 'place') and form.place.data:
+            data['links']['insert'].append({
+                'property': 'P7',
+                'range':
+                    Link.get_linked_entity_safe(int(form.place.data), 'P53')})
         if entity.class_.name == 'acquisition':
             if form.given_place.data:
-                data['links']['insert']['P24'] = form.given_place.data
-        elif entity.class_.name == 'move':
-            if form.artifact.data:
-                data['links']['insert']['P25'] = form.artifact.data
-            if form.person.data:
-                data['links']['insert']['P25'] = form.person.data
-            if form.place_from.data:
-                data['links']['insert']['P27'] = \
-                    Link.get_linked_entity_safe(
-                         int(form.place_from.data),
-                         'P53')
-            if form.place_to.data:
-                data['links']['insert']['P26'] = \
-                    Link.get_linked_entity_safe(
-                        int(form.place_to.data),
-                        'P53')
+                data['links']['insert'].append({
+                    'property': 'P24',
+                    'range': form.given_place.data})
         elif entity.class_.name == 'production':
             if form.artifact.data:
-                data['links']['insert']['P108'] = form.artifact.data
+                data['links']['insert'].append({
+                    'property': 'P108',
+                    'range': form.artifact.data})
+        elif entity.class_.name == 'move':
+            if form.artifact.data:
+                data['links']['insert'].append({
+                    'property': 'P25',
+                    'range': form.artifact.data})
+            if form.person.data:
+                data['links']['insert'].append({
+                    'property': 'P25',
+                    'range': form.person.data})
+            if form.place_from.data:
+                data['links']['insert'].append({
+                    'property': 'P27',
+                    'range':  Link.get_linked_entity_safe(
+                         int(form.place_from.data),
+                         'P53')})
+            if form.place_to.data:
+                data['links']['insert'].append({
+                    'property': 'P26',
+                    'range': Link.get_linked_entity_safe(
+                        int(form.place_to.data),
+                        'P53')})
     elif entity.class_.view in ['artifact', 'place']:
         # location = entity.get_linked_entity_safe('P53')
         # if action == 'update':
@@ -174,15 +194,20 @@ def process_form_data(
         # Gis.insert(location, form)
         if entity.class_.name == 'artifact':
             data['links']['delete'].append('P52')
-            data['links']['insert']['P52'] = form.actor.data
+            data['links']['insert'].append({
+                'property': 'P52',
+                'range': form.actor.data})
     elif entity.class_.view == 'source' and not origin:
         data['links_inverse']['delete'].append('P128')
         if form.artifact.data:
-            data['links_inverse']['insert']['P128'] = form.artifact.data
-    for key, value in data['links']['insert'].items():
-        if isinstance(value, str):
-            data['links']['insert'][key] = form_string_to_entity_list(value)
-
+            data['links_inverse']['insert'].append({
+                'property': 'P128',
+                'range': form.artifact.data})
+    for link_ in data['links']['insert']:
+        if isinstance(link_['range'], str):
+            link_['range'] = form_string_to_entity_list(link_['range'])
+    #if origin and entity.class_.name not in ('administrative_unit', 'type'):
+    #    data = process_origin_data(entity, origin, form, data)
     return data
 
 
@@ -207,12 +232,39 @@ def form_string_to_entity_list(string: str) -> List[Entity]:
     #             entity.delete_links([property_code])
     #             entity.link(property_code, new_super)
 
+def process_origin_data(entity, origin, form, data):
+    if origin.class_.view == 'reference':
+        data['links_inverse']['insert']['P67'] = origin
+        if entity.class_.name == 'file':
+            origin.link('P67', entity, form.page.data)
+        else:
+            origin.link('P67', entity)
+    elif entity.class_.name == 'file':
+        entity.link('P67', origin)
+    elif entity.class_.view == 'reference':
+        entity.link('P67', origin)
+    elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
+        if entity.class_.view == 'place' \
+                or entity.class_.name == 'artifact':
+            origin.link('P46', entity)
+    elif origin.class_.view in ['source', 'file']:
+        origin.link('P67', entity)
+    elif entity.class_.view == 'source':
+        entity.link('P67', origin)
+    elif origin.class_.view == 'event':  # Involvement from actor
+        origin.link('P11', entity)
+    elif origin.class_.view == 'actor' and entity.class_.view == 'event':
+        entity.link('P11', origin)  # Involvement from event
+    elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
+        origin.link('OA7', entity)  # Actor with actor relation
+    return {}
+
 
 def process_form_dates(form: FlaskForm) -> Dict[str, Any]:
     data = {
         'begin_from': None, 'begin_to': None, 'begin_comment': None,
         'end_from': None, 'end_to': None, 'end_comment': None}
-    if form.begin_year_from.data:
+    if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
         data['begin_comment'] = form.begin_comment.data
         data['begin_from'] = form_to_datetime64(
             form.begin_year_from.data,
@@ -223,7 +275,7 @@ def process_form_dates(form: FlaskForm) -> Dict[str, Any]:
             form.begin_month_to.data,
             form.begin_day_to.data,
             to_date=True)
-    if form.end_year_from.data:
+    if hasattr(form, 'end_year_from') and form.end_year_from.data:
         data['end_comment'] = form.end_comment.data
         data['end_from'] = form_to_datetime64(
             form.end_year_from.data,

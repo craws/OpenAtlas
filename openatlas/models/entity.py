@@ -154,10 +154,10 @@ class Entity:
             self.update_aliases(data['aliases'])
         if self.class_.name != 'type':
             self.self_update_types(data)
-        for property_, entities in data['links']['insert'].items():
-            self.link(property_, entities)
-        for property_, entities in data['links_inverse']['insert'].items():
-            self.link(property_, entities, inverse=True)
+        for link_ in data['links']['insert']:
+            self.link(link_['property'], link_['range'])
+        for link_ in data['links_inverse']['insert']:
+            self.link(link_['property'], link_['range'], inverse=True)
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         Db.update({
