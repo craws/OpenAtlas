@@ -157,7 +157,7 @@ class Entity:
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
         if self.class_.name != 'type':
-            self.self_update_types(data)
+            self.update_types(data)
         for link_ in data['links']['insert']:
             ids = self.link(link_['property'], link_['range'])
             if 'return_link_id' in link_ and link_['return_link_id']:
@@ -168,6 +168,19 @@ class Entity:
                 redirect_link_id = ids[0]
         for key, value in data['attributes'].items():
             setattr(self, key, value)
+        if 'gis' in data:
+            print(data)
+            from openatlas.models.gis import Gis
+            location = self.get_linked_entity_safe('P53')
+            if not new:
+                Gis.delete_by_entity(location)
+            Gis.insert(location, data['gis'])
+
+        # Todo: update location name
+        # if self.class_.name == 'object_location':
+        #     self.name = 'Location of ' + self.name
+        #     self.description = None
+
         Db.update({
             'id': self.id,
             'name': str(self.name).strip(),
@@ -184,40 +197,19 @@ class Entity:
         })
         return redirect_link_id
 
-    def update2(self, form: Optional[FlaskForm] = None) -> None:
-        if form:  # e.g. imports have no forms
-            if hasattr(form, 'name_inverse'):
-                self.name = form.name.data.replace(
-                    '(', '').replace(')', '').strip()
-                if form.name_inverse.data.strip():
-                    inverse = form.name_inverse.data.replace(
-                        '(', '').replace(')', '').strip()
-                    self.name += ' (' + inverse + ')'
-        if self.class_.name == 'type':
-            self.name = sanitize(self.name, 'type')
-        elif self.class_.name == 'object_location':
-            self.name = 'Location of ' + self.name
-            self.description = None
-        Db.update({
-            'id': self.id,
-            'name': str(self.name).strip(),
-            'begin_from': datetime64_to_timestamp(self.begin_from),
-            'begin_to': datetime64_to_timestamp(self.begin_to),
-            'end_from': datetime64_to_timestamp(self.end_from),
-            'end_to': datetime64_to_timestamp(self.end_to),
-            'begin_comment':
-                str(self.begin_comment).strip() if self.begin_comment else None,
-            'end_comment':
-                str(self.end_comment).strip() if self.end_comment else None,
-            'description':
-                sanitize(self.description, 'text') if self.description else None
-        })
-
-    def self_update_types(self, data):
+    def update_types(self, data):
         self.link('P2', [g.types[id_] for id_ in data['types']])
         for type_ in data['value_types']:
             if type_['value'] is not None:  # Allow the number zero
                 self.link('P2', g.types[type_['id']], type_['value'])
+        if 'administrative_units' in data:
+            if not self.location:
+                self.location = self.get_linked_entity_safe('P53')
+            self.location.delete_links(['P89'])
+            if data['administrative_units']:
+                self.location.link(
+                    'P89',
+                    [g.types[id_] for id_ in data['administrative_units']])
 
     def update_aliases(self, aliases) -> None:
         delete_ids = []

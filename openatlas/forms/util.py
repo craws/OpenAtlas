@@ -14,7 +14,7 @@ from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
+from openatlas.util.util import sanitize, uc_first
 
 
 def get_link_type(form: Any) -> Optional[Entity]:
@@ -93,14 +93,13 @@ def process_form_data(
     data: Dict[str, Any] = {
         'attributes': process_form_dates(form),
         'links': {'insert': [], 'delete': []},
-        'links_inverse': {'insert': {}, 'delete': []},
-        'administrative_units': [],
+        'links_inverse': {'insert': [], 'delete': []},
         'types': [],
         'value_types': []}
     for key, value in form.data.items():
         field_type = getattr(form, key).type
         if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] \
-                or key.startswith(('begin_', 'end_')):
+                or key.startswith(('begin_', 'end_', 'name_inverse')):
             continue
         if field_type in [
                 'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
@@ -111,13 +110,27 @@ def process_form_data(
                 value = []
 
         # Data mapping
-        if key in ['name', 'description']:
+        if key == 'name':
+            name = form.data['name']
+            if hasattr(form, 'name_inverse'):
+                name = form.name.data.replace('(', '').replace(')', '').strip()
+                if form.name_inverse.data.strip():
+                    inverse = form.name_inverse.data.\
+                        replace('(', '').\
+                        replace(')', '').strip()
+                    name += ' (' + inverse + ')'
+            if entity.class_.name == 'type':
+                name = sanitize(name, 'type')
+            data['attributes']['name'] = name
+        elif key == 'description':
             data['attributes'][key] = form.data[key]
         elif key == 'alias':
             data['aliases'] = value
         elif field_type in ['TreeField', 'TreeMultiField']:
             if g.types[int(getattr(form, key).id)].class_.name \
                     == 'administrative_unit':
+                if 'administrative_units'not in data:
+                    data['administrative_units'] = []
                 data['administrative_units'] += value
             else:
                 data['types'] += value
@@ -188,10 +201,9 @@ def process_form_data(
                         int(form.place_to.data),
                         'P53')})
     elif entity.class_.view in ['artifact', 'place']:
-        # location = entity.get_linked_entity_safe('P53')
-        # if action == 'update':
-        #    Gis.delete_by_entity(location)
-        # Gis.insert(location, form)
+        data['gis'] = {}
+        for shape in ['point', 'line', 'polygon']:
+            data['gis'][shape] = getattr(form, f'gis_{shape}s').data
         if entity.class_.name == 'artifact':
             data['links']['delete'].append('P52')
             data['links']['insert'].append({
