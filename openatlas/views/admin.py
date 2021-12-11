@@ -420,10 +420,7 @@ def admin_check_dates() -> str:
             link_.description,
             link(
                 _('edit'),
-                url_for(
-                    'involvement_update',
-                    id_=link_.id,
-                    origin_id=actor.id))]
+                url_for('link_update', id_=link_.id, origin_id=actor.id))]
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]

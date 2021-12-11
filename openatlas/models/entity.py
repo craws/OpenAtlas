@@ -145,7 +145,11 @@ class Entity:
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
         Link.delete_by_codes(self, codes, inverse)
 
-    def update(self, data: Dict[str, Any], new: Optional[bool] = False) -> None:
+    def update(
+            self,
+            data: Dict[str, Any],
+            new: Optional[bool] = False,) -> Optional[int]:
+        redirect_link_id = None
         if not new:
             self.delete_links(['P2'] + data['links']['delete'])
             if data['links_inverse']['delete']:
@@ -155,9 +159,13 @@ class Entity:
         if self.class_.name != 'type':
             self.self_update_types(data)
         for link_ in data['links']['insert']:
-            self.link(link_['property'], link_['range'])
+            ids = self.link(link_['property'], link_['range'])
+            if 'return_link_id' in link_ and link_['return_link_id']:
+                redirect_link_id = ids[0]
         for link_ in data['links_inverse']['insert']:
-            self.link(link_['property'], link_['range'], inverse=True)
+            ids = self.link(link_['property'], link_['range'], inverse=True)
+            if 'return_link_id' in link_ and link_['return_link_id']:
+                redirect_link_id = ids[0]
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         Db.update({
@@ -174,6 +182,7 @@ class Entity:
             'description':
                 sanitize(self.description, 'text') if self.description else None
         })
+        return redirect_link_id
 
     def update2(self, form: Optional[FlaskForm] = None) -> None:
         if form:  # e.g. imports have no forms

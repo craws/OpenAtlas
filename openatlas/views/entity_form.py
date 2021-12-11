@@ -240,6 +240,7 @@ def save(
         return insert_file(form, origin)
     Transaction.begin()
     action = 'update' if entity else 'insert'
+    redirect_link_id = None
     try:
         if not entity:
             entity = insert_entity(form, class_)
@@ -259,13 +260,13 @@ def save(
                 entity.add_classes(form)
             ReferenceSystem.update_links(form, entity)
         else:
-            entity.update(
+            redirect_link_id = entity.update(
                 process_form_data(form, entity, origin),
                 action == 'insert')
             class_ = entity.class_.name
         logger.log_user(entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(form, entity, class_, origin)
+        url = get_redirect_url(form, entity, class_, origin, redirect_link_id)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -311,53 +312,17 @@ def get_redirect_url(
         form: FlaskForm,
         entity: Entity,
         class_: str,
-        origin: Union[Entity, None] = None) -> str:
+        origin: Union[Entity, None] = None,
+        redirect_link_id: Union[Entity, None] = None) -> str:
+    if redirect_link_id:
+        return url_for('link_update', id_=redirect_link_id, origin_id=origin.id)
     url = url_for('view', id_=entity.id)
     if origin and class_ not in ('administrative_unit', 'type'):
         url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
-        if origin.class_.view == 'reference':
-            if entity.class_.name == 'file':
-                origin.link('P67', entity, form.page.data)
-            else:
-                link_id = origin.link('P67', entity)[0]
-                url = url_for(
-                    'reference_link_update',
-                    link_id=link_id,
-                    origin_id=origin.id)
-        elif entity.class_.name == 'file':
-            entity.link('P67', origin)
+        if entity.class_.name == 'file':
             url = f"{url_for('view', id_=origin.id)}#tab-file"
-        elif entity.class_.view == 'reference':
-            link_id = entity.link('P67', origin)[0]
-            url = url_for(
-                'reference_link_update',
-                link_id=link_id,
-                origin_id=origin.id)
         elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
-            if entity.class_.view == 'place' \
-                    or entity.class_.name == 'artifact':
-                origin.link('P46', entity)
-                url = url_for('view', id_=entity.id)
-        elif origin.class_.view in ['source', 'file']:
-            origin.link('P67', entity)
-        elif entity.class_.view == 'source':
-            entity.link('P67', origin)
-        elif origin.class_.view == 'event':  # Involvement from actor
-            link_id = origin.link('P11', entity)[0]
-            url = url_for(
-                'involvement_update',
-                id_=link_id,
-                origin_id=origin.id)
-        elif origin.class_.view == 'actor' and entity.class_.view == 'event':
-            link_id = entity.link('P11', origin)[0]  # Involvement from event
-            url = url_for(
-                'involvement_update',
-                id_=link_id,
-                origin_id=origin.id)
-        elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
-            link_id = origin.link('OA7', entity)[0]  # Actor with actor relation
-            url = url_for('relation_update', id_=link_id, origin_id=origin.id)
-
+            url = url_for('view', id_=entity.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = url_for(
             'insert',

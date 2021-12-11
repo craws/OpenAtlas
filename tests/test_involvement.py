@@ -58,10 +58,10 @@ class InvolvementTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 link_id = Link.get_links(event_id, 'P22')[0].id
             rv = self.app.get(
-                url_for('involvement_update', id_=link_id, origin_id=event_id))
+                url_for('link_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
             rv = self.app.post(
-                url_for('involvement_update', id_=link_id, origin_id=actor.id),
+                url_for('link_update', id_=link_id, origin_id=actor.id),
                 data={
                     'description': 'Infinite Space - Infinite Terror',
                     'activity': 'P23'},

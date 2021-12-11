@@ -84,15 +84,15 @@ class RelationTests(TestBaseCase):
             assert b'Entities were updated' in rv.data
 
             rv = self.app.get(
-                url_for('relation_update', id_=link_id, origin_id=related.id))
+                url_for('link_update', id_=link_id, origin_id=related.id))
             assert b'Connor' in rv.data
             rv = self.app.post(
-                url_for('relation_update', id_=link_id, origin_id=actor.id),
+                url_for('link_update', id_=link_id, origin_id=actor.id),
                 data={'description': 'There can be only one!', 'inverse': True},
                 follow_redirects=True)
             assert b'only one' in rv.data
             rv = self.app.post(
-                url_for('relation_update', id_=link_id2, origin_id=actor.id),
+                url_for('link_update', id_=link_id2, origin_id=actor.id),
                 data={'description': 'There can be only one!', 'inverse': None},
                 follow_redirects=True)
             assert b'only one' in rv.data

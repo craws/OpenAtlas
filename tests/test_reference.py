@@ -62,10 +62,7 @@ class ReferenceTest(TestBaseCase):
                 file = Entity.insert('file', 'The X-Files')
                 file.link('P67', reference)
             rv = self.app.post(
-                url_for(
-                    'reference_link_update',
-                    link_id=link_id,
-                    origin_id=reference.id),
+                url_for('link_update', id_=link_id, origin_id=reference.id),
                 data={'page': '666'}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 

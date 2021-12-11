@@ -206,8 +206,8 @@ def process_form_data(
     for link_ in data['links']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
-    #if origin and entity.class_.name not in ('administrative_unit', 'type'):
-    #    data = process_origin_data(entity, origin, form, data)
+    if origin and entity.class_.name not in ('administrative_unit', 'type'):
+        data = process_origin_data(entity, origin, form, data)
     return data
 
 
@@ -234,30 +234,47 @@ def form_string_to_entity_list(string: str) -> List[Entity]:
 
 def process_origin_data(entity, origin, form, data):
     if origin.class_.view == 'reference':
-        data['links_inverse']['insert']['P67'] = origin
         if entity.class_.name == 'file':
-            origin.link('P67', entity, form.page.data)
+            data['links_inverse']['insert'].append({
+                'property': 'P67',
+                'range': origin,
+                'description': form.page.data})
         else:
-            origin.link('P67', entity)
-    elif entity.class_.name == 'file':
-        entity.link('P67', origin)
-    elif entity.class_.view == 'reference':
-        entity.link('P67', origin)
+            data['links_inverse']['insert'].append({
+                'property': 'P67',
+                'range': origin,
+                'return_link_id': True})
+    elif entity.class_.name == 'file' \
+            or entity.class_.view in ['reference', 'source']:
+        data['links']['insert'].append({
+            'property': 'P67',
+            'range': origin,
+            'return_link_id': entity.class_.view == 'reference'})
     elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
-        if entity.class_.view == 'place' \
-                or entity.class_.name == 'artifact':
-            origin.link('P46', entity)
+        if entity.class_.view == 'place' or entity.class_.name == 'artifact':
+            data['links_inverse']['insert'].append({
+                'property': 'P46',
+                'range': origin})
     elif origin.class_.view in ['source', 'file']:
-        origin.link('P67', entity)
-    elif entity.class_.view == 'source':
-        entity.link('P67', origin)
+        data['links_inverse']['insert'].append({
+            'property': 'P46',
+            'range': origin})
     elif origin.class_.view == 'event':  # Involvement from actor
-        origin.link('P11', entity)
+        data['links_inverse']['insert'].append({
+            'property': 'P11',
+            'range': origin,
+            'return_link_id': True})
     elif origin.class_.view == 'actor' and entity.class_.view == 'event':
-        entity.link('P11', origin)  # Involvement from event
+        data['links']['insert'].append({  # Involvement from event
+            'property': 'P11',
+            'range': origin,
+            'return_link_id': True})
     elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
-        origin.link('OA7', entity)  # Actor with actor relation
-    return {}
+        data['links_inverse']['insert'].append({  # Actor actor relation
+            'property': 'OA7',
+            'range': origin,
+            'return_link_id': True})
+    return data
 
 
 def process_form_dates(form: FlaskForm) -> Dict[str, Any]:

@@ -12,10 +12,10 @@ from openatlas.forms.form import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
@@ -24,7 +24,7 @@ from openatlas.util.util import (
     get_base_table_data, get_entity_data, get_file_path, is_authorized, link,
     required_group, uc_first)
 from openatlas.views.entity_index import file_preview
-from openatlas.views.reference import AddReferenceForm
+from openatlas.views.link import AddReferenceForm
 
 
 @app.route('/entity/<int:id_>')
@@ -144,10 +144,7 @@ def view(id_: int) -> Union[str, Response]:
             else:
                 add_edit_link(
                     data,
-                    url_for(
-                        'involvement_update',
-                        id_=link_.id,
-                        origin_id=entity.id))
+                    url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
@@ -172,7 +169,7 @@ def view(id_: int) -> Union[str, Response]:
                 link_.description]
             add_edit_link(
                 data,
-                url_for('relation_update', id_=link_.id, origin_id=entity.id))
+                url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, related.name, link_, entity, 'relation')
             tabs['relation'].table.rows.append(data)
         for link_ in entity.get_links('P107', True):
@@ -239,10 +236,7 @@ def view(id_: int) -> Union[str, Response]:
                 link_.description]
             add_edit_link(
                 data,
-                url_for(
-                    'involvement_update',
-                    id_=link_.id,
-                    origin_id=entity.id))
+                url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
         entity.linked_places = [
@@ -270,10 +264,7 @@ def view(id_: int) -> Union[str, Response]:
             data.append(link_.description)
             add_edit_link(
                 data,
-                url_for(
-                    'reference_link_update',
-                    link_id=link_.id,
-                    origin_id=entity.id))
+                url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'place':
@@ -324,10 +315,7 @@ def view(id_: int) -> Union[str, Response]:
             data.append(link_.description)
             add_edit_link(
                 data,
-                url_for(
-                    'reference_link_update',
-                    link_id=link_.id,
-                    origin_id=entity.id))
+                url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(
                 data,
                 range_.name,
@@ -407,10 +395,7 @@ def view(id_: int) -> Union[str, Response]:
                 data.append(link_.description)
                 add_edit_link(
                     data,
-                    url_for(
-                        'reference_link_update',
-                        link_id=link_.id,
-                        origin_id=entity.id))
+                    url_for('link_update', id_=link_.id, origin_id=entity.id))
                 if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)
                     continue
