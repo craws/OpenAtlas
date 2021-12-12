@@ -257,7 +257,6 @@ def save(
             entity.update_system(form)
             if hasattr(form, 'classes'):
                 entity.add_classes(form)
-            ReferenceSystem.update_links(form, entity)
         else:
             redirect_link_id = entity.update(
                 data=process_form_data(form, entity, origin),

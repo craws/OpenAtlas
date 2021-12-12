@@ -94,12 +94,10 @@ def relation_update(
             link_.delete()
             if form.inverse.data:
                 link_ = Link.get_by_id(
-                    related.link('OA7', origin, form.description.data)[
-                        0])
+                    related.link('OA7', origin, form.description.data)[0])
             else:
                 link_ = Link.get_by_id(
-                    origin.link('OA7', related, form.description.data)[
-                        0])
+                    origin.link('OA7', related, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

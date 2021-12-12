@@ -7,6 +7,7 @@ from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
@@ -108,11 +109,17 @@ def process_form_data(
                 value = ids if isinstance(ids, list) else [int(ids)]
             else:
                 value = []
-        if key.startswith(
-                ('begin_', 'end_', 'name_inverse', 'multiple')) \
+        if key.startswith((
+                'begin_',
+                'end_',
+                'name_inverse',
+                'multiple',
+                'page',
+                'reference_system_precision_')) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',
+                    'MultipleFileField',
                     'SelectMultipleField',
                     'SubmitField',
                     'TableField',
@@ -144,9 +151,19 @@ def process_form_data(
                 data['types'] += value
         elif field_type == 'ValueFloatField':
             data['value_types'].append({'id': int(key), 'value': value})
+        elif key.startswith('reference_system_id_'):
+            system = Entity.get_by_id(
+                int(key.replace('reference_system_id_', '')))
+            precision_field = getattr(form, key.replace('id_', 'precision_'))
+            data['delete_reference_system_links'] = True
+            if value:
+                data['links_inverse']['insert'].append({
+                    'property': 'P67',
+                    'range': system,
+                    'description': value,
+                    'type_id': precision_field.data})
         else:  # pragma: no cover
-            # Todo: throw an exception and log it
-            print('unknown form field type', field_type, key, value)
+            abort(418, f'Form field error: {key}, {field_type}, value={value}')
 
     if entity.class_.view == 'actor':
         data['links']['delete'] += ['P74', 'OA8', 'OA9']

@@ -56,21 +56,8 @@ class ReferenceSystem(Entity):
             'identifier_example': self.placeholder})
 
     @staticmethod
-    def update_links(form: FlaskForm, entity: Entity) -> None:
-        for field in form:
-            if field.id.startswith('reference_system_id_'):  # Recreate link
-                system = Entity.get_by_id(
-                    int(field.id.replace('reference_system_id_', '')))
-                precision_field = getattr(
-                    form,
-                    field.id.replace('id_', 'precision_'))
-                Db.remove_link(system.id, entity.id)
-                if field.data:
-                    system.link(
-                        'P67',
-                        entity,
-                        field.data,
-                        type_id=precision_field.data)
+    def delete_links_from_entity(entity: Entity):
+        Db.delete_links_from_entity(entity.id)
 
     @staticmethod
     def get_class_choices(

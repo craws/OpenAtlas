@@ -94,3 +94,15 @@ class ReferenceSystem:
             VALUES (
                 %(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);""",
             data)
+
+    @staticmethod
+    def delete_links_from_entity(entity_id: int) -> None:
+        g.cursor.execute(
+            """
+            DELETE FROM model.link l
+            WHERE property_code = 'P67'
+                AND domain_id IN %(systems_ids)s
+                AND range_id = %(entity_id)s;""",
+            {
+                'systems_ids': tuple(g.reference_systems.keys()),
+                'entity_id': entity_id})

@@ -154,16 +154,29 @@ class Entity:
             self.delete_links(['P2'] + data['links']['delete'])
             if data['links_inverse']['delete']:
                 self.delete_links(data['links_inverse']['delete'], True)
+            if 'delete_reference_system_links' in data \
+                    and data['delete_reference_system_links']:
+                from openatlas.models.reference_system import ReferenceSystem
+                ReferenceSystem.delete_links_from_entity(self)
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
         if self.class_.name != 'type':
             self.update_types(data)
         for link_ in data['links']['insert']:
-            ids = self.link(link_['property'], link_['range'])
+            ids = self.link(
+                link_['property'],
+                link_['range'],
+                link_['description'] if 'description' in link_ else None,
+                type_id=link_['type_id'] if 'type_id' in link_ else None)
             if 'return_link_id' in link_ and link_['return_link_id']:
                 redirect_link_id = ids[0]
         for link_ in data['links_inverse']['insert']:
-            ids = self.link(link_['property'], link_['range'], inverse=True)
+            ids = self.link(
+                link_['property'],
+                link_['range'],
+                link_['description'] if 'description' in link_ else None,
+                inverse=True,
+                type_id=link_['type_id'] if 'type_id' in link_ else None)
             if 'return_link_id' in link_ and link_['return_link_id']:
                 redirect_link_id = ids[0]
         for key, value in data['attributes'].items():
