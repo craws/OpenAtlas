@@ -34,6 +34,8 @@ def insert(
     origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(class_, origin=origin)
     if form.validate_on_submit():
+        if class_ == 'file':
+            return redirect(insert_files(form, origin))
         return redirect(save(form, class_=class_, origin=origin))
     populate_insert_form(form, class_, origin)
     place_info = get_place_info_for_insert(g.classes[class_].view, origin)
@@ -194,7 +196,7 @@ def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
         'location': entity.get_linked_entity_safe('P53', types=True)}
 
 
-def insert_file(
+def insert_files(
         form: FlaskForm,
         origin: Optional[Entity] = None) -> Union[str, Response]:
     filenames = []
@@ -216,8 +218,7 @@ def insert_file(
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:
                     url = f"{url_for('view', id_=origin.id)}#tab-file"
-            entity.update(form)
-            # update_links(entity, form, 'insert', origin)
+            entity.update(process_form_data(form, entity, origin))
             logger.log_user(entity.id, 'insert')
         Transaction.commit()
         flash(_('entity created'), 'info')
@@ -236,8 +237,6 @@ def save(
         entity: Optional[Entity] = None,
         class_: Optional[str] = None,
         origin: Optional[Entity] = None) -> Union[str, Response]:
-    if class_ == 'file' and not entity:
-        return insert_file(form, origin)
     Transaction.begin()
     action = 'update' if entity else 'insert'
     redirect_link_id = None
