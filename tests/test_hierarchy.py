@@ -17,12 +17,12 @@ class HierarchyTest(TestBaseCase):
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(
-                url_for('hierarchy_insert', param='custom'),
+                url_for('hierarchy_insert', category='custom'),
                 follow_redirects=True,
                 data=data)
             assert b'An entry has been created' in rv.data
             rv = self.app.post(
-                url_for('hierarchy_insert', param='custom'),
+                url_for('hierarchy_insert', category='custom'),
                 follow_redirects=True,
                 data=data)
             assert b'The name is already in use' in rv.data
@@ -37,7 +37,7 @@ class HierarchyTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            rv = self.app.get(url_for('hierarchy_insert', param='custom'))
+            rv = self.app.get(url_for('hierarchy_insert', category='custom'))
             assert b'+ Custom' in rv.data
 
             data = {'name': 'My secret type', 'description': 'Very important!'}
@@ -65,10 +65,10 @@ class HierarchyTest(TestBaseCase):
             assert b'deleted' in rv.data
 
             # Value types
-            rv = self.app.get(url_for('hierarchy_insert', param='value'))
+            rv = self.app.get(url_for('hierarchy_insert', category='value'))
             assert b'+ Value' in rv.data
             rv = self.app.post(
-                url_for('hierarchy_insert', param='value'),
+                url_for('hierarchy_insert', category='value'),
                 follow_redirects=True,
                 data={
                     'name': 'A valued value',

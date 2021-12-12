@@ -109,7 +109,7 @@
           {% endfor %}
           {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
             <span style="margin:1em;">
-              {{ _('type')|button(url_for('hierarchy_insert', param=category)) }}
+              {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
             </span>
           {% endif %}
         </div>

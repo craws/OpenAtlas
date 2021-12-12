@@ -4,7 +4,6 @@ import ast
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
-from flask_wtf import FlaskForm
 
 from openatlas import app
 from openatlas.database.type import Type as Db
@@ -125,33 +124,30 @@ class Type(Entity):
         return choices
 
     @staticmethod
-    def insert_hierarchy(type_: Type, form: FlaskForm, category: str) -> None:
-        multiple = False
-        if category == 'value' or (
-                hasattr(form, 'multiple')
-                and form.multiple
-                and form.multiple.data):
-            multiple = True
+    def insert_hierarchy(
+            type_: Type,
+            category: str,
+            classes: list[str],
+            multiple: bool,
+            ) -> None:
         Db.insert_hierarchy({
             'id': type_.id,
             'name': type_.name,
             'multiple': multiple,
             'category': category})
-        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
-    def update_hierarchy(type_: Type, form: FlaskForm) -> None:
-        multiple = False
-        if type_.multiple or (
-                hasattr(form, 'multiple')
-                and form.multiple
-                and form.multiple.data):
-            multiple = True
+    def update_hierarchy(
+            type_: Type,
+            name: str,
+            classes: list[str],
+            multiple: bool) -> None:
         Db.update_hierarchy({
             'id': type_.id,
-            'name': form.name.data,
+            'name': name,
             'multiple': multiple})
-        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
     def get_type_orphans() -> List[Type]:

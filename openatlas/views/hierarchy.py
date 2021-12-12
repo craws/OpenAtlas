@@ -9,30 +9,34 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
+from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, sanitize, uc_first
 
 
-@app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
+@app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_insert(param: str) -> Union[str, Response]:
-    form = build_form('hierarchy', code=param)
+def hierarchy_insert(category: str) -> Union[str, Response]:
+    form = build_form('hierarchy', code=category)
     form.classes.choices = Type.get_class_choices()
     if form.validate_on_submit():
         if Type.check_hierarchy_exists(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('display_form.html', form=form)
-        save(form, param=param)
+        save(form, category=category)
         flash(_('entity created'), 'info')
-        return redirect(f"{url_for('type_index')}#menu-tab-{param}")
+        return redirect(f"{url_for('type_index')}#menu-tab-{category}")
     return render_template(
         'display_form.html',
         form=form,
         manual_page='entity/type',
         title=_('types'),
-        crumbs=[[_('types'), url_for('type_index')], f'+ {uc_first(_(param))}'])
+        crumbs=[
+            [_('types'),
+             url_for('type_index')],
+            f'+ {uc_first(_(category))}'])
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
@@ -104,15 +108,25 @@ def hierarchy_delete(id_: int) -> Response:
 def save(
         form: FlaskForm,
         type_: Optional[Type] = None,
-        param: Optional[str] = None) -> Optional[Type]:
+        category: Optional[str] = None) -> Optional[Type]:
+    multiple = False
+    if category == 'value' or (
+            hasattr(form, 'multiple')
+            and form.multiple
+            and form.multiple.data):
+        multiple = True
     Transaction.begin()
     try:
         if type_:
-            Type.update_hierarchy(type_, form)
+            Type.update_hierarchy(
+                type_,
+                sanitize(form.name.data),
+                form.classes.data,
+                multiple)
         else:
             type_ = Entity.insert('type', sanitize(form.name.data))
-            Type.insert_hierarchy(type_, form, param)
-        type_.update(form)
+            Type.insert_hierarchy(type_, category, form.classes.data, multiple)
+        type_.update(process_form_data(form, type_))
         Transaction.commit()
     except Exception as e:  # pragma: no cover
         Transaction.rollback()

@@ -98,18 +98,26 @@ def process_form_data(
         'value_types': []}
     for key, value in form.data.items():
         field_type = getattr(form, key).type
-        if field_type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] \
-                or key.startswith(('begin_', 'end_', 'name_inverse')):
-            continue
         if field_type in [
-                'TreeField', 'TreeMultiField', 'TableField', 'TableMultiField']:
+                'TreeField',
+                'TreeMultiField',
+                'TableField',
+                'TableMultiField']:
             if value:
                 ids = ast.literal_eval(value)
                 value = ids if isinstance(ids, list) else [int(ids)]
             else:
                 value = []
-
-        # Data mapping
+        if key.startswith(
+                ('begin_', 'end_', 'name_inverse', 'multiple')) \
+                or field_type in [
+                    'CSRFTokenField',
+                    'HiddenField',
+                    'SelectMultipleField',
+                    'SubmitField',
+                    'TableField',
+                    'TableMultiField']:
+            continue
         if key == 'name':
             name = form.data['name']
             if hasattr(form, 'name_inverse'):
@@ -215,7 +223,7 @@ def process_form_data(
             data['links_inverse']['insert'].append({
                 'property': 'P128',
                 'range': form.artifact.data})
-    elif entity.class_.view == 'type':
+    elif entity.class_.view == 'type' and 'classes' not in form:  # is sub type
         type_ = origin if isinstance(origin, Type) else entity
         root = g.types[type_.root[0]] if type_.root else type_
         super_id = g.types[type_.root[-1]] if type_.root else type_
