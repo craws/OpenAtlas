@@ -215,6 +215,18 @@ def process_form_data(
             data['links_inverse']['insert'].append({
                 'property': 'P128',
                 'range': form.artifact.data})
+    elif entity.class_.view == 'type':
+        type_ = origin if isinstance(origin, Type) else entity
+        root = g.types[type_.root[0]] if type_.root else type_
+        super_id = g.types[type_.root[-1]] if type_.root else type_
+        new_super_id = getattr(form, str(root.id)).data
+        new_super = g.types[int(new_super_id)] if new_super_id else root
+        code = 'P127' if entity.class_.name == 'type' else 'P89'
+        if super_id != new_super.id:
+            data['links']['delete'].append(code)
+            data['links']['insert'].append({
+                 'property': code,
+                 'range': new_super})
     for link_ in data['links']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
@@ -228,21 +240,6 @@ def form_string_to_entity_list(string: str) -> List[Entity]:
     ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
     return Entity.get_by_ids(ids)
 
-
-#     def save_entity_types(entity: Entity, form: Any) -> None:
-#         entity_location.delete_links(['P89'])
-#         entity.link('P89', range_)
-    #     elif entity.class_.view == 'type':
-    #         type_ = origin if isinstance(origin, Type) else entity
-    #         root = g.types[type_.root[0]] if type_.root else type_
-    #         super_id = g.types[type_.root[-1]] if type_.root else type_
-    #         new_super_id = getattr(form, str(root.id)).data
-    #         new_super = g.types[int(new_super_id)] if new_super_id else root
-    #         if super_id != new_super.id:
-    #             property_code = 'P127' if entity.class_.name == 'type' else
-    #             'P89'
-    #             entity.delete_links([property_code])
-    #             entity.link(property_code, new_super)
 
 def process_origin_data(entity, origin, form, data):
     if origin.class_.view == 'reference':

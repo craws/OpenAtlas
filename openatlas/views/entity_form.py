@@ -261,8 +261,8 @@ def save(
             ReferenceSystem.update_links(form, entity)
         else:
             redirect_link_id = entity.update(
-                process_form_data(form, entity, origin),
-                action == 'insert')
+                data=process_form_data(form, entity, origin),
+                new=(action == 'insert'))
             class_ = entity.class_.name
         logger.log_user(entity.id, action)
         Transaction.commit()

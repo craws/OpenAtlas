@@ -169,7 +169,6 @@ class Entity:
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         if 'gis' in data:
-            print(data)
             from openatlas.models.gis import Gis
             location = self.get_linked_entity_safe('P53')
             if not new:
