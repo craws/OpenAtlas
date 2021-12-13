@@ -115,7 +115,11 @@ def process_form_data(
                 'name_inverse',
                 'multiple',
                 'page',
-                'reference_system_precision_')) \
+                'reference_system_precision_',
+                'website_url',
+                'resolver_url',
+                'placeholder',
+                'classes')) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',
@@ -136,6 +140,10 @@ def process_form_data(
                     name += ' (' + inverse + ')'
             if entity.class_.name == 'type':
                 name = sanitize(name, 'type')
+            elif entity.class_.name == 'reference_system' \
+                    and hasattr(entity, 'system') \
+                    and entity.system:
+                name = entity.name
             data['attributes']['name'] = name
         elif key == 'description':
             data['attributes'][key] = form.data[key]
@@ -234,6 +242,12 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'P52',
                 'range': form.actor.data})
+    elif entity.class_.view == 'reference_system':
+        data['reference_system'] = {
+            'website_url': form.website_url.data,
+            'resolver_url': form.resolver_url.data,
+            'placeholder': form.placeholder.data,
+            'classes': form.classes.data}
     elif entity.class_.view == 'source' and not origin:
         data['links_inverse']['delete'].append('P128')
         if form.artifact.data:

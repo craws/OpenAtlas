@@ -239,29 +239,12 @@ def save(
         origin: Optional[Entity] = None) -> Union[str, Response]:
     Transaction.begin()
     action = 'update' if entity else 'insert'
-    redirect_link_id = None
     try:
         if not entity:
             entity = insert_entity(form, class_)
-        if isinstance(entity, ReferenceSystem):
-            entity.name = entity.name \
-                if hasattr(entity, 'system') and entity.system \
-                else form.name.data
-            entity.description = form.description.data
-            entity.website_url = form.website_url.data \
-                if form.website_url.data else None
-            entity.resolver_url = form.resolver_url.data \
-                if form.resolver_url.data else None
-            entity.placeholder = form.placeholder.data \
-                if form.placeholder.data else None
-            entity.update_system(form)
-            if hasattr(form, 'classes'):
-                entity.add_classes(form)
-        else:
-            redirect_link_id = entity.update(
-                data=process_form_data(form, entity, origin),
-                new=(action == 'insert'))
-            class_ = entity.class_.name
+        redirect_link_id = entity.update(
+            data=process_form_data(form, entity, origin),
+            new=(action == 'insert'))
         logger.log_user(entity.id, action)
         Transaction.commit()
         url = get_redirect_url(form, entity, class_, origin, redirect_link_id)

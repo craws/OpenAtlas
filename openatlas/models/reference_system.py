@@ -37,23 +37,20 @@ class ReferenceSystem(Entity):
             if system.name == name:
                 return system
 
-    def add_classes(self, form: FlaskForm) -> None:
-        Db.add_classes(self.id, form.classes.data)
-
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
             if link_.range.class_.name == class_name:  # pragma: no cover
                 return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 
-    def update_system(self, form: FlaskForm) -> None:
-        self.update(form)
+    def update_system(self, data: Dict[str, Any]) -> None:
         Db.update_system({
             'entity_id': self.id,
             'name': self.name,
-            'website_url': self.website_url,
-            'resolver_url': self.resolver_url,
-            'identifier_example': self.placeholder})
+            'website_url': data['reference_system']['website_url'],
+            'resolver_url': data['reference_system']['resolver_url'],
+            'identifier_example': data['reference_system']['placeholder']})
+        Db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
     def delete_links_from_entity(entity: Entity):

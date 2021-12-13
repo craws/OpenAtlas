@@ -149,36 +149,38 @@ class Entity:
             self,
             data: Dict[str, Any],
             new: Optional[bool] = False,) -> Optional[int]:
+        from openatlas.models.reference_system import ReferenceSystem
         redirect_link_id = None
-        if not new:
+        if not new and 'links' in data:
             self.delete_links(['P2'] + data['links']['delete'])
             if data['links_inverse']['delete']:
                 self.delete_links(data['links_inverse']['delete'], True)
             if 'delete_reference_system_links' in data \
                     and data['delete_reference_system_links']:
-                from openatlas.models.reference_system import ReferenceSystem
                 ReferenceSystem.delete_links_from_entity(self)
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
         if self.class_.name != 'type':
             self.update_types(data)
-        for link_ in data['links']['insert']:
-            ids = self.link(
-                link_['property'],
-                link_['range'],
-                link_['description'] if 'description' in link_ else None,
-                type_id=link_['type_id'] if 'type_id' in link_ else None)
-            if 'return_link_id' in link_ and link_['return_link_id']:
-                redirect_link_id = ids[0]
-        for link_ in data['links_inverse']['insert']:
-            ids = self.link(
-                link_['property'],
-                link_['range'],
-                link_['description'] if 'description' in link_ else None,
-                inverse=True,
-                type_id=link_['type_id'] if 'type_id' in link_ else None)
-            if 'return_link_id' in link_ and link_['return_link_id']:
-                redirect_link_id = ids[0]
+        if 'links' in data:
+            for link_ in data['links']['insert']:
+                ids = self.link(
+                    link_['property'],
+                    link_['range'],
+                    link_['description'] if 'description' in link_ else None,
+                    type_id=link_['type_id'] if 'type_id' in link_ else None)
+                if 'return_link_id' in link_ and link_['return_link_id']:
+                    redirect_link_id = ids[0]
+        if 'links_inverse' in data:
+            for link_ in data['links_inverse']['insert']:
+                ids = self.link(
+                    link_['property'],
+                    link_['range'],
+                    link_['description'] if 'description' in link_ else None,
+                    inverse=True,
+                    type_id=link_['type_id'] if 'type_id' in link_ else None)
+                if 'return_link_id' in link_ and link_['return_link_id']:
+                    redirect_link_id = ids[0]
         for key, value in data['attributes'].items():
             setattr(self, key, value)
         if 'gis' in data:
@@ -187,12 +189,6 @@ class Entity:
             if not new:
                 Gis.delete_by_entity(location)
             Gis.insert(location, data['gis'])
-
-        # Todo: update location name
-        # if self.class_.name == 'object_location':
-        #     self.name = 'Location of ' + self.name
-        #     self.description = None
-
         Db.update({
             'id': self.id,
             'name': str(self.name).strip(),
@@ -207,6 +203,12 @@ class Entity:
             'description':
                 sanitize(self.description, 'text') if self.description else None
         })
+        if isinstance(self, ReferenceSystem):
+            self.update_system(data)
+        # Todo: update location name
+        # if self.class_.name == 'object_location':
+        #     self.name = 'Location of ' + self.name
+        #     self.description = None
         return redirect_link_id
 
     def update_types(self, data):
