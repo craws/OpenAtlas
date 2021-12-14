@@ -160,7 +160,7 @@ class Entity:
                 ReferenceSystem.delete_links_from_entity(self)
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
-        if self.class_.name != 'type':
+        if 'types' in data and self.class_.name != 'type':
             self.update_types(data)
         if 'links' in data:
             for link_ in data['links']['insert']:

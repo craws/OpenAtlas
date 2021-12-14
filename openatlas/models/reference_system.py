@@ -50,7 +50,8 @@ class ReferenceSystem(Entity):
             'website_url': data['reference_system']['website_url'],
             'resolver_url': data['reference_system']['resolver_url'],
             'identifier_example': data['reference_system']['placeholder']})
-        Db.add_classes(self.id, data['reference_system']['classes'])
+        if data['reference_system']['classes']:
+            Db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
     def delete_links_from_entity(entity: Entity):

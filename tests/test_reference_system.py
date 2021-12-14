@@ -59,11 +59,11 @@ class ReferenceSystemTest(TestBaseCase):
                 Type.get_hierarchy('External reference match').id: precision_id,
                 'website_url': 'https://www.geonames2.org/',
                 'resolver_url': 'https://www.geonames2.org/',
-                'classes': [],
                 'placeholder': ''}
             rv = self.app.post(
                 url_for('update', id_=geonames.id),
                 follow_redirects=True, data=data)
+
             assert b'Changes have been saved.' in rv.data
             rv = self.app.post(
                 url_for('update', id_=geonames.id),

@@ -247,7 +247,7 @@ def process_form_data(
             'website_url': form.website_url.data,
             'resolver_url': form.resolver_url.data,
             'placeholder': form.placeholder.data,
-            'classes': form.classes.data}
+            'classes': form.classes.data if hasattr(form, 'classes') else None}
     elif entity.class_.view == 'source' and not origin:
         data['links_inverse']['delete'].append('P128')
         if form.artifact.data:

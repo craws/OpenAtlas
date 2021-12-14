@@ -46,13 +46,13 @@ class ApiTests(TestBaseCase):
                 place.modified = str(datetime.now())
 
                 # Adding Dates to place
-                place.begin_from = '2018-01-31'
-                place.begin_to = '2018-03-01'
-                place.begin_comment = 'Begin of the shire'
-                place.end_from = '2019-01-31'
-                place.end_to = '2019-03-01'
-                place.end_comment = 'Descent of Shire'
-                place.update()
+                place.update({'attributes': {
+                    'begin_from': '2018-01-31',
+                    'begin_to': '2018-03-01',
+                    'begin_comment': 'Begin of the shire',
+                    'end_from': '2019-01-31',
+                    'end_to': '2019-03-01',
+                    'end_comment': 'Descent of Shire'}})
 
                 location = place.get_linked_entity_safe('P53')
                 Gis.add_example_geom(location)
