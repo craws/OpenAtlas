@@ -403,10 +403,8 @@ def admin_check_dates() -> str:
         tabs['link_dates'].table.rows.append([
             link(
                 _(name),
-                url_for(
-                    f'{name}_update',
-                    id_=link_.id,
-                    origin_id=link_.domain.id)),
+                url_for('link_update', id_=link_.id, origin_id=link_.domain.id)
+            ),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():

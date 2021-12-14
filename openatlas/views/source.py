@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
+from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
@@ -80,7 +81,7 @@ def save(
             logger.log_user(entity.id, 'insert')
         else:
             abort(400)  # pragma: no cover, entity or source needed
-        entity.update(form)
+        entity.update(process_form_data(form, entity))
         Transaction.commit()
     except Exception as e:  # pragma: no cover
         Transaction.rollback()

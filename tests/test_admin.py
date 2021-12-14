@@ -52,23 +52,24 @@ class ContentTests(TestBaseCase):
                 rv = self.app.get(url_for('admin_check_links'))
                 assert b'Invalid linked entity' in rv.data
 
-    # def test_dates(self) -> None:
-    #     with app.app_context():
-    #         with app.test_request_context():
-    #             app.preprocess_request()  # type: ignore
-    #             # Create invalid dates for an actor and a relation link
-    #             person = Entity.insert('person', 'Person')
-    #             event = Entity.insert('activity', 'Event')
-    #             person.begin_from = '2018-01-31'
-    #             person.begin_to = '2018-01-01'
-    #             person.update()
-    #             involvement = Link.get_by_id(event.link('P11', person)[0])
-    #             involvement.begin_from = '2017-01-31'
-    #             involvement.begin_to = '2017-01-01'
-    #             involvement.end_from = '2017-01-01'
-    #             involvement.update()
-    #         rv = self.app.get(url_for('admin_check_dates'))
-    #         assert b'<span class="tab-counter">' in rv.data
+    def test_dates(self) -> None:
+        with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                # Create invalid dates for an actor and a relation link
+                person = Entity.insert('person', 'Person')
+                event = Entity.insert('activity', 'Event')
+                person.update({
+                    'attributes': {
+                        'begin_from': '2018-01-31',
+                        'begin_to': '2018-01-01'}})
+                involvement = Link.get_by_id(event.link('P11', person)[0])
+                involvement.begin_from = '2017-01-31'
+                involvement.begin_to = '2017-01-01'
+                involvement.end_from = '2017-01-01'
+                involvement.update()
+            rv = self.app.get(url_for('admin_check_dates'))
+            assert b'<span class="tab-counter">' in rv.data
 
     def test_duplicates(self) -> None:
         with app.app_context():

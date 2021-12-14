@@ -51,8 +51,7 @@ class ReferenceSystemTest(TestBaseCase):
                     delete_id=wikipedia_id),
                 follow_redirects=True)
             assert b'The entry has been deleted' in rv.data
-
-            rv = self.app.post(url_for('update', id_=geonames.id))
+            rv = self.app.get(url_for('update', id_=geonames.id))
             assert b'Website URL' in rv.data
             data = {
                 'name': 'GeoNames',
@@ -63,7 +62,6 @@ class ReferenceSystemTest(TestBaseCase):
             rv = self.app.post(
                 url_for('update', id_=geonames.id),
                 follow_redirects=True, data=data)
-
             assert b'Changes have been saved.' in rv.data
             rv = self.app.post(
                 url_for('update', id_=geonames.id),

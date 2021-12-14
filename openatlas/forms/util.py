@@ -191,8 +191,7 @@ def process_form_data(
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
     elif entity.class_.view == 'event':
-        data['links']['delete'] += \
-            ['P7', 'P24', 'P25', 'P26', 'P27', 'P108', 'P117']
+        data['links']['delete'] += ['P7', 'P117']
         if form.event.data:  # Super event
             data['links']['insert'].append({
                 'property': 'P117',
@@ -203,16 +202,19 @@ def process_form_data(
                 'range':
                     Link.get_linked_entity_safe(int(form.place.data), 'P53')})
         if entity.class_.name == 'acquisition':
+            data['links']['delete'].append('P24')
             if form.given_place.data:
                 data['links']['insert'].append({
                     'property': 'P24',
                     'range': form.given_place.data})
         elif entity.class_.name == 'production':
+            data['links']['delete'].append('P108')
             if form.artifact.data:
                 data['links']['insert'].append({
                     'property': 'P108',
                     'range': form.artifact.data})
         elif entity.class_.name == 'move':
+            data['links']['delete'] += ['P25', 'P26', 'P27']
             if form.artifact.data:
                 data['links']['insert'].append({
                     'property': 'P25',
@@ -239,9 +241,10 @@ def process_form_data(
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data
         if entity.class_.name == 'artifact':
             data['links']['delete'].append('P52')
-            data['links']['insert'].append({
-                'property': 'P52',
-                'range': form.actor.data})
+            if form.actor.data:
+                data['links']['insert'].append({
+                    'property': 'P52',
+                    'range': form.actor.data})
     elif entity.class_.view == 'reference_system':
         data['reference_system'] = {
             'website_url': form.website_url.data,
@@ -267,6 +270,9 @@ def process_form_data(
                  'property': code,
                  'range': new_super})
     for link_ in data['links']['insert']:
+        if isinstance(link_['range'], str):
+            link_['range'] = form_string_to_entity_list(link_['range'])
+    for link_ in data['links_inverse']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
     if origin and entity.class_.name not in ('administrative_unit', 'type'):
@@ -305,7 +311,7 @@ def process_origin_data(entity, origin, form, data):
                 'range': origin})
     elif origin.class_.view in ['source', 'file']:
         data['links_inverse']['insert'].append({
-            'property': 'P46',
+            'property': 'P67',
             'range': origin})
     elif origin.class_.view == 'event':  # Involvement from actor
         data['links_inverse']['insert'].append({

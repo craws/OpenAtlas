@@ -1,4 +1,4 @@
-import pathlib
+from pathlib import Path
 
 from flask import url_for
 
@@ -37,9 +37,7 @@ class ImportTest(TestBaseCase):
             rv = self.app.get(
                 url_for('import_data', class_='person', project_id=project_id))
             assert b'File *' in rv.data
-            csv = \
-                pathlib.Path(app.root_path) \
-                / 'static' / 'import' / 'example.csv'
+            csv = Path(app.root_path) / 'static' / 'import' / 'example.csv'
             with open(csv, 'rb') as file:
                 rv = self.app.post(
                     url_for(
@@ -59,7 +57,7 @@ class ImportTest(TestBaseCase):
                     follow_redirects=True)
             assert b'IDs already in database' in rv.data
             with open(
-                    pathlib.Path(app.root_path)
+                    Path(app.root_path)
                     / 'static' / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(
                     url_for(
