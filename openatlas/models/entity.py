@@ -187,6 +187,16 @@ class Entity:
             from openatlas.models.gis import Gis
             location = self.get_linked_entity_safe('P53')
             if not new:
+                Db.update({
+                    'id': location.id,
+                    'name': f'Location of {str(self.name).strip()}',
+                    'begin_from': None,
+                    'begin_to': None,
+                    'end_from': None,
+                    'end_to': None,
+                    'begin_comment': None,
+                    'end_comment': None,
+                    'description': None})
                 Gis.delete_by_entity(location)
             Gis.insert(location, data['gis'])
         Db.update({
@@ -205,10 +215,6 @@ class Entity:
         })
         if isinstance(self, ReferenceSystem):
             self.update_system(data)
-        # Todo: update location name
-        # if self.class_.name == 'object_location':
-        #     self.name = 'Location of ' + self.name
-        #     self.description = None
         return redirect_link_id
 
     def update_types(self, data):
