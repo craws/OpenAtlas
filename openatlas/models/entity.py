@@ -147,49 +147,37 @@ class Entity:
     def update(
             self,
             data: Dict[str, Any],
-            new: Optional[bool] = False,) -> Optional[int]:
+            new: bool = False,) -> Optional[int]:
         from openatlas.models.reference_system import ReferenceSystem
-        if not new and 'links' in data:
-            self.delete_links(['P2'] + data['links']['delete'])
-            if data['links']['delete_inverse']:
-                self.delete_links(data['links']['delete_inverse'], True)
-            if 'delete_reference_system_links' in data \
-                    and data['delete_reference_system_links']:
-                ReferenceSystem.delete_links_from_entity(self)
+        redirect_link_id = None
         if 'attributes' in data:
-            for key, value in data['attributes'].items():
-                setattr(self, key, value)
+            self.update_attributes(data['attributes'])
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
-        if 'types' in data and self.class_.name != 'type':
-            self.update_types(data)
-        redirect_link_id = None
+        if 'administrative_units' in data:
+            self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
-            for link_ in data['links']['insert']:
-                ids = self.link(
-                    link_['property'],
-                    link_['range'],
-                    link_['description'] if 'description' in link_ else None,
-                    type_id=link_['type_id'] if 'type_id' in link_ else None,
-                    inverse=('inverse' in link_ and link_['inverse']))
-                if 'return_link_id' in link_ and link_['return_link_id']:
-                    redirect_link_id = ids[0]
+            redirect_link_id = self.update_links(data['links'], new)
         if 'gis' in data:
-            from openatlas.models.gis import Gis
-            location = self.get_linked_entity_safe('P53')
-            if not new:
-                Db.update({
-                    'id': location.id,
-                    'name': f'Location of {str(self.name).strip()}',
-                    'begin_from': None,
-                    'begin_to': None,
-                    'end_from': None,
-                    'end_to': None,
-                    'begin_comment': None,
-                    'end_comment': None,
-                    'description': None})
-                Gis.delete_by_entity(location)
-            Gis.insert(location, data['gis'])
+            self.update_gis(data['gis'], new)
+        if isinstance(self, ReferenceSystem):
+            self.update_system(data)
+        return redirect_link_id
+
+    def update_administrative_units(
+            self,
+            units: Dict[str, List[int]],
+            new: bool) -> None:
+        if not self.location:
+            self.location = self.get_linked_entity_safe('P53')
+        if not new:
+            self.location.delete_links(['P89'])
+        if units:
+            self.location.link('P89', [g.types[id_] for id_ in units])
+
+    def update_attributes(self, attributes: Dict[str, Any]) -> None:
+        for key, value in attributes.items():
+            setattr(self, key, value)
         Db.update({
             'id': self.id,
             'name': str(self.name).strip(),
@@ -204,25 +192,8 @@ class Entity:
             'description':
                 sanitize(self.description, 'text') if self.description else None
         })
-        if isinstance(self, ReferenceSystem):
-            self.update_system(data)
-        return redirect_link_id
 
-    def update_types(self, data):
-        self.link('P2', [g.types[id_] for id_ in data['types']])
-        for type_ in data['value_types']:
-            if type_['value'] is not None:  # Allow the number zero
-                self.link('P2', g.types[type_['id']], type_['value'])
-        if 'administrative_units' in data:
-            if not self.location:
-                self.location = self.get_linked_entity_safe('P53')
-            self.location.delete_links(['P89'])
-            if data['administrative_units']:
-                self.location.link(
-                    'P89',
-                    [g.types[id_] for id_ in data['administrative_units']])
-
-    def update_aliases(self, aliases) -> None:
+    def update_aliases(self, aliases: List[str]) -> None:
         delete_ids = []
         for id_, alias in self.aliases.items():
             if alias in aliases:
@@ -236,6 +207,46 @@ class Entity:
                     self.link('P131', Entity.insert('actor_appellation', alias))
                 else:
                     self.link('P1', Entity.insert('appellation', alias))
+
+    def update_links(self, links: Dict[str, Any], new: bool) -> Optional[int]:
+        from openatlas.models.reference_system import ReferenceSystem
+        if not new:
+            if 'delete' in links and links['delete']:
+                self.delete_links(links['delete'])
+            if 'delete_inverse' in links and links['delete_inverse']:
+                self.delete_links(links['delete_inverse'], True)
+            if 'delete_reference_system' in links \
+                    and links['delete_reference_system']:
+                ReferenceSystem.delete_links_from_entity(self)
+        redirect_link_id = None
+        for link_ in links['insert']:
+            ids = self.link(
+                link_['property'],
+                link_['range'],
+                link_['description'] if 'description' in link_ else None,
+                type_id=link_['type_id'] if 'type_id' in link_ else None,
+                inverse=('inverse' in link_ and link_['inverse']))
+            if 'return_link_id' in link_ and link_['return_link_id']:
+                redirect_link_id = ids[0]
+        return redirect_link_id
+
+    def update_gis(self, gis_data: Dict[str, Any], new: bool) -> None:
+        from openatlas.models.gis import Gis
+        if not self.location:
+            self.location = self.get_linked_entity_safe('P53')
+        if not new:
+            Db.update({
+                'id': self.location.id,
+                'name': f'Location of {str(self.name).strip()}',
+                'begin_from': None,
+                'begin_to': None,
+                'end_from': None,
+                'end_to': None,
+                'begin_comment': None,
+                'end_comment': None,
+                'description': None})
+            Gis.delete_by_entity(self.location)
+        Gis.insert(self.location, gis_data)
 
     def set_image_for_places(self) -> None:
         self.image_id = self.get_profile_image_id()

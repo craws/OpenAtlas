@@ -93,9 +93,7 @@ def process_form_data(
         origin: Optional[Entity] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {
         'attributes': process_form_dates(form),
-        'links': {'insert': [], 'delete': [], 'delete_inverse': []},
-        'types': [],
-        'value_types': []}
+        'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
     for key, value in form.data.items():
         field_type = getattr(form, key).type
         if field_type in [
@@ -155,14 +153,21 @@ def process_form_data(
                     data['administrative_units'] = []
                 data['administrative_units'] += value
             else:
-                data['types'] += value
+                data['links']['delete'].add('P2')
+                data['links']['insert'].append({
+                    'property': 'P2',
+                    'range': [g.types[id_] for id_ in value]})
         elif field_type == 'ValueFloatField':
-            data['value_types'].append({'id': int(key), 'value': value})
+            if value is not None:  # Allow the number zero
+                data['links']['insert'].append({
+                    'property': 'P2',
+                    'description': value,
+                    'range': g.types[int(key)]})
         elif key.startswith('reference_system_id_'):
             system = Entity.get_by_id(
                 int(key.replace('reference_system_id_', '')))
             precision_field = getattr(form, key.replace('id_', 'precision_'))
-            data['delete_reference_system_links'] = True
+            data['links']['delete_reference_system'] = True
             if value:
                 data['links']['insert'].append({
                     'property': 'P67',
@@ -174,7 +179,7 @@ def process_form_data(
             abort(418, f'Form field error: {key}, {field_type}, value={value}')
 
     if entity.class_.view == 'actor':
-        data['links']['delete'] += ['P74', 'OA8', 'OA9']
+        data['links']['delete'].update(['P74', 'OA8', 'OA9'])
         if form.residence.data:
             residence = Entity.get_by_id(int(form.residence.data))
             data['links']['insert'].append({
@@ -191,7 +196,7 @@ def process_form_data(
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
     elif entity.class_.view == 'event':
-        data['links']['delete'] += ['P7', 'P117']
+        data['links']['delete'].update(['P7', 'P117'])
         if form.event.data:  # Super event
             data['links']['insert'].append({
                 'property': 'P117',
@@ -202,19 +207,19 @@ def process_form_data(
                 'range':
                     Link.get_linked_entity_safe(int(form.place.data), 'P53')})
         if entity.class_.name == 'acquisition':
-            data['links']['delete'].append('P24')
+            data['links']['delete'].add('P24')
             if form.given_place.data:
                 data['links']['insert'].append({
                     'property': 'P24',
                     'range': form.given_place.data})
         elif entity.class_.name == 'production':
-            data['links']['delete'].append('P108')
+            data['links']['delete'].add('P108')
             if form.artifact.data:
                 data['links']['insert'].append({
                     'property': 'P108',
                     'range': form.artifact.data})
         elif entity.class_.name == 'move':
-            data['links']['delete'] += ['P25', 'P26', 'P27']
+            data['links']['delete'].update(['P25', 'P26', 'P27'])
             if form.artifact.data:
                 data['links']['insert'].append({
                     'property': 'P25',
@@ -240,7 +245,7 @@ def process_form_data(
         for shape in ['point', 'line', 'polygon']:
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data
         if entity.class_.name == 'artifact':
-            data['links']['delete'].append('P52')
+            data['links']['delete'].add('P52')
             if form.actor.data:
                 data['links']['insert'].append({
                     'property': 'P52',
@@ -252,7 +257,7 @@ def process_form_data(
             'placeholder': form.placeholder.data,
             'classes': form.classes.data if hasattr(form, 'classes') else None}
     elif entity.class_.view == 'source' and not origin:
-        data['links']['delete_inverse'].append('P128')
+        data['links']['delete_inverse'].add('P128')
         if form.artifact.data:
             data['links']['insert'].append({
                 'property': 'P128',
@@ -266,7 +271,7 @@ def process_form_data(
         new_super = g.types[int(new_super_id)] if new_super_id else root
         code = 'P127' if entity.class_.name == 'type' else 'P89'
         if super_id != new_super.id:
-            data['links']['delete'].append(code)
+            data['links']['delete'].add(code)
             data['links']['insert'].append({
                  'property': code,
                  'range': new_super})
