@@ -24,7 +24,7 @@ class Link:
             domain: Optional['Entity'] = None,
             range_: Optional['Entity'] = None) -> None:
         from openatlas.models.entity import Entity
-        from openatlas.forms.date import format_date
+        from openatlas.util.util import format_date_part
         self.id = row['id']
         self.description = row['description']
         self.property = g.properties[row['property_code']]
@@ -41,11 +41,11 @@ class Link:
             self.end_from = timestamp_to_datetime64(row['end_from'])
             self.end_to = timestamp_to_datetime64(row['end_to'])
             self.end_comment = row['end_comment']
-            self.first = format_date(self.begin_from, 'year') \
+            self.first = format_date_part(self.begin_from, 'year') \
                 if self.begin_from else None
-            self.last = format_date(self.end_from, 'year') \
+            self.last = format_date_part(self.end_from, 'year') \
                 if self.end_from else None
-            self.last = format_date(self.end_to, 'year') \
+            self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
     def update(self) -> None:

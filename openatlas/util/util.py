@@ -997,3 +997,17 @@ class MLStripper(HTMLParser):
 
     def get_data(self) -> str:
         return ''.join(self.fed)
+
+
+def format_date_part(date: numpy.datetime64, part: str) -> str:
+    string = str(date).split(' ')[0]
+    bc = False
+    if string.startswith('-') or string.startswith('0000'):
+        bc = True
+        string = string[1:]
+    parts = string.split('-')
+    if part == 'year':  # If it's a negative year, add one year
+        return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
+    if part == 'month':
+        return parts[1]
+    return parts[2]

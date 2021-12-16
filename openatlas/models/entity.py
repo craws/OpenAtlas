@@ -12,11 +12,10 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
-from openatlas.forms.date import format_date
 from openatlas.models.date import (
     datetime64_to_timestamp, timestamp_to_datetime64)
 from openatlas.models.link import Link
-from openatlas.util.util import get_base_table_data, sanitize
+from openatlas.util.util import format_date_part, get_base_table_data, sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
@@ -75,11 +74,11 @@ class Entity:
             self.end_from = timestamp_to_datetime64(data['end_from'])
             self.end_to = timestamp_to_datetime64(data['end_to'])
             self.end_comment = data['end_comment']
-            self.first = format_date(self.begin_from, 'year') \
+            self.first = format_date_part(self.begin_from, 'year') \
                 if self.begin_from else None
-            self.last = format_date(self.end_from, 'year') \
+            self.last = format_date_part(self.end_from, 'year') \
                 if self.end_from else None
-            self.last = format_date(self.end_to, 'year') \
+            self.last = format_date_part(self.end_to, 'year') \
                 if self.end_to else self.last
 
     def get_linked_entity(
@@ -157,7 +156,7 @@ class Entity:
             if 'delete_reference_system_links' in data \
                     and data['delete_reference_system_links']:
                 ReferenceSystem.delete_links_from_entity(self)
-        if 'attribute' in data:
+        if 'attributes' in data:
             for key, value in data['attributes'].items():
                 setattr(self, key, value)
         if 'aliases' in data:
