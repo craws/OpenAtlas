@@ -93,8 +93,7 @@ def process_form_data(
         origin: Optional[Entity] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {
         'attributes': process_form_dates(form),
-        'links': {'insert': [], 'delete': []},
-        'links_inverse': {'insert': [], 'delete': []},
+        'links': {'insert': [], 'delete': [], 'delete_inverse': []},
         'types': [],
         'value_types': []}
     for key, value in form.data.items():
@@ -152,7 +151,7 @@ def process_form_data(
         elif field_type in ['TreeField', 'TreeMultiField']:
             if g.types[int(getattr(form, key).id)].class_.name \
                     == 'administrative_unit':
-                if 'administrative_units'not in data:
+                if 'administrative_units' not in data:
                     data['administrative_units'] = []
                 data['administrative_units'] += value
             else:
@@ -165,11 +164,12 @@ def process_form_data(
             precision_field = getattr(form, key.replace('id_', 'precision_'))
             data['delete_reference_system_links'] = True
             if value:
-                data['links_inverse']['insert'].append({
+                data['links']['insert'].append({
                     'property': 'P67',
                     'range': system,
                     'description': value,
-                    'type_id': precision_field.data})
+                    'type_id': precision_field.data,
+                    'inverse': True})
         else:  # pragma: no cover
             abort(418, f'Form field error: {key}, {field_type}, value={value}')
 
@@ -252,11 +252,12 @@ def process_form_data(
             'placeholder': form.placeholder.data,
             'classes': form.classes.data if hasattr(form, 'classes') else None}
     elif entity.class_.view == 'source' and not origin:
-        data['links_inverse']['delete'].append('P128')
+        data['links']['delete_inverse'].append('P128')
         if form.artifact.data:
-            data['links_inverse']['insert'].append({
+            data['links']['insert'].append({
                 'property': 'P128',
-                'range': form.artifact.data})
+                'range': form.artifact.data,
+                'inverse': True})
     elif entity.class_.view == 'type' and 'classes' not in form:  # is sub type
         type_ = origin if isinstance(origin, Type) else entity
         root = g.types[type_.root[0]] if type_.root else type_
@@ -270,9 +271,6 @@ def process_form_data(
                  'property': code,
                  'range': new_super})
     for link_ in data['links']['insert']:
-        if isinstance(link_['range'], str):
-            link_['range'] = form_string_to_entity_list(link_['range'])
-    for link_ in data['links_inverse']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
     if origin and entity.class_.name not in ('administrative_unit', 'type'):
@@ -289,15 +287,17 @@ def form_string_to_entity_list(string: str) -> List[Entity]:
 def process_origin_data(entity, origin, form, data):
     if origin.class_.view == 'reference':
         if entity.class_.name == 'file':
-            data['links_inverse']['insert'].append({
+            data['links']['insert'].append({
                 'property': 'P67',
                 'range': origin,
-                'description': form.page.data})
+                'description': form.page.data,
+                'inverse': True})
         else:
-            data['links_inverse']['insert'].append({
+            data['links']['insert'].append({
                 'property': 'P67',
                 'range': origin,
-                'return_link_id': True})
+                'return_link_id': True,
+                'inverse': True})
     elif entity.class_.name == 'file' \
             or entity.class_.view in ['reference', 'source']:
         data['links']['insert'].append({
@@ -306,28 +306,32 @@ def process_origin_data(entity, origin, form, data):
             'return_link_id': entity.class_.view == 'reference'})
     elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
         if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-            data['links_inverse']['insert'].append({
+            data['links']['insert'].append({
                 'property': 'P46',
-                'range': origin})
+                'range': origin,
+                'inverse': True})
     elif origin.class_.view in ['source', 'file']:
-        data['links_inverse']['insert'].append({
+        data['links']['insert'].append({
             'property': 'P67',
-            'range': origin})
+            'range': origin,
+            'inverse': True})
     elif origin.class_.view == 'event':  # Involvement from actor
-        data['links_inverse']['insert'].append({
+        data['links']['insert'].append({
             'property': 'P11',
             'range': origin,
-            'return_link_id': True})
+            'return_link_id': True,
+            'inverse': True})
     elif origin.class_.view == 'actor' and entity.class_.view == 'event':
         data['links']['insert'].append({  # Involvement from event
             'property': 'P11',
             'range': origin,
             'return_link_id': True})
     elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
-        data['links_inverse']['insert'].append({  # Actor actor relation
+        data['links']['insert'].append({  # Actor actor relation
             'property': 'OA7',
             'range': origin,
-            'return_link_id': True})
+            'return_link_id': True,
+            'inverse': True})
     return data
 
 
