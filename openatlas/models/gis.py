@@ -17,11 +17,6 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
-    def add_example_geom(location: Entity) -> None:
-        # Todo: Used for tests until model is decoupled from forms
-        Db.add_example_geom(location.id)
-
-    @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:
         return Db.get_by_id(id_)
 
@@ -133,7 +128,7 @@ class Gis:
     @staticmethod
     def insert(entity: Entity, data: Dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
-            if not data[shape]:
+            if shape not in data or not data[shape]:
                 continue  # pragma: no cover
             for item in json.loads(data[shape]):
                 if not item['geometry']['coordinates'] \

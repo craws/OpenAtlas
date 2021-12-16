@@ -36,7 +36,8 @@ class ApiTests(TestBaseCase):
                     (id_, node) in Type.get_all().items()}
                 # Creation of Shire (place)
                 place = insert_entity(
-                    'Shire', 'place',
+                    'Shire',
+                    'place',
                     description='The Shire was the homeland of the hobbits.')
                 if not place:  # Needed for Mypy
                     return  # pragma: no cover
@@ -53,9 +54,13 @@ class ApiTests(TestBaseCase):
                     'end_from': '2019-01-31',
                     'end_to': '2019-03-01',
                     'end_comment': 'Descent of Shire'}})
-
                 location = place.get_linked_entity_safe('P53')
-                Gis.add_example_geom(location)
+                Gis.insert(location, {
+                    'point':
+                        '[{"type":"Feature","geometry":'
+                        '{"type":"Point","coordinates":[9, 17]},'
+                        '"properties":{"name":"","description":"",'
+                        '"shapeType":"centerpoint"}}]'})
 
                 # Adding Type Place
                 boundary_mark = Entity.get_by_id(
@@ -188,8 +193,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.geometric_entities',
                     download=True)).get_json()]:
-                assert bool(rv['features'][0]['geometry'][
-                                'coordinates'])
+                assert bool(rv['features'][0]['geometry']['coordinates'])
                 assert ApiTests.get_geom_properties(rv, 'id')
                 assert ApiTests.get_geom_properties(rv, 'objectDescription')
                 assert ApiTests.get_geom_properties(rv, 'objectId')
