@@ -172,12 +172,11 @@ class EventTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Test super event validation
-            data = {'name': 'Event Horizon', 'event': event_id}
             rv = self.app.post(
                 url_for('update', id_=event_id),
-                data=data,
+                data={'name': 'Event', 'event': event_id, 'event_id': event_id},
                 follow_redirects=True)
-            assert b'error' in rv.data
+            assert b'as super' in rv.data
 
             # Delete
             rv = self.app.get(

@@ -77,7 +77,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     elif domain.class_.view == 'actor' and range_.class_.view == 'actor':
         return relation_update(link_, domain, range_, origin)
     else:
-        abort(403)
+        abort(403)  # pragma: no cover
 
 
 def relation_update(

@@ -126,7 +126,7 @@ class Entity:
             description: Optional[str] = None,
             inverse: bool = False) -> None:
         if not range_:
-            return
+            return  # pragma: no cover
         # range_ = string value from a form, can be empty, int or int list
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
