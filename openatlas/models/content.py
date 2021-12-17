@@ -1,7 +1,6 @@
-from typing import Dict, Optional
+from typing import Dict, List, Optional
 
 from flask import session
-from flask_wtf import FlaskForm
 
 from openatlas import app
 from openatlas.database.content import Content as Db
@@ -36,9 +35,6 @@ def get_translation(name: str, lang: Optional[str] = None) -> str:
     return translations[session['settings']['default_language']]
 
 
-def update_content(name: str, form: FlaskForm) -> None:
-    for language in app.config['LANGUAGES'].keys():
-        Db.update(
-            name,
-            language,
-            form.__getattribute__(language).data.strip())
+def update_content(data: List[Dict[str, str]]) -> None:
+    for item in data:
+        Db.update(item['name'], item['language'], item['text'])
