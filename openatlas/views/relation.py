@@ -9,7 +9,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
-from openatlas.forms.util import get_link_type
+from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
@@ -31,7 +31,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
                 else:
                     link_ = Link.get_by_id(
                         origin.link('OA7', actor, form.description.data)[0])
-                link_.set_dates(form)
+                link_.set_dates(process_form_dates(form))
                 link_.type = get_link_type(form)
                 link_.update()
             Transaction.commit()

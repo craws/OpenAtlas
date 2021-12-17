@@ -3,13 +3,12 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
-from flask_wtf import FlaskForm
 
 from openatlas import logger
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.models.date import (
-    datetime64_to_timestamp, form_to_datetime64, timestamp_to_datetime64)
+    datetime64_to_timestamp, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -66,35 +65,13 @@ class Link:
     def delete(self) -> None:
         Link.delete_(self.id)
 
-    def set_dates(self, form: FlaskForm) -> None:
-        self.begin_from = None
-        self.begin_to = None
-        self.begin_comment = None
-        self.end_from = None
-        self.end_to = None
-        self.end_comment = None
-        if form.begin_year_from.data:
-            self.begin_from = form_to_datetime64(
-                form.begin_year_from.data,
-                form.begin_month_from.data,
-                form.begin_day_from.data)
-            self.begin_to = form_to_datetime64(
-                form.begin_year_to.data,
-                form.begin_month_to.data,
-                form.begin_day_to.data,
-                True)
-            self.begin_comment = form.begin_comment.data
-        if form.end_year_from.data:
-            self.end_from = form_to_datetime64(
-                form.end_year_from.data,
-                form.end_month_from.data,
-                form.end_day_from.data)
-            self.end_to = form_to_datetime64(
-                form.end_year_to.data,
-                form.end_month_to.data,
-                form.end_day_to.data,
-                True)
-            self.end_comment = form.end_comment.data
+    def set_dates(self, data: Dict[str, Any]) -> None:
+        self.begin_from = data['begin_from']
+        self.begin_to = data['begin_to']
+        self.begin_comment = data['begin_comment']
+        self.end_from = data['end_from']
+        self.end_to = data['end_to']
+        self.end_comment = data['end_comment']
 
     @staticmethod
     def insert(
