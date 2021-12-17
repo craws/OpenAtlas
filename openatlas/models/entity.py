@@ -5,7 +5,6 @@ from typing import (
     Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union)
 
 from flask import g, request
-from flask_wtf import FlaskForm
 from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
@@ -385,20 +384,19 @@ class Entity:
         return [Entity(row) for row in Db.get_by_link_property(code, class_)]
 
     @staticmethod
-    def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
+    def get_similar_named(class_: str, ratio: int) -> Dict[int, Any]:
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
-        entities = Entity.get_by_class(form.classes.data)
+        entities = Entity.get_by_class(class_)
         for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
             for entity in filter(lambda x: x.id != sample.id, entities):
-                if fuzz.ratio(sample.name, entity.name) >= form.ratio.data:
+                if fuzz.ratio(sample.name, entity.name) >= ratio:
                     already_added.add(sample.id)
                     already_added.add(entity.id)
                     similar[sample.id]['entities'].append(entity)
         return {
-            similar: data
-            for similar, data in similar.items() if data['entities']}
+            item: data for item, data in similar.items() if data['entities']}
 
     @staticmethod
     def get_overview_counts() -> Dict[str, int]:

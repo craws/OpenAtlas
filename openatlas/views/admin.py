@@ -345,11 +345,13 @@ def admin_settings(category: str) -> Union[str, Response]:
 def admin_check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (x.name, x.label) for name, x in g.classes.items() if x.label]
+        (class_.name, class_.label) for name, class_ in g.classes.items()
+        if class_.label and class_.view]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for sample in Entity.get_similar_named(form).values():
+        for sample in Entity.get_similar_named(
+                form.classes.data, form.ratio.data).values():
             html = link(sample['entity'])
             for entity in sample['entities']:  # Table linebreaks workaround
                 html += f'<br><br><br><br><br>{link(entity)}'
