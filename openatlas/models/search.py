@@ -6,7 +6,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas.database.entity import Entity as Db
-from openatlas.models.date import form_to_datetime64
+from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 

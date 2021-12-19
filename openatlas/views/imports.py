@@ -14,13 +14,13 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    format_date, get_backup_file_data, link, required_group, uc_first)
+    datetime64_to_timestamp, format_date, get_backup_file_data, link,
+    required_group, uc_first)
 
 
 class ProjectForm(FlaskForm):

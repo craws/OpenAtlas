@@ -4,7 +4,7 @@ from flask import request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
-from openatlas.models.date import form_to_datetime64
+from openatlas.forms.util import form_to_datetime64
 from openatlas.util.util import uc_first
 
 

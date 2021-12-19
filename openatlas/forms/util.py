@@ -3,6 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 from typing import Any, Dict, List, Optional, Union
 
+import numpy
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -11,7 +12,6 @@ from werkzeug.exceptions import abort
 
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
-from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -463,3 +463,53 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         form.artifact.data = [
             item.id for item in
             entity.get_linked_entities('P128', inverse=True)]
+
+
+def form_to_datetime64(
+        year: Any,
+        month: Any,
+        day: Any,
+        to_date: bool = False) -> Optional[numpy.datetime64]:
+    if not year:
+        return None
+    year = year if year > 0 else year + 1
+
+    def is_leap_year(year_: int) -> bool:
+        if year_ % 400 == 0:  # e.g. 2000
+            return True
+        if year_ % 100 == 0:  # e.g. 1000
+            return False
+        if year_ % 4 == 0:  # e.g. 1996
+            return True
+        return False
+
+    def get_last_day_of_month(year_: int, month_: int) -> int:
+        months_days: Dict[int, int] = {
+            1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+            10: 31, 11: 30, 12: 31}
+        months_days_leap: Dict[int, int] = {
+            1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+            10: 31, 11: 30, 12: 31}
+        date_lookup = months_days_leap \
+            if is_leap_year(year_) else months_days
+        return date_lookup[month_]
+
+    if month:
+        month = f'{month:02}'
+    elif to_date:
+        month = '12'
+    else:
+        month = '01'
+
+    if day:
+        day = f'{day:02}'
+    elif to_date:
+        day = f'{get_last_day_of_month(int(year), int(month)):02}'
+    else:
+        day = '01'
+
+    try:
+        date_time = numpy.datetime64(f'{year}-{month}-{day}')
+    except ValueError:
+        return None
+    return date_time

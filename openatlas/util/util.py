@@ -28,7 +28,6 @@ from wtforms.validators import Email
 
 from openatlas import app, logger
 from openatlas.models.content import get_translation
-from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
 from openatlas.models.link import Link
 from openatlas.models.cidoc_property import CidocProperty
@@ -1011,3 +1010,25 @@ def format_date_part(date: numpy.datetime64, part: str) -> str:
     if part == 'month':
         return parts[1]
     return parts[2]
+
+
+def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
+    if not string:
+        return None
+    if 'BC' in string:
+        parts = string.split(' ')[0].split('-')
+        string = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}'
+    return numpy.datetime64(string.split(' ')[0])
+
+
+def datetime64_to_timestamp(date: numpy.datetime64) -> Optional[str]:
+    if not date:
+        return None
+    string = str(date)
+    postfix = ''
+    if string.startswith('-') or string.startswith('0000'):
+        string = string[1:]
+        postfix = ' BC'
+    parts = string.split('-')
+    year = int(parts[0]) + 1 if postfix else int(parts[0])
+    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'

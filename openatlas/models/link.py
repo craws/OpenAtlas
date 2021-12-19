@@ -7,8 +7,7 @@ from flask import abort, g
 from openatlas import logger
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.models.date import (
-    datetime64_to_timestamp, timestamp_to_datetime64)
+from openatlas.util.util import datetime64_to_timestamp, timestamp_to_datetime64
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
