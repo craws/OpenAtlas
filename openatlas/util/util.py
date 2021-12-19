@@ -29,7 +29,6 @@ from wtforms.validators import Email
 from openatlas import app, logger
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.models.link import Link
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
@@ -37,6 +36,7 @@ from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
+    from openatlas.models.entity import Link
     from openatlas.models.type import Type
 
 

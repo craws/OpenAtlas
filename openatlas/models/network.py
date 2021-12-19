@@ -1,7 +1,6 @@
-from typing import Optional, Set
+from typing import Dict, Optional, Set
 
 from flask import g
-from flask_wtf import FlaskForm
 
 from openatlas.database.network import Network as Db
 
@@ -10,7 +9,8 @@ class Network:
 
     @staticmethod
     def get_network_json(
-            form: FlaskForm,
+            colors: Dict[str, str],
+            hide_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
         classes = [c.name for c in g.classes.values() if c.network_color]
@@ -26,7 +26,7 @@ class Network:
                 'id': row['id'],
                 'label' if dimensions else
                 'name': Network.truncate(row['name'].replace("'", "")),
-                'color': form[row['openatlas_class_name']].data})
+                'color': colors[row['openatlas_class_name']]})
             entities.add(row['id'])
         linked_entity_ids = set()
         edges = []
@@ -44,7 +44,7 @@ class Network:
                 'target': range_id})
             edge_entity_ids.add(domain_id)
             edge_entity_ids.add(range_id)
-        if not form.orphans.data:
+        if hide_orphans:
             nodes[:] = [d for d in nodes if int(d['id']) in edge_entity_ids]
         return str({
             'nodes': nodes,

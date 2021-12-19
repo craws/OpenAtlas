@@ -258,14 +258,6 @@ def model_network(dimensions: Optional[int] = None) -> str:
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = []
-    params: Dict[str, Any] = {
-        'classes': {},
-        'options': {
-            'orphans': form.orphans.data,
-            'width': form.width.data,
-            'height': form.height.data,
-            'charge': form.charge.data,
-            'distance': form.distance.data}}
     for class_ in network_classes:
         if class_.name == 'object_location':
             continue
@@ -274,7 +266,17 @@ def model_network(dimensions: Optional[int] = None) -> str:
         'model/network2.html' if dimensions else 'model/network.html',
         form=form,
         dimensions=dimensions,
-        network_params=params,
-        json_data=Network.get_network_json(form, dimensions),
+        network_params={
+            'classes': {},
+            'options': {
+                'orphans': form.orphans.data,
+                'width': form.width.data,
+                'height': form.height.data,
+                'charge': form.charge.data,
+                'distance': form.distance.data}},
+        json_data=Network.get_network_json(
+            {class_.name: form[class_.name].data for class_ in network_classes},
+            bool(form.orphans.data),
+            dimensions),
         title=_('model'),
         crumbs=[_('network visualization')])
