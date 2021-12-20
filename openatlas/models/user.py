@@ -5,10 +5,8 @@ import secrets
 import string
 from typing import Any, Dict, List, Optional, Tuple
 
-import bcrypt
 from flask import session
 from flask_login import UserMixin, current_user
-from flask_wtf import FlaskForm
 
 from openatlas.database.user import User as Db
 from openatlas.util.util import sanitize
@@ -56,15 +54,9 @@ class User(UserMixin):
             'password_reset_code': self.password_reset_code,
             'password_reset_date': self.password_reset_date})
 
-    def update_settings(self, form: Any) -> None:
-        for field in form:
-            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] \
-                    or field.name in ['name', 'email']:
-                continue
-            value = field.data
-            if field.type == 'BooleanField':
-                value = 'True' if value else ''
-            Db.update_settings(self.id, field.name, value)
+    def update_settings(self, settings: Dict[str, Any]) -> None:
+        for name, value in settings.items():
+            Db.update_settings(self.id, name, value)
 
     def remove_newsletter(self) -> None:
         Db.remove_newsletter(self.id)
@@ -132,17 +124,8 @@ class User(UserMixin):
         return Db.get_created_entities_count(user_id)
 
     @staticmethod
-    def insert(form: FlaskForm) -> int:
-        return Db.insert({
-            'username': form.username.data.strip(),
-            'real_name': form.real_name.data.strip(),
-            'info': form.description.data,
-            'email': form.email.data,
-            'active': form.active.data,
-            'group_name': form.group.data,
-            'password': bcrypt.hashpw(
-                form.password.data.encode('utf-8'),
-                bcrypt.gensalt()).decode('utf-8')})
+    def insert(data: Dict[str, Any]) -> int:
+        return Db.insert(data)
 
     @staticmethod
     def delete(id_: int) -> None:

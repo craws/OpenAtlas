@@ -1,5 +1,6 @@
 from typing import List, Optional, Tuple, Union
 
+import bcrypt
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -189,7 +190,16 @@ def user_insert() -> Union[str, Response]:
     if not session['settings']['mail']:
         del form.send_info
     if form.validate_on_submit():
-        user_id = User.insert(form)
+        user_id = User.insert({
+            'username': form.username.data.strip(),
+            'real_name': form.real_name.data.strip(),
+            'info': form.description.data,
+            'email': form.email.data,
+            'active': form.active.data,
+            'group_name': form.group.data,
+            'password': bcrypt.hashpw(
+                form.password.data.encode('utf-8'),
+                bcrypt.gensalt()).decode('utf-8')})
         flash(_('user created'), 'info')
         if session['settings']['mail'] \
                 and form.send_info.data:  # pragma: no cover

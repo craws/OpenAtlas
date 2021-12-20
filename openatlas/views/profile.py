@@ -95,6 +95,7 @@ def profile_settings(category: str) -> Union[str, Response]:
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
     if form.validate_on_submit():
+        settings = {}
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
@@ -103,11 +104,14 @@ def profile_settings(category: str) -> Union[str, Response]:
             elif field.name == 'email':
                 current_user.email = field.data
             else:
-                current_user.settings[field.name] = field.data
+                value = field.data
+                if field.type == 'BooleanField':
+                    value = 'True' if value else ''
+                settings[field.name] = value
         Transaction.begin()
         try:
             current_user.update()
-            current_user.update_settings(form)
+            current_user.update_settings(settings)
             Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
