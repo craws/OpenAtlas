@@ -3,7 +3,6 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 from typing import Any, Dict, List, Tuple, Union
 
 from flask import g
-from flask_wtf import FlaskForm
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
@@ -73,16 +72,15 @@ class ReferenceSystem(Entity):
         return choices
 
     @staticmethod
-    def insert_system(form: FlaskForm) -> Entity:
+    def insert_system(data: Dict[str, str]) -> Entity:
         entity = Entity.insert(
             'reference_system',
-            form.name.data,
-            form.description.data)
+            data['name'],
+            data['description'])
         Db.insert_system({
             'entity_id': entity.id,
             'name': entity.name,
-            'website_url': form.website_url.data
-            if form.website_url.data else None,
-            'resolver_url': form.resolver_url.data
-            if form.resolver_url.data else None})
+            'website_url': data['website_url'] if data['website_url'] else None,
+            'resolver_url': data['resolver_url']
+            if data['resolver_url'] else None})
         return ReferenceSystem.get_all()[entity.id]

@@ -280,7 +280,11 @@ def save(
 def insert_entity(form: FlaskForm, class_: str) \
         -> Union[Entity, Type, ReferenceSystem]:
     if class_ == 'reference_system':
-        return ReferenceSystem.insert_system(form)
+        return ReferenceSystem.insert_system({
+            'name': form.name.data,
+            'description': form.description.data,
+            'website_url': form.website_url.data,
+            'resolver_url': form.resolver_url.data})
     entity = Entity.insert(class_, form.name.data)
     if class_ == 'artifact' or g.classes[class_].view == 'place':
         entity.link(
