@@ -313,9 +313,17 @@ def admin_settings(category: str) -> Union[str, Response]:
         importlib.import_module('openatlas.forms.setting'),
         form_name)()
     if form.validate_on_submit():
+        data = {}
+        for field in form:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+                continue
+            value = field.data
+            if field.type == 'BooleanField':
+                value = 'True' if field.data else ''
+            data[field.name] = value
         Transaction.begin()
         try:
-            Settings.update(form)
+            Settings.update(data)
             logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')

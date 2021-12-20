@@ -30,14 +30,9 @@ class Settings:
         return settings
 
     @staticmethod
-    def update(form: Any) -> None:
-        for field in form:
-            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
-                continue
-            value = field.data
-            if field.type == 'BooleanField':
-                value = 'True' if field.data else ''
-            Db.update(field.name, value)
+    def update(data: Dict[str, str]) -> None:
+        for name, value in data.items():
+            Db.update(name, value)
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:
