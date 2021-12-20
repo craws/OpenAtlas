@@ -97,7 +97,22 @@ def search_index() -> str:
 
 def build_search_table(form: FlaskForm) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in search(form):
+    entities = search({
+        'term': form.term.data,
+        'classes': form.classes.data,
+        'desc': form.desc.data,
+        'own': form.own.data,
+        'include_dateless': form.include_dateless.data,
+        'from_date': form_to_datetime64(
+            form.begin_year.data,
+            form.begin_month.data,
+            form.begin_day.data),
+        'to_date': form_to_datetime64(
+            form.end_year.data,
+            form.end_month.data,
+            form.end_day.data,
+            to_date=True)})
+    for entity in entities:
         table.rows.append([
             link(entity),
             g.classes[entity.class_.name].label,
