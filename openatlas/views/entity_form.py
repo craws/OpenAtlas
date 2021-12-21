@@ -88,10 +88,7 @@ def update(id_: int) -> Union[str, Response]:
         overlays=place_info['overlays'],
         geonames_module=check_geonames_module(entity.class_.name),
         title=entity.name,
-        crumbs=add_crumbs(
-            class_=entity.class_.name,
-            origin=entity,
-            structure=place_info['structure']))
+        crumbs=add_crumbs(entity.class_.name, entity, place_info['structure']))
 
 
 def add_crumbs(
@@ -107,6 +104,11 @@ def add_crumbs(
     crumbs = [
         [label, url_for('index', view=origin.class_.view if origin else view)],
         link(origin)]
+    if class_ == 'source_translation' and not insert_:
+        crumbs = [
+            [_('source'), url_for('index', view='source')],
+            origin.get_linked_entity('P73', True),
+            origin]
     if structure:
         crumbs = [
             [_('place'), url_for('index', view='place')],
