@@ -524,10 +524,7 @@ def add_buttons(entity: Entity) -> List[str]:
         if not entity.classes and not entity.system:
             buttons.append(display_delete_link(entity))
     elif entity.class_.name == 'source_translation':
-        buttons.append(
-            button(
-                _('edit'),
-                url_for('translation_update', id_=entity.id)))
+        buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         buttons.append(display_delete_link(entity))
     else:
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))

@@ -242,6 +242,8 @@ def save(
     try:
         if not entity:
             entity = insert_entity(form, class_)
+            if class_ == 'source_translation' and origin:
+                origin.link('P73', entity)
         redirect_link_id = entity.update(
             data=process_form_data(form, entity, origin),
             new=(action == 'insert'))
@@ -302,7 +304,8 @@ def get_redirect_url(
     if redirect_link_id:
         return url_for('link_update', id_=redirect_link_id, origin_id=origin.id)
     url = url_for('view', id_=entity.id)
-    if origin and class_ not in ('administrative_unit', 'type'):
+    if origin and class_ not in \
+            ('administrative_unit', 'source_translation', 'type'):
         url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
         if entity.class_.name == 'file':
             url = f"{url_for('view', id_=origin.id)}#tab-file"

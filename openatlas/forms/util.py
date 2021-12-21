@@ -315,7 +315,8 @@ def process_origin_data(entity, origin, form, data):
                 'property': 'P46',
                 'range': origin,
                 'inverse': True})
-    elif origin.class_.view in ['source', 'file']:
+    elif origin.class_.view in ['source', 'file'] \
+            and entity.class_.name != 'source_translation':
         data['links']['insert'].append({
             'property': 'P67',
             'range': origin,

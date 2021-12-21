@@ -127,7 +127,8 @@ def add_buttons(
     if entity:
         return form
     if 'continue' in FORMS[name] and (
-            name in ['involvement', 'artifact', 'human_remains', 'type']
+            name in ['involvement', 'artifact', 'human_remains',
+                     'source_translation', 'type']
             or not origin):
         setattr(
             form,
