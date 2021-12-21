@@ -87,7 +87,7 @@ def overview() -> str:
                     link(g.classes[name].label, url)
                     if url else g.classes[name].label,
                     format_number(count)])
-        for entity in Entity.get_latest(8):
+        for entity in Entity.get_latest(10):
             tables['latest'].rows.append([
                 format_date(entity.created),
                 link(entity),
