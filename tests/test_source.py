@@ -122,6 +122,9 @@ class SourceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('translation_insert', source_id=source.id))
             assert b'+ Text' in rv.data
+            self.app.post(
+                url_for('translation_insert', source_id=source.id),
+                data={'name': 'Translation continued', 'continue_': 'yes'})
             data = {'name': 'Test translation'}
             rv = self.app.post(
                 url_for('translation_insert', source_id=source.id),
@@ -146,15 +149,11 @@ class SourceTest(TestBaseCase):
             assert b'Translation updated' in rv.data
             rv = self.app.get(
                 url_for(
-                    'translation_delete',
-                    id_=translation_id,
-                    source_id=source.id),
+                    'index',
+                    view='source_translation',
+                    delete_id=translation_id),
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            data = {'name': 'Translation continued', 'continue_': 'yes'}
-            self.app.post(
-                url_for('translation_insert', source_id=source.id),
-                data=data)
 
             # Delete source
             rv = self.app.get(

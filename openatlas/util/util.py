@@ -636,9 +636,7 @@ def add_remove_link(
 
 
 def display_delete_link(entity: Entity) -> str:
-    if entity.class_.name == 'source_translation':
-        url = url_for('translation_delete', id_=entity.id)
-    elif entity.id in g.types:
+    if entity.id in g.types:
         url = url_for('type_delete', id_=entity.id)
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)

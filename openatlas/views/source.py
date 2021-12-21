@@ -12,7 +12,6 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
 
 
@@ -36,15 +35,6 @@ def translation_insert(source_id: int) -> Union[str, Response]:
             [_('source'), url_for('index', view='source')],
             source,
             f"+ {uc_first(_('text'))}"])
-
-
-@app.route('/source/translation/delete/<int:id_>')
-@required_group('contributor')
-def translation_delete(id_: int) -> Response:
-    source = Link.get_linked_entity_safe(id_, 'P73', inverse=True)
-    Entity.delete_(id_)
-    flash(_('entity deleted'), 'info')
-    return redirect(f"{url_for('view', id_=source.id)}#tab-text")
 
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
