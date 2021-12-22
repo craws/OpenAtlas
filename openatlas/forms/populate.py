@@ -45,7 +45,7 @@ def pre_populate_form(
 
 def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
     system_links = {
-        # Can't use isinstance for class_ check here
+        # Can't use isinstance for class check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
         if link_.domain.class_.name == 'reference_system'}
     for field in form:

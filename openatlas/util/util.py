@@ -34,7 +34,7 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
 
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.entity import Link
     from openatlas.models.type import Type
