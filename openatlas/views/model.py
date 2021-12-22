@@ -85,7 +85,7 @@ def openatlas_class_index() -> str:
         _('standard type'),
         _('write access'),
         'alias',
-        'reference systems',
+        _('reference system'),
         'add type',
         _('color'),
         'count'])

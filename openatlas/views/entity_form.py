@@ -103,7 +103,7 @@ def add_crumbs(
     label = _(label.replace('_', ' '))
     crumbs = [
         [label, url_for('index', view=origin.class_.view if origin else view)],
-        link(origin)]
+        origin]
     if class_ == 'source_translation' and not insert_:
         crumbs = [
             [_('source'), url_for('index', view='source')],
@@ -116,12 +116,11 @@ def add_crumbs(
             if origin and origin.class_.name != 'place' else '',
             structure['feature'],
             structure['stratigraphic_unit'],
-            link(origin)]
+            origin]
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
-            for type_id in origin.root:
-                crumbs += [link(g.types[type_id])]
+            crumbs += [g.types[type_id] for type_id in origin.root]
         crumbs += [origin]
     sibling_count = 0
     if origin \

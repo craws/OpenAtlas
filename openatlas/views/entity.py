@@ -481,18 +481,17 @@ def get_profile_image_table_link(
 def add_crumbs(
         entity: Union[Entity, Type],
         structure: Optional[Dict[str, Any]]) -> List[str]:
+    label = _(entity.class_.view.replace('_', ' '))
     crumbs = [
-        [_(entity.class_.view.replace('_', ' ')),
-         url_for('index', view=entity.class_.view)],
+        [label, url_for('index', view=entity.class_.view)],
         entity.name]
     if structure:
-        first_item = [g.classes['place'].label, url_for('index', view='place')]
+        crumbs = [[g.classes['place'].label, url_for('index', view='place')]]
         if entity.class_.name == 'artifact':
-            first_item = [
+            crumbs = [[
                 g.classes['artifact'].label,
-                url_for('index', view='artifact')]
-        crumbs = [
-            first_item,
+                url_for('index', view='artifact')]]
+        crumbs += [
             structure['place'],
             structure['feature'],
             structure['stratigraphic_unit'],
