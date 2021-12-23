@@ -8,7 +8,8 @@ class Changelog:
                 '1549': 'API: deprecation of node and subunit functions',
                 '1579': 'API: Include Swagger documentation',
                 '1598': 'API: Offset Pagination',
-                '1603': 'API: Specialized GeoJSON format, filter multiple ids'},
+                '1603': 'API: Specialized GeoJSON format, filter multiple ids',
+                '1605': 'Refactor'},
             'fix': {
                 '1614': 'Custom folders in uploads causing errors'}}],
         '6.6.4': ['2021-12-23', {
