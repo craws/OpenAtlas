@@ -11,8 +11,10 @@ class Changelog:
                 '1603': 'API: Specialized GeoJSON format, filter multiple ids'},
             'fix': {
                 '1614': 'Custom folders in uploads causing errors'}}],
+        '6.6.4': ['2021-12-23', {
+            'fix': {'1621': 'Error at CSV export'}}],
         '6.6.3': ['2021-12-08', {
-            'fix': {'1616': 'Error at inserting an adminitrative unit'}}],
+            'fix': {'1616': 'Error at inserting an administrative unit'}}],
         '6.6.2': ['2021-11-23', {
             'fix': {'1609': 'Problem with types'}}],
         '6.6.1': ['2021-11-20', {

@@ -34,7 +34,7 @@ def csv_export(form: FlaskForm) -> None:
             'id',
             'name',
             'description',
-            'class_code',
+            'cidoc_class_code',
             "replace(to_char(begin_from, 'yyyy-mm-dd BC'), ' AD', '')",
             "replace(to_char(begin_to, 'yyyy-mm-dd BC'), ' AD', '')",
             'begin_comment',
