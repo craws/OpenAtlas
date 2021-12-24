@@ -1,7 +1,8 @@
 # This script is for developing purposes and is not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
-# Currently we are using CIDOC CRM 6.2.1 from http://www.cidoc-crm.org/versions-of-the-cidoc-crm
+# Currently we are using CIDOC CRM 7.7.1 (October 2021) from
+# http://www.cidoc-crm.org/versions-of-the-cidoc-crm
 #
 # The script parses the rdfs file and imports it to a PostgreSQL database.
 # Installation of needed package: # apt-get install python3-rdflib
@@ -13,11 +14,12 @@ import psycopg2.extras
 from rdflib import URIRef
 from rdflib.graph import Graph
 
-FILENAME = 'cidoc_crm_v6.2.1.rdfs'
+FILENAME = 'CIDOC_CRM_v7.1.1.rdfs'
 CRM_URL = 'http://www.cidoc-crm.org/cidoc-crm/'
 
-EXCLUDE_PROPERTIES = ['P3', 'P57', 'P79', 'P80', 'P81', 'P81a', 'P81b', 'P82', 'P82a', 'P82b',
-                      'P90', 'P168']
+EXCLUDE_PROPERTIES = [
+    'P3', 'P57', 'P79', 'P80', 'P81', 'P81a', 'P81b', 'P82', 'P82a', 'P82b',
+    'P90', 'P168']
 
 DATABASE_NAME = 'cidoc'
 DATABASE_USER = 'openatlas'
@@ -28,11 +30,14 @@ DATABASE_PASS = 'CHANGE ME'
 
 def connect() -> psycopg2.connect:
     try:
-        connection_ = psycopg2.connect(database=DATABASE_NAME, user=DATABASE_USER,
-                                       password=DATABASE_PASS, port=DATABASE_PORT,
-                                       host=DATABASE_HOST)
+        connection_ = psycopg2.connect(
+            database=DATABASE_NAME,
+            user=DATABASE_USER,
+            password=DATABASE_PASS,
+            port=DATABASE_PORT,
+            host=DATABASE_HOST)
         return connection_
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         print("Database connection error.")
         raise Exception(e)
 
@@ -63,7 +68,11 @@ def import_cidoc() -> None:  # pragma: no cover
 
     # Get classes and properties
     for subject, predicate, object_ in graph:
-        code, name = subject.replace(CRM_URL, '').split('_', 1)
+        try:
+            code, name = subject.replace(CRM_URL, '').split('_', 1)
+        except:
+            print(f'Not parse able subject: {subject}')
+            continue
         item = Item(code, name.replace('_', ' '), graph.comment(subject))
 
         # Translations
@@ -83,7 +92,10 @@ def import_cidoc() -> None:  # pragma: no cover
                 properties[code] = item
 
     for code, property_inverse in properties_inverse.items():
-        properties[code].name_inverse = property_inverse.name
+        if code in properties:
+            properties[code].name_inverse = property_inverse.name
+        else:
+            print(f'Missing property code: {code}')
 
     # Get subClassOf
     subs = graph.triples((None, URIRef('http://www.w3.org/2000/01/rdf-schema#subClassOf'), None))
@@ -136,37 +148,46 @@ def import_cidoc() -> None:  # pragma: no cover
 
     connection = connect()
     cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+
+    # Todo, add constraints
+    # model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey
+    # web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey
+    # model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
+    #
+
     cursor.execute("""
         BEGIN;
-
-        ALTER TABLE model.class DROP COLUMN IF EXISTS comment;
-        ALTER TABLE model.class ADD COLUMN comment text;
+        ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS comment;
+        ALTER TABLE model.cidoc_class ADD COLUMN comment text;
         ALTER TABLE model.property DROP COLUMN IF EXISTS comment;
         ALTER TABLE model.property ADD COLUMN comment text;
         ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS text_inverse;
         ALTER TABLE model.property_i18n ADD COLUMN text_inverse text;
 
         ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
+        ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
         ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
-        ALTER TABLE model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
-        ALTER TABLE model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
-        ALTER TABLE model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+        ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+        ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+        ALTER TABLE model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
         ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
         ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
         ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
         ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
         ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
-        ALTER TABLE ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
-        ALTER TABLE ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
+        ALTER TABLE model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
+        ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
+        ALTER TABLE model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
+        ALTER TABLE web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 
-        ALTER TABLE model.class_i18n DROP COLUMN IF EXISTS attribute;
+        ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS attribute;
         ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS attribute;
 
-        TRUNCATE model.class_inheritance, model.class_i18n, model.class, model.property_inheritance, model.property_i18n, model.property;
+        TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property;
 
-        ALTER SEQUENCE model.class_id_seq RESTART;
-        ALTER SEQUENCE model.class_inheritance_id_seq RESTART;
-        ALTER SEQUENCE model.class_i18n_id_seq RESTART;
+        ALTER SEQUENCE model.cidoc_class_id_seq RESTART;
+        ALTER SEQUENCE model.cidoc_class_inheritance_id_seq RESTART;
+        ALTER SEQUENCE model.cidoc_class_i18n_id_seq RESTART;
         ALTER SEQUENCE model.property_id_seq RESTART;
         ALTER SEQUENCE model.property_inheritance_id_seq RESTART;
         ALTER SEQUENCE model.property_i18n_id_seq RESTART;
@@ -175,15 +196,16 @@ def import_cidoc() -> None:  # pragma: no cover
 
     # Classes
     for code, class_ in classes.items():
-        sql = 'INSERT INTO model.class (code, name, comment) VALUES (%(code)s, %(name)s, %(comment)s);'
-        cursor.execute(sql, {'code': class_.code, 'name': class_.name, 'comment': class_.comment})
+        sql = 'INSERT INTO model.cidoc_class (code, name, comment) VALUES (%(code)s, %(name)s, %(comment)s);'
+        cursor.execute(sql, {'code': class_.code, 'name': class_.code, 'comment': class_.code})
+        print(sql, class_.code, class_.code, class_.code)
     for code, class_ in classes.items():
         for sub_code_of in class_.sub_class_of:
-            sql = 'INSERT INTO model.class_inheritance (super_code, sub_code) VALUES (%(super_code)s, %(sub_code)s);'
+            sql = 'INSERT INTO model.cidoc_class_inheritance (super_code, sub_code) VALUES (%(super_code)s, %(sub_code)s);'
             cursor.execute(sql, {'super_code': sub_code_of, 'sub_code': class_.code})
         for language, label in class_.label.items():
             sql = """
-                INSERT INTO model.class_i18n (class_code, language_code, text)
+                INSERT INTO model.cidoc_class_i18n (class_code, language_code, text)
                 VALUES (%(class)s, %(language)s, %(text)s);"""
             cursor.execute(sql, {'class': class_.code, 'language': language, 'text': label})
 
@@ -212,22 +234,26 @@ def import_cidoc() -> None:  # pragma: no cover
             sql = """
                 INSERT INTO model.property_i18n (property_code, language_code, text, text_inverse)
                 VALUES (%(property)s, %(language)s, %(text)s, %(text_inverse)s);"""
-            cursor.execute(sql, {'property': property_.code, 'language': language, 'text': label,
-                                 'text_inverse': text_inverse})
-    cursor.execute("""
-        ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
-        ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_language_code_key UNIQUE (property_code, language_code);
-        COMMIT;""")
+            cursor.execute(sql, {
+                'property': property_.code,
+                'language': language,
+                'text': label,
+                'text_inverse': text_inverse})
+    cursor.execute("COMMIT")
+    # cursor.execute("""
+    #     ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.cidoc_class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+    #     ALTER TABLE ONLY model.cidoc_class_i18n ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
+    #     ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_language_code_key UNIQUE (property_code, language_code);
+    #     """)
 
     print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
 
