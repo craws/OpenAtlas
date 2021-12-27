@@ -232,4 +232,4 @@ class Tab:
         elif name == 'text':
             buttons += [button(
                 _('text'),
-                url_for('translation_insert', source_id=id_))]
+                url_for('insert', class_='source_translation', origin_id=id_))]

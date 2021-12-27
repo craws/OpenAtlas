@@ -1,61 +1,28 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import ValuesView
+from typing import Any, Dict, List
 
 from flask_login import current_user
-from flask_wtf import FlaskForm
 
 from openatlas.database.entity import Entity as Db
-from openatlas.models.date import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-def search(form: FlaskForm) -> ValuesView[Entity]:
-    if not form.term.data:
-        return {}.values()
-    classes = form.classes.data
-    if 'person' in classes:
-        classes.append('actor_appellation')
-    if 'place' in classes:
-        classes.append('appellation')
+def search(data: Dict[str, Any]) -> List[Entity]:
+    if not data['term']:
+        return []
+    if 'person' in data['classes']:
+        data['classes'].append('actor_appellation')
+    if 'place' in data['classes']:
+        data['classes'].append('appellation')
 
-    # Repopulate date fields with autocompleted values
-    from_date = form_to_datetime64(
-        form.begin_year.data,
-        form.begin_month.data,
-        form.begin_day.data)
-    to_date = form_to_datetime64(
-        form.end_year.data,
-        form.end_month.data,
-        form.end_day.data,
-        to_date=True)
-    if from_date:
-        string = str(from_date)
-        if string.startswith('-') or string.startswith('0000'):
-            string = string[1:]
-        parts = string.split('-')
-        form.begin_month.raw_data = None
-        form.begin_day.raw_data = None
-        form.begin_month.data = int(parts[1])
-        form.begin_day.data = int(parts[2])
-    if to_date:
-        string = str(to_date)
-        if string.startswith('-') or string.startswith('0000'):
-            string = string[1:]  # pragma: no cover
-        parts = string.split('-')
-        form.end_month.raw_data = None
-        form.end_day.raw_data = None
-        form.end_month.data = int(parts[1])
-        form.end_day.data = int(parts[2])
-
-    # Get search results
     entities = []
     for row in Db.search(
-            form.term.data,
-            form.classes.data,
-            form.desc.data,
-            form.own.data,
+            data['term'],
+            data['classes'],
+            data['desc'],
+            data['own'],
             current_user.id):
         if row['openatlas_class_name'] == 'actor_appellation':  # Actor alias
             entity = Link.get_linked_entity(row['id'], 'P131', True)
@@ -63,45 +30,32 @@ def search(form: FlaskForm) -> ValuesView[Entity]:
             entity = Link.get_linked_entity(row['id'], 'P1', True)
         else:
             entity = Entity(row)
-
-        if not entity:  # pragma: no cover
-            continue
-
-        if not from_date and not to_date:
+        if check_dates(entity, data):
             entities.append(entity)
-            continue
+    return list({d.id: d for d in entities}.values())  # Remove duplicates
 
-        # Date criteria present but entity has no dates
-        if not entity.begin_from \
-                and not entity.begin_to \
-                and not entity.end_from \
-                and not entity.end_to:
-            if form.include_dateless.data:  # Include dateless entities
-                entities.append(entity)
-            continue
 
-        # Check date criteria
-        dates = [
-            entity.begin_from,
-            entity.begin_to,
-            entity.end_from,
-            entity.end_to]
-        begin_check_ok = False
-        if not from_date:
-            begin_check_ok = True  # pragma: no cover
-        else:
-            for date in dates:
-                if date and date >= from_date:
-                    begin_check_ok = True
-
-        end_check_ok = False
-        if not to_date:
-            end_check_ok = True  # pragma: no cover
-        else:
-            for date in dates:
-                if date and date <= to_date:
-                    end_check_ok = True
-
-        if begin_check_ok and end_check_ok:
-            entities.append(entity)
-    return {d.id: d for d in entities}.values()  # Remove duplicates
+def check_dates(entity: Entity, data: Dict[str, any]) -> bool:
+    if not data['from_date'] and not data['to_date']:
+        return True
+    if not entity.begin_from \
+            and not entity.begin_to \
+            and not entity.end_from \
+            and not entity.end_to:
+        return True if data['include_dateless'] else False
+    begin_ok = False
+    end_ok = False
+    dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
+    if not data['from_date']:
+        begin_ok = True  # pragma: no cover
+    else:
+        for date in dates:
+            if date and date >= data['from_date']:
+                begin_ok = True
+    if not data['to_date']:
+        end_ok = True  # pragma: no cover
+    else:
+        for date in dates:
+            if date and date <= data['to_date']:
+                end_ok = True
+    return bool(begin_ok and end_ok)

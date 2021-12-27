@@ -90,19 +90,22 @@ class Import:
                 origin_id=row['id'] if 'id' in row and row['id'] else None)
 
             # Dates
+            dates = {
+                'begin_from': None, 'begin_to': None, 'begin_comment': None,
+                'end_from': None, 'end_to': None, 'end_comment': None}
             if 'begin_from' in row and row['begin_from']:
-                entity.begin_from = row['begin_from']
+                dates['begin_from'] = row['begin_from']
                 if 'begin_to' in row and row['begin_to']:
-                    entity.begin_to = row['begin_to']
+                    dates['begin_to'] = row['begin_to']
                 if 'begin_comment' in row and row['begin_comment']:
-                    entity.begin_comment = row['begin_comment']
+                    dates['begin_comment'] = row['begin_comment']
             if 'end_from' in row and row['end_from']:
-                entity.end_from = row['end_from']
+                dates['end_from'] = row['end_from']
                 if 'end_to' in row and row['end_to']:
-                    entity.end_to = row['end_to']
+                    dates['end_to'] = row['end_to']
                 if 'end_comment' in row and row['end_comment']:
-                    entity.end_comment = row['end_comment']
-            entity.update()
+                    dates['end_comment'] = row['end_comment']
+            entity.update({'attributes': dates})
 
             # Types
             if 'type_ids' in row and row['type_ids']:  # pragma: no cover

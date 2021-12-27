@@ -57,7 +57,14 @@ class ExportTest(TestBaseCase):
                 follow_redirects=True,
                 data={
                     'zip': True,
-                    'model_class': True,
+                    'model_cidoc_class': True,
+                    'model_cidoc_class_inheritance': True,
+                    'model_entity': True,
+                    'model_link': True,
+                    'model_property': True,
+                    'model_property_inheritance': True,
+                    'gis_linestring': True,
+                    'gis_polygon': True,
                     'gis_point': True,
                     'gis_format': 'wkt'})
             assert b'Data was exported as CSV' in rv.data

@@ -28,16 +28,15 @@ from wtforms.validators import Email
 
 from openatlas import app, logger
 from openatlas.models.content import get_translation
-from openatlas.models.date import datetime64_to_timestamp
 from openatlas.models.imports import Project
-from openatlas.models.link import Link
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
 
 
-if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
+    from openatlas.models.entity import Link
     from openatlas.models.type import Type
 
 
@@ -582,7 +581,7 @@ def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
-    info = logger.get_log_for_advanced_view(entity.id)
+    info = logger.get_log_info(entity.id)
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
@@ -637,9 +636,7 @@ def add_remove_link(
 
 
 def display_delete_link(entity: Entity) -> str:
-    if entity.class_.name == 'source_translation':
-        url = url_for('translation_delete', id_=entity.id)
-    elif entity.id in g.types:
+    if entity.id in g.types:
         url = url_for('type_delete', id_=entity.id)
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
@@ -997,3 +994,39 @@ class MLStripper(HTMLParser):
 
     def get_data(self) -> str:
         return ''.join(self.fed)
+
+
+def format_date_part(date: numpy.datetime64, part: str) -> str:
+    string = str(date).split(' ')[0]
+    bc = False
+    if string.startswith('-') or string.startswith('0000'):
+        bc = True
+        string = string[1:]
+    parts = string.split('-')
+    if part == 'year':  # If it's a negative year, add one year
+        return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
+    if part == 'month':
+        return parts[1]
+    return parts[2]
+
+
+def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
+    if not string:
+        return None
+    if 'BC' in string:
+        parts = string.split(' ')[0].split('-')
+        string = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}'
+    return numpy.datetime64(string.split(' ')[0])
+
+
+def datetime64_to_timestamp(date: numpy.datetime64) -> Optional[str]:
+    if not date:
+        return None
+    string = str(date)
+    postfix = ''
+    if string.startswith('-') or string.startswith('0000'):
+        string = string[1:]
+        postfix = ' BC'
+    parts = string.split('-')
+    year = int(parts[0]) + 1 if postfix else int(parts[0])
+    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'

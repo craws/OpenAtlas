@@ -4,7 +4,6 @@ import ast
 from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
-from flask_wtf import FlaskForm
 
 from openatlas import app
 from openatlas.database.type import Type as Db
@@ -125,62 +124,30 @@ class Type(Entity):
         return choices
 
     @staticmethod
-    def save_entity_types(entity: Entity, form: Any) -> None:
-        from openatlas.forms.field import TreeField
-        from openatlas.forms.field import TreeMultiField
-        from openatlas.forms.field import ValueFloatField
-        # Can't use isinstance checks for entity here because it is always a
-        # Entity at this point. So entity.class_.name checks have to be used.
-        if hasattr(entity, 'types'):
-            entity.delete_links(['P2', 'P89'])
-        for field in form:
-            if isinstance(field, ValueFloatField):
-                if entity.class_.name == 'object_location' \
-                        or isinstance(entity, Type):
-                    continue  # pragma: no cover
-                if field.data is not None:  # Allow 0 (zero)
-                    entity.link('P2', g.types[int(field.name)], field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
-                try:
-                    range_ = [g.types[int(field.data)]]
-                except ValueError:  # Form value was a list string e.g. '[8,27]'
-                    range_ = [
-                        g.types[int(range_id)]
-                        for range_id in ast.literal_eval(field.data)]
-                if g.types[int(field.id)].class_.name == 'administrative_unit':
-                    if entity.class_.name == 'object_location':
-                        entity.link('P89', range_)
-                elif entity.class_.name not in ['object_location', 'type']:
-                    entity.link('P2', range_)
-
-    @staticmethod
-    def insert_hierarchy(type_: Type, form: FlaskForm, category: str) -> None:
-        multiple = False
-        if category == 'value' or (
-                hasattr(form, 'multiple')
-                and form.multiple
-                and form.multiple.data):
-            multiple = True
+    def insert_hierarchy(
+            type_: Type,
+            category: str,
+            classes: list[str],
+            multiple: bool,
+            ) -> None:
         Db.insert_hierarchy({
             'id': type_.id,
             'name': type_.name,
             'multiple': multiple,
             'category': category})
-        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
-    def update_hierarchy(type_: Type, form: FlaskForm) -> None:
-        multiple = False
-        if type_.multiple or (
-                hasattr(form, 'multiple')
-                and form.multiple
-                and form.multiple.data):
-            multiple = True
+    def update_hierarchy(
+            type_: Type,
+            name: str,
+            classes: list[str],
+            multiple: bool) -> None:
         Db.update_hierarchy({
             'id': type_.id,
-            'name': form.name.data,
+            'name': name,
             'multiple': multiple})
-        Db.add_classes_to_hierarchy(type_.id, form.classes.data)
+        Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
     def get_type_orphans() -> List[Type]:

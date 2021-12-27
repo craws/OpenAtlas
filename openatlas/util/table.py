@@ -38,7 +38,7 @@ class Table:
                 [{'title': uc_first(_(item)) if item else ''}
                  for item in self.header] +
                 [{'title': ''}  # Add empty
-                 for i in range(len(self.rows[0]) - len(self.header))],
+                 for _item in range(len(self.rows[0]) - len(self.header))],
             'paging': self.paging,
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}

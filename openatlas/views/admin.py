@@ -185,13 +185,11 @@ def admin_index(
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
 def admin_content(item: str) -> Union[str, Response]:
-
-    # Needed for translations of content items
+    # Translations of content items
     _('intro_for_frontend')
     _('legal_notice_for_frontend')
     _('contact_for_frontend')
     _('site_name_for_frontend')
-
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(
@@ -201,7 +199,13 @@ def admin_content(item: str) -> Union[str, Response]:
             if item == 'site_name_for_frontend' else TextAreaField())
     form = ContentForm()
     if form.validate_on_submit():
-        update_content(item, form)
+        data = []
+        for language in app.config['LANGUAGES'].keys():
+            data.append({
+                'name': item,
+                'language': language,
+                'text': form.__getattribute__(language).data.strip()})
+        update_content(data)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
     for language in languages:
@@ -309,9 +313,17 @@ def admin_settings(category: str) -> Union[str, Response]:
         importlib.import_module('openatlas.forms.setting'),
         form_name)()
     if form.validate_on_submit():
+        data = {}
+        for field in form:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+                continue
+            value = field.data
+            if field.type == 'BooleanField':
+                value = 'True' if field.data else ''
+            data[field.name] = value
         Transaction.begin()
         try:
-            Settings.update(form)
+            Settings.update(data)
             logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')
@@ -341,11 +353,13 @@ def admin_settings(category: str) -> Union[str, Response]:
 def admin_check_similar() -> str:
     form = SimilarForm()
     form.classes.choices = [
-        (x.name, x.label) for name, x in g.classes.items() if x.label]
+        (class_.name, class_.label) for name, class_ in g.classes.items()
+        if class_.label and class_.view]
     table = None
     if form.validate_on_submit():
         table = Table(['name', _('count')])
-        for sample in Entity.get_similar_named(form).values():
+        for sample in Entity.get_similar_named(
+                form.classes.data, form.ratio.data).values():
             html = link(sample['entity'])
             for entity in sample['entities']:  # Table linebreaks workaround
                 html += f'<br><br><br><br><br>{link(entity)}'
@@ -403,10 +417,8 @@ def admin_check_dates() -> str:
         tabs['link_dates'].table.rows.append([
             link(
                 _(name),
-                url_for(
-                    f'{name}_update',
-                    id_=link_.id,
-                    origin_id=link_.domain.id)),
+                url_for('link_update', id_=link_.id, origin_id=link_.domain.id)
+            ),
             link(link_.domain),
             link(link_.range)])
     for link_ in Link.invalid_involvement_dates():
@@ -420,10 +432,7 @@ def admin_check_dates() -> str:
             link_.description,
             link(
                 _('edit'),
-                url_for(
-                    'involvement_update',
-                    id_=link_.id,
-                    origin_id=actor.id))]
+                url_for('link_update', id_=link_.id, origin_id=actor.id))]
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]

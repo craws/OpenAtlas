@@ -4,7 +4,7 @@ from flask import request, session
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
-from openatlas.models.date import form_to_datetime64
+from openatlas.forms.util import form_to_datetime64
 from openatlas.util.util import uc_first
 
 
@@ -80,7 +80,7 @@ def validate(self: FlaskForm) -> bool:
             and hasattr(self, 'event_id') \
             and self.event.data \
             and str(self.event.data) == str(self.event_id.data):
-        self.event.errors.append(_('error type self as super'))
+        self.event.errors.append(_('error event self as super'))
         valid = False
 
     # External reference systems

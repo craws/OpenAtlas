@@ -9,7 +9,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
-from openatlas.forms.util import get_link_type
+from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
@@ -31,7 +31,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
                 else:
                     link_ = Link.get_by_id(
                         origin.link('OA7', actor, form.description.data)[0])
-                link_.set_dates(form)
+                link_.set_dates(process_form_dates(form))
                 link_.type = get_link_type(form)
                 link_.update()
             Transaction.commit()
@@ -51,47 +51,3 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             [_('actor'), url_for('index', view='actor')],
             origin,
             f"+ {uc_first(_('relation'))}"])
-
-
-@app.route(
-    '/relation/update/<int:id_>/<int:origin_id>',
-    methods=['POST', 'GET'])
-@required_group('contributor')
-def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
-    link_ = Link.get_by_id(id_)
-    domain = Entity.get_by_id(link_.domain.id)
-    range_ = Entity.get_by_id(link_.range.id)
-    origin = range_ if origin_id == range_.id else domain
-    related = range_ if origin_id == domain.id else domain
-    form = build_form('actor_actor_relation', link_)
-    if form.validate_on_submit():
-        Transaction.begin()
-        try:
-            link_.delete()
-            if form.inverse.data:
-                link_ = Link.get_by_id(
-                    related.link('OA7', origin, form.description.data)[0])
-            else:
-                link_ = Link.get_by_id(
-                    origin.link('OA7', related, form.description.data)[0])
-            link_.set_dates(form)
-            link_.type = get_link_type(form)
-            link_.update()
-            Transaction.commit()
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
-    if origin.id == range_.id:
-        form.inverse.data = True
-    return render_template(
-        'display_form.html',
-        form=form,
-        title=_('relation'),
-        crumbs=[
-            [_('actor'), url_for('index', view='actor')],
-            origin,
-            related,
-            _('edit')])

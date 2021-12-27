@@ -87,14 +87,14 @@ def overview() -> str:
                     link(g.classes[name].label, url)
                     if url else g.classes[name].label,
                     format_number(count)])
-        for entity in Entity.get_latest(8):
+        for entity in Entity.get_latest(10):
             tables['latest'].rows.append([
                 format_date(entity.created),
                 link(entity),
                 entity.class_.label,
                 entity.first,
                 entity.last,
-                link(logger.get_log_for_advanced_view(entity.id)['creator'])])
+                link(logger.get_log_info(entity.id)['creator'])])
     tabs['info'].content = render_template(
         'index/index.html',
         intro=get_translation('intro'),

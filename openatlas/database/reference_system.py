@@ -76,16 +76,6 @@ class ReferenceSystem:
             WHERE entity_id = %(entity_id)s;""", data)
 
     @staticmethod
-    def remove_link(system_id: int, entity_id: int) -> None:
-        g.cursor.execute(
-            """
-            DELETE FROM model.link
-            WHERE property_code = 'P67'
-                AND domain_id = %(system_id)s
-                AND range_id = %(entity_id)s;""",
-            {'system_id': system_id, 'entity_id': entity_id})
-
-    @staticmethod
     def insert_system(data: Dict[str, Any]) -> None:
         g.cursor.execute(
             """
@@ -94,3 +84,15 @@ class ReferenceSystem:
             VALUES (
                 %(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);""",
             data)
+
+    @staticmethod
+    def delete_links_from_entity(entity_id: int) -> None:
+        g.cursor.execute(
+            """
+            DELETE FROM model.link l
+            WHERE property_code = 'P67'
+                AND domain_id IN %(systems_ids)s
+                AND range_id = %(entity_id)s;""",
+            {
+                'systems_ids': tuple(g.reference_systems.keys()),
+                'entity_id': entity_id})

@@ -3,7 +3,6 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 from typing import Any, Dict
 
 from flask_login import current_user
-from flask_wtf import FlaskForm
 
 from openatlas import app
 from openatlas.database.overlay import Overlay as Db
@@ -23,31 +22,27 @@ class Overlay:
         self.image_name = path.name if path else False
 
     @staticmethod
-    def insert(
-            form: FlaskForm,
-            image_id: int,
-            place_id: int,
-            link_id: int) -> None:
+    def insert(data: Dict[str, Any]) -> None:
         Db.insert({
-            'image_id': image_id,
-            'place_id': place_id,
-            'link_id': link_id,
-            'bounding_box': f'''[
-                [{form.top_left_northing.data}, {form.top_left_easting.data}],
-                [{form.top_right_northing.data}, {form.top_right_easting.data}],
-                [{form.bottom_left_northing.data}, 
-                 {form.bottom_left_easting.data}]]'''})
+            'image_id': data['image_id'],
+            'place_id': data['place_id'],
+            'link_id': data['link_id'],
+            'bounding_box':
+                f"[[{data['top_left_northing']}, {data['top_left_easting']}], "
+                f"[{data['top_right_northing']}, {data['top_right_easting']}], "
+                f"[{data['bottom_left_northing']}, "
+                f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def update(form: FlaskForm, image_id: int, place_id: int) -> None:
+    def update(data) -> None:
         Db.update({
-            'image_id': image_id,
-            'place_id': place_id,
-            'bounding_box': f'''[
-                [{form.top_left_northing.data}, {form.top_left_easting.data}],
-                [{form.top_right_northing.data}, {form.top_right_easting.data}],
-                [{form.bottom_left_northing.data}, 
-                 {form.bottom_left_easting.data}]]'''})
+            'image_id': data['image_id'],
+            'place_id': data['place_id'],
+            'bounding_box':
+                f"[[{data['top_left_northing']}, {data['top_left_easting']}], "
+                f"[{data['top_right_northing']}, {data['top_right_easting']}], "
+                f"[{data['bottom_left_northing']}, "
+                f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:

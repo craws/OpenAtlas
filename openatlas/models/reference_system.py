@@ -3,7 +3,6 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 from typing import Any, Dict, List, Tuple, Union
 
 from flask import g
-from flask_wtf import FlaskForm
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
@@ -37,40 +36,25 @@ class ReferenceSystem(Entity):
             if system.name == name:
                 return system
 
-    def add_classes(self, form: FlaskForm) -> None:
-        Db.add_classes(self.id, form.classes.data)
-
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
             if link_.range.class_.name == class_name:  # pragma: no cover
                 return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 
-    def update_system(self, form: FlaskForm) -> None:
-        self.update(form)
+    def update_system(self, data: Dict[str, Any]) -> None:
         Db.update_system({
             'entity_id': self.id,
             'name': self.name,
-            'website_url': self.website_url,
-            'resolver_url': self.resolver_url,
-            'identifier_example': self.placeholder})
+            'website_url': data['reference_system']['website_url'],
+            'resolver_url': data['reference_system']['resolver_url'],
+            'identifier_example': data['reference_system']['placeholder']})
+        if data['reference_system']['classes']:
+            Db.add_classes(self.id, data['reference_system']['classes'])
 
     @staticmethod
-    def update_links(form: FlaskForm, entity: Entity) -> None:
-        for field in form:
-            if field.id.startswith('reference_system_id_'):  # Recreate link
-                system = Entity.get_by_id(
-                    int(field.id.replace('reference_system_id_', '')))
-                precision_field = getattr(
-                    form,
-                    field.id.replace('id_', 'precision_'))
-                Db.remove_link(system.id, entity.id)
-                if field.data:
-                    system.link(
-                        'P67',
-                        entity,
-                        field.data,
-                        type_id=precision_field.data)
+    def delete_links_from_entity(entity: Entity):
+        Db.delete_links_from_entity(entity.id)
 
     @staticmethod
     def get_class_choices(
@@ -88,16 +72,15 @@ class ReferenceSystem(Entity):
         return choices
 
     @staticmethod
-    def insert_system(form: FlaskForm) -> Entity:
+    def insert_system(data: Dict[str, str]) -> Entity:
         entity = Entity.insert(
             'reference_system',
-            form.name.data,
-            form.description.data)
+            data['name'],
+            data['description'])
         Db.insert_system({
             'entity_id': entity.id,
             'name': entity.name,
-            'website_url': form.website_url.data
-            if form.website_url.data else None,
-            'resolver_url': form.resolver_url.data
-            if form.resolver_url.data else None})
+            'website_url': data['website_url'] if data['website_url'] else None,
+            'resolver_url': data['resolver_url']
+            if data['resolver_url'] else None})
         return ReferenceSystem.get_all()[entity.id]

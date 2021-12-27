@@ -1,27 +1,28 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import time
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, List, Optional, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, FieldList, HiddenField, MultipleFileField, SelectField,
-    SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
-from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
+    BooleanField, FieldList, HiddenField, IntegerField, MultipleFileField,
+    SelectField, SelectMultipleField, StringField, SubmitField, TextAreaField,
+    widgets)
+from wtforms.validators import (
+    InputRequired, NoneOf, NumberRange,  Optional as OptionalValidator, URL)
 
 from openatlas import app
-from openatlas.forms import date
 from openatlas.forms.field import (
     TableField, TableMultiField, TreeField, TreeMultiField, ValueFloatField)
+from openatlas.forms.populate import pre_populate_form
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import view_class_mapping
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
@@ -71,7 +72,6 @@ def build_form(
             [InputRequired(), URL()] if class_ == 'external_reference'
             else [InputRequired()],
             render_kw={'autofocus': True}))
-
     if 'alias' in FORMS[class_]:
         setattr(
             Form,
@@ -82,13 +82,13 @@ def build_form(
     add_fields(Form, class_, code, entity, origin)
     add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
-        date.add_date_fields(Form)
+        add_date_fields(Form)
     if 'description' in FORMS[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
         if class_ == 'type':  # Change description field if value type
-            type = entity if entity else origin
-            root = g.types[type.root[0]] if type.root else type
+            type_ = entity if entity else origin
+            root = g.types[type_.root[0]] if type_.root else type_
             if root.category == 'value':
                 del Form.description
                 setattr(Form, 'description', StringField(_('unit')))
@@ -100,54 +100,9 @@ def build_form(
     if not entity or (request and request.method != 'GET'):
         form = Form()
     else:
-        form = populate_form(Form(obj=entity), entity, location)
+        form = pre_populate_form(Form(obj=entity), entity, location)
     customize_labels(class_, form, entity, origin)
     return form
-
-
-def populate_form(
-        form: FlaskForm,
-        item: Union[Entity, Link],
-        location: Union[Entity, None]) -> FlaskForm:
-    # Dates
-    if hasattr(form, 'begin_year_from'):
-        date.populate_dates(form, item)
-
-    # Types
-    types: Dict[Type, str] = item.types
-    if location:  # Needed for administrative unit and historical place types
-        types.update(location.types)
-    form.opened.data = time.time()
-    type_data: Dict[int, List[int]] = {}
-    for type_, value in types.items():
-        root = g.types[type_.root[0]] if type_.root else type
-        if root.id not in type_data:
-            type_data[root.id] = []
-        type_data[root.id].append(type_.id)
-        if root.category == 'value':
-            getattr(form, str(type_.id)).data = value
-    for root_id, types_ in type_data.items():
-        if hasattr(form, str(root_id)):
-            getattr(form, str(root_id)).data = types_
-    if isinstance(item, Entity):
-        populate_reference_systems(form, item)
-    return form
-
-
-def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
-    system_links = {
-        # Can't use isinstance for class_ check here
-        link_.domain.id: link_ for link_ in item.get_links('P67', True)
-        if link_.domain.class_.name == 'reference_system'}
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            system_id = int(field.id.replace('reference_system_id_', ''))
-            if system_id in system_links:
-                field.data = system_links[system_id].description
-                precision_field = getattr(
-                    form,
-                    f'reference_system_precision_{system_id}')
-                precision_field.data = str(system_links[system_id].type.id)
 
 
 def customize_labels(
@@ -172,7 +127,8 @@ def add_buttons(
     if entity:
         return form
     if 'continue' in FORMS[name] and (
-            name in ['involvement', 'artifact', 'human_remains', 'type']
+            name in ['involvement', 'artifact', 'human_remains',
+                     'source_translation', 'type']
             or not origin):
         setattr(
             form,
@@ -439,3 +395,41 @@ def build_move_form(type_: Type) -> FlaskForm:
             choices.append((entity.id, entity.name))
     form.selection.choices = choices
     return form
+
+
+def add_date_fields(form: Any) -> None:
+    validator_day = [OptionalValidator(), NumberRange(min=1, max=31)]
+    validator_month = [OptionalValidator(), NumberRange(min=1, max=12)]
+    validator_year = [
+        OptionalValidator(),
+        NumberRange(min=-4713, max=9999),
+        NoneOf([0])]
+
+    setattr(form, 'begin_year_from', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'begin_month_from', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'begin_day_from', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_year_to', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'begin_month_to', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'begin_day_to', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_comment', StringField(
+        render_kw={'placeholder': _('comment')}))
+    setattr(form, 'end_year_from', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'end_month_from', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'end_day_from', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_year_to', IntegerField(
+        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
+    setattr(form, 'end_month_to', IntegerField(
+        render_kw={'placeholder': _('MM')}, validators=validator_month))
+    setattr(form, 'end_day_to', IntegerField(
+        render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_comment', StringField(
+        render_kw={'placeholder': _('comment')}))

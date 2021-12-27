@@ -2,7 +2,6 @@ import ast
 from typing import Any, Dict, List, Optional
 
 from flask import g, json
-from flask_wtf import FlaskForm
 
 from openatlas.database.gis import Gis as Db
 from openatlas.models.entity import Entity
@@ -16,11 +15,6 @@ class InvalidGeomException(Exception):
 
 
 class Gis:
-
-    @staticmethod
-    def add_example_geom(location: Entity) -> None:
-        # Used for tests until model is decoupled from forms
-        Db.add_example_geom(location.id)
 
     @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:
@@ -132,12 +126,11 @@ class Gis:
                 + selected['point'])}
 
     @staticmethod
-    def insert(entity: Entity, form: FlaskForm) -> None:
+    def insert(entity: Entity, data: Dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
-            data = getattr(form, 'gis_' + shape + 's').data
-            if not data:
+            if shape not in data or not data[shape]:
                 continue  # pragma: no cover
-            for item in json.loads(data):
+            for item in json.loads(data[shape]):
                 if not item['geometry']['coordinates'] \
                         or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
@@ -148,9 +141,8 @@ class Gis:
                     data={
                         'entity_id': entity.id,
                         'name': sanitize(item['properties']['name'], 'text'),
-                        'description': sanitize(
-                            item['properties']['description'],
-                            'text'),
+                        'description':
+                            sanitize(item['properties']['description'], 'text'),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
 

@@ -7,19 +7,6 @@ from flask import g
 class Gis:
 
     @staticmethod
-    def add_example_geom(id_: int) -> None:
-        g.cursor.execute(
-            """
-            INSERT INTO gis.point (
-                entity_id, name, description, type, geom)
-            VALUES (
-                (%(location_id)s), '', '', 'centerpoint',
-                public.ST_SetSRID(
-                    public.ST_GeomFromGeoJSON(
-                        '{"type":"Point","coordinates":[9,17]}'),
-                        4326));""", {'location_id': id_})
-
-    @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:
         geometries = []
         for shape in ['point', 'polygon', 'linestring']:
