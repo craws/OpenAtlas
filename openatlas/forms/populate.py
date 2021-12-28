@@ -4,11 +4,11 @@ from typing import Dict, List, Union
 from flask import g
 from flask_wtf import FlaskForm
 
-from openatlas.util.util import format_date_part
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
+from openatlas.util.util import format_date_part
 
 
 def pre_populate_form(
@@ -78,3 +78,72 @@ def populate_dates(form: FlaskForm, item: Union['Entity', Link]) -> None:
             form.end_year_to.data = format_date_part(item.end_to, 'year')
             form.end_month_to.data = format_date_part(item.end_to, 'month')
             form.end_day_to.data = format_date_part(item.end_to, 'day')
+
+
+def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
+    if hasattr(form, 'alias'):
+        for alias in entity.aliases.values():
+            form.alias.append_entry(alias)
+        form.alias.append_entry('')
+    if entity.class_.view == 'actor':
+        residence = entity.get_linked_entity('P74')
+        form.residence.data = residence.get_linked_entity_safe('P53', True).id \
+            if residence else ''
+        first = entity.get_linked_entity('OA8')
+        form.begins_in.data = first.get_linked_entity_safe('P53', True).id \
+            if first else ''
+        last = entity.get_linked_entity('OA9')
+        form.ends_in.data = last.get_linked_entity_safe('P53', True).id \
+            if last else ''
+    elif entity.class_.name == 'artifact':
+        owner = entity.get_linked_entity('P52')
+        form.actor.data = owner.id if owner else None
+    elif entity.class_.view == 'event':
+        super_event = entity.get_linked_entity('P117')
+        form.event.data = super_event.id if super_event else ''
+        preceding = entity.get_linked_entity('P134', True)
+        form.event_preceding.data = preceding.id if preceding else ''
+        if entity.class_.name == 'move':
+            place_from = entity.get_linked_entity('P27')
+            form.place_from.data = place_from.get_linked_entity_safe(
+                'P53', True).id if place_from else ''
+            place_to = entity.get_linked_entity('P26')
+            form.place_to.data = \
+                place_to.get_linked_entity_safe('P53', True).id \
+                if place_to else ''
+            person_data = []
+            object_data = []
+            for linked_entity in entity.get_linked_entities('P25'):
+                if linked_entity.class_.name == 'person':
+                    person_data.append(linked_entity.id)
+                elif linked_entity.class_.view == 'artifact':
+                    object_data.append(linked_entity.id)
+            form.person.data = person_data
+            form.artifact.data = object_data
+        else:
+            place = entity.get_linked_entity('P7')
+            form.place.data = place.get_linked_entity_safe('P53', True).id \
+                if place else ''
+        if entity.class_.name == 'acquisition':
+            form.given_place.data = \
+                [entity.id for entity in entity.get_linked_entities('P24')]
+        if entity.class_.name == 'production':
+            form.artifact.data = \
+                [entity.id for entity in entity.get_linked_entities('P108')]
+    elif isinstance(entity, Type):
+        if hasattr(form, 'name_inverse'):  # Directional, e.g. actor relation
+            name_parts = entity.name.split(' (')
+            form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                form.name_inverse.data = name_parts[1][:-1]  # remove the ")"
+        root = g.types[entity.root[0]] if entity.root else entity
+        if root:  # Set super if exists and is not same as root
+            super_ = g.types[entity.root[-1]]
+            getattr(
+                form,
+                str(root.id)).data = super_.id \
+                if super_.id != root.id else None
+    elif entity.class_.view == 'source':
+        form.artifact.data = [
+            item.id for item in
+            entity.get_linked_entities('P128', inverse=True)]

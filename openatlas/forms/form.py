@@ -246,6 +246,7 @@ def add_fields(
     elif class_ in view_class_mapping['event']:
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
+        setattr(form, 'event_preceding', TableField(_('preceding event')))
         if class_ in ['activity', 'acquisition', 'production']:
             setattr(form, 'place', TableField(_('location')))
         if class_ == 'acquisition':
