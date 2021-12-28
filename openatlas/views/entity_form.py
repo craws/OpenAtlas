@@ -12,7 +12,8 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.forms.util import (
-    populate_insert_form, populate_update_form, process_form_data)
+    populate_insert_form, process_form_data)
+from openatlas.forms.populate import populate_update_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
