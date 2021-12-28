@@ -54,15 +54,14 @@ class ValueFloatField(FloatField):
 class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
-
         selection = ''
         if field.id in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-            entities = g.properties \
-                if field.id == 'cidoc_property' else g.cidoc_classes
-            table = Table(['code', 'name'], defs=[
+            table = Table(['code', 'name'], order=[[0, 'desc']], defs=[
                 {'orderDataType': 'cidoc-model', 'targets': [0]},
                 {'sType': 'numeric', 'targets': [0]}])
-            for id_, entity in entities.items():
+            for id_, entity in (
+                    g.properties if field.id == 'cidoc_property'
+                    else g.cidoc_classes).items():
                 table.rows.append([
                     f"""
                     <a href="#" onclick="selectFromTable(
@@ -87,7 +86,6 @@ class TableSelect(HiddenInput):
                     types=True,
                     aliases=aliases)
             table = Table(g.table_headers[class_])
-            selection = ''
             for entity in entities:
                 if field.data and entity.id == int(field.data):
                     selection = entity.name
