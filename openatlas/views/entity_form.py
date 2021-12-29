@@ -311,7 +311,8 @@ def get_redirect_url(
         url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
         if entity.class_.name == 'file':
             url = f"{url_for('view', id_=origin.id)}#tab-file"
-        elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
+        elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit'] \
+                and entity.class_.view != 'actor':
             url = url_for('view', id_=entity.id)
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = url_for(
