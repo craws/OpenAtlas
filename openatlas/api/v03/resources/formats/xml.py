@@ -4,7 +4,7 @@ import dicttoxml
 
 
 def subunit_xml(
-        out: Union[List[Dict[str, Any]], Dict[Union[str, int]]]) -> bytes:
+        out: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
     out = transform_output(out)
     xml = dicttoxml.dicttoxml(
         out,

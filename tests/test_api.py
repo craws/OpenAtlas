@@ -31,8 +31,8 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
 
                 # Adding Created and Modified
-                place.created = str(datetime.now())
-                place.modified = str(datetime.now())
+                place.created = str(datetime.datetime.now())
+                place.modified = str(datetime.datetime.now())
 
                 # Adding Dates to place
                 place.update({'attributes': {
@@ -70,13 +70,13 @@ class ApiTests(TestBaseCase):
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
-                feature.created = str(datetime.now())
-                feature.modified = str(datetime.now())
+                feature.created = str(datetime.datetime.now())
+                feature.modified = str(datetime.datetime.now())
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
-                strati.created = str(datetime.now())
-                strati.modified = str(datetime.now())
+                strati.created = str(datetime.datetime.now())
+                strati.modified = str(datetime.datetime.now())
 
                 # Adding Administrative Unit Type
                 unit_node = Type.get_hierarchy('Administrative unit')
