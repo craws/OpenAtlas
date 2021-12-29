@@ -1,8 +1,8 @@
 from typing import Any, Dict, List
 
 from openatlas.api.v03.resources.error import WrongOperatorError
-from openatlas.api.v03.resources.search.search_validation import check_if_date, \
-    check_if_date_search
+from openatlas.api.v03.resources.search.search_validation import \
+    check_if_date, check_if_date_search
 from openatlas.models.entity import Entity
 
 
