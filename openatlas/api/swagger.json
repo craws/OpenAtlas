@@ -58,6 +58,14 @@
           "type": "string"
         }
       },
+      "searchParam": {
+        "description": "Search request with AND/OR logic. Confer https://redmine.craws.net/projects/uni/wiki/API_03#Search",
+        "in": "query",
+        "name": "search",
+        "schema": {
+          "type": "string"
+        }
+      },
       "firstParam": {
         "description": "List of results start with given ID",
         "in": "query",

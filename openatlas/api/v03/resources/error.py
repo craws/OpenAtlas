@@ -84,6 +84,9 @@ class TypeIDError(Exception):
 class LastEntityError(Exception):
     pass
 
+class WrongOperatorError(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -198,6 +201,11 @@ errors = {
     "LastEntityError": {
         "message": "The ID is the last entity, please choose another ID",
         "title": "Last ID Error",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "WrongOperatorError": {
+        "message": "The used operator is not available within this category",
+        "title": "Wrong Operator Error",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

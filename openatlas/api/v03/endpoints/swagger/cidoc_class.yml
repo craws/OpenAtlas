@@ -1,4 +1,4 @@
-Classes endpoint
+Cidoc_Class endpoint
 ---
 tags:
   - Entities
@@ -13,7 +13,7 @@ parameters:
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'
-  - $ref: '#/components/parameters/filterParam'
+  - $ref: '#/components/parameters/searchParam'
   - $ref: '#/components/parameters/firstParam'
   - $ref: '#/components/parameters/lastParam'
   - $ref: '#/components/parameters/showParam'

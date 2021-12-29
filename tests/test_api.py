@@ -16,7 +16,8 @@ from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
                                                LastEntityError,
                                                NoEntityAvailable,
                                                NoSearchStringError,
-                                               QueryEmptyError, TypeIDError)
+                                               QueryEmptyError, TypeIDError,
+                                               WrongOperatorError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -752,7 +753,77 @@ class ApiTests(TestBaseCase):
                     format='lp',
                     search=f'{{"typeName":[{{"operator":"equal",'
                            f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}'))]:
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
+                           f'"values":["2020-1-1"],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
+                           f'"values":["2018-3-01"],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
+                           f'"values":["2018-3-01"],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
+                           f'"values":["2013-2-1"],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
+                           f'"values":["2013-2-1"],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
+                           f'"values":["2019-03-01"],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
+                           f'"values":["2019-03-01"],'
+                           f'"logicalOperator":"or"}}]}}'))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
 
@@ -943,6 +1014,21 @@ class ApiTests(TestBaseCase):
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqual",'
                            f'"values":[],'
+                           f'"logicalOperator":"or"}}]}}'))
+            with self.assertRaises(WrongOperatorError):
+                self.app.get(url_for(
+                    'api_03.code',
+                    entities=place.id,
+                    code='place',
+                    search=f'{{"typeName":[{{"operator":"greaterThan",'
+                           f'"values":["51"],'
+                           f'"logicalOperator":"or"}}]}}'))
+            with self.assertRaises(NoEntityAvailable):
+                self.app.get(url_for(
+                    'api_03.code',
+                    code='place',
+                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
+                           f'"values":["2000-1-1"],'
                            f'"logicalOperator":"or"}}]}}'))
 
     @staticmethod

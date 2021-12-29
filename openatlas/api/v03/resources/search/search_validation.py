@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 from openatlas.api.v03.resources.error import FilterColumnError, \
     FilterLogicalOperatorError, FilterOperatorError, NoSearchStringError
@@ -9,8 +9,10 @@ logical_operators: List[str] = [
 entity_categories: List[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
     "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
-    "valueTypeID", "valueTypeName"]
-compare_operators: List[str] = ['equal', 'notEqual']
+    "valueTypeID", "valueTypeName", "beginFrom", "beginTo", "endFrom", "endTo"]
+compare_operators: List[str] = [
+    'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
+    'lesserThanEqual']
 
 
 def iterate_validation(parameters: List[Dict[str, Any]]) -> List[List[bool]]:
@@ -42,3 +44,11 @@ def parameter_validation(
     if not search_values:
         raise NoSearchStringError
     return True
+
+
+def check_if_date_search(k: str) -> bool:
+    return True if k in ["beginFrom", "beginTo", "endFrom", "endTo"] else False
+
+
+def check_if_date(value: str) -> Union[str, bool]:
+    return False if value == "None" else value
