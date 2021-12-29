@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 
 class GetLatest(Resource):
     @staticmethod
-    def get( latest: int) \
+    def get(latest: int) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetLatest.get_latest(latest),

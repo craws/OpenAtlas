@@ -25,7 +25,7 @@ def get_subunits(
         'id': entity.id,
         'rootId': root.id,
         'parentId': entity.get_linked_entity_safe('P46', inverse=True).id
-        if entity.id != root.id else None,
+            if entity.id != root.id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
@@ -55,8 +55,8 @@ def get_geometries_thanados(
 
 
 def check_geometries(
-        geom: Dict[str, Any]) -> Union[
-    List[List[Dict[str, Any]]], List[Dict[str, Any]], None]:
+        geom: Dict[str, Any]) \
+        -> Union[List[List[Dict[str, Any]]], List[Dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
         return [transform_coords(k) for i in geom['coordinates'] for k in i]
     if geom['type'] == 'LineString':  # pragma: no cover

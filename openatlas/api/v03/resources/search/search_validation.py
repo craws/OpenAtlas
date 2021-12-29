@@ -47,7 +47,7 @@ def parameter_validation(
 
 
 def check_if_date_search(k: str) -> bool:
-    return True if k in ["beginFrom", "beginTo", "endFrom", "endTo"] else False
+    return bool(k in ["beginFrom", "beginTo", "endFrom", "endTo"])
 
 
 def check_if_date(value: str) -> Union[str, bool]:

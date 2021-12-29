@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Union
 
 from flask_restful import fields
 from flask_restful.fields import List as RestList
@@ -7,7 +7,7 @@ from flask_restful.fields import List as RestList
 class SubunitTemplate:
 
     @staticmethod
-    def subunit_template(id_: str) -> Dict[str, RestList]:
+    def subunit_template(id_: Union[int, str]) -> Dict[str, RestList]:
         standard_type = {
             'name': fields.String,
             'id': fields.Integer,

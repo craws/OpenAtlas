@@ -9,9 +9,9 @@ from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.util import get_file_path
 
+
 def get_location_id(links: List[Link]) -> int:
-    return [link_.range.id for link_ in links
-        if link_.property.code == 'P53'][0]
+    return [k.range.id for k in links if k.property.code == 'P53'][0]
 
 
 def relation_type(link_: Link, inverse: bool = False) -> str:
@@ -31,7 +31,7 @@ def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
                 _external=True),
         'relationType': relation_type(link_, inverse),
         'relationSystemClass': link_.domain.class_.name
-        if inverse else link_.range.class_.name,
+            if inverse else link_.range.class_.name,
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'relationDescription': link_.description,
         'when': {'timespans': [
