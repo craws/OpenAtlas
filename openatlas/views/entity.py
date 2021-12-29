@@ -283,16 +283,19 @@ def view(id_: int) -> Union[str, Response]:
             tabs['artifact'] = Tab('artifact', entity=entity)
             tabs['human_remains'] = Tab('human_remains', entity=entity)
         entity.location = entity.get_linked_entity_safe('P53', types=True)
-        event_ids = []  # Keep track of inserted events to prevent doubles
+        events = []  # Collect events to display actors
+        event_ids = []  # Keep track of event ids to prevent event doubles
         for event in entity.location.get_linked_entities(
                 ['P7', 'P26', 'P27'],
                 inverse=True):
+            events.append(event)
             tabs['event'].table.rows.append(get_base_table_data(event))
             event_ids.append(event.id)
         for event in entity.get_linked_entities('P24', inverse=True):
             if event.id not in event_ids:  # Don't add again if already in table
                 tabs['event'].table.rows.append(get_base_table_data(event))
-        if 'actor' in tabs:
+                events.append(event)
+        if entity.class_.name == 'place':
             for link_ in entity.location.get_links(
                     ['P74', 'OA8', 'OA9'],
                     inverse=True):
@@ -304,6 +307,18 @@ def view(id_: int) -> Union[str, Response]:
                     actor.first,
                     actor.last,
                     actor.description])
+            actor_ids = []
+            for event in events:
+                for actor in event.get_linked_entities(
+                        ['P11', 'P14', 'P22', 'P23']):
+                    if actor.id in actor_ids:
+                        continue  # pragma: no cover
+                    actor_ids.append(actor.id)
+                    tabs['actor'].table.rows.append([
+                        link(actor),
+                        f"{_('participated at an event')}",
+                        event.class_.name, '', '', ''])
+
     elif entity.class_.view == 'reference':
         for name in [
                 'source', 'event', 'actor', 'place', 'feature',
