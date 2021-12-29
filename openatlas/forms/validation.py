@@ -17,8 +17,8 @@ def validate(self: FlaskForm) -> bool:
         # Check date format, put in list "dates" for further validation
         dates = {}
         for prefix in ['begin_', 'end_']:
-            if getattr(self, prefix + 'year_to').data \
-                    and not getattr(self, prefix + 'year_from').data:
+            if getattr(self, f'{prefix}year_to').data \
+                    and not getattr(self, f'{prefix}year_from').data:
                 getattr(self, prefix + 'year_from').errors.append(
                     _("Required for time span"))
                 valid = False
@@ -80,7 +80,14 @@ def validate(self: FlaskForm) -> bool:
             and hasattr(self, 'event_id') \
             and self.event.data \
             and str(self.event.data) == str(self.event_id.data):
-        self.event.errors.append(_('error event self as super'))
+        self.event.errors.append(_('self as super not allowed'))
+        valid = False
+
+    # Preceding event
+    if hasattr(self, 'event_preceding') \
+            and self.event_preceding.data \
+            and str(self.event_preceding.data) == str(self.event_id.data):
+        self.event_preceding.errors.append(_('self as proceeding not allowed'))
         valid = False
 
     # External reference systems

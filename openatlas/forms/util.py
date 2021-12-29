@@ -197,10 +197,16 @@ def process_form_data(
                 'range': end_place.get_linked_entity_safe('P53')})
     elif entity.class_.view == 'event':
         data['links']['delete'].update(['P7', 'P117'])
+        data['links']['delete_inverse'].update(['P134'])
         if form.event.data:  # Super event
             data['links']['insert'].append({
                 'property': 'P117',
                 'range': form.event.data})
+        if form.event_preceding.data:  # Proceeding event
+            data['links']['insert'].append({
+                'property': 'P134',
+                'range': form.event_preceding.data,
+                'inverse': True})
         if hasattr(form, 'place') and form.place.data:
             data['links']['insert'].append({
                 'property': 'P7',
@@ -397,73 +403,6 @@ def populate_insert_form(
         root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None
-
-
-def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
-    if hasattr(form, 'alias'):
-        for alias in entity.aliases.values():
-            form.alias.append_entry(alias)
-        form.alias.append_entry('')
-    if entity.class_.view == 'actor':
-        residence = entity.get_linked_entity('P74')
-        form.residence.data = residence.get_linked_entity_safe('P53', True).id \
-            if residence else ''
-        first = entity.get_linked_entity('OA8')
-        form.begins_in.data = first.get_linked_entity_safe('P53', True).id \
-            if first else ''
-        last = entity.get_linked_entity('OA9')
-        form.ends_in.data = last.get_linked_entity_safe('P53', True).id \
-            if last else ''
-    elif entity.class_.name == 'artifact':
-        owner = entity.get_linked_entity('P52')
-        form.actor.data = owner.id if owner else None
-    elif entity.class_.view == 'event':
-        super_event = entity.get_linked_entity('P117')
-        form.event.data = super_event.id if super_event else ''
-        if entity.class_.name == 'move':
-            place_from = entity.get_linked_entity('P27')
-            form.place_from.data = place_from.get_linked_entity_safe(
-                'P53', True).id if place_from else ''
-            place_to = entity.get_linked_entity('P26')
-            form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id \
-                if place_to else ''
-            person_data = []
-            object_data = []
-            for linked_entity in entity.get_linked_entities('P25'):
-                if linked_entity.class_.name == 'person':
-                    person_data.append(linked_entity.id)
-                elif linked_entity.class_.view == 'artifact':
-                    object_data.append(linked_entity.id)
-            form.person.data = person_data
-            form.artifact.data = object_data
-        else:
-            place = entity.get_linked_entity('P7')
-            form.place.data = place.get_linked_entity_safe('P53', True).id \
-                if place else ''
-        if entity.class_.name == 'acquisition':
-            form.given_place.data = \
-                [entity.id for entity in entity.get_linked_entities('P24')]
-        if entity.class_.name == 'production':
-            form.artifact.data = \
-                [entity.id for entity in entity.get_linked_entities('P108')]
-    elif isinstance(entity, Type):
-        if hasattr(form, 'name_inverse'):  # Directional, e.g. actor relation
-            name_parts = entity.name.split(' (')
-            form.name.data = name_parts[0]
-            if len(name_parts) > 1:
-                form.name_inverse.data = name_parts[1][:-1]  # remove the ")"
-        root = g.types[entity.root[0]] if entity.root else entity
-        if root:  # Set super if exists and is not same as root
-            super_ = g.types[entity.root[-1]]
-            getattr(
-                form,
-                str(root.id)).data = super_.id \
-                if super_.id != root.id else None
-    elif entity.class_.view == 'source':
-        form.artifact.data = [
-            item.id for item in
-            entity.get_linked_entities('P128', inverse=True)]
 
 
 def form_to_datetime64(

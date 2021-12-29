@@ -24,9 +24,12 @@ $(document).ready(function () {
   /* DataTables - sort for CIDOC model */
   $.fn.dataTable.ext.order['cidoc-model'] = function (settings, col) {
     return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
-      const d = td.firstChild.innerText
-          .replace('OA', '100')
-          .replace(/[\D]*/, '');
+      // The sort function is broken for model checker because of undefined
+      if (typeof td.firstChild.innerText === 'undefined') {
+        d = 0
+      } else {
+        d = td.firstChild.innerText.replace('OA', '100');
+      }
       return parseInt(d, 10);
     });
   };

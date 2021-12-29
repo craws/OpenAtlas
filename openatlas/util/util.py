@@ -233,8 +233,8 @@ def get_entity_data(
     if entity.class_.name == 'move':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
-            from_link = link(place_from.get_linked_entity_safe('P53', True)) \
-                        + ' '
+            from_link = \
+                link(place_from.get_linked_entity_safe('P53', True)) + ' '
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
@@ -298,6 +298,13 @@ def get_entity_data(
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data[_('sub event of')] = link(super_event)
+        proceeding_event = entity.get_linked_entity('P134', True)
+        if proceeding_event:
+            data[_('proceeding event')] = link(proceeding_event)
+        succeeding_event = entity.get_linked_entities('P134')
+        if succeeding_event:
+            data[_('succeeding event')] = \
+                '<br>'.join([link(e) for e in succeeding_event])
         if entity.class_.name == 'move':
             person_data = []
             artifact_data = []
