@@ -1,5 +1,8 @@
 from typing import Any, Dict, List
 
+from openatlas.api.v03.resources.error import WrongOperatorError
+from openatlas.api.v03.resources.search.search_validation import check_if_date, \
+    check_if_date_search
 from openatlas.models.entity import Entity
 
 
@@ -24,7 +27,8 @@ def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
                 entity_values=value_to_be_searched(entity, key),
                 operator_=i['operator'],
                 search_values=i["values"],
-                logical_operator=logical_o)))
+                logical_operator=logical_o,
+                is_date=check_if_date_search(key))))
     return bool(all(check))
 
 
@@ -32,13 +36,15 @@ def search_entity(
         entity_values: Any,
         operator_: str,
         search_values: List[Any],
-        logical_operator: str) -> bool:
+        logical_operator: str,
+        is_date: bool) -> bool:
+    if not entity_values and is_date:
+        return False
     if operator_ == 'equal':
         if logical_operator == 'or':
             return bool(any(item in entity_values for item in search_values))
         if logical_operator == 'and':
             return bool(all(item in entity_values for item in search_values))
-
     if operator_ == 'notEqual':
         if logical_operator == 'or':
             return bool(
@@ -46,7 +52,27 @@ def search_entity(
         if logical_operator == 'and':
             return bool(
                 not all(item in entity_values for item in search_values))
-    return False  # pragma: no cover
+    if operator_ == 'greaterThan' and is_date:
+        if logical_operator == 'or':
+            return bool(any(item < entity_values for item in search_values))
+        if logical_operator == 'and':
+            return bool(all(item < entity_values for item in search_values))
+    if operator_ == 'greaterThanEqual' and is_date:
+        if logical_operator == 'or':
+            return bool(any(item <= entity_values for item in search_values))
+        if logical_operator == 'and':
+            return bool(all(item <= entity_values for item in search_values))
+    if operator_ == 'lesserThan' and is_date:
+        if logical_operator == 'or':
+            return bool(any(item > entity_values for item in search_values))
+        if logical_operator == 'and':
+            return bool(all(item > entity_values for item in search_values))
+    if operator_ == 'lesserThanEqual' and is_date:
+        if logical_operator == 'or':
+            return bool(any(item >= entity_values for item in search_values))
+        if logical_operator == 'and':
+            return bool(all(item >= entity_values for item in search_values))
+    raise WrongOperatorError
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:
@@ -55,7 +81,8 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
     if key == "entityName":
         return entity.name
     if key == "entityAliases":
-        return [value for value in entity.aliases.values()]
+        alias = [value for value in entity.aliases.values()]
+        return alias
     if key == "entityCidocClass":
         return [entity.cidoc_class.code]
     if key == "entitySystemClass":
@@ -64,3 +91,11 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         return [node.name for node in entity.types]
     if key == "typeID":
         return [node.id for node in entity.types]
+    if key == "beginFrom":
+        return check_if_date(str(entity.begin_from))
+    if key == "beginTo":
+        return check_if_date(str(entity.begin_to))
+    if key == "endFrom":
+        return check_if_date(str(entity.end_from))
+    if key == "endTo":
+        return check_if_date(str(entity.end_to))
