@@ -35,7 +35,7 @@ def search(data: Dict[str, Any]) -> List[Entity]:
     return list({d.id: d for d in entities}.values())  # Remove duplicates
 
 
-def check_dates(entity: Entity, data: Dict[str, any]) -> bool:
+def check_dates(entity: Entity, data: Dict[str, Any]) -> bool:
     if not data['from_date'] and not data['to_date']:
         return True
     if not entity.begin_from \

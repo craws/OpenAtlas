@@ -11,9 +11,8 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
-from openatlas.forms.util import (
-    populate_insert_form, process_form_data)
 from openatlas.forms.populate import populate_update_form
+from openatlas.forms.util import populate_insert_form, process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -105,7 +104,7 @@ def add_crumbs(
     crumbs = [
         [label, url_for('index', view=origin.class_.view if origin else view)],
         origin]
-    if class_ == 'source_translation' and not insert_:
+    if class_ == 'source_translation' and origin and not insert_:
         crumbs = [
             [_('source'), url_for('index', view='source')],
             origin.get_linked_entity('P73', True),
@@ -137,7 +136,8 @@ def add_crumbs(
 
 
 def check_geonames_module(class_: str) -> bool:
-    return class_ == 'place' and ReferenceSystem.get_by_name('GeoNames').classes
+    return class_ == 'place' \
+           and bool(ReferenceSystem.get_by_name('GeoNames').classes)
 
 
 def check_insert_access(class_: str) -> None:
@@ -208,7 +208,7 @@ def insert_files(
         entity_name = form.name.data.strip()
         for count, file in enumerate(form.file.data):
             entity = Entity.insert('file', file.filename)
-            url = get_redirect_url(form, entity, 'file', origin)
+            url = get_redirect_url(form, entity, origin)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
@@ -251,7 +251,7 @@ def save(
             new=(action == 'insert'))
         logger.log_user(entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(form, entity, class_, origin, redirect_link_id)
+        url = get_redirect_url(form, entity, origin, redirect_link_id)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -300,13 +300,12 @@ def insert_entity(form: FlaskForm, class_: str) \
 def get_redirect_url(
         form: FlaskForm,
         entity: Entity,
-        class_: str,
         origin: Union[Entity, None] = None,
-        redirect_link_id: Union[Entity, None] = None) -> str:
-    if redirect_link_id:
+        redirect_link_id: Union[int, None] = None) -> str:
+    if redirect_link_id and origin:
         return url_for('link_update', id_=redirect_link_id, origin_id=origin.id)
     url = url_for('view', id_=entity.id)
-    if origin and class_ not in \
+    if origin and entity.class_.name not in \
             ('administrative_unit', 'source_translation', 'type'):
         url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
         if entity.class_.name == 'file':
@@ -317,15 +316,15 @@ def get_redirect_url(
     if hasattr(form, 'continue_') and form.continue_.data == 'yes':
         url = url_for(
             'insert',
-            class_=class_,
+            class_=entity.class_.name,
             origin_id=origin.id if origin else None)
-        if class_ in ('administrative_unit', 'type'):
+        if entity.class_.name in ('administrative_unit', 'type'):
             root_id = origin.root[0] \
                 if isinstance(origin, Type) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
             url = url_for(
                 'insert',
-                class_=class_,
+                class_=entity.class_.name,
                 origin_id=str(super_id) if super_id else root_id)
     elif hasattr(form, 'continue_') \
             and form.continue_.data in ['sub', 'human_remains']:

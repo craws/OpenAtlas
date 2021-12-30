@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import url_for
 
@@ -83,11 +83,12 @@ def get_reference_links(
 
 def get_geometries(
         entity: Entity,
-        links: List[Link]) -> Dict[str, Any]:
+        links: List[Link]) -> Union[Dict[str, Any], None]:
     if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
         return get_geoms_by_entity(get_location_id(links))
     if entity.class_.name == 'object_location':
         return get_geoms_by_entity(entity.id)
+    return None
 
 
 def get_names(

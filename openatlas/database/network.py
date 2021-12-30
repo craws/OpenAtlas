@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any, Dict, List
 
 from flask import g
 
@@ -22,7 +22,7 @@ class Network:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_entities(classes: List[str]) -> List[Dict[str, Union[int, str]]]:
+    def get_entities(classes: List[str]) -> List[Dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT e.id, e.name, e.openatlas_class_name

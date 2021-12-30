@@ -34,7 +34,7 @@ class Overlay:
                 f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def update(data) -> None:
+    def update(data: Dict[str, Any]) -> None:
         Db.update({
             'image_id': data['image_id'],
             'place_id': data['place_id'],

@@ -422,19 +422,19 @@ def view(id_: int) -> Union[str, Response]:
                 domain.class_.view)
             tabs[domain.class_.view].table.rows.append(data)
 
-    structure = None  # Needed for place
-    gis_data = None  # Needed for place
+    place_structure = None
+    gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        structure = get_structure(entity)
-        if structure:
-            for item in structure['subunits']:
+        place_structure = get_structure(entity)
+        if place_structure:
+            for item in place_structure['subunits']:
                 tabs[item.class_.name].table.rows.append(
                     get_base_table_data(item))
-        gis_data = Gis.get_all([entity], structure)
+        gis_data = Gis.get_all([entity], place_structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['super_id']):
+                and (not place_structure or not place_structure['super_id']):
             gis_data = {}
 
     if not gis_data:
@@ -464,14 +464,14 @@ def view(id_: int) -> Union[str, Response]:
         buttons=add_buttons(entity),
         entity=entity,
         gis_data=gis_data,
-        structure=structure,  # Needed for place views
-        overlays=overlays,  # Needed for place views
+        structure=place_structure,
+        overlays=overlays,
         title=entity.name)
     return render_template(
         'tabs.html',
         tabs=tabs,
         gis_data=gis_data,
-        crumbs=add_crumbs(entity, structure),
+        crumbs=add_crumbs(entity, place_structure),
         entity=entity)
 
 

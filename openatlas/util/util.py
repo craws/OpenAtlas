@@ -27,12 +27,11 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app, logger
+from openatlas.models.cidoc_class import CidocClass
+from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.models.cidoc_property import CidocProperty
-from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -95,7 +94,7 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 
 @contextfilter
 @app.template_filter()
-def is_authorized(context, group: Optional[str] = None) -> bool:
+def is_authorized(context: str, group: Optional[str] = None) -> bool:
     # Using context filter to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
@@ -405,7 +404,7 @@ def send_mail(
 
 @contextfilter
 @app.template_filter()
-def system_warnings(_context, _unneeded_string: str) -> str:
+def system_warnings(_context: str, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
         return ''
     warnings = []
@@ -842,7 +841,7 @@ def display_profile_image(entity: Entity) -> str:
 
 @contextfilter
 @app.template_filter()
-def display_content_translation(_context, text: str) -> str:
+def display_content_translation(_context: str, text: str) -> str:
     return get_translation(text)
 
 
