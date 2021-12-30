@@ -14,7 +14,7 @@ from openatlas.models.link import Link
 
 class GetTypeEntitiesAll(Resource):
     @swag_from("../swagger/type_entities_all.yml",
-               endpoint="api.type_entities_all")
+               endpoint="api_02.type_entities_all")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         entities = [entity for entity in GetTypeEntitiesAll.get_node_all(id_)]

@@ -13,7 +13,7 @@ from openatlas.models.place import get_structure
 
 
 class GetSubunit(Resource):
-    @swag_from("../swagger/subunit.yml", endpoint="api.subunit")
+    @swag_from("../swagger/subunit.yml", endpoint="api_02.subunit")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser({"nodes": GetSubunit.get_subunits(id_)},

@@ -15,7 +15,7 @@ from openatlas.models.entity import Entity
 
 
 class GetQuery(Resource):
-    @swag_from("../swagger/query.yml", endpoint="api.query")
+    @swag_from("../swagger/query.yml", endpoint="api_02.query")
     def get(self) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parser = query.parse_args()
         if not parser['entities'] \

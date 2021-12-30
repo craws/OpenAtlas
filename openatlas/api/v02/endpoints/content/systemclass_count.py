@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 
 class SystemClassCount(Resource):
     @swag_from("../swagger/system_class_count.yml",
-               endpoint="api.system_class_count")
+               endpoint="api_02.system_class_count")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         return marshal(
             Entity.get_overview_counts(),

@@ -880,20 +880,6 @@
       }
     }
   },
-  "info": {
-    "contact": {
-      "email": "bernhard.koschicek-krombholz@oeaw.ac.at",
-      "name": "Bernhard Koschiček-Krombholz"
-    },
-    "description": "A documentation of the OpenAtlas API",
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "title": "OpenAtlas API",
-    "version": "0.2"
-  },
-  "openapi": "3.0.2",
   "servers": [
     {
       "description": "Local Host",

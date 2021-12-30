@@ -19,7 +19,7 @@ from openatlas.models.entity import Entity
 
 
 class GetEntity(Resource):
-    @swag_from("../swagger/entity.yml", endpoint="api.entity")
+    @swag_from("../swagger/entity.yml", endpoint="api_02.entity")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return GetEntity.resolve_entity(

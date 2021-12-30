@@ -12,7 +12,7 @@ from openatlas.models.gis import Gis
 
 class GetGeometricEntities(Resource):
     @swag_from("../swagger/geometric_entities.yml",
-               endpoint="api.geometric_entities")
+               endpoint="api_02.geometric_entities")
     def get(self) -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
         output = {

@@ -12,7 +12,7 @@ from openatlas.models.type import Type
 
 
 class GetNodeOverview(Resource):
-    @swag_from("../swagger/nodes_overview.yml", endpoint="api.node_overview")
+    @swag_from("../swagger/nodes_overview.yml", endpoint="api_02.node_overview")
     def get(self) -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = {"types": GetNodeOverview.get_node_overview()}

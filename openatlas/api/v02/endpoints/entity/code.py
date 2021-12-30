@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 
 
 class GetByCode(Resource):
-    @swag_from("../swagger/code.yml", endpoint="api.code")
+    @swag_from("../swagger/code.yml", endpoint="api_02.code")
     def get(self,
             code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parsed = entity_.parse_args()

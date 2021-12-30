@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 
 
 class GetLatest(Resource):
-    @swag_from("../swagger/latest.yml", endpoint="api.latest")
+    @swag_from("../swagger/latest.yml", endpoint="api_02.latest")
     def get(self, latest: int) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(

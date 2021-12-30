@@ -12,7 +12,7 @@ from openatlas.models.entity import Entity
 
 
 class GetBySystemClass(Resource):
-    @swag_from("../swagger/system_class.yml", endpoint="api.system_class")
+    @swag_from("../swagger/system_class.yml", endpoint="api_02.system_class")
     def get(self, system_class: str) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(

@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 
 class GetLinkedEntities(Resource):
     @swag_from("../swagger/linked_entities.yml",
-               endpoint="api.entities_linked_to_entity")
+               endpoint="api_02.entities_linked_to_entity")
     def get(self,
             id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
