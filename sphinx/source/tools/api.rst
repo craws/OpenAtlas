@@ -17,4 +17,4 @@ The base url of the current OpenAtlas API is api/0.2/
 
 Settings: :doc:`/admin/api`
 
-Documentation: /apidocs
+Documentation: /swagger
