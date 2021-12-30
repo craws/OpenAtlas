@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 class GetLatest(Resource):
     @staticmethod
     @swag_from("../swagger/latest.yml", endpoint="api_03.latest")
-    def get( latest: int) \
+    def get(latest: int) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetLatest.get_latest(latest),

@@ -10,8 +10,6 @@ from openatlas.api.v02.routes_02 import add_routes_v02
 from openatlas.api.v03.resources.error import errors
 from openatlas.api.v03.routes_03 import add_routes_v03
 
-# pylint: disable=C0103
-
 app.config['SWAGGER'] = {
     'openapi': '3.0.2',
     'uiversion': 3,
@@ -20,7 +18,8 @@ app.config['SWAGGER'] = {
         {
             "version": "0.2",
             "title": "OpenAtlas Api",
-            "termsOfService": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
+            "termsOfService":
+                "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
             "license": {
                 "name": "Apache 2.0",
                 "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
@@ -33,7 +32,8 @@ app.config['SWAGGER'] = {
         {
             "version": "0.3",
             "title": "OpenAtlas Api",
-            "termsOfService": "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
+            "termsOfService":
+                "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
             "description": 'This is the unstable version of the OpenAtlas API',
             "endpoint": '03',
             "license": {
@@ -44,7 +44,6 @@ app.config['SWAGGER'] = {
             "rule_filter": lambda rule: rule.endpoint.startswith('api_03'),
         }
     ],
-    # "static_url_path": "/flasgger_static",
     "specs_route": "/swagger/",
 }
 

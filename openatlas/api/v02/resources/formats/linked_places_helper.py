@@ -33,7 +33,8 @@ class LPHelper:
                     id_=link_.domain.id if inverse else link_.range.id,
                     _external=True),
             'relationType': LPHelper.relation_type(link_, inverse),
-            'relationSystemClass': link_.domain.class_.name
+            'relationSystemClass':
+                link_.domain.class_.name
                 if inverse else link_.range.class_.name,
             'type': to_camel_case(link_.type.name) if link_.type else None,
             'relationDescription': link_.description,
