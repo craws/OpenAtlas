@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional
+from typing import Optional
 
 from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -11,8 +11,8 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
-from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.network import Network
+from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, uc_first
 

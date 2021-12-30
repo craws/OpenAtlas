@@ -42,7 +42,7 @@ def check_dates(entity: Entity, data: Dict[str, Any]) -> bool:
             and not entity.begin_to \
             and not entity.end_from \
             and not entity.end_to:
-        return True if data['include_dateless'] else False
+        return bool(data['include_dateless'])
     begin_ok = False
     end_ok = False
     dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
