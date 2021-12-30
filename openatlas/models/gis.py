@@ -23,7 +23,7 @@ class Gis:
     @staticmethod
     def get_all(
             objects: Optional[List[Entity]] = None,
-            structure: Optional[Dict[str, Any]] = None) -> Dict[str, List[Any]]:
+            structure: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
 
         if not objects:
             objects = []

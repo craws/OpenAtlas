@@ -72,12 +72,11 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     if 'reference' in [domain.class_.view, range_.class_.view]:
         return reference_link_update(link_, origin)
-    elif 'event' in [domain.class_.view, range_.class_.view]:
+    if 'event' in [domain.class_.view, range_.class_.view]:
         return involvement_update(link_, origin)
-    elif domain.class_.view == 'actor' and range_.class_.view == 'actor':
+    if domain.class_.view == 'actor' and range_.class_.view == 'actor':
         return relation_update(link_, domain, range_, origin)
-    else:
-        abort(403)  # pragma: no cover
+    abort(403)  # pragma: no cover
 
 
 def relation_update(

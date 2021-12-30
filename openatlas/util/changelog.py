@@ -4,6 +4,7 @@ class Changelog:
         '7.0.0': ['TBA', {
             'feature': {
                 '1566': 'Update OpenAtlas software to Debian/bullseye',
+                '1297': 'Connecting events sequentially',
                 '1615': 'Manual examples for artifacts and adding types',
                 '1549': 'API: deprecation of node and subunit functions',
                 '1579': 'API: Include Swagger documentation',

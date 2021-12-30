@@ -35,14 +35,14 @@ def search(data: Dict[str, Any]) -> List[Entity]:
     return list({d.id: d for d in entities}.values())  # Remove duplicates
 
 
-def check_dates(entity: Entity, data: Dict[str, any]) -> bool:
+def check_dates(entity: Entity, data: Dict[str, Any]) -> bool:
     if not data['from_date'] and not data['to_date']:
         return True
     if not entity.begin_from \
             and not entity.begin_to \
             and not entity.end_from \
             and not entity.end_to:
-        return True if data['include_dateless'] else False
+        return bool(data['include_dateless'])
     begin_ok = False
     end_ok = False
     dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]

@@ -24,8 +24,9 @@ class NoteTest(TestBaseCase):
             assert b'A nice description' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                user_id = User.get_by_username('Alice').id
-                note_id = User.get_notes_by_user_id(user_id)[0]['id']
+                user = User.get_by_username('Alice')
+                if user:
+                    note_id = User.get_notes_by_user_id(user.id)[0]['id']
             rv = self.app.get(url_for('note_update', id_=note_id))
             assert b'A nice description' in rv.data
             rv = self.app.post(

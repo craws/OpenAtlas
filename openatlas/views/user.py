@@ -45,6 +45,8 @@ class UserForm(FlaskForm):
         user_email = ''
         if self.user_id:
             user = User.get_by_id(self.user_id)
+            if not user:
+                abort(404)  # pragma: no cover
             username = user.username
             user_email = user.email
         if username != self.username.data \
@@ -126,6 +128,8 @@ def user_activity(user_id: int = 0) -> str:
 @required_group('readonly')
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
+    if not user:
+        abort(404)  # pragma: no cover
     info = {
         _('username'): user.username,
         _('group'): user.group,
@@ -151,6 +155,8 @@ def user_view(id_: int) -> str:
 @required_group('manager')
 def user_update(id_: int) -> Union[str, Response]:
     user = User.get_by_id(id_)
+    if not user:
+        abort(404)  # pragma: no cover
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
     form = UserForm(obj=user)

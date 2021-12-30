@@ -87,7 +87,7 @@ def validate(self: FlaskForm) -> bool:
     if hasattr(self, 'event_preceding') \
             and self.event_preceding.data \
             and str(self.event_preceding.data) == str(self.event_id.data):
-        self.event_preceding.errors.append(_('self as proceeding not allowed'))
+        self.event_preceding.errors.append(_('self as preceding not allowed'))
         valid = False
 
     # External reference systems

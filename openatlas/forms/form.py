@@ -11,7 +11,7 @@ from wtforms import (
     SelectField, SelectMultipleField, StringField, SubmitField, TextAreaField,
     widgets)
 from wtforms.validators import (
-    InputRequired, NoneOf, NumberRange,  Optional as OptionalValidator, URL)
+    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 
 from openatlas import app
 from openatlas.forms.field import (
@@ -231,7 +231,7 @@ def add_fields(
         form: Any,
         class_: str,
         code: Union[str, None],
-        entity: Union[Entity, Type, Link, None],
+        entity: Union[Entity, Link, ReferenceSystem, Type, None],
         origin: Union[Entity, Type, None]) -> None:
     if class_ == 'actor_actor_relation':
         setattr(form, 'inverse', BooleanField(_('inverse')))

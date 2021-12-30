@@ -283,16 +283,19 @@ def view(id_: int) -> Union[str, Response]:
             tabs['artifact'] = Tab('artifact', entity=entity)
             tabs['human_remains'] = Tab('human_remains', entity=entity)
         entity.location = entity.get_linked_entity_safe('P53', types=True)
-        event_ids = []  # Keep track of inserted events to prevent doubles
+        events = []  # Collect events to display actors
+        event_ids = []  # Keep track of event ids to prevent event doubles
         for event in entity.location.get_linked_entities(
                 ['P7', 'P26', 'P27'],
                 inverse=True):
+            events.append(event)
             tabs['event'].table.rows.append(get_base_table_data(event))
             event_ids.append(event.id)
         for event in entity.get_linked_entities('P24', inverse=True):
             if event.id not in event_ids:  # Don't add again if already in table
                 tabs['event'].table.rows.append(get_base_table_data(event))
-        if 'actor' in tabs:
+                events.append(event)
+        if entity.class_.name == 'place':
             for link_ in entity.location.get_links(
                     ['P74', 'OA8', 'OA9'],
                     inverse=True):
@@ -304,6 +307,18 @@ def view(id_: int) -> Union[str, Response]:
                     actor.first,
                     actor.last,
                     actor.description])
+            actor_ids = []
+            for event in events:
+                for actor in event.get_linked_entities(
+                        ['P11', 'P14', 'P22', 'P23']):
+                    if actor.id in actor_ids:
+                        continue  # pragma: no cover
+                    actor_ids.append(actor.id)
+                    tabs['actor'].table.rows.append([
+                        link(actor),
+                        f"{_('participated at an event')}",
+                        event.class_.name, '', '', ''])
+
     elif entity.class_.view == 'reference':
         for name in [
                 'source', 'event', 'actor', 'place', 'feature',
@@ -407,19 +422,19 @@ def view(id_: int) -> Union[str, Response]:
                 domain.class_.view)
             tabs[domain.class_.view].table.rows.append(data)
 
-    structure = None  # Needed for place
-    gis_data = None  # Needed for place
+    place_structure = None
+    gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        structure = get_structure(entity)
-        if structure:
-            for item in structure['subunits']:
+        place_structure = get_structure(entity)
+        if place_structure:
+            for item in place_structure['subunits']:
                 tabs[item.class_.name].table.rows.append(
                     get_base_table_data(item))
-        gis_data = Gis.get_all([entity], structure)
+        gis_data = Gis.get_all([entity], place_structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['super_id']):
+                and (not place_structure or not place_structure['super_id']):
             gis_data = {}
 
     if not gis_data:
@@ -449,14 +464,14 @@ def view(id_: int) -> Union[str, Response]:
         buttons=add_buttons(entity),
         entity=entity,
         gis_data=gis_data,
-        structure=structure,  # Needed for place views
-        overlays=overlays,  # Needed for place views
+        structure=place_structure,
+        overlays=overlays,
         title=entity.name)
     return render_template(
         'tabs.html',
         tabs=tabs,
         gis_data=gis_data,
-        crumbs=add_crumbs(entity, structure),
+        crumbs=add_crumbs(entity, place_structure),
         entity=entity)
 
 

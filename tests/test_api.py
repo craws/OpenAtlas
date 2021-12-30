@@ -4,20 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.error import (EntityDoesNotExistError,
-                                               FilterColumnError,
-                                               FilterLogicalOperatorError,
-                                               FilterOperatorError,
-                                               InvalidCidocClassCode,
-                                               InvalidCodeError,
-                                               InvalidLimitError,
-                                               InvalidSubunitError,
-                                               InvalidSystemClassError,
-                                               LastEntityError,
-                                               NoEntityAvailable,
-                                               NoSearchStringError,
-                                               QueryEmptyError, TypeIDError,
-                                               WrongOperatorError)
+from openatlas.api.v03.resources.error import *
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -44,8 +31,8 @@ class ApiTests(TestBaseCase):
                     return  # pragma: no cover
 
                 # Adding Created and Modified
-                place.created = str(datetime.now())
-                place.modified = str(datetime.now())
+                place.created = str(datetime.datetime.now())
+                place.modified = str(datetime.datetime.now())
 
                 # Adding Dates to place
                 place.update({'attributes': {
@@ -83,13 +70,13 @@ class ApiTests(TestBaseCase):
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
-                feature.created = str(datetime.now())
-                feature.modified = str(datetime.now())
+                feature.created = str(datetime.datetime.now())
+                feature.modified = str(datetime.datetime.now())
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
-                strati.created = str(datetime.now())
-                strati.modified = str(datetime.now())
+                strati.created = str(datetime.datetime.now())
+                strati.modified = str(datetime.datetime.now())
 
                 # Adding Administrative Unit Type
                 unit_node = Type.get_hierarchy('Administrative unit')
@@ -668,16 +655,16 @@ class ApiTests(TestBaseCase):
             assert bool([True for i in rv['nodes'] if i['label'] == 'Wien'])
 
             # Test Type Entities count
-            rv =self.app.get(url_for(
-                    'api_02.node_entities',
-                    id_=unit_node.id,
-                    count=True))
+            rv = self.app.get(url_for(
+                'api_02.node_entities',
+                id_=unit_node.id,
+                count=True))
             assert bool(rv.get_json() == 6)
 
             # Test Type Overview
-            for rv in [
-                self.app.get(url_for('api_02.node_overview')),
-                self.app.get(url_for('api_02.node_overview', download=True))]:
+            for rv in [self.app.get(url_for('api_02.node_overview')),
+                       self.app.get(
+                           url_for('api_02.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types'][0]['place']['Administrative unit']
                 assert bool([True for i in rv if
