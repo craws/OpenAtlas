@@ -297,9 +297,9 @@ def get_entity_data(
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data[_('sub event of')] = link(super_event)
-        proceeding_event = entity.get_linked_entity('P134', True)
-        if proceeding_event:
-            data[_('proceeding event')] = link(proceeding_event)
+        preceding_event = entity.get_linked_entity('P134', True)
+        if preceding_event:
+            data[_('preceding event')] = link(preceding_event)
         succeeding_event = entity.get_linked_entities('P134')
         if succeeding_event:
             data[_('succeeding event')] = \

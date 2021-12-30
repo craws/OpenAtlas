@@ -202,7 +202,7 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'P117',
                 'range': form.event.data})
-        if form.event_preceding.data:  # Proceeding event
+        if form.event_preceding.data:
             data['links']['insert'].append({
                 'property': 'P134',
                 'range': form.event_preceding.data,
