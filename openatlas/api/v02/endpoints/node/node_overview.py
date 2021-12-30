@@ -12,8 +12,9 @@ from openatlas.models.type import Type
 
 
 class GetNodeOverview(Resource):
-    @swag_from("../swagger/nodes_overview.yml", endpoint="api_02.node_overview")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    @swag_from("../swagger/node_overview.yml", endpoint="api_02.node_overview")
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = {"types": GetNodeOverview.get_node_overview()}
         template = NodesOverviewTemplate.node_overview_template()

@@ -19,9 +19,9 @@ from openatlas.models.entity import Entity
 
 
 class GetEntity(Resource):
+    @staticmethod
     @swag_from("../swagger/entity.yml", endpoint="api_02.entity")
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return GetEntity.resolve_entity(
             get_entity_by_id(id_),
             entity_.parse_args())

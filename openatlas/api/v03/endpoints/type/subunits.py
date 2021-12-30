@@ -14,8 +14,7 @@ from openatlas.models.entity import Entity
 
 class GetSubunits(Resource):  # type: ignore
     @staticmethod
-    # Todo: make a subunits definition
-    # @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
+    @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_subunit(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),

@@ -393,13 +393,17 @@ class ApiTests(TestBaseCase):
                     code='place',
                     format='xml')),
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     code='place',
                     format='xml')),
-                self.app.get(
-                    url_for('api_02.code', code='place', export='csv')),
-                self.app.get(
-                    url_for('api_03.code', code='place', export='csv')),
+                self.app.get(url_for(
+                    'api_02.code',
+                    code='place',
+                    export='csv')),
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    code='place',
+                    export='csv')),
                 self.app.get(url_for(
                     'api_02.query',
                     entities=location.id,
@@ -468,10 +472,10 @@ class ApiTests(TestBaseCase):
                     code='place',
                     filter=f"and|begin_from|eq|{place.begin_from}")),
                 self.app.get(url_for(
-                    'api_03.class',
+                    'api_03.cidoc_class',
                     class_code='E21')),
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     code='place',
                     type_id=boundary_mark.id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
@@ -523,7 +527,7 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.class', class_code='E21',
                                      show='none')),
-                self.app.get(url_for('api_03.class', class_code='E21',
+                self.app.get(url_for('api_03.cidoc_class', class_code='E21',
                                      show='none'))]:
                 rv = rv.get_json()
                 rv = rv['results'][0]['features'][0]
@@ -921,7 +925,7 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for('api_03.entity', id_=233423424))
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
-                    'api_03.class',
+                    'api_03.cidoc_class',
                     class_code='E18',
                     last=1231))
             with self.assertRaises(LastEntityError):
@@ -946,7 +950,7 @@ class ApiTests(TestBaseCase):
                     entities=12345))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
-                    'api_03.class',
+                    'api_03.cidoc_class',
                     class_code='E68',
                     last=1231))
             with self.assertRaises(InvalidSystemClassError):
@@ -965,11 +969,11 @@ class ApiTests(TestBaseCase):
                     id_=1234))
             with self.assertRaises(InvalidCidocClassCode):
                 self.app.get(url_for(
-                    'api_03.class',
+                    'api_03.cidoc_class',
                     class_code='e99999999'))
             with self.assertRaises(InvalidCodeError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     code='Invalid'))
             with self.assertRaises(InvalidLimitError):
                 self.app.get(url_for(
@@ -977,7 +981,7 @@ class ApiTests(TestBaseCase):
                     latest='99999999'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"equal",'
@@ -985,7 +989,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"and"}}]}}'))
             with self.assertRaises(FilterOperatorError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqualT",'
@@ -993,7 +997,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"and"}}]}}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqual",'
@@ -1001,7 +1005,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"xor"}}]}}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"All":[{{"operator":"notEqual",'
@@ -1009,7 +1013,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"or"}}]}}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"notEqual",'
@@ -1017,7 +1021,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"or"}}]}}'))
             with self.assertRaises(WrongOperatorError):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     entities=place.id,
                     code='place',
                     search=f'{{"typeName":[{{"operator":"greaterThan",'
@@ -1025,7 +1029,7 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"or"}}]}}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
-                    'api_03.code',
+                    'api_03.view_class',
                     code='place',
                     search=f'{{"beginFrom":[{{"operator":"lesserThan",'
                            f'"values":["2000-1-1"],'

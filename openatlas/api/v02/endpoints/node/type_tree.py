@@ -11,8 +11,9 @@ from openatlas.models.type import Type
 
 
 class GetTypeTree(Resource):
+    @staticmethod
     @swag_from("../swagger/type_tree.yml", endpoint="api_02.type_tree")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         template = TypeTreeTemplate.type_tree_template()
