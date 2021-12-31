@@ -30,7 +30,7 @@ class Table:
             'className': 'dt-body-right',
             'targets': [
                 i for i, j in enumerate(self.header)
-                if j in ['begin', 'end', 'size']]})
+                if j in ['begin', 'end', 'count', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',

@@ -1,15 +1,17 @@
 class Changelog:
 
     versions = {
-        '7.0.0': ['TBA', {
+        '7.0.0': ['2022-01-01', {
             'feature': {
                 '1566': 'Update OpenAtlas software to Debian/bullseye',
                 '1297': 'Connecting events sequentially',
-                '1615': 'Manual examples for artifacts and adding types',
+                '1577': 'Show actors at places from events',
+                '1615': 'Additional step by step examples in manual',
                 '1549': 'API: deprecation of node and subunit functions',
                 '1579': 'API: Include Swagger documentation',
                 '1598': 'API: Offset Pagination',
-                '1603': 'API: Specialized GeoJSON format, filter multiple ids',
+                '1603': 'API: Specialized GeoJSON format for subunits',
+                '1622': 'API: search with dates',
                 '1605': 'Refactor'},
             'fix': {
                 '1614': 'Custom folders in uploads causing errors'}}],
