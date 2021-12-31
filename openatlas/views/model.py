@@ -88,6 +88,7 @@ def openatlas_class_index() -> str:
         _('reference system'),
         'add type',
         _('color'),
+        _('icon'),
         'count'])
     class_count = OpenatlasClass.get_class_count()
     for class_ in g.classes.values():
@@ -101,6 +102,7 @@ def openatlas_class_index() -> str:
             _('allowed') if class_.reference_system_allowed else '',
             _('allowed') if class_.new_types_allowed else '',
             class_.network_color,
+            class_.icon,
             format_number(class_count[class_.name])
             if class_count[class_.name] else ''])
     return render_template(
