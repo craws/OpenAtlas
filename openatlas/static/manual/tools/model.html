@@ -179,31 +179,45 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>The software automatically maps information to the international standard of the
-<a class="reference external" href="http://www.cidoc-crm.org/">CIDOC CRM</a>. The CIDOC CRM was imported to the system, can be
-browsed and is used to verify link conformity between entities.</p>
-<p>Although it was paid much attention to design a web interface where users don’t have to be aware of
-the underlying data model, interested user can get insights how their data is mapped.</p>
-<p>After login there is a <strong>Model</strong> button on the start page which leads to a graphical presentation of
-the model (see below), a link checker and links to browse the classes and properties.</p>
+<a class="reference external" href="http://www.cidoc-crm.org/">CIDOC CRM</a>. The CIDOC CRM was imported to the
+system, can be browsed and is used to verify link conformity between entities.</p>
+<p>Although it was paid much attention to design a web interface where users don’t
+have to be aware of the underlying data model, interested user can get insights
+how their data is mapped.</p>
+<p>After login there is a <strong>Model</strong> button on the start page which leads to a
+graphical presentation of the model (see below), a link checker and links to
+browse the classes and properties.</p>
 <img alt="../_images/openatlas_schema.png" src="../_images/openatlas_schema.png" />
 <img alt="../_images/openatlas_schema2.png" src="../_images/openatlas_schema2.png" />
-<p>You can also active the <strong>advanced Layout</strong> in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> which displays the CIDOC
-CRM class of an entity at the detail view.</p>
-<div class="section" id="classes">
-<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
-<p>All entities belong to a CIDOC CRM class. E.g. a person has the class <strong>Person (E21)</strong>. In the
-overview table you can browse the classes and see how often they were used. A click on the
-class name will get you to a detail view with more information, e.g. a description and their super
-and sub classes.</p>
+<p>You can also active the <strong>advanced Layout</strong> in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> which
+displays the CIDOC class of an entity at the detail view.</p>
+<div class="section" id="cidoc-classes">
+<h2>CIDOC Classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this headline">¶</a></h2>
+<p>All entities belong to a CIDOC class. E.g. a person has the class
+<strong>Person (E21)</strong>. In the overview table you can browse the classes and see how
+often they were used. A click on the class name will get you to a detail view
+with more information, e.g. a description and their super and sub classes.</p>
 </div>
-<div class="section" id="properties">
-<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
-<p>Entities are linked with a CIDOC CRM property. E.g. if you select a location for an activity,
-the <strong>Activity (E7)</strong> will be linked with the property <strong>took place at (P7)</strong> to a <strong>Place (E53)</strong>.</p>
+<div class="section" id="cidoc-properties">
+<h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this headline">¶</a></h2>
+<p>Entities are linked with a CIDOC property. E.g. if you select a location
+for an activity, the <strong>Activity (E7)</strong> will be linked with the property
+<strong>took place at (P7)</strong> to a <strong>Place (E53)</strong>.</p>
+</div>
+<div class="section" id="openatlas-classes">
+<h2>OpenAtlas Classes<a class="headerlink" href="#openatlas-classes" title="Permalink to this headline">¶</a></h2>
+<p>OpenAtlas uses the CIDOC in the application but because of contextual
+differences we needed a more fine grained model for the user interface.
+E.g. E33 Linguistic Object can be a source or a source translation which have
+different forms in different context.</p>
+<p>Following the <strong>OpenAtlas Classes</strong> link you will see an overview of classes
+used in OpenAtlas with details such as corresponding CIDOC class, used
+standard type, user access and more.</p>
 </div>
 <div class="section" id="link-checker">
 <h2>Link Checker<a class="headerlink" href="#link-checker" title="Permalink to this headline">¶</a></h2>
-<p>With the link checker you can test if certain class and property connections are CIDOC CRM conform.</p>
+<p>With the link checker you can test if certain class and property connections
+are CIDOC CRM conform.</p>
 </div>
 </div>
 
