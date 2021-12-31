@@ -8,8 +8,9 @@ from openatlas.api.v03.templates.class_mapping import ClassMappingTemplate
 
 
 class ClassMapping(Resource):
+    @staticmethod
     @swag_from("../swagger/class_mapping.yml", endpoint="api_03.class_mapping")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[Tuple[Resource, int], Response]:
         return marshal(
             ClassMapping.get_mapping(),
             ClassMappingTemplate.class_template()), 200

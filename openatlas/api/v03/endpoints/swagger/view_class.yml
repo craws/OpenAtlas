@@ -1,8 +1,8 @@
-Code endpoint
+View Class Endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their OpenAtlas categorie. Available categories are **actor**, **event**, **place**, **source**, **reference**, **object**. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities based on their OpenAtlas view class. Available categories are **actor**, **event**, **place**, **source**, **reference**, **object**. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
     name: code

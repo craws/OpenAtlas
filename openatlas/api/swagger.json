@@ -23,7 +23,7 @@
         }
       },
       "countParam": {
-        "description": "Returns a number which represents the total count of the result",
+        "description": "Returns a integer which represents the total count of the result",
         "in": "query",
         "name": "count",
         "schema": {
@@ -71,7 +71,7 @@
         "in": "query",
         "name": "first",
         "schema": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "pageParam": {
@@ -79,7 +79,7 @@
         "in": "query",
         "name": "page",
         "schema": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "formatParam": {
@@ -96,23 +96,6 @@
       },
       "geometryParam": {
         "description": "Filter, which geometric entities will be retrieved through /geometric_entities",
-        "in": "query",
-        "name": "geometry",
-        "schema": {
-          "enum": [
-            "gisAll",
-            "gisPointAll",
-            "gisPointSupers",
-            "gisPointSubs",
-            "gisPointSibling",
-            "gisLineAll",
-            "gisPolygonAll"
-          ],
-          "type": "string"
-        }
-      },
-      "geometryParam": {
-        "description": "Select geometry types.",
         "in": "query",
         "name": "geometry",
         "schema": {
@@ -145,15 +128,15 @@
         "in": "query",
         "name": "last",
         "schema": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "limitParam": {
-        "description": "Number of entities returned per page",
+        "description": "integer of entities returned per page",
         "in": "query",
         "name": "limit",
         "schema": {
-          "type": "number"
+          "type": "integer"
         }
       },
       "showParam": {
@@ -191,7 +174,7 @@
         "in": "query",
         "name": "type_id",
         "schema": {
-          "type": "number"
+          "type": "integer"
         }
       }
     },
@@ -277,6 +260,9 @@
           "crmClass": {
             "type": "string"
           },
+          "systemClass": {
+            "type": "string"
+          },
           "depictions": {
             "items": {
               "$ref": "#/components/schemas/DepictionModel"
@@ -315,9 +301,6 @@
             },
             "type": "array"
           },
-          "systemClass": {
-            "type": "string"
-          },
           "type": {
             "type": "string"
           },
@@ -332,6 +315,12 @@
               "$ref": "#/components/schemas/WhenModel"
             },
             "type": "array"
+          },
+          "geometry": {
+            "items": {
+              "$ref": "#/components/schemas/GeometryModel"
+            },
+            "type": "array"
           }
         },
         "required": [
@@ -339,6 +328,36 @@
           "geometry",
           "type"
         ],
+        "type": "object"
+      },
+      "GeometryModel": {
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "coordinates": {
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "integer"
+                  }
+                }
+              ]
+            }
+          }
+        },
         "type": "object"
       },
       "GeometricEntries": {
@@ -416,7 +435,7 @@
               "coordinates": {
                 "items": {
                   "items": {
-                    "type": "number"
+                    "type": "integer"
                   },
                   "type": "array"
                 },
@@ -446,7 +465,7 @@
                 "type": "string"
               },
               "id": {
-                "type": "number"
+                "type": "integer"
               },
               "name": {
                 "type": "string"
@@ -454,7 +473,7 @@
               "place": {
                 "properties": {
                   "id": {
-                    "type": "number"
+                    "type": "integer"
                   },
                   "name": {
                     "type": "string"
@@ -463,7 +482,7 @@
                     "items": {
                       "properties": {
                         "id": {
-                          "type": "number"
+                          "type": "integer"
                         },
                         "name": {
                           "type": "string"
@@ -488,7 +507,7 @@
         },
         "type": "object"
       },
-      "GeometryModel": {
+      "GeometryOutModel": {
         "properties": {
           "features": {
             "items": {
@@ -501,12 +520,6 @@
           }
         },
         "type": "object"
-      },
-      "LatestModel": {
-        "items": {
-          "$ref": "#/components/schemas/LinkedPlaceModel"
-        },
-        "type": "array"
       },
       "LinkModel": {
         "properties": {
@@ -568,25 +581,31 @@
             "items": {
               "type": "string"
             },
-            "type": "array"
+            "type": "object"
           },
           "places": {
             "items": {
               "type": "string"
             },
-            "type": "array"
+            "type": "object"
           },
           "standard": {
             "items": {
               "type": "string"
             },
-            "type": "array"
+            "type": "object"
           },
           "value": {
             "items": {
               "type": "string"
             },
-            "type": "array"
+            "type": "object"
+          },
+          "system": {
+            "items": {
+              "type": "string"
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -594,7 +613,7 @@
       "NodeModel": {
         "properties": {
           "id": {
-            "type": "number"
+            "type": "integer"
           },
           "label": {
             "type": "string"
@@ -623,7 +642,7 @@
           },
           "results": {
             "items": {
-              "$ref": "#/components/schemas/GeometryModel"
+              "$ref": "#/components/schemas/GeometryOutModel"
             },
             "type": "array"
           }
@@ -647,7 +666,7 @@
       "OverviewCountModel": {
         "properties": {
           "count": {
-            "type": "number"
+            "type": "integer"
           },
           "systemClass": {
             "type": "string"
@@ -658,10 +677,10 @@
       "PaginationIndexModel": {
         "properties": {
           "page": {
-            "type": "number"
+            "type": "integer"
           },
           "startId": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "type": "object"
@@ -669,10 +688,10 @@
       "PaginationModel": {
         "properties": {
           "entities": {
-            "type": "number"
+            "type": "integer"
           },
           "entitiesPerPage": {
-            "type": "number"
+            "type": "integer"
           },
           "index": {
             "items": {
@@ -681,7 +700,7 @@
             "type": "array"
           },
           "totalPages": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "type": "object"
@@ -695,6 +714,12 @@
             "type": "string"
           },
           "relationType": {
+            "type": "string"
+          },
+          "relationSystemClass": {
+            "type": "string"
+          },
+          "relationDescription": {
             "type": "string"
           },
           "type": {
@@ -712,55 +737,55 @@
       "SystemClassCountModel": {
         "properties": {
           "acquisition": {
-            "type": "number"
+            "type": "integer"
           },
           "activity": {
-            "type": "number"
+            "type": "integer"
           },
           "administrative_unit": {
-            "type": "number"
+            "type": "integer"
           },
           "artifact": {
-            "type": "number"
+            "type": "integer"
           },
           "bibliography": {
-            "type": "number"
+            "type": "integer"
           },
           "edition": {
-            "type": "number"
+            "type": "integer"
           },
           "feature": {
-            "type": "number"
+            "type": "integer"
           },
           "file": {
-            "type": "number"
+            "type": "integer"
           },
           "group": {
-            "type": "number"
+            "type": "integer"
           },
           "move": {
-            "type": "number"
+            "type": "integer"
           },
           "person": {
-            "type": "number"
+            "type": "integer"
           },
           "place": {
-            "type": "number"
+            "type": "integer"
           },
           "reference_system": {
-            "type": "number"
+            "type": "integer"
           },
           "source": {
-            "type": "number"
+            "type": "integer"
           },
           "source_translation": {
-            "type": "number"
+            "type": "integer"
           },
           "stratigraphic_unit": {
-            "type": "number"
+            "type": "integer"
           },
           "type": {
-            "type": "number"
+            "type": "integer"
           }
         },
         "type": "object"
@@ -797,6 +822,15 @@
           },
           "label": {
             "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "value": {
+            "type": "number"
+          },
+          "unit": {
+            "type": "number"
           }
         },
         "type": "object"
@@ -877,23 +911,195 @@
           }
         },
         "type": "object"
+      },
+      "SubunitsModel": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "parentId": {
+            "type": "integer"
+          },
+          "rootId": {
+            "type": "integer"
+          },
+          "openatlasClassName": {
+            "type": "string"
+          },
+          "crmClass": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string"
+          },
+          "modified": {
+            "type": "string"
+          },
+          "latestModRec": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            }
+          },
+          "geometry": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "geometries": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GeometryModel"
+                }
+              }
+            }
+          },
+          "properties": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "description": {
+                "type": "string"
+              },
+              "standardType": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "id": {
+                    "type": "integer"
+                  },
+                  "rootId": {
+                    "type": "integer"
+                  },
+                  "path": {
+                    "type": "string"
+                  }
+                }
+              },
+              "timespan": {
+                "type": "object",
+                "properties": {
+                  "earliestBegin": {
+                    "type": "string"
+                  },
+                  "latestBegin": {
+                    "type": "string"
+                  },
+                  "earliestEnd": {
+                    "type": "string"
+                  },
+                  "latestEnd": {
+                    "type": "string"
+                  }
+                }
+              },
+              "externalReferences": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string"
+                    },
+                    "identifier": {
+                      "type": "string"
+                    },
+                    "referenceSystem": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "references": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "abbreviation": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "pages": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "files": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "fileName": {
+                      "type": "string"
+                    },
+                    "license": {
+                      "type": "string"
+                    },
+                    "source": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "types": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "rootId": {
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "path": {
+                      "type": "string"
+                    },
+                    "value": {
+                      "type": "number"
+                    },
+                    "unit": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   },
-  "info": {
-    "contact": {
-      "email": "bernhard.koschicek-krombholz@oeaw.ac.at",
-      "name": "Bernhard Koschiček-Krombholz"
-    },
-    "description": "A documentation of the OpenAtlas API",
-    "license": {
-      "name": "Apache 2.0",
-      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
-    },
-    "title": "OpenAtlas API",
-    "version": "0.2"
-  },
-  "openapi": "3.0.2",
   "servers": [
     {
       "description": "Local Host",

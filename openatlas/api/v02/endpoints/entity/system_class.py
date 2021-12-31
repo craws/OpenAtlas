@@ -12,8 +12,9 @@ from openatlas.models.entity import Entity
 
 
 class GetBySystemClass(Resource):
-    @swag_from("../swagger/system_class.yml", endpoint="api.system_class")
-    def get(self, system_class: str) \
+    @staticmethod
+    @swag_from("../swagger/system_class.yml", endpoint="api_02.system_class")
+    def get(system_class: str) \
             -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
             GetBySystemClass.get_by_system(system_class, entity_.parse_args()),

@@ -24,7 +24,8 @@ def get_subunits(
     return {
         'id': entity.id,
         'rootId': root.id,
-        'parentId': entity.get_linked_entity_safe('P46', inverse=True).id
+        'parentId':
+            entity.get_linked_entity_safe('P46', inverse=True).id
             if entity.id != root.id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
@@ -54,8 +55,7 @@ def get_geometries_thanados(
     return geom
 
 
-def check_geometries(
-        geom: Dict[str, Any]) \
+def check_geometries(geom: Dict[str, Any]) \
         -> Union[List[List[Dict[str, Any]]], List[Dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
         return [transform_coords(k) for i in geom['coordinates'] for k in i]
@@ -88,8 +88,9 @@ def get_properties(
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
-        'standardType': get_standard_type(entity.standard_type)
-        if entity.standard_type else None,
+        'standardType':
+            get_standard_type(entity.standard_type)
+            if entity.standard_type else None,
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),
@@ -165,8 +166,8 @@ def get_file(
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
-            'source': link.domain.description
-            if link.domain.description else None})
+            'source':
+                link.domain.description if link.domain.description else None})
     if parser['format'] == 'xml':
         return [{'file': file} for file in files] if files else None
     return files if files else None

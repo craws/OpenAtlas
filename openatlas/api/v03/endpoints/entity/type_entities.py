@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
@@ -12,9 +13,9 @@ from openatlas.models.link import Link
 
 
 class GetTypeEntities(Resource):
-
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    @staticmethod
+    @swag_from("../swagger/type_entities.yml", endpoint="api_03.type_entities")
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         entities = [entity for entity in GetTypeEntities.get_node(id_)]
         if not entities:
             entities = GetTypeEntities.get_special_nodes(id_)

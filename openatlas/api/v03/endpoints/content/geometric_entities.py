@@ -11,9 +11,10 @@ from openatlas.models.gis import Gis
 
 
 class GetGeometricEntities(Resource):
+    @staticmethod
     @swag_from("../swagger/geometric_entities.yml",
-               endpoint="api_3.geometric_entities")
-    def get(self) -> Union[int, Response, Tuple[Any, int]]:
+               endpoint="api_03.geometric_entities")
+    def get() -> Union[int, Response, Tuple[Any, int]]:
         parser = gis.parse_args()
         output = GetGeometricEntities.get_geom_collection(parser)
         if parser['count']:

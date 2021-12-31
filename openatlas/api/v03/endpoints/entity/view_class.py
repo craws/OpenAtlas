@@ -10,12 +10,12 @@ from openatlas.api.v03.resources.resolve_endpoints import resolve_entities
 from openatlas.models.entity import Entity
 
 
-class GetByCode(Resource):
-    @swag_from("../swagger/code.yml", endpoint="api_03.code")
-    def get(self,
-            code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+class GetByViewClass(Resource):
+    @staticmethod
+    @swag_from("../swagger/view_class.yml", endpoint="api_03.view_class")
+    def get(code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
-            GetByCode.get_by_view(code),
+            GetByViewClass.get_by_view(code),
             entity_.parse_args(),
             code)
 
