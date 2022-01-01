@@ -436,11 +436,10 @@ def view(id_: int) -> Union[str, Response]:
                 and gis_data['gisLineSelected'] == '[]' \
                 and (not place_structure or not place_structure['super_id']):
             gis_data = {}
-
-    if not gis_data:
+    entity.info_data = get_entity_data(entity, event_links=event_links)
+    if not gis_data:  # Has to be after get_entity_data()
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
-    entity.info_data = get_entity_data(entity, event_links=event_links)
     tabs['note'] = Tab('note', entity=entity)
     for note in current_user.get_notes_by_entity_id(entity.id):
         data = [
