@@ -134,8 +134,9 @@ class Gis:
                 if not item['geometry']['coordinates'] \
                         or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
-                if item['properties']['shapeType'] != 'centerpoint':
-                    Db.test_geom(json.dumps(item['geometry']))
+                if item['properties']['shapeType'] != 'centerpoint' \
+                        and not Db.test_geom(json.dumps(item['geometry'])):
+                    raise InvalidGeomException
                 Db.insert(
                     shape='linestring' if shape == 'line' else shape,
                     data={

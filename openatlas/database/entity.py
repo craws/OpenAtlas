@@ -1,4 +1,4 @@
-from typing import Any, Dict, Iterable, List, Optional, Union
+from typing import Any, Iterable, Optional, Union
 
 from flask import g
 
@@ -9,7 +9,7 @@ class Entity:
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Optional[Dict[str, Any]]:
+            aliases: bool = False) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             Entity.build_sql(types, aliases) +
             ' WHERE e.id = %(id)s GROUP BY e.id;',
@@ -20,7 +20,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False) -> List[Dict[str, Any]]:
+            aliases: bool = False) -> list[dict[str, Any]]:
         if not ids:
             return []
         g.cursor.execute(
@@ -30,7 +30,7 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_link_property(code: str, class_: str) -> List[Dict[str, Any]]:
+    def get_by_link_property(code: str, class_: str) -> list[dict[str, Any]]:
         sql = """
             SELECT
                 e.id, e.cidoc_class_code, e.name, e.openatlas_class_name,
@@ -43,7 +43,7 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_project_id(project_id: int) -> List[Dict[str, Any]]:
+    def get_by_project_id(project_id: int) -> list[dict[str, Any]]:
         sql = """
             SELECT
                 e.id, ie.origin_id, e.cidoc_class_code, e.name, e.description,
@@ -62,9 +62,9 @@ class Entity:
 
     @staticmethod
     def get_by_class(
-            classes: Union[str, List[str]],
+            classes: Union[str, list[str]],
             types: bool = False,
-            aliases: bool = False) -> List[Dict[str, Any]]:
+            aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
             Entity.build_sql(types, aliases) +
             ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
@@ -74,9 +74,9 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(
-            code: Union[str, List[str]],
+            code: Union[str, list[str]],
             types: bool = False,
-            aliases: bool = False) -> List[Dict[str, Any]]:
+            aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
             Entity.build_sql(types, aliases) +
             'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
@@ -84,20 +84,17 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_overview_counts(classes: List[str]) -> Dict[str, int]:
-        g.cursor.execute(
-            """
-            SELECT openatlas_class_name, COUNT(openatlas_class_name)
+    def get_overview_counts(classes: list[str]) -> dict[str, int]:
+        g.cursor.execute("""
+            SELECT openatlas_class_name AS name, COUNT(openatlas_class_name)
             FROM model.entity
             WHERE openatlas_class_name IN %(classes)s
-            GROUP BY openatlas_class_name;""",
-            {'classes': tuple(classes)})
+            GROUP BY openatlas_class_name;""", {'classes': tuple(classes)})
         return {
-            row['openatlas_class_name']:
-                row['count'] for row in g.cursor.fetchall()}
+            row['name']: row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_orphans() -> List[Dict[str, Any]]:
+    def get_orphans() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT e.id FROM model.entity e
             LEFT JOIN model.link l1 on e.id = l1.domain_id
@@ -109,7 +106,7 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_latest(classes: List[str], limit: int) -> List[Dict[str, Any]]:
+    def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
         sql = Entity.build_sql() + """
             WHERE e.openatlas_class_name IN %(codes)s GROUP BY e.id
             ORDER BY e.created DESC LIMIT %(limit)s;"""
@@ -117,13 +114,13 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_circular() -> List[Dict[str, Any]]:
+    def get_circular() -> list[dict[str, Any]]:
         g.cursor.execute(
             'SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def insert(data: Dict[str, Any]) -> int:
+    def insert(data: dict[str, Any]) -> int:
         g.cursor.execute(
             """
             INSERT INTO model.entity
@@ -135,26 +132,22 @@ class Entity:
         return g.cursor.fetchone()['id']
 
     @staticmethod
-    def update(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def update(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             UPDATE model.entity SET (
                 name, description, begin_from, begin_to, begin_comment,
                 end_from, end_to, end_comment)
             = (
                 %(name)s, %(description)s, %(begin_from)s, %(begin_to)s,
                 %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
-            WHERE id = %(id)s;""",
-            data)
+            WHERE id = %(id)s;""", data)
 
     @staticmethod
     def get_profile_image_id(id_: int) -> Optional[int]:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             SELECT i.image_id
             FROM web.entity_profile_image i
-            WHERE i.entity_id = %(id_)s;""",
-            {'id_': id_})
+            WHERE i.entity_id = %(id_)s;""", {'id_': id_})
         return g.cursor.fetchone()['image_id'] if g.cursor.rowcount else None
 
     @staticmethod
@@ -173,7 +166,7 @@ class Entity:
             {'id': id_})
 
     @staticmethod
-    def delete(ids: List[int]) -> None:  # Triggers psql delete_entity_related()
+    def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related()
         g.cursor.execute(
             'DELETE FROM model.entity WHERE id IN %(ids)s;',
             {'ids': tuple(ids)})
@@ -222,10 +215,10 @@ class Entity:
     @staticmethod
     def search(
             term: str,
-            classes: List[str],
+            classes: list[str],
             desc: bool = False,
             own: bool = False,
-            user_id: Optional[int] = None) -> List[Dict[str, Any]]:
+            user_id: Optional[int] = None) -> list[dict[str, Any]]:
         sql = Entity.build_sql() + """
             {user_clause}
             WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from flask import g
 
@@ -15,7 +15,7 @@ class User:
         LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
-    def update(data: Dict[str, Any]) -> None:
+    def update(data: dict[str, Any]) -> None:
         sql = """
             UPDATE web.user
             SET (
@@ -65,47 +65,46 @@ class User:
             {'user_id': user_id, 'value': value})
 
     @staticmethod
-    def get_all() -> List[Dict[str, Any]]:
+    def get_all() -> list[dict[str, Any]]:
         g.cursor.execute(User.sql + ' ORDER BY username;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_bookmarks(user_id: int) -> List[int]:
-        g.cursor.execute(
-            """
+    def get_bookmarks(user_id: int) -> list[int]:
+        g.cursor.execute("""
             SELECT entity_id
             FROM web.user_bookmarks
             WHERE user_id = %(user_id)s;""", {'user_id': user_id})
         return [row['entity_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_id(user_id: int) -> Optional[Dict[str, Any]]:
+    def get_by_id(user_id: int) -> Optional[dict[str, Any]]:
         g.cursor.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_reset_code(code: str) -> Optional[Dict[str, Any]]:
+    def get_by_reset_code(code: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             User.sql + ' WHERE u.password_reset_code = %(code)s;',
             {'code': code})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_email(email: str) -> Optional[Dict[str, Any]]:
+    def get_by_email(email: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             User.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);',
             {'email': email})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_username(username: str) -> Optional[Dict[str, Any]]:
+    def get_by_username(username: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             User.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);',
             {'username': username})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
-    def get_by_unsubscribe_code(code: str) -> Optional[Dict[str, Any]]:
+    def get_by_unsubscribe_code(code: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             User.sql + ' WHERE u.unsubscribe_code = %(code)s;',
             {'code': code})
@@ -115,18 +114,16 @@ class User:
     def get_activities(
             limit: int,
             user_id: int,
-            action: str) -> List[Dict[str, Any]]:
+            action: str) -> list[dict[str, Any]]:
         sql = """
             SELECT
                 id, user_id, entity_id, created, action, 'ignore' AS ignore
             FROM web.user_log WHERE TRUE"""
-        sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
+        sql += ' AND user_id = %(id)s' if int(user_id) else ''
         sql += ' AND action = %(action)s' if action != 'all' else ''
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) else ''
-        g.cursor.execute(
-            sql,
-            {'limit': limit, 'user_id': user_id, 'action': action})
+        g.cursor.execute(sql, {'limit': limit, 'id': user_id, 'action': action})
         return g.cursor.fetchall()
 
     @staticmethod
@@ -140,9 +137,8 @@ class User:
         return g.cursor.fetchone()['count']
 
     @staticmethod
-    def insert(data: Dict[str, Any]) -> int:
-        g.cursor.execute(
-            """
+    def insert(data: dict[str, Any]) -> int:
+        g.cursor.execute("""
             INSERT INTO web.user (
                 username, real_name, info, email, active, password, group_id)
             VALUES (
@@ -163,7 +159,7 @@ class User:
             {'user_id': id_})
 
     @staticmethod
-    def get_users_for_form() -> List[Tuple[int, str]]:
+    def get_users_for_form() -> list[tuple[int, str]]:
         g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
         return [(row['id'], row['username']) for row in g.cursor.fetchall()]
 
@@ -184,7 +180,7 @@ class User:
             {'user_id': user_id, 'entity_id': entity_id})
 
     @staticmethod
-    def get_settings(user_id: int) -> List[Dict[str, Any]]:
+    def get_settings(user_id: int) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT "name", value
@@ -195,7 +191,7 @@ class User:
     @staticmethod
     def get_notes_by_entity_id(
             user_id: int,
-            entity_id: int) -> List[Dict[str, Any]]:
+            entity_id: int) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT id, created, public, text, user_id
@@ -206,23 +202,19 @@ class User:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_notes_by_user_id(user_id: int) -> List[Dict[str, Any]]:
-        g.cursor.execute(
-            """
+    def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
+        g.cursor.execute("""
             SELECT id, created, public, text, user_id, entity_id
             FROM web.user_notes
-            WHERE user_id = %(user_id)s;""",
-            {'user_id': user_id})
+            WHERE user_id = %(user_id)s;""", {'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_note_by_id(id_: int) -> Dict[str, Any]:
-        g.cursor.execute(
-            """
+    def get_note_by_id(id_: int) -> dict[str, Any]:
+        g.cursor.execute("""
             SELECT id, created, public, text, user_id, entity_id
             FROM web.user_notes
-            WHERE id = %(id)s;""",
-            {'id': id_})
+            WHERE id = %(id)s;""", {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
@@ -242,8 +234,7 @@ class User:
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             UPDATE web.user_notes
             SET text = %(text)s, public = %(public)s
             WHERE id = %(id)s;""", {'id': id_, 'text': note, 'public': public})

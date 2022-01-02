@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g
 
@@ -16,28 +16,26 @@ class Import:
 
     @staticmethod
     def insert_project(name: str, description: Union[str, None]) -> int:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             INSERT INTO import.project (name, description)
             VALUES (%(name)s, %(description)s)
-            RETURNING id;""",
-            {'name': name, 'description': description})
+            RETURNING id;""", {'name': name, 'description': description})
         return g.cursor.fetchone()['id']
 
     @staticmethod
-    def get_all_projects() -> List[Dict[str, Any]]:
+    def get_all_projects() -> list[dict[str, Any]]:
         g.cursor.execute(Import.sql + ' GROUP by p.id ORDER BY name;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_project_by_id(id_: int) -> Dict[str, Any]:
+    def get_project_by_id(id_: int) -> dict[str, Any]:
         g.cursor.execute(
             Import.sql + ' WHERE p.id = %(id)s GROUP by p.id;',
             {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
-    def get_project_by_name(name: str) -> Optional[Dict[str, Any]]:
+    def get_project_by_name(name: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
             Import.sql + ' WHERE p.name = %(name)s GROUP by p.id;',
             {'name': name})
@@ -49,7 +47,7 @@ class Import:
             'DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
-    def check_origin_ids(project_id: int, origin_ids: List[str]) -> List[str]:
+    def check_origin_ids(project_id: int, origin_ids: list[str]) -> list[str]:
         g.cursor.execute(
             """
             SELECT origin_id FROM import.entity
@@ -58,7 +56,7 @@ class Import:
         return [row['origin_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def check_duplicates(class_: str, names: List[str]) -> List[str]:
+    def check_duplicates(class_: str, names: list[str]) -> list[str]:
         g.cursor.execute(
             """
             SELECT DISTINCT name FROM model.entity

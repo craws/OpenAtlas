@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class Settings:
 
     @staticmethod
-    def get_settings() -> List[Dict[str, str]]:
+    def get_settings() -> list[dict[str, str]]:
         g.cursor.execute("SELECT name, value FROM web.settings;")
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -20,8 +20,7 @@ class Settings:
 
     @staticmethod
     def set_logo(file_id: Union[int, str] = None) -> None:
-        g.cursor.execute(
-            """
+        g.cursor.execute("""
             UPDATE web.settings
             SET value = %(file_id)s
             WHERE name = 'logo_file_id';""", {'file_id': file_id})

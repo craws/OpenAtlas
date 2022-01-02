@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -7,10 +7,10 @@ from flask import g
 class Gis:
 
     @staticmethod
-    def get_by_id(id_: int) -> List[Dict[str, Any]]:
+    def get_by_id(id_: int) -> list[dict[str, Any]]:
         geometries = []
         for shape in ['point', 'polygon', 'linestring']:
-            sql = f"""
+            g.cursor.execute(f"""
                 SELECT
                     {shape}.id,
                     {shape}.name,
@@ -19,8 +19,7 @@ class Gis:
                     public.ST_AsGeoJSON({shape}.geom) AS geojson
                 FROM model.entity place
                 JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
-                WHERE place.id = %(id_)s;"""
-            g.cursor.execute(sql, {'id_': id_})
+                WHERE place.id = %(id_)s;""", {'id_': id_})
             for row in g.cursor.fetchall():
                 geometry = ast.literal_eval(row['geojson'])
                 geometry['title'] = row['name'].replace('"', '\"') \
@@ -32,11 +31,10 @@ class Gis:
         return geometries
 
     @staticmethod
-    def get_by_shape(shape: str, extra_ids: List[int]) -> List[Dict[str, Any]]:
+    def get_by_shape(shape: str, extra_ids: list[int]) -> list[dict[str, Any]]:
         polygon_sql = '' if shape != 'polygon' else \
-            """
-            public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom))
-                AS polygon_point, """
+            ' public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom))' \
+            ' AS polygon_point, '
         sql = f"""
             SELECT
                 object.id AS object_id,
@@ -63,20 +61,16 @@ class Gis:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def test_geom(geometry: str) -> None:
-        from openatlas.models.gis import InvalidGeomException
-        g.cursor.execute(
-            """
+    def test_geom(geometry: str) -> bool:
+        g.cursor.execute("""
             SELECT st_isvalid(
                 public.ST_SetSRID(
                     public.ST_GeomFromGeoJSON(%(geojson)s),
-                    4326));""",
-            {'geojson': geometry})
-        if not g.cursor.fetchone()['st_isvalid']:
-            raise InvalidGeomException
+                    4326));""", {'geojson': geometry})
+        return bool(g.cursor.fetchone()['st_isvalid'])
 
     @staticmethod
-    def insert(data: Dict[str, Any], shape: str) -> None:
+    def insert(data: dict[str, Any], shape: str) -> None:
         sql = f"""
             INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
             VALUES (
@@ -89,7 +83,7 @@ class Gis:
         g.cursor.execute(sql, data)
 
     @staticmethod
-    def insert_import(data: Dict[str, Any]) -> None:
+    def insert_import(data: dict[str, Any]) -> None:
         sql = """
             INSERT INTO gis.point (entity_id, name, description, type, geom)
             VALUES (

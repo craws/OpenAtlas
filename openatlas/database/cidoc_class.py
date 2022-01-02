@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class CidocClass:
 
     @staticmethod
-    def get_classes() -> List[Dict[str, Any]]:
+    def get_classes() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
             FROM model.cidoc_class c
@@ -15,13 +15,13 @@ class CidocClass:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_hierarchy() -> List[Dict[str, Any]]:
+    def get_hierarchy() -> list[dict[str, Any]]:
         g.cursor.execute(
             "SELECT super_code, sub_code FROM model.cidoc_class_inheritance;")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_translations(language_codes: List[str]) -> List[Dict[str, Any]]:
+    def get_translations(language_codes: list[str]) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT class_code, language_code, text FROM model.cidoc_class_i18n

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class CidocProperty:
 
     @staticmethod
-    def get_properties() -> List[Dict[str, Any]]:
+    def get_properties() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT
                 p.id,
@@ -30,13 +30,13 @@ class CidocProperty:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_hierarchy() -> List[Dict[str, Any]]:
+    def get_hierarchy() -> list[dict[str, Any]]:
         g.cursor.execute(
             'SELECT super_code, sub_code FROM model.property_inheritance;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_translations(language_codes: List[str]) -> List[Dict[str, Any]]:
+    def get_translations(language_codes: list[str]) -> list[dict[str, Any]]:
         sql = """
             SELECT property_code, language_code, text, text_inverse
             FROM model.property_i18n

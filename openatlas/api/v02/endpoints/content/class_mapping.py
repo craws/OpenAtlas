@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 from openatlas.api.v02.templates.class_mapping import ClassMappingTemplate
 
 
-class ClassMapping(Resource):  # type: ignore
+class ClassMapping(Resource):
     @staticmethod
     @swag_from("../swagger/class_mapping.yml", endpoint="api_02.class_mapping")
     def get() -> Union[Tuple[Resource, int], Response]:
