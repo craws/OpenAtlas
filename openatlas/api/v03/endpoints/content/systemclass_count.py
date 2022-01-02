@@ -1,5 +1,6 @@
 from typing import Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource, marshal
 
@@ -10,6 +11,8 @@ from openatlas.models.entity import Entity
 
 class SystemClassCount(Resource):
     @staticmethod
+    @swag_from("../swagger/system_class_count.yml",
+               endpoint="api_03.system_class_count")
     def get() -> Union[Tuple[Resource, int], Response]:
         return marshal(
             Entity.get_overview_counts(),

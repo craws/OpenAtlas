@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from flask import g
 
@@ -9,8 +9,8 @@ class Api:
 
     @staticmethod
     def get_by_class_code(
-            code: Union[str, List[str]],
-            parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+            code: Union[str, list[str]],
+            parser: dict[str, Any]) -> list[dict[str, Any]]:
         sql_parts = Filter.get_filter(
             parameters={
                 'codes': tuple(code if isinstance(code, list) else [code])},
@@ -24,8 +24,8 @@ class Api:
 
     @staticmethod
     def get_by_system_class(
-            classes: Union[str, List[str]],
-            parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+            classes: Union[str, list[str]],
+            parser: dict[str, Any]) -> list[dict[str, Any]]:
         sql_parts = Filter.get_filter(
             parameters={
                 'class': tuple(
@@ -40,9 +40,9 @@ class Api:
 
 
 class Filter:
-    logical_operators: Dict[str, Any] = {
+    logical_operators: dict[str, Any] = {
         'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT'}
-    valid_columns: Dict[str, str] = {
+    valid_columns: dict[str, str] = {
         'id': 'e.id',
         'class_code': 'e.class_code',
         'name': 'e.name',
@@ -54,10 +54,10 @@ class Filter:
         'modified': 'e.modified',
         'end_to': 'e.end_to',
         'end_from': 'e.end_from'}
-    compare_operators: Dict[str, Any] = {
+    compare_operators: dict[str, Any] = {
         'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>', 'ge': '>=',
         'like': 'LIKE'}
-    valid_date_column: Dict[str, str] = {
+    valid_date_column: dict[str, str] = {
         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
         'created': 'e.created',
         'modified': 'e.modified', 'end_to': 'e.end_to',
@@ -65,9 +65,9 @@ class Filter:
 
     @staticmethod
     def get_filter(
-            parameters: Dict[str, Any],
-            parser: Dict[str, Any]) -> Dict[str, Any]:
-        filters: List[Dict[str, Any]] = [
+            parameters: dict[str, Any],
+            parser: dict[str, Any]) -> dict[str, Any]:
+        filters: list[dict[str, Any]] = [
             {'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
         if parser['filter']:
             filters = Filter.prepare_sql(parser['filter'])
@@ -83,7 +83,7 @@ class Filter:
         return {'clause': clause, 'parameters': parameters}
 
     @staticmethod
-    def prepare_sql(filter_: List[str]) -> List[Dict[str, Any]]:
+    def prepare_sql(filter_: list[str]) -> list[dict[str, Any]]:
         from openatlas.api.v02.resources.filter_validation import Validation
         filter_clean = Validation.get_filter_from_url_parameter(filter_)
         out = []
@@ -100,7 +100,7 @@ class Filter:
         return out
 
     @staticmethod
-    def validate_term(filter_: List[str]) -> Union[int, str]:
+    def validate_term(filter_: list[str]) -> Union[int, str]:
         from openatlas.api.v02.resources.filter_validation import Validation
         # Check if search term is a valid date if needed
         if Filter.valid_columns[

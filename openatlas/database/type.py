@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,9 +6,8 @@ from flask import g
 class Type:
 
     @staticmethod
-    def get_types(class_: str, property_: str) -> List[Dict[str, Any]]:
-        g.cursor.execute(
-            """
+    def get_types(class_: str, property_: str) -> list[dict[str, Any]]:
+        g.cursor.execute("""
             SELECT
                 e.id,
                 e.name,
@@ -40,35 +39,31 @@ class Type:
 
             WHERE e.openatlas_class_name = %(class)s
             GROUP BY e.id, es.id
-            ORDER BY e.name;""",
-            {'class': class_, 'property_code': property_})
+            ORDER BY e.name;""", {'class': class_, 'property_code': property_})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_hierarchies() -> List[Dict[str, Any]]:
-        g.cursor.execute(
-            """
+    def get_hierarchies() -> list[dict[str, Any]]:
+        g.cursor.execute("""
             SELECT h.id, h.name, h.category, h.multiple, h.directional
             FROM web.hierarchy h;""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def insert_hierarchy(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def insert_hierarchy(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             INSERT INTO web.hierarchy (id, name, multiple, category)
             VALUES (%(id)s, %(name)s, %(multiple)s, %(category)s);""", data)
 
     @staticmethod
-    def update_hierarchy(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def update_hierarchy(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             UPDATE web.hierarchy
             SET name = %(name)s, multiple = %(multiple)s
             WHERE id = %(id)s;""", data)
 
     @staticmethod
-    def add_classes_to_hierarchy(type_id: int, class_names: List[str]) -> None:
+    def add_classes_to_hierarchy(type_id: int, class_names: list[str]) -> None:
         for class_name in class_names:
             g.cursor.execute(
                 """
@@ -78,21 +73,20 @@ class Type:
                 {'type_id': type_id, 'class_name': class_name})
 
     @staticmethod
-    def move_link_type(data: Dict[str, int]) -> None:
-        g.cursor.execute(
-            """
+    def move_link_type(data: dict[str, int]) -> None:
+        g.cursor.execute("""
             UPDATE model.link SET type_id = %(new_type_id)s
             WHERE type_id = %(old_type_id)s AND id IN %(entity_ids)s;""", data)
 
     @staticmethod
-    def move_entity_type(data: Dict[str, int]) -> None:
+    def move_entity_type(data: dict[str, int]) -> None:
         sql = """
             UPDATE model.link SET range_id = %(new_type_id)s
             WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
         g.cursor.execute(sql, data)
 
     @staticmethod
-    def remove_link_type(type_id: int, delete_ids: List[int]) -> None:
+    def remove_link_type(type_id: int, delete_ids: list[int]) -> None:
         g.cursor.execute(
             """
             UPDATE model.link SET type_id = NULL
@@ -100,7 +94,7 @@ class Type:
             {'type_id': type_id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def remove_entity_type(type_id: int, delete_ids: List[int]) -> None:
+    def remove_entity_type(type_id: int, delete_ids: list[int]) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.link
@@ -108,7 +102,7 @@ class Type:
             {'type_id': type_id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_form_count(class_name: str, type_ids: List[int]) -> int:
+    def get_form_count(class_name: str, type_ids: list[int]) -> int:
         g.cursor.execute(
             """
             SELECT COUNT(*) FROM model.link l

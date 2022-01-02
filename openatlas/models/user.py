@@ -16,7 +16,7 @@ class User(UserMixin):
 
     def __init__(
             self,
-            row: Dict[str, Any] = None,
+            row: Dict[str, Any],
             bookmarks: Optional[List[int]] = None) -> None:
         self.id = row['id']
         self.active = row['active'] == 1

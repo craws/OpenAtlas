@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class Date:
 
     @staticmethod
-    def get_invalid_dates() -> List[Dict[str, Any]]:
+    def get_invalid_dates() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT id FROM model.entity WHERE
                 begin_from > begin_to OR end_from > end_to
@@ -21,7 +21,7 @@ class Date:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_invalid_link_dates() -> List[Dict[str, Any]]:
+    def get_invalid_link_dates() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT id FROM model.link WHERE
                 begin_from > begin_to OR end_from > end_to
@@ -36,7 +36,7 @@ class Date:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def invalid_involvement_dates() -> List[Dict[str, Any]]:
+    def invalid_involvement_dates() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT l.id FROM model.entity actor
             JOIN model.link l ON actor.id = l.range_id

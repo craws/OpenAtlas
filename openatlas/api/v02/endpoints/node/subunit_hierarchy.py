@@ -15,10 +15,10 @@ from openatlas.models.place import get_structure
 
 
 class GetSubunitHierarchy(Resource):
+    @staticmethod
     @swag_from("../swagger/subunit_hierarchy.yml",
-               endpoint="api.subunit_hierarchy")
-    def get(self,
-            id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+               endpoint="api_02.subunit_hierarchy")
+    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_node_parser(
             {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
             default.parse_args(),

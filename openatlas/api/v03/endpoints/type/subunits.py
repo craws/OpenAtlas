@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
@@ -13,6 +14,7 @@ from openatlas.models.entity import Entity
 
 class GetSubunits(Resource):  # type: ignore
     @staticmethod
+    @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_subunit(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),

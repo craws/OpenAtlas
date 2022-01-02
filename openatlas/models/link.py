@@ -170,15 +170,15 @@ class Link:
         for row in result:
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])
-        entities = {
+        linked_entities = {
             entity.id: entity for entity
             in Entity.get_by_ids(entity_ids, types=True)}
         links = []
         for row in result:
             links.append(Link(
                 row,
-                domain=entities[row['domain_id']],
-                range_=entities[row['range_id']]))
+                domain=linked_entities[row['domain_id']],
+                range_=linked_entities[row['range_id']]))
         return links
 
     @staticmethod

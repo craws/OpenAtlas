@@ -1,11 +1,12 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
 from openatlas.api.v03.endpoints.entity.cidoc_class import GetByClass
 from openatlas.api.v03.endpoints.entity.system_class import GetBySystemClass
-from openatlas.api.v03.endpoints.entity.view_class import GetByCode
+from openatlas.api.v03.endpoints.entity.view_class import GetByViewClass
 from openatlas.api.v03.resources.error import QueryEmptyError
 from openatlas.api.v03.resources.parser import query
 from openatlas.api.v03.resources.resolve_endpoints import resolve_entities
@@ -15,6 +16,7 @@ from openatlas.models.entity import Entity
 
 class GetQuery(Resource):
     @staticmethod
+    @swag_from("../swagger/query.yml", endpoint="api_03.query")
     def get() -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         parser = query.parse_args()
         if not parser['entities'] \
@@ -31,7 +33,7 @@ class GetQuery(Resource):
             entities.extend(get_entities_by_ids(parser['entities']))
         if parser['codes']:
             for code_ in parser['codes']:
-                entities.extend(GetByCode.get_by_view(code_))
+                entities.extend(GetByViewClass.get_by_view(code_))
         if parser['system_classes']:
             for system_class in parser['system_classes']:
                 entities.extend(GetBySystemClass.get_by_system(system_class))

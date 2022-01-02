@@ -1,33 +1,25 @@
-Code endpoint
+Linked Entities endpoint
 ---
 tags:
   - Entities
-description: Retrieves a json with a list of entities based on their OpenAtlas categorie. Available categories are **actor**, **event**, **place**, **source**, **reference**, **object**. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
+description: Retrieves a json with a list of entities, which are linked to the entered entity. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
-    name: code
-    description: Need to be an OpenAtlas menu item
+    name: id_
+    description: ID must be an entity
     required: true
     schema:
-      type: string
-      enum:
-        - actor
-        - event
-        - place
-        - reference
-        - source
-        - object
+      type: number
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'
-  - $ref: '#/components/parameters/filterParam'
+  - $ref: '#/components/parameters/searchParam'
   - $ref: '#/components/parameters/firstParam'
   - $ref: '#/components/parameters/lastParam'
   - $ref: '#/components/parameters/showParam'
   - $ref: '#/components/parameters/typeParam'
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
-  - $ref: '#/components/parameters/formatParam'
   - $ref: '#/components/parameters/pageParam'
 responses:
   '200':

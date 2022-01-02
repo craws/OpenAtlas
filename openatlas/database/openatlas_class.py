@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,9 +6,8 @@ from flask import g
 class OpenAtlasClass:
 
     @staticmethod
-    def get_class_count() -> Dict[str, int]:
-        g.cursor.execute(
-            """
+    def get_class_count() -> dict[str, int]:
+        g.cursor.execute("""
             SELECT oc.name, COUNT(e.id) AS count
             FROM model.openatlas_class oc
             LEFT JOIN model.entity e ON oc.name = e.openatlas_class_name
@@ -16,7 +15,7 @@ class OpenAtlasClass:
         return {row['name']: row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_classes() -> List[Dict[str, Any]]:
+    def get_classes() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT
                 c.id,

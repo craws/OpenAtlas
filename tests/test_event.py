@@ -186,7 +186,7 @@ class EventTest(TestBaseCase):
                     'event_preceding': event_id,
                     'event_id': event_id},
                 follow_redirects=True)
-            assert b'Self as proceeding not allowed' in rv.data
+            assert b'Self as preceding not allowed' in rv.data
             rv = self.app.post(
                 url_for('update', id_=event_id),
                 data={

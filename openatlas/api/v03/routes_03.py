@@ -8,29 +8,30 @@ from openatlas.api.v03.endpoints.content.systemclass_count import \
     SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
 from openatlas.api.v03.endpoints.entity.cidoc_class import GetByClass
+from openatlas.api.v03.endpoints.entity.entities_linked_to_entity import \
+    GetEntitiesLinkedToEntity
 from openatlas.api.v03.endpoints.entity.entity import GetEntity
 from openatlas.api.v03.endpoints.entity.latest import GetLatest
-from openatlas.api.v03.endpoints.entity.linked_entities import GetLinkedEntities
 from openatlas.api.v03.endpoints.entity.query import GetQuery
 from openatlas.api.v03.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v03.endpoints.entity.type_entities import GetTypeEntities
 from openatlas.api.v03.endpoints.entity.type_entities_all import \
     GetTypeEntitiesAll
-from openatlas.api.v03.endpoints.entity.view_class import GetByCode
-from openatlas.api.v03.endpoints.node.type_overview import GetTypeOverview
-from openatlas.api.v03.endpoints.node.subunits import GetSubunits
-from openatlas.api.v03.endpoints.node.type_tree import GetTypeTree
+from openatlas.api.v03.endpoints.entity.view_class import GetByViewClass
+from openatlas.api.v03.endpoints.type.subunits import GetSubunits
+from openatlas.api.v03.endpoints.type.type_overview import GetTypeOverview
+from openatlas.api.v03.endpoints.type.type_tree import GetTypeTree
 
 
 def add_routes_v03(api: Api) -> None:
     api.add_resource(
-        GetByCode,
-        '/code/<string:code>',
-        endpoint="code")
+        GetByViewClass,
+        '/view_class/<string:code>',
+        endpoint="view_class")
     api.add_resource(
         GetByClass,
-        '/class/<string:class_code>',
-        endpoint="class")
+        '/cidoc_class/<string:class_code>',
+        endpoint="cidoc_class")
     api.add_resource(
         GetEntity,
         '/entity/<int:id_>',
@@ -56,9 +57,10 @@ def add_routes_v03(api: Api) -> None:
         '/type_entities_all/<int:id_>',
         endpoint="type_entities_all")
     api.add_resource(
-        GetLinkedEntities,
+        GetEntitiesLinkedToEntity,
         '/entities_linked_to_entity/<int:id_>',
         endpoint="entities_linked_to_entity")
+
     api.add_resource(
         GetTypeOverview,
         '/type_overview/',

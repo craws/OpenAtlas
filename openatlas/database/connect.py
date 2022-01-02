@@ -1,10 +1,10 @@
-from typing import Any, Dict
+from typing import Any
 
 from flask import g
 from psycopg2 import connect, extras
 
 
-def open_connection(config: Dict[str, Any]) -> None:
+def open_connection(config: dict[str, Any]) -> None:
     try:
         g.db = connect(
             database=config['DATABASE_NAME'],

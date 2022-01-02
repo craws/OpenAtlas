@@ -67,8 +67,7 @@ def admin_index(
                 'last login',
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
-        'content': Table(['name'] + [
-            language for language in app.config['LANGUAGES'].keys()])}
+        'content': Table(['name'] + list(app.config['LANGUAGES'].keys()))}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email \

@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
@@ -10,11 +11,14 @@ from openatlas.api.v03.resources.util import get_all_links, \
 from openatlas.models.entity import Entity
 
 
-class GetLinkedEntities(Resource):
+class GetEntitiesLinkedToEntity(Resource):
     @staticmethod
+    @swag_from(
+        "../swagger/entities_linked_to_entity.yml",
+        endpoint="api_03.entities_linked_to_entity")
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_entities(
-            GetLinkedEntities.get_linked_entities(id_),
+            GetEntitiesLinkedToEntity.get_linked_entities(id_),
             entity_.parse_args(),
             'linkedEntities')
 

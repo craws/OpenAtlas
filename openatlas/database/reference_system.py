@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,7 +6,7 @@ from flask import g
 class ReferenceSystem:
 
     @staticmethod
-    def get_all() -> List[Dict[str, Any]]:
+    def get_all() -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT
                 e.id, e.name,
@@ -45,13 +45,14 @@ class ReferenceSystem:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def add_classes(entity_id: int, class_names: List[str]) -> None:
+    def add_classes(entity_id: int, class_names: list[str]) -> None:
         for name in class_names:
-            sql = """
+            g.cursor.execute(
+                """
                 INSERT INTO web.reference_system_openatlas_class (
                     reference_system_id, openatlas_class_name)
-                VALUES (%(entity_id)s, %(name)s);"""
-            g.cursor.execute(sql, {'entity_id': entity_id, 'name': name})
+                VALUES (%(entity_id)s, %(name)s);""",
+                {'entity_id': entity_id, 'name': name})
 
     @staticmethod
     def remove_class(entity_id: int, class_name: str) -> None:
@@ -63,9 +64,8 @@ class ReferenceSystem:
             {'reference_system_id': entity_id, 'class_name': class_name})
 
     @staticmethod
-    def update_system(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def update_system(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             UPDATE web.reference_system
             SET (name, website_url, resolver_url, identifier_example)
             = (
@@ -76,7 +76,7 @@ class ReferenceSystem:
             WHERE entity_id = %(entity_id)s;""", data)
 
     @staticmethod
-    def insert_system(data: Dict[str, Any]) -> None:
+    def insert_system(data: dict[str, Any]) -> None:
         g.cursor.execute(
             """
             INSERT INTO web.reference_system (

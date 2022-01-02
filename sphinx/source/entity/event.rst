@@ -19,7 +19,10 @@ Form fields
 * :doc:`/form/date`
 * :doc:`/form/description`
 * **Location** - a :doc:`place` where the event occurred
-* **Sub event of** - events can be part of another event, e.g. a battle as a sub event of a war.
+* **Sub event of** - events can be part of another event,
+  e.g. a battle as a sub event of a war.
+* **Preceding event** - events can follow up other events, useful for e.g.
+  entering a journey
 * :doc:`reference_system`
 
 Can be linked via tabs to

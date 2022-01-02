@@ -202,7 +202,7 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'P117',
                 'range': form.event.data})
-        if form.event_preceding.data:  # Proceeding event
+        if form.event_preceding.data:
             data['links']['insert'].append({
                 'property': 'P134',
                 'range': form.event_preceding.data,
@@ -295,7 +295,11 @@ def form_string_to_entity_list(string: str) -> List[Entity]:
     return Entity.get_by_ids(ids)
 
 
-def process_origin_data(entity, origin, form, data):
+def process_origin_data(
+        entity: Entity,
+        origin: Entity,
+        form: FlaskForm,
+        data: Dict[str, Any]) -> Dict[str, Any]:
     if origin.class_.view == 'reference':
         if entity.class_.name == 'file':
             data['links']['insert'].append({

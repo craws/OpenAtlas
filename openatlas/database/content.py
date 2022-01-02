@@ -1,12 +1,10 @@
-from typing import Dict, List
-
 from flask import g
 
 
 class Content:
 
     @staticmethod
-    def get_content() -> List[Dict[str, str]]:
+    def get_content() -> list[dict[str, str]]:
         g.cursor.execute("SELECT name, language, text FROM web.i18n;")
         return [dict(row) for row in g.cursor.fetchall()]
 

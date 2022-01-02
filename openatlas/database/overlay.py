@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g
 
@@ -6,9 +6,8 @@ from flask import g
 class Overlay:
 
     @staticmethod
-    def insert(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def insert(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             INSERT INTO web.map_overlay (
                 image_id,
                 place_id,
@@ -21,14 +20,13 @@ class Overlay:
                 %(bounding_box)s);""", data)
 
     @staticmethod
-    def update(data: Dict[str, Any]) -> None:
-        g.cursor.execute(
-            """
+    def update(data: dict[str, Any]) -> None:
+        g.cursor.execute("""
             UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
             WHERE image_id = %(image_id)s AND place_id = %(place_id)s;""", data)
 
     @staticmethod
-    def get_by_object(ids: List[int]) -> List[Dict[str, Any]]:
+    def get_by_object(ids: list[int]) -> list[dict[str, Any]]:
         sql = """
             SELECT o.id, o.place_id, o.image_id, o.bounding_box, i.name
             FROM web.map_overlay o
@@ -38,9 +36,8 @@ class Overlay:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_id(id_: int) -> Dict[str, Any]:
-        g.cursor.execute(
-            """
+    def get_by_id(id_: int) -> dict[str, Any]:
+        g.cursor.execute("""
             SELECT id, place_id, image_id, bounding_box
             FROM web.map_overlay WHERE id = %(id)s;""", {'id': id_})
         return dict(g.cursor.fetchone())

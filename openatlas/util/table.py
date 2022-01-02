@@ -13,7 +13,7 @@ class Table:
     def __init__(
             self,
             header: Optional[List[str]] = None,
-            rows: Optional[List[List[Any]]] = None,
+            rows: Optional[List[Any]] = None,
             order: Optional[List[List[Union[int, str]]]] = None,
             defs: Optional[List[Dict[str, Any]]] = None,
             paging: bool = True) -> None:
@@ -30,7 +30,7 @@ class Table:
             'className': 'dt-body-right',
             'targets': [
                 i for i, j in enumerate(self.header)
-                if j in ['begin', 'end', 'size']]})
+                if j in ['begin', 'end', 'count', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',

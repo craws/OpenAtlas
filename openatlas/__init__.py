@@ -1,7 +1,7 @@
 import locale
 import os
 import sys
-from typing import Any
+from typing import Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
@@ -96,7 +96,7 @@ def apply_caching(response: Response) -> Response:
 
 
 @app.teardown_request
-def teardown_request(_exception: Any) -> None:
+def teardown_request(_exception: Optional[Exception]) -> None:
     close_connection()
 
 

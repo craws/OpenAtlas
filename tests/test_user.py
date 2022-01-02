@@ -33,9 +33,9 @@ class UserTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 logged_in_user = User.get_by_username('Alice')
-                logged_in_user.remove_newsletter()
                 if not logged_in_user:
                     abort(404)  # pragma: no cover
+                logged_in_user.remove_newsletter()
             rv = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)

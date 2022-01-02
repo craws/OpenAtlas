@@ -1,5 +1,6 @@
 from typing import Any, Dict, List, Tuple, Union
 
+from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
@@ -12,6 +13,7 @@ from openatlas.models.type import Type
 
 class GetTypeOverview(Resource):
     @staticmethod
+    @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = {"types": GetTypeOverview.get_node_overview()}

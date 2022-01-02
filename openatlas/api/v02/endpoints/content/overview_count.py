@@ -10,8 +10,11 @@ from openatlas.models.entity import Entity
 
 # Deprecated
 class OverviewCount(Resource):
-    @swag_from("../swagger/overview_count.yml", endpoint="api.overview_count")
-    def get(self) -> Union[Tuple[Resource, int], Response]:
+    @staticmethod
+    @swag_from(
+        "../swagger/overview_count.yml",
+        endpoint="api_02.overview_count")
+    def get() -> Union[Tuple[Resource, int], Response]:
         return marshal(
             [{'systemClass': name, 'count': count} for name, count in
              Entity.get_overview_counts().items()],

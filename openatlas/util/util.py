@@ -27,12 +27,11 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app, logger
+from openatlas.models.cidoc_class import CidocClass
+from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.models.cidoc_property import CidocProperty
-from openatlas.models.cidoc_class import CidocClass
 from openatlas.util.image_processing import ImageProcessing
-
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -95,7 +94,7 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
 
 @contextfilter
 @app.template_filter()
-def is_authorized(context, group: Optional[str] = None) -> bool:
+def is_authorized(context: str, group: Optional[str] = None) -> bool:
     # Using context filter to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
@@ -231,17 +230,13 @@ def get_entity_data(
     from_link = ''
     to_link = ''
     if entity.class_.name == 'move':  # Add places to dates if it's a move
-        place_from = entity.get_linked_entity('P27')
-        if place_from:
+        if place_from := entity.get_linked_entity('P27'):
             from_link = \
                 link(place_from.get_linked_entity_safe('P53', True)) + ' '
-        place_to = entity.get_linked_entity('P26')
-        if place_to:
+        if place_to := entity.get_linked_entity('P26'):
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
-    data[_('begin')] = \
-        (from_link if from_link else '') + format_entity_date(entity, 'begin')
-    data[_('end')] = \
-        (to_link if to_link else '') + format_entity_date(entity, 'end')
+    data[_('begin')] = from_link + format_entity_date(entity, 'begin')
+    data[_('end')] = to_link + format_entity_date(entity, 'end')
 
     # Types
     if entity.standard_type:
@@ -264,23 +259,18 @@ def get_entity_data(
         data[_('resolver URL')] = external_url(entity.resolver_url)
         data[_('example ID')] = entity.placeholder
     elif entity.class_.view == 'actor':
-        begin_place = entity.get_linked_entity('OA8')
         begin_object = None
-        if begin_place:
+        if begin_place := entity.get_linked_entity('OA8'):
             begin_object = begin_place.get_linked_entity_safe('P53', True)
             entity.linked_places.append(begin_object)
-        end_place = entity.get_linked_entity('OA9')
         end_object = None
-        if end_place:
+        if end_place := entity.get_linked_entity('OA9'):
             end_object = end_place.get_linked_entity_safe('P53', True)
             entity.linked_places.append(end_object)
-        residence_place = entity.get_linked_entity('P74')
-        residence_object = None
-        if residence_place:
-            residence_object = residence_place.get_linked_entity_safe(
-                'P53',
-                True)
+        if residence := entity.get_linked_entity('P74'):
+            residence_object = residence.get_linked_entity_safe('P53', True)
             entity.linked_places.append(residence_object)
+            data[_('residence')] = link(residence_object)
         data[_('alias')] = list(entity.aliases.values())
         data[_('begin')] = format_entity_date(entity, 'begin', begin_object)
         data[_('end')] = format_entity_date(entity, 'end', end_object)
@@ -288,23 +278,16 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-        data[_('residence')] = link(
-            residence_object) if residence_object else ''
     elif entity.class_.view == 'artifact':
         data[_('source')] = \
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
-        super_event = entity.get_linked_entity('P117')
-        if super_event:
-            data[_('sub event of')] = link(super_event)
-        proceeding_event = entity.get_linked_entity('P134', True)
-        if proceeding_event:
-            data[_('proceeding event')] = link(proceeding_event)
-        succeeding_event = entity.get_linked_entities('P134')
-        if succeeding_event:
-            data[_('succeeding event')] = \
-                '<br>'.join([link(e) for e in succeeding_event])
+        data[_('sub event of')] = link(entity.get_linked_entity('P117'))
+        data[_('preceding event')] = link(
+            entity.get_linked_entity('P134', True))
+        data[_('succeeding event')] = \
+            '<br>'.join([link(e) for e in entity.get_linked_entities('P134')])
         if entity.class_.name == 'move':
             person_data = []
             artifact_data = []
@@ -316,8 +299,7 @@ def get_entity_data(
             data[_('person')] = [link(item) for item in person_data]
             data[_('artifact')] = [link(item) for item in artifact_data]
         else:
-            place = entity.get_linked_entity('P7')
-            if place:
+            if place := entity.get_linked_entity('P7'):
                 data[_('location')] = link(
                     place.get_linked_entity_safe('P53', True))
         if entity.class_.name == 'acquisition':
@@ -405,7 +387,7 @@ def send_mail(
 
 @contextfilter
 @app.template_filter()
-def system_warnings(_context, _unneeded_string: str) -> str:
+def system_warnings(_context: str, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
         return ''
     warnings = []
@@ -842,7 +824,7 @@ def display_profile_image(entity: Entity) -> str:
 
 @contextfilter
 @app.template_filter()
-def display_content_translation(_context, text: str) -> str:
+def display_content_translation(_context: str, text: str) -> str:
     return get_translation(text)
 
 

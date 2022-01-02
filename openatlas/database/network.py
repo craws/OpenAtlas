@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Any
 
 from flask import g
 
@@ -7,8 +7,8 @@ class Network:
 
     @staticmethod
     def get_edges(
-            classes: List[str],
-            properties: List[str]) -> List[Dict[str, int]]:
+            classes: list[str],
+            properties: list[str]) -> list[dict[str, int]]:
         g.cursor.execute(
             """
             SELECT l.id, l.domain_id, l.range_id
@@ -22,7 +22,7 @@ class Network:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_entities(classes: List[str]) -> List[Dict[str, Union[int, str]]]:
+    def get_entities(classes: list[str]) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT e.id, e.name, e.openatlas_class_name
@@ -32,7 +32,7 @@ class Network:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_object_mapping() -> Dict[int, int]:
+    def get_object_mapping() -> dict[int, int]:
         g.cursor.execute("""
             SELECT e.id, l.range_id
             FROM model.entity e
