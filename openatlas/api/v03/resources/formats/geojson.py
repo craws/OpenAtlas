@@ -44,11 +44,9 @@ class Geojson:
     @staticmethod
     def get_node(entity: Entity) -> Optional[List[str]]:
         nodes = []
-        print(entity.types)
         for node in entity.types:
             out = [node.name]
             nodes.append(': '.join(out))
-        print(nodes)
         return nodes if nodes else None
 
     @staticmethod
