@@ -61,17 +61,14 @@ def pagination(
 def get_results(
         new_entities: List[Entity],
         parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+    limited_entities = new_entities[:int(parser['limit'])]
     if parser['format'] == 'geojson':
-        return [get_geojson(new_entities, parser)]
+        return Geojson.get_geojson(limited_entities)
     return linked_places_result(
-        new_entities[:int(parser['limit'])],
+        limited_entities,
         parser,
-        link_parser_check(
-            new_entities[:int(parser['limit'])],
-            parser),
-        link_parser_check(
-            new_entities[:int(parser['limit'])],
-            parser, True))
+        link_parser_check(limited_entities, parser),
+        link_parser_check(limited_entities, parser, True))
 
 
 def get_entities_by_type(
@@ -109,10 +106,3 @@ def linked_places_result(
              link_.range.id == entity.id],
             parser)
         for entity in entities]
-
-
-def get_geojson(
-        entity_limit: List[Entity],
-        parser: Dict[str, str]) -> Dict[str, Any]:
-    return Geojson.return_output(
-        Geojson.get_geojson(entity_limit[:int(parser['limit'])]))

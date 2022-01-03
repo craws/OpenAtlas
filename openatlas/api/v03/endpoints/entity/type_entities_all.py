@@ -36,7 +36,8 @@ class GetTypeEntitiesAll(Resource):
             data: List[Entity]) -> List[Entity]:
         for entity in g.types[id_].get_linked_entities(
                 ['P2', 'P89'],
-                inverse=True):
+                inverse=True,
+                types=True):
             data.append(entity)
         for sub_id in g.types[id_].subs:
             GetTypeEntitiesAll.get_recursive_node_entities(sub_id, data)

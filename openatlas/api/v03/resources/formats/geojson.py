@@ -11,11 +11,13 @@ class Geojson:
     def get_geojson(entities: List[Entity]) -> List[Dict[str, Any]]:
         out = []
         for entity in entities:
-            geoms = [Geojson.get_entity(entity, geom)
-                     for geom in Geojson.get_geom(entity)]
-            out.extend(geoms) if geoms else out.append(
-                Geojson.get_entity(entity))
-        return out
+            if geoms := [Geojson.get_entity(entity, geom)
+                         for geom in Geojson.get_geom(entity)]:
+                out.extend(geoms)
+            else:
+                out.append(Geojson.get_entity(entity))
+        return [{'type': 'FeatureCollection',
+                 'features': out}]
 
     @staticmethod
     def get_entity(
@@ -42,14 +44,12 @@ class Geojson:
     @staticmethod
     def get_node(entity: Entity) -> Optional[List[str]]:
         nodes = []
+        print(entity.types)
         for node in entity.types:
             out = [node.name]
             nodes.append(': '.join(out))
+        print(nodes)
         return nodes if nodes else None
-
-    @staticmethod
-    def return_output(output: List[Dict[str, Any]]) -> Dict[str, Any]:
-        return {'type': 'FeatureCollection', 'features': output}
 
     @staticmethod
     def get_geom(entity: Entity) -> Union[List[Dict[str, Any]], List[Any]]:
