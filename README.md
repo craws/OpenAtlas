@@ -33,11 +33,14 @@ Please refer to [install.md](install.md) for requirements and installation.
 **Bernhard Koschiček-Krombholz** - Software Development, API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 
+**Nina Richards** - Bioarchaeological Expertise
+([nina.brundke@oeaw.ac.at](mailto:nina.brundke@oeaw.ac.at))
+
 **Christoph Hoffmann** - Frontend Development
 ([christoph.hoffmann@oeaw.ac.at](mailto:christoph.hoffmann@oeaw.ac.at))
 
-**Nina Richards** - Bioarchaeological Expertise
-([nina.brundke@oeaw.ac.at](mailto:nina.brundke@oeaw.ac.at))
+**Andreas Olschnögger** - Frontend Development
+([andreas.olschnoegger@oeaw.ac.at](mailto:andreas.olschnoegger@oeaw.ac.at)
 
 **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
