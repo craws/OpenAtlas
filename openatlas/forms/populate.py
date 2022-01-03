@@ -86,15 +86,12 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     if entity.class_.view == 'actor':
-        residence = entity.get_linked_entity('P74')
-        form.residence.data = residence.get_linked_entity_safe('P53', True).id \
-            if residence else ''
-        first = entity.get_linked_entity('OA8')
-        form.begins_in.data = first.get_linked_entity_safe('P53', True).id \
-            if first else ''
-        last = entity.get_linked_entity('OA9')
-        form.ends_in.data = last.get_linked_entity_safe('P53', True).id \
-            if last else ''
+        if res := entity.get_linked_entity('P74'):
+            form.residence.data = res.get_linked_entity_safe('P53', True).id
+        if first := entity.get_linked_entity('OA8'):
+            form.begins_in.data = first.get_linked_entity_safe('P53', True).id
+        if last := entity.get_linked_entity('OA9'):
+            form.ends_in.data = last.get_linked_entity_safe('P53', True).id
     elif entity.class_.name == 'artifact':
         owner = entity.get_linked_entity('P52')
         form.actor.data = owner.id if owner else None
@@ -104,13 +101,12 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         preceding = entity.get_linked_entity('P134', True)
         form.event_preceding.data = preceding.id if preceding else ''
         if entity.class_.name == 'move':
-            place_from = entity.get_linked_entity('P27')
-            form.place_from.data = place_from.get_linked_entity_safe(
-                'P53', True).id if place_from else ''
-            place_to = entity.get_linked_entity('P26')
-            form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id \
-                if place_to else ''
+            if place_from := entity.get_linked_entity('P27'):
+                form.place_from.data = \
+                    place_from.get_linked_entity_safe('P53', True).id
+            if place_to := entity.get_linked_entity('P26'):
+                form.place_to.data = \
+                    place_to.get_linked_entity_safe('P53', True).id
             person_data = []
             object_data = []
             for linked_entity in entity.get_linked_entities('P25'):
@@ -121,9 +117,8 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.person.data = person_data
             form.artifact.data = object_data
         else:
-            place = entity.get_linked_entity('P7')
-            form.place.data = place.get_linked_entity_safe('P53', True).id \
-                if place else ''
+            if place := entity.get_linked_entity('P7'):
+                form.place.data = place.get_linked_entity_safe('P53', True).id
         if entity.class_.name == 'acquisition':
             form.given_place.data = \
                 [entity.id for entity in entity.get_linked_entities('P24')]

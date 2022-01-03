@@ -64,14 +64,14 @@ def validate(self: FlaskForm) -> bool:
 
     # File
     if request.files:
-        files = request.files.getlist('file')
         ext = session['settings']['file_upload_allowed_extension']
-        for file_ in files:
+        for file_ in request.files.getlist('file'):
             if not file_:  # pragma: no cover
                 self.file.errors.append(_('no file to upload'))
                 valid = False
-            elif not ('.' in file_.filename
-                      and file_.filename.rsplit('.', 1)[1].lower() in ext):
+            elif not (
+                    '.' in file_.filename
+                    and file_.filename.rsplit('.', 1)[1].lower() in ext):
                 self.file.errors.append(_('file type not allowed'))
                 valid = False
 

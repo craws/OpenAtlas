@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from collections import OrderedDict
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -201,7 +201,7 @@ def add_reference_systems(form: Any, class_: str) -> None:
                 default=system.precision_default_id))
 
 
-def add_value_type_fields(form: Any, subs: List[int]) -> None:
+def add_value_type_fields(form: Any, subs: list[int]) -> None:
     for sub_id in subs:
         sub = g.types[sub_id]
         setattr(
@@ -316,8 +316,7 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Type.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        choices = ReferenceSystem.get_class_choices(entity)
-        if choices:
+        if choices := ReferenceSystem.get_class_choices(entity):
             setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
@@ -342,7 +341,7 @@ def build_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
+def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """Returns a form with a list of entities with checkboxes."""
     if class_ == 'place':
         entities = Entity.get_by_class('place', types=True, aliases=True)
