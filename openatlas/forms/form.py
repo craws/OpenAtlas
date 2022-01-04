@@ -293,7 +293,7 @@ def add_fields(
             form,
             'actor' if code == 'member' else 'group',
             TableMultiField(_('actor'), [InputRequired()]))
-    elif class_ in g.classes and g.classes[class_].view == 'type':
+    elif class_ in g.view_class_mapping['type']:
         setattr(form, 'is_type_form', HiddenField())
         type_ = entity if entity else origin
         root = g.types[type_.root[0]] if type_.root else type_
