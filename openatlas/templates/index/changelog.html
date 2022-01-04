@@ -1,28 +1,31 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% for version_name, version in versions.items() %}
-        <div class="changelog-version">
-            {{ _('version')|uc_first }} {{ version_name }}
-        </div>
-        <div class="changelog-date">
-            {{ version[0] }}
-        </div>
-        <ul>
-            {% for issue_type, issues in version[1].items() %}
-                {% for issue_number, issue_text in issues.items() %}
-                    <li class="changelog">
-                        {% if issue_number %}
-                            {{ issue_type|uc_first }}
-                            <a target="_blank" rel="noopener noreferrer" href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
-                                #{{ issue_number }}
-                            </a>
-                            {{ issue_text|safe }}
-                        {% else %}
-                            {{ issue_text|safe }}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            {% endfor %}
-        </ul>
-    {% endfor %}
+  {% for release, version in versions.items() %}
+    <div class="changelog-version">
+      {{ _('version')|uc_first }} {{ release }}
+    </div>
+    <div class="changelog-date">
+      {{ version[0] }}
+    </div>
+    <ul>
+      {% for issue_type, issues in version[1].items() %}
+        {% for issue_number, issue_text in issues.items() %}
+          <li class="changelog">
+            {% if issue_number %}
+              {{ issue_type|uc_first }}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
+                  #{{ issue_number }}
+              </a>
+              {{ issue_text|safe }}
+            {% else %}
+              {{ issue_text|safe }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      {% endfor %}
+    </ul>
+  {% endfor %}
 {% endblock %}

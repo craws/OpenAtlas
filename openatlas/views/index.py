@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Union
 
 from flask import flash, g, jsonify, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -15,7 +15,7 @@ from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.changelog import Changelog
+from openatlas.util.changelog import versions
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -150,17 +150,17 @@ def index_content(item: str) -> str:
 
 
 @app.errorhandler(400)
-def bad_request(e: Exception) -> Tuple[Any, int]:  # pragma: no cover
+def bad_request(e: Exception) -> tuple[Any, int]:  # pragma: no cover
     return render_template('400.html', crumbs=['400 - Bad Request'], e=e), 400
 
 
 @app.errorhandler(403)
-def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def forbidden(e: Exception) -> tuple[Union[dict[str, str], str], int]:
     return render_template('403.html', crumbs=['403 - Forbidden'], e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def page_not_found(e: Exception) -> tuple[Union[dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
         return jsonify({
             'message': 'Endpoint not found',
@@ -174,17 +174,17 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 
 @app.errorhandler(405)  # pragma: no cover
-def method_not_allowed(_e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def method_not_allowed(_e: Exception) -> tuple[Union[dict[str, str], str], int]:
     raise MethodNotAllowedError
 
 
 @app.errorhandler(418)
-def invalid_id(e: Exception) -> Tuple[str, int]:
+def invalid_id(e: Exception) -> tuple[str, int]:
     return render_template('418.html', crumbs=["418 - I’m a teapot"], e=e), 418
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+def unprocessable_entity(e: Exception) -> tuple[str, int]:  # pragma: no cover
     return render_template(
         '422.html',
         crumbs=['422 - Unprocessable entity'],
@@ -197,7 +197,7 @@ def index_changelog() -> str:
         'index/changelog.html',
         title=_('changelog'),
         crumbs=[_('changelog')],
-        versions=Changelog.versions)
+        versions=versions)
 
 
 @app.route('/unsubscribe/<code>')
