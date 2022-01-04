@@ -48,8 +48,7 @@ class GetEntity(Resource):
             parser: Dict[str, Any]) \
             -> Union[List[Dict[str, Any]], Dict[str, Any]]:
         if parser['format'] == 'geojson':
-            return [{'type': 'FeatureCollection',
-                     'features': Geojson.get_geojson([entity])}]
+            return Geojson.get_geojson([entity])
         return get_entity(
             entity,
             get_all_links(entity.id),

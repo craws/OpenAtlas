@@ -8,7 +8,7 @@ from openatlas.models.link import Link
 class Geojson:
 
     @staticmethod
-    def get_geojson(entities: List[Entity]) -> List[Dict[str, Any]]:
+    def get_geojson(entities: List[Entity]) -> Dict[str, Any]:
         out = []
         for entity in entities:
             if geoms := [Geojson.get_entity(entity, geom)
@@ -16,8 +16,7 @@ class Geojson:
                 out.extend(geoms)
             else:
                 out.append(Geojson.get_entity(entity))
-        return [{'type': 'FeatureCollection',
-                 'features': out}]
+        return {'type': 'FeatureCollection', 'features': out}
 
     @staticmethod
     def get_entity(
