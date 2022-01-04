@@ -5,17 +5,13 @@ from psycopg2 import connect, extras
 
 
 def open_connection(config: dict[str, Any]) -> None:
-    try:
-        g.db = connect(
-            database=config['DATABASE_NAME'],
-            user=config['DATABASE_USER'],
-            password=config['DATABASE_PASS'],
-            port=config['DATABASE_PORT'],
-            host=config['DATABASE_HOST'])
-        g.db.autocommit = True
-    except Exception as e:  # pragma: no cover
-        print("Database connection failed")
-        raise Exception(e)
+    g.db = connect(
+        database=config['DATABASE_NAME'],
+        user=config['DATABASE_USER'],
+        password=config['DATABASE_PASS'],
+        port=config['DATABASE_PORT'],
+        host=config['DATABASE_HOST'])
+    g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
 
 

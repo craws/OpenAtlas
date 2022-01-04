@@ -277,7 +277,8 @@ def model_network(dimensions: Optional[int] = None) -> str:
                 'charge': form.charge.data,
                 'distance': form.distance.data}},
         json_data=Network.get_network_json(
-            {class_.name: form[class_.name].data for class_ in network_classes},
+            {class_.name:
+                getattr(form, class_.name).data for class_ in network_classes},
             bool(form.orphans.data),
             dimensions),
         title=_('model'),

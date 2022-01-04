@@ -207,7 +207,7 @@ def import_data(project_id: int, class_: str) -> str:
             missing_name_count = 0
             invalid_type_ids = False
             invalid_geoms = False
-            for index, row in data_frame.iterrows():
+            for _index, row in data_frame.iterrows():
                 if not row['name']:  # pragma: no cover
                     missing_name_count += 1
                     continue

@@ -147,7 +147,6 @@ class Entity:
             self,
             data: Dict[str, Any],
             new: bool = False,) -> Optional[int]:
-        from openatlas.models.reference_system import ReferenceSystem
         redirect_link_id = None
         if 'attributes' in data:
             self.update_attributes(data['attributes'])
@@ -159,8 +158,6 @@ class Entity:
             redirect_link_id = self.update_links(data['links'], new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
-        if isinstance(self, ReferenceSystem):
-            self.update_system(data)
         return redirect_link_id
 
     def update_administrative_units(

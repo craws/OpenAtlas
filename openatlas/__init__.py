@@ -36,7 +36,8 @@ from openatlas.util.util import get_file_stats
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
     index, involvement, imports, link, login, member, model, note, overlay,
-    profile, reference, relation, reference_system, search, sql, type, user)
+    profile, reference, relation, reference_system, search, sql, type as type_,
+    user)
 
 
 @babel.localeselector
