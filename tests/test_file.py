@@ -139,6 +139,16 @@ class FileTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Updated file' in rv.data
 
+            # Create source coming from file
+            self.app.post(
+                url_for('insert', class_='source', origin_id=file_id),
+                data={'name': 'Created source coming from file'})
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                source_id = Entity.get_by_class('source')[0].id
+            rv = self.app.get(url_for('view', id_=source_id))
+            assert b'Created source coming from file' in rv.data
+
             # Delete
             for file in files:
                 rv = self.app.get(

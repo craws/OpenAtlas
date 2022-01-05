@@ -2,6 +2,9 @@ versions = {
     '7.1.0': ['TBA', {
         'feature': {
             '1624': 'Refactor'}}],
+    '7.0.1': ['2022-01-05', {
+        'fix': {
+            '1627': 'Error when creating a source from file view'}}],
     '7.0.0': ['2022-01-01', {
         'feature': {
             '1566': 'Update OpenAtlas software to Debian/bullseye',

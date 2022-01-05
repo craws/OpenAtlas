@@ -314,7 +314,8 @@ def process_origin_data(
                 'return_link_id': True,
                 'inverse': True})
     elif entity.class_.name == 'file' \
-            or entity.class_.view in ['reference', 'source']:
+            or (entity.class_.view in ['reference', 'source']
+                and origin.class_.name != 'file'):
         data['links']['insert'].append({
             'property': 'P67',
             'range': origin,
