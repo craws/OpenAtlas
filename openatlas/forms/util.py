@@ -48,15 +48,15 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
             value = ''  # In case of a missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
-        if field.type == 'BooleanField':
-            # str() needed for templates
+        if field.type == 'BooleanField':  # str() needed for templates
             settings[label] = str(_('on')) if value else str(_('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
-        if field.name in ['mail_recipients_feedback',
-                          'file_upload_allowed_extension']:
+        if field.name in [
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             settings[label] = ' '.join(value)
     return settings
 
@@ -77,8 +77,9 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in ['log_level']:
             field.data = int(session['settings'][field.name])
             continue
-        if field.name in \
-                ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+        if field.name in [
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
             continue
         if field.name not in session['settings']:  # pragma: no cover

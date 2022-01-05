@@ -1,5 +1,5 @@
 import time
-from typing import Dict, List, Union
+from typing import Optional, Union
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -14,7 +14,7 @@ from openatlas.util.util import format_date_part
 def pre_populate_form(
         form: FlaskForm,
         item: Union[Entity, Link],
-        location: Union[Entity, None]) -> FlaskForm:
+        location: Optional[Entity]) -> FlaskForm:
     form.opened.data = time.time()
     if hasattr(form, 'begin_year_from'):
         populate_dates(form, item)
@@ -26,10 +26,10 @@ def pre_populate_form(
         form.event_id.data = item.id
 
     # Types
-    types: Dict[Type, str] = item.types
+    types: dict[Type, str] = item.types
     if location:  # Needed for administrative unit and historical place types
         types.update(location.types)
-    type_data: Dict[int, List[int]] = {}
+    type_data: dict[int, list[int]] = {}
     for type_, value in types.items():
         root = g.types[type_.root[0]] if type_.root else type
         if root.id not in type_data:
@@ -48,7 +48,8 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
         # Can't use isinstance for class check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
         if link_.domain.class_.name == 'reference_system'}
-    for field in form:
+    for key in form.data.keys():
+        field = getattr(form, key)
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
