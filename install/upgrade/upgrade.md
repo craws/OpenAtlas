@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 7.0.0 to 7.0.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are
 using Debian upgrade it to 11 (bullseye).
