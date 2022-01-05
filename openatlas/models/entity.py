@@ -1,8 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import (
-    Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union)
+from typing import Any, Iterable, Optional, TYPE_CHECKING, Union
 
 from flask import g, request
 from fuzzywuzzy import fuzz
@@ -23,21 +22,24 @@ if TYPE_CHECKING:  # pragma: no cover
 
 class Entity:
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
 
         self.id = data['id']
         self.standard_type = None
-        self.types: Dict['Type', str] = {}
         self.name = data['name']
+        self.description = data['description']
+        self.created = data['created']
+        self.modified = data['modified']
+        self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
+        self.class_ = g.classes[data['openatlas_class_name']]
+        self.reference_systems: list[Link] = []
+        self.origin_id: Optional[int] = None  # When coming from another entity
+        self.image_id: Optional[int] = None  # Profile image
+        self.linked_places: list[Entity] = []  # Related places for map
+        self.location: Optional[Entity] = None  # Respective location if a place
+        self.info_data: dict[str, Union[str, list[str], None]]
 
-        if 'types' in data and data['types']:
-            for item in data['types']:
-                type_ = g.types[item['f1']]  # f1 = type id, f2 = value
-                self.types[type_] = item['f2']
-                if type_.category == 'standard':
-                    self.standard_type = type_
-
-        self.aliases: Dict[int, str] = {}
+        self.aliases: dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
             for alias in data['aliases']:
                 # f1 = alias id, f2 = alias name
@@ -45,17 +47,14 @@ class Entity:
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
                 key=lambda item_: item_[1])}
-        self.description = data['description']
-        self.created = data['created']
-        self.modified = data['modified']
-        self.cidoc_class = g.cidoc_classes[data['cidoc_class_code']]
-        self.class_ = g.classes[data['openatlas_class_name']]
-        self.reference_systems: List[Link] = []
-        self.origin_id: Optional[int] = None  # When coming from another entity
-        self.image_id: Optional[int] = None  # Profile image
-        self.linked_places: List[Entity] = []  # Related places for map
-        self.location: Optional[Entity] = None  # Respective location if a place
-        self.info_data: Dict[str, Union[str, List[str], None]]
+
+        self.types: dict[Type, str] = {}
+        if 'types' in data and data['types']:
+            for item in data['types']:
+                type_ = g.types[item['f1']]  # f1 = type id, f2 = value
+                self.types[type_] = item['f2']
+                if type_.category == 'standard':
+                    self.standard_type = type_
 
         # Dates
         self.begin_from = None
@@ -100,9 +99,9 @@ class Entity:
 
     def get_linked_entities(
             self,
-            code: Union[str, List[str]],
+            code: Union[str, list[str]],
             inverse: bool = False,
-            types: bool = False) -> List[Entity]:
+            types: bool = False) -> list[Entity]:
         return Link.get_linked_entities(
             self.id,
             code,
@@ -111,10 +110,10 @@ class Entity:
 
     def link(self,
              code: str,
-             range_: Union[Entity, List[Entity]],
+             range_: Union[Entity, list[Entity]],
              description: Optional[str] = None,
              inverse: bool = False,
-             type_id: Optional[int] = None) -> List[int]:
+             type_id: Optional[int] = None) -> list[int]:
         return Link.insert(self, code, range_, description, inverse, type_id)
 
     def link_string(
@@ -133,19 +132,19 @@ class Entity:
 
     def get_links(
             self,
-            codes: Union[str, List[str]],
-            inverse: bool = False) -> List[Link]:
+            codes: Union[str, list[str]],
+            inverse: bool = False) -> list[Link]:
         return Link.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
         Entity.delete_(self.id)
 
-    def delete_links(self, codes: List[str], inverse: bool = False) -> None:
+    def delete_links(self, codes: list[str], inverse: bool = False) -> None:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(
             self,
-            data: Dict[str, Any],
+            data: dict[str, Any],
             new: bool = False,) -> Optional[int]:
         redirect_link_id = None
         if 'attributes' in data:
@@ -162,7 +161,7 @@ class Entity:
 
     def update_administrative_units(
             self,
-            units: Dict[str, List[int]],
+            units: dict[str, list[int]],
             new: bool) -> None:
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
@@ -171,7 +170,7 @@ class Entity:
         if units:
             self.location.link('P89', [g.types[id_] for id_ in units])
 
-    def update_attributes(self, attributes: Dict[str, Any]) -> None:
+    def update_attributes(self, attributes: dict[str, Any]) -> None:
         for key, value in attributes.items():
             setattr(self, key, value)
         Db.update({
@@ -189,7 +188,7 @@ class Entity:
                 sanitize(self.description, 'text') if self.description else None
         })
 
-    def update_aliases(self, aliases: List[str]) -> None:
+    def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
         for id_, alias in self.aliases.items():
             if alias in aliases:
@@ -204,7 +203,7 @@ class Entity:
                 else:
                     self.link('P1', Entity.insert('appellation', alias))
 
-    def update_links(self, links: Dict[str, Any], new: bool) -> Optional[int]:
+    def update_links(self, links: dict[str, Any], new: bool) -> Optional[int]:
         from openatlas.models.reference_system import ReferenceSystem
         if not new:
             if 'delete' in links and links['delete']:
@@ -226,7 +225,7 @@ class Entity:
                 redirect_link_id = ids[0]
         return redirect_link_id
 
-    def update_gis(self, gis_data: Dict[str, Any], new: bool) -> None:
+    def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
         from openatlas.models.gis import Gis
         if not self.location:
             self.location = self.get_linked_entity_safe('P53')
@@ -269,22 +268,22 @@ class Entity:
         return name_parts[0]
 
     @staticmethod
-    def get_invalid_dates() -> List[Entity]:
+    def get_invalid_dates() -> list[Entity]:
         return [
             Entity.get_by_id(row['id'], types=True)
             for row in Date.get_invalid_dates()]
 
     @staticmethod
-    def delete_(id_: Union[int, List[int]]) -> None:
+    def delete_(id_: Union[int, list[int]]) -> None:
         if not id_:
             return
         Db.delete(id_ if isinstance(id_, list) else [id_])
 
     @staticmethod
     def get_by_class(
-            classes: Union[str, List[str]],
+            classes: Union[str, list[str]],
             types: bool = False,
-            aliases: bool = False) -> List[Entity]:
+            aliases: bool = False) -> list[Entity]:
         if aliases:  # For performance: check classes if they can have an alias
             aliases = False
             for class_ in classes if isinstance(classes, list) \
@@ -298,11 +297,11 @@ class Entity:
     def get_by_view(
             view: str,
             types: bool = False,
-            aliases: bool = False) -> List[Entity]:
+            aliases: bool = False) -> list[Entity]:
         return Entity.get_by_class(g.view_class_mapping[view], types, aliases)
 
     @staticmethod
-    def get_display_files() -> List[Entity]:
+    def get_display_files() -> list[Entity]:
         entities = []
         for row in Db.get_by_class('file', types=True):
             ext = g.file_stats[row['id']]['ext'] \
@@ -330,17 +329,17 @@ class Entity:
 
     @staticmethod
     def get_by_cidoc_class(
-            code: Union[str, List[str]],
+            code: Union[str, list[str]],
             types: bool = False,
-            aliases: bool = False) -> List[Entity]:
-        return [Entity(row) for row in
-                Db.get_by_cidoc_class(code, types, aliases)]
+            aliases: bool = False) -> list[Entity]:
+        return \
+            [Entity(row) for row in Db.get_by_cidoc_class(code, types, aliases)]
 
     @staticmethod
     def get_by_id(
             id_: int,
             types: bool = False,
-            aliases: bool = False) -> Union[Entity, Type, 'ReferenceSystem']:
+            aliases: bool = False) -> Union[Entity, Type, ReferenceSystem]:
         if id_ in g.types:
             return g.types[id_]
         if id_ in g.reference_systems:
@@ -356,7 +355,7 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False) -> List[Entity]:
+            aliases: bool = False) -> list[Entity]:
         entities = []
         for row in Db.get_by_ids(ids, types, aliases):
             if row['id'] in g.types:
@@ -368,7 +367,7 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_by_project_id(project_id: int) -> List[Entity]:
+    def get_by_project_id(project_id: int) -> list[Entity]:
         entities = []
         for row in Db.get_by_project_id(project_id):
             entity = Entity(row)
@@ -377,13 +376,13 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_by_link_property(code: str, class_: str) -> List[Entity]:
+    def get_by_link_property(code: str, class_: str) -> list[Entity]:
         return [Entity(row) for row in Db.get_by_link_property(code, class_)]
 
     @staticmethod
-    def get_similar_named(class_: str, ratio: int) -> Dict[int, Any]:
-        similar: Dict[int, Any] = {}
-        already_added: Set[int] = set()
+    def get_similar_named(class_: str, ratio: int) -> dict[int, Any]:
+        similar: dict[int, Any] = {}
+        already_added: set[int] = set()
         entities = Entity.get_by_class(class_)
         for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
@@ -396,15 +395,15 @@ class Entity:
             item: data for item, data in similar.items() if data['entities']}
 
     @staticmethod
-    def get_overview_counts() -> Dict[str, int]:
+    def get_overview_counts() -> dict[str, int]:
         return Db.get_overview_counts(g.class_view_mapping.keys())
 
     @staticmethod
-    def get_orphans() -> List[Entity]:
+    def get_orphans() -> list[Entity]:
         return [Entity.get_by_id(row['id']) for row in Db.get_orphans()]
 
     @staticmethod
-    def get_latest(limit: int) -> List[Entity]:
+    def get_latest(limit: int) -> list[Entity]:
         return [
             Entity(row)
             for row in Db.get_latest(g.class_view_mapping.keys(), limit)]
@@ -414,5 +413,5 @@ class Entity:
         Db.set_profile_image(id_, origin_id)
 
     @staticmethod
-    def get_entities_linked_to_itself() -> List[Entity]:
+    def get_entities_linked_to_itself() -> list[Entity]:
         return [Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]

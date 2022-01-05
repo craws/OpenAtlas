@@ -60,7 +60,7 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
                 precision_field.data = str(system_links[system_id].type.id)
 
 
-def populate_dates(form: FlaskForm, item: Union['Entity', Link]) -> None:
+def populate_dates(form: FlaskForm, item: Union[Entity, Link]) -> None:
     if item.begin_from:
         form.begin_year_from.data = format_date_part(item.begin_from, 'year')
         form.begin_month_from.data = format_date_part(item.begin_from, 'month')

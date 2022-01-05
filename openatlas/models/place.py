@@ -1,19 +1,19 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from openatlas.models.entity import Entity
 
 
 def get_structure(
         object_: Optional[Entity] = None,
-        super_: Optional[Entity] = None) -> Optional[Dict[str, Any]]:
+        super_: Optional[Entity] = None) -> Optional[dict[str, Any]]:
     super_id = None
     place = None
     feature = None
     stratigraphic_unit = None
-    siblings: List[Entity] = []
-    subunits: List[Entity] = []
+    siblings: list[Entity] = []
+    subunits: list[Entity] = []
 
     if super_:
         super_id = super_.id

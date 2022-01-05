@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from flask import request, session
 from flask_login import current_user
@@ -34,7 +34,7 @@ class Logger:
     def get_system_logs(
             limit: str,
             priority: str,
-            user_id: str) -> List[Dict[str, Any]]:
+            user_id: str) -> list[dict[str, Any]]:
         return Db.get_system_logs(limit, priority, user_id)
 
     @staticmethod
@@ -46,7 +46,7 @@ class Logger:
         Db.log_user(entity_id, current_user.id, action)
 
     @staticmethod
-    def get_log_info(entity_id: str) -> Dict[str, Any]:
+    def get_log_info(entity_id: str) -> dict[str, Any]:
         from openatlas.models.user import User
         from openatlas.models.imports import Import
         data = Db.get_log_for_advanced_view(entity_id)

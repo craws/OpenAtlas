@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional
+from typing import Any, Optional
 
 from flask import g, json
 
@@ -17,25 +17,25 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
-    def get_by_id(id_: int) -> List[Dict[str, Any]]:
+    def get_by_id(id_: int) -> list[dict[str, Any]]:
         return Db.get_by_id(id_)
 
     @staticmethod
     def get_all(
-            objects: Optional[List[Entity]] = None,
-            structure: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+            objects: Optional[list[Entity]] = None,
+            structure: Optional[dict[str, Any]] = None) -> dict[str, Any]:
 
         if not objects:
             objects = []
-        all_: Dict[str, List[Any]] = {
+        all_: dict[str, list[Any]] = {
             'point': [],
             'linestring': [],
             'polygon': []}
-        extra: Dict[str, List[Any]] = {
+        extra: dict[str, list[Any]] = {
             'supers': [],
             'subs': [],
             'siblings': []}
-        selected: Dict[str, List[Any]] = {
+        selected: dict[str, list[Any]] = {
             'point': [],
             'linestring': [],
             'polygon': [],
@@ -126,7 +126,7 @@ class Gis:
                 + selected['point'])}
 
     @staticmethod
-    def insert(entity: Entity, data: Dict[str, Any]) -> None:
+    def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
             if shape not in data or not data[shape]:
                 continue  # pragma: no cover

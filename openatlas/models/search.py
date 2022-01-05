@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from flask_login import current_user
 
@@ -9,7 +9,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-def search(data: Dict[str, Any]) -> List[Entity]:
+def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
     if 'person' in data['classes']:
@@ -35,7 +35,7 @@ def search(data: Dict[str, Any]) -> List[Entity]:
     return list({d.id: d for d in entities}.values())  # Remove duplicates
 
 
-def check_dates(entity: Entity, data: Dict[str, Any]) -> bool:
+def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
     if not data['from_date'] and not data['to_date']:
         return True
     if not entity.begin_from \

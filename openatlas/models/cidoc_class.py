@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import session
 
@@ -10,15 +10,15 @@ from openatlas.database.cidoc_class import CidocClass as Db
 
 class CidocClass:
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self._name = data['name']
         self.code = data['code']
         self.id = data['id']
         self.comment = data['comment']
         self.count = data['count']
-        self.i18n: Dict[str, str] = {}
-        self.sub: List[CidocClass] = []
-        self.super: List[CidocClass] = []
+        self.i18n: dict[str, str] = {}
+        self.sub: list[CidocClass] = []
+        self.super: list[CidocClass] = []
 
     @property
     def name(self) -> str:
@@ -33,7 +33,7 @@ class CidocClass:
         return getattr(self, '_name')  # pragma: no cover
 
     @staticmethod
-    def get_all() -> Dict[str, CidocClass]:
+    def get_all() -> dict[str, CidocClass]:
         classes = {row['code']: CidocClass(row) for row in Db.get_classes()}
         for row in Db.get_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])

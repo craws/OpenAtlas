@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
@@ -14,13 +14,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 class Link:
-    object_: Optional['Entity']  # Needed for first/last appearance
+    object_: Optional[Entity]  # Needed for first/last appearance
 
     def __init__(
             self,
-            row: Dict[str, Any],
-            domain: Optional['Entity'] = None,
-            range_: Optional['Entity'] = None) -> None:
+            row: dict[str, Any],
+            domain: Optional[Entity] = None,
+            range_: Optional[Entity] = None) -> None:
         from openatlas.models.entity import Entity
         from openatlas.util.util import format_date_part
         self.id = row['id']
@@ -29,7 +29,7 @@ class Link:
         self.domain = domain if domain else Entity.get_by_id(row['domain_id'])
         self.range = range_ if range_ else Entity.get_by_id(row['range_id'])
         self.type = g.types[row['type_id']] if row['type_id'] else None
-        self.types: Dict['Entity', None] = {}
+        self.types: dict[Entity, None] = {}
         if 'type_id' in row and row['type_id']:
             self.types[g.types[row['type_id']]] = None
         if 'begin_from' in row:
@@ -64,7 +64,7 @@ class Link:
     def delete(self) -> None:
         Link.delete_(self.id)
 
-    def set_dates(self, data: Dict[str, Any]) -> None:
+    def set_dates(self, data: dict[str, Any]) -> None:
         self.begin_from = data['begin_from']
         self.begin_to = data['begin_to']
         self.begin_comment = data['begin_comment']
@@ -74,12 +74,12 @@ class Link:
 
     @staticmethod
     def insert(
-            entity: 'Entity',
+            entity: Entity,
             property_code: str,
-            range_: Union['Entity', List['Entity']],
+            range_: Union[Entity, list[Entity]],
             description: Optional[str] = None,
             inverse: bool = False,
-            type_id: Optional[int] = None) -> List[int]:
+            type_id: Optional[int] = None) -> list[int]:
         property_ = g.properties[property_code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -116,7 +116,7 @@ class Link:
             id_: int,
             code: str,
             inverse: bool = False,
-            types: bool = False) -> 'Entity':
+            types: bool = False) -> Entity:
         result = Link.get_linked_entities(
             id_,
             code,
@@ -133,9 +133,9 @@ class Link:
     @staticmethod
     def get_linked_entities(
             id_: int,
-            codes: Union[str, List[str]],
+            codes: Union[str, list[str]],
             inverse: bool = False,
-            types: bool = False) -> List['Entity']:
+            types: bool = False) -> list[Entity]:
         from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         return Entity.get_by_ids(
@@ -146,9 +146,9 @@ class Link:
     def get_linked_entity_safe(
             id_: int, code: str,
             inverse: bool = False,
-            types: bool = False) -> 'Entity':
+            types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:  # pragma: no cover - should return an entity
+        if not entity:  # pragma: no cover
             logger.log(
                 'error',
                 'model',
@@ -159,9 +159,9 @@ class Link:
 
     @staticmethod
     def get_links(
-            entities: Union[int, List[int]],
-            codes: Union[str, List[str], None] = None,
-            inverse: bool = False) -> List[Link]:
+            entities: Union[int, list[int]],
+            codes: Union[str, list[str], None] = None,
+            inverse: bool = False) -> list[Link]:
         from openatlas.models.entity import Entity
         entity_ids = set()
         result = Db.get_links(
@@ -183,8 +183,8 @@ class Link:
 
     @staticmethod
     def delete_by_codes(
-            entity: 'Entity',
-            codes: List[str],
+            entity: Entity,
+            codes: list[str],
             inverse: bool = False) -> None:
         Db.delete_by_codes(entity.id, codes, inverse)
 
@@ -193,7 +193,7 @@ class Link:
         return Link(Db.get_by_id(id_))
 
     @staticmethod
-    def get_entities_by_type(type_: 'Entity') -> List[Dict[str, Any]]:
+    def get_entities_by_type(type_: Entity) -> list[dict[str, Any]]:
         return Db.get_entities_by_type(type_.id)
 
     @staticmethod
@@ -201,7 +201,7 @@ class Link:
         Db.delete_(id_)
 
     @staticmethod
-    def get_invalid_cidoc_links() -> List[Dict[str, str]]:
+    def get_invalid_cidoc_links() -> list[dict[str, str]]:
         from openatlas.models.entity import Entity
         from openatlas.util.util import link
         invalid_linking = []
@@ -227,19 +227,19 @@ class Link:
         return invalid_links
 
     @staticmethod
-    def invalid_involvement_dates() -> List['Link']:
+    def invalid_involvement_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
             for row in Date.invalid_involvement_dates()]
 
     @staticmethod
-    def get_invalid_link_dates() -> List['Link']:
+    def get_invalid_link_dates() -> list[Link]:
         return [
             Link.get_by_id(row['id'])
             for row in Date.get_invalid_link_dates()]
 
     @staticmethod
-    def check_link_duplicates() -> List[Dict[str, Any]]:
+    def check_link_duplicates() -> list[dict[str, Any]]:
         return Db.check_link_duplicates()
 
     @staticmethod
@@ -247,7 +247,7 @@ class Link:
         return Db.delete_link_duplicates()
 
     @staticmethod
-    def check_single_type_duplicates() -> List[Dict[str, Any]]:
+    def check_single_type_duplicates() -> list[dict[str, Any]]:
         from openatlas.models.type import Type
         from openatlas.models.entity import Entity
         data = []

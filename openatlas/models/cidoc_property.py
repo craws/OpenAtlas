@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List
+from typing import Any
 
 from flask import g, session
 
@@ -10,7 +10,7 @@ from openatlas.database.cidoc_property import CidocProperty as Db
 
 class CidocProperty:
 
-    def __init__(self, data: Dict[str, Any]) -> None:
+    def __init__(self, data: dict[str, Any]) -> None:
         self.id = data['id']
         self._name = data['name']
         self._name_inverse = data['name_inverse']
@@ -19,10 +19,10 @@ class CidocProperty:
         self.domain_class_code = data['domain_class_code']
         self.range_class_code = data['range_class_code']
         self.count = data['count']
-        self.sub: List[int] = []
-        self.super: List[int] = []
-        self.i18n: Dict[str, str] = {}
-        self.i18n_inverse: Dict[str, str] = {}
+        self.sub: list[int] = []
+        self.super: list[int] = []
+        self.i18n: dict[str, str] = {}
+        self.i18n_inverse: dict[str, str] = {}
 
     @property
     def name(self) -> str:
@@ -48,7 +48,7 @@ class CidocProperty:
 
     def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)
-        if valid_domain_id == class_id:  # Check if links are CIDOC CRM valid
+        if valid_domain_id == class_id:
             return True
         return self.find_subs(
             attr,
@@ -58,7 +58,7 @@ class CidocProperty:
     def find_subs(
             self, attr:
             str, class_id:
-            int, valid_subs: List[int]) -> bool:
+            int, valid_subs: list[int]) -> bool:
         for sub_id in valid_subs:
             if sub_id == class_id or self.find_subs(
                     attr,
@@ -68,7 +68,7 @@ class CidocProperty:
         return False
 
     @staticmethod
-    def get_all() -> Dict[str, CidocProperty]:
+    def get_all() -> dict[str, CidocProperty]:
         properties = {
             row['code']: CidocProperty(row) for row in Db.get_properties()}
         for row in Db.get_hierarchy():

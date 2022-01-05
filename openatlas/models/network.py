@@ -1,4 +1,4 @@
-from typing import Dict, Optional, Set
+from typing import Optional
 
 from flask import g
 
@@ -9,7 +9,7 @@ class Network:
 
     @staticmethod
     def get_network_json(
-            colors: Dict[str, str],
+            colors: dict[str, str],
             hide_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
@@ -17,7 +17,7 @@ class Network:
         properties = [
             'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74',
             'P107', 'OA7', 'OA8', 'OA9']
-        entities: Set[int] = set()
+        entities: set[int] = set()
         nodes = []
         for row in Db.get_entities(classes):
             if row['id'] in mapping or row['id'] in entities:

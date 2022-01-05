@@ -1,3 +1,5 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 from typing import List, Optional, TYPE_CHECKING, Union
 
 from flask import g, url_for
@@ -31,7 +33,7 @@ class Tab:
             content: Optional[str] = None,
             table: Optional[Table] = None,
             buttons: Optional[List[str]] = None,
-            entity: Optional['Entity'] = None) -> None:
+            entity: Optional[Entity] = None) -> None:
 
         self.name = name
         self.content = content

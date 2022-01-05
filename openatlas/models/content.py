@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 from flask import session
 
@@ -6,8 +6,8 @@ from openatlas import app
 from openatlas.database.content import Content as Db
 
 
-def get_content() -> Dict[str, Dict[str, str]]:
-    content: Dict[str, Dict[str, str]] = {}
+def get_content() -> dict[str, dict[str, str]]:
+    content: dict[str, dict[str, str]] = {}
     for name in [
             'intro',
             'legal_notice',
@@ -35,6 +35,6 @@ def get_translation(name: str, lang: Optional[str] = None) -> str:
     return translations[session['settings']['default_language']]
 
 
-def update_content(data: List[Dict[str, str]]) -> None:
+def update_content(data: list[dict[str, str]]) -> None:
     for item in data:
         Db.update(item['name'], item['language'], item['text'])

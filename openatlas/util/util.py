@@ -130,9 +130,9 @@ def test_file(file_name: str) -> Optional[str]:
 
 
 def format_entity_date(
-        entity: Union['Entity', 'Link'],
+        entity: Union[Entity, Link],
         type_: str,  # begin or end
-        object_: Optional['Entity'] = None) -> str:
+        object_: Optional[Entity] = None) -> str:
     html = link(object_) if object_ else ''
     if getattr(entity, f'{type_}_from'):
         html += ', ' if html else ''
@@ -147,7 +147,7 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
+def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
@@ -176,9 +176,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(
-        entity: 'Entity',
-        show_links: bool = True) -> List[Any]:
+def get_base_table_data(entity: Entity, show_links: bool = True) -> List[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
@@ -222,7 +220,7 @@ def get_file_stats(
 
 
 def get_entity_data(
-        entity: 'Entity',
+        entity: Entity,
         event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
     data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
 
@@ -426,7 +424,7 @@ def tooltip(text: str) -> str:
         </span>""".format(title=text.replace('"', "'"))
 
 
-def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
+def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
@@ -435,7 +433,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
+def get_appearance(event_links: List[Link]) -> Tuple[str, str]:
     # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
@@ -478,13 +476,13 @@ def format_datetime(value: Any) -> str:
     return value.replace(microsecond=0).isoformat() if value else ''
 
 
-def get_file_extension(entity: Union[int, 'Entity']) -> str:
+def get_file_extension(entity: Union[int, Entity]) -> str:
     path = get_file_path(entity if isinstance(entity, int) else entity.id)
     return path.suffix if path else 'N/A'
 
 
 def get_file_path(
-        entity: Union[int, 'Entity'],
+        entity: Union[int, Entity],
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
     if id_ not in g.file_stats:
@@ -760,7 +758,7 @@ def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def get_type_data(entity: 'Entity') -> Dict[str, Any]:
+def get_type_data(entity: Entity) -> Dict[str, Any]:
     if entity.location:
         entity.types.update(entity.location.types)  # Add location types
     data: Dict[str, Any] = defaultdict(list)
@@ -948,8 +946,8 @@ def display_form(
 
 def display_value_type_fields(
         form: Any,
-        type_: 'Type',
-        root: Optional['Type'] = None) -> str:
+        type_: Type,
+        root: Optional[Type] = None) -> str:
     root = root if root else type_
     html = ''
     for sub_id in type_.subs:
