@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 import numpy
 from bcrypt import hashpw
@@ -66,7 +66,9 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     if origin:
         view_name = origin.class_.view
     html = ''
-    for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
+    for item in [
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type']:
         active = ''
         request_parts = request.path.split('/')
         if (view_name == item) or request.path.startswith('/index/' + item):
@@ -76,26 +78,17 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             if name in g.class_view_mapping \
                     and g.class_view_mapping[name] == item:
                 active = 'active'
-        url = url_for('index', view=item)
+        label = 'types' if item == 'type' else item
         html += \
-            f'<a href="{url}" class="nav-item nav-link {active}">' \
-            f'{uc_first(_(item))}</a>'
-    active = ''
-    if request.path.startswith('/types') \
-            or request.path.startswith('/insert/type') \
-            or (entity and entity.class_.view == 'type'):
-        active = 'active'
-    url = url_for('type_index')
-    html += \
-        f'<a href="{url}" class="nav-item nav-link {active}">' \
-        f'{uc_first(_("types"))}</a>'
+            f'<a href="{url_for("index", view=item)}" ' \
+            f'class="nav-item nav-link {active}">{uc_first(_(label))}</a>'
     return Markup(html)
 
 
 @contextfilter
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
-    # Using context filter to prevent Jinja2 context caching
+    # Using context filter above to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
@@ -156,17 +149,18 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
-def get_backup_file_data() -> Dict[str, Any]:
+def get_backup_file_data() -> dict[str, Any]:
     path = app.config['EXPORT_DIR'] / 'sql'
     latest_file = None
     latest_file_date = None
-    for file in [f for f in path.iterdir()
-                 if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
-    file_data: Dict[str, Any] = {'backup_too_old': True}
+    file_data: dict[str, Any] = {'backup_too_old': True}
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file.name
@@ -176,7 +170,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(entity: Entity, show_links: bool = True) -> List[Any]:
+def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
@@ -196,7 +190,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> List[Any]:
     return data
 
 
-def get_disk_space_info() -> Optional[Dict[str, Any]]:
+def get_disk_space_info() -> Optional[dict[str, Any]]:
     if os.name != "posix":  # pragma: no cover
         return None
     statvfs = os.statvfs(app.config['UPLOAD_DIR'])
@@ -209,8 +203,8 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 
 def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> Dict[int, Dict[str, Any]]:
-    stats: Dict[int, Dict[str, Any]] = {}
+        path: Path = app.config['UPLOAD_DIR']) -> dict[int, dict[str, Any]]:
+    stats: dict[int, dict[str, Any]] = {}
     for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
         stats[int(file.stem)] = {
             'ext': file.suffix,
@@ -221,8 +215,8 @@ def get_file_stats(
 
 def get_entity_data(
         entity: Entity,
-        event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
+        event_links: Optional[list[Link]] = None) -> dict[str, Any]:
+    data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
     from_link = ''
@@ -340,11 +334,11 @@ def required_group(group: str):  # type: ignore
 def send_mail(
         subject: str,
         text: str,
-        recipients: Union[str, List[str]],
+        recipients: Union[str, list[str]],
         log_body: bool = True) -> bool:  # pragma: no cover
     """
         Send one mail to every recipient.
-        Set log_body to False for sensitive data e.g. passwords.
+        Set log_body to False for sensitive data, e.g. password mails
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
@@ -433,7 +427,7 @@ def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
     return True
 
 
-def get_appearance(event_links: List[Link]) -> Tuple[str, str]:
+def get_appearance(event_links: list[Link]) -> tuple[str, str]:
     # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
@@ -561,7 +555,7 @@ def external_url(url: Union[str, None]) -> str:
         if url else ''
 
 
-def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
+def add_system_data(entity: Entity, data: dict[str, Any]) -> dict[str, Any]:
     """Add additional information for entity views if activated in profile"""
     if not hasattr(current_user, 'settings'):
         return data  # pragma: no cover
@@ -600,13 +594,12 @@ def delete_link(name: str, url: str) -> str:
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def add_edit_link(data: List[Any], url: str) -> None:
-    if is_authorized('contributor'):
-        data.append(link(_('edit'), url))
+def add_edit_link(url: str) -> Optional[str]:
+    return link(_('edit'), url) if is_authorized('contributor') else None
 
 
 def add_remove_link(
-        data: List[Any],
+        data: list[Any],
         name: str,
         link_: Link,
         origin: Entity,
@@ -693,7 +686,7 @@ def button(
 
 
 @app.template_filter()
-def button_bar(buttons: List[Any]) -> str:
+def button_bar(buttons: list[Any]) -> str:
     return Markup(
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
         if buttons else ''
@@ -708,7 +701,7 @@ def display_citation_example(code: str) -> str:
 
 
 @app.template_filter()
-def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
+def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
@@ -732,7 +725,7 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
 
 
 @app.template_filter()
-def breadcrumb(crumbs: List[Any]) -> str:
+def breadcrumb(crumbs: list[Any]) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     items = []
@@ -754,14 +747,14 @@ def uc_first(string: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
+def display_info(data: dict[str, Union[str, list[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def get_type_data(entity: Entity) -> Dict[str, Any]:
+def get_type_data(entity: Entity) -> dict[str, Any]:
     if entity.location:
         entity.types.update(entity.location.types)  # Add location types
-    data: Dict[str, Any] = defaultdict(list)
+    data: dict[str, Any] = defaultdict(list)
     for type_, value in sorted(entity.types.items(), key=lambda x: x[0].name):
         if entity.standard_type and type_.id == entity.standard_type.id:
             continue  # Standard type is already added
@@ -974,7 +967,7 @@ class MLStripper(HTMLParser):
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed: List[str] = []
+        self.fed: list[str] = []
 
     def handle_data(self, d: Any) -> None:
         self.fed.append(d)

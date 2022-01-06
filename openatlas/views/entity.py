@@ -142,8 +142,7 @@ def view(id_: int) -> Union[str, Response]:
             if link_.property.code == 'P25':
                 data += ['']
             else:
-                add_edit_link(
-                    data,
+                data += add_edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'event')
             tabs['event'].table.rows.append(data)
@@ -167,8 +166,7 @@ def view(id_: int) -> Union[str, Response]:
                 link_.first,
                 link_.last,
                 link_.description]
-            add_edit_link(
-                data,
+            data += add_edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, related.name, link_, entity, 'relation')
             tabs['relation'].table.rows.append(data)
@@ -179,8 +177,7 @@ def view(id_: int) -> Union[str, Response]:
                 link_.first,
                 link_.last,
                 link_.description]
-            add_edit_link(
-                data,
+            data += add_edit_link(
                 url_for('member_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
             tabs['member_of'].table.rows.append(data)
@@ -194,8 +191,7 @@ def view(id_: int) -> Union[str, Response]:
                     link_.first,
                     link_.last,
                     link_.description]
-                add_edit_link(
-                    data,
+                data += add_edit_link(
                     url_for('member_update', id_=link_.id, origin_id=entity.id))
                 add_remove_link(data, link_.range.name, link_, entity, 'member')
                 tabs['member'].table.rows.append(data)
@@ -234,8 +230,7 @@ def view(id_: int) -> Union[str, Response]:
                 last,
                 g.properties[link_.property.code].name_inverse,
                 link_.description]
-            add_edit_link(
-                data,
+            data += add_edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.range.name, link_, entity, 'actor')
             tabs['actor'].table.rows.append(data)
@@ -262,8 +257,7 @@ def view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
-            add_edit_link(
-                data,
+            data += add_edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(data, link_.domain.name, link_, entity, 'reference')
             tabs['reference'].table.rows.append(data)
@@ -328,8 +322,7 @@ def view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            add_edit_link(
-                data,
+            data += add_edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id))
             add_remove_link(
                 data,
@@ -393,8 +386,7 @@ def view(id_: int) -> Union[str, Response]:
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         if domain.id in overlays:
-                            add_edit_link(
-                                data,
+                            data += add_edit_link(
                                 url_for(
                                     'overlay_update',
                                     id_=overlays[domain.id].id))
@@ -408,8 +400,7 @@ def view(id_: int) -> Union[str, Response]:
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
-                add_edit_link(
-                    data,
+                data += add_edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id))
                 if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)

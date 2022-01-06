@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import List, Optional, TYPE_CHECKING, Union
+from typing import Optional, TYPE_CHECKING, Union
 
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
@@ -32,7 +32,7 @@ class Tab:
             name: str,
             content: Optional[str] = None,
             table: Optional[Table] = None,
-            buttons: Optional[List[str]] = None,
+            buttons: Optional[list[str]] = None,
             entity: Optional[Entity] = None) -> None:
 
         self.name = name
@@ -60,7 +60,7 @@ class Tab:
     def add_buttons(
             self,
             name: str,
-            buttons: List[str],
+            buttons: list[str],
             view: Union[None, str],
             id_: Union[None, int],
             class_: Union[None, OpenatlasClass]) -> None:

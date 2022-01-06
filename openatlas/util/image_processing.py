@@ -55,12 +55,11 @@ class ImageProcessing:
 
     @staticmethod
     def check_processed_image(filename: str) -> bool:
-        name = filename.rsplit('.', 1)[0].lower()
         file_format = '.' + filename.split('.', 1)[1].lower()
         try:
             if file_format in app.config['ALLOWED_IMAGE_EXT']:
                 return ImageProcessing.loop_through_processed_folders(
-                    name,
+                    filename.rsplit('.', 1)[0].lower(),
                     file_format)
             return False
         except Exception as e:  # pragma: no cover
