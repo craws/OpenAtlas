@@ -594,27 +594,6 @@ def delete_link(name: str, url: str) -> str:
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def add_edit_link(url: str) -> Optional[str]:
-    return link(_('edit'), url) if is_authorized('contributor') else None
-
-
-def add_remove_link(
-        data: list[Any],
-        name: str,
-        link_: Link,
-        origin: Entity,
-        tab_: str) -> None:
-    if is_authorized('contributor'):
-        data.append(link(
-            _('remove'),
-            url_for(
-                'link_delete',
-                id_=link_.id,
-                origin_id=origin.id) + '#tab-' + tab_,
-            js="return confirm('{x}')".format(
-                x=_('Remove %(name)s?', name=name.replace("'", '')))))
-
-
 def display_delete_link(entity: Entity) -> str:
     if entity.id in g.types:
         url = url_for('type_delete', id_=entity.id)

@@ -20,9 +20,9 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    add_edit_link, add_remove_link, button, display_delete_link, format_date,
-    get_base_table_data, get_entity_data, get_file_path, is_authorized, link,
-    required_group, uc_first)
+    button, display_delete_link, format_date, get_base_table_data,
+    get_entity_data, get_file_path, is_authorized, link, required_group,
+    uc_first)
 from openatlas.views.entity_index import file_preview
 from openatlas.views.link import AddReferenceForm
 
@@ -140,11 +140,11 @@ def view(id_: int) -> Union[str, Response]:
                 last,
                 link_.description]
             if link_.property.code == 'P25':
-                data += ['']
+                data.append('')
             else:
-                data += add_edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(data, link_.domain.name, link_, entity, 'event')
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            data.append(remove_link(link_.domain.name, link_, entity, 'event'))
             tabs['event'].table.rows.append(data)
         for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
             type_ = ''
@@ -160,41 +160,43 @@ def view(id_: int) -> Union[str, Response]:
                     type_ = link(
                         link_.type.get_name_directed(True),
                         url_for('view', id_=link_.type.id))
-            data = [
+            tabs['relation'].table.rows.append([
                 type_,
                 link(related),
                 link_.first,
                 link_.last,
-                link_.description]
-            data += add_edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(data, related.name, link_, entity, 'relation')
-            tabs['relation'].table.rows.append(data)
+                link_.description,
+                edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(related.name, link_, entity, 'relation')])
         for link_ in entity.get_links('P107', True):
             data = [
                 link(link_.domain),
                 link(link_.type),
                 link_.first,
                 link_.last,
-                link_.description]
-            data += add_edit_link(
-                url_for('member_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(data, link_.domain.name, link_, entity, 'member-of')
+                link_.description,
+                edit_link(
+                    url_for('member_update', id_=link_.id, origin_id=entity.id)
+                ),
+                remove_link(link_.domain.name, link_, entity, 'member-of')]
             tabs['member_of'].table.rows.append(data)
         if entity.class_.name != 'group':
             del tabs['member']
         else:
             for link_ in entity.get_links('P107'):
-                data = [
+                tabs['member'].table.rows.append([
                     link(link_.range),
                     link(link_.type),
                     link_.first,
                     link_.last,
-                    link_.description]
-                data += add_edit_link(
-                    url_for('member_update', id_=link_.id, origin_id=entity.id))
-                add_remove_link(data, link_.range.name, link_, entity, 'member')
-                tabs['member'].table.rows.append(data)
+                    link_.description,
+                    edit_link(
+                        url_for(
+                            'member_update',
+                            id_=link_.id,
+                            origin_id=entity.id)),
+                    remove_link(link_.range.name, link_, entity, 'member')])
         for link_ in entity.get_links('P52', True):
             data = [
                 link(link_.domain),
@@ -222,18 +224,17 @@ def view(id_: int) -> Union[str, Response]:
             last = link_.last
             if not link_.last and entity.last:
                 last = f'<span class="inactive">{entity.last}</span>'
-            data = [
+            tabs['actor'].table.rows.append([
                 link(link_.range),
                 link_.range.class_.label,
                 link_.type.name if link_.type else '',
                 first,
                 last,
                 g.properties[link_.property.code].name_inverse,
-                link_.description]
-            data += add_edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(data, link_.range.name, link_, entity, 'actor')
-            tabs['actor'].table.rows.append(data)
+                link_.description,
+                edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(link_.range.name, link_, entity, 'actor')])
         entity.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
@@ -247,19 +248,16 @@ def view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            add_remove_link(
-                data,
-                range_.name,
-                link_,
-                entity,
-                range_.class_.name)
+            data.append(
+                remove_link(range_.name, link_, entity, range_.class_.name))
             tabs[range_.class_.view].table.rows.append(data)
         for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
-            data += add_edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(data, link_.domain.name, link_, entity, 'reference')
+            data.append(edit_link(
+                url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            data.append(
+                remove_link(link_.domain.name, link_, entity, 'reference'))
             tabs['reference'].table.rows.append(data)
     elif entity.class_.view == 'place':
         tabs['source'] = Tab('source', entity=entity)
@@ -322,14 +320,10 @@ def view(id_: int) -> Union[str, Response]:
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            data += add_edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id))
-            add_remove_link(
-                data,
-                range_.name,
-                link_,
-                entity,
-                range_.class_.name)
+            data.append(edit_link(
+                url_for('link_update', id_=link_.id, origin_id=entity.id)))
+            data.append(
+                remove_link(range_.name, link_, entity, range_.class_.name))
             tabs[range_.class_.view].table.rows.append(data)
     elif entity.class_.view == 'source':
         for name in [
@@ -344,12 +338,8 @@ def view(id_: int) -> Union[str, Response]:
         for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            add_remove_link(
-                data,
-                range_.name,
-                link_,
-                entity,
-                range_.class_.name)
+            data.append(
+                remove_link(range_.name, link_, entity, range_.class_.name))
             tabs[range_.class_.view].table.rows.append(data)
 
     if entity.class_.view in [
@@ -386,10 +376,10 @@ def view(id_: int) -> Union[str, Response]:
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         if domain.id in overlays:
-                            data += add_edit_link(
+                            data.append(edit_link(
                                 url_for(
                                     'overlay_update',
-                                    id_=overlays[domain.id].id))
+                                    id_=overlays[domain.id].id)))
                         else:
                             data.append(link(_('link'), url_for(
                                 'overlay_insert',
@@ -400,17 +390,13 @@ def view(id_: int) -> Union[str, Response]:
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
-                data += add_edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id))
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
                 if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)
                     continue
-            add_remove_link(
-                data,
-                domain.name,
-                link_,
-                entity,
-                domain.class_.view)
+            data.append(
+                remove_link(domain.name, link_, entity, domain.class_.view))
             tabs[domain.class_.view].table.rows.append(data)
 
     place_structure = None
@@ -607,3 +593,22 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_('reference')}"])
+
+
+def edit_link(url: str) -> Optional[str]:
+    return link(_('edit'), url) if is_authorized('contributor') else None
+
+
+def remove_link(
+        name: str,
+        link_: Link,
+        origin: Entity,
+        tab: str) -> Optional[str]:
+    if not is_authorized('contributor'):
+        return None  # pragma: no cover
+    url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
+    return link(
+        _('remove'),
+        f'{url}#tab-{tab}',
+        js="return confirm('{x}')".format(
+            x=_('Remove %(name)s?', name=name.replace("'", ''))))
