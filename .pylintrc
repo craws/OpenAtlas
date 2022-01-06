@@ -9,3 +9,4 @@ max-line-length=80
 
 [TYPECHECK]
 ignored-classes=Form
+disable=cyclic-import  # Too noisy and random for now, turn on again later
