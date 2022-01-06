@@ -15,17 +15,17 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use test database if running tests
-instance_name = 'production' \
-    if 'test_runner.py' not in sys.argv[0] else 'testing'
+INSTANCE = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 
 app.config.from_object('config')
-app.config.from_pyfile(instance_name + '.py')
+app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 if os.name == "posix":
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
+# pylint: disable=wrong-import-position, import-outside-toplevel
 from openatlas.models.logger import Logger
 
 logger = Logger()
