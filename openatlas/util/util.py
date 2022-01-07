@@ -190,29 +190,6 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     return data
 
 
-def get_disk_space_info() -> Optional[dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail
-    return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
-
-
-def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> dict[int, dict[str, Any]]:
-    stats: dict[int, dict[str, Any]] = {}
-    for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(file.stem)] = {
-            'ext': file.suffix,
-            'size': convert_size(file.stat().st_size),
-            'date': file.stat().st_ctime}
-    return stats
-
-
 def get_entity_data(
         entity: Entity,
         event_links: Optional[list[Link]] = None) -> dict[str, Any]:

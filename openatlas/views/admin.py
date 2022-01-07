@@ -1,7 +1,8 @@
 import datetime
 import importlib
+import math
 import os
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -23,17 +24,17 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
+from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.image_processing import ImageProcessing
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_disk_space_info, get_file_path, is_authorized, link,
-    manual, required_group, sanitize, send_mail, uc_first)
+    format_datetime, get_file_path, is_authorized, link, manual, required_group,
+    sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -716,3 +717,15 @@ def admin_delete_orphaned_resized_images() -> Response:
     ImageProcessing.delete_orphaned_resized_images()
     flash(_('resized orphaned images were deleted'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
+
+
+def get_disk_space_info() -> Optional[dict[str, Any]]:
+    if os.name != "posix":  # pragma: no cover
+        return None
+    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
+    disk_space = statvfs.f_frsize * statvfs.f_blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail
+    return {
+        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
