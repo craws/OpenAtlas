@@ -78,10 +78,16 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             if name in g.class_view_mapping \
                     and g.class_view_mapping[name] == item:
                 active = 'active'
-        label = 'types' if item == 'type' else item
-        html += \
-            f'<a href="{url_for("index", view=item)}" ' \
-            f'class="nav-item nav-link {active}">{uc_first(_(label))}</a>'
+        if item == 'type':
+            html += \
+                f'<a href="{url_for("type_index")}" ' \
+                f'class="nav-item nav-link {active}">{uc_first(_("types"))}</a>'
+        else:
+            html += \
+                f'<a href="{url_for("index", view=item)}" ' \
+                f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
+
+
     return Markup(html)
 
 
