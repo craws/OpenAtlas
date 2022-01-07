@@ -313,7 +313,9 @@ def get_entity_data(
         data[_('artifact')] = [
             link(artifact) for artifact in
             entity.get_linked_entities('P128', inverse=True)]
-    return add_system_data(entity, data)
+    if hasattr(current_user, 'settings'):
+        data |= get_system_data(entity)
+    return data
 
 
 def required_group(group: str):  # type: ignore
@@ -555,10 +557,8 @@ def external_url(url: Union[str, None]) -> str:
         if url else ''
 
 
-def add_system_data(entity: Entity, data: dict[str, Any]) -> dict[str, Any]:
-    """Add additional information for entity views if activated in profile"""
-    if not hasattr(current_user, 'settings'):
-        return data  # pragma: no cover
+def get_system_data(entity: Entity) -> dict[str, Any]:
+    data = {}
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
@@ -610,16 +610,25 @@ def link(
         class_: Optional[str] = '',
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None) -> str:
+    from openatlas.models.entity import Entity
+    from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
         return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
             class_=class_,
             js=f'onclick="{js}"' if js else '',
             label=(uc_first(str(object_))) if uc_first_ else object_)
-
-    # Builds an HTML link to a detail view of an object
-    from openatlas.models.entity import Entity
-    from openatlas.models.user import User
+    if isinstance(object_, Entity):
+        return link(
+            object_.name,
+            url_for('view', id_=object_.id),
+            uc_first_=False)
+    if isinstance(object_, CidocClass):
+        return link(
+            object_.code,
+            url_for('cidoc_class_view', code=object_.code))
+    if isinstance(object_, CidocProperty):
+        return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Project):
         return link(
             object_.name,
@@ -629,17 +638,6 @@ def link(
             object_.username,
             url_for('user_view', id_=object_.id),
             class_='' if object_.active else 'inactive',
-            uc_first_=False)
-    if isinstance(object_, CidocClass):
-        return link(
-            object_.code,
-            url_for('cidoc_class_view', code=object_.code))
-    if isinstance(object_, CidocProperty):
-        return link(object_.code, url_for('property_view', code=object_.code))
-    if isinstance(object_, Entity):
-        return link(
-            object_.name,
-            url_for('view', id_=object_.id),
             uc_first_=False)
     return ''
 
@@ -651,17 +649,16 @@ def button(
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
+    tag = 'a' if url else 'span'
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
-    return Markup(
-        render_template(
-            'util/button.html',
-            label=label,
-            url=url,
-            css=css,
-            id_=id_,
-            js=onclick))
+    return Markup(f"""
+        <{tag}
+            {f'href="{url}"' if url else ''}
+            {f'id="{id_}"' if id_ else ''} 
+            class="{app.config['CSS']['button'][css]}"
+            {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
 
 
 @app.template_filter()
@@ -673,10 +670,11 @@ def button_bar(buttons: list[Any]) -> str:
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
-    text = get_translation('citation_example')
-    if not text or code != 'reference':
+    if code != 'reference':
         return ''
-    return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
+    if text := get_translation('citation_example'):
+        return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
+    return ''  # pragma: no cover
 
 
 @app.template_filter()
@@ -739,8 +737,7 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
             continue  # Standard type is already added
         html = f"""
             <span title="{" > ".join([g.types[i].name for i in type_.root])}">
-                {link(type_)}
-            </span>"""
+                {link(type_)}</span>"""
         if type_.category == 'value':
             html += f' {float(value):g} {type_.description}'
         data[g.types[type_.root[0]].name].append(html)
@@ -920,8 +917,8 @@ def display_value_type_fields(
         form: Any,
         type_: Type,
         root: Optional[Type] = None) -> str:
-    root = root if root else type_
     html = ''
+    root = root if root else type_
     for sub_id in type_.subs:
         sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
