@@ -193,8 +193,8 @@ class Link:
         return Link(Db.get_by_id(id_))
 
     @staticmethod
-    def get_entities_by_type(type_: Entity) -> list[dict[str, Any]]:
-        return Db.get_entities_by_type(type_.id)
+    def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
+        return Db.get_links_by_type(type_.id)
 
     @staticmethod
     def delete_(id_: int) -> None:

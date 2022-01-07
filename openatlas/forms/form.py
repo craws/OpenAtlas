@@ -386,7 +386,7 @@ def build_move_form(type_: Type) -> FlaskForm:
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in Link.get_entities_by_type(type_):
+        for row in Link.get_links_by_type(type_):
             domain = Entity.get_by_id(row['domain_id'])
             range_ = Entity.get_by_id(row['range_id'])
             choices.append((row['id'], domain.name + ' - ' + range_.name))

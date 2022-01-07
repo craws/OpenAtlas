@@ -131,7 +131,7 @@ class Link:
         return dict(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_type(type_id: int) -> list[dict[str, Any]]:
+    def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
         g.cursor.execute("""
             SELECT id, domain_id, range_id from model.link
             WHERE type_id = %(type_id)s;""", {'type_id': type_id})

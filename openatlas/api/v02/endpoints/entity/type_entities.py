@@ -31,7 +31,7 @@ class GetTypeEntities(Resource):
     @staticmethod
     def get_special_nodes(id_: int) -> list[Entity]:
         domain_ids = [link_['domain_id'] for link_ in
-                      Link.get_entities_by_type(g.types[id_])]
+                      Link.get_links_by_type(g.types[id_])]
         range_ids = [link_['range_id'] for link_ in
-                     Link.get_entities_by_type(g.types[id_])]
+                     Link.get_links_by_type(g.types[id_])]
         return get_entities_by_ids(range_ids + domain_ids)
