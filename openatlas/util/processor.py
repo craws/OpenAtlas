@@ -17,7 +17,7 @@ class GlobalSearchForm(FlaskForm):
 @app.context_processor
 def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     def get_logo() -> str:
-        logo = Path('static') / 'images' / 'layout' / 'logo.png'
+        logo = Path('/static') / 'images' / 'layout' / 'logo.png'
         if session['settings']['logo_file_id']:
             ext = get_file_extension(int(session['settings']['logo_file_id']))
             if ext != 'N/A':
