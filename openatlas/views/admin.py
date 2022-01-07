@@ -263,10 +263,7 @@ def admin_check_link_duplicates(
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    duplicates = False
-    if table.rows:
-        duplicates = True
-    else:  # If no exact duplicates check single types for multiple use
+    if not table.rows:  # Check single types for multiple use
         table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
         for row in Link.check_single_type_duplicates():
@@ -286,7 +283,6 @@ def admin_check_link_duplicates(
     return render_template(
         'admin/check_link_duplicates.html',
         table=table,
-        duplicates=duplicates,
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -331,8 +327,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = 'data' if category == 'api' else category
-        tab = 'email' if category == 'mail' else tab
+        tab = category.replace('api', 'data').replace('mail', 'email')
         return redirect(f"{url_for('admin_index')}#tab-{tab}")
     set_form_settings(form)
     return render_template(
@@ -359,7 +354,8 @@ def admin_check_similar() -> str:
     if form.validate_on_submit():
         table = Table(['name', _('count')])
         for sample in Entity.get_similar_named(
-                form.classes.data, form.ratio.data).values():
+                form.classes.data,
+                form.ratio.data).values():
             html = link(sample['entity'])
             for entity in sample['entities']:  # Table linebreaks workaround
                 html += f'<br><br><br><br><br>{link(entity)}'
@@ -392,12 +388,8 @@ def admin_check_dates() -> str:
             table=Table(['link', 'domain', 'range'])),
         'involvement_dates': Tab(
             'invalid_involvement_dates',
-            table=Table([
-                'actor',
-                'event',
-                'class',
-                'involvement',
-                'description']))}
+            table=Table(
+                ['actor', 'event', 'class', 'involvement', 'description']))}
     for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -476,8 +468,7 @@ def admin_orphans() -> str:
     for entity in filter(
             lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
         tabs[
-            'unlinked' if entity.class_.view
-            else 'orphans'].table.rows.append([
+            'unlinked' if entity.class_.view else 'orphans'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
@@ -580,8 +571,9 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in g.file_stats:
-            date = format_date(datetime.datetime.utcfromtimestamp(
-                g.file_stats[entity.id]['date']))
+            date = format_date(
+                datetime.datetime.utcfromtimestamp(
+                    g.file_stats[entity.id]['date']))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
