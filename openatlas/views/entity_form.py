@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
@@ -95,7 +95,7 @@ def add_crumbs(
         class_: str,
         origin: Union[Entity, None],
         structure: Optional[Dict[str, Any]],
-        insert_: Optional[bool] = False) -> List[Any]:
+        insert_: Optional[bool] = False) -> list[Any]:
     view = g.classes[class_].view
     label = origin.class_.name if origin else view
     if label in g.class_view_mapping:
