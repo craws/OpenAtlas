@@ -44,112 +44,17 @@ def view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    event_links = None  # Needed for actor
-    overlays = None  # Needed for place
+    event_links = None  # Needed for actor and info data
     tabs = {'info': Tab('info')}
     if isinstance(entity, Type):
         tabs |= add_tabs_for_type(entity)
     elif isinstance(entity, ReferenceSystem):
         tabs |= add_tabs_for_reference_system(entity)
     elif entity.class_.view == 'actor':
-        for name in [
-                'source', 'event', 'relation', 'member_of', 'member',
-                'artifact']:
-            tabs[name] = Tab(name, entity=entity)
         event_links = entity.get_links(
             ['P11', 'P14', 'P22', 'P23', 'P25'],
             True)
-        for link_ in event_links:
-            event = link_.domain
-            places = event.get_linked_entities(['P7', 'P26', 'P27'])
-            link_.object_ = None  # Needed for first/last appearance
-            for place in places:
-                object_ = place.get_linked_entity_safe('P53', True)
-                entity.linked_places.append(object_)
-                link_.object_ = object_
-            first = link_.first
-            if not link_.first and event.first:
-                first = f'<span class="inactive">{event.first}</span>'
-            last = link_.last
-            if not link_.last and event.last:
-                last = f'<span class="inactive">{event.last}</span>'
-            data = [
-                link(event),
-                event.class_.label,
-                _('moved')
-                if link_.property.code == 'P25' else link(link_.type),
-                first,
-                last,
-                link_.description]
-            if link_.property.code == 'P25':
-                data.append('')
-            else:
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-            data.append(remove_link(link_.domain.name, link_, entity, 'event'))
-            tabs['event'].table.rows.append(data)
-        for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
-            type_ = ''
-            if entity.id == link_.domain.id:
-                related = link_.range
-                if link_.type:
-                    type_ = link(
-                        link_.type.get_name_directed(),
-                        url_for('view', id_=link_.type.id))
-            else:
-                related = link_.domain
-                if link_.type:
-                    type_ = link(
-                        link_.type.get_name_directed(True),
-                        url_for('view', id_=link_.type.id))
-            tabs['relation'].table.rows.append([
-                type_,
-                link(related),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(related.name, link_, entity, 'relation')])
-        for link_ in entity.get_links('P107', True):
-            data = [
-                link(link_.domain),
-                link(link_.type),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(
-                    url_for(
-                        'member_update',
-                        id_=link_.id,
-                        origin_id=entity.id)),
-                remove_link(link_.domain.name, link_, entity, 'member-of')]
-            tabs['member_of'].table.rows.append(data)
-        if entity.class_.name != 'group':
-            del tabs['member']
-        else:
-            for link_ in entity.get_links('P107'):
-                tabs['member'].table.rows.append([
-                    link(link_.range),
-                    link(link_.type),
-                    link_.first,
-                    link_.last,
-                    link_.description,
-                    edit_link(
-                        url_for(
-                            'member_update',
-                            id_=link_.id,
-                            origin_id=entity.id)),
-                    remove_link(link_.range.name, link_, entity, 'member')])
-        for link_ in entity.get_links('P52', True):
-            data = [
-                link(link_.domain),
-                link_.domain.class_.label,
-                link(link_.domain.standard_type),
-                link_.domain.first,
-                link_.domain.last,
-                link_.domain.description]
-            tabs['artifact'].table.rows.append(data)
+        tabs |= add_tabs_for_actor(entity, event_links)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
     elif entity.class_.view == 'event':
@@ -163,6 +68,7 @@ def view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'source':
         tabs |= add_tabs_for_source(entity)
 
+    overlays = None  # Needed for place
     if entity.class_.view in [
             'actor', 'artifact', 'event', 'place', 'source', 'type']:
         if not isinstance(entity, Type):
@@ -221,6 +127,16 @@ def view(id_: int) -> Union[str, Response]:
                 remove_link(domain.name, link_, entity, domain.class_.view))
             tabs[domain.class_.view].table.rows.append(data)
 
+    if 'file' in tabs \
+            and current_user.settings['table_show_icons'] \
+            and session['settings']['image_processing']:
+        tabs['file'].table.header.insert(1, uc_first(_('icon')))
+        for row in tabs['file'].table.rows:
+            row.insert(
+                1,
+                file_preview(
+                    int(row[0].replace('<a href="/entity/', '').split('"')[0])))
+
     place_structure = None
     gis_data = None
     if entity.class_.view in ['artifact', 'place']:
@@ -239,26 +155,7 @@ def view(id_: int) -> Union[str, Response]:
     if not gis_data:  # Has to be after get_entity_data()
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
-
-    tabs['note'] = Tab('note', entity=entity)
-    for note in current_user.get_notes_by_entity_id(entity.id):
-        data = [
-            format_date(note['created']),
-            uc_first(_('public')) if note['public'] else uc_first(_('private')),
-            link(User.get_by_id(note['user_id'])),
-            note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">'
-            f'{uc_first(_("view"))}</a>']
-        tabs['note'].table.rows.append(data)
-
-    if 'file' in tabs and current_user.settings['table_show_icons'] and \
-            session['settings']['image_processing']:
-        tabs['file'].table.header.insert(1, uc_first(_('icon')))
-        for row in tabs['file'].table.rows:
-            row.insert(
-                1,
-                file_preview(
-                    int(row[0].replace('<a href="/entity/', '').split('"')[0])))
+    tabs['note'] = add_note_tab(entity)
     tabs['info'].content = render_template(
         'entity/view.html',
         buttons=add_buttons(entity),
@@ -504,6 +401,101 @@ def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
     return tabs
 
 
+def add_tabs_for_actor(
+        entity: Entity,
+        event_links: list[Link]) -> dict[str, Tab]:
+    tabs = {}
+    for name in [
+            'source', 'event', 'relation', 'member_of', 'member', 'artifact']:
+        tabs[name] = Tab(name, entity=entity)
+    for link_ in event_links:
+        event = link_.domain
+        link_.object_ = None  # Needed for first/last appearance
+        for place in event.get_linked_entities(['P7', 'P26', 'P27']):
+            object_ = place.get_linked_entity_safe('P53', True)
+            entity.linked_places.append(object_)
+            link_.object_ = object_
+        first = link_.first
+        if not link_.first and event.first:
+            first = f'<span class="inactive">{event.first}</span>'
+        last = link_.last
+        if not link_.last and event.last:
+            last = f'<span class="inactive">{event.last}</span>'
+        data = [
+            link(event),
+            event.class_.label,
+            _('moved')
+            if link_.property.code == 'P25' else link(link_.type),
+            first,
+            last,
+            link_.description]
+        if link_.property.code == 'P25':
+            data.append('')
+        else:
+            data.append(edit_link(
+                url_for('link_update', id_=link_.id, origin_id=entity.id)))
+        data.append(remove_link(link_.domain.name, link_, entity, 'event'))
+        tabs['event'].table.rows.append(data)
+    for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
+        type_ = ''
+        if entity.id == link_.domain.id:
+            related = link_.range
+            if link_.type:
+                type_ = link(
+                    link_.type.get_name_directed(),
+                    url_for('view', id_=link_.type.id))
+        else:
+            related = link_.domain
+            if link_.type:
+                type_ = link(
+                    link_.type.get_name_directed(True),
+                    url_for('view', id_=link_.type.id))
+        tabs['relation'].table.rows.append([
+            type_,
+            link(related),
+            link_.first,
+            link_.last,
+            link_.description,
+            edit_link(
+                url_for('link_update', id_=link_.id, origin_id=entity.id)),
+            remove_link(related.name, link_, entity, 'relation')])
+    for link_ in entity.get_links('P107', True):
+        data = [
+            link(link_.domain),
+            link(link_.type),
+            link_.first,
+            link_.last,
+            link_.description,
+            edit_link(
+                url_for('member_update', id_=link_.id, origin_id=entity.id)),
+            remove_link(link_.domain.name, link_, entity, 'member-of')]
+        tabs['member_of'].table.rows.append(data)
+    if entity.class_.name != 'group':
+        del tabs['member']
+    else:
+        for link_ in entity.get_links('P107'):
+            tabs['member'].table.rows.append([
+                link(link_.range),
+                link(link_.type),
+                link_.first,
+                link_.last,
+                link_.description,
+                edit_link(
+                    url_for('member_update', id_=link_.id, origin_id=entity.id)
+                ),
+                remove_link(link_.range.name, link_, entity, 'member')])
+    for link_ in entity.get_links('P52', True):
+        data = [
+            link(link_.domain),
+            link_.domain.class_.label,
+            link(link_.domain.standard_type),
+            link_.domain.first,
+            link_.domain.last,
+            link_.domain.description]
+        tabs['artifact'].table.rows.append(data)
+    return tabs
+
+
 def add_tabs_for_event(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in ['subs', 'source', 'actor']:
@@ -649,3 +641,17 @@ def add_tabs_for_source(entity: Entity) -> dict[str, Tab]:
         data.append(remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs
+
+
+def add_note_tab(entity: Entity) -> Tab:
+    tab = Tab('note', entity=entity)
+    for note in current_user.get_notes_by_entity_id(entity.id):
+        data = [
+            format_date(note['created']),
+            uc_first(_('public')) if note['public'] else uc_first(_('private')),
+            link(User.get_by_id(note['user_id'])),
+            note['text'],
+            f'<a href="{url_for("note_view", id_=note["id"])}">'
+            f'{uc_first(_("view"))}</a>']
+        tab.table.rows.append(data)
+    return tab
