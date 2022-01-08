@@ -34,8 +34,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
         manual_page='entity/type',
         title=_('types'),
         crumbs=[
-            [_('types'),
-             url_for('type_index')],
+            [_('types'), url_for('type_index')],
             f'+ {uc_first(_(category))}'])
 
 
@@ -111,9 +110,7 @@ def save(
         category: Optional[str] = None) -> Optional[Type]:
     multiple = False
     if category == 'value' or (
-            hasattr(form, 'multiple')
-            and form.multiple
-            and form.multiple.data):
+            hasattr(form, 'multiple') and form.multiple and form.multiple.data):
         multiple = True
     Transaction.begin()
     try:

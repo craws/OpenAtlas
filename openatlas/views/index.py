@@ -71,22 +71,23 @@ def overview() -> str:
                 f'<a href="{url_for("note_view", id_=note["id"])}">'
                 f'{uc_first(_("view"))}</a>'])
         for name, count in Entity.get_overview_counts().items():
-            if count:
-                url = url_for('index', view=g.class_view_mapping[name])
-                if name == 'administrative_unit':
-                    url = f"{url_for('type_index')}#menu-tab-place"
-                elif name == 'type':
-                    url = url_for('type_index')
-                elif name in [
-                        'feature',
-                        'human_remains',
-                        'stratigraphic_unit',
-                        'source_translation']:
-                    url = ''
-                tables['overview'].rows.append([
-                    link(g.classes[name].label, url)
-                    if url else g.classes[name].label,
-                    format_number(count)])
+            if not count:
+                continue  # pragma: no cover
+            url = url_for('index', view=g.class_view_mapping[name])
+            if name == 'administrative_unit':
+                url = f"{url_for('type_index')}#menu-tab-place"
+            elif name == 'type':
+                url = url_for('type_index')
+            elif name in [
+                    'feature',
+                    'human_remains',
+                    'stratigraphic_unit',
+                    'source_translation']:
+                url = ''
+            tables['overview'].rows.append([
+                link(g.classes[name].label, url) if url
+                else g.classes[name].label,
+                format_number(count)])
         for entity in Entity.get_latest(10):
             tables['latest'].rows.append([
                 format_date(entity.created),
@@ -114,21 +115,18 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
+    settings = session['settings']
     form = FeedbackForm()
-    if form.validate_on_submit() \
-            and session['settings']['mail']:  # pragma: no cover
-        subject = \
-            f"{uc_first(form.subject.data)} " \
-            f"from {session['settings']['site_name']}"
-        user = current_user
+    if form.validate_on_submit() and settings['mail']:  # pragma: no cover
         body = \
-            f'{form.subject.data} from {user.username} ({user.id}) ' \
-            f'{user.email} at {request.headers["Host"]}\n\n' \
+            f'{form.subject.data} from {current_user.username} ' \
+            f'({current_user.id}) {current_user.email} at ' \
+            f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                subject,
+                f"{uc_first(form.subject.data)} from {settings['site_name']}",
                 body,
-                session['settings']['mail_recipients_feedback']):
+                settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')

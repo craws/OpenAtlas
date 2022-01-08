@@ -144,8 +144,7 @@ def delete_entity(id_: int) -> Optional[str]:
 
 
 def delete_files(id_: int) -> None:
-    path = get_file_path(id_)
-    if path:  # Only delete existing files to prevent a missing file error
+    if path := get_file_path(id_):  # Prevent missing file warning
         path.unlink()
     for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
         path.unlink()

@@ -25,22 +25,23 @@ def download_file(filename: str) -> Any:
 def display_file(filename: str) -> Any:
     if request.args.get('size'):
         return send_from_directory(
-            app.config['RESIZED_IMAGES'] / request.args.get('size'), filename)
+            app.config['RESIZED_IMAGES'] / request.args.get('size'),
+            filename)
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
-def display_logo(filename: str) -> Any:  # File display function for public
+def display_logo(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
-@app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
+@app.route('/file/set_profile_image/<int:id_>/<int:origin_id>')
 def set_profile_image(id_: int, origin_id: int) -> Response:
     Entity.set_profile_image(id_, origin_id)
     return redirect(url_for('view', id_=origin_id))
 
 
-@app.route('/file/set_as_profile_image/<int:entity_id>')
+@app.route('/file/remove_profile_image/<int:entity_id>')
 def file_remove_profile_image(entity_id: int) -> Response:
     entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
