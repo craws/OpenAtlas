@@ -327,8 +327,9 @@ def admin_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = category.replace('api', 'data').replace('mail', 'email')
-        return redirect(f"{url_for('admin_index')}#tab-{tab}")
+        return redirect(
+            f"{url_for('admin_index')}"
+            f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
     return render_template(
         'display_form.html',

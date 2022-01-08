@@ -37,7 +37,7 @@ def link_delete(id_: int, origin_id: int) -> Response:
 @required_group('contributor')
 def link_insert(id_: int, view: str) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
-    property_code = 'P67'  # Set defaults (for source)
+    property_code = 'P67'
     inverse = False
     if entity.class_.view == 'actor' and view == 'artifact':
         property_code = 'P52'
@@ -129,8 +129,8 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = link_.range.class_.view \
-            if origin.class_.view == 'reference' else 'reference'
+        tab = link_.range.class_.view if origin.class_.view == 'reference' \
+            else 'reference'
         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
     form.save.label.text = _('save')
     form.page.data = link_.description
@@ -173,8 +173,9 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = 'actor' if origin.class_.view == 'event' else 'event'
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
     form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description

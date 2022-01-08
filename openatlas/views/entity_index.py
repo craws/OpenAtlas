@@ -125,8 +125,9 @@ def delete_entity(id_: int) -> Optional[str]:
             return url_for('view', id_=id_)
         if entity.class_.name != 'place':
             if parent := entity.get_linked_entity('P46', True):
-                tab = f"#tab-{entity.class_.name.replace('_', '-')}"
-                url = url_for('view', id_=parent.id) + tab
+                url = \
+                    f"{url_for('view', id_=parent.id)}" \
+                    f"#tab-{entity.class_.name.replace('_', '-')}"
     elif entity.class_.name == 'source_translation':
         source = entity.get_linked_entity_safe('P73', inverse=True)
         url = f"{url_for('view', id_=source.id)}#tab-text"

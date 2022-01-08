@@ -48,8 +48,9 @@ def member_insert(
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(
                 url_for('member_insert', origin_id=origin_id, code=code))
-        tab = '#tab-member' if code == 'member' else '#tab-member-of'
-        return redirect(url_for('view', id_=origin.id) + tab)
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-member{'' if code == 'member' else '-of'}")
     return render_template(
         'display_form.html',
         form=form,
@@ -81,8 +82,9 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
-        return redirect(url_for('view', id_=origin.id) + tab)
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-member{'-of' if origin.id == range_.id else ''}")
     form.save.label.text = _('save')
     related = range_ if origin_id == domain.id else domain
     return render_template(
