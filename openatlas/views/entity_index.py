@@ -123,24 +123,21 @@ def delete_entity(id_: int) -> Optional[str]:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('view', id_=id_)
-        parent = None \
-            if entity.class_.name == 'place' \
-            else entity.get_linked_entity('P46', True)
-        entity.delete()
-        if parent:
-            tab = f"#tab-{entity.class_.name.replace('_', '-')}"
-            url = url_for('view', id_=parent.id) + tab
-    else:
-        if entity.class_.name == 'source_translation':
-            source = entity.get_linked_entity_safe('P73', inverse=True)
-            url = f"{url_for('view', id_=source.id)}#tab-text"
-        Entity.delete_(id_)
-        if entity.class_.name == 'file':
-            try:
-                delete_files(id_)
-            except Exception as e:  # pragma: no cover
-                logger.log('error', 'file', 'file deletion failed', e)
-                flash(_('error file delete'), 'error')
+        if entity.class_.name != 'place':
+            if parent := entity.get_linked_entity('P46', True):
+                tab = f"#tab-{entity.class_.name.replace('_', '-')}"
+                url = url_for('view', id_=parent.id) + tab
+    elif entity.class_.name == 'source_translation':
+        source = entity.get_linked_entity_safe('P73', inverse=True)
+        url = f"{url_for('view', id_=source.id)}#tab-text"
+    elif entity.class_.name == 'file':
+        try:
+            delete_files(id_)
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'file', 'file deletion failed', e)
+            flash(_('error file delete'), 'error')
+            return url_for('view', id_=id_)
+    entity.delete()
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return url
