@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, url_for
 
@@ -1024,26 +1024,26 @@ class ApiTests(TestBaseCase):
 
     @staticmethod
     def get_bool(
-            data: Dict[str, Any], key: str,
-            value: Optional[Union[str, List[Any]]] = None) -> bool:
+            data: dict[str, Any], key: str,
+            value: Optional[Union[str, list[Any]]] = None) -> bool:
         if value:
             return bool(data[key] == value)
         return bool(data[key])
 
     @staticmethod
-    def get_bool_inverse(data: Dict[str, Any], key: str) -> bool:
+    def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
         return bool(not data[key])
 
     @staticmethod
-    def get_no_key(data: Dict[str, Any], key: str) -> bool:
+    def get_no_key(data: dict[str, Any], key: str) -> bool:
         return bool(key not in data.keys())
 
     @staticmethod
-    def get_geom_properties(geom: Dict[str, Any], key: str) -> bool:
+    def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
         return bool(geom['features'][0]['properties'][key])
 
     @staticmethod
-    def get_class_mapping(data: List[Dict[str, Any]]) -> bool:
+    def get_class_mapping(data: list[dict[str, Any]]) -> bool:
         return bool(data[0]['systemClass']
                     and data[0]['crmClass']
                     and data[0]['view']

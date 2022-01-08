@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
@@ -94,7 +94,7 @@ def update(id_: int) -> Union[str, Response]:
 def add_crumbs(
         class_: str,
         origin: Union[Entity, None],
-        structure: Optional[Dict[str, Any]],
+        structure: Optional[dict[str, Any]],
         insert_: Optional[bool] = False) -> list[Any]:
     view = g.classes[class_].view
     label = origin.class_.name if origin else view
@@ -172,7 +172,7 @@ def check_type(entity: Type, form: FlaskForm) -> bool:
 
 def get_place_info_for_insert(
         class_view: str,
-        origin: Optional[Entity]) -> Dict[str, Any]:
+        origin: Optional[Entity]) -> dict[str, Any]:
     if class_view not in ['artifact', 'place']:
         return {'structure': None, 'gis_data': None, 'overlays': None}
     structure = get_structure(super_=origin)
@@ -183,7 +183,7 @@ def get_place_info_for_insert(
         if origin and origin.class_.view == 'place' else None}
 
 
-def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
+def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
     if entity.class_.view not in ['artifact', 'place']:
         return {
             'structure': None,
