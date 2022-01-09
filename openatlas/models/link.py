@@ -116,7 +116,7 @@ class Link:
             id_: int,
             code: str,
             inverse: bool = False,
-            types: bool = False) -> Entity:
+            types: bool = False) -> Optional[Entity]:
         result = Link.get_linked_entities(
             id_,
             code,
@@ -144,7 +144,8 @@ class Link:
 
     @staticmethod
     def get_linked_entity_safe(
-            id_: int, code: str,
+            id_: int,
+            code: str,
             inverse: bool = False,
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
@@ -166,7 +167,8 @@ class Link:
         entity_ids = set()
         result = Db.get_links(
             entities,
-            codes if isinstance(codes, list) else [codes], inverse)
+            codes if isinstance(codes, list) else [str(codes)],
+            inverse)
         for row in result:
             entity_ids.add(row['domain_id'])
             entity_ids.add(row['range_id'])

@@ -1,5 +1,5 @@
 import time
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -26,9 +26,9 @@ def pre_populate_form(
         form.event_id.data = item.id
 
     # Types
-    types: dict[Type, str] = item.types
-    if location:  # Needed for administrative unit and historical place types
-        types.update(location.types)
+    types: dict[Any, Any] = item.types
+    if location:
+        types |= location.types  # Administrative units and historical places
     type_data: dict[int, list[int]] = {}
     for type_, value in types.items():
         root = g.types[type_.root[0]] if type_.root else type

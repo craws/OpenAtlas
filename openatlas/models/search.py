@@ -30,7 +30,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             entity = Link.get_linked_entity(row['id'], 'P1', True)
         else:
             entity = Entity(row)
-        if check_dates(entity, data):
+        if entity and check_dates(entity, data):
             entities.append(entity)
     return list({d.id: d for d in entities}.values())  # Remove duplicates
 

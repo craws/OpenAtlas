@@ -14,6 +14,7 @@ from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.util import sanitize, uc_first
 
@@ -138,10 +139,8 @@ def process_form_data(
                     name += ' (' + inverse + ')'
             if entity.class_.name == 'type':
                 name = sanitize(name, 'type')
-            elif entity.class_.name == 'reference_system' \
-                    and hasattr(entity, 'system') \
-                    and entity.system:
-                name = entity.name
+            elif isinstance(entity, ReferenceSystem) and entity.system:
+                name = entity.name  # Prevent name changing of a system type
             data['attributes']['name'] = name
         elif key == 'description':
             data['attributes'][key] = form.data[key]
@@ -270,18 +269,19 @@ def process_form_data(
                 'property': 'P128',
                 'range': form.artifact.data,
                 'inverse': True})
-    elif entity.class_.view == 'type' and 'classes' not in form:  # is sub type
+    elif entity.class_.view == 'type' and 'classes' not in form:
         type_ = origin if isinstance(origin, Type) else entity
-        root = g.types[type_.root[0]] if type_.root else type_
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        code = 'P127' if entity.class_.name == 'type' else 'P89'
-        if super_id != new_super.id:
-            data['links']['delete'].add(code)
-            data['links']['insert'].append({
-                 'property': code,
-                 'range': new_super})
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            super_id = g.types[type_.root[-1]] if type_.root else type_
+            new_super_id = getattr(form, str(root.id)).data
+            new_super = g.types[int(new_super_id)] if new_super_id else root
+            code = 'P127' if entity.class_.name == 'type' else 'P89'
+            if super_id != new_super.id:
+                data['links']['delete'].add(code)
+                data['links']['insert'].append({
+                     'property': code,
+                     'range': new_super})
     for link_ in data['links']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
@@ -405,7 +405,7 @@ def populate_insert_form(
                 form.place.data = origin.id
     if view == 'source' and origin.class_.name == 'artifact':
         form.artifact.data = [origin.id]
-    if view == 'type':
+    if view == 'type' and isinstance(origin, Type):
         root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None

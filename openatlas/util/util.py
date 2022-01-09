@@ -35,7 +35,7 @@ from openatlas.util.image_processing import ImageProcessing
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.entity import Link
+    from openatlas.models.link import Link
     from openatlas.models.type import Type
 
 
@@ -86,8 +86,6 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
                 f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
-
-
     return Markup(html)
 
 
@@ -177,7 +175,7 @@ def get_backup_file_data() -> dict[str, Any]:
 
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
-    data = [format_name_and_aliases(entity, show_links)]
+    data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
@@ -744,9 +742,12 @@ def description(entity: Union[Entity, Project]) -> str:
 
 @app.template_filter()
 def download_button(entity: Entity) -> str:
-    return Markup(button(
-        _('download'),
-        url_for('download_file', filename=get_file_path(entity.image_id).name)))
+    if entity.image_id:
+        if path := get_file_path(entity.image_id):
+            return Markup(button(
+                    _('download'),
+                    url_for('download_file', filename=path.name)))
+    return ''  # pragma: no cover
 
 
 @app.template_filter()
@@ -760,10 +761,8 @@ def display_profile_image(entity: Entity) -> str:
     size = app.config['IMAGE_SIZE']['thumbnail']
     if session['settings']['image_processing'] \
             and ImageProcessing.check_processed_image(path.name):
-        resized = url_for(
-            'display_file',
-            filename=get_file_path(entity.image_id, size).name,
-            size=size)
+        if path_ := get_file_path(entity.image_id, size):
+            resized = url_for('display_file', filename=path_.name, size=size)
     return Markup(
         render_template(
             'util/profile_image.html',

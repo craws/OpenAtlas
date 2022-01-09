@@ -3,6 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 from typing import Any, Optional, Union
 
 from flask import g
+from werkzeug.exceptions import abort
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
@@ -39,6 +40,7 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
+        abort(404)  # pragma: nocover
 
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):

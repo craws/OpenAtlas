@@ -101,9 +101,9 @@ def file_preview(entity_id: int) -> str:
         return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
     if path and ImageProcessing.check_processed_image(path.name):
-        icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
-        url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' {parameter}>"
+        if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
+            url = url_for('display_file', filename=icon.name, size=size)
+            return f"<img src='{url}' {parameter}>"
     return ''
 
 
@@ -147,5 +147,5 @@ def delete_entity(id_: int) -> Optional[str]:
 def delete_files(id_: int) -> None:
     if path := get_file_path(id_):  # Prevent missing file warning
         path.unlink()
-    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
-        path.unlink()
+    for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
+        resized_path.unlink()

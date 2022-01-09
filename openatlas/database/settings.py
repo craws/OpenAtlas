@@ -19,7 +19,7 @@ class Settings:
             {'name': field_name, 'value': value})
 
     @staticmethod
-    def set_logo(file_id: Union[int, str] = None) -> None:
+    def set_logo(file_id: Union[int, str, None] = None) -> None:
         g.cursor.execute("""
             UPDATE web.settings
             SET value = %(file_id)s

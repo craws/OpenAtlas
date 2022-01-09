@@ -86,12 +86,13 @@ def build_form(
     if 'description' in FORMS[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
-        if class_ == 'type':  # Change description field if value type
+        if class_ == 'type':
             type_ = entity if entity else origin
-            root = g.types[type_.root[0]] if type_.root else type_
-            if root.category == 'value':
-                del Form.description
-                setattr(Form, 'description', StringField(_('unit')))
+            if isinstance(type_, Type):
+                root = g.types[type_.root[0]] if type_.root else type_
+                if root.category == 'value':
+                    del Form.description
+                    setattr(Form, 'description', StringField(_('unit')))
     if 'map' in FORMS[class_]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -114,14 +115,15 @@ def customize_labels(
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
         type_ = item if item else origin
-        root = g.types[type_.root[0]] if type_.root else type_
-        getattr(form, str(root.id)).label.text = 'super'
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            getattr(form, str(root.id)).label.text = 'super'
 
 
 def add_buttons(
         form: Any,
         name: str,
-        entity: Union[Entity, None],
+        entity: Union[Entity, Type, Link, None],
         origin: Optional[Entity] = None) -> FlaskForm:
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
@@ -267,7 +269,10 @@ def add_fields(
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if code == 'custom' or (entity and entity.category != 'value'):
+        if code == 'custom' or (
+                entity
+                and isinstance(entity, Type)
+                and entity.category != 'value'):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
@@ -296,10 +301,11 @@ def add_fields(
     elif class_ in g.view_class_mapping['type']:
         setattr(form, 'is_type_form', HiddenField())
         type_ = entity if entity else origin
-        root = g.types[type_.root[0]] if type_.root else type_
-        setattr(form, str(root.id), TreeField(str(root.id)))
-        if root.directional:
-            setattr(form, 'name_inverse', StringField(_('inverse')))
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            setattr(form, str(root.id), TreeField(str(root.id)))
+            if root.directional:
+                setattr(form, 'name_inverse', StringField(_('inverse')))
     elif class_ == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
