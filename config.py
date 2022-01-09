@@ -53,7 +53,9 @@ REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
 # API
-API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld'
+API_SCHEMA = \
+    'https://raw.githubusercontent.com/LinkedPasts/linked-places' \
+    '/master/linkedplaces-context-v1.1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS)
 ALLOWED_IPS = ['127.0.0.1']
 RDF_FORMATS = {
