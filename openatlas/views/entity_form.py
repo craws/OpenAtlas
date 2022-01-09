@@ -101,7 +101,7 @@ def add_crumbs(
     if label in g.class_view_mapping:
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
-    crumbs = [
+    crumbs: list[Any] = [
         [label, url_for('index', view=origin.class_.view if origin else view)],
         origin]
     if class_ == 'source_translation' and origin and not insert_:
@@ -243,6 +243,8 @@ def save(
     action = 'update' if entity else 'insert'
     try:
         if not entity:
+            if not class_:
+                abort(404)  # pragma: no cover, entity or class needed
             entity = insert_entity(form, class_)
             if class_ == 'source_translation' and origin:
                 origin.link('P73', entity)
@@ -318,7 +320,7 @@ def get_redirect_url(
             'insert',
             class_=entity.class_.name,
             origin_id=origin.id if origin else None)
-        if entity.class_.name in ('administrative_unit', 'type'):
+        if entity.class_.name in ('administrative_unit', 'type') and origin:
             root_id = origin.root[0] \
                 if isinstance(origin, Type) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data
