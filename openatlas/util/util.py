@@ -31,7 +31,7 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -759,8 +759,8 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
-    if session['settings']['image_processing'] \
-            and ImageProcessing.check_processed_image(path.name):
+    if session['settings']['image_processing']\
+            and check_processed_image(path.name):
         if path_ := get_file_path(entity.image_id, size):
             resized = url_for('display_file', filename=path_.name, size=size)
     return Markup(

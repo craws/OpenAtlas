@@ -19,7 +19,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import resize_image
 from openatlas.util.util import (
     is_authorized, link, required_group, was_modified)
 
@@ -132,7 +132,7 @@ def add_crumbs(
                 sibling_count += 1
     siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
     return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+           [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -215,7 +215,7 @@ def insert_files(
             file.save(str(app.config['UPLOAD_DIR'] / new_name))
             filenames.append(new_name)
             if session['settings']['image_processing']:
-                ImageProcessing.resize_image(new_name)
+                resize_image(new_name)
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:

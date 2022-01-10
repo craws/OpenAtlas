@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import check_processed_image
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, external_url, format_date, get_base_table_data, get_file_path,
@@ -100,7 +100,7 @@ def file_preview(entity_id: int) -> str:
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
-    if path and ImageProcessing.check_processed_image(path.name):
+    if path and check_processed_image(path.name):
         if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
             url = url_for('display_file', filename=icon.name, size=size)
             return f"<img src='{url}' {parameter}>"
