@@ -22,7 +22,6 @@ class ImageProcessing:
 
     @staticmethod
     def safe_resize_image(name: str, file_format: str, size: str) -> bool:
-        # With python3-wand 0.6. Path works and str conversation can be removed
         try:
             if ImageProcessing.check_if_folder_exist(
                     size,
