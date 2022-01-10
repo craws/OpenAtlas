@@ -107,7 +107,7 @@ def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
 
 
 def get_reference_systems(
-        links_inverse: List[Link]) -> Optional[List[Dict[str, Any]]]:
+        links_inverse: List[Link]) -> Union[List[Dict[str, Any]], None]:
     ref = []
     for link_ in links_inverse:
         if not isinstance(link_.domain, ReferenceSystem):

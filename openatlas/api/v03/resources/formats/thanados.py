@@ -121,9 +121,8 @@ def get_ref_system(
         links_inverse: List[Link],
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     ref_sys = get_reference_systems(links_inverse)
-    if parser['format'] == 'xml':
-        return [{'externalReference': ref} for ref in
-                ref_sys] if ref_sys else None
+    if ref_sys and parser['format'] == 'xml':
+        return [{'externalReference': ref} for ref in ref_sys]
     return ref_sys
 
 
@@ -140,8 +139,8 @@ def get_references(
                 'title': link_.domain.description,
                 'pages': link_.description if link_.description else None})
     if parser['format'] == 'xml':
-        return [{'reference': ref} for ref in
-                references] if references else None
+        return [
+            {'reference': ref} for ref in references] if references else None
     return references if references else None
 
 
