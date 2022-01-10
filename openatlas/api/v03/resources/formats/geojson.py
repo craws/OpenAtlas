@@ -51,7 +51,8 @@ class Geojson:
     @staticmethod
     def get_geom(entity: Entity) -> Union[List[Dict[str, Any]], List[Any]]:
         if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
-            return Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
+            return Gis.get_by_id(
+                Link.get_linked_entity_safe(entity.id, 'P53').id)
         if entity.class_.name == 'object_location':
             return Gis.get_by_id(entity.id)
         return []
