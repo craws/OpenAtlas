@@ -22,7 +22,6 @@ class ImageProcessing:
 
     @staticmethod
     def safe_resize_image(name: str, file_format: str, size: str) -> bool:
-        # With python3-wand 0.6. Path works and str conversation can be removed
         try:
             if ImageProcessing.check_if_folder_exist(
                     size,
@@ -38,19 +37,18 @@ class ImageProcessing:
             return False
 
     @staticmethod
-    def image_resizing(name: str, file_format: str, size: str) -> bool:
-        with Image(filename=str(Path(app.config['UPLOAD_DIR']) /
-                                f"{name}{file_format}[0]")) as src:
-            extension = app.config['PROCESSED_EXT'] \
-                if file_format in app.config['NONE_DISPLAY_EXT'] \
-                else file_format
-            with src.convert(extension.replace('.', '')) as img:
+    def image_resizing(name: str, format_: str, size: str) -> bool:
+        conf = app.config
+        filename = Path(conf['UPLOAD_DIR']) / f"{name}{format_}[0]"
+        with Image(filename=filename) as src:
+            ext = conf['PROCESSED_EXT'] \
+                if format_ in conf['NONE_DISPLAY_EXT'] else format_
+            with src.convert(ext.replace('.', '')) as img:
                 img.transform(resize=f"{size}x{size}>")
                 img.compression_quality = 75
-                img.save(filename=str(
-                    Path(app.config['RESIZED_IMAGES'])
-                    / size
-                    / f"{name}{extension}"))
+                img.save(
+                    filename=Path(
+                        conf['RESIZED_IMAGES']) / size / f"{name}{ext}")
                 return True
 
     @staticmethod
