@@ -11,8 +11,9 @@ class Geojson:
     def get_geojson(entities: List[Entity]) -> Dict[str, Any]:
         out = []
         for entity in entities:
-            if geoms := [Geojson.get_entity(entity, geom)
-                         for geom in Geojson.get_geom(entity)]:
+            if geoms := [
+                    Geojson.get_entity(entity, geom)
+                    for geom in Geojson.get_geom(entity)]:
                 out.extend(geoms)
             else:
                 out.append(Geojson.get_entity(entity))

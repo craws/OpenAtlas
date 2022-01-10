@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 from flask import g
 from wand.image import Image

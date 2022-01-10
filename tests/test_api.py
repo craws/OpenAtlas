@@ -4,7 +4,12 @@ from typing import Any, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.error import *
+from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
+    FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
+    InvalidCidocClassCode, InvalidCodeError,  InvalidLimitError, \
+    InvalidSubunitError, InvalidSystemClassError,  LastEntityError, \
+    NoEntityAvailable,  NoSearchStringError, QueryEmptyError, TypeIDError,\
+    WrongOperatorError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -29,8 +34,8 @@ class ApiTests(TestBaseCase):
                     description='The Shire was the homeland of the hobbits.')
 
                 # Adding Created and Modified
-                place.created = str(datetime.datetime.now())
-                place.modified = str(datetime.datetime.now())
+                place.created = str(datetime.now())
+                place.modified = str(datetime.now())
 
                 # Adding Dates to place
                 place.update({'attributes': {
@@ -68,13 +73,13 @@ class ApiTests(TestBaseCase):
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
-                feature.created = str(datetime.datetime.now())
-                feature.modified = str(datetime.datetime.now())
+                feature.created = str(datetime.now())
+                feature.modified = str(datetime.now())
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
-                strati.created = str(datetime.datetime.now())
-                strati.modified = str(datetime.datetime.now())
+                strati.created = str(datetime.now())
+                strati.modified = str(datetime.now())
 
                 # Adding Administrative Unit Type
                 unit_node = Type.get_hierarchy('Administrative unit')
@@ -305,7 +310,7 @@ class ApiTests(TestBaseCase):
                     rv['depictions'][0],
                     'url')
 
-           # Test entity in GeoJSON format
+            # Test entity in GeoJSON format
             for rv in [
                 self.app.get(url_for('api_02.entity', id_=place.id,
                                      format='geojson')),

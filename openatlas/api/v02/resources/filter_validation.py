@@ -27,7 +27,7 @@ class Validation:
         checked_filter = []
         for item in filters:
             Validation.check_filter_input(item.split('|'))
-            checked_filter.append([word for word in item.split('|')])
+            checked_filter.append(item.split('|'))
         return checked_filter
 
     @staticmethod

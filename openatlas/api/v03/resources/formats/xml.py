@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any
 
 import dicttoxml
 
@@ -17,5 +17,3 @@ def subunit_xml(out: dict[str, Any]) -> bytes:
     xml = xml.replace(b'<item>', b'')
     xml = xml.replace(b'</item>', b'')
     return xml
-
-
