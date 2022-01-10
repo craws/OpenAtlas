@@ -155,7 +155,7 @@ def get_timespans(entity: Entity) -> Dict[str, Any]:
 
 def get_file(
         links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':

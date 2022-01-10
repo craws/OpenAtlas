@@ -46,7 +46,7 @@ def image_resizing(name: str, format_: str, size: str) -> bool:
             return True
 
 
-def check_processed_image(filename: str) -> Optional[bool]:
+def check_processed_image(filename: str) -> bool:
     file_format = '.' + filename.split('.', 1)[1].lower()
     try:
         if file_format in app.config['ALLOWED_IMAGE_EXT']:
@@ -59,6 +59,7 @@ def check_processed_image(filename: str) -> Optional[bool]:
             'image processing',
             'failed to validate file as image',
             e)
+    return False
 
 
 def loop_through_processed_folders(name: str, file_format: str) -> bool:

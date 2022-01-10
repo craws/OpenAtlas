@@ -1,53 +1,45 @@
-from typing import Dict, Union
+from typing import Union
 
 from flask_restful import fields
-from flask_restful.fields import List as RestList
+from flask_restful.fields import List
 
 
 class SubunitTemplate:
 
     @staticmethod
-    def subunit_template(id_: Union[int, str]) -> Dict[str, RestList]:
+    def subunit_template(id_: Union[int, str]) -> dict[str, List]:
         standard_type = {
             'name': fields.String,
             'id': fields.Integer,
             'rootId': fields.Integer,
             'path': fields.String}
-
         timespan = {
             'earliestBegin': fields.String,
             'latestBegin': fields.String,
             'earliestEnd': fields.String,
-            'latestEnd': fields.String,
-        }
-
+            'latestEnd': fields.String}
         external_references = {
             'type': fields.String,
             'identifier': fields.String,
-            'referenceSystem': fields.String
-        }
-
+            'referenceSystem': fields.String}
         references = {
             'id': fields.Integer,
             'abbreviation': fields.String,
             'title': fields.String,
-            'pages': fields.String,
-        }
+            'pages': fields.String}
         files = {
             'id': fields.Integer,
             'name': fields.String,
             'fileName': fields.String,
             'license': fields.String,
-            'source': fields.String,
-        }
+            'source': fields.String}
         types = {
             'id': fields.Integer,
             'rootId': fields.Integer,
             'name': fields.String,
             'path': fields.String,
             'value': fields.Float,
-            'unit': fields.String,
-        }
+            'unit': fields.String}
         properties = {
             'name': fields.String,
             'aliases': fields.List(fields.String),
@@ -58,10 +50,7 @@ class SubunitTemplate:
                 fields.Nested(external_references)),
             'references': fields.List(fields.Nested(references)),
             'files': fields.List(fields.Nested(files)),
-            'types': fields.List(fields.Nested(types)),
-
-        }
-
+            'types': fields.List(fields.Nested(types))}
         json = {
             'id': fields.Integer,
             'parentId': fields.Integer,
@@ -74,5 +63,4 @@ class SubunitTemplate:
             'geometry': fields.Raw,
             'children': fields.List(fields.Integer),
             'properties': fields.Nested(properties)}
-
-        return {id_: fields.List(fields.Nested(json))}
+        return {str(id_): fields.List(fields.Nested(json))}

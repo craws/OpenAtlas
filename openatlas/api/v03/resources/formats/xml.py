@@ -1,13 +1,16 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 import dicttoxml
 
 
-def subunit_xml(
-        out: Union[List[Dict[str, Any]], Dict[str, Any]]) -> bytes:
-    out = transform_output(out)
+def subunit_xml(out: dict[str, Any]) -> bytes:
+    item_list = []
+    new_dict = {}
+    for key, value in out.items():
+        item_list.append({item['openatlasClassName']: item} for item in value)
+        new_dict[key] = item_list
     xml = dicttoxml.dicttoxml(
-        out,
+        new_dict,
         root=False,
         attr_type=False)
     xml = xml.replace(b'<item >', b'')
@@ -16,10 +19,3 @@ def subunit_xml(
     return xml
 
 
-def transform_output(out: Dict[str, Any]) -> Dict[str, Any]:
-    item_list = []
-    new_dict = {}
-    for key, value in out.items():
-        item_list.append({item['openatlasClassName']: item} for item in value)
-        new_dict[key] = item_list
-    return new_dict
