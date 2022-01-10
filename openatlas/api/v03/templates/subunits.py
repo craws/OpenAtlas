@@ -63,4 +63,4 @@ class SubunitTemplate:
             'geometry': fields.Raw,
             'children': fields.List(fields.Integer),
             'properties': fields.Nested(properties)}
-        return {str(id_): fields.List(fields.Nested(json))}
+        return {id_: fields.List(fields.Nested(json))}

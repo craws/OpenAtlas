@@ -27,8 +27,6 @@ class ApiTests(TestBaseCase):
                     'Shire',
                     'place',
                     description='The Shire was the homeland of the hobbits.')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding Created and Modified
                 place.created = str(datetime.datetime.now())
@@ -105,8 +103,6 @@ class ApiTests(TestBaseCase):
                 actor = insert_entity(
                     'Frodo', 'person',
                     description='That is Frodo')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 alias2 = insert_entity('The ring bearer', 'actor_appellation')
                 actor.link('P131', alias2)
@@ -123,8 +119,6 @@ class ApiTests(TestBaseCase):
                 actor2 = insert_entity(
                     'Sam', 'person',
                     description='That is Sam')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding residence
                 actor2.link('P74', location)
@@ -144,8 +138,6 @@ class ApiTests(TestBaseCase):
                 place2 = insert_entity(
                     'Mordor', 'place',
                     description='The heart of evil.')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding Type Settlement
                 place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
