@@ -106,7 +106,7 @@ class TableSelect(HiddenInput):
 
     @staticmethod
     def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-        link = f"""<a href='#' onclick="selectFromTable(this, 
+        link = f"""<a href='#' onclick="selectFromTable(this,
             '{field_id}', {entity.id})">{entity.name}</a>"""
         if not entity.aliases:
             return link
