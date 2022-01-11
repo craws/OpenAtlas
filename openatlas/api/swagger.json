@@ -627,13 +627,88 @@
       "NodeOverviewModel": {
         "properties": {
           "types": {
+            "$ref": "#/components/schemas/NodeCategoryModel"
+          }
+        },
+        "type": "object"
+      },
+      "TypeOverviewModel": {
+        "properties": {
+          "custom": {
             "items": {
-              "$ref": "#/components/schemas/NodeCategoryModel"
+              "$ref": "#/components/schemas/TypeOverviewEntry"
+            },
+            "type": "array"
+          },
+          "places": {
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewEntry"
+            },
+            "type": "array"
+          },
+          "standard": {
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewEntry"
+            },
+            "type": "array"
+          },
+          "value": {
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewEntry"
+            },
+            "type": "array"
+          },
+          "system": {
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewEntry"
             },
             "type": "array"
           }
         },
         "type": "object"
+      },
+      "TypeOverviewEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "viewClass": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewChildren"
+            }
+          }
+        }
+      },
+      "TypeOverviewChildren": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewChildren"
+            }
+          }
+        }
       },
       "OutputModelGeojson": {
         "properties": {

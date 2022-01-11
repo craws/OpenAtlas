@@ -6,9 +6,9 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
-    InvalidCidocClassCode, InvalidCodeError,  InvalidLimitError, \
-    InvalidSubunitError, InvalidSystemClassError,  LastEntityError, \
-    NoEntityAvailable,  NoSearchStringError, QueryEmptyError, TypeIDError,\
+    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
+    InvalidSubunitError, InvalidSystemClassError, LastEntityError, \
+    NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
     WrongOperatorError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -671,9 +671,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for('api_03.type_overview')),
                 self.app.get(url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()
-                rv = rv['types']['place']['Administrative unit']
-                assert bool([True for i in rv if
-                             i['label'] == 'Austria'])
+                rv = rv['place'][0]['children'][0]
+                assert bool(rv['label'] == 'Austria')
 
             # Test Type Tree
             for rv in [

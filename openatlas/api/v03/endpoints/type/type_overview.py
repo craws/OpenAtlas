@@ -16,7 +16,7 @@ class GetTypeOverview(Resource):
     @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[Tuple[Resource, int], Response]:
         parser = default.parse_args()
-        node = {"types": GetTypeOverview.get_node_overview()}
+        node = GetTypeOverview.get_node_overview()
         template = TypeOverviewTemplate.type_overview_template()
         if parser['download']:
             return download(node, template, 'types')
@@ -25,16 +25,20 @@ class GetTypeOverview(Resource):
     @staticmethod
     def get_node_overview() -> Dict[str, Dict[Entity, str]]:
         nodes: Dict[str, Any] = {
-            'standard': {},
-            'custom': {},
-            'place': {},
-            'value': {},
-            'system': {}}
+            'standard': [],
+            'custom': [],
+            'place': [],
+            'value': [],
+            'system': []}
         for node in g.types.values():
             if node.root:
                 continue
-            nodes[node.category][node.name] = GetTypeOverview.walk_tree(
-                Type.get_types(node.name))
+            nodes[node.category].append({
+                "id": node.id,
+                "name": node.name,
+                "viewClass": node.classes,
+                "children":
+                    GetTypeOverview.walk_tree(Type.get_types(node.name))})
         return nodes
 
     @staticmethod
