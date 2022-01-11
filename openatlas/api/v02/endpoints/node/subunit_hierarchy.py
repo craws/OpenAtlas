@@ -29,8 +29,8 @@ class GetSubunitHierarchy(Resource):
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
             entity = get_entity_by_id(id_)
-        except EntityDoesNotExistError:  # pragma: no cover
-            raise EntityDoesNotExistError
+        except EntityDoesNotExistError as e:  # pragma: no cover
+            raise EntityDoesNotExistError from e
         if not entity.class_.name == 'place' \
                 and not entity.class_.name == 'feature' \
                 and not entity.class_.name == 'stratigraphic_unit':

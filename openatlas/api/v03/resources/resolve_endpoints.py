@@ -70,8 +70,7 @@ def resolve_output(
 def resolve_subunit(
         subunit: list[dict[str, Any]],
         parser: dict[str, Any],
-        name: Union[int, str]) \
-        -> Union[Response, dict[str, Any], tuple[Any, int]]:
+        name: str) -> Union[Response, dict[str, Any], tuple[Any, int]]:
     out = {'collection' if parser['format'] == 'xml' else name: subunit}
     if parser['count']:
         return jsonify(len(out[name]))
@@ -86,8 +85,7 @@ def resolve_subunit(
             subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, SubunitTemplate.subunit_template(name),
-                        name)
+        return download(out, SubunitTemplate.subunit_template(name), name)
     return marshal(out, SubunitTemplate.subunit_template(name)), 200
 
 

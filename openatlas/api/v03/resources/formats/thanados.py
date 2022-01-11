@@ -110,8 +110,7 @@ def get_standard_type(type_: Type) -> Dict[str, Any]:
 
 
 def get_aliases(entity: Entity, parser: Dict[str, Any]) -> Optional[List[Any]]:
-    aliases = [value for value in entity.aliases.values()] \
-        if entity.aliases.values() else None
+    aliases = list(entity.aliases.values()) if entity.aliases.values() else None
     if parser['format'] == 'xml':
         return [{'alias': alias} for alias in aliases] if aliases else None
     return aliases

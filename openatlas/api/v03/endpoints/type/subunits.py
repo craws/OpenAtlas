@@ -19,7 +19,7 @@ class GetSubunits(Resource):
         return resolve_subunit(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
             entity_.parse_args(),
-            id_)
+            str(id_))
 
     @staticmethod
     def iterate(entity: Entity, parser: Dict[str, Any]) -> List[Dict[str, Any]]:

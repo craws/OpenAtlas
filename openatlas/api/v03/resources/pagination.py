@@ -63,7 +63,7 @@ def get_results(
         parser: Dict[str, Any]) -> List[Dict[str, Any]]:
     limited_entities = new_entities[:int(parser['limit'])]
     if parser['format'] == 'geojson':
-        return Geojson.get_geojson(limited_entities)
+        return [Geojson.get_geojson(limited_entities)]
     return linked_places_result(
         limited_entities,
         parser,

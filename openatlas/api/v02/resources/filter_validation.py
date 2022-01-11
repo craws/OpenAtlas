@@ -45,12 +45,12 @@ class Validation:
     def test_date(term: str) -> None:
         try:
             datetime.datetime.strptime(term, "%Y-%m-%d")
-        except ValueError:  # pragma: no cover
-            raise InvalidSearchDateError
+        except Exception as e:  # pragma: no cover
+            raise InvalidSearchDateError from e
 
     @staticmethod
     def test_id(term: str) -> None:
         try:
             int(term)
-        except Exception:  # pragma: no cover
-            raise InvalidSearchNumberError
+        except Exception as e:  # pragma: no cover
+            raise InvalidSearchNumberError from e

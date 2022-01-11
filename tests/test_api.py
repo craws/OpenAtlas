@@ -696,9 +696,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entityCidocClass":[{{"operator":"equal",'
-                           f'"values":["E21"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"entityCidocClass":[{"operator":"equal",
+                        "values":["E21"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -706,9 +705,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entitySystemClass":[{{"operator":"equal",'
-                           f'"values":["person"],'
-                           f'"logicalOperator":"and"}}]}}'))]:
+                    search="""{"entitySystemClass":[{"operator":"equal",
+                        "values":["person"],"logicalOperator":"and"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 2)
 
@@ -728,9 +726,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='place',
-                    search=f'{{"entityName":[{{"operator":"notEqual",'
-                           f'"values":["Mordor"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"entityName":[{"operator":"notEqual",
+                        "values":["Mordor"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -738,9 +735,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"typeName":[{"operator":"equal",
+                        "values":["Boundary Mark", "Height"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -748,9 +745,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
-                           f'"values":["2020-1-1"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"beginFrom":[{"operator":"lesserThan",
+                        "values":["2020-1-1"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -758,9 +754,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
-                           f'"values":["2018-3-01"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"beginTo":[{"operator":"lesserThanEqual",
+                        "values":["2018-3-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -768,9 +763,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
-                           f'"values":["2018-3-01"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"beginTo":[{"operator":"lesserThanEqual",
+                        "values":["2018-3-01"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -778,9 +772,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
-                           f'"values":["2013-2-1"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"endFrom":[{"operator":"greaterThan",
+                        "values":["2013-2-1"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -788,9 +781,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
-                           f'"values":["2013-2-1"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"endFrom":[{"operator":"greaterThan",
+                        "values":["2013-2-1"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -798,9 +790,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
-                           f'"values":["2019-03-01"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"endTo":[{"operator":"greaterThanEqual",
+                        "values":["2019-03-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -808,9 +799,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
-                           f'"values":["2019-03-01"],'
-                           f'"logicalOperator":"or"}}]}}'))]:
+                    search="""{"endTo":[{"operator":"greaterThanEqual",
+                    "values":["2019-03-01"],"logicalOperator":"or"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
 
@@ -823,9 +813,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"typeName":[{"operator":"notEqual",
+                        "values":["Boundary Mark", "Height"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -843,9 +833,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entityAliases":[{{"operator":"notEqual",'
-                           f'"values":["Sûza"],'
-                           f'"logicalOperator":"and"}}]}}'))]:
+                    search="""{"entityAliases":[{"operator":"notEqual",
+                        "values":["Sûza"],"logicalOperator":"and"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 6)
 
@@ -853,9 +842,9 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api_03.query',
                 system_classes='place',
-                search=f'{{"entityName":[{{"operator":"notEqual",'
-                       f'"values":["Mordor"],'
-                       f'"logicalOperator":"or"}}]}}')).get_json()
+                search="""{"entityName":[{"operator":"notEqual",
+                    "values":["Mordor"],
+                    "logicalOperator":"or"}]}""")).get_json()
             assert bool(rv['pagination']['entities'] == 1)
 
             # subunit/

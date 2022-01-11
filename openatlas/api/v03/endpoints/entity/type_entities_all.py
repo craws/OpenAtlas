@@ -18,7 +18,7 @@ class GetTypeEntitiesAll(Resource):
         "../swagger/type_entities_all.yml",
         endpoint="api_03.type_entities_all")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        entities = [entity for entity in GetTypeEntitiesAll.get_node_all(id_)]
+        entities = GetTypeEntitiesAll.get_node_all(id_)
         if not entities:
             entities = get_entities_by_ids(
                 GetTypeEntitiesAll.get_special_node(id_, []))

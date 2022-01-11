@@ -81,8 +81,7 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
     if key == "entityName":
         return entity.name
     if key == "entityAliases":
-        alias = [value for value in entity.aliases.values()]
-        return alias
+        return list(value for value in entity.aliases.values())
     if key == "entityCidocClass":
         return [entity.cidoc_class.code]
     if key == "entitySystemClass":

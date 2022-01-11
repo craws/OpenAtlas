@@ -11,8 +11,8 @@ from openatlas.models.link import Link
 def get_entity_by_id(id_: int) -> Entity:
     try:
         entity = Entity.get_by_id(id_, types=True, aliases=True)
-    except Exception:
-        raise EntityDoesNotExistError
+    except Exception as e:
+        raise EntityDoesNotExistError from e
     return entity
 
 

@@ -1,5 +1,3 @@
-from typing import Union
-
 from flask_restful import fields
 from flask_restful.fields import List
 
@@ -7,7 +5,7 @@ from flask_restful.fields import List
 class SubunitTemplate:
 
     @staticmethod
-    def subunit_template(id_: Union[int, str]) -> dict[str, List]:
+    def subunit_template(id_: str) -> dict[str, List]:
         standard_type = {
             'name': fields.String,
             'id': fields.Integer,
