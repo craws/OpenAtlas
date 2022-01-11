@@ -23,4 +23,4 @@ class ClassMapping(Resource):
             "view": class_.view,
             "icon": class_.icon,
             "en": class_.label}
-                for class_ in g.classes.values() if class_.cidoc_class]
+            for class_ in g.classes.values() if class_.cidoc_class]

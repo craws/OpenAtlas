@@ -84,6 +84,7 @@ class TypeIDError(Exception):
 class LastEntityError(Exception):
     pass
 
+
 class WrongOperatorError(Exception):
     pass
 

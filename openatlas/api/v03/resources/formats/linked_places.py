@@ -38,7 +38,7 @@ def build_feature(
             'description': get_description(entity),
             'names': get_names(entity, parser),
             'geometry': get_geometries(entity, links)
-                if 'geometry' in parser['show'] else None,
+            if 'geometry' in parser['show'] else None,
             'relations': get_relations(links, links_inverse, parser)}
 
 

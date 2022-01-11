@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g
@@ -17,7 +17,7 @@ class GetTypeEntitiesAll(Resource):
     @swag_from(
         "../swagger/type_entities_all.yml",
         endpoint="api_03.type_entities_all")
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         entities = [entity for entity in GetTypeEntitiesAll.get_node_all(id_)]
         if not entities:
             entities = get_entities_by_ids(
@@ -25,7 +25,7 @@ class GetTypeEntitiesAll(Resource):
         return resolve_entities(entities, entity_.parse_args(), id_)
 
     @staticmethod
-    def get_node_all(id_: int) -> List[Entity]:
+    def get_node_all(id_: int) -> list[Entity]:
         if id_ not in g.types:
             raise InvalidSubunitError
         return GetTypeEntitiesAll.get_recursive_node_entities(id_, [])
@@ -33,7 +33,7 @@ class GetTypeEntitiesAll(Resource):
     @staticmethod
     def get_recursive_node_entities(
             id_: int,
-            data: List[Entity]) -> List[Entity]:
+            data: list[Entity]) -> list[Entity]:
         for entity in g.types[id_].get_linked_entities(
                 ['P2', 'P89'],
                 inverse=True,
@@ -44,7 +44,7 @@ class GetTypeEntitiesAll(Resource):
         return data
 
     @staticmethod
-    def get_special_node(id_: int, data: List[int]) -> List[int]:
+    def get_special_node(id_: int, data: list[int]) -> list[int]:
         for link_ in Link.get_links_by_type(g.types[id_]):
             data.append(link_['domain_id'])
             data.append(link_['range_id'])

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 class GetQuery(Resource):
     @staticmethod
     @swag_from("../swagger/query.yml", endpoint="api_03.query")
-    def get() -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get() -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parser = query.parse_args()
         if not parser['entities'] \
                 and not parser['codes'] \
@@ -27,7 +27,7 @@ class GetQuery(Resource):
         return resolve_entities(GetQuery.get_entities(parser), parser, 'query')
 
     @staticmethod
-    def get_entities(parser: Dict[str, Any]) -> List[Entity]:
+    def get_entities(parser: dict[str, Any]) -> list[Entity]:
         entities = []
         if parser['entities']:
             entities.extend(get_entities_by_ids(parser['entities']))

@@ -1,4 +1,4 @@
-from typing import Any, dict
+from typing import Any
 
 from flask_restful import fields
 
