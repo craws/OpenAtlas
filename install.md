@@ -13,9 +13,10 @@ need substantially more knowledge about server administration.
 
 ### Python 3.9 and Flask 1.1.2
 
-    # apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask python3-flask-babel
-    # apt install python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy python3-pandas python3-jinja2 python3-flask-cors
-    # apt install python3-flask-restful p7zip-full python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
+    # apt install python3 python3-bcrypt python3-dateutil python3-psycopg2 python3-fuzzywuzzy python3-flask
+    # apt install python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown python3-numpy
+    # apt install python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full
+    # apt install python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger
 
 ### Apache 2.4
 
