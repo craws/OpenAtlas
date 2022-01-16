@@ -322,7 +322,7 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Type.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        if choices := ReferenceSystem.get_class_choices(entity):
+        if choices := ReferenceSystem.get_class_choices(entity):  # type: ignore
             setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
