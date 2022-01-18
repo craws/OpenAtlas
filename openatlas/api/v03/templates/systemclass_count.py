@@ -24,5 +24,4 @@ class SystemClsCountTemplate:
                 'stratigraphic_unit': fields.Integer,
                 'edition': fields.Integer,
                 'group': fields.Integer,
-                'source': fields.Integer
-                }
+                'source': fields.Integer}

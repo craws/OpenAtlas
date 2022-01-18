@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 from flask import g
 
@@ -17,14 +17,14 @@ class Type(Entity):
     multiple = False
     directional = False
 
-    def __init__(self, row: Dict[str, Any]) -> None:
+    def __init__(self, row: dict[str, Any]) -> None:
         super().__init__(row)
-        self.root: List[int] = []
-        self.subs: List[int] = []
-        self.classes: List[str] = []
+        self.root: list[int] = []
+        self.subs: list[int] = []
+        self.classes: list[str] = []
 
     @staticmethod
-    def get_all() -> Dict[int, Type]:
+    def get_all() -> dict[int, Type]:
         types = {}
         for row in \
                 Db.get_types('type', 'P127') + \
@@ -40,7 +40,7 @@ class Type(Entity):
         return types
 
     @staticmethod
-    def populate_subs(types: Dict[int, Type]) -> None:
+    def populate_subs(types: dict[int, Type]) -> None:
         hierarchies = {row['id']: row for row in Db.get_hierarchies()}
         for type_ in types.values():
             if type_.root:
@@ -62,10 +62,10 @@ class Type(Entity):
 
     @staticmethod
     def get_root_path(
-            types: Dict[int, Type],
+            types: dict[int, Type],
             type_: Type,
             super_id: int,
-            root: List[int]) -> List[int]:
+            root: list[int]) -> list[int]:
         super_ = types[super_id]
         super_.count_subs += type_.count
         if not super_.root:
@@ -74,14 +74,14 @@ class Type(Entity):
         return Type.get_root_path(types, type_, super_.root[-1], root)
 
     @staticmethod
-    def get_types(name: str) -> List[int]:
+    def get_types(name: str) -> list[int]:
         for type_ in g.types.values():
             if type_.name == name and not type_.root:
                 return type_.subs
         return []  # pragma: no cover
 
     @staticmethod
-    def check_hierarchy_exists(name: str) -> List[Type]:
+    def check_hierarchy_exists(name: str) -> list[Type]:
         hierarchies = [
             root for root in g.types.values()
             if root.name == name and not root.root]
@@ -96,13 +96,13 @@ class Type(Entity):
     @staticmethod
     def get_tree_data(
             type_id: int,
-            selected_ids: List[int]) -> List[Dict[str, Any]]:
+            selected_ids: list[int]) -> list[dict[str, Any]]:
         return Type.walk_tree(g.types[type_id].subs, selected_ids)
 
     @staticmethod
     def walk_tree(
-            types: List[Type],
-            selected_ids: List[int]) -> List[Dict[str, Any]]:
+            types: list[Type],
+            selected_ids: list[int]) -> list[dict[str, Any]]:
         items = []
         for id_ in types:
             item = g.types[id_]
@@ -115,7 +115,7 @@ class Type(Entity):
         return items
 
     @staticmethod
-    def get_class_choices(root: Optional[Type] = None) -> List[Tuple[int, str]]:
+    def get_class_choices(root: Optional[Type] = None) -> list[tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
             if class_.new_types_allowed \
@@ -128,8 +128,7 @@ class Type(Entity):
             type_: Type,
             category: str,
             classes: list[str],
-            multiple: bool,
-            ) -> None:
+            multiple: bool) -> None:
         Db.insert_hierarchy({
             'id': type_.id,
             'name': type_.name,
@@ -150,7 +149,7 @@ class Type(Entity):
         Db.add_classes_to_hierarchy(type_.id, classes)
 
     @staticmethod
-    def get_type_orphans() -> List[Type]:
+    def get_type_orphans() -> list[Type]:
         return [
             n for key, n in g.types.items()
             if n.root and n.count < 1 and not n.subs]
@@ -194,21 +193,17 @@ class Type(Entity):
     @staticmethod
     def get_all_sub_ids(
             type_: Type,
-            subs: Optional[List[int]] = None) -> List[int]:
-        # Recursive function to return a list with all sub type ids
-        subs = subs if subs else []
-        subs += type_.subs
+            subs: Optional[list[int]] = None) -> list[int]:
+        subs = (subs if subs else []) + type_.subs
         for sub_id in type_.subs:
             Type.get_all_sub_ids(g.types[sub_id], subs)
         return subs
 
     @staticmethod
     def get_form_count(root_type: Type, class_name: str) -> Optional[int]:
-        # Check if types linked to entities before offering to remove them
-        type_ids = Type.get_all_sub_ids(root_type)
-        if not type_ids:
-            return None
-        return Db.get_form_count(class_name, type_ids)
+        if type_ids := Type.get_all_sub_ids(root_type):
+            return Db.get_form_count(class_name, type_ids)
+        return None
 
     @staticmethod
     def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
@@ -219,7 +214,7 @@ class Type(Entity):
         Db.remove_by_entity_and_type(entity_id, type_id)
 
     @staticmethod
-    def get_untyped(hierarchy_id: int) -> List[Entity]:
+    def get_untyped(hierarchy_id: int) -> list[Entity]:
         hierarchy = g.types[hierarchy_id]
         classes = hierarchy.classes
         if hierarchy.name in ('Administrative unit', 'Historical place'):

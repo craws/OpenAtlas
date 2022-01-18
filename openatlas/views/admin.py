@@ -1,7 +1,8 @@
 import datetime
 import importlib
+import math
 import os
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -23,17 +24,18 @@ from openatlas.models.content import get_content, update_content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
+from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import create_resized_images, \
+    delete_orphaned_resized_images
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_disk_space_info, get_file_path, is_authorized, link,
-    manual, required_group, sanitize, send_mail, uc_first)
+    format_datetime, get_file_path, is_authorized, link, manual, required_group,
+    sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -262,10 +264,7 @@ def admin_check_link_duplicates(
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    duplicates = False
-    if table.rows:
-        duplicates = True
-    else:  # If no exact duplicates check single types for multiple use
+    if not table.rows:  # Check single types for multiple use
         table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
         for row in Link.check_single_type_duplicates():
@@ -285,7 +284,6 @@ def admin_check_link_duplicates(
     return render_template(
         'admin/check_link_duplicates.html',
         table=table,
-        duplicates=duplicates,
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -330,9 +328,9 @@ def admin_settings(category: str) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        tab = 'data' if category == 'api' else category
-        tab = 'email' if category == 'mail' else tab
-        return redirect(f"{url_for('admin_index')}#tab-{tab}")
+        return redirect(
+            f"{url_for('admin_index')}"
+            f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
     return render_template(
         'display_form.html',
@@ -358,7 +356,8 @@ def admin_check_similar() -> str:
     if form.validate_on_submit():
         table = Table(['name', _('count')])
         for sample in Entity.get_similar_named(
-                form.classes.data, form.ratio.data).values():
+                form.classes.data,
+                form.ratio.data).values():
             html = link(sample['entity'])
             for entity in sample['entities']:  # Table linebreaks workaround
                 html += f'<br><br><br><br><br>{link(entity)}'
@@ -391,12 +390,8 @@ def admin_check_dates() -> str:
             table=Table(['link', 'domain', 'range'])),
         'involvement_dates': Tab(
             'invalid_involvement_dates',
-            table=Table([
-                'actor',
-                'event',
-                'class',
-                'involvement',
-                'description']))}
+            table=Table(
+                ['actor', 'event', 'class', 'involvement', 'description']))}
     for entity in Entity.get_invalid_dates():
         tabs['dates'].table.rows.append([
             link(entity),
@@ -475,15 +470,14 @@ def admin_orphans() -> str:
     for entity in filter(
             lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
         tabs[
-            'unlinked' if entity.class_.view
-            else 'orphans'].table.rows.append([
-                link(entity),
-                link(entity.class_),
-                link(entity.standard_type),
-                entity.class_.label,
-                format_date(entity.created),
-                format_date(entity.modified),
-                entity.description])
+            'unlinked' if entity.class_.view else 'orphans'].table.rows.append([
+            link(entity),
+            link(entity.class_),
+            link(entity.standard_type),
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -579,8 +573,9 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     for entity in Entity.get_display_files():
         date = 'N/A'
         if entity.id in g.file_stats:
-            date = format_date(datetime.datetime.utcfromtimestamp(
-                g.file_stats[entity.id]['date']))
+            date = format_date(
+                datetime.datetime.utcfromtimestamp(
+                    g.file_stats[entity.id]['date']))
         table.rows.append([
             link(_('set'), url_for('admin_logo', id_=entity.id)),
             entity.name,
@@ -705,7 +700,7 @@ def admin_newsletter() -> Union[str, Response]:
 @app.route('/admin/resize_images')
 @required_group('admin')
 def admin_resize_images() -> Response:
-    ImageProcessing.create_resized_images()
+    create_resized_images()
     flash(_('images were created'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
 
@@ -713,6 +708,18 @@ def admin_resize_images() -> Response:
 @app.route('/admin/delete_orphaned_resized_images')
 @required_group('admin')
 def admin_delete_orphaned_resized_images() -> Response:
-    ImageProcessing.delete_orphaned_resized_images()
+    delete_orphaned_resized_images()
     flash(_('resized orphaned images were deleted'), 'info')
     return redirect(url_for('admin_index') + '#tab-data')
+
+
+def get_disk_space_info() -> Optional[dict[str, Any]]:
+    if os.name != "posix":  # pragma: no cover
+        return None
+    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
+    disk_space = statvfs.f_frsize * statvfs.f_blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail
+    return {
+        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))}

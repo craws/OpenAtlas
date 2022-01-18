@@ -1,7 +1,8 @@
 import locale
 import os
 import sys
-from typing import Optional
+from pathlib import Path
+from typing import Any, Optional
 
 from flask import Flask, Response, g, request, session
 from flask_babel import Babel
@@ -15,28 +16,29 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use test database if running tests
-instance_name = 'production' \
-    if 'test_runner.py' not in sys.argv[0] else 'testing'
+INSTANCE = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 
 app.config.from_object('config')
-app.config.from_pyfile(instance_name + '.py')
+app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
 if os.name == "posix":
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
+# pylint: disable=wrong-import-position, import-outside-toplevel
 from openatlas.models.logger import Logger
 
 logger = Logger()
 
 from openatlas.api import api  # New routes
 from openatlas.util import processor
-from openatlas.util.util import get_file_stats
+from openatlas.util.util import convert_size
 from openatlas.views import (
     admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
     index, involvement, imports, link, login, member, model, note, overlay,
-    profile, reference, relation, reference_system, search, sql, type, user)
+    profile, reference, relation, reference_system, search, sql, type as type_,
+    user)
 
 
 @babel.localeselector
@@ -98,6 +100,17 @@ def apply_caching(response: Response) -> Response:
 @app.teardown_request
 def teardown_request(_exception: Optional[Exception]) -> None:
     close_connection()
+
+
+def get_file_stats(
+        path: Path = app.config['UPLOAD_DIR']) -> dict[int, dict[str, Any]]:
+    stats: dict[int, dict[str, Any]] = {}
+    for file_ in filter(lambda x: x.stem.isdigit(), path.iterdir()):
+        stats[int(file_.stem)] = {
+            'ext': file_.suffix,
+            'size': convert_size(file_.stat().st_size),
+            'date': file_.stat().st_ctime}
+    return stats
 
 
 if __name__ == "__main__":  # pragma: no cover

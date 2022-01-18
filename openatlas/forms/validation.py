@@ -23,25 +23,25 @@ def validate(self: FlaskForm) -> bool:
                     _("Required for time span"))
                 valid = False
             for postfix in ['_from', '_to']:
-                if getattr(self, prefix + 'year' + postfix).data:
-                    date_ = form_to_datetime64(
-                        getattr(self, prefix + 'year' + postfix).data,
-                        getattr(self, prefix + 'month' + postfix).data,
-                        getattr(self, prefix + 'day' + postfix).data)
-                    if not date_:
-                        getattr(self, prefix + 'day' + postfix).errors.append(
+                if getattr(self, f'{prefix}year{postfix}').data:
+                    date = form_to_datetime64(
+                        getattr(self, f'{prefix}year{postfix}').data,
+                        getattr(self, f'{prefix}month{postfix}').data,
+                        getattr(self, f'{prefix}day{postfix}').data)
+                    if not date:
+                        getattr(self, f'{prefix}day{postfix}').errors.append(
                             _('not a valid date'))
                         valid = False
                     else:
-                        dates[prefix + postfix.replace('_', '')] = date_
+                        dates[prefix + postfix.replace('_', '')] = date
 
         # Check for valid date combination e.g. begin not after end
         if valid:
             for prefix in ['begin', 'end']:
-                if prefix + '_from' in dates \
-                        and prefix + '_to' in dates \
-                        and dates[prefix + '_from'] > dates[prefix + '_to']:
-                    field = getattr(self, prefix + '_day_from')
+                if f'{prefix}_from' in dates \
+                        and f'{prefix}_to' in dates \
+                        and dates[f'{prefix}_from'] > dates[f'{prefix}_to']:
+                    field = getattr(self, f'{prefix}_day_from')
                     field.errors.append(_('First date cannot be after second.'))
                     valid = False
         if 'begin_from' in dates and 'end_from' in dates:
@@ -64,14 +64,14 @@ def validate(self: FlaskForm) -> bool:
 
     # File
     if request.files:
-        files = request.files.getlist('file')
         ext = session['settings']['file_upload_allowed_extension']
-        for file_ in files:
+        for file_ in request.files.getlist('file'):
             if not file_:  # pragma: no cover
                 self.file.errors.append(_('no file to upload'))
                 valid = False
-            elif not ('.' in file_.filename
-                      and file_.filename.rsplit('.', 1)[1].lower() in ext):
+            elif not (
+                    '.' in file_.filename
+                    and file_.filename.rsplit('.', 1)[1].lower() in ext):
                 self.file.errors.append(_('file type not allowed'))
                 valid = False
 

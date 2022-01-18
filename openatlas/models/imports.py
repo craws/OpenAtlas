@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g
 from flask_login import current_user
@@ -10,7 +10,7 @@ from openatlas.database.imports import Import as Db
 
 class Project:
 
-    def __init__(self, row: Dict[str, Any]) -> None:
+    def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
         self.name = row['name']
         self.count = row['count']
@@ -28,7 +28,7 @@ class Import:
             description.strip() if description else None)
 
     @staticmethod
-    def get_all_projects() -> List[Project]:
+    def get_all_projects() -> list[Project]:
         return [Project(row) for row in Db.get_all_projects()]
 
     @staticmethod
@@ -45,11 +45,11 @@ class Import:
         Db.delete_project(id_)
 
     @staticmethod
-    def get_origin_ids(project: Project, origin_ids: List[str]) -> List[str]:
+    def get_origin_ids(project: Project, origin_ids: list[str]) -> list[str]:
         return Db.check_origin_ids(project.id, origin_ids)
 
     @staticmethod
-    def check_duplicates(class_: str, names: List[str]) -> List[str]:
+    def check_duplicates(class_: str, names: list[str]) -> list[str]:
         return Db.check_duplicates(class_, names)
 
     @staticmethod
@@ -75,7 +75,7 @@ class Import:
         return True
 
     @staticmethod
-    def import_data(project: 'Project', class_: str, data: List[Any]) -> None:
+    def import_data(project: 'Project', class_: str, data: list[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
         for row in data:

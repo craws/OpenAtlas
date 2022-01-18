@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
+# pylint: disable=invalid-name
 version = '7.0.0'
 release = '7.0.0'
 templates_path = ['_templates']
@@ -18,7 +19,7 @@ html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_domain_indices = False
 html_use_index = False
-html_copy_source = False  # prevent including source html files
+html_copy_source = False  # Prevent including source html files
 html_show_copyright = False
 
 html_theme_options = {

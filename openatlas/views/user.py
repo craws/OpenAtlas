@@ -1,4 +1,4 @@
-from typing import List, Optional, Tuple, Union
+from typing import Optional, Union
 
 import bcrypt
 from flask import abort, flash, render_template, request, session, url_for
@@ -161,11 +161,11 @@ def user_update(id_: int) -> Union[str, Response]:
         abort(403)  # pragma: no cover
     form = UserForm(obj=user)
     form.user_id = id_
-    del form.password, form.password2, form.send_info
-    del form.insert_and_continue, form.show_passwords
+    del form.password, form.password2, form.send_info, \
+        form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
-        # Active is always true if current user to prevent self deactivation
+        # Active is always true for current user to prevent self deactivation
         user.active = True if user.id == current_user.id else form.active.data
         user.real_name = form.real_name.data
         user.username = form.username.data
@@ -240,9 +240,8 @@ def user_insert() -> Union[str, Response]:
             f"+ {uc_first(_('user'))}"])
 
 
-def get_groups() -> List[Tuple[str, str]]:
-    """List groups from weakest permissions to strongest"""
-    choices = [(name, name) for name in [
+def get_groups() -> list[tuple[str, str]]:
+    choices = [(name, name) for name in [  # Weakest to strongest permissions
         'readonly',
         'contributor',
         'editor',

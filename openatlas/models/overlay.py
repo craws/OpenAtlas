@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict
+from typing import Any
 
 from flask_login import current_user
 
@@ -12,7 +12,7 @@ from openatlas.util.util import get_file_path
 
 class Overlay:
 
-    def __init__(self, row: Dict[str, Any]) -> None:
+    def __init__(self, row: dict[str, Any]) -> None:
         self.id = row['id']
         self.name = row['name'] if 'name' in row else ''
         self.image_id = row['image_id']
@@ -22,7 +22,7 @@ class Overlay:
         self.image_name = path.name if path else False
 
     @staticmethod
-    def insert(data: Dict[str, Any]) -> None:
+    def insert(data: dict[str, Any]) -> None:
         Db.insert({
             'image_id': data['image_id'],
             'place_id': data['place_id'],
@@ -34,7 +34,7 @@ class Overlay:
                 f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def update(data: Dict[str, Any]) -> None:
+    def update(data: dict[str, Any]) -> None:
         Db.update({
             'image_id': data['image_id'],
             'place_id': data['place_id'],
@@ -45,7 +45,7 @@ class Overlay:
                 f"{data['bottom_left_easting']}]]"})
 
     @staticmethod
-    def get_by_object(object_: Entity) -> Dict[int, Overlay]:
+    def get_by_object(object_: Entity) -> dict[int, Overlay]:
         if not app.config['IS_UNIT_TEST'] \
                 and not current_user.settings['module_map_overlay']:
             return {}  # pragma: no cover - tests can't access user settings

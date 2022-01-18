@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -22,7 +22,7 @@ def note_view(id_: int) -> str:
     if not note['public'] and note['user_id'] != current_user.id:
         abort(403)  # pragma: no cover
     entity = Entity.get_by_id(note['entity_id'])
-    buttons: List[str] = [manual('tools/notes')]
+    buttons: list[str] = [manual('tools/notes')]
     if note['user_id'] == current_user.id:
         buttons += [
             button(_('edit'), url_for('note_update', id_=note['id'])),

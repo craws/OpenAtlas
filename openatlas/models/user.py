@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import datetime
 import secrets
 import string
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 from flask import session
 from flask_login import UserMixin, current_user
@@ -16,8 +16,8 @@ class User(UserMixin):
 
     def __init__(
             self,
-            row: Dict[str, Any],
-            bookmarks: Optional[List[int]] = None) -> None:
+            row: dict[str, Any],
+            bookmarks: Optional[list[int]] = None) -> None:
         self.id = row['id']
         self.active = row['active'] == 1
         self.username = row['username']
@@ -54,7 +54,7 @@ class User(UserMixin):
             'password_reset_code': self.password_reset_code,
             'password_reset_date': self.password_reset_date})
 
-    def update_settings(self, settings: Dict[str, Any]) -> None:
+    def update_settings(self, settings: dict[str, Any]) -> None:
         for name, value in settings.items():
             Db.update_settings(self.id, name, value)
 
@@ -69,27 +69,25 @@ class User(UserMixin):
         if not self.login_last_failure \
                 or self.login_failed_count < failed_login_tries:
             return False
-        last_failure_date = self.login_last_failure
-        forget_minutes = int(session['settings']['failed_login_forget_minutes'])
-        last_failure_date += datetime.timedelta(minutes=forget_minutes)
-        if last_failure_date > datetime.datetime.now():
+        forget = int(session['settings']['failed_login_forget_minutes'])
+        unlocked = self.login_last_failure + datetime.timedelta(minutes=forget)
+        if unlocked > datetime.datetime.now():
             return True
         return False  # pragma no cover - no waiting in tests
 
-    def get_notes_by_entity_id(self, entity_id: int) -> List[Dict[str, Any]]:
+    def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return Db.get_notes_by_entity_id(self.id, entity_id)
 
     @staticmethod
-    def get_all() -> List[User]:
+    def get_all() -> list[User]:
         return [User(row) for row in Db.get_all()]
 
     @staticmethod
-    def get_by_id(user_id: int, with_bookmarks: bool = False) -> Optional[User]:
-        user_data = Db.get_by_id(user_id)
-        if user_data:
+    def get_by_id(user_id: int, bookmarks: bool = False) -> Optional[User]:
+        if user_data := Db.get_by_id(user_id):
             return User(
                 user_data,
-                Db.get_bookmarks(user_id) if with_bookmarks else None)
+                Db.get_bookmarks(user_id) if bookmarks else None)
         return None  # pragma no cover - e.g. obsolete session values
 
     @staticmethod
@@ -116,7 +114,7 @@ class User(UserMixin):
     def get_activities(
             limit: int,
             user_id: int,
-            action: str) -> List[Dict[str, Any]]:
+            action: str) -> list[dict[str, Any]]:
         return Db.get_activities(limit, user_id, action)
 
     @staticmethod
@@ -124,7 +122,7 @@ class User(UserMixin):
         return Db.get_created_entities_count(user_id)
 
     @staticmethod
-    def insert(data: Dict[str, Any]) -> int:
+    def insert(data: dict[str, Any]) -> int:
         return Db.insert(data)
 
     @staticmethod
@@ -132,7 +130,7 @@ class User(UserMixin):
         Db.delete(id_)
 
     @staticmethod
-    def get_users_for_form() -> List[Tuple[int, str]]:
+    def get_users_for_form() -> list[tuple[int, str]]:
         return Db.get_users_for_form()
 
     @staticmethod
@@ -144,7 +142,7 @@ class User(UserMixin):
         return 'bookmark remove'
 
     @staticmethod
-    def get_settings(user_id: int) -> Dict[str, Any]:
+    def get_settings(user_id: int) -> dict[str, Any]:
         settings = {
             'layout': 'default',
             'language': session['language'],
@@ -185,11 +183,11 @@ class User(UserMixin):
         Db.update_note(id_, sanitize(note, 'text'), public)
 
     @staticmethod
-    def get_note_by_id(id_: int) -> Dict[str, Any]:
+    def get_note_by_id(id_: int) -> dict[str, Any]:
         return Db.get_note_by_id(id_)
 
     @staticmethod
-    def get_notes_by_user_id(user_id: int) -> List[Dict[str, Any]]:
+    def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
         return Db.get_notes_by_user_id(user_id)
 
     @staticmethod

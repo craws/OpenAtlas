@@ -1,5 +1,5 @@
 import collections
-from typing import Dict, List, Optional, Union
+from typing import Optional, Union
 
 import numpy
 import pandas as pd
@@ -170,13 +170,13 @@ def import_data(project_id: int, class_: str) -> str:
     form = ImportForm()
     table = None
     imported = False
-    messages: Dict[str, List[str]] = {'error': [], 'warn': []}
+    messages: dict[str, list[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
     class_label = g.classes[class_].label
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)
-        columns: Dict[str, List[str]] = {
+        columns: dict[str, list[str]] = {
             'allowed': [
                 'name', 'id', 'description', 'begin_from', 'begin_to',
                 'begin_comment', 'end_from', 'end_to', 'end_comment',
@@ -207,7 +207,7 @@ def import_data(project_id: int, class_: str) -> str:
             missing_name_count = 0
             invalid_type_ids = False
             invalid_geoms = False
-            for index, row in data_frame.iterrows():
+            for _index, row in data_frame.iterrows():
                 if not row['name']:  # pragma: no cover
                     missing_name_count += 1
                     continue

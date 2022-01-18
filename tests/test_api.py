@@ -1,10 +1,15 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.error import *
+from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
+    FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
+    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
+    InvalidSubunitError, InvalidSystemClassError, LastEntityError, \
+    NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
+    WrongOperatorError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -27,12 +32,10 @@ class ApiTests(TestBaseCase):
                     'Shire',
                     'place',
                     description='The Shire was the homeland of the hobbits.')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding Created and Modified
-                place.created = str(datetime.datetime.now())
-                place.modified = str(datetime.datetime.now())
+                place.created = str(datetime.now())
+                place.modified = str(datetime.now())
 
                 # Adding Dates to place
                 place.update({'attributes': {
@@ -70,13 +73,13 @@ class ApiTests(TestBaseCase):
 
                 # Adding feature to place
                 feature = insert_entity('Home of Baggins', 'feature', place)
-                feature.created = str(datetime.datetime.now())
-                feature.modified = str(datetime.datetime.now())
+                feature.created = str(datetime.now())
+                feature.modified = str(datetime.now())
 
                 # Adding stratigraphic to place
                 strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
-                strati.created = str(datetime.datetime.now())
-                strati.modified = str(datetime.datetime.now())
+                strati.created = str(datetime.now())
+                strati.modified = str(datetime.now())
 
                 # Adding Administrative Unit Type
                 unit_node = Type.get_hierarchy('Administrative unit')
@@ -105,8 +108,6 @@ class ApiTests(TestBaseCase):
                 actor = insert_entity(
                     'Frodo', 'person',
                     description='That is Frodo')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 alias2 = insert_entity('The ring bearer', 'actor_appellation')
                 actor.link('P131', alias2)
@@ -123,8 +124,6 @@ class ApiTests(TestBaseCase):
                 actor2 = insert_entity(
                     'Sam', 'person',
                     description='That is Sam')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding residence
                 actor2.link('P74', location)
@@ -144,8 +143,6 @@ class ApiTests(TestBaseCase):
                 place2 = insert_entity(
                     'Mordor', 'place',
                     description='The heart of evil.')
-                if not place:  # Needed for Mypy
-                    return  # pragma: no cover
 
                 # Adding Type Settlement
                 place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
@@ -674,9 +671,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for('api_03.type_overview')),
                 self.app.get(url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()
-                rv = rv['types']['place']['Administrative unit']
-                assert bool([True for i in rv if
-                             i['label'] == 'Austria'])
+                rv = rv['place'][0]['children'][0]
+                assert bool(rv['label'] == 'Austria')
 
             # Test Type Tree
             for rv in [
@@ -700,9 +696,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entityCidocClass":[{{"operator":"equal",'
-                           f'"values":["E21"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"entityCidocClass":[{"operator":"equal",
+                        "values":["E21"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -710,9 +705,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entitySystemClass":[{{"operator":"equal",'
-                           f'"values":["person"],'
-                           f'"logicalOperator":"and"}}]}}'))]:
+                    search="""{"entitySystemClass":[{"operator":"equal",
+                        "values":["person"],"logicalOperator":"and"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 2)
 
@@ -732,9 +726,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='place',
-                    search=f'{{"entityName":[{{"operator":"notEqual",'
-                           f'"values":["Mordor"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"entityName":[{"operator":"notEqual",
+                        "values":["Mordor"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -742,9 +735,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"typeName":[{"operator":"equal",
+                        "values":["Boundary Mark", "Height"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -752,9 +745,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
-                           f'"values":["2020-1-1"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"beginFrom":[{"operator":"lesserThan",
+                        "values":["2020-1-1"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -762,9 +754,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
-                           f'"values":["2018-3-01"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"beginTo":[{"operator":"lesserThanEqual",
+                        "values":["2018-3-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -772,9 +763,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"beginTo":[{{"operator":"lesserThanEqual",'
-                           f'"values":["2018-3-01"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"beginTo":[{"operator":"lesserThanEqual",
+                        "values":["2018-3-01"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -782,9 +772,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
-                           f'"values":["2013-2-1"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"endFrom":[{"operator":"greaterThan",
+                        "values":["2013-2-1"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -792,9 +781,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endFrom":[{{"operator":"greaterThan",'
-                           f'"values":["2013-2-1"],'
-                           f'"logicalOperator":"or"}}]}}')),
+                    search="""{"endFrom":[{"operator":"greaterThan",
+                        "values":["2013-2-1"],"logicalOperator":"or"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -802,9 +790,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
-                           f'"values":["2019-03-01"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"endTo":[{"operator":"greaterThanEqual",
+                        "values":["2019-03-01"],"logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -812,9 +799,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"endTo":[{{"operator":"greaterThanEqual",'
-                           f'"values":["2019-03-01"],'
-                           f'"logicalOperator":"or"}}]}}'))]:
+                    search="""{"endTo":[{"operator":"greaterThanEqual",
+                    "values":["2019-03-01"],"logicalOperator":"or"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
 
@@ -827,9 +813,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}')),
+                    search="""{"typeName":[{"operator":"notEqual",
+                        "values":["Boundary Mark", "Height"],
+                        "logicalOperator":"and"}]}""")),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -847,9 +833,8 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=f'{{"entityAliases":[{{"operator":"notEqual",'
-                           f'"values":["Sûza"],'
-                           f'"logicalOperator":"and"}}]}}'))]:
+                    search="""{"entityAliases":[{"operator":"notEqual",
+                        "values":["Sûza"],"logicalOperator":"and"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 6)
 
@@ -857,9 +842,9 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for(
                 'api_03.query',
                 system_classes='place',
-                search=f'{{"entityName":[{{"operator":"notEqual",'
-                       f'"values":["Mordor"],'
-                       f'"logicalOperator":"or"}}]}}')).get_json()
+                search="""{"entityName":[{"operator":"notEqual",
+                    "values":["Mordor"],
+                    "logicalOperator":"or"}]}""")).get_json()
             assert bool(rv['pagination']['entities'] == 1)
 
             # subunit/
@@ -1024,26 +1009,26 @@ class ApiTests(TestBaseCase):
 
     @staticmethod
     def get_bool(
-            data: Dict[str, Any], key: str,
-            value: Optional[Union[str, List[Any]]] = None) -> bool:
+            data: dict[str, Any], key: str,
+            value: Optional[Union[str, list[Any]]] = None) -> bool:
         if value:
             return bool(data[key] == value)
         return bool(data[key])
 
     @staticmethod
-    def get_bool_inverse(data: Dict[str, Any], key: str) -> bool:
+    def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
         return bool(not data[key])
 
     @staticmethod
-    def get_no_key(data: Dict[str, Any], key: str) -> bool:
+    def get_no_key(data: dict[str, Any], key: str) -> bool:
         return bool(key not in data.keys())
 
     @staticmethod
-    def get_geom_properties(geom: Dict[str, Any], key: str) -> bool:
+    def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
         return bool(geom['features'][0]['properties'][key])
 
     @staticmethod
-    def get_class_mapping(data: List[Dict[str, Any]]) -> bool:
+    def get_class_mapping(data: list[dict[str, Any]]) -> bool:
         return bool(data[0]['systemClass']
                     and data[0]['crmClass']
                     and data[0]['view']

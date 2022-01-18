@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from collections import OrderedDict
-from typing import Any, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
@@ -86,12 +86,13 @@ def build_form(
     if 'description' in FORMS[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
-        if class_ == 'type':  # Change description field if value type
+        if class_ == 'type':
             type_ = entity if entity else origin
-            root = g.types[type_.root[0]] if type_.root else type_
-            if root.category == 'value':
-                del Form.description
-                setattr(Form, 'description', StringField(_('unit')))
+            if isinstance(type_, Type):
+                root = g.types[type_.root[0]] if type_.root else type_
+                if root.category == 'value':
+                    del Form.description
+                    setattr(Form, 'description', StringField(_('unit')))
     if 'map' in FORMS[class_]:
         setattr(Form, 'gis_points', HiddenField(default='[]'))
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
@@ -114,14 +115,15 @@ def customize_labels(
         form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
         type_ = item if item else origin
-        root = g.types[type_.root[0]] if type_.root else type_
-        getattr(form, str(root.id)).label.text = 'super'
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            getattr(form, str(root.id)).label.text = 'super'
 
 
 def add_buttons(
         form: Any,
         name: str,
-        entity: Union[Entity, None],
+        entity: Union[Entity, Type, Link, None],
         origin: Optional[Entity] = None) -> FlaskForm:
     setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
@@ -201,7 +203,7 @@ def add_reference_systems(form: Any, class_: str) -> None:
                 default=system.precision_default_id))
 
 
-def add_value_type_fields(form: Any, subs: List[int]) -> None:
+def add_value_type_fields(form: Any, subs: list[int]) -> None:
     for sub_id in subs:
         sub = g.types[sub_id]
         setattr(
@@ -267,7 +269,10 @@ def add_fields(
         setattr(form, 'begins_in', TableField(_('begins in')))
         setattr(form, 'ends_in', TableField(_('ends in')))
     elif class_ == 'hierarchy':
-        if code == 'custom' or (entity and entity.category != 'value'):
+        if code == 'custom' or (
+                entity
+                and isinstance(entity, Type)
+                and entity.category != 'value'):
             setattr(form, 'multiple', BooleanField(
                 _('multiple'),
                 description=_('tooltip hierarchy multiple')))
@@ -293,13 +298,14 @@ def add_fields(
             form,
             'actor' if code == 'member' else 'group',
             TableMultiField(_('actor'), [InputRequired()]))
-    elif class_ in g.classes and g.classes[class_].view == 'type':
+    elif class_ in g.view_class_mapping['type']:
         setattr(form, 'is_type_form', HiddenField())
         type_ = entity if entity else origin
-        root = g.types[type_.root[0]] if type_.root else type_
-        setattr(form, str(root.id), TreeField(str(root.id)))
-        if root.directional:
-            setattr(form, 'name_inverse', StringField(_('inverse')))
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            setattr(form, str(root.id), TreeField(str(root.id)))
+            if root.directional:
+                setattr(form, 'name_inverse', StringField(_('inverse')))
     elif class_ == 'person':
         setattr(form, 'residence', TableField(_('residence')))
         setattr(form, 'begins_in', TableField(_('born in')))
@@ -316,8 +322,7 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Type.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        choices = ReferenceSystem.get_class_choices(entity)
-        if choices:
+        if choices := ReferenceSystem.get_class_choices(entity):  # type: ignore
             setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
@@ -342,7 +347,7 @@ def build_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def build_table_form(class_: str, linked_entities: List[Entity]) -> str:
+def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """Returns a form with a list of entities with checkboxes."""
     if class_ == 'place':
         entities = Entity.get_by_class('place', types=True, aliases=True)
@@ -387,7 +392,7 @@ def build_move_form(type_: Type) -> FlaskForm:
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in Link.get_entities_by_type(type_):
+        for row in Link.get_links_by_type(type_):
             domain = Entity.get_by_id(row['domain_id'])
             range_ = Entity.get_by_id(row['range_id'])
             choices.append((row['id'], domain.name + ' - ' + range_.name))

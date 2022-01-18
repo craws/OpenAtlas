@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 import numpy
 from flask import g, session
@@ -14,6 +14,7 @@ from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.util import sanitize, uc_first
 
@@ -26,7 +27,7 @@ def get_link_type(form: Any) -> Optional[Entity]:
     return None
 
 
-def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
+def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
     if isinstance(form, ProfileForm):
         return {
             _('name'): current_user.real_name,
@@ -48,15 +49,15 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
             value = ''  # In case of a missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
-        if field.type == 'BooleanField':
-            # str() needed for templates
+        if field.type == 'BooleanField':  # str() needed for templates
             settings[label] = str(_('on')) if value else str(_('off'))
         if field.type == 'SelectField':
             if isinstance(value, str) and value.isdigit():
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
-        if field.name in ['mail_recipients_feedback',
-                          'file_upload_allowed_extension']:
+        if field.name in [
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             settings[label] = ' '.join(value)
     return settings
 
@@ -77,8 +78,9 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in ['log_level']:
             field.data = int(session['settings'][field.name])
             continue
-        if field.name in \
-                ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+        if field.name in [
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
             continue
         if field.name not in session['settings']:  # pragma: no cover
@@ -90,8 +92,8 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
 def process_form_data(
         form: FlaskForm,
         entity: Entity,
-        origin: Optional[Entity] = None) -> Dict[str, Any]:
-    data: Dict[str, Any] = {
+        origin: Optional[Entity] = None) -> dict[str, Any]:
+    data: dict[str, Any] = {
         'attributes': process_form_dates(form),
         'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
     for key, value in form.data.items():
@@ -137,10 +139,8 @@ def process_form_data(
                     name += ' (' + inverse + ')'
             if entity.class_.name == 'type':
                 name = sanitize(name, 'type')
-            elif entity.class_.name == 'reference_system' \
-                    and hasattr(entity, 'system') \
-                    and entity.system:
-                name = entity.name
+            elif isinstance(entity, ReferenceSystem) and entity.system:
+                name = entity.name  # Prevent name changing of a system type
             data['attributes']['name'] = name
         elif key == 'description':
             data['attributes'][key] = form.data[key]
@@ -269,18 +269,19 @@ def process_form_data(
                 'property': 'P128',
                 'range': form.artifact.data,
                 'inverse': True})
-    elif entity.class_.view == 'type' and 'classes' not in form:  # is sub type
+    elif entity.class_.view == 'type' and 'classes' not in form:
         type_ = origin if isinstance(origin, Type) else entity
-        root = g.types[type_.root[0]] if type_.root else type_
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        code = 'P127' if entity.class_.name == 'type' else 'P89'
-        if super_id != new_super.id:
-            data['links']['delete'].add(code)
-            data['links']['insert'].append({
-                 'property': code,
-                 'range': new_super})
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            super_id = g.types[type_.root[-1]] if type_.root else type_
+            new_super_id = getattr(form, str(root.id)).data
+            new_super = g.types[int(new_super_id)] if new_super_id else root
+            code = 'P127' if entity.class_.name == 'type' else 'P89'
+            if super_id != new_super.id:
+                data['links']['delete'].add(code)
+                data['links']['insert'].append({
+                     'property': code,
+                     'range': new_super})
     for link_ in data['links']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
@@ -289,7 +290,7 @@ def process_form_data(
     return data
 
 
-def form_string_to_entity_list(string: str) -> List[Entity]:
+def form_string_to_entity_list(string: str) -> list[Entity]:
     ids = ast.literal_eval(string)
     ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
     return Entity.get_by_ids(ids)
@@ -299,7 +300,7 @@ def process_origin_data(
         entity: Entity,
         origin: Entity,
         form: FlaskForm,
-        data: Dict[str, Any]) -> Dict[str, Any]:
+        data: dict[str, Any]) -> dict[str, Any]:
     if origin.class_.view == 'reference':
         if entity.class_.name == 'file':
             data['links']['insert'].append({
@@ -314,7 +315,8 @@ def process_origin_data(
                 'return_link_id': True,
                 'inverse': True})
     elif entity.class_.name == 'file' \
-            or entity.class_.view in ['reference', 'source']:
+            or (entity.class_.view in ['reference', 'source']
+                and origin.class_.name != 'file'):
         data['links']['insert'].append({
             'property': 'P67',
             'range': origin,
@@ -351,7 +353,7 @@ def process_origin_data(
     return data
 
 
-def process_form_dates(form: FlaskForm) -> Dict[str, Any]:
+def process_form_dates(form: FlaskForm) -> dict[str, Any]:
     data = {
         'begin_from': None, 'begin_to': None, 'begin_comment': None,
         'end_from': None, 'end_to': None, 'end_comment': None}
@@ -403,7 +405,7 @@ def populate_insert_form(
                 form.place.data = origin.id
     if view == 'source' and origin.class_.name == 'artifact':
         form.artifact.data = [origin.id]
-    if view == 'type':
+    if view == 'type' and isinstance(origin, Type):
         root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None
@@ -428,10 +430,10 @@ def form_to_datetime64(
         return False
 
     def get_last_day_of_month(year_: int, month_: int) -> int:
-        months_days: Dict[int, int] = {
+        months_days: dict[int, int] = {
             1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
             10: 31, 11: 30, 12: 31}
-        months_days_leap: Dict[int, int] = {
+        months_days_leap: dict[int, int] = {
             1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
             10: 31, 11: 30, 12: 31}
         date_lookup = months_days_leap \

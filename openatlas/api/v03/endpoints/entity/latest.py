@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -14,14 +14,14 @@ class GetLatest(Resource):
     @staticmethod
     @swag_from("../swagger/latest.yml", endpoint="api_03.latest")
     def get(latest: int) \
-            -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
             GetLatest.get_latest(latest),
             entity_.parse_args(),
             latest)
 
     @staticmethod
-    def get_latest(limit_: int) -> List[Entity]:
+    def get_latest(limit_: int) -> list[Entity]:
         if not 0 < limit_ < 101:
             raise InvalidLimitError
         return Entity.get_latest(limit_)

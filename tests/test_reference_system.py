@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -19,7 +21,7 @@ class ReferenceSystemTest(TestBaseCase):
 
             rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'Resolver URL' in rv.data
-            data = {
+            data: dict[Any, Any] = {
                 'name': 'Wikipedia',
                 'website_url': 'https://wikipedia.org',
                 'resolver_url': 'https://wikipedia.org',

@@ -1,8 +1,9 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Optional, Union
 
 from flask import g
+from werkzeug.exceptions import abort
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
@@ -10,7 +11,7 @@ from openatlas.models.entity import Entity
 
 class ReferenceSystem(Entity):
 
-    def __init__(self, row: Dict[str, Any]) -> None:
+    def __init__(self, row: dict[str, Any]) -> None:
 
         super().__init__(row)
         self.website_url = row['website_url']
@@ -20,10 +21,14 @@ class ReferenceSystem(Entity):
             list(self.types.keys())[0].id if self.types else None
         self.count = row['count']
         self.system = row['system']
-        self.classes: List[str] = []
+        self.classes: list[str] = []
+
+    def update(self, data: dict[str, Any], new: bool = False,) -> Optional[int]:
+        self.update_system(data)
+        return super().update(data, new)
 
     @staticmethod
-    def get_all() -> Dict[int, ReferenceSystem]:
+    def get_all() -> dict[int, ReferenceSystem]:
         systems = {row['id']: ReferenceSystem(row) for row in Db.get_all()}
         for class_ in g.classes.values():
             for system_id in class_.reference_systems:
@@ -35,6 +40,7 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
+        abort(404)  # pragma: nocover
 
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
@@ -42,7 +48,7 @@ class ReferenceSystem(Entity):
                 return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 
-    def update_system(self, data: Dict[str, Any]) -> None:
+    def update_system(self, data: dict[str, Any]) -> None:
         Db.update_system({
             'entity_id': self.id,
             'name': self.name,
@@ -58,7 +64,7 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def get_class_choices(
-            entity: Union[ReferenceSystem, None]) -> List[Tuple[int, str]]:
+            entity: Union[ReferenceSystem, None]) -> list[tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
             if not class_.reference_system_allowed \
@@ -72,7 +78,7 @@ class ReferenceSystem(Entity):
         return choices
 
     @staticmethod
-    def insert_system(data: Dict[str, str]) -> Entity:
+    def insert_system(data: dict[str, str]) -> Entity:
         entity = Entity.insert(
             'reference_system',
             data['name'],

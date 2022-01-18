@@ -91,7 +91,7 @@ class ApiExportCSV:  # pragma: no cover
         geom = {'type': None, 'coordinates': None}
         if entity.class_.view == 'place' or entity.class_.name == 'artifact':
             geom = ApiExportCSV.get_geometry(
-                Link.get_linked_entity(entity.id, 'P53'))
+                Link.get_linked_entity_safe(entity.id, 'P53'))
         elif entity.class_.name == 'object_location':
             geom = ApiExportCSV.get_geometry(entity)
         return geom

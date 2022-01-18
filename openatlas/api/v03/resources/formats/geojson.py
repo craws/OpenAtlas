@@ -8,14 +8,16 @@ from openatlas.models.link import Link
 class Geojson:
 
     @staticmethod
-    def get_geojson(entities: List[Entity]) -> List[Dict[str, Any]]:
+    def get_geojson(entities: List[Entity]) -> Dict[str, Any]:
         out = []
         for entity in entities:
-            geoms = [Geojson.get_entity(entity, geom)
-                     for geom in Geojson.get_geom(entity)]
-            out.extend(geoms) if geoms else out.append(
-                Geojson.get_entity(entity))
-        return out
+            if geoms := [
+                Geojson.get_entity(entity, geom)
+                for geom in Geojson.get_geom(entity)]:
+                out.extend(geoms)
+            else:
+                out.append(Geojson.get_entity(entity))
+        return {'type': 'FeatureCollection', 'features': out}
 
     @staticmethod
     def get_entity(
@@ -48,13 +50,10 @@ class Geojson:
         return nodes if nodes else None
 
     @staticmethod
-    def return_output(output: List[Dict[str, Any]]) -> Dict[str, Any]:
-        return {'type': 'FeatureCollection', 'features': output}
-
-    @staticmethod
     def get_geom(entity: Entity) -> Union[List[Dict[str, Any]], List[Any]]:
         if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
-            return Gis.get_by_id(Link.get_linked_entity(entity.id, 'P53').id)
+            return Gis.get_by_id(
+                Link.get_linked_entity_safe(entity.id, 'P53').id)
         if entity.class_.name == 'object_location':
             return Gis.get_by_id(entity.id)
         return []

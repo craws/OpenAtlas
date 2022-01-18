@@ -11,8 +11,8 @@ from openatlas.models.link import Link
 def get_entity_by_id(id_: int) -> Entity:
     try:
         entity = Entity.get_by_id(id_, types=True, aliases=True)
-    except Exception:
-        raise EntityDoesNotExistError
+    except Exception as e:
+        raise EntityDoesNotExistError from e
     return entity
 
 
@@ -59,7 +59,7 @@ def link_builder(
 
 def get_all_subunits_recursive(
         entity: Entity,
-        data: List[Dict[Entity, List[Any]]]) -> List[Dict[Any, Any]]:
+        data: List[Dict[Entity, Any]]) -> List[Dict[Any, Any]]:
     if entity.class_.name not in ['artifact', 'human_remains']:
         sub_entities = entity.get_linked_entities('P46', types=True)
         data[-1] = {entity: sub_entities if sub_entities else None}

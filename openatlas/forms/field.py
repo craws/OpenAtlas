@@ -1,7 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any, List
+from typing import Any
 
 from flask import g, render_template
 from flask_login import current_user
@@ -106,10 +106,8 @@ class TableSelect(HiddenInput):
 
     @staticmethod
     def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-        link = f"""
-            <a href='#'
-                onclick="selectFromTable(this, '{field_id}', {entity.id})">
-                {entity.name}</a>"""
+        link = f"""<a href='#' onclick="selectFromTable(this,
+            '{field_id}', {entity.id})">{entity.name}</a>"""
         if not entity.aliases:
             return link
         html = f'<p>{link}</p>'
@@ -125,7 +123,7 @@ class TableField(HiddenField):
 class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
-        data: List[int] = []
+        data: list[int] = []
         if field.data:
             data = ast.literal_eval(field.data) \
                 if isinstance(field.data, str) else field.data

@@ -77,7 +77,7 @@ class IndexTests(TestBaseCase):
                 url_for('login'),
                 data={'username': 'inactive', 'password': 'test'})
             assert b'This user is not activated' in rv.data
-            for i in range(4):
+            for _i in range(4):
                 rv = self.app.post(
                     url_for('login'),
                     data={'username': 'inactive', 'password': '?'})

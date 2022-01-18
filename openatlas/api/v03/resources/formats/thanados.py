@@ -110,8 +110,7 @@ def get_standard_type(type_: Type) -> Dict[str, Any]:
 
 
 def get_aliases(entity: Entity, parser: Dict[str, Any]) -> Optional[List[Any]]:
-    aliases = [value for value in entity.aliases.values()] \
-        if entity.aliases.values() else None
+    aliases = list(entity.aliases.values()) if entity.aliases.values() else None
     if parser['format'] == 'xml':
         return [{'alias': alias} for alias in aliases] if aliases else None
     return aliases
@@ -121,9 +120,8 @@ def get_ref_system(
         links_inverse: List[Link],
         parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     ref_sys = get_reference_systems(links_inverse)
-    if parser['format'] == 'xml':
-        return [{'externalReference': ref} for ref in
-                ref_sys] if ref_sys else None
+    if ref_sys and parser['format'] == 'xml':
+        return [{'externalReference': ref} for ref in ref_sys]
     return ref_sys
 
 
@@ -140,8 +138,8 @@ def get_references(
                 'title': link_.domain.description,
                 'pages': link_.description if link_.description else None})
     if parser['format'] == 'xml':
-        return [{'reference': ref} for ref in
-                references] if references else None
+        return [
+            {'reference': ref} for ref in references] if references else None
     return references if references else None
 
 
@@ -155,7 +153,7 @@ def get_timespans(entity: Entity) -> Dict[str, Any]:
 
 def get_file(
         links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, str]]]:
+        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':

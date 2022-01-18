@@ -1,5 +1,5 @@
 import time
-from typing import Dict, List, Union
+from typing import Any, Optional, Union
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -14,7 +14,7 @@ from openatlas.util.util import format_date_part
 def pre_populate_form(
         form: FlaskForm,
         item: Union[Entity, Link],
-        location: Union[Entity, None]) -> FlaskForm:
+        location: Optional[Entity]) -> FlaskForm:
     form.opened.data = time.time()
     if hasattr(form, 'begin_year_from'):
         populate_dates(form, item)
@@ -26,10 +26,10 @@ def pre_populate_form(
         form.event_id.data = item.id
 
     # Types
-    types: Dict[Type, str] = item.types
-    if location:  # Needed for administrative unit and historical place types
-        types.update(location.types)
-    type_data: Dict[int, List[int]] = {}
+    types: dict[Any, Any] = item.types
+    if location:
+        types |= location.types  # Administrative units and historical places
+    type_data: dict[int, list[int]] = {}
     for type_, value in types.items():
         root = g.types[type_.root[0]] if type_.root else type
         if root.id not in type_data:
@@ -48,7 +48,8 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
         # Can't use isinstance for class check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
         if link_.domain.class_.name == 'reference_system'}
-    for field in form:
+    for key in form.data.keys():
+        field = getattr(form, key)
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))
             if system_id in system_links:
@@ -59,7 +60,7 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
                 precision_field.data = str(system_links[system_id].type.id)
 
 
-def populate_dates(form: FlaskForm, item: Union['Entity', Link]) -> None:
+def populate_dates(form: FlaskForm, item: Union[Entity, Link]) -> None:
     if item.begin_from:
         form.begin_year_from.data = format_date_part(item.begin_from, 'year')
         form.begin_month_from.data = format_date_part(item.begin_from, 'month')
@@ -86,15 +87,12 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     if entity.class_.view == 'actor':
-        residence = entity.get_linked_entity('P74')
-        form.residence.data = residence.get_linked_entity_safe('P53', True).id \
-            if residence else ''
-        first = entity.get_linked_entity('OA8')
-        form.begins_in.data = first.get_linked_entity_safe('P53', True).id \
-            if first else ''
-        last = entity.get_linked_entity('OA9')
-        form.ends_in.data = last.get_linked_entity_safe('P53', True).id \
-            if last else ''
+        if res := entity.get_linked_entity('P74'):
+            form.residence.data = res.get_linked_entity_safe('P53', True).id
+        if first := entity.get_linked_entity('OA8'):
+            form.begins_in.data = first.get_linked_entity_safe('P53', True).id
+        if last := entity.get_linked_entity('OA9'):
+            form.ends_in.data = last.get_linked_entity_safe('P53', True).id
     elif entity.class_.name == 'artifact':
         owner = entity.get_linked_entity('P52')
         form.actor.data = owner.id if owner else None
@@ -104,13 +102,12 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         preceding = entity.get_linked_entity('P134', True)
         form.event_preceding.data = preceding.id if preceding else ''
         if entity.class_.name == 'move':
-            place_from = entity.get_linked_entity('P27')
-            form.place_from.data = place_from.get_linked_entity_safe(
-                'P53', True).id if place_from else ''
-            place_to = entity.get_linked_entity('P26')
-            form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id \
-                if place_to else ''
+            if place_from := entity.get_linked_entity('P27'):
+                form.place_from.data = \
+                    place_from.get_linked_entity_safe('P53', True).id
+            if place_to := entity.get_linked_entity('P26'):
+                form.place_to.data = \
+                    place_to.get_linked_entity_safe('P53', True).id
             person_data = []
             object_data = []
             for linked_entity in entity.get_linked_entities('P25'):
@@ -121,9 +118,8 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.person.data = person_data
             form.artifact.data = object_data
         else:
-            place = entity.get_linked_entity('P7')
-            form.place.data = place.get_linked_entity_safe('P53', True).id \
-                if place else ''
+            if place := entity.get_linked_entity('P7'):
+                form.place.data = place.get_linked_entity_safe('P53', True).id
         if entity.class_.name == 'acquisition':
             form.given_place.data = \
                 [entity.id for entity in entity.get_linked_entities('P24')]

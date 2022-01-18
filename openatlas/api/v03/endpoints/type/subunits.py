@@ -12,14 +12,14 @@ from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
 from openatlas.models.entity import Entity
 
 
-class GetSubunits(Resource):  # type: ignore
+class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
         return resolve_subunit(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
             entity_.parse_args(),
-            id_)
+            str(id_))
 
     @staticmethod
     def iterate(entity: Entity, parser: Dict[str, Any]) -> List[Dict[str, Any]]:

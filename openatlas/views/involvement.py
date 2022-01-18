@@ -62,8 +62,9 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
-        tab = 'actor' if origin.class_.view == 'event' else 'event'
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
     return render_template(
         'display_form.html',
         form=form,

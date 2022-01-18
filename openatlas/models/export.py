@@ -19,11 +19,10 @@ def current_date_for_filename() -> str:
 
 
 def csv_export(form: FlaskForm) -> None:
-
-    date_ = current_date_for_filename()
+    date = current_date_for_filename()
     path = app.config['EXPORT_DIR'] / 'csv'
     if form.zip.data:
-        path = app.config['TMP_DIR'] / f'{date_}_openatlas_csv_export'
+        path = app.config['TMP_DIR'] / f'{date}_openatlas_csv_export'
         if path.is_dir():
             shutil.rmtree(path)  # pragma: no cover
         path.mkdir()
@@ -84,26 +83,27 @@ def csv_export(form: FlaskForm) -> None:
             data_frame = psql.read_sql(
                 f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};",
                 g.db)
-            data_frame.to_csv(path / f'{date_}_{table}.csv', index=False)
+            data_frame.to_csv(path / f'{date}_{table}.csv', index=False)
     if form.zip.data:
         info = \
             f"CSV export from: {request.headers['Host']}\n" \
-            f"Created: {date_} by {current_user.username}\n" \
+            f"Created: {date} by {current_user.username}\n" \
             f"OpenAtlas version: {app.config['VERSION']}"
         with open(path / 'info.txt', "w") as file:
             print(info, file=file)
-        zip_file = app.config['EXPORT_DIR'] / 'csv' / f'{date_}_csv'
+        zip_file = app.config['EXPORT_DIR'] / 'csv' / f'{date}_csv'
         shutil.make_archive(zip_file, 'zip', path)
         shutil.rmtree(path)
 
 
 def sql_export() -> bool:
     file = \
-        app.config['EXPORT_DIR'] / 'sql' \
+        app.config['EXPORT_DIR'] \
+        / 'sql' \
         / f'{current_date_for_filename()}_dump.sql'
     if os.name == 'posix':
         command = \
-            f"pg_dump " \
+            "pg_dump " \
             f"-h {app.config['DATABASE_HOST']} " \
             f"-d {app.config['DATABASE_NAME']} " \
             f"-U {app.config['DATABASE_USER']} " \
@@ -125,7 +125,7 @@ def sql_export() -> bool:
     else:  # pragma: no cover
         os.popen(
             f'"{shutil.which("pg_dump")}" '
-            f'-h 127.0.0.1 '
+            '-h 127.0.0.1 '
             f'-d {app.config["DATABASE_NAME"]} '
             f'-U {app.config["DATABASE_USER"]} '
             f'-p {app.config["DATABASE_PORT"]} '

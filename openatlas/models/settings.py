@@ -1,17 +1,16 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from openatlas.database.settings import Settings as Db
 
 
 class Settings:
-
     MODULES = ['map_overlay', 'sub_units']
 
     @staticmethod
-    def get_settings() -> Dict[str, Any]:
-        settings: Dict[str, Union[int, str, List[str]]] = {}
+    def get_settings() -> dict[str, Any]:
+        settings: dict[str, Union[int, str, list[str]]] = {}
         for name in Settings.MODULES:  # Set empty in case it doesn't exist
-            settings['module_' + name] = ''
+            settings[f'module_{name}'] = ''
         for row in Db.get_settings():
             settings[row['name']] = row['value']
             if row['name'] in [
@@ -30,7 +29,7 @@ class Settings:
         return settings
 
     @staticmethod
-    def update(data: Dict[str, str]) -> None:
+    def update(data: dict[str, str]) -> None:
         for name, value in data.items():
             Db.update(name, value)
 

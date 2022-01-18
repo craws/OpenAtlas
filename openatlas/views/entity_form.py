@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
@@ -19,7 +19,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import resize_image
 from openatlas.util.util import (
     is_authorized, link, required_group, was_modified)
 
@@ -94,14 +94,14 @@ def update(id_: int) -> Union[str, Response]:
 def add_crumbs(
         class_: str,
         origin: Union[Entity, None],
-        structure: Optional[Dict[str, Any]],
-        insert_: Optional[bool] = False) -> List[Any]:
+        structure: Optional[dict[str, Any]],
+        insert_: Optional[bool] = False) -> list[Any]:
     view = g.classes[class_].view
     label = origin.class_.name if origin else view
     if label in g.class_view_mapping:
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
-    crumbs = [
+    crumbs: list[Any] = [
         [label, url_for('index', view=origin.class_.view if origin else view)],
         origin]
     if class_ == 'source_translation' and origin and not insert_:
@@ -132,7 +132,7 @@ def add_crumbs(
                 sibling_count += 1
     siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
     return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+           [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -172,7 +172,7 @@ def check_type(entity: Type, form: FlaskForm) -> bool:
 
 def get_place_info_for_insert(
         class_view: str,
-        origin: Optional[Entity]) -> Dict[str, Any]:
+        origin: Optional[Entity]) -> dict[str, Any]:
     if class_view not in ['artifact', 'place']:
         return {'structure': None, 'gis_data': None, 'overlays': None}
     structure = get_structure(super_=origin)
@@ -183,7 +183,7 @@ def get_place_info_for_insert(
         if origin and origin.class_.view == 'place' else None}
 
 
-def get_place_info_for_update(entity: Entity) -> Dict[str, Any]:
+def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
     if entity.class_.view not in ['artifact', 'place']:
         return {
             'structure': None,
@@ -215,7 +215,7 @@ def insert_files(
             file.save(str(app.config['UPLOAD_DIR'] / new_name))
             filenames.append(new_name)
             if session['settings']['image_processing']:
-                ImageProcessing.resize_image(new_name)
+                resize_image(new_name)
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
                 if origin:
@@ -243,6 +243,8 @@ def save(
     action = 'update' if entity else 'insert'
     try:
         if not entity:
+            if not class_:
+                abort(404)  # pragma: no cover, entity or class needed
             entity = insert_entity(form, class_)
             if class_ == 'source_translation' and origin:
                 origin.link('P73', entity)
@@ -318,7 +320,7 @@ def get_redirect_url(
             'insert',
             class_=entity.class_.name,
             origin_id=origin.id if origin else None)
-        if entity.class_.name in ('administrative_unit', 'type'):
+        if entity.class_.name in ('administrative_unit', 'type') and origin:
             root_id = origin.root[0] \
                 if isinstance(origin, Type) and origin.root else origin.id
             super_id = getattr(form, str(root_id)).data

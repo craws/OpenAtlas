@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from pathlib import Path
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 import numpy
 from bcrypt import hashpw
@@ -31,11 +31,11 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.entity import Link
+    from openatlas.models.link import Link
     from openatlas.models.type import Type
 
 
@@ -66,7 +66,9 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     if origin:
         view_name = origin.class_.view
     html = ''
-    for item in ['source', 'event', 'actor', 'place', 'artifact', 'reference']:
+    for item in [
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type']:
         active = ''
         request_parts = request.path.split('/')
         if (view_name == item) or request.path.startswith('/index/' + item):
@@ -76,26 +78,21 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             if name in g.class_view_mapping \
                     and g.class_view_mapping[name] == item:
                 active = 'active'
-        url = url_for('index', view=item)
-        html += \
-            f'<a href="{url}" class="nav-item nav-link {active}">' \
-            f'{uc_first(_(item))}</a>'
-    active = ''
-    if request.path.startswith('/types') \
-            or request.path.startswith('/insert/type') \
-            or (entity and entity.class_.view == 'type'):
-        active = 'active'
-    url = url_for('type_index')
-    html += \
-        f'<a href="{url}" class="nav-item nav-link {active}">' \
-        f'{uc_first(_("types"))}</a>'
+        if item == 'type':
+            html += \
+                f'<a href="{url_for("type_index")}" ' \
+                f'class="nav-item nav-link {active}">{uc_first(_("types"))}</a>'
+        else:
+            html += \
+                f'<a href="{url_for("index", view=item)}" ' \
+                f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
     return Markup(html)
 
 
 @contextfilter
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
-    # Using context filter to prevent Jinja2 context caching
+    # Using context filter above to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
@@ -130,9 +127,9 @@ def test_file(file_name: str) -> Optional[str]:
 
 
 def format_entity_date(
-        entity: Union['Entity', 'Link'],
+        entity: Union[Entity, Link],
         type_: str,  # begin or end
-        object_: Optional['Entity'] = None) -> str:
+        object_: Optional[Entity] = None) -> str:
     html = link(object_) if object_ else ''
     if getattr(entity, f'{type_}_from'):
         html += ', ' if html else ''
@@ -147,7 +144,7 @@ def format_entity_date(
     return html + (f" ({comment})" if comment else '')
 
 
-def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
+def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
     name = link(entity) if show_links else entity.name
     if not entity.aliases or not current_user.settings['table_show_aliases']:
         return name
@@ -156,17 +153,18 @@ def format_name_and_aliases(entity: 'Entity', show_links: bool) -> str:
         f'{"".join(f"<p>{alias}</p>" for alias in entity.aliases.values())}'
 
 
-def get_backup_file_data() -> Dict[str, Any]:
+def get_backup_file_data() -> dict[str, Any]:
     path = app.config['EXPORT_DIR'] / 'sql'
     latest_file = None
     latest_file_date = None
-    for file in [f for f in path.iterdir()
-                 if (path / f).is_file() and f.name != '.gitignore']:
+    for file in [
+            f for f in path.iterdir()
+            if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
-    file_data: Dict[str, Any] = {'backup_too_old': True}
+    file_data: dict[str, Any] = {'backup_too_old': True}
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file.name
@@ -176,10 +174,8 @@ def get_backup_file_data() -> Dict[str, Any]:
     return file_data
 
 
-def get_base_table_data(
-        entity: 'Entity',
-        show_links: bool = True) -> List[Any]:
-    data = [format_name_and_aliases(entity, show_links)]
+def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
+    data: list[Any] = [format_name_and_aliases(entity, show_links)]
     if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
@@ -198,33 +194,10 @@ def get_base_table_data(
     return data
 
 
-def get_disk_space_info() -> Optional[Dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail
-    return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
-
-
-def get_file_stats(
-        path: Path = app.config['UPLOAD_DIR']) -> Dict[int, Dict[str, Any]]:
-    stats: Dict[int, Dict[str, Any]] = {}
-    for file in filter(lambda x: x.stem.isdigit(), path.iterdir()):
-        stats[int(file.stem)] = {
-            'ext': file.suffix,
-            'size': convert_size(file.stat().st_size),
-            'date': file.stat().st_ctime}
-    return stats
-
-
 def get_entity_data(
-        entity: 'Entity',
-        event_links: Optional[List[Link]] = None) -> Dict[str, Any]:
-    data: Dict[str, Any] = {_('alias'): list(entity.aliases.values())}
+        entity: Entity,
+        event_links: Optional[list[Link]] = None) -> dict[str, Any]:
+    data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
     from_link = ''
@@ -321,7 +294,9 @@ def get_entity_data(
         data[_('artifact')] = [
             link(artifact) for artifact in
             entity.get_linked_entities('P128', inverse=True)]
-    return add_system_data(entity, data)
+    if hasattr(current_user, 'settings'):
+        data |= get_system_data(entity)
+    return data
 
 
 def required_group(group: str):  # type: ignore
@@ -342,11 +317,11 @@ def required_group(group: str):  # type: ignore
 def send_mail(
         subject: str,
         text: str,
-        recipients: Union[str, List[str]],
+        recipients: Union[str, list[str]],
         log_body: bool = True) -> bool:  # pragma: no cover
     """
         Send one mail to every recipient.
-        Set log_body to False for sensitive data e.g. passwords.
+        Set log_body to False for sensitive data, e.g. password mails
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
@@ -426,7 +401,7 @@ def tooltip(text: str) -> str:
         </span>""".format(title=text.replace('"', "'"))
 
 
-def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
+def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
@@ -435,7 +410,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
+def get_appearance(event_links: list[Link]) -> tuple[str, str]:
     # Get first/last appearance year from events for actors without begin/end
     first_year = None
     last_year = None
@@ -478,13 +453,13 @@ def format_datetime(value: Any) -> str:
     return value.replace(microsecond=0).isoformat() if value else ''
 
 
-def get_file_extension(entity: Union[int, 'Entity']) -> str:
+def get_file_extension(entity: Union[int, Entity]) -> str:
     path = get_file_path(entity if isinstance(entity, int) else entity.id)
     return path.suffix if path else 'N/A'
 
 
 def get_file_path(
-        entity: Union[int, 'Entity'],
+        entity: Union[int, Entity],
         size: Optional[str] = None) -> Optional[Path]:
     id_ = entity if isinstance(entity, int) else entity.id
     if id_ not in g.file_stats:
@@ -563,10 +538,8 @@ def external_url(url: Union[str, None]) -> str:
         if url else ''
 
 
-def add_system_data(entity: Entity, data: Dict[str, Any]) -> Dict[str, Any]:
-    """Add additional information for entity views if activated in profile"""
-    if not hasattr(current_user, 'settings'):
-        return data  # pragma: no cover
+def get_system_data(entity: Entity) -> dict[str, Any]:
+    data = {}
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
@@ -602,28 +575,6 @@ def delete_link(name: str, url: str) -> str:
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def add_edit_link(data: List[Any], url: str) -> None:
-    if is_authorized('contributor'):
-        data.append(link(_('edit'), url))
-
-
-def add_remove_link(
-        data: List[Any],
-        name: str,
-        link_: Link,
-        origin: Entity,
-        tab_: str) -> None:
-    if is_authorized('contributor'):
-        data.append(link(
-            _('remove'),
-            url_for(
-                'link_delete',
-                id_=link_.id,
-                origin_id=origin.id) + '#tab-' + tab_,
-            js="return confirm('{x}')".format(
-                x=_('Remove %(name)s?', name=name.replace("'", '')))))
-
-
 def display_delete_link(entity: Entity) -> str:
     if entity.id in g.types:
         url = url_for('type_delete', id_=entity.id)
@@ -640,16 +591,25 @@ def link(
         class_: Optional[str] = '',
         uc_first_: Optional[bool] = True,
         js: Optional[str] = None) -> str:
+    from openatlas.models.entity import Entity
+    from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
         return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
             url=url,
             class_=class_,
             js=f'onclick="{js}"' if js else '',
             label=(uc_first(str(object_))) if uc_first_ else object_)
-
-    # Builds an HTML link to a detail view of an object
-    from openatlas.models.entity import Entity
-    from openatlas.models.user import User
+    if isinstance(object_, Entity):
+        return link(
+            object_.name,
+            url_for('view', id_=object_.id),
+            uc_first_=False)
+    if isinstance(object_, CidocClass):
+        return link(
+            object_.code,
+            url_for('cidoc_class_view', code=object_.code))
+    if isinstance(object_, CidocProperty):
+        return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Project):
         return link(
             object_.name,
@@ -659,17 +619,6 @@ def link(
             object_.username,
             url_for('user_view', id_=object_.id),
             class_='' if object_.active else 'inactive',
-            uc_first_=False)
-    if isinstance(object_, CidocClass):
-        return link(
-            object_.code,
-            url_for('cidoc_class_view', code=object_.code))
-    if isinstance(object_, CidocProperty):
-        return link(object_.code, url_for('property_view', code=object_.code))
-    if isinstance(object_, Entity):
-        return link(
-            object_.name,
-            url_for('view', id_=object_.id),
             uc_first_=False)
     return ''
 
@@ -681,21 +630,20 @@ def button(
         css: Optional[str] = 'primary',
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
+    tag = 'a' if url else 'span'
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
-    return Markup(
-        render_template(
-            'util/button.html',
-            label=label,
-            url=url,
-            css=css,
-            id_=id_,
-            js=onclick))
+    return Markup(f"""
+        <{tag}
+            {f'href="{url}"' if url else ''}
+            {f'id="{id_}"' if id_ else ''} 
+            class="{app.config['CSS']['button'][css]}"
+            {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
 
 
 @app.template_filter()
-def button_bar(buttons: List[Any]) -> str:
+def button_bar(buttons: list[Any]) -> str:
     return Markup(
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
         if buttons else ''
@@ -703,14 +651,15 @@ def button_bar(buttons: List[Any]) -> str:
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
-    text = get_translation('citation_example')
-    if not text or code != 'reference':
+    if code != 'reference':
         return ''
-    return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
+    if text := get_translation('citation_example'):
+        return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
+    return ''  # pragma: no cover
 
 
 @app.template_filter()
-def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
+def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
@@ -734,7 +683,7 @@ def siblings_pager(entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
 
 
 @app.template_filter()
-def breadcrumb(crumbs: List[Any]) -> str:
+def breadcrumb(crumbs: list[Any]) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     items = []
@@ -756,21 +705,20 @@ def uc_first(string: str) -> str:
 
 
 @app.template_filter()
-def display_info(data: Dict[str, Union[str, List[str]]]) -> str:
+def display_info(data: dict[str, Union[str, list[str]]]) -> str:
     return Markup(render_template('util/info_data.html', data=data))
 
 
-def get_type_data(entity: 'Entity') -> Dict[str, Any]:
+def get_type_data(entity: Entity) -> dict[str, Any]:
     if entity.location:
         entity.types.update(entity.location.types)  # Add location types
-    data: Dict[str, Any] = defaultdict(list)
+    data: dict[str, Any] = defaultdict(list)
     for type_, value in sorted(entity.types.items(), key=lambda x: x[0].name):
         if entity.standard_type and type_.id == entity.standard_type.id:
             continue  # Standard type is already added
         html = f"""
             <span title="{" > ".join([g.types[i].name for i in type_.root])}">
-                {link(type_)}
-            </span>"""
+                {link(type_)}</span>"""
         if type_.category == 'value':
             html += f' {float(value):g} {type_.description}'
         data[g.types[type_.root[0]].name].append(html)
@@ -794,9 +742,12 @@ def description(entity: Union[Entity, Project]) -> str:
 
 @app.template_filter()
 def download_button(entity: Entity) -> str:
-    return Markup(button(
-        _('download'),
-        url_for('download_file', filename=get_file_path(entity.image_id).name)))
+    if entity.image_id:
+        if path := get_file_path(entity.image_id):
+            return Markup(button(
+                    _('download'),
+                    url_for('download_file', filename=path.name)))
+    return ''  # pragma: no cover
 
 
 @app.template_filter()
@@ -808,12 +759,10 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
-    if session['settings']['image_processing'] \
-            and ImageProcessing.check_processed_image(path.name):
-        resized = url_for(
-            'display_file',
-            filename=get_file_path(entity.image_id, size).name,
-            size=size)
+    if session['settings']['image_processing']\
+            and check_processed_image(path.name):
+        if path_ := get_file_path(entity.image_id, size):
+            resized = url_for('display_file', filename=path_.name, size=size)
     return Markup(
         render_template(
             'util/profile_image.html',
@@ -948,10 +897,10 @@ def display_form(
 
 def display_value_type_fields(
         form: Any,
-        type_: 'Type',
-        root: Optional['Type'] = None) -> str:
-    root = root if root else type_
+        type_: Type,
+        root: Optional[Type] = None) -> str:
     html = ''
+    root = root if root else type_
     for sub_id in type_.subs:
         sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
@@ -976,7 +925,7 @@ class MLStripper(HTMLParser):
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed: List[str] = []
+        self.fed: list[str] = []
 
     def handle_data(self, d: Any) -> None:
         self.fed.append(d)
@@ -1008,7 +957,8 @@ def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
     return numpy.datetime64(string.split(' ')[0])
 
 
-def datetime64_to_timestamp(date: numpy.datetime64) -> Optional[str]:
+def datetime64_to_timestamp(
+        date: Union[numpy.datetime64, None]) -> Optional[str]:
     if not date:
         return None
     string = str(date)

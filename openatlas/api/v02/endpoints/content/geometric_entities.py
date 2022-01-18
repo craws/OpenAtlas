@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, json, jsonify
@@ -14,9 +14,9 @@ class GetGeometricEntities(Resource):
     @staticmethod
     @swag_from("../swagger/geometric_entities.yml",
                endpoint="api_02.geometric_entities")
-    def get() -> Union[int, Response, Tuple[Any, int]]:
+    def get() -> Union[int, Response, tuple[Any, int]]:
         parser = gis.parse_args()
-        output = {
+        output: dict[str, Any] = {
             'type': 'FeatureCollection',
             'features': GetGeometricEntities.get_geometries(parser)}
         if parser['count']:
@@ -29,7 +29,7 @@ class GetGeometricEntities(Resource):
         return marshal(output, GeometriesTemplate.geometries_template()), 200
 
     @staticmethod
-    def get_geometries(parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
         choices = [
             'gisPointAll', 'gisPointSupers', 'gisPointSubs',
             'gisPointSibling', 'gisLineAll', 'gisPolygonAll']

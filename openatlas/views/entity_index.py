@@ -1,5 +1,5 @@
 import datetime
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.image_processing import ImageProcessing
+from openatlas.util.image_processing import check_processed_image
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, external_url, format_date, get_base_table_data, get_file_path,
@@ -24,8 +24,7 @@ from openatlas.util.util import (
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # Delete before showing index to prevent additional redirects
-        url = delete_entity(delete_id)
-        if url:  # e.g. an error occurred and entry is shown again
+        if url := delete_entity(delete_id):
             return redirect(url)
     return render_template(
         'entity/index.html',
@@ -38,11 +37,10 @@ def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
         if view == 'file' else [_(view).replace('_', ' ')])
 
 
-def get_buttons(view: str) -> List[str]:
+def get_buttons(view: str) -> list[str]:
     buttons = []
-    names = [view] \
-        if view in ['artifact', 'place'] else g.view_class_mapping[view]
-    for name in names:
+    for name in [view] if view in ['artifact', 'place'] \
+            else g.view_class_mapping[view]:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
                 button(g.classes[name].label, url_for('insert', class_=name)))
@@ -77,7 +75,6 @@ def get_table(view: str) -> Table:
                     and current_user.settings['table_show_icons']:
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)
-
     elif view == 'reference_system':
         for system in g.reference_systems.values():
             table.rows.append([
@@ -97,17 +94,16 @@ def get_table(view: str) -> Table:
 
 
 def file_preview(entity_id: int) -> str:
-    icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
     size = app.config['IMAGE_SIZE']['table']
     parameter = f"loading='lazy' alt='image' width='{size}'"
-    if icon_path:
+    if icon_path := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)
-    if path and ImageProcessing.check_processed_image(path.name):
-        icon_path = get_file_path(entity_id, app.config['IMAGE_SIZE']['table'])
-        url = url_for('display_file', filename=icon_path.name, size=size)
-        return f"<img src='{url}' {parameter}>"
+    if path and check_processed_image(path.name):
+        if icon := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
+            url = url_for('display_file', filename=icon.name, size=size)
+            return f"<img src='{url}' {parameter}>"
     return ''
 
 
@@ -127,32 +123,29 @@ def delete_entity(id_: int) -> Optional[str]:
         if entity.get_linked_entities('P46'):
             flash(_('Deletion not possible if subunits exists'), 'error')
             return url_for('view', id_=id_)
-        parent = None \
-            if entity.class_.name == 'place' \
-            else entity.get_linked_entity('P46', True)
-        entity.delete()
-        if parent:
-            tab = f"#tab-{entity.class_.name.replace('_', '-')}"
-            url = url_for('view', id_=parent.id) + tab
-    else:
-        if entity.class_.name == 'source_translation':
-            source = entity.get_linked_entity_safe('P73', inverse=True)
-            url = f"{url_for('view', id_=source.id)}#tab-text"
-        Entity.delete_(id_)
-        if entity.class_.name == 'file':
-            try:
-                delete_files(id_)
-            except Exception as e:  # pragma: no cover
-                logger.log('error', 'file', 'file deletion failed', e)
-                flash(_('error file delete'), 'error')
+        if entity.class_.name != 'place':
+            if parent := entity.get_linked_entity('P46', True):
+                url = \
+                    f"{url_for('view', id_=parent.id)}" \
+                    f"#tab-{entity.class_.name.replace('_', '-')}"
+    elif entity.class_.name == 'source_translation':
+        source = entity.get_linked_entity_safe('P73', inverse=True)
+        url = f"{url_for('view', id_=source.id)}#tab-text"
+    elif entity.class_.name == 'file':
+        try:
+            delete_files(id_)
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'file', 'file deletion failed', e)
+            flash(_('error file delete'), 'error')
+            return url_for('view', id_=id_)
+    entity.delete()
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return url
 
 
 def delete_files(id_: int) -> None:
-    path = get_file_path(id_)
-    if path:  # Only delete existing files to prevent a missing file error
+    if path := get_file_path(id_):  # Prevent missing file warning
         path.unlink()
-    for path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
-        path.unlink()
+    for resized_path in app.config['RESIZED_IMAGES'].glob(f'**/{id_}.*'):
+        resized_path.unlink()

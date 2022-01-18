@@ -17,7 +17,7 @@ class GetTypeEntitiesAll(Resource):
     @swag_from("../swagger/type_entities_all.yml",
                endpoint="api_02.type_entities_all")
     def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
-        entities = [entity for entity in GetTypeEntitiesAll.get_node_all(id_)]
+        entities = GetTypeEntitiesAll.get_node_all(id_)
         if not entities:
             entities = get_entities_by_ids(
                 GetTypeEntitiesAll.get_special_node(id_, []))
@@ -43,7 +43,7 @@ class GetTypeEntitiesAll(Resource):
 
     @staticmethod
     def get_special_node(id_: int, data: List[int]) -> List[int]:
-        for link_ in Link.get_entities_by_type(g.types[id_]):
+        for link_ in Link.get_links_by_type(g.types[id_]):
             data.append(link_['domain_id'])
             data.append(link_['range_id'])
         for sub_id in g.types[id_].subs:

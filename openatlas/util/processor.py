@@ -1,4 +1,5 @@
-from typing import Dict, Union
+from pathlib import Path
+from typing import Union
 
 from flask import session, url_for
 from flask_babel import lazy_gettext as _
@@ -14,19 +15,15 @@ class GlobalSearchForm(FlaskForm):
 
 
 @app.context_processor
-def inject_template_functions() -> Dict[str, Union[str, GlobalSearchForm]]:
-    # Defines variables and functions without arguments for templates.
-
+def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     def get_logo() -> str:
-        logo = '/static/images/layout/logo.png'
         if session['settings']['logo_file_id']:
             ext = get_file_extension(int(session['settings']['logo_file_id']))
             if ext != 'N/A':
-                logo = url_for(
+                return url_for(
                     'display_logo',
-                    filename=session['settings']['logo_file_id'] + ext)
-        return logo
-
+                    filename=f"{session['settings']['logo_file_id']}{ext}")
+        return str(Path('/static') / 'images' / 'layout' / 'logo.png')
     return dict(
         get_logo=get_logo(),
-        search_form=GlobalSearchForm(prefix="global"))
+        search_form=GlobalSearchForm(prefix='global'))

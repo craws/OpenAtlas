@@ -1,6 +1,6 @@
 import json
 import operator
-from typing import Any, Dict, List, MutableSet, Tuple, Union
+from typing import Any, Union
 
 from flask import Response, jsonify, request
 from flask_restful import marshal
@@ -22,17 +22,17 @@ from openatlas.api.v03.templates.subunits import SubunitTemplate
 from openatlas.models.entity import Entity
 
 
-def get_template(parser: Dict[str, str]) -> Dict[str, Any]:
+def get_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return GeojsonTemplate.pagination()
     return LinkedPlacesTemplate.pagination(parser)
 
 
 def resolve_entities(
-        entities: List[Entity],
-        parser: Dict[str, Any],
+        entities: list[Entity],
+        parser: dict[str, Any],
         file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     if parser['type_id']:
@@ -52,10 +52,10 @@ def resolve_entities(
 
 
 def resolve_output(
-        result: Dict[str, Any],
-        parser: Dict[str, Any],
+        result: dict[str, Any],
+        parser: dict[str, Any],
         file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
             rdf_output(result['results'], parser),
@@ -68,10 +68,9 @@ def resolve_output(
 
 
 def resolve_subunit(
-        subunit: List[Dict[str, Any]],
-        parser: Dict[str, Any],
-        name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        subunit: list[dict[str, Any]],
+        parser: dict[str, Any],
+        name: str) -> Union[Response, dict[str, Any], tuple[Any, int]]:
     out = {'collection' if parser['format'] == 'xml' else name: subunit}
     if parser['count']:
         return jsonify(len(out[name]))
@@ -86,14 +85,13 @@ def resolve_subunit(
             subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, SubunitTemplate.subunit_template(name),
-                        name)
+        return download(out, SubunitTemplate.subunit_template(name), name)
     return marshal(out, SubunitTemplate.subunit_template(name)), 200
 
 
 def download(
-        data: Union[List[Any], Dict[Any, Any]],
-        template: Dict[Any, Any],
+        data: Union[list[Any], dict[Any, Any]],
+        template: dict[Any, Any],
         name: Union[str, int]) -> Response:
     return Response(
         json.dumps(marshal(data, template)),
@@ -101,14 +99,15 @@ def download(
         headers={'Content-Disposition': f'attachment;filename={name}.json'})
 
 
-def remove_duplicate_entities(entities: List[Entity]) -> List[Entity]:
-    seen: MutableSet = set()
+def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
+    seen = set()  # type: ignore
     seen_add = seen.add  # Do not change, faster than always call seen.add(e.id)
-    return [entity for entity in entities if
-            not (entity.id in seen or seen_add(entity.id))]
+    return [
+        entity for entity in entities
+        if not (entity.id in seen or seen_add(entity.id))]
 
 
-def sorting(entities: List[Entity], parser: Dict[str, Any]) -> List[Entity]:
+def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
     entities = remove_duplicate_entities(entities)
     return entities if 'latest' in request.path else \
         sorted(

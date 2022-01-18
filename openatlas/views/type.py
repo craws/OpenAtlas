@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, sanitize
 
 
-def walk_tree(types: List[int]) -> List[Dict[str, Any]]:
+def walk_tree(types: list[int]) -> list[dict[str, Any]]:
     items = []
     for id_ in types:
         item = g.types[id_]
@@ -34,15 +34,13 @@ def walk_tree(types: List[int]) -> List[Dict[str, Any]]:
 @app.route('/type')
 @required_group('readonly')
 def type_index() -> str:
-    types: Dict[str, Dict[Entity, str]] = \
+    types: dict[str, dict[Entity, str]] = \
         {'standard': {}, 'custom': {}, 'place': {}, 'value': {}, 'system': {}}
-    for types_ in g.types.values():
-        if types_.root:
-            continue
-        types[types_.category][types_] = render_template(
+    for type_ in [type_ for type_ in g.types.values() if not type_.root]:
+        types[type_.category][type_] = render_template(
             'forms/tree_select_item.html',
-            name=sanitize(types_.name),
-            data=walk_tree(Type.get_types(types_.name)))
+            name=sanitize(type_.name),
+            data=walk_tree(Type.get_types(type_.name)))
     return render_template(
         'type/index.html',
         types=types,
@@ -54,9 +52,9 @@ def type_index() -> str:
 @required_group('editor')
 def type_delete(id_: int) -> Response:
     type_ = g.types[id_]
-    root = g.types[type_.root[0]] if type_.root else None
     if type_.category == 'system' or type_.subs or type_.count:
         abort(403)
+    root = g.types[type_.root[0]] if type_.root else None  # Before deleting
     type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(
@@ -68,8 +66,8 @@ def type_delete(id_: int) -> Response:
 def type_move_entities(id_: int) -> Union[str, Response]:
     type_ = g.types[id_]
     root = g.types[type_.root[0]]
-    if root.category == 'value':  # pragma: no cover
-        abort(403)
+    if root.category == 'value':
+        abort(403)  # pragma: no cover
     form = build_move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()

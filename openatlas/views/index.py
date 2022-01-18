@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, Tuple, Union
+from typing import Any, Union
 
 from flask import flash, g, jsonify, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -15,7 +15,7 @@ from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.changelog import Changelog
+from openatlas.util.changelog import versions
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -71,22 +71,23 @@ def overview() -> str:
                 f'<a href="{url_for("note_view", id_=note["id"])}">'
                 f'{uc_first(_("view"))}</a>'])
         for name, count in Entity.get_overview_counts().items():
-            if count:
-                url = url_for('index', view=g.class_view_mapping[name])
-                if name == 'administrative_unit':
-                    url = f"{url_for('type_index')}#menu-tab-place"
-                elif name == 'type':
-                    url = url_for('type_index')
-                elif name in [
-                        'feature',
-                        'human_remains',
-                        'stratigraphic_unit',
-                        'source_translation']:
-                    url = ''
-                tables['overview'].rows.append([
-                    link(g.classes[name].label, url)
-                    if url else g.classes[name].label,
-                    format_number(count)])
+            if not count:
+                continue  # pragma: no cover
+            url = url_for('index', view=g.class_view_mapping[name])
+            if name == 'administrative_unit':
+                url = f"{url_for('type_index')}#menu-tab-place"
+            elif name == 'type':
+                url = url_for('type_index')
+            elif name in [
+                    'feature',
+                    'human_remains',
+                    'stratigraphic_unit',
+                    'source_translation']:
+                url = ''
+            tables['overview'].rows.append([
+                link(g.classes[name].label, url) if url
+                else g.classes[name].label,
+                format_number(count)])
         for entity in Entity.get_latest(10):
             tables['latest'].rows.append([
                 format_date(entity.created),
@@ -114,21 +115,18 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
+    settings = session['settings']
     form = FeedbackForm()
-    if form.validate_on_submit() \
-            and session['settings']['mail']:  # pragma: no cover
-        subject = \
-            f"{uc_first(form.subject.data)} " \
-            f"from {session['settings']['site_name']}"
-        user = current_user
+    if form.validate_on_submit() and settings['mail']:  # pragma: no cover
         body = \
-            f'{form.subject.data} from {user.username} ({user.id}) ' \
-            f'{user.email} at {request.headers["Host"]}\n\n' \
+            f'{form.subject.data} from {current_user.username} ' \
+            f'({current_user.id}) {current_user.email} at ' \
+            f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                subject,
+                f"{uc_first(form.subject.data)} from {settings['site_name']}",
                 body,
-                session['settings']['mail_recipients_feedback']):
+                settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')
@@ -150,17 +148,17 @@ def index_content(item: str) -> str:
 
 
 @app.errorhandler(400)
-def bad_request(e: Exception) -> Tuple[Any, int]:  # pragma: no cover
+def bad_request(e: Exception) -> tuple[Any, int]:  # pragma: no cover
     return render_template('400.html', crumbs=['400 - Bad Request'], e=e), 400
 
 
 @app.errorhandler(403)
-def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def forbidden(e: Exception) -> tuple[Union[dict[str, str], str], int]:
     return render_template('403.html', crumbs=['403 - Forbidden'], e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def page_not_found(e: Exception) -> tuple[Union[dict[str, str], str], int]:
     if request.path.startswith('/api/'):  # pragma: nocover
         return jsonify({
             'message': 'Endpoint not found',
@@ -174,17 +172,17 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 
 @app.errorhandler(405)  # pragma: no cover
-def method_not_allowed(_e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def method_not_allowed(_e: Exception) -> tuple[Union[dict[str, str], str], int]:
     raise MethodNotAllowedError
 
 
 @app.errorhandler(418)
-def invalid_id(e: Exception) -> Tuple[str, int]:
+def invalid_id(e: Exception) -> tuple[str, int]:
     return render_template('418.html', crumbs=["418 - I’m a teapot"], e=e), 418
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+def unprocessable_entity(e: Exception) -> tuple[str, int]:  # pragma: no cover
     return render_template(
         '422.html',
         crumbs=['422 - Unprocessable entity'],
@@ -197,7 +195,7 @@ def index_changelog() -> str:
         'index/changelog.html',
         title=_('changelog'),
         crumbs=[_('changelog')],
-        versions=Changelog.versions)
+        versions=versions)
 
 
 @app.route('/unsubscribe/<code>')

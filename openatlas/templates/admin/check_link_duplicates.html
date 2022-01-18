@@ -2,13 +2,11 @@
 {% block content %}
     <div class="toolbar">
         {{ 'admin/data_integrity_checks'|manual }}
-        {% if duplicates %}
+        {% if table.rows %}
             {{ _('delete link duplicates')|button(url_for('admin_check_link_duplicates', delete='delete')) }}
         {% endif %}
     </div>
-    {% if duplicates %}
-        {{ table.display() }}
-    {% elif table.rows %}
+    {% if table.rows %}
         {{ table.display() }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}

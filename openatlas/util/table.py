@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import json, render_template
 from flask_babel import lazy_gettext as _
@@ -12,10 +12,10 @@ class Table:
 
     def __init__(
             self,
-            header: Optional[List[str]] = None,
-            rows: Optional[List[Any]] = None,
-            order: Optional[List[List[Union[int, str]]]] = None,
-            defs: Optional[List[Dict[str, Any]]] = None,
+            header: Optional[list[str]] = None,
+            rows: Optional[list[Any]] = None,
+            order: Optional[list[list[Union[int, str]]]] = None,
+            defs: Optional[list[dict[str, Any]]] = None,
             paging: bool = True) -> None:
         self.header = header if header else []
         self.rows = rows if rows else []
@@ -29,8 +29,8 @@ class Table:
         self.defs.append({
             'className': 'dt-body-right',
             'targets': [
-                i for i, j in enumerate(self.header)
-                if j in ['begin', 'end', 'count', 'size']]})
+                i for i, name in enumerate(self.header)
+                if name in ['begin', 'end', 'count', 'size']]})
         data_table = {
             'data': self.rows,
             'stateSave': 'true',

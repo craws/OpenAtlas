@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Dict, List, Optional
+from typing import Optional
 
 from flask import g
 from flask_babel import lazy_gettext as _
@@ -39,10 +39,10 @@ class OpenatlasClass:
             self,
             name: str,
             cidoc_class: str,
-            hierarchies: List[int],
+            hierarchies: list[int],
             alias_allowed: bool,
             reference_system_allowed: bool,
-            reference_system_ids: List[int],
+            reference_system_ids: list[int],
             new_types_allowed: bool,
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
@@ -50,9 +50,7 @@ class OpenatlasClass:
             icon: Optional[str] = None) -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))
-        self.cidoc_class = None
-        if cidoc_class:
-            self.cidoc_class = g.cidoc_classes[cidoc_class]
+        self.cidoc_class = g.cidoc_classes[cidoc_class] if cidoc_class else None
         self.hierarchies = hierarchies
         self.standard_type_id = standard_type_id
         self.network_color = color
@@ -68,11 +66,11 @@ class OpenatlasClass:
                 self.view = item
 
     @staticmethod
-    def get_class_count() -> Dict[str, int]:
+    def get_class_count() -> dict[str, int]:
         return Db.get_class_count()
 
     @staticmethod
-    def get_all() -> Dict[str, OpenatlasClass]:
+    def get_all() -> dict[str, OpenatlasClass]:
         classes = {}
         for row in Db.get_classes():
             classes[row['name']] = OpenatlasClass(
@@ -91,7 +89,7 @@ class OpenatlasClass:
         return classes
 
     @staticmethod
-    def get_table_headers() -> Dict[str, List[str]]:
+    def get_table_headers() -> dict[str, list[str]]:
         headers = {
             'actor': ['name', 'class', 'begin', 'end', 'description'],
             'artifact': [
@@ -119,7 +117,7 @@ class OpenatlasClass:
         return headers
 
     @staticmethod
-    def get_class_view_mapping() -> Dict['str', 'str']:
+    def get_class_view_mapping() -> dict['str', 'str']:
         mapping = {}
         for view, classes in view_class_mapping.items():
             for class_ in classes:

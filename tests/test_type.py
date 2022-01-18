@@ -3,7 +3,7 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class TypeTest(TestBaseCase):
@@ -14,7 +14,14 @@ class TypeTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 actor_type = Type.get_hierarchy('Actor actor relation')
                 dimension_type = Type.get_hierarchy('Dimensions')
+                historical_type = Type.get_hierarchy('Historical place')
                 sex_type = Type.get_hierarchy('Sex')
+                place = insert_entity('Home', 'place')
+                place.link('P2', g.types[dimension_type.subs[0]], '46')
+                location = place.get_linked_entity_safe('P53')
+                location.link('P89', g.types[historical_type.subs[0]])
+            rv = self.app.get(url_for('view', id_=historical_type.subs[0]))
+            assert b'Historical place' in rv.data
             rv = self.app.get(url_for('type_index'))
             assert b'Actor actor relation' in rv.data
             rv = self.app.get(
@@ -43,7 +50,7 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            # Insert an continue
+            # Insert and continue
             data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
@@ -104,7 +111,6 @@ class TypeTest(TestBaseCase):
             assert b'Dimensions' in rv.data
 
             # Untyped entities
-
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Connor MacLeod')

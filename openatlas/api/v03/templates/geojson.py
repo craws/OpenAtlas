@@ -18,7 +18,7 @@ class GeojsonTemplate:
             'end_earliest': fields.String,
             'end_latest': fields.String,
             'end_comment': fields.String,
-            'types': fields.Raw}
+            'types': fields.List(fields.String)}
 
         return {
             'type': fields.String,

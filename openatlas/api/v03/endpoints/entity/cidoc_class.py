@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g
@@ -13,15 +13,15 @@ from openatlas.models.entity import Entity
 class GetByClass(Resource):
     @staticmethod
     @swag_from("../swagger/cidoc_class.yml", endpoint="api_03.cidoc_class")
-    def get(class_code: str)\
-            -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(class_code: str) \
+            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
             GetByClass.get_by_class(class_code),
             entity_.parse_args(),
             class_code)
 
     @staticmethod
-    def get_by_class(class_code: str) -> List[Entity]:
+    def get_by_class(class_code: str) -> list[Entity]:
         if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode
         return Entity.get_by_cidoc_class(class_code, types=True, aliases=True)
