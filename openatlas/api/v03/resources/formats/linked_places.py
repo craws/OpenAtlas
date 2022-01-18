@@ -35,7 +35,7 @@ def build_feature(
             'depictions': get_depictions(links_inverse, parser),
             'when': get_timespans(entity, parser),
             'links': get_reference_links(links_inverse, parser),
-            'description': get_description(entity),
+            'descriptions': get_description(entity),
             'names': get_names(entity, parser),
             'geometry': get_geometries(entity, links)
             if 'geometry' in parser['show'] else None,

@@ -201,7 +201,113 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.entity', id_=place.id)),
                 self.app.get(
-                    url_for('api_02.entity', id_=place.id, download=True)),
+                    url_for('api_02.entity', id_=place.id, download=True))]:
+                rv = rv.get_json()
+                rv = rv['features'][0]
+                assert ApiTests.get_bool(
+                    rv,
+                    '@id')
+                assert ApiTests.get_bool(
+                    rv,
+                    'type',
+                    'Feature')
+                assert ApiTests.get_bool(
+                    rv,
+                    'crmClass',
+                    'crm:E18 Physical Thing')
+                assert ApiTests.get_bool(
+                    rv,
+                    'systemClass',
+                    'place')
+                assert ApiTests.get_bool(
+                    rv['properties'],
+                    'title')
+                assert ApiTests.get_bool(
+                    rv['description'][0],
+                    'value',
+                    'The Shire was the homeland of the hobbits.')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['start'],
+                    'earliest',
+                    '2018-01-31')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['start'],
+                    'latest',
+                    '2018-03-01')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['end'],
+                    'earliest',
+                    '2019-01-31')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['end'],
+                    'latest',
+                    '2019-03-01')
+                assert ApiTests.get_bool(
+                    rv['types'][0],
+                    'identifier')
+                assert ApiTests.get_bool(
+                    rv['types'][0],
+                    'label',
+                    'Boundary Mark')
+                assert ApiTests.get_bool(
+                    rv['relations'][1],
+                    'label',
+                    'Height')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationTo')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationType',
+                    'crm:P2 has type')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationSystemClass',
+                    'type')
+                assert ApiTests.get_bool(
+                    rv['relations'][1],
+                    'relationDescription',
+                    '23.0')
+                assert ApiTests.get_bool(
+                    rv['names'][0],
+                    'alias',
+                    'Sûza')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'type',
+                    'closeMatch')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'identifier',
+                    'https://www.geonames.org/2761369')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'referenceSystem',
+                    'GeoNames')
+                assert ApiTests.get_bool(
+                    rv['geometry'],
+                    'type',
+                    'Point')
+                assert ApiTests.get_bool(
+                    rv['geometry'],
+                    'coordinates',
+                    [9, 17])
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    '@id')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'title',
+                    'Picture with a License')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'license',
+                    'Open license')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'url')
+
+            for rv in [
                 self.app.get(url_for('api_03.entity', id_=place.id)),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, download=True))]:
@@ -226,7 +332,7 @@ class ApiTests(TestBaseCase):
                     rv['properties'],
                     'title')
                 assert ApiTests.get_bool(
-                    rv['description'][0],
+                    rv['descriptions'][0],
                     'value',
                     'The Shire was the homeland of the hobbits.')
                 assert ApiTests.get_bool(
