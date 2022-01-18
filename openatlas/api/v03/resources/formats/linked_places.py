@@ -18,15 +18,8 @@ def get_entity(
     return {
         'type': 'FeatureCollection',
         '@context': app.config['API_SCHEMA'],
-        'features': [build_feature(entity, links, links_inverse, parser)]}
-
-
-def build_feature(
-        entity: Entity,
-        links: List[Link],
-        links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Dict[str, Any]:
-    return {'@id': url_for('view', id_=entity.id, _external=True),
+        'features': [replace_empty_list_values_in_dict_with_none({
+            '@id': url_for('view', id_=entity.id, _external=True),
             'type': 'Feature',
             'crmClass': get_crm_class(entity),
             'systemClass': entity.class_.name,
@@ -39,8 +32,14 @@ def build_feature(
             'names': get_names(entity, parser),
             'geometry': get_geometries(entity, links)
             if 'geometry' in parser['show'] else None,
-            'relations': get_relations(links, links_inverse, parser)}
+            'relations': get_relations(links, links_inverse, parser)})]}
 
+def replace_empty_list_values_in_dict_with_none(
+        data: dict[str, Any]) -> dict[str, Any]:
+    for key, value in data.items():
+        if isinstance(value, list):
+           data[key] = None
+    return data
 
 def get_description(entity: Entity) -> Optional[List[Dict[str, Any]]]:
     return [{'value': entity.description}] if entity.description else None
