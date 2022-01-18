@@ -9,7 +9,7 @@ logical_operators: List[str] = [
 entity_categories: List[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
     "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
-    "valueTypeID", "valueTypeName", "beginFrom", "beginTo", "endFrom", "endTo"]
+    "beginFrom", "beginTo", "endFrom", "endTo"]
 compare_operators: List[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
     'lesserThanEqual']
