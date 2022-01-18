@@ -13,6 +13,10 @@ is working.
 
     service apache2 restart
 
+### 7.0.x to 7.1.0
+API 0.3 braking change: 
+* Renamed 'description' to 'descriptions' in LinkedPlaces Format (standard output)
+
 ### 7.0.0 to 7.0.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
