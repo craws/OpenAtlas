@@ -104,7 +104,7 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         return [entity.class_.name]
     if key == "typeName":
         return [node.name for node in entity.types]
-    if key == "typeID" or key == "typeIDWithSubs":
+    if key in ["typeID", "typeIDWithSubs"]:
         return [node.id for node in entity.types]
     if key == "beginFrom":
         return check_if_date(str(entity.begin_from))
