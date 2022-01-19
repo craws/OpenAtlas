@@ -1062,56 +1062,56 @@ class ApiTests(TestBaseCase):
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Boundary Mark", "Height", "Dimension"],'
-                           f'"logicalOperator":"and"}}]}}'))
+                    search='"typeName":[{"operator":"equal",'
+                           '"values":["Boundary Mark", "Height", "Dimension"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqualT",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqualT",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"xor"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqual",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"xor"}]}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"All":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"All":[{"operator":"notEqual",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":[],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqual",'
+                           '"values":[],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(WrongOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"greaterThan",'
-                           f'"values":["51"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"typeName":[{"operator":"greaterThan",'
+                           '"values":["51"],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.view_class',
                     code='place',
-                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
-                           f'"values":["2000-1-1"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"beginFrom":[{"operator":"lesserThan",'
+                           '"values":["2000-1-1"],'
+                           '"logicalOperator":"or"}]}'))
 
     @staticmethod
     def get_bool(
