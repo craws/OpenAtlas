@@ -25,7 +25,7 @@ class LinkedPlacesTemplate:
         types = {
             'identifier': fields.String,
             'label': fields.String,
-            'description': fields.String,
+            'descriptions': fields.String,
             'hierarchy': fields.String,
             'value': fields.Float,
             'unit': fields.String}
@@ -66,7 +66,7 @@ class LinkedPlacesTemplate:
             'crmClass': fields.String,
             'systemClass': fields.String,
             'properties': fields.Nested(title),
-            'description': fields.List(fields.Nested(description))}
+            'descriptions': fields.List(fields.Nested(description))}
 
         if 'when' in show:
             feature['when'] = fields.Nested(when)
