@@ -4,7 +4,8 @@ from typing import Any, Optional, Union
 from flask import g
 
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    InvalidSearchSyntax
+    InvalidCidocClassCode, InvalidCodeError, InvalidSearchSyntax, \
+    InvalidSystemClassError
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -49,8 +50,8 @@ def to_camel_case(i: str) -> str:
 def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
     try:
         return [ast.literal_eval(p) for p in parser]
-    except Exception:
-        raise InvalidSearchSyntax
+    except Exception as e:
+        raise InvalidSearchSyntax from e
 
 
 def link_builder(
@@ -82,3 +83,28 @@ def replace_empty_list_values_in_dict_with_none(
         if isinstance(value, list) and not data[key]:
             data[key] = None
     return data
+
+
+def get_by_view(code_: str) -> list[Entity]:
+    if code_ not in g.view_class_mapping:
+        raise InvalidCodeError
+    return Entity.get_by_class(
+        g.view_class_mapping[code_],
+        types=True,
+        aliases=True)
+
+
+def get_by_class(class_code: str) -> list[Entity]:
+    if class_code not in g.cidoc_classes:
+        raise InvalidCidocClassCode
+    return Entity.get_by_cidoc_class(class_code, types=True, aliases=True)
+
+
+def get_by_system(system_class: str) -> list[Entity]:
+    if system_class not in g.classes:
+        raise InvalidSystemClassError
+    return Entity.get_by_class(system_class, types=True, aliases=True)
+
+
+def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
+    return [item for sublist in list_ for item in sublist if item not in list_]

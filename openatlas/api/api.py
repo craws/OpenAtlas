@@ -13,38 +13,30 @@ app.config['SWAGGER'] = {
     'openapi': '3.0.2',
     'uiversion': 3,
     "swagger_version": "2.0",
-    "specs": [
-        {
-            "version": "0.2",
-            "title": "OpenAtlas Api",
-            "termsOfService":
-                "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
-            "license": {
-                "name": "Apache 2.0",
-                "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
-            },
-            "endpoint": '02',
-            "description": 'This is the stable version of the OpenAtlas API',
-            "route": '/swagger/02',
-            "rule_filter": lambda rule: rule.endpoint.startswith('api_02')
-        },
-        {
-            "version": "0.3",
-            "title": "OpenAtlas Api",
-            "termsOfService":
-                "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
-            "description": 'This is the unstable version of the OpenAtlas API',
-            "endpoint": '03',
-            "license": {
-                "name": "Apache 2.0",
-                "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
-            },
-            "route": '/swagger/03',
-            "rule_filter": lambda rule: rule.endpoint.startswith('api_03'),
-        }
-    ],
-    "specs_route": "/swagger/",
-}
+    "specs": [{
+        "version": "0.2",
+        "title": "OpenAtlas Api",
+        "termsOfService":
+            "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
+        "endpoint": '02',
+        "description": 'This is the stable version of the OpenAtlas API',
+        "route": '/swagger/02',
+        "rule_filter": lambda rule: rule.endpoint.startswith('api_02')}, {
+        "version": "0.3",
+        "title": "OpenAtlas Api",
+        "termsOfService":
+            "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
+        "description": 'This is the unstable version of the OpenAtlas API',
+        "endpoint": '03',
+        "license": {
+            "name": "Apache 2.0",
+            "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
+        "route": '/swagger/03',
+        "rule_filter": lambda rule: rule.endpoint.startswith('api_03')}],
+    "specs_route": "/swagger/"}
 
 cors = CORS(
     app,
