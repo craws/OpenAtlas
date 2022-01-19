@@ -3,7 +3,8 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.error import EntityDoesNotExistError
+from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
+    InvalidSearchSyntax
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -46,7 +47,10 @@ def to_camel_case(i: str) -> str:
 
 
 def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
-    return [ast.literal_eval(p) for p in parser]
+    try:
+        return [ast.literal_eval(p) for p in parser]
+    except Exception:
+        raise InvalidSearchSyntax
 
 
 def link_builder(

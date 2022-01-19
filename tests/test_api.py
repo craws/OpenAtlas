@@ -7,7 +7,8 @@ from openatlas import app
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
-    InvalidSubunitError, InvalidSystemClassError, LastEntityError, \
+    InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
+    LastEntityError, \
     NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
     WrongOperatorError
 from openatlas.models.entity import Entity
@@ -1062,7 +1063,7 @@ class ApiTests(TestBaseCase):
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search='"typeName":[{"operator":"equal",'
+                    search='{"typeName":[{"operator":"equal",'
                            '"values":["Boundary Mark", "Height", "Dimension"],'
                            '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterOperatorError):
@@ -1110,6 +1111,13 @@ class ApiTests(TestBaseCase):
                     'api_03.view_class',
                     code='place',
                     search='{"beginFrom":[{"operator":"lesserThan",'
+                           '"values":["2000-1-1"],'
+                           '"logicalOperator":"or"}]}'))
+            with self.assertRaises(InvalidSearchSyntax):
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    code='place',
+                    search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
 
