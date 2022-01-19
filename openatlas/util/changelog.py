@@ -1,7 +1,13 @@
 versions = {
     '7.1.0': ['TBA', {
         'feature': {
-            '1624': 'Refactor'}}],
+            '1629': 'Improved mail function',
+            '1623': 'API: Show types for view name',
+            '1624': 'Refactor',
+            },
+        'fix': {
+            '1626':
+                "API: typed_entities doesn't show types in geojson format"}}],
     '7.0.1': ['2022-01-05', {
         'fix': {
             '1627': 'Error when creating a source from file view'}}],
