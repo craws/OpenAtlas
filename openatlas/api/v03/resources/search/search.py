@@ -1,9 +1,13 @@
 from typing import Any
 
+from flask import g
+
 from openatlas.api.v03.resources.error import WrongOperatorError
 from openatlas.api.v03.resources.search.search_validation import \
     check_if_date, check_if_date_search
+from openatlas.api.v03.resources.util import flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
+from openatlas.models.type import Type
 
 
 def search(
@@ -22,14 +26,26 @@ def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
     check = []
     for key, value in parameter.items():
         for i in value:
+            search_values = i["values"]
+            if key in ["typeIDWithSubs"]:
+                search_values += flatten_list_and_remove_duplicates(
+                    [get_sub_ids(value, []) for value in i["values"]])
             logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
             check.append(bool(search_entity(
                 entity_values=value_to_be_searched(entity, key),
                 operator_=i['operator'],
-                search_values=i["values"],
+                search_values=search_values,
                 logical_operator=logical_o,
                 is_date=check_if_date_search(key))))
     return bool(all(check))
+
+
+def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
+    new_subs = Type.get_all_sub_ids(g.types[id_])
+    subs.extend(new_subs)
+    for sub in new_subs:
+        get_sub_ids(sub, subs)
+    return subs
 
 
 def search_entity(
@@ -88,7 +104,7 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         return [entity.class_.name]
     if key == "typeName":
         return [node.name for node in entity.types]
-    if key == "typeID":
+    if key == "typeID" or key == "typeIDWithSubs":
         return [node.id for node in entity.types]
     if key == "beginFrom":
         return check_if_date(str(entity.begin_from))

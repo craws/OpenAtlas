@@ -832,6 +832,17 @@ class ApiTests(TestBaseCase):
                            f'"logicalOperator":"or"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{params["boundary_mark_id"]},'
+                           f'{params["height_id"]}],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
                     system_classes='place',
                     search="""{"entityName":[{"operator":"notEqual",
                         "values":["Mordor"],"logicalOperator":"or"}]}""")),

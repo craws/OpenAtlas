@@ -50,8 +50,8 @@ def to_camel_case(i: str) -> str:
 def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
     try:
         return [ast.literal_eval(p) for p in parser]
-    except Exception:
-        raise InvalidSearchSyntax
+    except Exception as e:
+        raise InvalidSearchSyntax from e
 
 
 def link_builder(
@@ -104,3 +104,7 @@ def get_by_system(system_class: str) -> list[Entity]:
     if system_class not in g.classes:
         raise InvalidSystemClassError
     return Entity.get_by_class(system_class, types=True, aliases=True)
+
+
+def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
+    return [item for sublist in list_ for item in sublist if item not in list_]

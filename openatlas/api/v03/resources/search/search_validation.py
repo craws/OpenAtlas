@@ -8,7 +8,8 @@ logical_operators: list[str] = [
     'or']
 entity_categories: list[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "entityID", "typeID", "typeName", "typeDescription",
+    "entitySystemClass", "entityID", "typeID", "typeName",
+    "typeIDWithSubs", "typeNameWithSubs",
     "beginFrom", "beginTo", "endFrom", "endTo"]
 compare_operators: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
