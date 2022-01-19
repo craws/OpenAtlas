@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, url_for
 
@@ -10,7 +10,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.util import get_file_path
 
 
-def get_location_id(links: List[Link]) -> int:
+def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
 
 
@@ -21,7 +21,7 @@ def relation_type(link_: Link, inverse: bool = False) -> str:
     return f"crm:{link_.property.code}{property_}"
 
 
-def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
+def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
     return {
         'label': link_.domain.name if inverse else link_.range.name,
         'relationTo':
@@ -39,17 +39,17 @@ def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
 
 
 def get_links(
-        links: List[Link],
-        links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+        links: list[Link],
+        links_inverse: list[Link]) -> list[dict[str, str]]:
     out = []
     for link_ in links:
         out.append(link_dict(link_))
     for link_ in links_inverse:
         out.append(link_dict(link_, inverse=True))
-    return out if out else None
+    return out
 
 
-def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+def get_file(links_inverse: list[Link]) -> list[dict[str, str]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':
@@ -63,11 +63,10 @@ def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
                 'api.display',
                 filename=path.name,
                 _external=True) if path else "N/A"})
-    return files if files else None
+    return files
 
 
-def get_node(entity: Entity,
-             links: List[Link]) -> Optional[List[Dict[str, Any]]]:
+def get_node(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
     nodes = []
     for node in entity.types:
         nodes_dict = {
@@ -84,10 +83,10 @@ def get_node(entity: Entity,
         hierarchy = [g.types[root].name for root in node.root]
         nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
         nodes.append(nodes_dict)
-    return nodes if nodes else None
+    return nodes
 
 
-def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
+def get_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
     return {
         'start': {
             'earliest': str(entity.begin_from),
@@ -99,7 +98,7 @@ def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
             'comment': entity.end_comment}}
 
 
-def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
+def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
     geoms = Gis.get_by_id(entity_id)
     if len(geoms) == 1:
         return geoms[0]
@@ -107,7 +106,7 @@ def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
 
 
 def get_reference_systems(
-        links_inverse: List[Link]) -> Union[List[Dict[str, Any]], None]:
+        links_inverse: list[Link]) -> list[dict[str, Any]]:
     ref = []
     for link_ in links_inverse:
         if not isinstance(link_.domain, ReferenceSystem):
@@ -118,4 +117,4 @@ def get_reference_systems(
             'identifier': f"{identifier}{link_.description}",
             'type': to_camel_case(g.types[link_.type.id].name),
             'referenceSystem': system.name})
-    return ref if ref else None
+    return ref

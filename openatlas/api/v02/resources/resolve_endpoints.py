@@ -1,30 +1,30 @@
 import json
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flask import Response, jsonify, url_for
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.formats.rdf import rdf_output
 from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v02.templates.nodes import NodeTemplate
+from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.models.entity import Entity
 
 
-def get_template(parser: Dict[str, str]) -> Dict[str, Any]:
+def get_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return GeojsonTemplate.pagination()
     return LinkedPlacesTemplate.pagination(parser)
 
 
 def resolve_entities(
-        entities: List[Entity],
-        parser: Dict[str, Any],
+        entities: list[Entity],
+        parser: dict[str, Any],
         file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
         return ApiExportCSV.export_entities(entities, file_name)
     result = Pagination.pagination(entities, parser)
@@ -40,10 +40,10 @@ def resolve_entities(
 
 
 def resolve_node_parser(
-        node: Dict[str, Any],
-        parser: Dict[str, Any],
+        node: dict[str, Any],
+        parser: dict[str, Any],
         file_name: Union[int, str]) \
-        -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['count']:
         return jsonify(len(node['nodes']))
     if parser['download']:
@@ -51,7 +51,7 @@ def resolve_node_parser(
     return marshal(node, NodeTemplate.node_template()), 200
 
 
-def get_node_dict(entity: Entity) -> Dict[str, Any]:
+def get_node_dict(entity: Entity) -> dict[str, Any]:
     return {
         'id': entity.id,
         'label': entity.name,
@@ -59,8 +59,8 @@ def get_node_dict(entity: Entity) -> Dict[str, Any]:
 
 
 def download(
-        data: Union[List[Dict[str, Any]], Dict[str, Any], List[Entity]],
-        template: Dict[str, Any],
+        data: Union[list[dict[str, Any]], dict[str, Any], list[Entity]],
+        template: dict[str, Any],
         name: Union[str, int]) -> Response:
     return Response(
         json.dumps(marshal(data, template)),

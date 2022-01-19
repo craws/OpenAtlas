@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g
@@ -15,15 +15,15 @@ class GetBySystemClass(Resource):
     @staticmethod
     @swag_from("../swagger/system_class.yml", endpoint="api_02.system_class")
     def get(system_class: str) \
-            -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
             GetBySystemClass.get_by_system(system_class, entity_.parse_args()),
             entity_.parse_args(),
             system_class)
 
     @staticmethod
-    def get_by_system(system_class: str, parser: Dict[str, Any]) \
-            -> List[Entity]:
+    def get_by_system(system_class: str, parser: dict[str, Any]) \
+            -> list[Entity]:
         if system_class not in g.classes:
             raise InvalidSystemClassError  # pragma: no cover
         return [Entity(row) for row in

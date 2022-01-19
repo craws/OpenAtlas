@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Optional, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -18,7 +18,7 @@ class GetSubunitHierarchy(Resource):
     @staticmethod
     @swag_from("../swagger/subunit_hierarchy.yml",
                endpoint="api_02.subunit_hierarchy")
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_node_parser(
             {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
             default.parse_args(),
@@ -26,7 +26,7 @@ class GetSubunitHierarchy(Resource):
 
     @staticmethod
 
-    def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
+    def get_subunit_hierarchy(id_: int) -> list[dict[str, Any]]:
         try:
             entity = get_entity_by_id(id_)
         except EntityDoesNotExistError as e:  # pragma: no cover
@@ -40,7 +40,7 @@ class GetSubunitHierarchy(Resource):
     @staticmethod
     def get_subunits_recursive(
             entity: Optional[Entity],
-            data: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+            data: list[dict[str, Any]]) -> list[dict[str, Any]]:
         structure = get_structure(entity)
         if structure and structure['subunits']:
             for subunit in structure['subunits']:

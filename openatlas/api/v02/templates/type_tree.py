@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from flask_restful import fields
 
@@ -6,5 +6,5 @@ from flask_restful import fields
 class TypeTreeTemplate:
 
     @staticmethod
-    def type_tree_template() -> Dict[str, Any]:
+    def type_tree_template() -> dict[str, Any]:
         return {'typeTree': fields.Raw}

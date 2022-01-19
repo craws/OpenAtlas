@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -15,14 +15,14 @@ from openatlas.models.entity import Entity
 class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_subunit(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
             entity_.parse_args(),
             str(id_))
 
     @staticmethod
-    def iterate(entity: Entity, parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def iterate(entity: Entity, parser: dict[str, Any]) -> list[dict[str, Any]]:
         root = entity
         hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
         entities = [entity for dict_ in hierarchy for entity in dict_]

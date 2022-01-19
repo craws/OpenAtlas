@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any
 
 from openatlas.api.v03.resources.error import WrongOperatorError
 from openatlas.api.v03.resources.search.search_validation import \
@@ -7,18 +7,18 @@ from openatlas.models.entity import Entity
 
 
 def search(
-        entities: List[Entity],
-        parser: List[Dict[str, Any]]) -> List[Entity]:
+        entities: list[Entity],
+        parser: list[dict[str, Any]]) -> list[Entity]:
     return [e for e in entities if iterate_through_entities(e, parser)]
 
 
 def iterate_through_entities(
         entity: Entity,
-        parser: List[Dict[str, Any]]) -> bool:
+        parser: list[dict[str, Any]]) -> bool:
     return bool([p for p in parser if search_result(entity, p)])
 
 
-def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
+def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
     check = []
     for key, value in parameter.items():
         for i in value:
@@ -35,7 +35,7 @@ def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
 def search_entity(
         entity_values: Any,
         operator_: str,
-        search_values: List[Any],
+        search_values: list[Any],
         logical_operator: str,
         is_date: bool) -> bool:
     if not entity_values and is_date:

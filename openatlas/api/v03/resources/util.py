@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g
 
@@ -16,18 +16,18 @@ def get_entity_by_id(id_: int) -> Entity:
     return entity
 
 
-def get_entities_by_ids(ids: List[int]) -> List[Entity]:
+def get_entities_by_ids(ids: list[int]) -> list[Entity]:
     return Entity.get_by_ids(ids, types=True, aliases=True)
 
 
-def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
+def get_all_links(entities: Union[int, list[int]]) -> list[Link]:
     links = []
     for link in Link.get_links(entities, list(g.properties)):
         links.append(link)
     return links
 
 
-def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
+def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
     links_inverse = []
     for link in Link.get_links(entities, list(g.properties), inverse=True):
         links_inverse.append(link)
@@ -45,13 +45,13 @@ def to_camel_case(i: str) -> str:
     return (i[0] + i.title().translate(" ")[1:] if i else i).replace(" ", "")
 
 
-def parser_str_to_dict(parser: List[str]) -> List[Dict[str, Any]]:
+def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
     return [ast.literal_eval(p) for p in parser]
 
 
 def link_builder(
-        new_entities: List[Entity],
-        inverse: bool = False) -> List[Link]:
+        new_entities: list[Entity],
+        inverse: bool = False) -> list[Link]:
     entities = [e.id for e in new_entities]
     return get_all_links_inverse(entities) \
         if inverse else get_all_links(entities)
@@ -59,7 +59,7 @@ def link_builder(
 
 def get_all_subunits_recursive(
         entity: Entity,
-        data: List[Dict[Entity, Any]]) -> List[Dict[Any, Any]]:
+        data: list[dict[Entity, Any]]) -> list[dict[Any, Any]]:
     if entity.class_.name not in ['artifact', 'human_remains']:
         sub_entities = entity.get_linked_entities('P46', types=True)
         data[-1] = {entity: sub_entities if sub_entities else None}
@@ -69,4 +69,12 @@ def get_all_subunits_recursive(
         if sub_entities:
             for e in sub_entities:
                 get_all_subunits_recursive(e, data)
+    return data
+
+
+def replace_empty_list_values_in_dict_with_none(
+        data: dict[str, Any]) -> dict[str, Any]:
+    for key, value in data.items():
+        if isinstance(value, list) and not data[key]:
+            data[key] = None
     return data

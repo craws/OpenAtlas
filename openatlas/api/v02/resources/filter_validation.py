@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, Dict, List
+from typing import Any
 
 from openatlas.api.v02.resources.error import FilterColumnError, \
     FilterLogicalOperatorError, FilterOperatorError, InvalidSearchDateError, \
@@ -7,23 +7,23 @@ from openatlas.api.v02.resources.error import FilterColumnError, \
 
 
 class Validation:
-    logical_operators: Dict[str, Any] = {
+    logical_operators: dict[str, Any] = {
         'and': 'AND',
         'or': 'OR',
         'onot': 'OR NOT',
         'anot': 'AND NOT'}
-    valid_columns: Dict[str, str] = {
+    valid_columns: dict[str, str] = {
         'id': 'e.id', 'class_code': 'e.class_code', 'name': 'e.name',
         'description': 'e.description', 'system_class': 'e.system_class',
         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
         'created': 'e.created', 'modified': 'e.modified', 'end_to': 'e.end_to',
         'end_from': 'e.end_from'}
-    compare_operators: Dict[str, Any] = {
+    compare_operators: dict[str, Any] = {
         'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>', 'ge': '>=',
         'like': 'LIKE'}
 
     @staticmethod
-    def get_filter_from_url_parameter(filters: List[str]) -> List[List[str]]:
+    def get_filter_from_url_parameter(filters: list[str]) -> list[list[str]]:
         checked_filter = []
         for item in filters:
             Validation.check_filter_input(item.split('|'))
@@ -31,7 +31,7 @@ class Validation:
         return checked_filter
 
     @staticmethod
-    def check_filter_input(values: List[str]) -> None:
+    def check_filter_input(values: list[str]) -> None:
         if values[0] not in Validation.logical_operators.keys():
             raise FilterLogicalOperatorError  # pragma: no cover
         if values[1] not in Validation.valid_columns:

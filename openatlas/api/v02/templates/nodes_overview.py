@@ -1,5 +1,3 @@
-from typing import Dict
-
 from flask_restful import fields
 from flask_restful.fields import List as RestList
 
@@ -7,7 +5,7 @@ from flask_restful.fields import List as RestList
 class NodesOverviewTemplate:
 
     @staticmethod
-    def node_overview_template() -> Dict[str, RestList]:
+    def node_overview_template() -> dict[str, RestList]:
         categories = {
             'standard': fields.Raw,
             'place': fields.Raw,

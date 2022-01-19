@@ -1,11 +1,10 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.formats.rdf import rdf_output
@@ -15,13 +14,14 @@ from openatlas.api.v02.resources.util import get_all_links, \
     get_all_links_inverse, get_entity_by_id
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
+from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.models.entity import Entity
 
 
 class GetEntity(Resource):
     @staticmethod
     @swag_from("../swagger/entity.yml", endpoint="api_02.entity")
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return GetEntity.resolve_entity(
             get_entity_by_id(id_),
             entity_.parse_args())
@@ -29,8 +29,8 @@ class GetEntity(Resource):
     @staticmethod
     def resolve_entity(
             entity: Entity,
-            parser: Dict[str, Any]) \
-            -> Union[Response, Dict[str, Any], Tuple[Any, int]]:
+            parser: dict[str, Any]) \
+            -> Union[Response, dict[str, Any], tuple[Any, int]]:
         if parser['export'] == 'csv':
             return ApiExportCSV.export_entity(entity)
         result = GetEntity.get_format(entity, parser)
@@ -45,8 +45,8 @@ class GetEntity(Resource):
     @staticmethod
     def get_format(
             entity: Entity,
-            parser: Dict[str, Any]) \
-            -> Union[List[Dict[str, Any]], Dict[str, Any]]:
+            parser: dict[str, Any]) \
+            -> Union[list[dict[str, Any]], dict[str, Any]]:
         if parser['format'] == 'geojson':
             return Geojson.return_output(Geojson.get_geojson([entity]))
         return LinkedPlaces.get_entity(
@@ -56,7 +56,7 @@ class GetEntity(Resource):
             parser)
 
     @staticmethod
-    def get_template(parser: Dict[str, Any]) -> Dict[str, Any]:
+    def get_template(parser: dict[str, Any]) -> dict[str, Any]:
         if parser['format'] == 'geojson':
             return GeojsonTemplate.geojson_collection_template()
         return LinkedPlacesTemplate.linked_places_template(parser['show'])

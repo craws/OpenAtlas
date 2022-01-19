@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -13,7 +13,7 @@ from openatlas.models.type import Type
 class GetTypeTree(Resource):
     @staticmethod
     @swag_from("../swagger/type_tree.yml", endpoint="api_02.type_tree")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         parser = default.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         template = TypeTreeTemplate.type_tree_template()
@@ -22,13 +22,13 @@ class GetTypeTree(Resource):
         return marshal(type_tree, template), 200
 
     @staticmethod
-    def get_type_tree() -> List[Dict[int, Dict[str, Any]]]:
+    def get_type_tree() -> list[dict[int, dict[str, Any]]]:
         return [
             {id_: GetTypeTree.serialize_to_json(node)}
             for id_, node in Type.get_all().items()]
 
     @staticmethod
-    def serialize_to_json(node: Type) -> Dict[str, Any]:
+    def serialize_to_json(node: Type) -> dict[str, Any]:
         return {
             'id': node.id,
             'name': node.name,
