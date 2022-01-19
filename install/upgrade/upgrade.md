@@ -14,8 +14,15 @@ is working.
     service apache2 restart
 
 ### 7.0.x to 7.1.0
-API 0.3 braking change: 
-* Renamed 'description' to 'descriptions' in LinkedPlaces Format (standard output)
+
+#### API 0.3 breaking change
+* Renamed **description** to **descriptions** in LinkedPlaces Format
+(standard output)
+
+#### Mail function change
+At admin/mail the port should be the default mail submission port **587**
+(in most cases). If you got port **25** there, you might want to change it. You
+should check results with the test mail function there afterwards.
 
 ### 7.0.0 to 7.0.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
