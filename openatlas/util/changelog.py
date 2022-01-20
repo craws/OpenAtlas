@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '7.0.2': ['2022-01-20', {
+            'fix': {
+                '1632': 'Multiple flag gets lost when updating a hierarchy'}}],
         '7.0.1': ['2022-01-05', {
             'fix': {
                 '1627': 'Error when creating a source from file view'}}],

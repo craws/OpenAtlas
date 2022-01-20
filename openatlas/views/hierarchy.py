@@ -110,10 +110,12 @@ def save(
         type_: Optional[Type] = None,
         category: Optional[str] = None) -> Optional[Type]:
     multiple = False
-    if category == 'value' or (
-            hasattr(form, 'multiple')
-            and form.multiple
-            and form.multiple.data):
+    if category == 'value' \
+            or (type_ and type_.multiple) \
+            or (
+                hasattr(form, 'multiple')
+                and form.multiple
+                and form.multiple.data):
         multiple = True
     Transaction.begin()
     try:
