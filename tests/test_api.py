@@ -140,6 +140,12 @@ class ApiTests(TestBaseCase):
                 event.link('P14', actor2)
                 event.link('P7', location)
 
+                # Creation of an event for subtypes
+                event2 = insert_entity('Exchange of the one ring', 'activity')
+                # exchange = Entity.get_by_id(Type.get_all_sub_ids(
+                #     g.types[Type.get_hierarchy('Event').subs[0]])[0])
+                event2.link('P2', Entity.get_by_id(params["exchange_id"]))
+
                 # Creation of Mordor (place)
                 place2 = insert_entity(
                     'Mordor', 'place',
@@ -813,7 +819,19 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search="""{"entitySystemClass":[{"operator":"equal",
-                        "values":["person"],"logicalOperator":"and"}]}"""))]:
+                        "values":["person"],"logicalOperator":"and"}]}""")),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='activity',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{params["boundary_mark_id"]},'
+                           f'{params["height_id"]},'
+                           f'{params["change_of_property_id"]}],'
+                           f'"logicalOperator":"or"}}]}}'))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 2)
 

@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Union
 
 from flask import g
 
@@ -13,31 +13,31 @@ from openatlas.models.type import Type
 def search(
         entities: list[Entity],
         parser: list[dict[str, Any]]) -> list[Entity]:
-    return [e for e in entities if iterate_through_entities(e, parser)]
+    parameter = [get_search_parameter(p) for p in parser]
+    return [e for e in entities if iterate_through_entities(e, parameter)]
 
 
-def iterate_through_entities(
-        entity: Entity,
-        parser: list[dict[str, Any]]) -> bool:
-    return bool([p for p in parser if search_result(entity, p)])
+def get_search_parameter(parser: dict[str: Any]) -> dict[str, Any]:
+    parameter = {}
+    for category, values in parser.items():
+        for i in values:
+            parameter.update({
+                "search_values": get_search_values(category, i["values"]),
+                "logical_operator": i['logicalOperator']
+                    if 'logicalOperator' in i else 'or',
+                "operator": i['operator'],
+                "category": category,
+                "is_date": check_if_date_search(category)})
+    return parameter
 
 
-def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
-    check = []
-    for key, value in parameter.items():
-        for i in value:
-            search_values = i["values"]
-            if key in ["typeIDWithSubs"]:
-                search_values += flatten_list_and_remove_duplicates(
-                    [get_sub_ids(value, []) for value in i["values"]])
-            logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
-            check.append(bool(search_entity(
-                entity_values=value_to_be_searched(entity, key),
-                operator_=i['operator'],
-                search_values=search_values,
-                logical_operator=logical_o,
-                is_date=check_if_date_search(key))))
-    return bool(all(check))
+def get_search_values(
+        category: str,
+        values: list[Union[str, int]]) -> list[Union[str, int]]:
+    if category in ["typeIDWithSubs"]:
+        values += flatten_list_and_remove_duplicates(
+            [get_sub_ids(value, []) for value in values])
+    return values
 
 
 def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
@@ -46,6 +46,21 @@ def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
     for sub in new_subs:
         get_sub_ids(sub, subs)
     return subs
+
+
+def iterate_through_entities(
+        entity: Entity,
+        parameter: list[dict[str, Any]]) -> bool:
+    return bool([p for p in parameter if search_result(entity, p)])
+
+
+def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
+    return bool(search_entity(
+        entity_values=value_to_be_searched(entity, parameter['category']),
+        operator_=parameter['operator'],
+        search_values=parameter['search_values'],
+        logical_operator=parameter['logical_operator'],
+        is_date=parameter['is_date']))
 
 
 def search_entity(
