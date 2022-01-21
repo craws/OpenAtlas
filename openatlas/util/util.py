@@ -256,7 +256,7 @@ def get_entity_data(
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
-        data[_('sub event of')] = link(entity.get_linked_entity('OA117'))
+        data[_('sub event of')] = link(entity.get_linked_entity('P9'))
         data[_('preceding event')] = link(
             entity.get_linked_entity('P134', True))
         data[_('succeeding event')] = \

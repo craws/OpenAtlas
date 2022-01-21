@@ -500,8 +500,7 @@ def add_tabs_for_event(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in ['subs', 'source', 'actor']:
         tabs[name] = Tab(name, entity=entity)
-    for sub_event in \
-            entity.get_linked_entities('OA117', inverse=True, types=True):
+    for sub_event in entity.get_linked_entities('P9', inverse=True, types=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
     tabs['actor'].table.header.insert(5, _('activity'))
     for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):

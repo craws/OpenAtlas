@@ -1204,8 +1204,7 @@ Joining events allow for describing people becoming members of a group with a mo
 The property P144.1 kind of member can be used to specify the type of membership or the role the member has in the group.'),
 	(148, 'OA7', 'E39', 'E39', 'has relationship to', NULL, 'OA7 is used to link two Actors (E39) via a certain relationship E39 Actor linked with E39 Actor: E39 (Actor) - P11i (participated in) - E5 (Event) - P11 (had participant) - E39 (Actor) Example: [ Stefan (E21)] participated in [ Relationship from Stefan to Joachim (E5)] had participant [Joachim (E21)] The connecting event is defined by an entity of class E55 (Type): [Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]'),
 	(149, 'OA8', 'E53', 'E77', ' begins in', NULL, 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
-	(150, 'OA9', 'E53', 'E77', ' begins in', NULL, 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]'),
-	(151, 'OA117', 'E2', 'E2', 'occurs during', 'includes', 'Former P117, this property allows the entire E52 Time-Span of an E2 Temporal Entity to be situated within the Time-Span of another temporal entity that starts before and ends after the included temporal entity.');
+	(150, 'OA9', 'E53', 'E77', ' begins in', NULL, 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
 
 
 --
@@ -2021,9 +2020,7 @@ INSERT INTO model.property_i18n VALUES
 	(806, 'OA8', 'en', 'begins in', NULL),
 	(807, 'OA8', 'de', 'beginnt in', NULL),
 	(808, 'OA9', 'en', 'ends in', NULL),
-	(809, 'OA9', 'de', 'endet in', NULL),
-	(810, 'OA117', 'de', 'fällt in', 'beinhaltet'),
-	(811, 'OA117', 'en', 'occurs during', 'includes');
+	(809, 'OA9', 'de', 'endet in', NULL);
 
 
 --
@@ -2163,4 +2160,3 @@ SELECT pg_catalog.setval('model.property_inheritance_id_seq', 1, false);
 --
 -- PostgreSQL database dump complete
 --
-

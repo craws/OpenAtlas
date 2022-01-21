@@ -97,7 +97,7 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         owner = entity.get_linked_entity('P52')
         form.actor.data = owner.id if owner else None
     elif entity.class_.view == 'event':
-        super_event = entity.get_linked_entity('OA117')
+        super_event = entity.get_linked_entity('P9')
         form.event.data = super_event.id if super_event else ''
         preceding = entity.get_linked_entity('P134', True)
         form.event_preceding.data = preceding.id if preceding else ''
