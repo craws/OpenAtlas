@@ -15,6 +15,13 @@ is working.
 
 ### 7.0.x to 7.1.0
 
+Execute **install/upgrade/7.1.0.sql** after making backups and reading release
+notes below, there are some changes you should be aware of.
+
+#### Update to current CIDOC CRM version 7.1.1
+Because classes and properties have changed, adaptions for e.g. presentation
+sites might be needed.
+
 #### API 0.3 breaking change
 * Renamed **description** to **descriptions** in LinkedPlaces Format
 (standard output)

@@ -1,10 +1,16 @@
 -- Upgrade 7.0.x to 7.1.0
 -- Be sure to backup the database and read the upgrade notes before executing!
 
-
--- #1506: Update CIDOC CRM to 7.1.1
 BEGIN;
 
+-- Raise database version
+Update web.web.settings SET value = '7.1.0' WHERE name == 'database_version';
+
+-- Fixing possible inconsistencies for source translation type
+UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');
+UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Translation';
+
+-- #1506: Update CIDOC CRM to 7.1.1
 UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = ('E41', 'appellation') WHERE cidoc_class_code = 'E82';
 UPDATE model.link SET property_code = 'P1' WHERE property_code = 'P131';
 UPDATE model.link SET property_code = 'P9' WHERE property_code = 'P117';
