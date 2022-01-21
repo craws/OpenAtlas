@@ -1,16 +1,19 @@
 from typing import Any, Union
 
 from openatlas.api.v03.resources.error import FilterColumnError, \
-    FilterLogicalOperatorError, FilterOperatorError, NoSearchStringError
+    FilterLogicalOperatorError, FilterOperatorError, NoSearchStringError, \
+    ValueNotIntegerError
 
-logical_operators: list[str] = [
-    'and',
-    'or']
-entity_categories: list[str] = [
+logical_operators: list[str] = ['and', 'or']
+str_categories: list[str] = [
     "entityName", "entityDescription", "entityAliases", "entityCidocClass",
-    "entitySystemClass", "entityID", "typeID", "typeName",
-    "typeIDWithSubs", "typeNameWithSubs",
+    "entitySystemClass", "typeName", "typeNameWithSubs",
     "beginFrom", "beginTo", "endFrom", "endTo"]
+int_categories: list[str] = [
+    "entityID", "typeID", "typeIDWithSubs", "relationToID"]
+set_categories: list[str] = ["valueTypeID"]
+valid_categories: list[str] = [
+    *str_categories, *int_categories, *set_categories]
 compare_operators: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
     'lesserThanEqual']
@@ -24,7 +27,7 @@ def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:
 
 def call_validation(search_key: str, values: dict[str, Any]) -> bool:
     return parameter_validation(
-        entity_values=search_key,
+        categories=search_key,
         operator_=values['operator'],
         search_values=values["values"],
         logical_operator=values[
@@ -32,18 +35,21 @@ def call_validation(search_key: str, values: dict[str, Any]) -> bool:
 
 
 def parameter_validation(
-        entity_values: Any,
+        categories: Any,
         operator_: str,
         search_values: list[Any],
         logical_operator: str) -> bool:
     if logical_operator not in logical_operators:
         raise FilterLogicalOperatorError
-    if entity_values not in entity_categories:
+    if categories not in valid_categories:
         raise FilterColumnError
     if operator_ not in compare_operators:
         raise FilterOperatorError
     if not search_values:
         raise NoSearchStringError
+    if categories in int_categories:
+        if not bool(any([isinstance(value, int) for value in search_values])):
+            raise ValueNotIntegerError
     return True
 
 

@@ -88,7 +88,12 @@ class LastEntityError(Exception):
 class WrongOperatorError(Exception):
     pass
 
+
 class InvalidSearchSyntax(Exception):
+    pass
+
+
+class ValueNotIntegerError(Exception):
     pass
 
 
@@ -214,7 +219,12 @@ errors = {
         "status": 404},
     "InvalidSearchSyntax": {
         "message": "The search syntax contains errors. Please read the manual.",
-        "title": "Incorrect search syntax ",
+        "title": "Incorrect search syntax",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "ValueNotIntegerError": {
+        "message": "The value is not a valid integer.",
+        "title": "Not valid integer",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

@@ -108,3 +108,19 @@ def get_by_system(system_class: str) -> list[Entity]:
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
     return [item for sublist in list_ for item in sublist if item not in list_]
+
+
+def get_linked_entities_api(id_: int) -> list[Entity]:
+    domain_entity = [link_.range for link_ in get_all_links(id_)]
+    range_entity = [link_.domain for link_ in get_all_links_inverse(id_)]
+    return [*range_entity, *domain_entity]
+
+
+def get_linked_entities_id_api(id_: int) -> list[Entity]:
+    domain_ids = [link_.range.id for link_ in get_all_links(id_)]
+    range_ids = [link_.domain.id for link_ in get_all_links_inverse(id_)]
+    return [*range_ids, *domain_ids]
+
+
+def get_links(id_: int) -> list[Link]:
+    return [link_ for link_ in get_all_links_inverse(id_)]
