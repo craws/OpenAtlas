@@ -1,11 +1,12 @@
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 from flask import g
 
 from openatlas.api.v03.resources.error import WrongOperatorError
 from openatlas.api.v03.resources.search.search_validation import \
     check_if_date, check_if_date_search
-from openatlas.api.v03.resources.util import flatten_list_and_remove_duplicates
+from openatlas.api.v03.resources.util import \
+    flatten_list_and_remove_duplicates, get_linked_entities_id_api, get_links
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -22,10 +23,11 @@ def get_search_parameter(parser: dict[str: Any]) -> dict[str, Any]:
     for category, values in parser.items():
         for i in values:
             parameter.update({
-                "search_values": get_search_values(category, i["values"]),
+                "search_values": get_search_values(category, i),
                 "logical_operator": i['logicalOperator']
                     if 'logicalOperator' in i else 'or',
-                "operator": i['operator'],
+                "operator": 'equal'
+                    if category == "valueTypeID" else i['operator'],
                 "category": category,
                 "is_date": check_if_date_search(category)})
     return parameter
@@ -33,10 +35,17 @@ def get_search_parameter(parser: dict[str: Any]) -> dict[str, Any]:
 
 def get_search_values(
         category: str,
-        values: list[Union[str, int]]) -> list[Union[str, int]]:
+        parameter: dict[str, Any]) -> list[Union[str, int]]:
+    values = parameter["values"]
     if category in ["typeIDWithSubs"]:
         values += flatten_list_and_remove_duplicates(
             [get_sub_ids(value, []) for value in values])
+    if category in ["relationToID"]:
+        return flatten_list_and_remove_duplicates(
+            [get_linked_entities_id_api(value) for value in values])
+    if category in ["valueTypeID"]:
+        return flatten_list_and_remove_duplicates(
+            [search_for_value(value, parameter) for value in values])
     return values
 
 
@@ -61,6 +70,24 @@ def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
         search_values=parameter['search_values'],
         logical_operator=parameter['logical_operator'],
         is_date=parameter['is_date']))
+
+
+def search_for_value(
+        values: Tuple[int, float],
+        parameter: dict[str, Any]) -> list[int]:
+    links = get_links(values[0])
+    ids = []
+    for link_ in links:
+        if link_.description and search_entity(
+                entity_values=[float(link_.description)]
+                    if parameter['operator']
+                        in ['equal', 'notEqual'] else float(link_.description),
+                operator_=parameter['operator'],
+                search_values=[values[1]],
+                logical_operator=parameter['logicalOperator'],
+                is_date=True):
+            ids.append(link_.domain.id)
+    return ids
 
 
 def search_entity(
@@ -107,7 +134,7 @@ def search_entity(
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:
-    if key == "entityID":
+    if key in ["entityID", "relationToID", "valueTypeID"]:
         return [entity.id]
     if key == "entityName":
         return entity.name

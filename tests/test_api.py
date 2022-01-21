@@ -10,7 +10,7 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
     LastEntityError, \
     NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
-    WrongOperatorError
+    ValueNotIntegerError, WrongOperatorError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -841,6 +841,16 @@ class ApiTests(TestBaseCase):
                     'api_03.query',
                     entities=place.id,
                     classes='E18',
+                    codes='place',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"valueTypeID":[{{"operator":"equal",'
+                           f'"values":[({params["height_id"]},23.0)],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
                     codes='artifact',
                     system_classes='person',
                     format='lp',
@@ -874,6 +884,16 @@ class ApiTests(TestBaseCase):
                     search="""{"typeName":[{"operator":"equal",
                         "values":["Boundary Mark", "Height"],
                         "logicalOperator":"and"}]}""")),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"relationToID":[{{"operator":"equal",'
+                           f'"values":[{place.id}],'
+                           f'"logicalOperator":"or"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -939,6 +959,7 @@ class ApiTests(TestBaseCase):
                     "values":["2019-03-01"],"logicalOperator":"or"}]}"""))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
+
 
             # Test search parameter
             for rv in [
@@ -1087,6 +1108,14 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.latest',
                     latest='99999999'))
+            with self.assertRaises(ValueNotIntegerError):
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    entities=place.id,
+                    code='place',
+                    search='{"typeID":[{"operator":"equal",'
+                           '"values":["Boundary Mark", "Height", "Dimension"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.view_class',
@@ -1148,9 +1177,10 @@ class ApiTests(TestBaseCase):
                     code='place',
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
-                           '"logicalOperator":"or"}]}'))
+                           '"logicalOperator":"or"}]}')) \
+ \
+                @ staticmethod
 
-    @staticmethod
     def get_bool(
             data: dict[str, Any], key: str,
             value: Optional[Union[str, list[Any]]] = None) -> bool:
