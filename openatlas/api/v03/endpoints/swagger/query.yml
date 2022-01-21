@@ -34,7 +34,6 @@ parameters:
       enum:
         - acquisition
         - activity
-        - actor_appellation
         - administrative_unit
         - appellation
         - artifact

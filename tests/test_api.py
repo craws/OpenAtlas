@@ -110,7 +110,7 @@ class ApiTests(TestBaseCase):
                     'Frodo', 'person',
                     description='That is Frodo')
 
-                alias2 = insert_entity('The ring bearer', 'actor_appellation')
+                alias2 = insert_entity('The ring bearer', 'appellation')
                 actor.link('P1', alias2)
 
                 # Adding file to actor
@@ -123,7 +123,8 @@ class ApiTests(TestBaseCase):
 
                 # Creation of second actor (Sam)
                 actor2 = insert_entity(
-                    'Sam', 'person',
+                    'Sam',
+                    'person',
                     description='That is Sam')
 
                 # Adding residence

@@ -12,9 +12,7 @@ from openatlas.models.link import Link
 def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
-    if 'person' in data['classes']:
-        data['classes'].append('actor_appellation')
-    if 'place' in data['classes']:
+    if 'person' in data['classes'] or 'place' in data['classes']:
         data['classes'].append('appellation')
 
     entities = []
