@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from flasgger import swag_from
 from flask import Response
@@ -14,7 +14,7 @@ class OverviewCount(Resource):
     @swag_from(
         "../swagger/overview_count.yml",
         endpoint="api_02.overview_count")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         return marshal(
             [{'systemClass': name, 'count': count} for name, count in
              Entity.get_overview_counts().items()],

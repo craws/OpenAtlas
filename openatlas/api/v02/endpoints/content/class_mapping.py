@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from flasgger import swag_from
 from flask import Response
@@ -10,7 +10,7 @@ from openatlas.api.v02.templates.class_mapping import ClassMappingTemplate
 class ClassMapping(Resource):
     @staticmethod
     @swag_from("../swagger/class_mapping.yml", endpoint="api_02.class_mapping")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         return marshal(
             ClassMapping.mapping,
             ClassMappingTemplate.class_template()), 200

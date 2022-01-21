@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from flasgger import swag_from
 from flask import Response
@@ -13,7 +13,7 @@ class SystemClassCount(Resource):
     @staticmethod
     @swag_from("../swagger/system_class_count.yml",
                endpoint="api_03.system_class_count")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         return marshal(
             Entity.get_overview_counts(),
             SystemClsCountTemplate.overview_template()), 200

@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 from flask import g
 
@@ -15,18 +15,18 @@ def get_entity_by_id(id_: int) -> Entity:
     return entity
 
 
-def get_entities_by_ids(ids: List[int]) -> List[Entity]:
+def get_entities_by_ids(ids: list[int]) -> list[Entity]:
     return Entity.get_by_ids(ids, types=True, aliases=True)
 
 
-def get_all_links(entities: Union[int, List[int]]) -> List[Link]:
+def get_all_links(entities: Union[int, list[int]]) -> list[Link]:
     links = []
     for link in Link.get_links(entities, list(g.properties)):
         links.append(link)
     return links
 
 
-def get_all_links_inverse(entities: Union[int, List[int]]) -> List[Link]:
+def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
     links_inverse = []
     for link in Link.get_links(entities, list(g.properties), inverse=True):
         links_inverse.append(link)

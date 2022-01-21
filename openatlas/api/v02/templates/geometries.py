@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 from flask_restful import fields
 
@@ -6,7 +6,7 @@ from flask_restful import fields
 class GeometriesTemplate:
 
     @staticmethod
-    def geometries_template() -> Dict[str, Any]:
+    def geometries_template() -> dict[str, Any]:
         properties = {
             'id': fields.Integer,
             'name': fields.String,

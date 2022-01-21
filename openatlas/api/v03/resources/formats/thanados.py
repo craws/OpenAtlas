@@ -1,12 +1,13 @@
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g
 
 from openatlas.api.v03.resources.formats.linked_places import get_geometries
 from openatlas.api.v03.resources.formats.linked_places_helper import \
     get_reference_systems
-from openatlas.api.v03.resources.util import get_license
+from openatlas.api.v03.resources.util import get_license, \
+    replace_empty_list_values_in_dict_with_none
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -15,13 +16,13 @@ from openatlas.util.util import get_file_path
 
 def get_subunits(
         entity: Entity,
-        children: List[Entity],
-        links: List[Link],
-        links_inverse: List[Link],
+        children: list[Entity],
+        links: list[Link],
+        links_inverse: list[Link],
         root: Entity,
         latest_mod_rec: datetime,
-        parser: Dict[str, Any]) -> Dict[str, Any]:
-    return {
+        parser: dict[str, Any]) -> dict[str, Any]:
+    return replace_empty_list_values_in_dict_with_none({
         'id': entity.id,
         'rootId': root.id,
         'parentId':
@@ -33,14 +34,14 @@ def get_subunits(
         'modified': str(entity.modified),
         'latestModRec': latest_mod_rec,
         'geometry': get_geometries_thanados(entity, links, parser),
-        'children': get_children(children, parser),
-        'properties': get_properties(entity, links, links_inverse, parser)}
+        'children': get_children(children, parser) if children else None,
+        'properties': get_properties(entity, links, links_inverse, parser)})
 
 
 def get_geometries_thanados(
         entity: Entity,
-        links: List[Link],
-        parser: Dict[str, Any]) -> Union[List[Any], None, Dict[str, Any]]:
+        links: list[Link],
+        parser: dict[str, Any]) -> Union[list[Any], None, dict[str, Any]]:
     geom = get_geometries(entity, links)
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
@@ -55,8 +56,8 @@ def get_geometries_thanados(
     return geom
 
 
-def check_geometries(geom: Dict[str, Any]) \
-        -> Union[List[List[Dict[str, Any]]], List[Dict[str, Any]], None]:
+def check_geometries(geom: dict[str, Any]) \
+        -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
         return [transform_coords(k) for i in geom['coordinates'] for k in i]
     if geom['type'] == 'LineString':  # pragma: no cover
@@ -66,25 +67,23 @@ def check_geometries(geom: Dict[str, Any]) \
     return None  # pragma: no cover
 
 
-def transform_coords(coords: List[float]) -> List[Dict[str, Any]]:
+def transform_coords(coords: list[float]) -> list[dict[str, Any]]:
     return [{'coordinate': {'longitude': coords[0], 'latitude': coords[1]}}]
 
 
 def get_children(
-        children: List[Entity],
-        parser: Dict[str, Any]) -> \
-        Optional[Union[List[int], List[Dict[str, Any]]]]:
-    if parser['format'] == 'xml':
-        return [{'child': child.id} for child in children] if children else None
-    return [child.id for child in children] if children else None
+        children: list[Entity],
+        parser: dict[str, Any]) -> Union[list[int], list[dict[str, Any]]]:
+    return [{'child': child.id} if parser['format'] == 'xml'
+            else child.id for child in children]
 
 
 def get_properties(
         entity: Entity,
-        links: List[Link],
-        links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Dict[str, Any]:
-    return {
+        links: list[Link],
+        links_inverse: list[Link],
+        parser: dict[str, Any]) -> dict[str, Any]:
+    return replace_empty_list_values_in_dict_with_none({
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
@@ -95,10 +94,10 @@ def get_properties(
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),
         'files': get_file(links_inverse, parser),
-        'types': get_types(entity, links, parser)}
+        'types': get_types(entity, links, parser)})
 
 
-def get_standard_type(type_: Type) -> Dict[str, Any]:
+def get_standard_type(type_: Type) -> dict[str, Any]:
     types_dict = {
         'id': type_.id,
         'name': type_.name}
@@ -109,16 +108,16 @@ def get_standard_type(type_: Type) -> Dict[str, Any]:
     return types_dict
 
 
-def get_aliases(entity: Entity, parser: Dict[str, Any]) -> Optional[List[Any]]:
-    aliases = list(entity.aliases.values()) if entity.aliases.values() else None
+def get_aliases(entity: Entity, parser: dict[str, Any]) -> list[Any]:
+    aliases = list(entity.aliases.values())
     if parser['format'] == 'xml':
-        return [{'alias': alias} for alias in aliases] if aliases else None
+        return [{'alias': alias} for alias in aliases]
     return aliases
 
 
 def get_ref_system(
-        links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+        links_inverse: list[Link],
+        parser: dict[str, Any]) -> list[dict[str, Any]]:
     ref_sys = get_reference_systems(links_inverse)
     if ref_sys and parser['format'] == 'xml':
         return [{'externalReference': ref} for ref in ref_sys]
@@ -126,8 +125,8 @@ def get_ref_system(
 
 
 def get_references(
-        links: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+        links: list[Link],
+        parser: dict[str, Any]) -> list[dict[str, Any]]:
     references = []
     for link_ in links:
         if link_.property.code == "P67" and link_.domain.class_.name in \
@@ -138,12 +137,11 @@ def get_references(
                 'title': link_.domain.description,
                 'pages': link_.description if link_.description else None})
     if parser['format'] == 'xml':
-        return [
-            {'reference': ref} for ref in references] if references else None
-    return references if references else None
+        return [{'reference': ref} for ref in references]
+    return references
 
 
-def get_timespans(entity: Entity) -> Dict[str, Any]:
+def get_timespans(entity: Entity) -> dict[str, Any]:
     return {
         'earliestBegin': str(entity.begin_from) if entity.begin_from else None,
         'latestBegin': str(entity.begin_to) if entity.begin_to else None,
@@ -152,8 +150,8 @@ def get_timespans(entity: Entity) -> Dict[str, Any]:
 
 
 def get_file(
-        links_inverse: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+        links_inverse: list[Link],
+        parser: dict[str, Any]) -> list[dict[str, Any]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':
@@ -167,14 +165,14 @@ def get_file(
             'source':
                 link.domain.description if link.domain.description else None})
     if parser['format'] == 'xml':
-        return [{'file': file} for file in files] if files else None
-    return files if files else None
+        return [{'file': file} for file in files]
+    return files
 
 
 def get_types(
         entity: Entity,
-        links: List[Link],
-        parser: Dict[str, Any]) -> Optional[List[Dict[str, Any]]]:
+        links: list[Link],
+        parser: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     types = []
     for type_ in entity.types:
         if type_.category == 'standard':
@@ -192,5 +190,5 @@ def get_types(
         types_dict['rootId'] = type_.root[0]
         types.append(types_dict)
     if parser['format'] == 'xml':
-        return [{'type': type_} for type_ in types] if types else None
-    return types if types else None
+        return [{'type': type_} for type_ in types]
+    return types

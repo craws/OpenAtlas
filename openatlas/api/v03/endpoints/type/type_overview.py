@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g, url_for
@@ -14,7 +14,7 @@ from openatlas.models.type import Type
 class GetTypeOverview(Resource):
     @staticmethod
     @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = GetTypeOverview.get_node_overview()
         template = TypeOverviewTemplate.type_overview_template()
@@ -23,8 +23,8 @@ class GetTypeOverview(Resource):
         return marshal(node, template), 200
 
     @staticmethod
-    def get_node_overview() -> Dict[str, Dict[Entity, str]]:
-        nodes: Dict[str, Any] = {
+    def get_node_overview() -> dict[str, dict[Entity, str]]:
+        nodes: dict[str, Any] = {
             'standard': [],
             'custom': [],
             'place': [],
@@ -42,7 +42,7 @@ class GetTypeOverview(Resource):
         return nodes
 
     @staticmethod
-    def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
+    def walk_tree(nodes: list[int]) -> list[dict[str, Any]]:
         items = []
         for id_ in nodes:
             item = g.types[id_]

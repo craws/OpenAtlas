@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Union
+from typing import Any, Union
 
 import pandas as pd
 from flask import Response, g
@@ -13,7 +13,7 @@ class ApiExportCSV:  # pragma: no cover
 
     @staticmethod
     def export_entities(
-            entities: List[Entity],
+            entities: list[Entity],
             name: Union[int, str]) -> Response:
         frames = [ApiExportCSV.build_dataframe(entity) for entity in entities]
         return Response(
@@ -22,7 +22,7 @@ class ApiExportCSV:  # pragma: no cover
             headers={'Content-Disposition': f'attachment;filename={name}.csv'})
 
     @staticmethod
-    def build_dataframe(entity: Entity) -> Dict[str, List[Union[str, int]]]:
+    def build_dataframe(entity: Entity) -> dict[str, list[Union[str, int]]]:
         geom = ApiExportCSV.get_geom_entry(entity)
         data = {
             'id': str(entity.id),
@@ -55,8 +55,8 @@ class ApiExportCSV:  # pragma: no cover
             headers={'Content-Disposition': f"attachment;filename={name}.csv"})
 
     @staticmethod
-    def get_node(entity: Entity) -> Dict[Any, List[Any]]:
-        nodes: Dict[str, Any] = defaultdict(list)
+    def get_node(entity: Entity) -> dict[Any, list[Any]]:
+        nodes: dict[str, Any] = defaultdict(list)
         for node in entity.types:
             hierarchy = [g.types[root].name for root in node.root]
             value = ''
@@ -70,8 +70,8 @@ class ApiExportCSV:  # pragma: no cover
         return nodes
 
     @staticmethod
-    def get_links(entity: Entity) -> Dict[str, Any]:
-        links: Dict[str, Any] = defaultdict(list)
+    def get_links(entity: Entity) -> dict[str, Any]:
+        links: dict[str, Any] = defaultdict(list)
         for link in Link.get_links(entity.id):
             key = f"""{link.property.i18n['en'].replace(' ', '_')}
                   _{link.range.class_.name}"""
@@ -87,7 +87,7 @@ class ApiExportCSV:  # pragma: no cover
         return links
 
     @staticmethod
-    def get_geom_entry(entity: Entity) -> Dict[str, None]:
+    def get_geom_entry(entity: Entity) -> dict[str, None]:
         geom = {'type': None, 'coordinates': None}
         if entity.class_.view == 'place' or entity.class_.name == 'artifact':
             geom = ApiExportCSV.get_geometry(
@@ -97,7 +97,7 @@ class ApiExportCSV:  # pragma: no cover
         return geom
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]:
+    def get_geometry(entity: Entity) -> dict[str, Any]:
         if entity.cidoc_class.code != 'E53':
             return {'type': None, 'coordinates': None}
         geoms = Gis.get_by_id(entity.id)

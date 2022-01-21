@@ -1,41 +1,72 @@
-from typing import Any, Dict, List
+from typing import Any, Union
+
+from flask import g
 
 from openatlas.api.v03.resources.error import WrongOperatorError
 from openatlas.api.v03.resources.search.search_validation import \
     check_if_date, check_if_date_search
+from openatlas.api.v03.resources.util import flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
+from openatlas.models.type import Type
 
 
 def search(
-        entities: List[Entity],
-        parser: List[Dict[str, Any]]) -> List[Entity]:
-    return [e for e in entities if iterate_through_entities(e, parser)]
+        entities: list[Entity],
+        parser: list[dict[str, Any]]) -> list[Entity]:
+    parameter = [get_search_parameter(p) for p in parser]
+    return [e for e in entities if iterate_through_entities(e, parameter)]
+
+
+def get_search_parameter(parser: dict[str: Any]) -> dict[str, Any]:
+    parameter = {}
+    for category, values in parser.items():
+        for i in values:
+            parameter.update({
+                "search_values": get_search_values(category, i["values"]),
+                "logical_operator": i['logicalOperator']
+                    if 'logicalOperator' in i else 'or',
+                "operator": i['operator'],
+                "category": category,
+                "is_date": check_if_date_search(category)})
+    return parameter
+
+
+def get_search_values(
+        category: str,
+        values: list[Union[str, int]]) -> list[Union[str, int]]:
+    if category in ["typeIDWithSubs"]:
+        values += flatten_list_and_remove_duplicates(
+            [get_sub_ids(value, []) for value in values])
+    return values
+
+
+def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
+    new_subs = Type.get_all_sub_ids(g.types[id_])
+    subs.extend(new_subs)
+    for sub in new_subs:
+        get_sub_ids(sub, subs)
+    return subs
 
 
 def iterate_through_entities(
         entity: Entity,
-        parser: List[Dict[str, Any]]) -> bool:
-    return bool([p for p in parser if search_result(entity, p)])
+        parameter: list[dict[str, Any]]) -> bool:
+    return bool([p for p in parameter if search_result(entity, p)])
 
 
-def search_result(entity: Entity, parameter: Dict[str, Any]) -> bool:
-    check = []
-    for key, value in parameter.items():
-        for i in value:
-            logical_o = i['logicalOperator'] if 'logicalOperator' in i else 'or'
-            check.append(bool(search_entity(
-                entity_values=value_to_be_searched(entity, key),
-                operator_=i['operator'],
-                search_values=i["values"],
-                logical_operator=logical_o,
-                is_date=check_if_date_search(key))))
-    return bool(all(check))
+def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
+    return bool(search_entity(
+        entity_values=value_to_be_searched(entity, parameter['category']),
+        operator_=parameter['operator'],
+        search_values=parameter['search_values'],
+        logical_operator=parameter['logical_operator'],
+        is_date=parameter['is_date']))
 
 
 def search_entity(
         entity_values: Any,
         operator_: str,
-        search_values: List[Any],
+        search_values: list[Any],
         logical_operator: str,
         is_date: bool) -> bool:
     if not entity_values and is_date:
@@ -88,7 +119,7 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         return [entity.class_.name]
     if key == "typeName":
         return [node.name for node in entity.types]
-    if key == "typeID":
+    if key in ["typeID", "typeIDWithSubs"]:
         return [node.id for node in entity.types]
     if key == "beginFrom":
         return check_if_date(str(entity.begin_from))

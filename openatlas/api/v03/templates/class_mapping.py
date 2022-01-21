@@ -1,4 +1,4 @@
-from typing import Dict, Type
+from typing import Type
 
 from flask_restful import fields
 from flask_restful.fields import String
@@ -7,7 +7,7 @@ from flask_restful.fields import String
 class ClassMappingTemplate:
 
     @staticmethod
-    def class_template() -> Dict[str, Type[String]]:
+    def class_template() -> dict[str, Type[String]]:
         return {
             'systemClass': fields.String,
             'crmClass': fields.String,

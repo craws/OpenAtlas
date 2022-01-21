@@ -1,4 +1,4 @@
-from typing import Dict, Type, Union
+from typing import Type, Union
 
 from flask_restful import fields
 from flask_restful.fields import List, Nested, String
@@ -7,7 +7,7 @@ from flask_restful.fields import List, Nested, String
 class LinkedPlacesTemplate:
 
     @staticmethod
-    def linked_places_template(show: str) -> Dict[str, Type[String]]:
+    def linked_places_template(show: str) -> dict[str, Type[String]]:
         title = {
             'title': fields.String}
 
@@ -25,7 +25,7 @@ class LinkedPlacesTemplate:
         types = {
             'identifier': fields.String,
             'label': fields.String,
-            'description': fields.String,
+            'descriptions': fields.String,
             'hierarchy': fields.String,
             'value': fields.Float,
             'unit': fields.String}
@@ -66,7 +66,7 @@ class LinkedPlacesTemplate:
             'crmClass': fields.String,
             'systemClass': fields.String,
             'properties': fields.Nested(title),
-            'description': fields.List(fields.Nested(description))}
+            'descriptions': fields.List(fields.Nested(description))}
 
         if 'when' in show:
             feature['when'] = fields.Nested(when)
@@ -94,7 +94,7 @@ class LinkedPlacesTemplate:
             'features': fields.List(fields.Nested(feature))}
 
     @staticmethod
-    def pagination(parser: Dict[str, str]) -> Dict[str, Union[List, Nested]]:
+    def pagination(parser: dict[str, str]) -> dict[str, Union[List, Nested]]:
         page_index = {
             "page": fields.Integer,
             "startId": fields.Integer}

@@ -7,7 +7,8 @@ from openatlas import app
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
-    InvalidSubunitError, InvalidSystemClassError, LastEntityError, \
+    InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
+    LastEntityError, \
     NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
     WrongOperatorError
 from openatlas.models.entity import Entity
@@ -139,6 +140,12 @@ class ApiTests(TestBaseCase):
                 event.link('P14', actor2)
                 event.link('P7', location)
 
+                # Creation of an event for subtypes
+                event2 = insert_entity('Exchange of the one ring', 'activity')
+                # exchange = Entity.get_by_id(Type.get_all_sub_ids(
+                #     g.types[Type.get_hierarchy('Event').subs[0]])[0])
+                event2.link('P2', Entity.get_by_id(params["exchange_id"]))
+
                 # Creation of Mordor (place)
                 place2 = insert_entity(
                     'Mordor', 'place',
@@ -201,7 +208,113 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.entity', id_=place.id)),
                 self.app.get(
-                    url_for('api_02.entity', id_=place.id, download=True)),
+                    url_for('api_02.entity', id_=place.id, download=True))]:
+                rv = rv.get_json()
+                rv = rv['features'][0]
+                assert ApiTests.get_bool(
+                    rv,
+                    '@id')
+                assert ApiTests.get_bool(
+                    rv,
+                    'type',
+                    'Feature')
+                assert ApiTests.get_bool(
+                    rv,
+                    'crmClass',
+                    'crm:E18 Physical Thing')
+                assert ApiTests.get_bool(
+                    rv,
+                    'systemClass',
+                    'place')
+                assert ApiTests.get_bool(
+                    rv['properties'],
+                    'title')
+                assert ApiTests.get_bool(
+                    rv['description'][0],
+                    'value',
+                    'The Shire was the homeland of the hobbits.')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['start'],
+                    'earliest',
+                    '2018-01-31')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['start'],
+                    'latest',
+                    '2018-03-01')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['end'],
+                    'earliest',
+                    '2019-01-31')
+                assert ApiTests.get_bool(
+                    rv['when']['timespans'][0]['end'],
+                    'latest',
+                    '2019-03-01')
+                assert ApiTests.get_bool(
+                    rv['types'][0],
+                    'identifier')
+                assert ApiTests.get_bool(
+                    rv['types'][0],
+                    'label',
+                    'Boundary Mark')
+                assert ApiTests.get_bool(
+                    rv['relations'][1],
+                    'label',
+                    'Height')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationTo')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationType',
+                    'crm:P2 has type')
+                assert ApiTests.get_bool(
+                    rv['relations'][0],
+                    'relationSystemClass',
+                    'type')
+                assert ApiTests.get_bool(
+                    rv['relations'][1],
+                    'relationDescription',
+                    '23.0')
+                assert ApiTests.get_bool(
+                    rv['names'][0],
+                    'alias',
+                    'Sûza')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'type',
+                    'closeMatch')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'identifier',
+                    'https://www.geonames.org/2761369')
+                assert ApiTests.get_bool(
+                    rv['links'][0],
+                    'referenceSystem',
+                    'GeoNames')
+                assert ApiTests.get_bool(
+                    rv['geometry'],
+                    'type',
+                    'Point')
+                assert ApiTests.get_bool(
+                    rv['geometry'],
+                    'coordinates',
+                    [9, 17])
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    '@id')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'title',
+                    'Picture with a License')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'license',
+                    'Open license')
+                assert ApiTests.get_bool(
+                    rv['depictions'][0],
+                    'url')
+
+            for rv in [
                 self.app.get(url_for('api_03.entity', id_=place.id)),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, download=True))]:
@@ -226,7 +339,7 @@ class ApiTests(TestBaseCase):
                     rv['properties'],
                     'title')
                 assert ApiTests.get_bool(
-                    rv['description'][0],
+                    rv['descriptions'][0],
                     'value',
                     'The Shire was the homeland of the hobbits.')
                 assert ApiTests.get_bool(
@@ -706,7 +819,19 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search="""{"entitySystemClass":[{"operator":"equal",
-                        "values":["person"],"logicalOperator":"and"}]}"""))]:
+                        "values":["person"],"logicalOperator":"and"}]}""")),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='activity',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{params["boundary_mark_id"]},'
+                           f'{params["height_id"]},'
+                           f'{params["change_of_property_id"]}],'
+                           f'"logicalOperator":"or"}}]}}'))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 2)
 
@@ -720,6 +845,17 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"typeID":[{{"operator":"equal",'
+                           f'"values":[{params["boundary_mark_id"]},'
+                           f'{params["height_id"]}],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
                            f'"values":[{params["boundary_mark_id"]},'
                            f'{params["height_id"]}],'
                            f'"logicalOperator":"or"}}]}}')),
@@ -956,56 +1092,63 @@ class ApiTests(TestBaseCase):
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"equal",'
-                           f'"values":["Boundary Mark", "Height", "Dimension"],'
-                           f'"logicalOperator":"and"}}]}}'))
+                    search='{"typeName":[{"operator":"equal",'
+                           '"values":["Boundary Mark", "Height", "Dimension"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqualT",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"and"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqualT",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"xor"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqual",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"xor"}]}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"All":[{{"operator":"notEqual",'
-                           f'"values":["Boundary Mark", "Height"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"All":[{"operator":"notEqual",'
+                           '"values":["Boundary Mark", "Height"],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"notEqual",'
-                           f'"values":[],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"typeName":[{"operator":"notEqual",'
+                           '"values":[],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(WrongOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
                     entities=place.id,
                     code='place',
-                    search=f'{{"typeName":[{{"operator":"greaterThan",'
-                           f'"values":["51"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"typeName":[{"operator":"greaterThan",'
+                           '"values":["51"],'
+                           '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.view_class',
                     code='place',
-                    search=f'{{"beginFrom":[{{"operator":"lesserThan",'
-                           f'"values":["2000-1-1"],'
-                           f'"logicalOperator":"or"}}]}}'))
+                    search='{"beginFrom":[{"operator":"lesserThan",'
+                           '"values":["2000-1-1"],'
+                           '"logicalOperator":"or"}]}'))
+            with self.assertRaises(InvalidSearchSyntax):
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    code='place',
+                    search='"beginFrom":[{"operator":"lesserThan",'
+                           '"values":["2000-1-1"],'
+                           '"logicalOperator":"or"}]}'))
 
     @staticmethod
     def get_bool(

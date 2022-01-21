@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g
@@ -15,14 +15,14 @@ class GetByClass(Resource):
     @staticmethod
     @swag_from("../swagger/class.yml", endpoint="api_02.class")
     def get(class_code: str) \
-            -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
             GetByClass.get_by_class(class_code, entity_.parse_args()),
             entity_.parse_args(),
             class_code)
 
     @staticmethod
-    def get_by_class(class_code: str, parser: Dict[str, Any]) -> List[Entity]:
+    def get_by_class(class_code: str, parser: dict[str, Any]) -> list[Entity]:
         if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode  # pragma: no cover
         return [Entity(row) for row in Db.get_by_class_code(class_code, parser)]

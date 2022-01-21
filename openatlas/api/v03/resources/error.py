@@ -88,6 +88,9 @@ class LastEntityError(Exception):
 class WrongOperatorError(Exception):
     pass
 
+class InvalidSearchSyntax(Exception):
+    pass
+
 
 errors = {
     "InternalServerError": {
@@ -207,6 +210,11 @@ errors = {
     "WrongOperatorError": {
         "message": "The used operator is not available within this category",
         "title": "Wrong Operator Error",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "InvalidSearchSyntax": {
+        "message": "The search syntax contains errors. Please read the manual.",
+        "title": "Incorrect search syntax ",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import g, url_for
 
@@ -12,7 +12,7 @@ from openatlas.util.util import get_file_path
 
 class LPHelper:
     @staticmethod
-    def get_location_id(links: List[Link]) -> int:
+    def get_location_id(links: list[Link]) -> int:
         return [link_.range.id for link_ in
                 links if link_.property.code == 'P53'][0]
 
@@ -24,7 +24,7 @@ class LPHelper:
         return f"crm:{link_.property.code}{property_}"
 
     @staticmethod
-    def link_dict(link_: Link, inverse: bool = False) -> Dict[str, Any]:
+    def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
         return {
             'label': link_.domain.name if inverse else link_.range.name,
             'relationTo':
@@ -43,8 +43,8 @@ class LPHelper:
 
     @staticmethod
     def get_links(
-            links: List[Link],
-            links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+            links: list[Link],
+            links_inverse: list[Link]) -> Optional[list[dict[str, str]]]:
         out = []
         for link_ in links:
             out.append(LPHelper.link_dict(link_))
@@ -53,7 +53,7 @@ class LPHelper:
         return out if out else None
 
     @staticmethod
-    def get_file(links_inverse: List[Link]) -> Optional[List[Dict[str, str]]]:
+    def get_file(links_inverse: list[Link]) -> Optional[list[dict[str, str]]]:
         files = []
         for link in links_inverse:
             if link.domain.class_.name != 'file':
@@ -72,7 +72,7 @@ class LPHelper:
 
     @staticmethod
     def get_node(entity: Entity,
-                 links: List[Link]) -> Optional[List[Dict[str, Any]]]:
+                 links: list[Link]) -> Optional[list[dict[str, Any]]]:
         nodes = []
         for node in entity.types:
             nodes_dict = {
@@ -92,7 +92,7 @@ class LPHelper:
         return nodes if nodes else None
 
     @staticmethod
-    def get_time(entity: Union[Entity, Link]) -> Optional[Dict[str, Any]]:
+    def get_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
         return {
             'start': {
                 'earliest': str(entity.begin_from),
@@ -104,15 +104,15 @@ class LPHelper:
                 'comment': entity.end_comment}}
 
     @staticmethod
-    def get_geoms_by_entity(entity_id: int) -> Dict[str, Any]:
+    def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
         geoms = Gis.get_by_id(entity_id)
         if len(geoms) == 1:
             return geoms[0]
         return {'type': 'GeometryCollection', 'geometries': geoms}
 
     @staticmethod
-    def get_reference_systems(links_inverse: List[Link]) \
-            -> Optional[List[Dict[str, Any]]]:
+    def get_reference_systems(links_inverse: list[Link]) \
+            -> Optional[list[dict[str, Any]]]:
         ref = []
         for link_ in links_inverse:
             if not isinstance(link_.domain, ReferenceSystem):

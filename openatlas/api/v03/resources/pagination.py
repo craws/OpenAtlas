@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List
+from typing import Any
 
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     LastEntityError
@@ -10,7 +10,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
+def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
     if parser['first'] and int(parser['first']) in total:
         return list(itertools.islice(
             total,
@@ -28,16 +28,16 @@ def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
 
 
 def get_by_page(
-        index: List[Dict[str, Any]],
-        parser: Dict[str, Any]) -> Dict[str, Any]:
+        index: list[dict[str, Any]],
+        parser: dict[str, Any]) -> dict[str, Any]:
     page = parser['page'] \
         if parser['page'] < index[-1]['page'] else index[-1]['page']
     return [entry['startId'] for entry in index if entry['page'] == page][0]
 
 
 def pagination(
-        entities: List[Entity],
-        parser: Dict[str, Any]) -> Dict[str, Any]:
+        entities: list[Entity],
+        parser: dict[str, Any]) -> dict[str, Any]:
     total = [e.id for e in entities]
     count = len(total)
     e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
@@ -59,8 +59,8 @@ def pagination(
 
 
 def get_results(
-        new_entities: List[Entity],
-        parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+        new_entities: list[Entity],
+        parser: dict[str, Any]) -> list[dict[str, Any]]:
     limited_entities = new_entities[:int(parser['limit'])]
     if parser['format'] == 'geojson':
         return [Geojson.get_geojson(limited_entities)]
@@ -72,8 +72,8 @@ def get_results(
 
 
 def get_entities_by_type(
-        entities: List[Entity],
-        parser: Dict[str, Any]) -> List[Entity]:
+        entities: list[Entity],
+        parser: dict[str, Any]) -> list[Entity]:
     new_entities = []
     for entity in entities:
         if any(ids in [key.id for key in entity.types]
@@ -83,9 +83,9 @@ def get_entities_by_type(
 
 
 def link_parser_check(
-        new_entities: List[Entity],
-        parser: Dict[str, Any],
-        inverse: bool = False) -> List[Link]:
+        new_entities: list[Entity],
+        parser: dict[str, Any],
+        inverse: bool = False) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
         return link_builder(new_entities, inverse)
@@ -93,10 +93,10 @@ def link_parser_check(
 
 
 def linked_places_result(
-        entities: List[Entity],
-        parser: Dict[str, str],
-        links: List[Link],
-        links_inverse: List[Link]) -> List[Dict[str, Any]]:
+        entities: list[Entity],
+        parser: dict[str, str],
+        links: list[Link],
+        links_inverse: list[Link]) -> list[dict[str, Any]]:
     return [
         get_entity(
             get_entity_by_id(entity.id) if 'names' in parser['show']
