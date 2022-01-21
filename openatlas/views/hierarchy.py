@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -72,7 +72,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                     hierarchy,
                     sanitize(form.name.data),
                     form.classes.data,
-                    is_multiple(form, hierarchy.category))
+                    is_multiple(form, hierarchy.category, hierarchy))
                 hierarchy.update(process_form_data(form, hierarchy))
                 Transaction.commit()
             except Exception as e:  # pragma: no cover
@@ -131,8 +131,15 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('type_index'))
 
 
-def is_multiple(form: FlaskForm, category: str) -> bool:
-    if category == 'value' or (
-            hasattr(form, 'multiple') and form.multiple and form.multiple.data):
+def is_multiple(
+        form: FlaskForm,
+        category: str,
+        hierarchy: Optional[Type] = None) -> bool:
+    if category == 'value' \
+        or (hierarchy and hierarchy.multiple) \
+        or (
+            hasattr(form, 'multiple')
+            and form.multiple
+            and form.multiple.data):
         return True
     return False  # pragma: no cover
