@@ -712,7 +712,6 @@ INSERT INTO model.cidoc_class_inheritance VALUES
 	(4, 'E77', 'E39'),
 	(5, 'E5', 'E7'),
 	(6, 'E73', 'E33'),
-	(7, 'E33', 'E33'),
 	(8, 'E41', 'E33'),
 	(9, 'E7', 'E66'),
 	(10, 'E63', 'E66'),
