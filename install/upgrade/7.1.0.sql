@@ -4,18 +4,26 @@
 BEGIN;
 
 -- Raise database version
-Update web.web.settings SET value = '7.1.0' WHERE name == 'database_version';
+Update web.settings SET value = '7.1.0' WHERE name = 'database_version';
 
 -- Fixing possible inconsistencies for source translation type
 UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');
 UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Translation';
 
--- #1506: Update CIDOC CRM to 7.1.1
+
+--------------------------------------
+-- #1506: Update CIDOC CRM to 7.1.1 --
+--------------------------------------
+
+-- Change sub/super event links
+UPDATE model.link SET property_code = 'P9' WHERE property_code = 'P117';
+
+-- Join appellation
 UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = ('E41', 'appellation') WHERE cidoc_class_code = 'E82';
 UPDATE model.link SET property_code = 'P1' WHERE property_code = 'P131';
-UPDATE model.link SET property_code = 'P9' WHERE property_code = 'P117';
 DELETE FROM model.openatlas_class WHERE cidoc_class_code = 'E82';
 
+-- Prepare CIDOC update
 ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
 ALTER TABLE model.cidoc_class_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
 ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
@@ -52,6 +60,7 @@ ALTER SEQUENCE model.property_id_seq RESTART;
 ALTER SEQUENCE model.property_inheritance_id_seq RESTART;
 ALTER SEQUENCE model.property_i18n_id_seq RESTART;
 
+-- Enter new CIDOC
 INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (1, 'E15', 'Identifier Assignment', 'This class comprises activities that result in the allocation of an identifier to an instance of E1 CRM Entity. Instances of E15 Identifier Assignment may include the creation of the identifier from multiple constituents, which themselves may be instances of E41 Appellation. The syntax and kinds of constituents to be used may be declared in a rule constituting an instance of E29 Design or Procedure.
 Examples of such identifiers include Find Numbers, Inventory Numbers, uniform titles in the sense of librarianship and Digital Object Identifiers (DOI). Documenting the act of identifier assignment and deassignment is especially useful when objects change custody or the identification system of an organization is changed. In order to keep track of the identity of things in such cases, it is important to document by whom, when and for what purpose an identifier is assigned to an item.
 The fact that an identifier is a preferred one for an organisation can be expressed by using the property E1 CRM Entity. P48 has preferred identifier (is preferred identifier of): E42 Identifier. It can better be expressed in a context independent form by assigning a suitable E55 Type, such as “preferred identifier assignment”, to the respective instance of E15 Identifier Assignment via the P2 has type property.');

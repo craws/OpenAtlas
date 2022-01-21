@@ -198,10 +198,7 @@ class Entity:
         Entity.delete_(delete_ids)
         for alias in aliases:
             if alias.strip():
-                if self.class_.view == 'actor':
-                    self.link('P131', Entity.insert('actor_appellation', alias))
-                else:
-                    self.link('P1', Entity.insert('appellation', alias))
+                self.link('P1', Entity.insert('appellation', alias))
 
     def update_links(self, links: dict[str, Any], new: bool) -> Optional[int]:
         from openatlas.models.reference_system import ReferenceSystem

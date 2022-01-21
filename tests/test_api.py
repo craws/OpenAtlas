@@ -111,7 +111,7 @@ class ApiTests(TestBaseCase):
                     description='That is Frodo')
 
                 alias2 = insert_entity('The ring bearer', 'actor_appellation')
-                actor.link('P131', alias2)
+                actor.link('P1', alias2)
 
                 # Adding file to actor
                 file2 = insert_entity('File without license', 'file')

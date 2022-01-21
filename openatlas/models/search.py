@@ -24,9 +24,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             data['desc'],
             data['own'],
             current_user.id):
-        if row['openatlas_class_name'] == 'actor_appellation':  # Actor alias
-            entity = Link.get_linked_entity(row['id'], 'P131', True)
-        elif row['openatlas_class_name'] == 'appellation':  # Place alias
+        if row['openatlas_class_name'] == 'appellation':
             entity = Link.get_linked_entity(row['id'], 'P1', True)
         else:
             entity = Entity(row)
