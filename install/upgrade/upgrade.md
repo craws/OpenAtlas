@@ -21,6 +21,11 @@ notes below, there are some changes you should be aware of.
 #### Update to current CIDOC CRM version 7.1.1
 Because classes and properties have changed, adaptions for e.g. presentation
 sites might be needed.
+* Changed link for sub/super events: **P117** -> **P9**
+* Merging of **actor appellation** to **appellation**
+   * **P131** replaced with **P1**
+   * **E82** replaced with **E41**
+   * OpenAtlas class **actor appellation** removed
 
 #### API 0.3 breaking change
 * Renamed **description** to **descriptions** in LinkedPlaces Format

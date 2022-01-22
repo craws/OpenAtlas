@@ -1,6 +1,7 @@
 versions = {
     '7.1.0': ['TBA', {
         'feature': {
+            '1506': 'Update CIDOC CRM to 7.1.1',
             '1629': 'Improved mail function',
             '1599': 'API: Search parameter include all subtypes',
             '1623': 'API: Show types for view name',

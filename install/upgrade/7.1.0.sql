@@ -13,7 +13,6 @@ UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Transla
 -- Removing date fields from OpenAtlas classes
 ALTER TABLE model.openatlas_class DROP COLUMN created, DROP COLUMN modified;
 
-
 --------------------------------------
 -- #1506: Update CIDOC CRM to 7.1.1 --
 --------------------------------------
