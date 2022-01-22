@@ -66,7 +66,6 @@ DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
-DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
@@ -747,9 +746,7 @@ CREATE TABLE model.openatlas_class (
     new_types_allowed boolean DEFAULT false,
     write_access_group_name text,
     layout_color text,
-    layout_icon text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    layout_icon text
 );
 
 
@@ -2129,13 +2126,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUT
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE FUNCTION model.update_modified();
-
-
---
--- Name: openatlas_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
