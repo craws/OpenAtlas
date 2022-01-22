@@ -18,7 +18,7 @@ def search(
     return [e for e in entities if iterate_through_entities(e, parameter)]
 
 
-def get_search_parameter(parser: dict[str: Any]) -> dict[str, Any]:
+def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
     parameter = {}
     for category, values in parser.items():
         for i in values:
