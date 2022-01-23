@@ -1,5 +1,5 @@
 -- Upgrade 7.0.x to 7.1.0
--- Be sure to backup the database and read the upgrade notes before executing!
+-- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
 
@@ -10,8 +10,21 @@ Update web.settings SET value = '7.1.0' WHERE name = 'database_version';
 UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');
 UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Translation';
 
--- Removing date fields from OpenAtlas classes
-ALTER TABLE model.openatlas_class DROP COLUMN created, DROP COLUMN modified;
+-- Remove created, modified fields in model tables
+ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.cidoc_class_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.property;
+DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
 
 --------------------------------------
 -- #1506: Update CIDOC CRM to 7.1.1 --
@@ -25,24 +38,7 @@ UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = ('E41', 'appe
 UPDATE model.link SET property_code = 'P1' WHERE property_code = 'P131';
 DELETE FROM model.openatlas_class WHERE cidoc_class_code = 'E82';
 
--- Remove created, modified fields for model tables
-ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.cidoc_class_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.property DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.property_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
-
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.property;
-DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
-
--- Drop foreign keys of model tables
+-- Drop foreign keys of model tables (recreated below after CIDOC update)
 ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
@@ -57,14 +53,8 @@ ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property
 ALTER TABLE model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
 ALTER TABLE web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
 
--- Drop former CIDOC model data and restart sequences
-TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property;
-ALTER SEQUENCE model.cidoc_class_id_seq RESTART;
-ALTER SEQUENCE model.cidoc_class_inheritance_id_seq RESTART;
-ALTER SEQUENCE model.cidoc_class_i18n_id_seq RESTART;
-ALTER SEQUENCE model.property_id_seq RESTART;
-ALTER SEQUENCE model.property_inheritance_id_seq RESTART;
-ALTER SEQUENCE model.property_i18n_id_seq RESTART;
+-- Remove former CIDOC
+TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property RESTART IDENTITY;
 
 -- Enter new CIDOC
 INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (1, 'E15', 'Identifier Assignment', 'This class comprises activities that result in the allocation of an identifier to an instance of E1 CRM Entity. Instances of E15 Identifier Assignment may include the creation of the identifier from multiple constituents, which themselves may be instances of E41 Appellation. The syntax and kinds of constituents to be used may be declared in a rule constituting an instance of E29 Design or Procedure.
