@@ -106,3 +106,6 @@ def linked_places_result(
              link_.range.id == entity.id],
             parser)
         for entity in entities]
+
+
+

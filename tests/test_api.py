@@ -492,7 +492,7 @@ class ApiTests(TestBaseCase):
                     format='xml')),
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='place',
+                    view_class='place',
                     format='xml')),
                 self.app.get(url_for(
                     'api_02.code',
@@ -500,7 +500,7 @@ class ApiTests(TestBaseCase):
                     export='csv')),
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='place',
+                    view_class='place',
                     export='csv')),
                 self.app.get(url_for(
                     'api_02.query',
@@ -571,10 +571,10 @@ class ApiTests(TestBaseCase):
                     filter=f"and|begin_from|eq|{place.begin_from}")),
                 self.app.get(url_for(
                     'api_03.cidoc_class',
-                    class_code='E21')),
+                    cidoc_class='E21')),
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='place',
+                    view_class='place',
                     type_id=boundary_mark.id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
                 self.app.get(
@@ -625,7 +625,7 @@ class ApiTests(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.class', class_code='E21',
                                      show='none')),
-                self.app.get(url_for('api_03.cidoc_class', class_code='E21',
+                self.app.get(url_for('api_03.cidoc_class', cidoc_class='E21',
                                      show='none'))]:
                 rv = rv.get_json()
                 rv = rv['results'][0]['features'][0]
@@ -961,7 +961,6 @@ class ApiTests(TestBaseCase):
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
 
-
             # Test search parameter
             for rv in [
                 self.app.get(url_for(
@@ -1056,7 +1055,7 @@ class ApiTests(TestBaseCase):
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
                     'api_03.cidoc_class',
-                    class_code='E18',
+                    cidoc_class='E18',
                     last=1231))
             with self.assertRaises(LastEntityError):
                 self.app.get(url_for(
@@ -1081,7 +1080,7 @@ class ApiTests(TestBaseCase):
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.cidoc_class',
-                    class_code='E68',
+                    cidoc_class='E68',
                     last=1231))
             with self.assertRaises(InvalidSystemClassError):
                 self.app.get(url_for(
@@ -1100,11 +1099,11 @@ class ApiTests(TestBaseCase):
             with self.assertRaises(InvalidCidocClassCode):
                 self.app.get(url_for(
                     'api_03.cidoc_class',
-                    class_code='e99999999'))
+                    cidoc_class='e99999999'))
             with self.assertRaises(InvalidCodeError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='Invalid'))
+                    view_class='Invalid'))
             with self.assertRaises(InvalidLimitError):
                 self.app.get(url_for(
                     'api_03.latest',
@@ -1112,76 +1111,68 @@ class ApiTests(TestBaseCase):
             with self.assertRaises(ValueNotIntegerError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeID":[{"operator":"equal",'
                            '"values":["Boundary Mark", "Height", "Dimension"],'
                            '"logicalOperator":"and"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeName":[{"operator":"equal",'
                            '"values":["Boundary Mark", "Height", "Dimension"],'
                            '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeName":[{"operator":"notEqualT",'
                            '"values":["Boundary Mark", "Height"],'
                            '"logicalOperator":"and"}]}'))
             with self.assertRaises(FilterLogicalOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeName":[{"operator":"notEqual",'
                            '"values":["Boundary Mark", "Height"],'
                            '"logicalOperator":"xor"}]}'))
             with self.assertRaises(FilterColumnError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"All":[{"operator":"notEqual",'
                            '"values":["Boundary Mark", "Height"],'
                            '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoSearchStringError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeName":[{"operator":"notEqual",'
                            '"values":[],'
                            '"logicalOperator":"or"}]}'))
             with self.assertRaises(WrongOperatorError):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    entities=place.id,
-                    code='place',
+                    view_class='place',
                     search='{"typeName":[{"operator":"greaterThan",'
                            '"values":["51"],'
                            '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='place',
+                    view_class='place',
                     search='{"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
             with self.assertRaises(InvalidSearchSyntax):
                 self.app.get(url_for(
                     'api_03.view_class',
-                    code='place',
+                    view_class='place',
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
-                           '"logicalOperator":"or"}]}')) \
- \
-                @ staticmethod
+                           '"logicalOperator":"or"}]}'))
 
+    @ staticmethod
     def get_bool(
             data: dict[str, Any], key: str,
             value: Optional[Union[str, list[Any]]] = None) -> bool:

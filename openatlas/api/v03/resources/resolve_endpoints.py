@@ -8,6 +8,8 @@ from flask_restful import marshal
 from openatlas import app
 from openatlas.api.v03.export.csv_export import ApiExportCSV
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
+from openatlas.api.v03.resources.formats.geojson import Geojson
+from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.formats.xml import subunit_xml
 from openatlas.api.v03.resources.pagination import get_entities_by_type, \
@@ -15,17 +17,40 @@ from openatlas.api.v03.resources.pagination import get_entities_by_type, \
 from openatlas.api.v03.resources.search.search import search
 from openatlas.api.v03.resources.search.search_validation import \
     iterate_validation
-from openatlas.api.v03.resources.util import parser_str_to_dict
+from openatlas.api.v03.resources.util import get_all_links, \
+    get_all_links_inverse, parser_str_to_dict
 from openatlas.api.v03.templates.geojson import GeojsonTemplate
 from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v03.templates.subunits import SubunitTemplate
 from openatlas.models.entity import Entity
 
 
-def get_template(parser: dict[str, str]) -> dict[str, Any]:
+def get_entity_template(parser: dict[str, Any]) -> dict[str, Any]:
+    if parser['format'] == 'geojson':
+        return GeojsonTemplate.geojson_collection_template()
+    return LinkedPlacesTemplate.linked_places_template(parser['show'])
+
+
+def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return GeojsonTemplate.pagination()
     return LinkedPlacesTemplate.pagination(parser)
+
+
+def resolve_entity(
+        entity: Entity,
+        parser: dict[str, Any]) \
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
+    if parser['export'] == 'csv':
+        return ApiExportCSV.export_entity(entity)
+    result = get_format_entity(entity, parser)
+    if parser['format'] in app.config['RDF_FORMATS']:
+        return Response(
+            rdf_output(result, parser),
+            mimetype=app.config['RDF_FORMATS'][parser['format']])
+    if parser['download']:
+        return download(result, get_entity_template(parser), entity.id)
+    return marshal(result, get_entity_template(parser)), 200
 
 
 def resolve_entities(
@@ -63,8 +88,8 @@ def resolve_output(
     if parser['count']:
         return jsonify(result['pagination']['entities'])
     if parser['download']:
-        return download(result, get_template(parser), file_name)
-    return marshal(result, get_template(parser)), 200
+        return download(result, get_entities_template(parser), file_name)
+    return marshal(result, get_entities_template(parser)), 200
 
 
 def resolve_subunit(
@@ -114,3 +139,17 @@ def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
             entities,
             key=operator.attrgetter(parser['column']),
             reverse=bool(parser['sort'] == 'desc'))
+
+
+def get_format_entity(
+        entity: Entity,
+        parser: dict[str, Any]) \
+        -> Union[list[dict[str, Any]], dict[str, Any]]:
+    if parser['format'] == 'geojson':
+        return Geojson.get_geojson([entity])
+    return get_entity(
+        entity,
+        get_all_links(entity.id),
+        get_all_links_inverse(entity.id),
+        parser)
+
