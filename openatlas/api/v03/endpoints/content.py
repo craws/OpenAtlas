@@ -7,10 +7,8 @@ from flask_restful import Resource, marshal
 from openatlas import app
 from openatlas.api.v03.resources.parser import gis, language
 from openatlas.api.v03.resources.resolve_endpoints import download
-from openatlas.api.v03.templates.class_mapping import ClassMappingTemplate
-from openatlas.api.v03.templates.content import ContentTemplate
-from openatlas.api.v03.templates.geometries import GeometriesTemplate
-from openatlas.api.v03.templates.systemclass_count import SystemClsCountTemplate
+from openatlas.api.v03.resources.templates import class_overview_template, \
+    content_template, geometries_template, overview_template
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -28,10 +26,9 @@ class GetContent(Resource):
             'siteName': get_translation('site_name_for_frontend', lang),
             'imageSizes': app.config['IMAGE_SIZE'],
             'legalNotice': get_translation('legal_notice_for_frontend', lang)}
-        template = ContentTemplate.content_template()
         if parser['download']:
-            return download(content, template, 'content')
-        return marshal(content, template), 200
+            return download(content, content_template(), 'content')
+        return marshal(content, content_template()), 200
 
 
 class ClassMapping(Resource):
@@ -39,13 +36,13 @@ class ClassMapping(Resource):
     @swag_from("../swagger/class_mapping.yml", endpoint="api_03.class_mapping")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal([{
-                "systemClass": class_.name,
-                "crmClass": class_.cidoc_class.code,
-                "view": class_.view,
-                "icon": class_.icon,
-                "en": class_.label}
-                for class_ in g.classes.values() if class_.cidoc_class],
-            ClassMappingTemplate.class_template()), 200
+            "systemClass": class_.name,
+            "crmClass": class_.cidoc_class.code,
+            "view": class_.view,
+            "icon": class_.icon,
+            "en": class_.label}
+            for class_ in g.classes.values() if class_.cidoc_class],
+            class_overview_template()), 200
 
 
 class GetGeometricEntities(Resource):
@@ -62,9 +59,9 @@ class GetGeometricEntities(Resource):
         if parser['download']:
             return download(
                 output,
-                GeometriesTemplate.geometries_template(),
+                geometries_template(),
                 'geometries')
-        return marshal(output, GeometriesTemplate.geometries_template()), 200
+        return marshal(output, geometries_template()), 200
 
     @staticmethod
     def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
@@ -84,6 +81,4 @@ class SystemClassCount(Resource):
     @swag_from("../swagger/system_class_count.yml",
                endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
-        return marshal(
-            Entity.get_overview_counts(),
-            SystemClsCountTemplate.overview_template()), 200
+        return marshal(Entity.get_overview_counts(), overview_template()), 200

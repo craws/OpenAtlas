@@ -6,7 +6,7 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.csv_export import export_entities, csv_export
+from openatlas.api.csv_export import csv_export, export_entities
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
@@ -17,24 +17,24 @@ from openatlas.api.v03.resources.pagination import get_entities_by_type, \
 from openatlas.api.v03.resources.search import search
 from openatlas.api.v03.resources.search_validation import \
     iterate_validation
+from openatlas.api.v03.resources.templates import geojson_collection_template, \
+    geojson_pagination, linked_place_pagination, \
+    linked_places_template, subunit_template
 from openatlas.api.v03.resources.util import get_all_links, \
     get_all_links_inverse, parser_str_to_dict
-from openatlas.api.v03.templates.geojson import GeojsonTemplate
-from openatlas.api.v03.templates.linked_places import LinkedPlacesTemplate
-from openatlas.api.v03.templates.subunits import SubunitTemplate
 from openatlas.models.entity import Entity
 
 
 def get_entity_template(parser: dict[str, Any]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
-        return GeojsonTemplate.geojson_collection_template()
-    return LinkedPlacesTemplate.linked_places_template(parser['show'])
+        return geojson_collection_template()
+    return linked_places_template(parser['show'])
 
 
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
-        return GeojsonTemplate.pagination()
-    return LinkedPlacesTemplate.pagination(parser)
+        return geojson_pagination()
+    return linked_place_pagination(parser)
 
 
 def resolve_entity(
@@ -110,8 +110,8 @@ def resolve_subunit(
             subunit_xml(out),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
     if parser['download']:
-        return download(out, SubunitTemplate.subunit_template(name), name)
-    return marshal(out, SubunitTemplate.subunit_template(name)), 200
+        return download(out, subunit_template(name), name)
+    return marshal(out, subunit_template(name)), 200
 
 
 def download(
@@ -152,4 +152,3 @@ def get_format_entity(
         get_all_links(entity.id),
         get_all_links_inverse(entity.id),
         parser)
-

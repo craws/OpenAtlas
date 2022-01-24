@@ -8,10 +8,10 @@ from openatlas.api.v03.resources.formats.thanados import get_subunits
 from openatlas.api.v03.resources.parser import default, entity_
 from openatlas.api.v03.resources.resolve_endpoints import download, \
     resolve_subunit
+from openatlas.api.v03.resources.templates import type_overview_template, \
+    type_tree_template
 from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
     get_entity_by_id, link_builder
-from openatlas.api.v03.templates.type_tree import TypeTreeTemplate
-from openatlas.api.v03.templates.types_overview import TypeOverviewTemplate
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -22,10 +22,9 @@ class GetTypeOverview(Resource):
     def get() -> Union[tuple[Resource, int], Response]:
         parser = default.parse_args()
         node = GetTypeOverview.get_node_overview()
-        template = TypeOverviewTemplate.type_overview_template()
         if parser['download']:
-            return download(node, template, 'types')
-        return marshal(node, template), 200
+            return download(node, type_overview_template(), 'types')
+        return marshal(node, type_overview_template()), 200
 
     @staticmethod
     def get_node_overview() -> dict[str, dict[Entity, str]]:
@@ -65,10 +64,9 @@ class GetTypeTree(Resource):
     def get() -> Union[tuple[Resource, int], Response]:
         parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
-        template = TypeTreeTemplate.type_tree_template()
         if parser['download']:
-            return download(type_tree, template, 'type_tree')
-        return marshal(type_tree, template), 200
+            return download(type_tree, type_tree_template(), 'type_tree')
+        return marshal(type_tree, type_tree_template()), 200
 
     @staticmethod
     def get_type_tree() -> dict[int, Any]:
