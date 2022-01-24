@@ -17,11 +17,10 @@ def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
             total.index(int(parser['first'])),
             None))
     if parser['last'] and int(parser['last']) in total:
-        out = list(itertools.islice(
-            total,
-            total.index(int(parser['last'])) + 1,
-            None))
-        if not out:
+        if not (out := list(itertools.islice(
+                total,
+                total.index(int(parser['last'])) + 1,
+                None))):
             raise LastEntityError
         return out
     raise EntityDoesNotExistError
@@ -41,8 +40,7 @@ def pagination(
     total = [e.id for e in entities]
     count = len(total)
     e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
-    index = [{'page': num + 1, 'startId': i} for num, i in
-             enumerate(e_list)]
+    index = [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
     parser['first'] = get_by_page(index, parser) \
         if parser['page'] else parser['first']
     total = get_start_entity(total, parser) \
@@ -50,7 +48,7 @@ def pagination(
     j = [i for i, x in enumerate(entities) if x.id == total[0]]
     new_entities = [e for idx, e in enumerate(entities[j[0]:])]
     return {
-        "results": get_results(new_entities, parser),
+        "results": get_entities_formatted(new_entities, parser),
         "pagination": {
             'entitiesPerPage': int(parser['limit']),
             'entities': count,
@@ -58,7 +56,7 @@ def pagination(
             'totalPages': len(index)}}
 
 
-def get_results(
+def get_entities_formatted(
         new_entities: list[Entity],
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     limited_entities = new_entities[:int(parser['limit'])]
@@ -69,17 +67,6 @@ def get_results(
         parser,
         link_parser_check(limited_entities, parser),
         link_parser_check(limited_entities, parser, True))
-
-
-def get_entities_by_type(
-        entities: list[Entity],
-        parser: dict[str, Any]) -> list[Entity]:
-    new_entities = []
-    for entity in entities:
-        if any(ids in [key.id for key in entity.types]
-               for ids in parser['type_id']):
-            new_entities.append(entity)
-    return new_entities
 
 
 def link_parser_check(
@@ -106,6 +93,3 @@ def linked_places_result(
              link_.range.id == entity.id],
             parser)
         for entity in entities]
-
-
-

@@ -156,3 +156,14 @@ def get_entities_linked_to_special_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_special_type_recursive(sub_id, data)
     return data
+
+
+def get_entities_by_type(
+        entities: list[Entity],
+        parser: dict[str, Any]) -> list[Entity]:
+    new_entities = []
+    for entity in entities:
+        if any(ids in [key.id for key in entity.types]
+               for ids in parser['type_id']):
+            new_entities.append(entity)
+    return new_entities

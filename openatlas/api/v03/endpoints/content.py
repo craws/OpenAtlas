@@ -47,8 +47,9 @@ class ClassMapping(Resource):
 
 class GetGeometricEntities(Resource):
     @staticmethod
-    @swag_from("../swagger/geometric_entities.yml",
-               endpoint="api_03.geometric_entities")
+    @swag_from(
+        "../swagger/geometric_entities.yml",
+        endpoint="api_03.geometric_entities")
     def get() -> Union[int, Response, tuple[Any, int]]:
         parser = gis.parse_args()
         output = {
@@ -57,10 +58,7 @@ class GetGeometricEntities(Resource):
         if parser['count']:
             return jsonify(len(output['features']))
         if parser['download']:
-            return download(
-                output,
-                geometries_template(),
-                'geometries')
+            return download(output, geometries_template(), 'geometries')
         return marshal(output, geometries_template()), 200
 
     @staticmethod
@@ -78,7 +76,8 @@ class GetGeometricEntities(Resource):
 
 class SystemClassCount(Resource):
     @staticmethod
-    @swag_from("../swagger/system_class_count.yml",
-               endpoint="api_03.system_class_count")
+    @swag_from(
+        "../swagger/system_class_count.yml",
+        endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal(Entity.get_overview_counts(), overview_template()), 200

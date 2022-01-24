@@ -12,8 +12,7 @@ from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.formats.xml import subunit_xml
-from openatlas.api.v03.resources.pagination import get_entities_by_type, \
-    pagination
+from openatlas.api.v03.resources.pagination import pagination
 from openatlas.api.v03.resources.search import search
 from openatlas.api.v03.resources.search_validation import \
     iterate_validation
@@ -21,8 +20,30 @@ from openatlas.api.v03.resources.templates import geojson_collection_template, \
     geojson_pagination, linked_place_pagination, \
     linked_places_template, subunit_template
 from openatlas.api.v03.resources.util import get_all_links, \
-    get_all_links_inverse, parser_str_to_dict
+    get_all_links_inverse, get_entities_by_type, parser_str_to_dict
 from openatlas.models.entity import Entity
+
+
+def resolve_entities(
+        entities: list[Entity],
+        parser: dict[str, Any],
+        file_name: Union[int, str]) \
+        -> Union[Response, dict[str, Any], tuple[Any, int]]:
+    if parser['export'] == 'csv':
+        return export_entities(entities, file_name)
+    if parser['type_id']:
+        if not (entities := get_entities_by_type(entities, parser)):
+            raise TypeIDError
+    if parser['search']:
+        search_parser = parser_str_to_dict(parser['search'])
+        if iterate_validation(search_parser):
+            entities = search(entities, search_parser)
+    if not entities:
+        raise NoEntityAvailable
+    return resolve_output(
+        pagination(sorting(entities, parser), parser),
+        parser,
+        file_name)
 
 
 def get_entity_template(parser: dict[str, Any]) -> dict[str, Any]:
@@ -43,7 +64,7 @@ def resolve_entity(
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
         return csv_export(entity)
-    result = get_format_entity(entity, parser)
+    result = get_entity_formatted(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
             rdf_output(result, parser),
@@ -51,29 +72,6 @@ def resolve_entity(
     if parser['download']:
         return download(result, get_entity_template(parser), entity.id)
     return marshal(result, get_entity_template(parser)), 200
-
-
-def resolve_entities(
-        entities: list[Entity],
-        parser: dict[str, Any],
-        file_name: Union[int, str]) \
-        -> Union[Response, dict[str, Any], tuple[Any, int]]:
-    if parser['export'] == 'csv':
-        return export_entities(entities, file_name)
-    if parser['type_id']:
-        entities = get_entities_by_type(entities, parser)
-        if not entities:
-            raise TypeIDError
-    if parser['search']:
-        search_parser = parser_str_to_dict(parser['search'])
-        if iterate_validation(search_parser):
-            entities = search(entities, search_parser)
-    if not entities:
-        raise NoEntityAvailable
-    return resolve_output(
-        pagination(sorting(entities, parser), parser),
-        parser,
-        file_name)
 
 
 def resolve_output(
@@ -141,10 +139,9 @@ def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
             reverse=bool(parser['sort'] == 'desc'))
 
 
-def get_format_entity(
+def get_entity_formatted(
         entity: Entity,
-        parser: dict[str, Any]) \
-        -> Union[list[dict[str, Any]], dict[str, Any]]:
+        parser: dict[str, Any]) -> Union[list[dict[str, Any]], dict[str, Any]]:
     if parser['format'] == 'geojson':
         return get_geojson([entity])
     return get_entity(
@@ -152,3 +149,5 @@ def get_format_entity(
         get_all_links(entity.id),
         get_all_links_inverse(entity.id),
         parser)
+
+
