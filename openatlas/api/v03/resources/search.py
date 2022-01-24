@@ -3,7 +3,7 @@ from typing import Any, Tuple, Union
 from flask import g
 
 from openatlas.api.v03.resources.error import WrongOperatorError
-from openatlas.api.v03.resources.search.search_validation import \
+from openatlas.api.v03.resources.search_validation import \
     check_if_date, check_if_date_search
 from openatlas.api.v03.resources.util import \
     flatten_list_and_remove_duplicates, get_linked_entities_id_api, get_links

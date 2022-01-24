@@ -1,13 +1,13 @@
 from flask_restful import Api
 
-from openatlas.api.v03.endpoints.content.content import ClassMapping, \
+from openatlas.api.v03.endpoints.content import ClassMapping, \
     GetContent, GetGeometricEntities, SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
-from openatlas.api.v03.endpoints.entity.entities import GetByCidocClass, \
+from openatlas.api.v03.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
     GetLatest, \
     GetQuery, GetTypeEntities, GetTypeEntitiesAll
-from openatlas.api.v03.endpoints.type.type import GetSubunits, GetTypeOverview, \
+from openatlas.api.v03.endpoints.type import GetSubunits, GetTypeOverview, \
     GetTypeTree
 
 

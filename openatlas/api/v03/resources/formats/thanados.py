@@ -3,8 +3,7 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.formats.linked_places import get_geometries
-from openatlas.api.v03.resources.formats.linked_places_helper import \
+from openatlas.api.v03.resources.formats.linked_places import get_geometries, \
     get_reference_systems
 from openatlas.api.v03.resources.util import get_license, \
     replace_empty_list_values_in_dict_with_none

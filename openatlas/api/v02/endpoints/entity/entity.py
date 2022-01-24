@@ -14,7 +14,7 @@ from openatlas.api.v02.resources.util import get_all_links, \
     get_all_links_inverse, get_entity_by_id
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
-from openatlas.api.v03.export.csv_export import ApiExportCSV
+from openatlas.api.csv_export import csv_export
 from openatlas.models.entity import Entity
 
 
@@ -32,7 +32,7 @@ class GetEntity(Resource):
             parser: dict[str, Any]) \
             -> Union[Response, dict[str, Any], tuple[Any, int]]:
         if parser['export'] == 'csv':
-            return ApiExportCSV.export_entity(entity)
+            return csv_export(entity)
         result = GetEntity.get_format(entity, parser)
         if parser['format'] in app.config['RDF_FORMATS']:
             return Response(

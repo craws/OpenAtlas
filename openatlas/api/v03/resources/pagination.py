@@ -3,7 +3,7 @@ from typing import Any
 
 from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     LastEntityError
-from openatlas.api.v03.resources.formats.geojson import Geojson
+from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.util import get_entity_by_id, link_builder
 from openatlas.models.entity import Entity
@@ -63,7 +63,7 @@ def get_results(
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     limited_entities = new_entities[:int(parser['limit'])]
     if parser['format'] == 'geojson':
-        return [Geojson.get_geojson(limited_entities)]
+        return [get_geojson(limited_entities)]
     return linked_places_result(
         limited_entities,
         parser,

@@ -6,16 +6,16 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.v03.export.csv_export import ApiExportCSV
+from openatlas.api.csv_export import export_entities, csv_export
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
-from openatlas.api.v03.resources.formats.geojson import Geojson
+from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
 from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.formats.xml import subunit_xml
 from openatlas.api.v03.resources.pagination import get_entities_by_type, \
     pagination
-from openatlas.api.v03.resources.search.search import search
-from openatlas.api.v03.resources.search.search_validation import \
+from openatlas.api.v03.resources.search import search
+from openatlas.api.v03.resources.search_validation import \
     iterate_validation
 from openatlas.api.v03.resources.util import get_all_links, \
     get_all_links_inverse, parser_str_to_dict
@@ -42,7 +42,7 @@ def resolve_entity(
         parser: dict[str, Any]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        return ApiExportCSV.export_entity(entity)
+        return csv_export(entity)
     result = get_format_entity(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
@@ -59,7 +59,7 @@ def resolve_entities(
         file_name: Union[int, str]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        return ApiExportCSV.export_entities(entities, file_name)
+        return export_entities(entities, file_name)
     if parser['type_id']:
         entities = get_entities_by_type(entities, parser)
         if not entities:
@@ -146,7 +146,7 @@ def get_format_entity(
         parser: dict[str, Any]) \
         -> Union[list[dict[str, Any]], dict[str, Any]]:
     if parser['format'] == 'geojson':
-        return Geojson.get_geojson([entity])
+        return get_geojson([entity])
     return get_entity(
         entity,
         get_all_links(entity.id),
