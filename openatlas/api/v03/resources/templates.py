@@ -47,14 +47,11 @@ def geometries_template() -> dict[str, Any]:
         'geometry': fields.Raw,
         'properties': fields.Nested(properties)}
 
-    return {
-        'type': fields.String,
-        'features': fields.Nested(feature)}
+    return {'type': fields.String, 'features': fields.Nested(feature)}
 
 
 def linked_places_template(show: str) -> dict[str, Type[String]]:
-    title = {
-        'title': fields.String}
+    title = {'title': fields.String}
 
     depictions = {
         '@id': fields.String,
@@ -75,26 +72,17 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'value': fields.Float,
         'unit': fields.String}
 
-    names = {
-        'alias': fields.String}
+    names = {'alias': fields.String}
 
-    start = {
-        'earliest': fields.String,
-        'latest': fields.String}
+    start = {'earliest': fields.String, 'latest': fields.String}
 
-    end = {
-        'earliest': fields.String,
-        'latest': fields.String}
+    end = {'earliest': fields.String, 'latest': fields.String}
 
-    description = {
-        'value': fields.String}
+    description = {'value': fields.String}
 
-    timespans = {
-        'start': fields.Nested(start),
-        'end': fields.Nested(end)}
+    timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
 
-    when = {
-        'timespans': fields.List(fields.Nested(timespans))}
+    when = {'timespans': fields.List(fields.Nested(timespans))}
 
     relations = {
         'label': fields.String,
@@ -128,10 +116,10 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
     if 'links' in show:
         feature['links'] = fields.List(fields.Nested(links))
 
-    feature['geometry'] = fields.Raw
-
     if 'depictions' in show:
         feature['depictions'] = fields.List(fields.Nested(depictions))
+
+    feature['geometry'] = fields.Raw
 
     return {
         '@context': fields.String,
@@ -140,9 +128,7 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
 
 
 def pagination() -> dict[str, Union[List, Nested]]:
-    page_index = {
-        "page": fields.Integer,
-        "startId": fields.Integer}
+    page_index = {"page": fields.Integer, "startId": fields.Integer}
 
     return {
         "entities": fields.Integer,
@@ -160,8 +146,7 @@ def linked_place_pagination(parser: dict[str, str]) -> dict[str, Any]:
 
 def geojson_pagination() -> dict[str, Any]:
     return {
-        "results": fields.List(
-            fields.Nested(geojson_collection_template())),
+        "results": fields.List(fields.Nested(geojson_collection_template())),
         "pagination": fields.Nested(pagination())}
 
 
