@@ -10,7 +10,7 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
     LastEntityError, \
     NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
-    ValueNotIntegerError, WrongOperatorError
+    ValueNotIntegerError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -1209,13 +1209,6 @@ class ApiTests(TestBaseCase):
                     view_class='place',
                     search='{"typeName":[{"operator":"notEqual",'
                            '"values":[],'
-                           '"logicalOperator":"or"}]}'))
-            with self.assertRaises(WrongOperatorError):
-                self.app.get(url_for(
-                    'api_03.view_class',
-                    view_class='place',
-                    search='{"typeName":[{"operator":"greaterThan",'
-                           '"values":["51"],'
                            '"logicalOperator":"or"}]}'))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(

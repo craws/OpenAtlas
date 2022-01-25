@@ -48,7 +48,7 @@ def parameter_validation(
     if not search_values:
         raise NoSearchStringError
     if categories in int_categories:
-        if not bool(any([isinstance(value, int) for value in search_values])):
+        if not bool(any(isinstance(value, int) for value in search_values)):
             raise ValueNotIntegerError
     return True
 
