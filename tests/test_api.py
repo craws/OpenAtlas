@@ -195,8 +195,10 @@ class ApiTests(TestBaseCase):
 
             # system_class_count/
             for rv in [
-                self.app.get(url_for('api_02.system_class_count')).get_json(),
-                self.app.get(url_for('api_03.system_class_count')).get_json()]:
+                self.app.get(url_for(
+                    'api_02.system_class_count')).get_json(),
+                self.app.get(url_for(
+                    'api_03.system_class_count')).get_json()]:
                 assert bool(rv['person'])
 
             # overview_count/
@@ -773,8 +775,9 @@ class ApiTests(TestBaseCase):
             assert bool(rv.get_json() == 6)
 
             # Test Type Overview
-            for rv in [self.app.get(url_for('api_02.node_overview')),
-                       self.app.get(
+            for rv in [
+                self.app.get(url_for('api_02.node_overview')),
+                    self.app.get(
                            url_for('api_02.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types'][0]['place']['Administrative unit']
@@ -782,22 +785,27 @@ class ApiTests(TestBaseCase):
                              i['label'] == 'Austria'])
 
             for rv in [
-                self.app.get(url_for('api_03.type_overview')),
-                self.app.get(url_for('api_03.type_overview', download=True))]:
+                self.app.get(url_for(
+                    'api_03.type_overview')),
+                self.app.get(url_for(
+                    'api_03.type_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['place'][0]['children'][0]
                 assert bool(rv['label'] == 'Austria')
 
             # Test Type Tree
             for rv in [
-                self.app.get(url_for('api_02.type_tree')),
-                self.app.get(url_for('api_02.type_tree', download=True))]:
+                self.app.get(url_for(
+                    'api_02.type_tree')),
+                self.app.get(url_for(
+                    'api_02.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'][0])
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
-                self.app.get(url_for('api_03.type_tree', download=True))]:
+                self.app.get(url_for(
+                    'api_03.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'])
 
@@ -832,7 +840,17 @@ class ApiTests(TestBaseCase):
                            f'"values":[{params["boundary_mark_id"]},'
                            f'{params["height_id"]},'
                            f'{params["change_of_property_id"]}],'
-                           f'"logicalOperator":"or"}}]}}'))]:
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"entityDescription":[{"operator":"like",'
+                           '"values":["FrOdO", "sam"],'
+                           '"logicalOperator":"or"}]}'))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 2)
 
@@ -957,7 +975,49 @@ class ApiTests(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search="""{"endTo":[{"operator":"greaterThanEqual",
-                    "values":["2019-03-01"],"logicalOperator":"or"}]}"""))]:
+                    "values":["2019-03-01"],"logicalOperator":"or"}]}""")),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"entityDescription":[{"operator":"equal",'
+                           '"values":["the shirE Was the Homeland of the'
+                           ' hobbits.", "homeland"],'
+                           '"logicalOperator":"or"}]}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"entityName":[{"operator":"like",'
+                           '"values":["Fr"],'
+                           '"logicalOperator":"or"}]}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"entityAliases":[{"operator":"like",'
+                           '"values":["S"],'
+                           '"logicalOperator":"or"}]}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"typeName": [{"operator": "like",'
+                           '"values": ["Oun", "HeI"],'
+                           '"logicalOperator": "and"}]}'))
+            ]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 1)
 
@@ -1164,6 +1224,17 @@ class ApiTests(TestBaseCase):
                     search='{"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
+            with self.assertRaises(NoEntityAvailable):
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    classes='E18',
+                    codes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search='{"entityDescription":[{"operator":"like",'
+                           '"values":["IS", "sam", "FrOdo"],'
+                           '"logicalOperator":"and"}]}'))
             with self.assertRaises(InvalidSearchSyntax):
                 self.app.get(url_for(
                     'api_03.view_class',
@@ -1172,7 +1243,7 @@ class ApiTests(TestBaseCase):
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
 
-    @ staticmethod
+    @staticmethod
     def get_bool(
             data: dict[str, Any], key: str,
             value: Optional[Union[str, list[Any]]] = None) -> bool:

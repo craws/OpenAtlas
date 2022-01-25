@@ -16,7 +16,7 @@ valid_categories: list[str] = [
     *str_categories, *int_categories, *set_categories]
 compare_operators: list[str] = [
     'equal', 'notEqual', 'greaterThan', 'lesserThan', 'greaterThanEqual',
-    'lesserThanEqual']
+    'lesserThanEqual', 'like']
 
 
 def iterate_validation(parameters: list[dict[str, Any]]) -> list[list[bool]]:

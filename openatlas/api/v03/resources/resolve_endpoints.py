@@ -149,5 +149,3 @@ def get_entity_formatted(
         get_all_links(entity.id),
         get_all_links_inverse(entity.id),
         parser)
-
-
