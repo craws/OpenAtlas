@@ -514,8 +514,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     export='csv'))
             ]:
@@ -649,8 +649,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     limit=1,
                     first=actor2.id))]:
@@ -670,8 +670,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     limit=1,
                     first=actor2.id))]:
@@ -691,8 +691,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     limit=1,
                     page=7))]:
@@ -711,8 +711,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     count=True))]:
                 assert bool(rv.get_json() == 8)
@@ -739,8 +739,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='geojson'))]:
                 rv = rv.get_json()
@@ -814,8 +814,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"entityCidocClass":[{"operator":"equal",
@@ -823,8 +823,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"entitySystemClass":[{"operator":"equal",
@@ -844,8 +844,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"entityDescription":[{"operator":"like",'
@@ -869,8 +869,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search=f'{{"typeID":[{{"operator":"equal",'
@@ -880,8 +880,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
@@ -896,8 +896,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"typeName":[{"operator":"equal",
@@ -906,8 +906,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search=f'{{"relationToID":[{{"operator":"equal",'
@@ -916,8 +916,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"beginFrom":[{"operator":"lesserThan",
@@ -925,8 +925,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"beginTo":[{"operator":"lesserThanEqual",
@@ -934,8 +934,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"beginTo":[{"operator":"lesserThanEqual",
@@ -943,8 +943,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"endFrom":[{"operator":"greaterThan",
@@ -952,8 +952,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"endFrom":[{"operator":"greaterThan",
@@ -961,8 +961,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"endTo":[{"operator":"greaterThanEqual",
@@ -970,8 +970,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"endTo":[{"operator":"greaterThanEqual",
@@ -979,8 +979,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"entityDescription":[{"operator":"equal",'
@@ -990,8 +990,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"entityName":[{"operator":"like",'
@@ -1000,8 +1000,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"entityAliases":[{"operator":"like",'
@@ -1010,8 +1010,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"typeName": [{"operator": "like",'
@@ -1026,8 +1026,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"typeName":[{"operator":"notEqual",
@@ -1036,8 +1036,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search=f'{{"entityID":[{{"operator":"notEqual",'
@@ -1046,8 +1046,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search="""{"entityAliases":[{"operator":"notEqual",
@@ -1121,8 +1121,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     sort='desc',
                     column='id',
@@ -1221,8 +1221,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
-                    classes='E18',
-                    codes='artifact',
+                    cidoc_classes='E18',
+                    view_classes='artifact',
                     system_classes='person',
                     format='lp',
                     search='{"entityDescription":[{"operator":"like",'

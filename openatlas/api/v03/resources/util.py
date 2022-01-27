@@ -85,25 +85,24 @@ def replace_empty_list_values_in_dict_with_none(
     return data
 
 
-def get_by_view(code_: str) -> list[Entity]:
-    if code_ not in g.view_class_mapping:
+def get_by_view(codes: list[str]) -> list[Entity]:
+    if not all(c in g.view_class_mapping for c in codes):
         raise InvalidCodeError
-    return Entity.get_by_class(
-        g.view_class_mapping[code_],
-        types=True,
-        aliases=True)
+    view_classes = flatten_list_and_remove_duplicates(
+        [g.view_class_mapping[view] for view in codes])
+    return Entity.get_by_class(view_classes, types=True, aliases=True)
 
 
-def get_by_class(class_code: str) -> list[Entity]:
-    if class_code not in g.cidoc_classes:
+def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
+    if not all(cc in g.cidoc_classes for cc in class_codes):
         raise InvalidCidocClassCode
-    return Entity.get_by_cidoc_class(class_code, types=True, aliases=True)
+    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
 
 
-def get_by_system(system_class: str) -> list[Entity]:
-    if system_class not in g.classes:
+def get_by_system_classes(system_classes: list[str]) -> list[Entity]:
+    if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError
-    return Entity.get_by_class(system_class, types=True, aliases=True)
+    return Entity.get_by_class(system_classes, types=True, aliases=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:

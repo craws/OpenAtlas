@@ -117,12 +117,12 @@ query.add_argument(
     action='append',
     help="{error_msg}")
 query.add_argument(
-    'classes',
+    'cidoc_classes',
     type=str,
     action='append',
     help="{error_msg}")
 query.add_argument(
-    'codes',
+    'view_classes',
     type=str,
     action='append',
     help="{error_msg}",
