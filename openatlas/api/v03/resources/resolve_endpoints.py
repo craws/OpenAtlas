@@ -1,5 +1,4 @@
 import json
-import operator
 from typing import Any, Union
 
 from flask import Response, jsonify, request
@@ -135,8 +134,16 @@ def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
     return entities if 'latest' in request.path else \
         sorted(
             entities,
-            key=operator.attrgetter(parser['column']),
+            key=lambda entity: get_key(entity, parser),
             reverse=bool(parser['sort'] == 'desc'))
+
+
+def get_key(entity: Entity, parser: dict[str, Any]) -> str:
+    if parser['column'] == 'cidoc_class':
+        return entity.cidoc_class.name
+    if parser['column'] == 'system_class':
+        return entity.class_.name
+    return getattr(entity, parser['column'])
 
 
 def get_entity_formatted(
