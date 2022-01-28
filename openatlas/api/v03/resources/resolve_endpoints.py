@@ -7,6 +7,8 @@ from flask_restful import marshal
 
 from openatlas import app
 from openatlas.api.csv_export import csv_export, export_entities
+from openatlas.api.v03.resources.csv_network import \
+    export_csv_for_network_analysis
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
@@ -29,8 +31,6 @@ def resolve_entities(
         parser: dict[str, Any],
         file_name: Union[int, str]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
-    if parser['export'] == 'csv':
-        return export_entities(entities, file_name)
     if parser['type_id']:
         if not (entities := get_entities_by_type(entities, parser)):
             raise TypeIDError
@@ -38,6 +38,11 @@ def resolve_entities(
         search_parser = parser_str_to_dict(parser['search'])
         if iterate_validation(search_parser):
             entities = search(entities, search_parser)
+    if parser['export'] == 'csv':
+        return export_entities(entities, file_name)
+    if parser['export'] == 'csvNetwork':
+        #return export_csv_for_network_analysis(entities)
+        export_csv_for_network_analysis(entities)
     if not entities:
         raise NoEntityAvailable
     return resolve_output(

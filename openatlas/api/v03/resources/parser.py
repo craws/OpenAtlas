@@ -81,7 +81,7 @@ entity_.add_argument(
     'export',
     type=str,
     help='{error_msg}',
-    choices='csv')
+    choices=('csv', 'csvNetwork'))
 entity_.add_argument(
     'format',
     type=str,
