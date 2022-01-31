@@ -13,6 +13,29 @@ is working.
 
     service apache2 restart
 
+### 7.0.x to 7.1.0
+
+Execute **install/upgrade/7.1.0.sql** after making backups and reading release
+notes below, there are some changes you should be aware of.
+
+#### Update to current CIDOC CRM version 7.1.1
+Because classes and properties have changed, adaptions for e.g. presentation
+sites might be needed.
+* Changed link for sub/super events: **P117** -> **P9**
+* Merging of **actor appellation** to **appellation**
+   * **P131** replaced with **P1**
+   * **E82** replaced with **E41**
+   * OpenAtlas class **actor appellation** removed
+
+#### API 0.3 breaking change
+* Renamed **description** to **descriptions** in LinkedPlaces Format
+(standard output)
+
+#### Mail function change
+At admin/mail the port should be the default mail submission port **587**
+(in most cases). If you got port **25** there, you might want to change it. You
+should check results with the test mail function there afterwards.
+
 ### 7.0.0 to 7.0.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 

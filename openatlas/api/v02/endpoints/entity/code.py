@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response, g
@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 class GetByCode(Resource):
     @staticmethod
     @swag_from("../swagger/code.yml", endpoint="api_02.code")
-    def get(code: str) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(code: str) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parsed = entity_.parse_args()
         return resolve_entities(
             GetByCode.get_by_view(code, parsed),
@@ -22,7 +22,7 @@ class GetByCode(Resource):
             code)
 
     @staticmethod
-    def get_by_view(code_: str, parser: Dict[str, Any]) -> List[Entity]:
+    def get_by_view(code_: str, parser: dict[str, Any]) -> list[Entity]:
         if code_ not in g.view_class_mapping:
             raise InvalidCodeError  # pragma: no cover
         sys_class = Db.get_by_system_class(g.view_class_mapping[code_], parser)

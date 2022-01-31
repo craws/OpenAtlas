@@ -1,3 +1,5 @@
+from pathlib import Path as Pathlib_path
+
 from flask import Response, send_file, send_from_directory
 from flask_restful import Resource
 
@@ -11,7 +13,6 @@ from openatlas.models.type import Type
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
-        from pathlib import Path as Pathlib_path
         entity = Entity.get_by_id(int(Pathlib_path(filename).stem), types=True)
         license_ = None
         for node in entity.types:

@@ -1,7 +1,18 @@
 versions = {
     '7.1.0': ['TBA', {
         'feature': {
-            '1624': 'Refactor'}}],
+            '1506': 'Update CIDOC CRM to 7.1.1',
+            '1629': 'Improved mail function',
+            '1599': 'API: Search parameter include all subtypes',
+            '1623': 'API: Show types for view name',
+            '1624': 'Refactor',
+            },
+        'fix': {
+            '1626':
+                "API: typed_entities doesn't show types in geojson format"}}],
+    '7.0.2': ['2022-01-20', {
+        'fix': {
+            '1632': 'Multiple flag gets lost when updating a hierarchy'}}],
     '7.0.1': ['2022-01-05', {
         'fix': {
             '1627': 'Error when creating a source from file view'}}],

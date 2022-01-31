@@ -256,7 +256,7 @@ def get_entity_data(
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
     elif entity.class_.view == 'event':
-        data[_('sub event of')] = link(entity.get_linked_entity('P117'))
+        data[_('sub event of')] = link(entity.get_linked_entity('P9'))
         data[_('preceding event')] = link(
             entity.get_linked_entity('P134', True))
         data[_('succeeding event')] = \
@@ -329,26 +329,26 @@ def send_mail(
         return False
     mail_user = settings['mail_transport_username']
     from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
-    server = smtplib.SMTP(
-        settings['mail_transport_host'],
-        settings['mail_transport_port'])
-    server.ehlo()
-    server.starttls()
     try:
-        if settings['mail_transport_username']:
-            server.login(mail_user, app.config['MAIL_PASSWORD'])
-        for recipient in recipients:
-            msg = MIMEText(text, _charset='utf-8')
-            msg['From'] = from_
-            msg['To'] = recipient.strip()
-            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
-            server.sendmail(
-                settings['mail_from_email'],
-                recipient, msg.as_string())
-        log_text = \
-            f'Mail from {from_} to {", ".join(recipients)} Subject: {subject}'
-        log_text += f' Content: {text}' if log_body else ''
-        logger.log('info', 'mail', f'Mail send from {from_}', log_text)
+        with smtplib.SMTP(
+                settings['mail_transport_host'],
+                settings['mail_transport_port']) as smtp:
+            smtp.starttls()
+            if settings['mail_transport_username']:
+                smtp.login(mail_user, app.config['MAIL_PASSWORD'])
+            for recipient in recipients:
+                msg = MIMEText(text, _charset='utf-8')
+                msg['From'] = from_
+                msg['To'] = recipient.strip()
+                msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
+                smtp.sendmail(
+                    settings['mail_from_email'],
+                    recipient, msg.as_string())
+            log_text = \
+                f'Mail from {from_} to {", ".join(recipients)} ' \
+                f'Subject: {subject}'
+            log_text += f' Content: {text}' if log_body else ''
+            logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
         logger.log('error', 'mail', f'Error mail login for {mail_user}', e)
         flash(_('error mail login'), 'error')

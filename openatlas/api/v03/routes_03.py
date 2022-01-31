@@ -1,36 +1,24 @@
 from flask_restful import Api
 
-from openatlas.api.v03.endpoints.content.class_mapping import ClassMapping
-from openatlas.api.v03.endpoints.content.content import GetContent
-from openatlas.api.v03.endpoints.content.geometric_entities import \
-    GetGeometricEntities
-from openatlas.api.v03.endpoints.content.systemclass_count import \
-    SystemClassCount
+from openatlas.api.v03.endpoints.content import ClassMapping, \
+    GetContent, GetGeometricEntities, SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
-from openatlas.api.v03.endpoints.entity.cidoc_class import GetByClass
-from openatlas.api.v03.endpoints.entity.entities_linked_to_entity import \
-    GetEntitiesLinkedToEntity
-from openatlas.api.v03.endpoints.entity.entity import GetEntity
-from openatlas.api.v03.endpoints.entity.latest import GetLatest
-from openatlas.api.v03.endpoints.entity.query import GetQuery
-from openatlas.api.v03.endpoints.entity.system_class import GetBySystemClass
-from openatlas.api.v03.endpoints.entity.type_entities import GetTypeEntities
-from openatlas.api.v03.endpoints.entity.type_entities_all import \
-    GetTypeEntitiesAll
-from openatlas.api.v03.endpoints.entity.view_class import GetByViewClass
-from openatlas.api.v03.endpoints.type.subunits import GetSubunits
-from openatlas.api.v03.endpoints.type.type_overview import GetTypeOverview
-from openatlas.api.v03.endpoints.type.type_tree import GetTypeTree
+from openatlas.api.v03.endpoints.entities import GetByCidocClass, \
+    GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
+    GetLatest, \
+    GetQuery, GetTypeEntities, GetTypeEntitiesAll
+from openatlas.api.v03.endpoints.type import GetSubunits, GetTypeOverview, \
+    GetTypeTree
 
 
 def add_routes_v03(api: Api) -> None:
     api.add_resource(
         GetByViewClass,
-        '/view_class/<string:code>',
+        '/view_class/<string:view_class>',
         endpoint="view_class")
     api.add_resource(
-        GetByClass,
-        '/cidoc_class/<string:class_code>',
+        GetByCidocClass,
+        '/cidoc_class/<string:cidoc_class>',
         endpoint="cidoc_class")
     api.add_resource(
         GetEntity,

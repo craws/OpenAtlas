@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.13 (Debian 11.13-0+deb10u1)
--- Dumped by pg_dump version 11.13 (Debian 11.13-0+deb10u1)
+-- Dumped from database version 13.5 (Debian 13.5-0+deb11u1)
+-- Dumped by pg_dump version 13.5 (Debian 13.5-0+deb11u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -66,15 +66,8 @@ DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
-DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.property;
-DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -300,7 +293,7 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
                 DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
-            -- Delete location (E53) if it was a place, find or human remains
+            -- Delete location (E53) if it was an artifact, human remains or place
             IF OLD.cidoc_class_code IN ('E18', 'E20', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
@@ -340,7 +333,7 @@ ALTER FUNCTION model.update_modified() OWNER TO openatlas;
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
+SET default_table_access_method = heap;
 
 --
 -- Name: linestring; Type: TABLE; Schema: gis; Owner: openatlas
@@ -540,8 +533,6 @@ CREATE TABLE model.cidoc_class (
     id integer NOT NULL,
     code text NOT NULL,
     name text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
     comment text
 );
 
@@ -570,9 +561,7 @@ CREATE TABLE model.cidoc_class_i18n (
     id integer NOT NULL,
     class_code text NOT NULL,
     language_code text NOT NULL,
-    text text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified time without time zone
+    text text NOT NULL
 );
 
 
@@ -627,9 +616,7 @@ ALTER SEQUENCE model.cidoc_class_id_seq OWNED BY model.cidoc_class.id;
 CREATE TABLE model.cidoc_class_inheritance (
     id integer NOT NULL,
     super_code text NOT NULL,
-    sub_code text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    sub_code text NOT NULL
 );
 
 
@@ -667,7 +654,6 @@ CREATE TABLE model.entity (
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    system_type text,
     begin_from timestamp without time zone,
     begin_to timestamp without time zone,
     begin_comment text,
@@ -760,9 +746,7 @@ CREATE TABLE model.openatlas_class (
     new_types_allowed boolean DEFAULT false,
     write_access_group_name text,
     layout_color text,
-    layout_icon text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    layout_icon text
 );
 
 
@@ -794,7 +778,6 @@ COMMENT ON COLUMN model.openatlas_class.layout_icon IS 'For Bootstrap icons';
 --
 
 CREATE SEQUENCE model.openatlas_class_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -822,8 +805,6 @@ CREATE TABLE model.property (
     domain_class_code text NOT NULL,
     name text NOT NULL,
     name_inverse text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
     comment text
 );
 
@@ -839,8 +820,6 @@ CREATE TABLE model.property_i18n (
     property_code text NOT NULL,
     language_code text NOT NULL,
     text text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
     text_inverse text
 );
 
@@ -896,9 +875,7 @@ ALTER SEQUENCE model.property_id_seq OWNED BY model.property.id;
 CREATE TABLE model.property_inheritance (
     id integer NOT NULL,
     super_code text NOT NULL,
-    sub_code text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    sub_code text NOT NULL
 );
 
 
@@ -1246,7 +1223,6 @@ ALTER TABLE web.reference_system_openatlas_class OWNER TO openatlas;
 --
 
 CREATE SEQUENCE web.reference_system_form_id_seq
-    AS integer
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -2107,168 +2083,119 @@ ALTER TABLE ONLY web."user"
 -- Name: linestring update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.linestring FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON gis.linestring FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: point update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.point FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON gis.point FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: polygon update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.polygon FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON gis.polygon FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: project update_modified; Type: TRIGGER; Schema: import; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON import.project FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON import.project FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: entity on_delete_entity; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.delete_entity_related();
-
-
---
--- Name: cidoc_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: cidoc_class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: cidoc_class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.cidoc_class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE FUNCTION model.delete_entity_related();
 
 
 --
 -- Name: entity update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: link update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: openatlas_class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.property FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: property_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: property_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web."group" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web."group" FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: hierarchy update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: hierarchy_openatlas_class update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_openatlas_class FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy_openatlas_class FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: i18n update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.i18n FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: map_overlay update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: reference_system update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.reference_system FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.reference_system FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: user update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web."user" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web."user" FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: user_bookmarks update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_bookmarks FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_bookmarks FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: user_notes update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
 -- Name: user_settings update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
@@ -2594,3 +2521,4 @@ ALTER TABLE ONLY web.user_settings
 --
 -- PostgreSQL database dump complete
 --
+

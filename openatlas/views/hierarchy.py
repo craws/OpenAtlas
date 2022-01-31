@@ -25,7 +25,21 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
         if Type.check_hierarchy_exists(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('display_form.html', form=form)
-        save(form, category=category)
+        try:
+            Transaction.begin()
+            type_ = Entity.insert('type', sanitize(form.name.data))
+            Type.insert_hierarchy(
+                type_,  # type: ignore
+                category,
+                form.classes.data,
+                is_multiple(form, category))
+            type_.update(process_form_data(form, type_))
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+            abort(418)
         flash(_('entity created'), 'info')
         return redirect(f"{url_for('type_index')}#menu-tab-{category}")
     return render_template(
@@ -52,7 +66,20 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         if form.name.data != hierarchy.name and Type.get_types(form.name.data):
             flash(_('error name exists'), 'error')
         else:
-            save(form, hierarchy)
+            Transaction.begin()
+            try:
+                Type.update_hierarchy(
+                    hierarchy,
+                    sanitize(form.name.data),
+                    form.classes.data,
+                    is_multiple(form, hierarchy.category, hierarchy))
+                hierarchy.update(process_form_data(form, hierarchy))
+                Transaction.commit()
+            except Exception as e:  # pragma: no cover
+                Transaction.rollback()
+                logger.log('error', 'database', 'transaction failed', e)
+                flash(_('error transaction'), 'error')
+                abort(418)
             flash(_('info update'), 'info')
         tab = 'value' if g.types[id_].category == 'value' else 'custom'
         return redirect(
@@ -104,30 +131,15 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('type_index'))
 
 
-def save(
+def is_multiple(
         form: FlaskForm,
-        type_: Optional[Type] = None,
-        category: Optional[str] = None) -> Optional[Type]:
-    multiple = False
-    if category == 'value' or (
-            hasattr(form, 'multiple') and form.multiple and form.multiple.data):
-        multiple = True
-    Transaction.begin()
-    try:
-        if type_:
-            Type.update_hierarchy(
-                type_,
-                sanitize(form.name.data),
-                form.classes.data,
-                multiple)
-        else:
-            type_ = Entity.insert('type', sanitize(form.name.data))
-            Type.insert_hierarchy(type_, category, form.classes.data, multiple)
-        type_.update(process_form_data(form, type_))
-        Transaction.commit()
-    except Exception as e:  # pragma: no cover
-        Transaction.rollback()
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
-        abort(418)
-    return type_
+        category: str,
+        hierarchy: Optional[Type] = None) -> bool:
+    if category == 'value' \
+        or (hierarchy and hierarchy.multiple) \
+        or (
+            hasattr(form, 'multiple')
+            and form.multiple
+            and form.multiple.data):
+        return True
+    return False  # pragma: no cover

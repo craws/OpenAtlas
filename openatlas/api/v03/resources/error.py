@@ -89,6 +89,14 @@ class WrongOperatorError(Exception):
     pass
 
 
+class InvalidSearchSyntax(Exception):
+    pass
+
+
+class ValueNotIntegerError(Exception):
+    pass
+
+
 errors = {
     "InternalServerError": {
         "message": "Something went wrong",
@@ -207,6 +215,16 @@ errors = {
     "WrongOperatorError": {
         "message": "The used operator is not available within this category",
         "title": "Wrong Operator Error",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "InvalidSearchSyntax": {
+        "message": "The search syntax contains errors. Please read the manual.",
+        "title": "Incorrect search syntax",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "ValueNotIntegerError": {
+        "message": "The value is not a valid integer.",
+        "title": "Not valid integer",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }

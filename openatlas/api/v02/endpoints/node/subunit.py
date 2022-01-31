@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -15,12 +15,12 @@ from openatlas.models.place import get_structure
 class GetSubunit(Resource):
     @staticmethod
     @swag_from("../swagger/subunit.yml", endpoint="api_02.subunit")
-    def get(id_: int) -> Union[Tuple[Resource, int], Response, Dict[str, Any]]:
+    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_node_parser({"nodes": GetSubunit.get_subunits(id_)},
                                    default.parse_args(), id_)
 
     @staticmethod
-    def get_subunits(id_: int) -> List[Dict[str, Any]]:
+    def get_subunits(id_: int) -> list[dict[str, Any]]:
         structure = get_structure(get_entity_by_id(id_))
         if not structure or not structure['subunits']:
             raise InvalidSubunitError  # pragma: no cover

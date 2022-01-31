@@ -196,11 +196,11 @@ def process_form_data(
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
     elif entity.class_.view == 'event':
-        data['links']['delete'].update(['P7', 'P117'])
+        data['links']['delete'].update(['P7', 'P9'])
         data['links']['delete_inverse'].update(['P134'])
         if form.event.data:  # Super event
             data['links']['insert'].append({
-                'property': 'P117',
+                'property': 'P9',
                 'range': form.event.data})
         if form.event_preceding.data:
             data['links']['insert'].append({

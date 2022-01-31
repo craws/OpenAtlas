@@ -1,5 +1,3 @@
-from typing import Dict
-
 from flask_restful import fields
 from flask_restful.fields import List as RestList
 
@@ -7,7 +5,7 @@ from flask_restful.fields import List as RestList
 class UsageTemplate:
 
     @staticmethod
-    def usage_template() -> Dict[str, RestList]:
+    def usage_template() -> dict[str, RestList]:
         examples = {
             'entity': fields.String,
             'code': fields.String,

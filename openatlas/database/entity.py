@@ -208,7 +208,7 @@ class Entity:
         if aliases:
             sql += """
                 LEFT JOIN model.link la ON e.id = la.domain_id
-                    AND la.property_code IN ('P1', 'P131')
+                    AND la.property_code = 'P1'
                 LEFT JOIN model.entity alias ON la.range_id = alias.id """
         return sql
 

@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Union
 
 from flasgger import swag_from
 from flask import Response
@@ -14,7 +14,7 @@ from openatlas.models.content import get_translation
 class GetContent(Resource):
     @staticmethod
     @swag_from("../swagger/content.yml", endpoint="api_02.content")
-    def get() -> Union[Tuple[Resource, int], Response]:
+    def get() -> Union[tuple[Resource, int], Response]:
         parser = language.parse_args()
         lang = parser['lang']
         content = {

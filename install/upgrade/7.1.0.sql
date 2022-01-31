@@ -1,69 +1,105 @@
---
--- PostgreSQL database dump
---
+-- Upgrade 7.0.x to 7.1.0
+-- Be sure to backup the database and read the upgrade notes before executing.
 
--- Dumped from database version 13.5 (Debian 13.5-0+deb11u1)
--- Dumped by pg_dump version 13.5 (Debian 13.5-0+deb11u1)
+BEGIN;
 
-SET statement_timeout = 0;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SELECT pg_catalog.set_config('search_path', '', false);
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
+-- Raise database version
+Update web.settings SET value = '7.1.0' WHERE name = 'database_version';
 
---
--- Data for Name: cidoc_class; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+-- Fixing possible inconsistencies for source translation type
+UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');
+UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Translation';
 
-INSERT INTO model.cidoc_class VALUES
-	(1, 'E15', 'Identifier Assignment', 'This class comprises activities that result in the allocation of an identifier to an instance of E1 CRM Entity. Instances of E15 Identifier Assignment may include the creation of the identifier from multiple constituents, which themselves may be instances of E41 Appellation. The syntax and kinds of constituents to be used may be declared in a rule constituting an instance of E29 Design or Procedure.
+-- Remove created, modified fields in model tables
+ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.cidoc_class_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.cidoc_class_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+ALTER TABLE model.openatlas_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.cidoc_class_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.property;
+DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.openatlas_class;
+
+--------------------------------------
+-- #1506: Update CIDOC CRM to 7.1.1 --
+--------------------------------------
+
+-- Change sub/super event links
+UPDATE model.link SET property_code = 'P9' WHERE property_code = 'P117';
+
+-- Join appellation
+UPDATE model.entity SET (cidoc_class_code, openatlas_class_name) = ('E41', 'appellation') WHERE cidoc_class_code = 'E82';
+UPDATE model.link SET property_code = 'P1' WHERE property_code = 'P131';
+DELETE FROM model.openatlas_class WHERE cidoc_class_code = 'E82';
+
+-- Drop foreign keys of model tables (recreated below after CIDOC update)
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
+ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
+ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
+ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
+ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
+ALTER TABLE model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_cidoc_class_code_fkey;
+ALTER TABLE web.reference_system_openatlas_class DROP CONSTRAINT IF EXISTS reference_system_openatlas_class_openatlas_class_name_fkey;
+
+-- Remove former CIDOC
+TRUNCATE model.cidoc_class_inheritance, model.cidoc_class_i18n, model.cidoc_class, model.property_inheritance, model.property_i18n, model.property RESTART IDENTITY;
+
+-- Enter new CIDOC
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (1, 'E15', 'Identifier Assignment', 'This class comprises activities that result in the allocation of an identifier to an instance of E1 CRM Entity. Instances of E15 Identifier Assignment may include the creation of the identifier from multiple constituents, which themselves may be instances of E41 Appellation. The syntax and kinds of constituents to be used may be declared in a rule constituting an instance of E29 Design or Procedure.
 Examples of such identifiers include Find Numbers, Inventory Numbers, uniform titles in the sense of librarianship and Digital Object Identifiers (DOI). Documenting the act of identifier assignment and deassignment is especially useful when objects change custody or the identification system of an organization is changed. In order to keep track of the identity of things in such cases, it is important to document by whom, when and for what purpose an identifier is assigned to an item.
-The fact that an identifier is a preferred one for an organisation can be expressed by using the property E1 CRM Entity. P48 has preferred identifier (is preferred identifier of): E42 Identifier. It can better be expressed in a context independent form by assigning a suitable E55 Type, such as “preferred identifier assignment”, to the respective instance of E15 Identifier Assignment via the P2 has type property.'),
-	(2, 'E12', 'Production', 'This class comprises activities that are designed to, and succeed in, creating one or more new items.
+The fact that an identifier is a preferred one for an organisation can be expressed by using the property E1 CRM Entity. P48 has preferred identifier (is preferred identifier of): E42 Identifier. It can better be expressed in a context independent form by assigning a suitable E55 Type, such as “preferred identifier assignment”, to the respective instance of E15 Identifier Assignment via the P2 has type property.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (2, 'E12', 'Production', 'This class comprises activities that are designed to, and succeed in, creating one or more new items.
 It specializes the notion of modification into production. The decision as to whether or not an object is regarded as new is context sensitive. Normally, items are considered “new” if there is no obvious overall similarity between them and the consumed items and material used in their production. In other cases, an item is considered “new” because it becomes relevant to documentation by a modification. For example, the scribbling of a name on a potsherd may make it a voting token. The original potsherd may not be worth documenting, in contrast to the inscribed one.
 This entity can be collective: the printing of a thousand books, for example, would normally be considered a single event.
-An event should also be documented using an instance of E81 Transformation if it results in the destruction of one or more objects and the simultaneous production of others using parts or material from the originals. In this case, the new items have separate identities and matter is preserved, but identity is not.'),
-	(3, 'E39', 'Actor', 'This class comprises people, either individually or in groups, who have the potential to perform intentional actions of kinds for which someone may be held responsible.'),
-	(4, 'E7', 'Activity', 'This class comprises actions intentionally carried out by instances of E39 Actor that result in changes of state in the cultural, social, or physical systems documented.
-This notion includes complex, composite and long-lasting actions such as the building of a settlement or a war, as well as simple, short-lived actions such as the opening of a door.'),
-	(5, 'E33', 'Linguistic Object', 'This class comprises identifiable expressions in natural language or languages.
+An event should also be documented using an instance of E81 Transformation if it results in the destruction of one or more objects and the simultaneous production of others using parts or material from the originals. In this case, the new items have separate identities and matter is preserved, but identity is not.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (3, 'E39', 'Actor', 'This class comprises people, either individually or in groups, who have the potential to perform intentional actions of kinds for which someone may be held responsible.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (4, 'E7', 'Activity', 'This class comprises actions intentionally carried out by instances of E39 Actor that result in changes of state in the cultural, social, or physical systems documented.
+This notion includes complex, composite and long-lasting actions such as the building of a settlement or a war, as well as simple, short-lived actions such as the opening of a door.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (5, 'E33', 'Linguistic Object', 'This class comprises identifiable expressions in natural language or languages.
 Instances of E33 Linguistic Object can be expressed in many ways: e.g., as written texts, recorded speech or sign language. However, the CIDOC CRM treats instances of E33 Linguistic Object independently from the medium or method by which they are expressed. Expressions in formal languages, such as computer code or mathematical formulae, are not treated as instances of E33 Linguistic Object by the CIDOC CRM. These should be modelled as instances of E73 Information Object.
 In general, an instance of E33 Linguistic Object may also contain non-linguistic information, often of artistic or aesthetic value. Only in cases in which the content of an instance of E33 Linguistic Object can completely be expressed by a series of binary-encoded symbols, its content may be documented within a respective knowledge base by the property P190 has symbolic content: E62 String. Otherwise, it should be understood as an identifiable digital resource only available independently from the respective knowledge base.
-In other cases, such as pages of an illuminated manuscript or recordings containing speech in a language supported by a writing system, the linguistic part of the content of an instance of E33 Linguistic Object may be documented within a respective knowledge base in a note by P3 has note: E62 String. Otherwise, it may be described using the property P165 incorporates (is incorporated in): E73 Information Object as a different object with its own identity.'),
-	(6, 'E66', 'Formation', 'This class comprises events that result in the formation of a formal or informal E74 Group of people, such as a club, society, association, corporation or nation.
+In other cases, such as pages of an illuminated manuscript or recordings containing speech in a language supported by a writing system, the linguistic part of the content of an instance of E33 Linguistic Object may be documented within a respective knowledge base in a note by P3 has note: E62 String. Otherwise, it may be described using the property P165 incorporates (is incorporated in): E73 Information Object as a different object with its own identity.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (6, 'E66', 'Formation', 'This class comprises events that result in the formation of a formal or informal E74 Group of people, such as a club, society, association, corporation or nation.
 E66 Formation does not include the arbitrary aggregation of people who do not act as a collective.
-The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining.'),
-	(7, 'E57', 'Material', 'This class is a specialization of E55 Type and comprises the concepts of materials.
+The formation of an instance of E74 Group does not require that the group is populated with members at the time of formation. In order to express the joining of members at the time of formation, the respective activity should be simultaneously an instance of both E66 Formation and E85 Joining.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (7, 'E57', 'Material', 'This class is a specialization of E55 Type and comprises the concepts of materials.
 Instances of E57 Material may denote properties of matter before its use, during its use, and as incorporated in an object, such as ultramarine powder, tempera paste, reinforced concrete. Discrete pieces of raw-materials kept in museums, such as bricks, sheets of fabric, pieces of metal, should be modelled individually in the same way as other objects. Discrete used or processed pieces, such as the stones from Nefer Titi''s temple, should be modelled as parts (cf. P46 is composed of (forms part of): E18 Physical Thing).
 This type is used categorically in the model without reference to instances of it, i.e., the Model does not foresee the description of instances of instances of E57 Material, e.g.: “instances of gold”.
-It is recommended that internationally or nationally agreed codes and terminology are used.'),
-	(14, 'E6', 'Destruction', 'This class comprises events that destroy one or more instances of E18 Physical Thing such that they lose their identity as the subjects of documentation.
+It is recommended that internationally or nationally agreed codes and terminology are used.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (14, 'E6', 'Destruction', 'This class comprises events that destroy one or more instances of E18 Physical Thing such that they lose their identity as the subjects of documentation.
 Some destruction events are intentional, while others are independent of human activity. Intentional destruction may be documented by classifying the event as both an instance of E6 Destruction and of E7 Activity.
 The decision to document an object as destroyed, transformed or modified is context sensitive:
 1. If the matter remaining from the destruction is not documented, the event is modelled solely as an instance of E6 Destruction.
 2. An event should also be documented as an instance of E81 Transformation if it results in the destruction of one or more objects and the simultaneous production of others using parts or material from the original. In this case, the new items have separate identities. Matter is preserved, but identity is not.
-3. When the initial identity of the changed instance of E18 Physical Thing is preserved, the event should be documented as an instance of E11 Modification.'),
-	(15, 'E20', 'Biological Object', 'This class comprises individual items of a material nature, which live, have lived or are natural products of or from living organisms.
-Artificial objects that incorporate biological elements, such as Victorian butterfly frames, can be documented as both instances of E20 Biological Object and E22 Human-Made Object.'),
-	(8, 'E52', 'Time-Span', 'This class comprises abstract temporal extents, in the sense of Galilean physics, having a beginning, an end and a duration.
+3. When the initial identity of the changed instance of E18 Physical Thing is preserved, the event should be documented as an instance of E11 Modification.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (15, 'E20', 'Biological Object', 'This class comprises individual items of a material nature, which live, have lived or are natural products of or from living organisms.
+Artificial objects that incorporate biological elements, such as Victorian butterfly frames, can be documented as both instances of E20 Biological Object and E22 Human-Made Object.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (8, 'E52', 'Time-Span', 'This class comprises abstract temporal extents, in the sense of Galilean physics, having a beginning, an end and a duration.
 Instances of E52 Time-Span have no semantic connotations about phenomena happening within the temporal extent they represent. They do not convey any meaning other than a positioning on the “time-line” of chronology. The actual extent of an instance of E52 Time-Span can be approximated by properties of E52 Time-Span giving inner and outer bounds in the form of dates (instances of E61 Time Primitive). Comparing knowledge about time-spans is fundamental for chronological reasoning.
 Some instances of E52 Time-Span may be defined as the actual, in principle observable, temporal extent of instances of E2 Temporal Entity via the property P4 has time-span (is time-span of): E52 Time-Span. They constitute phenomenal time-spans as defined in CRMgeo (Doerr &amp; Hiebel 2013). Since our knowledge of history is imperfect and physical phenomena are fuzzy in nature, the extent of phenomenal time-spans can only be described in approximation. An extreme case of approximation, might, for example, define an instance of E52 Time-Span having unknown beginning, end and duration. It may, nevertheless, be associated with other descriptions by which we can infer knowledge about it, such as in relative chronologies.
 Some instances of E52 may be defined precisely as representing a declaration of a temporal extent, as, for instance, done in a business contract. They constitute declarative time-spans as defined in CRMgeo (Doerr &amp; Hiebel 2013) and can be described via the property E61 Time Primitive P170 defines time (time is defined by): E52 Time-Span.
-When used as a common E52 Time-Span for two events, it will nevertheless describe them as being simultaneous, even if nothing else is known.'),
-	(9, 'E55', 'Type', 'This class comprises concepts denoted by terms from thesauri and controlled vocabularies used to characterize and classify instances of CIDOC CRM classes. Instances of E55 Type represent concepts in contrast to instances of E41 Appellation which are used to name instances of CIDOC CRM classes.
-E55 Type is the CIDOC CRM’s interface to domain specific ontologies and thesauri. These can be represented in the CIDOC CRM as subclasses of E55 Type, forming hierarchies of terms, i.e., instances of E55 Type linked via P127 has broader term (has narrower term): E55 Type. Such hierarchies may be extended with additional properties.'),
-	(10, 'E3', 'Condition State', 'This class comprises the states of objects characterised by a certain condition over a time-span.
+When used as a common E52 Time-Span for two events, it will nevertheless describe them as being simultaneous, even if nothing else is known.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (9, 'E55', 'Type', 'This class comprises concepts denoted by terms from thesauri and controlled vocabularies used to characterize and classify instances of CIDOC CRM classes. Instances of E55 Type represent concepts in contrast to instances of E41 Appellation which are used to name instances of CIDOC CRM classes.
+E55 Type is the CIDOC CRM’s interface to domain specific ontologies and thesauri. These can be represented in the CIDOC CRM as subclasses of E55 Type, forming hierarchies of terms, i.e., instances of E55 Type linked via P127 has broader term (has narrower term): E55 Type. Such hierarchies may be extended with additional properties.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (10, 'E3', 'Condition State', 'This class comprises the states of objects characterised by a certain condition over a time-span.
 An instance of this class describes the prevailing physical condition of any material object or feature during a specific instance of E52 Time Span. In general, the time-span for which a certain condition can be asserted may be shorter than the real time-span, for which this condition held.
-The nature of that condition can be described using P2 has type. For example, the instance of E3 Condition State “condition of the SS Great Britain between 22 September 1846 and 27 August 1847” can be characterized as an instance “wrecked” of E55 Type.'),
-	(11, 'E21', 'Person', 'This class comprises real persons who live or are assumed to have lived.
+The nature of that condition can be described using P2 has type. For example, the instance of E3 Condition State “condition of the SS Great Britain between 22 September 1846 and 27 August 1847” can be characterized as an instance “wrecked” of E55 Type.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (11, 'E21', 'Person', 'This class comprises real persons who live or are assumed to have lived.
 Legendary figures that may have existed, such as Ulysses and King Arthur, fall into this class if the documentation refers to them as historical figures. In cases where doubt exists as to whether several persons are in fact identical, multiple instances can be created and linked to indicate their relationship. The CIDOC CRM does not propose a specific form to support reasoning about possible identity.
-In a bibliographic context, a name presented following the conventions usually employed for personal names will be assumed to correspond to an actual real person (an instance of E21 Person), unless evidence is available to indicate that this is not the case. The fact that a persona may erroneously be classified as an instance of E21 Person does not imply that the concept comprises personae.'),
-	(12, 'E10', 'Transfer of Custody', 'This class comprises transfers of the physical custody or the legal responsibility for the physical custody of objects. The recording of the donor or recipient is optional. It is possible that in an instance of E10 Transfer of Custody there is either no donor or no recipient.
+In a bibliographic context, a name presented following the conventions usually employed for personal names will be assumed to correspond to an actual real person (an instance of E21 Person), unless evidence is available to indicate that this is not the case. The fact that a persona may erroneously be classified as an instance of E21 Person does not imply that the concept comprises personae.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (12, 'E10', 'Transfer of Custody', 'This class comprises transfers of the physical custody or the legal responsibility for the physical custody of objects. The recording of the donor or recipient is optional. It is possible that in an instance of E10 Transfer of Custody there is either no donor or no recipient.
 Depending on the circumstances, it may describe:
 1. the beginning of custody (there is no previous custodian)
 2. the end of custody (there is no subsequent custodian)
@@ -73,166 +109,166 @@ Depending on the circumstances, it may describe:
 In the event that only a single kind of transfer of custody occurs, either the legal responsibility for the custody or the actual physical possession of the object but not both, this difference should be expressed using the property P2 has type (is type of).
 The sense of physical possession requires that the object of custody be in the hands of the keeper at least with a part representative for the whole. The way, in which a representative part is defined, should ensure that it is unambiguous who keeps a part and who the whole and should be consistent with the identity criteria of the kept instance of E18 Physical Thing.
 The interpretation of the museum notion of "accession" differs between institutions. The CIDOC CRM therefore models legal ownership and physical custody separately. Institutions will then model their specific notions of accession and deaccession as combinations of these.
-Theft is a specific case of illegal transfer of custody.'),
-	(13, 'E5', 'Event', 'This class comprises distinct, delimited and coherent processes and interactions of a material nature, in cultural, social or physical systems, involving and affecting instances of E77 Persistent Item in a way characteristic of the kind of process. Typical examples are meetings, births, deaths, actions of decision taking, making or inventing things, but also more complex and extended ones such as conferences, elections, building of a castle, or battles.
+Theft is a specific case of illegal transfer of custody.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (13, 'E5', 'Event', 'This class comprises distinct, delimited and coherent processes and interactions of a material nature, in cultural, social or physical systems, involving and affecting instances of E77 Persistent Item in a way characteristic of the kind of process. Typical examples are meetings, births, deaths, actions of decision taking, making or inventing things, but also more complex and extended ones such as conferences, elections, building of a castle, or battles.
 While the continuous growth of a tree lacks the limits characteristic of an event, its germination from a seed does qualify as an event. Similarly, the blowing of the wind lacks the distinctness and limits of an event, but a hurricane, flood or earthquake would qualify as an event. Mental processes are considered as events, in cases where they are connected with the material externalization of their results; for example, the creation of a poem, a performance or a change of intention that becomes obvious from subsequent actions or declarations.
 The effects of an instance of E5 Event may not lead to relevant permanent changes of properties or relations of the items involved in it, for example an unrecorded performance. Of course, in order to be documented, some kind of evidence for an event must exist, be it witnesses, traces or products of the event.
 While instances of E4 Period always require some form of coherence between its constituent phenomena, in addition, the essential constituents of instances of E5 Event should contribute to an overall effect; for example, the statements made during a meeting and the listening of the audience.
-Viewed at a coarse level of detail, an instance of E5 Event may appear as if it had an ‘instantaneous’ overall effect, but any process or interaction of material nature in reality have an extent in time and space. At a fine level, instances of E5 Event may be analyzed into component phenomena and phases within a space and timeframe, and as such can be seen as a period, regardless of the size of the phenomena. The reverse is not necessarily the case: not all instances of E4 Period give rise to a noteworthy overall effect and are thus not instances of E5 Event.'),
-	(35, 'E42', 'Identifier', 'This class comprises strings or codes assigned to instances of E1 CRM Entity in order to identify them uniquely and permanently within the context of one or more organisations. Such codes are often known as inventory numbers, registration codes, etc. and are typically composed of alphanumeric sequences. Postal addresses, telephone numbers, urls and e-mail addresses are characteristic examples of identifiers used by services transporting things between clients.
-The class E42 Identifier is not normally used for machine-generated identifiers used for automated processing unless these are also used by human agents.'),
-	(16, 'E54', 'Dimension', 'This class comprises quantifiable properties that can be measured by some calibrated means and can be approximated by values, i.e., by points or regions in a mathematical or conceptual space, such as natural or real numbers, RGB values etc.
+Viewed at a coarse level of detail, an instance of E5 Event may appear as if it had an ‘instantaneous’ overall effect, but any process or interaction of material nature in reality have an extent in time and space. At a fine level, instances of E5 Event may be analyzed into component phenomena and phases within a space and timeframe, and as such can be seen as a period, regardless of the size of the phenomena. The reverse is not necessarily the case: not all instances of E4 Period give rise to a noteworthy overall effect and are thus not instances of E5 Event.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (16, 'E54', 'Dimension', 'This class comprises quantifiable properties that can be measured by some calibrated means and can be approximated by values, i.e., by points or regions in a mathematical or conceptual space, such as natural or real numbers, RGB values etc.
 An instance of E54 Dimension represents the empirical or theoretically derived quantity, including the precision tolerances resulting from the particular method or calculation. The identity of an instance of E54 Dimension depends on the method of its determination because each method may produce different values even when determining comparable qualities. For instance, the wingspan of a bird alive or dead is a different dimension. Thermoluninescence dating and Rehydroxylation [RHX] dating are different dimensions of temporal distance from now, even if they aim at dating the same object. The method of determination should be expressed using the property P2 has type (is type of). Note that simple terms such as “diameter” or “length” are normally insufficient to unambiguously describe a respective dimension. In contrast, “maximum linear extent” may be sufficient.
 The properties of the class E54 Dimension allow for expressing the numerical approximation of the values of instances of E54 Dimension adequate to the precision of the applied method of determination. If the respective quantity belongs to a non-discrete space according to the laws of physics, such as spatial distances, it is recommended to record them as approximations by intervals or regions of indeterminacy enclosing the assumed true values. For instance, a length of 5 cm may be recorded as 4.5-5.5 cm, according to the precision of the respective observation. Note, that comparability of values described in different units depends critically on the representation as value regions.
-Numerical approximations in archaic instances of E58 Measurement Unit used in historical records should be preserved. Equivalents corresponding to current knowledge should be recorded as additional instances of E54 Dimension, as appropriate.'),
-	(17, 'E85', 'Joining', 'This class comprises the activities that result in an instance of E39 Actor becoming a member of an instance of E74 Group. This class does not imply initiative by either party. It may be the initiative of a third party.
-Typical scenarios include becoming a member of a social organisation, becoming employee of a company, marriage, the adoption of a child by a family and the inauguration of somebody into an official position.'),
-	(18, 'E97', 'Monetary Amount', 'This class comprises quantities of monetary possessions or obligations in terms of their nominal value with respect to a particular currency. These quantities may be abstract accounting units, the nominal value of a heap of coins or bank notes at the time of validity of the respective currency, the nominal value of a bill of exchange or other documents expressing monetary claims or obligations. It specifically excludes amounts expressed in terms of weights of valuable items, like gold and diamonds, and quantities of other non-currency items, like goats or stocks and bonds.'),
-	(19, 'E30', 'Right', 'This class comprises legal privileges concerning material and immaterial things or their derivatives.
-These include reproduction and property rights.'),
-	(20, 'E41', 'Appellation', 'This class comprises signs, either meaningful or not, or arrangements of signs following a specific syntax, that are used or can be used to refer to and identify a specific instance of some class or category within a certain context.
+Numerical approximations in archaic instances of E58 Measurement Unit used in historical records should be preserved. Equivalents corresponding to current knowledge should be recorded as additional instances of E54 Dimension, as appropriate.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (17, 'E85', 'Joining', 'This class comprises the activities that result in an instance of E39 Actor becoming a member of an instance of E74 Group. This class does not imply initiative by either party. It may be the initiative of a third party.
+Typical scenarios include becoming a member of a social organisation, becoming employee of a company, marriage, the adoption of a child by a family and the inauguration of somebody into an official position.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (18, 'E97', 'Monetary Amount', 'This class comprises quantities of monetary possessions or obligations in terms of their nominal value with respect to a particular currency. These quantities may be abstract accounting units, the nominal value of a heap of coins or bank notes at the time of validity of the respective currency, the nominal value of a bill of exchange or other documents expressing monetary claims or obligations. It specifically excludes amounts expressed in terms of weights of valuable items, like gold and diamonds, and quantities of other non-currency items, like goats or stocks and bonds.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (19, 'E30', 'Right', 'This class comprises legal privileges concerning material and immaterial things or their derivatives.
+These include reproduction and property rights.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (20, 'E41', 'Appellation', 'This class comprises signs, either meaningful or not, or arrangements of signs following a specific syntax, that are used or can be used to refer to and identify a specific instance of some class or category within a certain context.
 Instances of E41 Appellation do not identify things by their meaning, even if they happen to have one, but instead by convention, tradition, or agreement. Instances of E41 Appellation are cultural constructs; as such, they have a context, a history, and a use in time and space by some group of users. A given instance of E41 Appellation can have alternative forms, i.e., other instances of E41 Appellation that are always regarded as equivalent independent from the thing it denotes.
 Different languages may use different appellations for the same thing, such as the names of major cities. Some appellations may be formulated using a valid noun phrase of a particular language. In these cases, the respective instances of E41 Appellation should also be declared as instances of E33 Linguistic Object. Then the language using the appellation can be declared with the property P72 has language: E56 Language.
 Instances of E41 Appellation may be used to identify any instance of E1 CRM Entity and sometimes are characteristic for instances of more specific subclasses E1 CRM Entity, such as for instances of E52 Time-Span (for instance “dates”), E39 Actor, E53 Place or E28 Conceptual Object. Postal addresses and E-mail addresses are characteristic examples of identifiers used by services transporting things between clients.
 Even numerically expressed identifiers for extents in space or time are also regarded as instances of E41 Appellation, such as Gregorian dates or spatial coordinates, even though they allow for determining some time or location by a known procedure starting from a reference point and by virtue of that fact play a double role as instances of E59 Primitive Value.
-E41 Appellation should not be confused with the act of naming something. Cf. E15 Identifier Assignment'),
-	(21, 'E9', 'Move', 'This class comprises changes of the physical location of the instances of E19 Physical Object.
-Note, that the class E9 Move inherits the property P7 took place at (witnessed): E53 Place. This property should be used to describe the trajectory or a larger area within which a move takes place, whereas the properties P26 moved to (was destination of), P27 moved from (was origin of) describe the start and end points only. Moves may also be documented to consist of other moves (via P9 consists of (forms part of)), in order to describe intermediate stages on a trajectory. In that case, start and end points of the partial moves should match appropriately between each other and with the overall event.'),
-	(22, 'E31', 'Document', 'This class comprises identifiable immaterial items that make propositions about reality.
-These propositions may be expressed in text, graphics, images, audiograms, videograms or by other similar means. Documentation databases are regarded as instances of E31 Document. This class should not be confused with the concept “document” in Information Technology, which is compatible with E73 Information Object.'),
-	(23, 'E8', 'Acquisition', 'This class comprises transfers of legal ownership from one or more instances of E39 Actor to one or more other instances of E39 Actor.
+E41 Appellation should not be confused with the act of naming something. Cf. E15 Identifier Assignment');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (21, 'E9', 'Move', 'This class comprises changes of the physical location of the instances of E19 Physical Object.
+Note, that the class E9 Move inherits the property P7 took place at (witnessed): E53 Place. This property should be used to describe the trajectory or a larger area within which a move takes place, whereas the properties P26 moved to (was destination of), P27 moved from (was origin of) describe the start and end points only. Moves may also be documented to consist of other moves (via P9 consists of (forms part of)), in order to describe intermediate stages on a trajectory. In that case, start and end points of the partial moves should match appropriately between each other and with the overall event.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (22, 'E31', 'Document', 'This class comprises identifiable immaterial items that make propositions about reality.
+These propositions may be expressed in text, graphics, images, audiograms, videograms or by other similar means. Documentation databases are regarded as instances of E31 Document. This class should not be confused with the concept “document” in Information Technology, which is compatible with E73 Information Object.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (23, 'E8', 'Acquisition', 'This class comprises transfers of legal ownership from one or more instances of E39 Actor to one or more other instances of E39 Actor.
 The class also applies to the establishment or loss of ownership of instances of E18 Physical Thing. It does not, however, imply changes of any other kinds of right. The recording of the donor and/or recipient is optional. It is possible that in an instance of E8 Acquisition there is either no donor or no recipient. Depending on the circumstances, it may describe:
 1. the beginning of ownership
 2. the end of ownership
 3. the transfer of ownership
 4. the acquisition from an unknown source
 5. the loss of title due to destruction of the item
-It may also describe events where a collector appropriates legal title, for example by annexation or field collection. The interpretation of the museum notion of "accession" differs between institutions. The CIDOC CRM therefore models legal ownership (E8 Acquisition) and physical custody (E10 Transfer of Custody) separately. Institutions will then model their specific notions of accession and deaccession as combinations of these.'),
-	(24, 'E36', 'Visual Item', 'This class comprises the intellectual or conceptual aspects of recognisable marks, images and other visual works.
+It may also describe events where a collector appropriates legal title, for example by annexation or field collection. The interpretation of the museum notion of "accession" differs between institutions. The CIDOC CRM therefore models legal ownership (E8 Acquisition) and physical custody (E10 Transfer of Custody) separately. Institutions will then model their specific notions of accession and deaccession as combinations of these.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (24, 'E36', 'Visual Item', 'This class comprises the intellectual or conceptual aspects of recognisable marks, images and other visual works.
 This class does not intend to describe the idiosyncratic characteristics of an individual physical embodiment of a visual item, but the underlying prototype. For example, a mark such as the ICOM logo is generally considered to be the same logo when used on any number of publications. The size, orientation and colour may change, but the logo remains uniquely identifiable. The same is true of images that are reproduced many times. This means that visual items are independent of their physical support.
-The class E36 Visual Item provides a means of identifying and linking together instances of E24 Physical Human-Made Thing that carry the same visual qualities (symbols, marks or images etc.). The property P62 depicts (is depicted by) between E24 Physical Human-Made Thing and depicted subjects (E1 CRM Entity) is a shortcut of the more fully developed path from E24 Physical Human-Made Thing through P65 shows visual item (is shown by), E36 Visual Item, P138 represents (has representation) to E1CRM Entity, which in addition captures the optical features of the depiction.'),
-	(25, 'E11', 'Modification', 'This class comprises instances of E7 Activity that are undertaken to create, alter or change instances of E24 Physical Human-Made Thing.
+The class E36 Visual Item provides a means of identifying and linking together instances of E24 Physical Human-Made Thing that carry the same visual qualities (symbols, marks or images etc.). The property P62 depicts (is depicted by) between E24 Physical Human-Made Thing and depicted subjects (E1 CRM Entity) is a shortcut of the more fully developed path from E24 Physical Human-Made Thing through P65 shows visual item (is shown by), E36 Visual Item, P138 represents (has representation) to E1CRM Entity, which in addition captures the optical features of the depiction.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (25, 'E11', 'Modification', 'This class comprises instances of E7 Activity that are undertaken to create, alter or change instances of E24 Physical Human-Made Thing.
 This class includes the production of an item from raw materials and other so far undocumented objects. It also includes the conservation treatment of an object.
 Since the distinction between modification and production is not always clear, modification is regarded as the more generally applicable concept. This implies that some items may be consumed or destroyed in an instance of E11 Modification, and that others may be produced as a result of it. An event should also be documented using an instance of E81 Transformation if it results in the destruction of one or more objects and the simultaneous production of others using parts or material from the originals. In this case, the new items have separate identities.
 An activity undertaken on an object which was designed to alter it, but which, in fact, it did not in any seemingly significant way (such as the application of a solvent during conservation which failed to dissolve any part of the object), is still considered as an instance of E11 Modification. Typically, any such activity will leave at least forensic traces of evidence on the object.
-If the instance of E29 Design or Procedure utilized for the modification prescribes the use of specific materials, they should be documented using property P68 foresees use of (use foreseen by): E57 Material of E29 Design or Procedure, rather than via P126 employed (was employed in): E57 Material.'),
-	(26, 'E16', 'Measurement', 'This class comprises actions measuring quantitative physical properties and other values that can be determined by a systematic, objective procedure of direct observation of particular states of physical reality.
+If the instance of E29 Design or Procedure utilized for the modification prescribes the use of specific materials, they should be documented using property P68 foresees use of (use foreseen by): E57 Material of E29 Design or Procedure, rather than via P126 employed (was employed in): E57 Material.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (26, 'E16', 'Measurement', 'This class comprises actions measuring quantitative physical properties and other values that can be determined by a systematic, objective procedure of direct observation of particular states of physical reality.
 An instance of E16 Measurement may us simple counting or tools, such as yardsticks or radiation detection devices. The interest is in the method and care applied, so that the reliability of the result may be judged at a later stage, or research continued on the associated documents. The date of the event is important for dimensions, which may change value over time, such as the length of an object subject to shrinkage. Methods and devices employed should be associated with instances of E16 Measurement by properties such as P33 used specific technique: E29 Design or Procedure, P125 used object of type: E55 Type, P16 used specific object (was used for): E70 Thing, whereas basic techniques such as "carbon 14 dating" should be encoded using P2 has type (is type of): E55 Type. Details of methods and devices reused or reusable in other instances of E16 Measurement should be documented for these entities rather than the measurements themselves, whereas details of particular execution may be documented by free text or by instantiating adequate sub-activities, if the detail may be of interest for an overarching query.
-Regardless whether a measurement is made by an instrument or by human senses, it represents the initial transition from physical reality to information without any other documented information object in between within the reasoning chain that would represent the result of the interaction of the observer or device with reality. Therefore, determining properties of an instance of E90 Symbolic Object is regarded as an instance of E13 Attribute Assignment, which may be inferred from observing and measuring representative carriers. In the case that the carrier can be named, the property P16 used specific object (was used for): should be used to indicate the instance(s) of E18 Physical Thing that was used as the empirical basis for the attribute assignment. For instance, inferring properties of depicted items using image material, such as satellite images, is not regarded as an instance of E16 Measurement, but as a subsequent instance of E13 Attribute Assignment. Rather, only the production of the images, understood as arrays of radiation intensities, is regarded as an instance of E16 Measurement. The same reasoning holds for other sensor data.'),
-	(27, 'E89', 'Propositional Object', 'This class comprises immaterial items, including but not limited to stories, plots, procedural prescriptions, algorithms, laws of physics or images that are, or represent in some sense, sets of propositions about real or imaginary things and that are documented as single units or serve as topic of discourse.
-This class also comprises items that are “about” something in the sense of a subject. In the wider sense, this class includes expressions of psychological value such as non-figural art and musical themes. However, conceptual items such as types and classes are not instances of E89 Propositional Object. This should not be confused with the definition of a type, which is indeed an instance of E89 Propositional Object.'),
-	(28, 'E18', 'Physical Thing', 'This class comprises all persistent physical items with a relatively stable form, human-made or natural.
+Regardless whether a measurement is made by an instrument or by human senses, it represents the initial transition from physical reality to information without any other documented information object in between within the reasoning chain that would represent the result of the interaction of the observer or device with reality. Therefore, determining properties of an instance of E90 Symbolic Object is regarded as an instance of E13 Attribute Assignment, which may be inferred from observing and measuring representative carriers. In the case that the carrier can be named, the property P16 used specific object (was used for): should be used to indicate the instance(s) of E18 Physical Thing that was used as the empirical basis for the attribute assignment. For instance, inferring properties of depicted items using image material, such as satellite images, is not regarded as an instance of E16 Measurement, but as a subsequent instance of E13 Attribute Assignment. Rather, only the production of the images, understood as arrays of radiation intensities, is regarded as an instance of E16 Measurement. The same reasoning holds for other sensor data.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (27, 'E89', 'Propositional Object', 'This class comprises immaterial items, including but not limited to stories, plots, procedural prescriptions, algorithms, laws of physics or images that are, or represent in some sense, sets of propositions about real or imaginary things and that are documented as single units or serve as topic of discourse.
+This class also comprises items that are “about” something in the sense of a subject. In the wider sense, this class includes expressions of psychological value such as non-figural art and musical themes. However, conceptual items such as types and classes are not instances of E89 Propositional Object. This should not be confused with the definition of a type, which is indeed an instance of E89 Propositional Object.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (28, 'E18', 'Physical Thing', 'This class comprises all persistent physical items with a relatively stable form, human-made or natural.
 Depending on the existence of natural boundaries of such things, the CIDOC CRM distinguishes the instances of E19 Physical Object from instances of E26 Physical Feature, such as holes, rivers, pieces of land etc. Most instances of E19 Physical Object can be moved (if not too heavy), whereas features are integral to the surrounding matter.
 An instance of E18 Physical Thing occupies not only a particular geometric space at any instant of its existence, but in the course of its existence it also forms a trajectory through spacetime, which occupies a real, that is phenomenal, volume in spacetime. We include in the occupied space the space filled by the matter of the physical thing and all its inner spaces, such as the interior of a box. For the purpose of more detailed descriptions of the presence of an instance of E18 Physical Thing in space and time it can be associated with its specific instance of E92 Spacetime Volume by the property P196 defines (is defined by).
-The CIDOC CRM is generally not concerned with amounts of matter in fluid or gaseous states, as long as they are not confined in an identifiable way for an identifiable minimal time-span.'),
-	(29, 'E14', 'Condition Assessment', 'This class describes the act of assessing the state of preservation of an object during a particular period.
-The condition assessment may be carried out by inspection, measurement or through historical research. This class is used to document circumstances of the respective assessment that may be relevant to interpret its quality at a later stage, or to continue research on related documents.'),
-	(30, 'E1', 'CRM Entity', 'This class comprises all things in the universe of discourse of the CIDOC Conceptual Reference Model.
+The CIDOC CRM is generally not concerned with amounts of matter in fluid or gaseous states, as long as they are not confined in an identifiable way for an identifiable minimal time-span.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (29, 'E14', 'Condition Assessment', 'This class describes the act of assessing the state of preservation of an object during a particular period.
+The condition assessment may be carried out by inspection, measurement or through historical research. This class is used to document circumstances of the respective assessment that may be relevant to interpret its quality at a later stage, or to continue research on related documents.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (30, 'E1', 'CRM Entity', 'This class comprises all things in the universe of discourse of the CIDOC Conceptual Reference Model.
 It is an abstract concept providing for three general properties:
 Identification by name or appellation, and in particular by a preferred identifier
 Classification by type, allowing further refinement of the specific subclass an instance belongs to
 Attachment of free text and other unstructured data for the expression of anything not captured by formal properties
-All other classes within the CIDOC CRM are directly or indirectly specialisations of E1 CRM Entity.'),
-	(31, 'E68', 'Dissolution', 'This class comprises the events that result in the formal or informal termination of an instance of E74 Group.
-If the dissolution was deliberate, the Dissolution event should also be instantiated as an instance of E7 Activity.'),
-	(32, 'E64', 'End of Existence', 'This class comprises events that end the existence of any instance of E77 Persistent Item.
-It may be used for temporal reasoning about things (physical items, groups of people, living beings) ceasing to exist; it serves as a hook for determination of a “terminus post quem” or “terminus ante quem”. In cases where substance from an instance of E64 Persistent Item continues to exist in a new form, the process would be documented as instances of E81 Transformation.'),
-	(33, 'E65', 'Creation', 'This class comprises events that result in the creation of conceptual items or immaterial products, such as legends, poems, texts, music, images, movies, laws, types etc.'),
-	(34, 'E63', 'Beginning of Existence', 'This class comprises events that bring into existence any instance of E77 Persistent Item.
-It may be used for temporal reasoning about things (intellectual products, physical items, groups of people, living beings) beginning to exist; it serves as a hook for determination of a “terminus post quem” or “terminus ante quem”.'),
-	(36, 'E81', 'Transformation', 'This class comprises the events that result in the simultaneous destruction of one or more than one E18 Physical Thing and the creation of one or more than one E18 Physical Thing that preserves recognizable substance and structure from the first one(s) but has fundamentally different nature or identity.
+All other classes within the CIDOC CRM are directly or indirectly specialisations of E1 CRM Entity.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (31, 'E68', 'Dissolution', 'This class comprises the events that result in the formal or informal termination of an instance of E74 Group.
+If the dissolution was deliberate, the Dissolution event should also be instantiated as an instance of E7 Activity.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (32, 'E64', 'End of Existence', 'This class comprises events that end the existence of any instance of E77 Persistent Item.
+It may be used for temporal reasoning about things (physical items, groups of people, living beings) ceasing to exist; it serves as a hook for determination of a “terminus post quem” or “terminus ante quem”. In cases where substance from an instance of E64 Persistent Item continues to exist in a new form, the process would be documented as instances of E81 Transformation.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (33, 'E65', 'Creation', 'This class comprises events that result in the creation of conceptual items or immaterial products, such as legends, poems, texts, music, images, movies, laws, types etc.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (34, 'E63', 'Beginning of Existence', 'This class comprises events that bring into existence any instance of E77 Persistent Item.
+It may be used for temporal reasoning about things (intellectual products, physical items, groups of people, living beings) beginning to exist; it serves as a hook for determination of a “terminus post quem” or “terminus ante quem”.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (35, 'E42', 'Identifier', 'This class comprises strings or codes assigned to instances of E1 CRM Entity in order to identify them uniquely and permanently within the context of one or more organisations. Such codes are often known as inventory numbers, registration codes, etc. and are typically composed of alphanumeric sequences. Postal addresses, telephone numbers, urls and e-mail addresses are characteristic examples of identifiers used by services transporting things between clients.
+The class E42 Identifier is not normally used for machine-generated identifiers used for automated processing unless these are also used by human agents.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (36, 'E81', 'Transformation', 'This class comprises the events that result in the simultaneous destruction of one or more than one E18 Physical Thing and the creation of one or more than one E18 Physical Thing that preserves recognizable substance and structure from the first one(s) but has fundamentally different nature or identity.
 Although the old and the new instances of E18 Physical Thing are treated as discrete entities having separate, unique identities, they are causally connected through the E81 Transformation; the destruction of the old E18 Physical Thing(s) directly causes the creation of the new one(s) using or preserving some relevant substance and structure. Instances of E81 Transformation are therefore distinct from re-classifications (documented using E17 Type Assignment) or modifications (documented using E11 Modification) of objects that do not fundamentally change their nature or identity. Characteristic cases are reconstructions and repurposing of historical buildings or ruins, fires leaving buildings in ruins, taxidermy of specimen in natural history.
-Even though such instances of E81 Transformation are often motivated by a change of intended use, substantial material changes should justify the documentation of the result as a new instance of E18 Physical Thing and not just the change of function. The latter may be documented as an extended activity (instance of E7 Activity) of using it.'),
-	(37, 'E78', 'Curated Holding', 'This class comprises aggregations of instances of E18 Physical Thing that are assembled and maintained (“curated” and “preserved,” in museological terminology) by one or more instances of E39 Actor over time for a specific purpose and audience, and according to a particular collection development plan. Typical instances of curated holdings are museum collections, archives, library holdings and digital libraries. A digital library is regarded as an instance of E18 Physical Thing because it requires keeping physical carriers of the electronic content.
+Even though such instances of E81 Transformation are often motivated by a change of intended use, substantial material changes should justify the documentation of the result as a new instance of E18 Physical Thing and not just the change of function. The latter may be documented as an extended activity (instance of E7 Activity) of using it.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (37, 'E78', 'Curated Holding', 'This class comprises aggregations of instances of E18 Physical Thing that are assembled and maintained (“curated” and “preserved,” in museological terminology) by one or more instances of E39 Actor over time for a specific purpose and audience, and according to a particular collection development plan. Typical instances of curated holdings are museum collections, archives, library holdings and digital libraries. A digital library is regarded as an instance of E18 Physical Thing because it requires keeping physical carriers of the electronic content.
 Items may be added or removed from an E78 Curated Holding in pursuit of this plan. This class should not be confused with the E39 Actor maintaining the E78 Curated Holding often referred to with the name of the E78 Curated Holding (e.g., “The Wallace Collection decided…”).
-Collective objects in the general sense, like a tomb full of gifts, a folder with stamps or a set of chessmen, should be documented as instances of E19 Physical Object, and not as instances of E78 Curated Holding. This is because they form wholes either because they are physically bound together or because they are kept together for their functionality.'),
-	(38, 'E58', 'Measurement Unit', 'This class is a specialization of E55 Type and comprises the types of measurement units: feet, inches, centimetres, litres, lumens, etc.
+Collective objects in the general sense, like a tomb full of gifts, a folder with stamps or a set of chessmen, should be documented as instances of E19 Physical Object, and not as instances of E78 Curated Holding. This is because they form wholes either because they are physically bound together or because they are kept together for their functionality.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (38, 'E58', 'Measurement Unit', 'This class is a specialization of E55 Type and comprises the types of measurement units: feet, inches, centimetres, litres, lumens, etc.
 This type is used categorically in the model without reference to instances of it, i.e., the Model does not foresee the description of instances of instances of E58 Measurement Unit, e.g.: “instances of cm”.
-Système International (SI) units or internationally recognized non-SI terms should be used whenever possible, such as those defined by ISO80000:2009. Archaic Measurement Units used in historical records should be preserved.'),
-	(39, 'E2', 'Temporal Entity', 'This class comprises all phenomena, such as the instances of E4 Periods and E5 Events, which happen over a limited extent in time. This extent in time must be contiguous, i.e., without gaps. In case the defining kinds of phenomena for an instance of E2 Temporal Entity cease to happen, and occur later again at another time, we regard that the former instance of E2 Temporal Entity has ended and a new instance has come into existence. In more intuitive terms, the same event cannot happen twice.
-In some contexts, such phenomena are also called perdurants. This class is disjoint from E77 Persistent Item and is an abstract class that typically has no direct instances. E2 Temporal Entity is specialized into E4 Period, which applies to a particular geographic area (defined with a greater or lesser degree of precision), and E3 Condition State, which applies to instances of E18 Physical Thing.'),
-	(40, 'E17', 'Type Assignment', 'This class comprises the actions of classifying items of whatever kind. Such items include objects, specimens, people, actions and concepts.
-This class allows for the documentation of the context of classification acts in cases where the value of the classification depends on the personal opinion of the classifier, and the date that the classification was made. This class also encompasses the notion of "determination," i.e., the systematic and molecular identification of a specimen in biology.'),
-	(41, 'E53', 'Place', 'This class comprises extents in space, in particular on the surface of the earth, in the pure sense of physics: independent from temporal phenomena and matter.
+Système International (SI) units or internationally recognized non-SI terms should be used whenever possible, such as those defined by ISO80000:2009. Archaic Measurement Units used in historical records should be preserved.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (39, 'E2', 'Temporal Entity', 'This class comprises all phenomena, such as the instances of E4 Periods and E5 Events, which happen over a limited extent in time. This extent in time must be contiguous, i.e., without gaps. In case the defining kinds of phenomena for an instance of E2 Temporal Entity cease to happen, and occur later again at another time, we regard that the former instance of E2 Temporal Entity has ended and a new instance has come into existence. In more intuitive terms, the same event cannot happen twice.
+In some contexts, such phenomena are also called perdurants. This class is disjoint from E77 Persistent Item and is an abstract class that typically has no direct instances. E2 Temporal Entity is specialized into E4 Period, which applies to a particular geographic area (defined with a greater or lesser degree of precision), and E3 Condition State, which applies to instances of E18 Physical Thing.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (40, 'E17', 'Type Assignment', 'This class comprises the actions of classifying items of whatever kind. Such items include objects, specimens, people, actions and concepts.
+This class allows for the documentation of the context of classification acts in cases where the value of the classification depends on the personal opinion of the classifier, and the date that the classification was made. This class also encompasses the notion of "determination," i.e., the systematic and molecular identification of a specimen in biology.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (41, 'E53', 'Place', 'This class comprises extents in space, in particular on the surface of the earth, in the pure sense of physics: independent from temporal phenomena and matter.
 The instances of E53 Place are usually determined by reference to the position of “immobile” objects such as buildings, cities, mountains, rivers, or dedicated geodetic marks, but may also be determined by reference to mobile objects. A Place can be determined by combining a frame of reference and a location with respect to this frame.
 It is sometimes argued that instances of E53 Place are best identified by global coordinates or absolute reference systems. However, relative references are often more relevant in the context of cultural documentation and tend to be more precise. In particular, we are often interested in position in relation to large, mobile objects, such as ships. For example, the Place at which Nelson died is known with reference to a large mobile object – H.M.S Victory. A resolution of this Place in terms of absolute coordinates would require knowledge of the movements of the vessel and the precise time of death, either of which may be revised, and the result would lack historical and cultural relevance.
-Any instance of E18 Physical Thing can serve as a frame of reference for an instance of E53 Place. This may be documented using the property P157 is at rest relative to (provides reference space for).'),
-	(67, 'E87', 'Curation Activity', 'This class comprises the activities that result in the continuity of management and the preservation and evolution of instances of E78 Curated Holding, following an implicit or explicit curation plan.
+Any instance of E18 Physical Thing can serve as a frame of reference for an instance of E53 Place. This may be documented using the property P157 is at rest relative to (provides reference space for).');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (67, 'E87', 'Curation Activity', 'This class comprises the activities that result in the continuity of management and the preservation and evolution of instances of E78 Curated Holding, following an implicit or explicit curation plan.
 It specializes the notion of activity into the curation of a collection and allows the history of curation to be recorded.
-Items are accumulated and organized following criteria like subject, chronological period, material type, style of art etc. and can be added or removed from an instance of E78 Curated Holding for a specific purpose and/or audience. The initial aggregation of items of a collection is regarded as an instance of E12 Production Event while the activity of evolving, preserving and promoting a collection is regarded as an instance of E87 Curation Activity.'),
-	(42, 'E26', 'Physical Feature', 'This class comprises identifiable features that are physically attached in an integral way to particular physical objects.
+Items are accumulated and organized following criteria like subject, chronological period, material type, style of art etc. and can be added or removed from an instance of E78 Curated Holding for a specific purpose and/or audience. The initial aggregation of items of a collection is regarded as an instance of E12 Production Event while the activity of evolving, preserving and promoting a collection is regarded as an instance of E87 Curation Activity.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (42, 'E26', 'Physical Feature', 'This class comprises identifiable features that are physically attached in an integral way to particular physical objects.
 Instances of E26 Physical Feature share many of the attributes of instances of E19 Physical Object. They may have a one-, two- or three-dimensional geometric extent, but there are no natural borders that separate them completely in an objective way from the carrier objects. For example, a doorway is a feature but the door itself, being attached by hinges, is not.
 Instances of E26 Physical Feature can be features in a narrower sense, such as scratches, holes, reliefs, surface colours, reflection zones in an opal crystal or a density change in a piece of wood. In the wider sense, they are portions of particular objects with partially imaginary borders, such as the core of the Earth, an area of property on the surface of the Earth, a landscape or the head of a contiguous marble statue. They can be measured and dated, and it is sometimes possible to state who or what is or was responsible for them. They cannot be separated from the carrier object, but a segment of the carrier object may be identified (or sometimes removed) carrying the complete feature.
-This definition coincides with the definition of "fiat objects" (Smith &amp; Varzi, 2000, pp.401-420), with the exception of aggregates of “bona fide objects”.'),
-	(43, 'E28', 'Conceptual Object', 'This class comprises non-material products of our minds and other human produced data that have become objects of a discourse about their identity, circumstances of creation or historical implication. The production of such information may have been supported by the use of technical devices such as cameras or computers.
+This definition coincides with the definition of "fiat objects" (Smith &amp; Varzi, 2000, pp.401-420), with the exception of aggregates of “bona fide objects”.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (43, 'E28', 'Conceptual Object', 'This class comprises non-material products of our minds and other human produced data that have become objects of a discourse about their identity, circumstances of creation or historical implication. The production of such information may have been supported by the use of technical devices such as cameras or computers.
 Characteristically, instances of this class are created, invented or thought by someone, and then may be documented or communicated between persons. Instances of E28 Conceptual Object have the ability to exist on more than one particular carrier at the same time, such as paper, electronic signals, marks, audio media, paintings, photos, human memories, etc.
-They cannot be destroyed. They exist as long as they can be found on at least one carrier or in at least one human memory. Their existence ends when the last carrier and the last memory are lost.'),
-	(44, 'E19', 'Physical Object', 'This class comprises items of a material nature that are units for documentation and have physical boundaries that separate them completely in an objective way from other objects.
+They cannot be destroyed. They exist as long as they can be found on at least one carrier or in at least one human memory. Their existence ends when the last carrier and the last memory are lost.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (44, 'E19', 'Physical Object', 'This class comprises items of a material nature that are units for documentation and have physical boundaries that separate them completely in an objective way from other objects.
 The class also includes all aggregates of objects made for functional purposes of whatever kind, independent of physical coherence, such as a set of chessmen. Typically, instances of E19 Physical Object can be moved (if not too heavy).
 In some contexts, such objects, except for aggregates, are also called “bona fide objects” (Smith &amp; Varzi, 2000, pp.401-420), i.e., naturally defined objects.
-The decision as to what is documented as a complete item, rather than by its parts or components, may be a purely administrative decision or may be a result of the order in which the item was acquired.'),
-	(45, 'E70', 'Thing', 'This general class comprises discrete, identifiable, instances of E77 Persistent Item that are documented as single units, that either consist of matter or depend on being carried by matter and are characterized by relative stability.
-They may be intellectual products or physical things. They may for instance have a solid physical form, an electronic encoding, or they may be a logical concept or structure.'),
-	(46, 'E77', 'Persistent Item', 'This class comprises items that have persistent characteristics of structural nature substantially related to their identity and their integrity, sometimes known as “endurants” in philosophy. Persistent Items may be physical entities, such as people, animals or things, conceptual entities such as ideas, concepts, products of the imagination or even names.
+The decision as to what is documented as a complete item, rather than by its parts or components, may be a purely administrative decision or may be a result of the order in which the item was acquired.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (45, 'E70', 'Thing', 'This general class comprises discrete, identifiable, instances of E77 Persistent Item that are documented as single units, that either consist of matter or depend on being carried by matter and are characterized by relative stability.
+They may be intellectual products or physical things. They may for instance have a solid physical form, an electronic encoding, or they may be a logical concept or structure.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (46, 'E77', 'Persistent Item', 'This class comprises items that have persistent characteristics of structural nature substantially related to their identity and their integrity, sometimes known as “endurants” in philosophy. Persistent Items may be physical entities, such as people, animals or things, conceptual entities such as ideas, concepts, products of the imagination or even names.
 Instances of E77 Persistent Item may be present or be part of interactions in different periods or events. They can repeatedly be recognized at disparate occasions during their existence by characteristics of structural nature. The respective characteristics need not be exactly the same during all the existence of an instance of E77 Persistent Item. Often, they undergo gradual change, still bearing some similarities with that of previous times, or disappear completely and new emerge. For instance, a person, from the time of being born on, will gradually change all its features and acquire new ones, such as a scar. Even the DNA in different body cells will develop defects and mutations. Nevertheless, relevant characteristics use to be sufficiently similar to recognize the instance for some substantial period of time.
 The more specific criteria that determine the identity of instances of subclasses of E77 Persistent Item may vary considerably and are described of referred to in the respective scope notes. The decision about which exact criteria to use depends on whether the observable behaviour of the respective part of reality such confined conforms to the reasoning the user is interested in. For example, a building can be regarded as no longer existing if it is dismantled and the materials reused in a different configuration. On the other hand, human beings go through radical and profound changes during their life-span, affecting both material composition and form, yet preserve their identity by other criteria, such as being bodily separated from other persons. Similarly, inanimate objects may be subject to exchange of parts and matter. On the opposite, the identity of a (version of a) text of a scientific publication is given by the exact arrangement of its relevant symbols.
 The main classes of objects that fall outside the scope of the E77 Persistent Item class are temporal objects such as periods, events and acts, and descriptive properties.
-An instance of E77 Persistent Item does not require actual knowledge of the identifying features of the instance being currently known. There may be cases, where the actual identifying features of an instance of E77 Persistent Item are not decidable at a particular state of knowledge.'),
-	(47, 'E98', 'Currency', 'This class comprises the units in which a monetary system, supported by an administrative authority or other community, quantifies and arithmetically compares all monetary amounts declared in the unit. The unit of a monetary system must describe a nominal value which is kept constant by its administrative authority and an associated banking system if it exists, and not by market value. For instance, one may pay with grams of gold, but the respective monetary amount would have been agreed as the gold price in US dollars on the day of the payment. Under this definition, British Pounds, U.S. Dollars, and European Euros are examples of currency, but “grams of gold” is not. One monetary system has one and only one currency. Instances of this class must not be confused with coin denominations, such as “Dime” or “Sestertius”. Non-monetary exchange of value in terms of quantities of a particular type of goods, such as cows, do not constitute a currency.'),
-	(48, 'E27', 'Site', 'This class comprises pieces of land or sea floor.
+An instance of E77 Persistent Item does not require actual knowledge of the identifying features of the instance being currently known. There may be cases, where the actual identifying features of an instance of E77 Persistent Item are not decidable at a particular state of knowledge.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (47, 'E98', 'Currency', 'This class comprises the units in which a monetary system, supported by an administrative authority or other community, quantifies and arithmetically compares all monetary amounts declared in the unit. The unit of a monetary system must describe a nominal value which is kept constant by its administrative authority and an associated banking system if it exists, and not by market value. For instance, one may pay with grams of gold, but the respective monetary amount would have been agreed as the gold price in US dollars on the day of the payment. Under this definition, British Pounds, U.S. Dollars, and European Euros are examples of currency, but “grams of gold” is not. One monetary system has one and only one currency. Instances of this class must not be confused with coin denominations, such as “Dime” or “Sestertius”. Non-monetary exchange of value in terms of quantities of a particular type of goods, such as cows, do not constitute a currency.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (48, 'E27', 'Site', 'This class comprises pieces of land or sea floor.
 In contrast to the purely geometric notion of E53 Place, this class describes constellations of matter on the surface of the Earth or other celestial body, which can be represented by photographs, paintings and maps.
-Instances of E27 Site are composed of relatively immobile material items and features in a particular configuration at a particular location.'),
-	(49, 'E35', 'Title', 'This class comprises textual strings that within a cultural context can be clearly identified as titles due to their form. Being a subclass of E41 Appellation, E35 Title can only be used when such a string is actually used as a title of a work, such as a text, an artwork, or a piece of music.
+Instances of E27 Site are composed of relatively immobile material items and features in a particular configuration at a particular location.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (49, 'E35', 'Title', 'This class comprises textual strings that within a cultural context can be clearly identified as titles due to their form. Being a subclass of E41 Appellation, E35 Title can only be used when such a string is actually used as a title of a work, such as a text, an artwork, or a piece of music.
 Titles are proper noun phrases or verbal phrases, and should not be confused with generic object names such as “chair”, “painting” or “book” (the latter are common nouns that stand for instances of E55 Type). Titles may be assigned by the creator of the work itself, or by a social group.
-This class also comprises the translations of titles that are used as surrogates for the original titles in different social contexts.'),
-	(50, 'E29', 'Design or Procedure', 'This class comprises documented plans for the execution of actions in order to achieve a result of a specific quality, form or contents. In particular, it comprises plans for deliberate human activities that may result in new instances of E71 Human-Made Thing or for shaping or guiding the execution of an instance of E7 Activity.
+This class also comprises the translations of titles that are used as surrogates for the original titles in different social contexts.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (50, 'E29', 'Design or Procedure', 'This class comprises documented plans for the execution of actions in order to achieve a result of a specific quality, form or contents. In particular, it comprises plans for deliberate human activities that may result in new instances of E71 Human-Made Thing or for shaping or guiding the execution of an instance of E7 Activity.
 Instances of E29 Design or Procedure can be structured in parts and sequences or depend on others.
 This is modelled using P69 has association with (is associated with): E29 Design or Procedure.
 Designs or procedures can be seen as one of the following
 1. A schema for the activities it describes
 2. A schema of the products that result from their application.
 3. An independent intellectual product that may have never been applied, such as Leonardo da Vinci’s famous plans for flying machines.
-Because designs or procedures may never be applied or only partially executed, the CIDOC CRM models a loose relationship between the plan and the respective product.'),
-	(51, 'E83', 'Type Creation', 'This class comprises activities formally defining new types of items.
-It is typically a rigorous scholarly or scientific process that ensures a type is exhaustively described and appropriately named. In some cases, particularly in archaeology and the life sciences, E83 Type Creation requires the identification of an exemplary specimen and the publication of the type definition in an appropriate scholarly forum. The activity modelled as an instance of E83 Type Creation is central to research in the life sciences, where a type would be referred to as a “taxon,” the type description as a “protologue,” and the exemplary specimens as “original element” or “holotype”.'),
-	(52, 'E74', 'Group', 'This class comprises any gatherings or organizations of human individuals or groups that act collectively or in a similar way due to any form of unifying relationship. In the wider sense this class also comprises official positions which used to be regarded in certain contexts as one actor, independent of the current holder of the office, such as the president of a country. In such cases, it may happen that the group never had more than one member. A joint pseudonym (i.e., a name that seems indicative of an individual but that is actually used as a persona by two or more people) is a particular case of E74 Group.
-A gathering of people becomes an instance of E74 Group when it exhibits organizational characteristics usually typified by a set of ideas or beliefs held in common, or actions performed together. These might be communication, creating some common artifact, a common purpose such as study, worship, business, sports, etc. Nationality can be modelled as membership in an instance of E74 Group. Married couples and other concepts of family are regarded as particular examples of E74 Group.'),
-	(53, 'E25', 'Human-Made Feature', 'This class comprises physical features that are purposely created by human activity, such as scratches, artificial caves, artificial water channels, etc. In particular, it includes the information encoding features on mechanical or digital carriers.'),
-	(54, 'E22', 'Human-Made Object', 'This class comprises all persistent physical objects of any size that are purposely created by human activity and have physical boundaries that separate them completely in an objective way from other objects.
-The class also includes all aggregates of objects made for functional purposes of whatever kind, independent of physical coherence, such as a set of chessmen.'),
-	(55, 'E72', 'Legal Object', 'This class comprises those material or immaterial items to which instances of E30 Right, such as the right of ownership or use, can be applied.
-This is true for all instances of E18 Physical Thing. In the case of instances of E28 Conceptual Object, however, the identity of an instance of E28 Conceptual Object or the method of its use may be too ambiguous to reliably establish instances of E30 Right, as in the case of taxa and inspirations. Ownership of corporations is currently regarded as out of scope of the CIDOC CRM.'),
-	(56, 'E32', 'Authority Document', 'This class comprises encyclopaedia, thesauri, authority lists and other documents that define terminology or conceptual systems for consistent use.'),
-	(57, 'E34', 'Inscription', 'This class comprises recognisable, texts attached to instances of E24 Physical Human-Made Thing.
+Because designs or procedures may never be applied or only partially executed, the CIDOC CRM models a loose relationship between the plan and the respective product.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (51, 'E83', 'Type Creation', 'This class comprises activities formally defining new types of items.
+It is typically a rigorous scholarly or scientific process that ensures a type is exhaustively described and appropriately named. In some cases, particularly in archaeology and the life sciences, E83 Type Creation requires the identification of an exemplary specimen and the publication of the type definition in an appropriate scholarly forum. The activity modelled as an instance of E83 Type Creation is central to research in the life sciences, where a type would be referred to as a “taxon,” the type description as a “protologue,” and the exemplary specimens as “original element” or “holotype”.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (52, 'E74', 'Group', 'This class comprises any gatherings or organizations of human individuals or groups that act collectively or in a similar way due to any form of unifying relationship. In the wider sense this class also comprises official positions which used to be regarded in certain contexts as one actor, independent of the current holder of the office, such as the president of a country. In such cases, it may happen that the group never had more than one member. A joint pseudonym (i.e., a name that seems indicative of an individual but that is actually used as a persona by two or more people) is a particular case of E74 Group.
+A gathering of people becomes an instance of E74 Group when it exhibits organizational characteristics usually typified by a set of ideas or beliefs held in common, or actions performed together. These might be communication, creating some common artifact, a common purpose such as study, worship, business, sports, etc. Nationality can be modelled as membership in an instance of E74 Group. Married couples and other concepts of family are regarded as particular examples of E74 Group.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (53, 'E25', 'Human-Made Feature', 'This class comprises physical features that are purposely created by human activity, such as scratches, artificial caves, artificial water channels, etc. In particular, it includes the information encoding features on mechanical or digital carriers.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (54, 'E22', 'Human-Made Object', 'This class comprises all persistent physical objects of any size that are purposely created by human activity and have physical boundaries that separate them completely in an objective way from other objects.
+The class also includes all aggregates of objects made for functional purposes of whatever kind, independent of physical coherence, such as a set of chessmen.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (55, 'E72', 'Legal Object', 'This class comprises those material or immaterial items to which instances of E30 Right, such as the right of ownership or use, can be applied.
+This is true for all instances of E18 Physical Thing. In the case of instances of E28 Conceptual Object, however, the identity of an instance of E28 Conceptual Object or the method of its use may be too ambiguous to reliably establish instances of E30 Right, as in the case of taxa and inspirations. Ownership of corporations is currently regarded as out of scope of the CIDOC CRM.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (56, 'E32', 'Authority Document', 'This class comprises encyclopaedia, thesauri, authority lists and other documents that define terminology or conceptual systems for consistent use.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (57, 'E34', 'Inscription', 'This class comprises recognisable, texts attached to instances of E24 Physical Human-Made Thing.
 The transcription of the text can be documented in a note by P3 has note: E62 String. The alphabet used can be documented by P2 has type: E55 Type. This class does not intend to describe the idiosyncratic characteristics of an individual physical embodiment of an inscription, but the underlying prototype. The physical embodiment is modelled in the CIDOC CRM as instances of E24 Physical Human-Made Thing.
-The relationship of a physical copy of a book to the text it contains is modelled using E18 Physical Thing. P128 carries (is carried by): E33 Linguistic Object.'),
-	(58, 'E80', 'Part Removal', 'This class comprises the activities that result in an instance of E18 Physical Thing being decreased by the removal of a part.
-Typical scenarios include the detachment of an accessory, the removal of a component or part of a composite object, or the deaccessioning of an object from a curated collection, an instance of E78 Curated Holding. If the instance of E80 Part Removal results in the total decomposition of the original object into pieces, such that the whole ceases to exist, the activity should instead be modelled as an instance of E81 Transformation, i.e., a simultaneous destruction and production. In cases where the part removed has no discernible identity prior to its removal but does have an identity subsequent to its removal, the activity should be modelled as both an instance of E80 Part Removal and E12 Production. This class of activities forms a basis for reasoning about the history, and continuity of identity over time, of objects that are removed from other objects, such as precious gemstones being extracted from different items of jewellry, or cultural artifacts being deaccessioned from different museum collections over their lifespan.'),
-	(59, 'E56', 'Language', 'This class is a specialization of E55 Type and comprises the natural languages in the sense of concepts.
+The relationship of a physical copy of a book to the text it contains is modelled using E18 Physical Thing. P128 carries (is carried by): E33 Linguistic Object.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (58, 'E80', 'Part Removal', 'This class comprises the activities that result in an instance of E18 Physical Thing being decreased by the removal of a part.
+Typical scenarios include the detachment of an accessory, the removal of a component or part of a composite object, or the deaccessioning of an object from a curated collection, an instance of E78 Curated Holding. If the instance of E80 Part Removal results in the total decomposition of the original object into pieces, such that the whole ceases to exist, the activity should instead be modelled as an instance of E81 Transformation, i.e., a simultaneous destruction and production. In cases where the part removed has no discernible identity prior to its removal but does have an identity subsequent to its removal, the activity should be modelled as both an instance of E80 Part Removal and E12 Production. This class of activities forms a basis for reasoning about the history, and continuity of identity over time, of objects that are removed from other objects, such as precious gemstones being extracted from different items of jewellry, or cultural artifacts being deaccessioned from different museum collections over their lifespan.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (59, 'E56', 'Language', 'This class is a specialization of E55 Type and comprises the natural languages in the sense of concepts.
 This type is used categorically in the model without reference to instances of it, i.e., the Model does not foresee the description of instances of instances of E56 Language, e.g.: “instances of Mandarin Chinese”.
-It is recommended that internationally or nationally agreed codes and terminology are used to denote instances of E56 Language, such as those defined in ISO 639-1:2002 and later versions.'),
-	(68, 'E96', 'Purchase', 'This class comprises transfers of legal ownership from one or more instances of E39 Actor to one or more different instances of E39 Actor, where the transferring party is completely compensated by the payment of a monetary amount. In more detail, a purchase agreement establishes a fixed monetary obligation at its initialization on the receiving party, to the giving party. An instance of E96 Purchase begins with the contract or equivalent agreement and ends with the fulfilment of all contractual obligations. In the case that the activity is abandoned before both parties have fulfilled these obligations, the activity is not regarded as an instance of E96 Purchase.
-This class is a very specific case of the much more complex social business practices of exchange of goods and the creation and satisfaction of related social obligations. Purchase activities which define individual sales prices per object can be modelled by instantiating E96 Purchase for each object individually and as part of an overall instance of E96 Purchase transaction.'),
-	(60, 'E79', 'Part Addition', 'This class comprises activities that result in an instance of E24 Physical Human-Made Thing being increased, enlarged or augmented by the addition of a part.
-Typical scenarios include the attachment of an accessory, the integration of a component, the addition of an element to an aggregate object, or the accessioning of an object into a curated instance of E78 Curated Holding. Objects to which parts are added are, by definition, human-made, since the addition of a part implies a human activity. Following the addition of parts, the resulting human-made assemblages are treated objectively as single identifiable wholes, made up of constituent or component parts bound together either physically (for example the engine becoming a part of the car), or by sharing a common purpose (such as the 32 chess pieces that make up a chess set). This class of activities forms a basis for reasoning about the history and continuity of identity of objects that are integrated into other objects over time, such as precious gemstones being repeatedly incorporated into different items of jewellery, or cultural artifacts being added to different museum instances of E78 Curated Holding over their lifespan.'),
-	(61, 'E13', 'Attribute Assignment', 'This class comprises the actions of making assertions about one property of an object or any single relation between two items or concepts. The type of the property asserted to hold between two items or concepts can be described by the property P177 assigned property type: E55 Type.
+It is recommended that internationally or nationally agreed codes and terminology are used to denote instances of E56 Language, such as those defined in ISO 639-1:2002 and later versions.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (60, 'E79', 'Part Addition', 'This class comprises activities that result in an instance of E24 Physical Human-Made Thing being increased, enlarged or augmented by the addition of a part.
+Typical scenarios include the attachment of an accessory, the integration of a component, the addition of an element to an aggregate object, or the accessioning of an object into a curated instance of E78 Curated Holding. Objects to which parts are added are, by definition, human-made, since the addition of a part implies a human activity. Following the addition of parts, the resulting human-made assemblages are treated objectively as single identifiable wholes, made up of constituent or component parts bound together either physically (for example the engine becoming a part of the car), or by sharing a common purpose (such as the 32 chess pieces that make up a chess set). This class of activities forms a basis for reasoning about the history and continuity of identity of objects that are integrated into other objects over time, such as precious gemstones being repeatedly incorporated into different items of jewellery, or cultural artifacts being added to different museum instances of E78 Curated Holding over their lifespan.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (61, 'E13', 'Attribute Assignment', 'This class comprises the actions of making assertions about one property of an object or any single relation between two items or concepts. The type of the property asserted to hold between two items or concepts can be described by the property P177 assigned property type: E55 Type.
 For example, the class describes the actions of people making propositions and statements during certain scientific/scholarly procedures, e.g., the person and date when a condition statement was made, an identifier was assigned, the museum object was measured, etc. Which kinds of such assignments and statements need to be documented explicitly in structures of a schema rather than free text, depends on whether this information should be accessible by structured queries.
 This class allows for the documentation of how the respective assignment came about, and whose opinion it was. Note that all instances of properties described in a knowledge base are the opinion of someone. Per default, they are the opinion of the team maintaining the knowledge base. This fact must not individually be registered for all instances of properties provided by the maintaining team, because it would result in an endless recursion of whose opinion was the description of an opinion. Therefore, the use of instances of E13 Attribute Assignment marks the fact, that the maintaining team is in general neutral to the validity of the respective assertion, but registers someone else’s opinion and how it came about.
 All properties assigned in such an action can also be seen as directly relating the respective pair of items or concepts. Multiple use of instances of E13 Attribute Assignment may possibly lead to a collection of contradictory values.
-All cases of properties in this model that are also described indirectly through a subclass of E13 Attribute Assignment are characterised as "short cuts" of a path via this subclass. This redundant modelling of two alternative views is preferred because many implementations may have good reasons to model either the action of assertion or the short cut, and the relation between both alternatives can be captured by simple rules.'),
-	(62, 'E37', 'Mark', 'This class comprises symbols, signs, signatures or short texts applied to instances of E24 Physical Human-Made Thing by arbitrary techniques, often in order to indicate such things as creator, owner, dedications, purpose or to communicate information generally. Instances of E37 Mark do not represent the actual image of a mark, but the abstract ideal (or archetype) as used for codification in reference documents forming cultural documentation.
-This class specifically excludes features that have no semantic significance, such as scratches or tool marks. These should be documented as instances of E25 Human-Made Feature.'),
-	(63, 'E90', 'Symbolic Object', 'This class comprises identifiable symbols and any aggregation of symbols, such as characters, identifiers, traffic signs, emblems, texts, data sets, images, musical scores, multimedia objects, computer program code or mathematical formulae that have an objectively recognizable structure and that are documented as single units.
+All cases of properties in this model that are also described indirectly through a subclass of E13 Attribute Assignment are characterised as "short cuts" of a path via this subclass. This redundant modelling of two alternative views is preferred because many implementations may have good reasons to model either the action of assertion or the short cut, and the relation between both alternatives can be captured by simple rules.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (62, 'E37', 'Mark', 'This class comprises symbols, signs, signatures or short texts applied to instances of E24 Physical Human-Made Thing by arbitrary techniques, often in order to indicate such things as creator, owner, dedications, purpose or to communicate information generally. Instances of E37 Mark do not represent the actual image of a mark, but the abstract ideal (or archetype) as used for codification in reference documents forming cultural documentation.
+This class specifically excludes features that have no semantic significance, such as scratches or tool marks. These should be documented as instances of E25 Human-Made Feature.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (63, 'E90', 'Symbolic Object', 'This class comprises identifiable symbols and any aggregation of symbols, such as characters, identifiers, traffic signs, emblems, texts, data sets, images, musical scores, multimedia objects, computer program code or mathematical formulae that have an objectively recognizable structure and that are documented as single units.
 It includes sets of signs of any nature, which may serve to designate something, or to communicate some propositional content. An instance of E90 Symbolic Object may or may not have a specific meaning, for example an arbitrary character string.
-In some cases, the content of an instance of E90 Symbolic Object may completely be represented by a serialized digital content model, such as a sequence of ASCII-encoded characters, an XML or HTML document, or a TIFF image. The property P3 has note and its subproperty P190 has symbolic content allow for the description of this content model. In order to disambiguate which symbolic level is the carrier of the meaning, the property P3.1 has type can be used to specify the encoding (e.g., "bit", "Latin character", RGB pixel).'),
-	(64, 'E86', 'Leaving', 'This class comprises the activities that result in an instance of E39 Actor to be disassociated from an instance of E74 Group. This class does not imply initiative by either party. It may be the initiative of a third party.
-Typical scenarios include the termination of membership in a social organisation, ending the employment at a company, divorce, and the end of tenure of somebody in an official position.'),
-	(65, 'E24', 'Physical Human-Made Thing', 'This class comprises all persistent physical items of any size that are purposely created by human activity. This class comprises, besides others, Human-Made objects, such as a sword, and Human-Made features, such as rock art. For example, a “cup and ring” carving on bedrock is regarded as instance of E24 Physical Human-Made Thing.
+In some cases, the content of an instance of E90 Symbolic Object may completely be represented by a serialized digital content model, such as a sequence of ASCII-encoded characters, an XML or HTML document, or a TIFF image. The property P3 has note and its subproperty P190 has symbolic content allow for the description of this content model. In order to disambiguate which symbolic level is the carrier of the meaning, the property P3.1 has type can be used to specify the encoding (e.g., "bit", "Latin character", RGB pixel).');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (64, 'E86', 'Leaving', 'This class comprises the activities that result in an instance of E39 Actor to be disassociated from an instance of E74 Group. This class does not imply initiative by either party. It may be the initiative of a third party.
+Typical scenarios include the termination of membership in a social organisation, ending the employment at a company, divorce, and the end of tenure of somebody in an official position.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (65, 'E24', 'Physical Human-Made Thing', 'This class comprises all persistent physical items of any size that are purposely created by human activity. This class comprises, besides others, Human-Made objects, such as a sword, and Human-Made features, such as rock art. For example, a “cup and ring” carving on bedrock is regarded as instance of E24 Physical Human-Made Thing.
 Instances of Human-Made thing may be the result of modifying pre-existing physical things, preserving larger parts or most of the original matter and structure, which poses the question if they are new or even Human-Made, the respective interventions of production made on such original material should be obvious and sufficient to regard that the product has a new, distinct identity and intended function and is human-made. Substantial continuity of the previous matter and structure in the new product can be documented by describing the production process also as an instance of E81 Transformation.
-Whereas interventions of conservation and repair are not regarded to produce a new Human-Made thing, the results of preparation of natural history specimens that substantially change their natural or original state should be regarded as physical Human-Made things, including the uncovering of petrified biological features from a solid piece of stone. On the other side, scribbling a museum number on a natural object should not be regarded to make it Human-Made. This notwithstanding, parts, sections, segments, or features of a physical Human-Made thing may continue to be non-Human-Made and preserved during the production process, for example natural pearls used as a part of an eardrop.'),
-	(66, 'E93', 'Presence', 'This class comprises instances of E92 Spacetime Volume, whose temporal extent has been chosen in order to determine the spatial extent of a phenomenon over the chosen time-span. Respective phenomena may, for instance, be historical events or periods, but can also be the diachronic extent and existence of physical things. In other words, instances of this class fix a slice of another instance of E92 Spacetime Volume in time.
-The temporal extent of an instance of E93 Presence typically is predetermined by the researcher so as to focus the investigation particularly on finding the spatial extent of the phenomenon by testing for its characteristic features. There are at least two basic directions such investigations might take. The investigation may wish to determine where something was during some time or it may wish to reconstruct the total passage of a phenomenon’s spacetime volume through an examination of discrete presences. Observation and measurement of features indicating the presence or absence of a phenomenon in some space allows for the progressive approximation of spatial extents through argumentation typically based on inclusion, exclusion and various overlaps.'),
-	(69, 'E4', 'Period', 'This class comprises sets of coherent phenomena or cultural manifestations occurring in time and space.
+Whereas interventions of conservation and repair are not regarded to produce a new Human-Made thing, the results of preparation of natural history specimens that substantially change their natural or original state should be regarded as physical Human-Made things, including the uncovering of petrified biological features from a solid piece of stone. On the other side, scribbling a museum number on a natural object should not be regarded to make it Human-Made. This notwithstanding, parts, sections, segments, or features of a physical Human-Made thing may continue to be non-Human-Made and preserved during the production process, for example natural pearls used as a part of an eardrop.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (66, 'E93', 'Presence', 'This class comprises instances of E92 Spacetime Volume, whose temporal extent has been chosen in order to determine the spatial extent of a phenomenon over the chosen time-span. Respective phenomena may, for instance, be historical events or periods, but can also be the diachronic extent and existence of physical things. In other words, instances of this class fix a slice of another instance of E92 Spacetime Volume in time.
+The temporal extent of an instance of E93 Presence typically is predetermined by the researcher so as to focus the investigation particularly on finding the spatial extent of the phenomenon by testing for its characteristic features. There are at least two basic directions such investigations might take. The investigation may wish to determine where something was during some time or it may wish to reconstruct the total passage of a phenomenon’s spacetime volume through an examination of discrete presences. Observation and measurement of features indicating the presence or absence of a phenomenon in some space allows for the progressive approximation of spatial extents through argumentation typically based on inclusion, exclusion and various overlaps.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (68, 'E96', 'Purchase', 'This class comprises transfers of legal ownership from one or more instances of E39 Actor to one or more different instances of E39 Actor, where the transferring party is completely compensated by the payment of a monetary amount. In more detail, a purchase agreement establishes a fixed monetary obligation at its initialization on the receiving party, to the giving party. An instance of E96 Purchase begins with the contract or equivalent agreement and ends with the fulfilment of all contractual obligations. In the case that the activity is abandoned before both parties have fulfilled these obligations, the activity is not regarded as an instance of E96 Purchase.
+This class is a very specific case of the much more complex social business practices of exchange of goods and the creation and satisfaction of related social obligations. Purchase activities which define individual sales prices per object can be modelled by instantiating E96 Purchase for each object individually and as part of an overall instance of E96 Purchase transaction.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (69, 'E4', 'Period', 'This class comprises sets of coherent phenomena or cultural manifestations occurring in time and space.
 It is the social or physical coherence of these phenomena that identify an instance of E4 Period and not the associated spatiotemporal extent. This extent is only the “ground” or space in an abstract physical sense that the actual process of growth, spread and retreat has covered. Consequently, different periods can overlap and coexist in time and space, such as when a nomadic culture exists in the same area and time as a sedentary culture. This also means that overlapping land use rights, common among first nations, amounts to overlapping periods.
 Often, this class is used to describe prehistoric or historic periods such as the “Neolithic Period”, the “Ming Dynasty” or the “McCarthy Era”, but also geopolitical units and activities of settlements are regarded as special cases of E4 Period. However, there are no assumptions about the scale of the associated phenomena. In particular all events are seen as synthetic processes consisting of coherent phenomena. Therefore, E4 Period is a superclass of E5 Event. For example, a modern clinical birth, an instance of E67 Birth, can be seen as both a single event, i.e., an instance of E5 Event, and as an extended period, i.e., an instance of E4 Period, that consists of multiple physical processes and complementary activities performed by multiple instances of E39 Actor.
 As the actual extent of an instance of E4 Period in spacetime we regard the trajectories of the participating physical things during their participation in an instance of E4 Period. This includes the open spaces via which these things have interacted and the spaces by which they had the potential to interact during that period or event in the way defined by the type of the respective period or event. Examples include the air in a meeting room transferring the voices of the participants. Since these phenomena are fuzzy, we assume the spatiotemporal extent to be contiguous, except for cases of phenomena spreading out over islands or other separated areas, including geopolitical units distributed over disconnected areas such as islands or colonies.
@@ -241,25 +277,110 @@ Consequently, an instance of E4 Period may occupy a number of disjoint spacetime
 We model E4 Period as a subclass of E2 Temporal Entity and of E92 Spacetime Volume. The latter is intended as a phenomenal spacetime volume as defined in CIDOC CRMgeo (Doerr &amp; Hiebel, 2013). By virtue of this multiple inheritance, we can discuss the physical extent of an instance of E4 Period without representing each instance of it together with an instance of its associated spacetime volume. This model combines two quite different kinds of substance: an instance of E4 Period is a phenomenon while an instance of E92 Spacetime Volume is an aggregation of points in spacetime. However, the real spatiotemporal extent of an instance of E4 Period is regarded to be unique to it due to all its details and fuzziness; its identity and existence depends uniquely on the identity of the instance of E4 Period. Therefore, this multiple inheritance is unambiguous and effective and furthermore corresponds to the intuitions of natural language.
 Typical use of this class in cultural heritage documentation is for documenting cultural and artistic periods. There are two different conceptualisations of ‘artistic style’, defined either by physical features or by historical context. For example, “Impressionism” can be viewed as a period in the European sphere of influence lasting from approximately 1870 to 1905 during which paintings with particular characteristics were produced by a group of artists that included (among others) Monet, Renoir, Pissarro, Sisley and Degas. Alternatively, it can be regarded as a style applicable to all paintings sharing the characteristics of the works produced by the Impressionist painters, regardless of historical context. The first interpretation is an instance of E4 Period, and the second defines morphological object types that fall under E55 Type.
 A geopolitical unit as a specific case of an instance of E4 Period is the set of activities and phenomena related to the claim of power, the consequences of belonging to a jurisdictional area and an administrative system that establishes a geopolitical unit. Examples from the modern period are countries or administrative areas of countries such as districts whose actions and structures define activities and phenomena in the area that they intend to govern. The borders of geopolitical units are often defined in contracts or treaties although they may deviate from the actual practice. The spatiotemporal properties of Geopolitical units can be modelled through the properties inherited from E92 Spacetime Volume.
-Another specific case of an instance of E4 Period is the actual extent of the set of activities and phenomena as evidenced by their physical traces that define a settlement, such as the populated period of Nineveh.'),
-	(70, 'E73', 'Information Object', 'This class comprises identifiable immaterial items, such as poems, jokes, data sets, images, texts, multimedia objects, procedural prescriptions, computer program code, algorithm or mathematical formulae, that have an objectively recognizable structure and are documented as single units. The encoding structure known as a "named graph" also falls under this class, so that each "named graph" is an instance of E73 Information Object.
+Another specific case of an instance of E4 Period is the actual extent of the set of activities and phenomena as evidenced by their physical traces that define a settlement, such as the populated period of Nineveh.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (70, 'E73', 'Information Object', 'This class comprises identifiable immaterial items, such as poems, jokes, data sets, images, texts, multimedia objects, procedural prescriptions, computer program code, algorithm or mathematical formulae, that have an objectively recognizable structure and are documented as single units. The encoding structure known as a "named graph" also falls under this class, so that each "named graph" is an instance of E73 Information Object.
 An instance of E73 Information Object does not depend on a specific physical carrier, which can include human memory, and it can exist on one or more carriers simultaneously.
-Instances of E73 Information Object of a linguistic nature should be declared as instances of the E33 Linguistic Object subclass. Instances of E73 Information Object of a documentary nature should be declared as instances of the E31 Document subclass. Conceptual items such as types and classes are not instances of E73 Information Object, nor are ideas without a reproducible expression.'),
-	(71, 'E99', 'Product Type', 'This classes comprises types that stand as the models for instances of E22 Human-Made Object that are produced as the result of production activities using plans exact enough to result in one or more series of uniform, functionally and aesthetically identical and interchangeable items. The product type is the intended ideal form of the manufacture process. It is typical of instances of E22 that conform to an instance of E99 Product Type that its component parts are interchangeable with component parts of other instances of E22 made after the model of the same instance of E99. Frequently, the uniform production according to a given instance of E99 Product Type is achieved by creating individual tools, such as moulds or print plates that are themselves carriers of the design of the product type. Modern tools may use the flexibility of electronically controlled devices to achieve such uniformity. The product type itself, i.e., the potentially unlimited series of aesthetically equivalent items, may be the target of artistic design, rather than the individual object. In extreme cases, only one instance of a product type may have been produced, such as in a "print on demand" process which was only triggered once. However, this should not be confused with industrial prototypes, such as car prototypes, which are produced prior to the production line being set up, or test the production line itself.'),
-	(72, 'E71', 'Human-Made Thing', 'This class comprises discrete, identifiable human-made items that are documented as single units.
-These items are either intellectual products or human-made physical things, and are characterized by relative stability. They may for instance have a solid physical form, an electronic encoding, or they may be logical concepts or structures.'),
-	(73, 'E67', 'Birth', 'This class comprises the births of human beings. E67 Birth is a biological event focussing on the context of people coming into life. (E63 Beginning of Existence comprises the coming into life of any living being).
-Twins, triplets etc. are typically brought into life by the same instance of E67 Birth. The introduction of E67 Birth as a documentation element allows the description of a range of family relationships in a simple model. Suitable extensions may describe more details and the complexity of motherhood with the intervention of modern medicine. In this model, the biological father is not seen as a necessary participant in the birth.'),
-	(74, 'E92', 'Spacetime Volume', 'This class comprises 4-dimensional point sets (volumes) in physical spacetime (in contrast to mathematical models of it) regardless their true geometric forms. They may derive their identity from being the extent of a material phenomenon or from being the interpretation of an expression defining an extent in spacetime. Intersections of instances of E92 Spacetime Volume, E53 Place and E52 Timespan are also regarded as instances of E92 Spacetime Volume. An instance of E92 Spacetime Volume is either contiguous or composed of a finite number of contiguous subsets. Its boundaries may be fuzzy due to the properties of the phenomena it derives from or due to the limited precision up to which defining expression can be identified with a real extent in spacetime. The duration of existence of an instance of E92 Spacetime Volume is its projection on time.'),
-	(75, 'E69', 'Death', 'This class comprises the deaths of human beings.
+Instances of E73 Information Object of a linguistic nature should be declared as instances of the E33 Linguistic Object subclass. Instances of E73 Information Object of a documentary nature should be declared as instances of the E31 Document subclass. Conceptual items such as types and classes are not instances of E73 Information Object, nor are ideas without a reproducible expression.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (71, 'E99', 'Product Type', 'This classes comprises types that stand as the models for instances of E22 Human-Made Object that are produced as the result of production activities using plans exact enough to result in one or more series of uniform, functionally and aesthetically identical and interchangeable items. The product type is the intended ideal form of the manufacture process. It is typical of instances of E22 that conform to an instance of E99 Product Type that its component parts are interchangeable with component parts of other instances of E22 made after the model of the same instance of E99. Frequently, the uniform production according to a given instance of E99 Product Type is achieved by creating individual tools, such as moulds or print plates that are themselves carriers of the design of the product type. Modern tools may use the flexibility of electronically controlled devices to achieve such uniformity. The product type itself, i.e., the potentially unlimited series of aesthetically equivalent items, may be the target of artistic design, rather than the individual object. In extreme cases, only one instance of a product type may have been produced, such as in a "print on demand" process which was only triggered once. However, this should not be confused with industrial prototypes, such as car prototypes, which are produced prior to the production line being set up, or test the production line itself.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (72, 'E71', 'Human-Made Thing', 'This class comprises discrete, identifiable human-made items that are documented as single units.
+These items are either intellectual products or human-made physical things, and are characterized by relative stability. They may for instance have a solid physical form, an electronic encoding, or they may be logical concepts or structures.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (73, 'E67', 'Birth', 'This class comprises the births of human beings. E67 Birth is a biological event focussing on the context of people coming into life. (E63 Beginning of Existence comprises the coming into life of any living being).
+Twins, triplets etc. are typically brought into life by the same instance of E67 Birth. The introduction of E67 Birth as a documentation element allows the description of a range of family relationships in a simple model. Suitable extensions may describe more details and the complexity of motherhood with the intervention of modern medicine. In this model, the biological father is not seen as a necessary participant in the birth.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (74, 'E92', 'Spacetime Volume', 'This class comprises 4-dimensional point sets (volumes) in physical spacetime (in contrast to mathematical models of it) regardless their true geometric forms. They may derive their identity from being the extent of a material phenomenon or from being the interpretation of an expression defining an extent in spacetime. Intersections of instances of E92 Spacetime Volume, E53 Place and E52 Timespan are also regarded as instances of E92 Spacetime Volume. An instance of E92 Spacetime Volume is either contiguous or composed of a finite number of contiguous subsets. Its boundaries may be fuzzy due to the properties of the phenomena it derives from or due to the limited precision up to which defining expression can be identified with a real extent in spacetime. The duration of existence of an instance of E92 Spacetime Volume is its projection on time.');
+INSERT INTO model.cidoc_class (id, code, name, comment) VALUES (75, 'E69', 'Death', 'This class comprises the deaths of human beings.
 If a person is killed, the death should be documented as an instance of both E69 Death and E7 Activity. The death or perishing of other living beings should be documented as instances of E64 End of Existence.');
 
+INSERT INTO model.cidoc_class_inheritance (id, super_code, sub_code) VALUES
+	(1, 'E13', 'E15'),
+	(2, 'E63', 'E12'),
+	(3, 'E11', 'E12'),
+	(4, 'E77', 'E39'),
+	(5, 'E5', 'E7'),
+	(6, 'E73', 'E33'),
+	(8, 'E41', 'E33'),
+	(9, 'E7', 'E66'),
+	(10, 'E63', 'E66'),
+	(11, 'E55', 'E57'),
+	(12, 'E1', 'E52'),
+	(13, 'E28', 'E55'),
+	(14, 'E2', 'E3'),
+	(15, 'E20', 'E21'),
+	(16, 'E39', 'E21'),
+	(17, 'E7', 'E10'),
+	(18, 'E4', 'E5'),
+	(19, 'E64', 'E6'),
+	(20, 'E19', 'E20'),
+	(21, 'E1', 'E54'),
+	(22, 'E7', 'E85'),
+	(23, 'E54', 'E97'),
+	(24, 'E89', 'E30'),
+	(25, 'E90', 'E41'),
+	(26, 'E7', 'E9'),
+	(27, 'E73', 'E31'),
+	(28, 'E7', 'E8'),
+	(29, 'E73', 'E36'),
+	(30, 'E7', 'E11'),
+	(31, 'E13', 'E16'),
+	(32, 'E28', 'E89'),
+	(33, 'E72', 'E18'),
+	(34, 'E13', 'E14'),
+	(35, 'E64', 'E68'),
+	(36, 'E5', 'E64'),
+	(37, 'E63', 'E65'),
+	(38, 'E7', 'E65'),
+	(39, 'E5', 'E63'),
+	(40, 'E41', 'E42'),
+	(41, 'E63', 'E81'),
+	(42, 'E64', 'E81'),
+	(43, 'E24', 'E78'),
+	(44, 'E55', 'E58'),
+	(45, 'E1', 'E2'),
+	(46, 'E13', 'E17'),
+	(47, 'E1', 'E53'),
+	(48, 'E18', 'E26'),
+	(49, 'E71', 'E28'),
+	(50, 'E18', 'E19'),
+	(51, 'E77', 'E70'),
+	(52, 'E1', 'E77'),
+	(53, 'E58', 'E98'),
+	(54, 'E26', 'E27'),
+	(55, 'E33', 'E35'),
+	(56, 'E41', 'E35'),
+	(57, 'E73', 'E29'),
+	(58, 'E65', 'E83'),
+	(59, 'E39', 'E74'),
+	(60, 'E26', 'E25'),
+	(61, 'E24', 'E25'),
+	(62, 'E19', 'E22'),
+	(63, 'E24', 'E22'),
+	(64, 'E70', 'E72'),
+	(65, 'E31', 'E32'),
+	(66, 'E37', 'E34'),
+	(67, 'E33', 'E34'),
+	(68, 'E11', 'E80'),
+	(69, 'E55', 'E56'),
+	(70, 'E11', 'E79'),
+	(71, 'E7', 'E13'),
+	(72, 'E36', 'E37'),
+	(73, 'E28', 'E90'),
+	(74, 'E72', 'E90'),
+	(75, 'E7', 'E86'),
+	(76, 'E18', 'E24'),
+	(77, 'E71', 'E24'),
+	(78, 'E92', 'E93'),
+	(79, 'E7', 'E87'),
+	(80, 'E8', 'E96'),
+	(81, 'E2', 'E4'),
+	(82, 'E92', 'E4'),
+	(83, 'E90', 'E73'),
+	(84, 'E89', 'E73'),
+	(85, 'E55', 'E99'),
+	(86, 'E70', 'E71'),
+	(87, 'E63', 'E67'),
+	(88, 'E1', 'E92'),
+	(89, 'E64', 'E69');
 
---
--- Data for Name: cidoc_class_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.cidoc_class_i18n VALUES
+INSERT INTO model.cidoc_class_i18n (id, class_code, language_code, text) VALUES
 	(1, 'E15', 'de', 'Kennzeichenzuweisung'),
 	(2, 'E15', 'en', 'Identifier Assignment'),
 	(3, 'E15', 'fr', 'Attribution d’identificateur'),
@@ -700,107 +821,7 @@ INSERT INTO model.cidoc_class_i18n VALUES
 	(438, 'E69', 'pt', 'Morte'),
 	(439, 'E69', 'zh', '死亡');
 
-
---
--- Data for Name: cidoc_class_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.cidoc_class_inheritance VALUES
-	(1, 'E13', 'E15'),
-	(2, 'E63', 'E12'),
-	(3, 'E11', 'E12'),
-	(4, 'E77', 'E39'),
-	(5, 'E5', 'E7'),
-	(6, 'E73', 'E33'),
-	(8, 'E41', 'E33'),
-	(9, 'E7', 'E66'),
-	(10, 'E63', 'E66'),
-	(11, 'E55', 'E57'),
-	(12, 'E1', 'E52'),
-	(13, 'E28', 'E55'),
-	(14, 'E2', 'E3'),
-	(15, 'E20', 'E21'),
-	(16, 'E39', 'E21'),
-	(17, 'E7', 'E10'),
-	(18, 'E4', 'E5'),
-	(19, 'E64', 'E6'),
-	(20, 'E19', 'E20'),
-	(21, 'E1', 'E54'),
-	(22, 'E7', 'E85'),
-	(23, 'E54', 'E97'),
-	(24, 'E89', 'E30'),
-	(25, 'E90', 'E41'),
-	(26, 'E7', 'E9'),
-	(27, 'E73', 'E31'),
-	(28, 'E7', 'E8'),
-	(29, 'E73', 'E36'),
-	(30, 'E7', 'E11'),
-	(31, 'E13', 'E16'),
-	(32, 'E28', 'E89'),
-	(33, 'E72', 'E18'),
-	(34, 'E13', 'E14'),
-	(35, 'E64', 'E68'),
-	(36, 'E5', 'E64'),
-	(37, 'E63', 'E65'),
-	(38, 'E7', 'E65'),
-	(39, 'E5', 'E63'),
-	(40, 'E41', 'E42'),
-	(41, 'E63', 'E81'),
-	(42, 'E64', 'E81'),
-	(43, 'E24', 'E78'),
-	(44, 'E55', 'E58'),
-	(45, 'E1', 'E2'),
-	(46, 'E13', 'E17'),
-	(47, 'E1', 'E53'),
-	(48, 'E18', 'E26'),
-	(49, 'E71', 'E28'),
-	(50, 'E18', 'E19'),
-	(51, 'E77', 'E70'),
-	(52, 'E1', 'E77'),
-	(53, 'E58', 'E98'),
-	(54, 'E26', 'E27'),
-	(55, 'E33', 'E35'),
-	(56, 'E41', 'E35'),
-	(57, 'E73', 'E29'),
-	(58, 'E65', 'E83'),
-	(59, 'E39', 'E74'),
-	(60, 'E26', 'E25'),
-	(61, 'E24', 'E25'),
-	(62, 'E19', 'E22'),
-	(63, 'E24', 'E22'),
-	(64, 'E70', 'E72'),
-	(65, 'E31', 'E32'),
-	(66, 'E37', 'E34'),
-	(67, 'E33', 'E34'),
-	(68, 'E11', 'E80'),
-	(69, 'E55', 'E56'),
-	(70, 'E11', 'E79'),
-	(71, 'E7', 'E13'),
-	(72, 'E36', 'E37'),
-	(73, 'E28', 'E90'),
-	(74, 'E72', 'E90'),
-	(75, 'E7', 'E86'),
-	(76, 'E18', 'E24'),
-	(77, 'E71', 'E24'),
-	(78, 'E92', 'E93'),
-	(79, 'E7', 'E87'),
-	(80, 'E8', 'E96'),
-	(81, 'E2', 'E4'),
-	(82, 'E92', 'E4'),
-	(83, 'E90', 'E73'),
-	(84, 'E89', 'E73'),
-	(85, 'E55', 'E99'),
-	(86, 'E70', 'E71'),
-	(87, 'E63', 'E67'),
-	(88, 'E1', 'E92'),
-	(89, 'E64', 'E69');
-
-
---
--- Data for Name: property; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property VALUES
+INSERT INTO model.property (id, code, range_class_code, domain_class_code, name, name_inverse, comment) VALUES
 	(1, 'P92', 'E77', 'E63', 'brought into existence', 'was brought into existence by', 'This property links an instance of E63 Beginning of Existence to the instance of E77 Persistent Item brought into existence by it.
 It allows a “start” to be attached to any instance of E77 Persistent Item being documented, i.e., as instances of E70 Thing, E72 Legal Object, E39 Actor, E41 Appellation and E55 Type.'),
 	(2, 'P101', 'E55', 'E70', 'had as general use', 'was use of', 'This property associates an instance of E70 Thing with an instance of E55 Type that describes the type of use that it was actually employed for.
@@ -966,9 +987,6 @@ The item that has ceased to exist and was replaced by the result of the Transfor
 This includes activities, orders and other organisational actions, taken in preparation for other activities or events.
 P20 had specific purpose (was purpose of) implies that an activity succeeded in achieving its aim. If it does not succeed, such as the setting of a trap that did not catch anything, one may document the unrealized intention using P21 had general purpose (was purpose of): E55 Type and/or P33 used specific technique (was used by): E29 Design or Procedure.'),
 	(64, 'P59', 'E53', 'E18', 'has section', 'is located on or within', 'This property links an area, i.e., an instance of E53 Place to the instance of E18 Physical Thing upon which it is found. This area may either be identified by a name, or by a geometry in terms of a coordinate system adapted to the shape of the respective instance of E18 Physical Thing. Typically, names identifying sections of physical objects are composed of the name of a kind of part and the name of the object itself, such as "The poop deck of H.M.S. Victory", which is composed of "poop deck" and "H.M.S. Victory".'),
-	(104, 'P122', 'E53', 'E53', 'borders with', NULL, 'This symmetric property associates an instance of E53 Place with another instance of E53 Place which shares a part of its border.
-This property is purely spatial. It does not imply that the phenomena that define, by their extent, places related by P122 borders with have ever shared a respective border at the same time or even coexisted. In particular, this may be the case when the respective common border is formed by a natural feature.
-This property is not transitive. This property is symmetric.'),
 	(65, 'P16', 'E70', 'E7', 'used specific object', 'was used for', 'This property describes the use of material or immaterial things in a way essential to the performance or the outcome of an instance of E7 Activity.
 This property typically applies to tools, instruments, moulds, raw materials and items embedded in a product. It implies that the presence of the object in question was a necessary condition for the action. For example, the activity of writing this text required the use of a computer. An immaterial thing can be used if at least one of its carriers is present. For example, the software tools on a computer.
 Another example is the use of a particular name by a particular group of people over some span to identify a thing, such as a settlement. In this case, the physical carriers of this name are at least the people understanding its use.'),
@@ -1060,6 +1078,9 @@ The property has more specific sub properties.'),
 Although an instance of E80 Part removal activity normally concerns only one instance of E24 Physical Human-Made Thing, it is possible to imagine circumstances under which more than one item might be diminished by a single instance of E80 Part Removal activity.'),
 	(101, 'P32', 'E55', 'E7', 'used general technique', 'was technique of', 'This property identifies the technique or method, modelled as an instance of E55 Type, that was employed in an instance of E7 Activity.
 These techniques should be drawn from an external E55 Type hierarchy of consistent terminology of general techniques or methods such as embroidery, oil-painting, carbon dating, etc. Specific documented techniques should be described as instances of E29 Design or Procedure.'),
+	(104, 'P122', 'E53', 'E53', 'borders with', NULL, 'This symmetric property associates an instance of E53 Place with another instance of E53 Place which shares a part of its border.
+This property is purely spatial. It does not imply that the phenomena that define, by their extent, places related by P122 borders with have ever shared a respective border at the same time or even coexisted. In particular, this may be the case when the respective common border is formed by a natural feature.
+This property is not transitive. This property is symmetric.'),
 	(105, 'P26', 'E53', 'E9', 'moved to', 'was destination of', 'This property identifies a destination, an instance of E53 place, of an instance of E9 Move.
 A move will be linked to a destination, such as the move of an artifact from storage to display. A move may be linked to many terminal instances of E53 Place by multiple instances of this property. In this case the move describes a distribution of a set of objects. The area of the move includes the origin(s), route and destination(s).
 Therefore, the described destination is an instance of E53 Place which P89 falls within (contains) the instance of E53 Place the move P7 took place at.'),
@@ -1205,12 +1226,94 @@ The property P144.1 kind of member can be used to specify the type of membership
 	(149, 'OA8', 'E53', 'E77', ' begins in', NULL, 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
 	(150, 'OA9', 'E53', 'E77', ' begins in', NULL, 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
 
+INSERT INTO model.property_inheritance (id, super_code, sub_code) VALUES
+	(1, 'P12', 'P92'),
+	(2, 'P14', 'P29'),
+	(3, 'P53', 'P55'),
+	(4, 'P12', 'P25'),
+	(5, 'P140', 'P39'),
+	(6, 'P182', 'P183'),
+	(7, 'P14', 'P23'),
+	(8, 'P92', 'P123'),
+	(9, 'P67', 'P71'),
+	(10, 'P46', 'P56'),
+	(11, 'P1', 'P102'),
+	(12, 'P93', 'P100'),
+	(13, 'P174', 'P184'),
+	(14, 'P141', 'P37'),
+	(15, 'P16', 'P142'),
+	(16, 'P105', 'P52'),
+	(17, 'P51', 'P52'),
+	(18, 'P92', 'P98'),
+	(19, 'P184', 'P185'),
+	(20, 'P12', 'P93'),
+	(21, 'P31', 'P108'),
+	(22, 'P92', 'P108'),
+	(23, 'P67', 'P68'),
+	(24, 'P141', 'P35'),
+	(25, 'P130', 'P73'),
+	(26, 'P93', 'P13'),
+	(27, 'P15', 'P136'),
+	(28, 'P132', 'P10'),
+	(29, 'P92', 'P95'),
+	(30, 'P11', 'P145'),
+	(31, 'P94', 'P135'),
+	(32, 'P10', 'P9'),
+	(33, 'P67', 'P138'),
+	(34, 'P14', 'P22'),
+	(35, 'P130', 'P128'),
+	(36, 'P16', 'P111'),
+	(37, 'P93', 'P124'),
+	(38, 'P157', 'P59'),
+	(39, 'P12', 'P16'),
+	(40, 'P15', 'P16'),
+	(41, 'P141', 'P38'),
+	(42, 'P141', 'P40'),
+	(43, 'P2', 'P177'),
+	(44, 'P11', 'P96'),
+	(45, 'P11', 'P143'),
+	(46, 'P106', 'P165'),
+	(47, 'P67', 'P129'),
+	(48, 'P12', 'P11'),
+	(49, 'P160', 'P164'),
+	(50, 'P15', 'P134'),
+	(51, 'P176', 'P134'),
+	(52, 'P11', 'P14'),
+	(53, 'P12', 'P31'),
+	(54, 'P92', 'P94'),
+	(55, 'P11', 'P151'),
+	(56, 'P31', 'P112'),
+	(57, 'P125', 'P32'),
+	(58, 'P31', 'P110'),
+	(59, 'P12', 'P113'),
+	(60, 'P49', 'P109'),
+	(61, 'P141', 'P42'),
+	(62, 'P128', 'P65'),
+	(63, 'P175', 'P176'),
+	(64, 'P140', 'P34'),
+	(65, 'P67', 'P70'),
+	(66, 'P93', 'P99'),
+	(67, 'P11', 'P99'),
+	(68, 'P1', 'P48'),
+	(69, 'P10', 'P166'),
+	(70, 'P140', 'P41'),
+	(71, 'P11', 'P146'),
+	(72, 'P173', 'P174'),
+	(73, 'P14', 'P28'),
+	(74, 'P53', 'P156'),
+	(75, 'P157', 'P156'),
+	(76, 'P91', 'P180'),
+	(77, 'P49', 'P50'),
+	(78, 'P2', 'P137'),
+	(79, 'P174', 'P175'),
+	(80, 'P176', 'P182'),
+	(81, 'P185', 'P182'),
+	(82, 'P15', 'P17'),
+	(83, 'P16', 'P33'),
+	(84, 'P7', 'P161'),
+	(85, 'P11', 'P144');
 
---
--- Data for Name: property_i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
---
-
-INSERT INTO model.property_i18n VALUES
+INSERT INTO model.property_i18n (id, property_code, language_code, text, text_inverse) VALUES
 	(1, 'P92', 'de', 'brachte in Existenz', 'wurde in Existenz gebracht durch'),
 	(2, 'P92', 'en', 'brought into existence', 'was brought into existence by'),
 	(3, 'P92', 'fr', 'a fait exister', 'a commencé à exister du fait de'),
@@ -1494,7 +1597,6 @@ INSERT INTO model.property_i18n VALUES
 	(281, 'P74', 'en', 'has current or former residence', 'is current or former residence of'),
 	(282, 'P74', 'fr', 'réside ou a résidé à', 'est ou a été la résidence de'),
 	(283, 'P74', 'ru', 'имеет текущее или бывшее местожительства', 'является текущим или бывшим местом жительства для'),
-	(373, 'P12', 'pt', 'ocorreu na presença de', 'estava presente no'),
 	(284, 'P74', 'el', 'έχει ή είχε κατοικία', 'είναι ή ήταν κατοικία του/της'),
 	(285, 'P74', 'pt', 'reside ou residiu em', 'é ou foi residência de'),
 	(286, 'P74', 'zh', '有当前或曾经居住地', '是当前或曾经居住地'),
@@ -1584,6 +1686,7 @@ INSERT INTO model.property_i18n VALUES
 	(370, 'P12', 'fr', 'est arrivé en présence de', 'était présent à'),
 	(371, 'P12', 'ru', 'появился в присутствии', 'присутствовал при'),
 	(372, 'P12', 'el', 'συνέβη παρουσία του/της', 'ήταν παρών/παρούσα/παρόν σε'),
+	(373, 'P12', 'pt', 'ocorreu na presença de', 'estava presente no'),
 	(374, 'P12', 'zh', '已出现', '出现在'),
 	(375, 'P189', 'en', 'approximates', 'is approximated by'),
 	(376, 'P124', 'de', 'wandelte um', 'wurde umgewandelt durch'),
@@ -1867,7 +1970,6 @@ INSERT INTO model.property_i18n VALUES
 	(654, 'P109', 'de', 'hat derzeitigen oder früheren Kurator', 'ist derzeitiger oder früherer Kurator von'),
 	(655, 'P109', 'en', 'has current or former curator', 'is current or former curator of'),
 	(656, 'P109', 'fr', 'a pour conservateur actuel ou ancien', 'est ou a été le conservateur de'),
-	(746, 'P28', 'el', 'μετεβίβασε κατοχή από', 'παρέδωσε κατοχή μέσω'),
 	(657, 'P109', 'ru', 'имеет действующего или бывшего хранителя', 'является действующим или бывшим хранителем'),
 	(658, 'P109', 'el', 'έχει ή είχε επιμελητή', 'είναι ή ήταν επιμελητής του/της'),
 	(659, 'P109', 'pt', 'tem ou teve curador', 'é ou foi curador de'),
@@ -1957,6 +2059,7 @@ INSERT INTO model.property_i18n VALUES
 	(743, 'P28', 'en', 'custody surrendered by', 'surrendered custody through'),
 	(744, 'P28', 'fr', 'changement de détenteur au détriment de', 'a cessé d’être détenteur à cause de'),
 	(745, 'P28', 'ru', 'опека отдана', 'опека отдана через'),
+	(746, 'P28', 'el', 'μετεβίβασε κατοχή από', 'παρέδωσε κατοχή μέσω'),
 	(747, 'P28', 'pt', 'custódia concedida por', 'final da custódia por meio de'),
 	(748, 'P28', 'zh', '监护权转自', '出让监护权'),
 	(749, 'P156', 'en', 'occupies', 'is occupied by'),
@@ -2022,140 +2125,18 @@ INSERT INTO model.property_i18n VALUES
 	(809, 'OA9', 'de', 'endet in', NULL);
 
 
---
--- Data for Name: property_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
---
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.cidoc_class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY model.openatlas_class ADD CONSTRAINT openatlas_class_cidoc_class_code_fkey FOREIGN KEY (cidoc_class_code) REFERENCES model.cidoc_class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.reference_system_openatlas_class ADD CONSTRAINT reference_system_openatlas_class_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
 
-INSERT INTO model.property_inheritance VALUES
-	(1, 'P12', 'P92'),
-	(2, 'P14', 'P29'),
-	(3, 'P53', 'P55'),
-	(4, 'P12', 'P25'),
-	(5, 'P140', 'P39'),
-	(6, 'P182', 'P183'),
-	(7, 'P14', 'P23'),
-	(8, 'P92', 'P123'),
-	(9, 'P67', 'P71'),
-	(10, 'P46', 'P56'),
-	(11, 'P1', 'P102'),
-	(12, 'P93', 'P100'),
-	(13, 'P174', 'P184'),
-	(14, 'P141', 'P37'),
-	(15, 'P16', 'P142'),
-	(16, 'P105', 'P52'),
-	(17, 'P51', 'P52'),
-	(18, 'P92', 'P98'),
-	(19, 'P184', 'P185'),
-	(20, 'P12', 'P93'),
-	(21, 'P31', 'P108'),
-	(22, 'P92', 'P108'),
-	(23, 'P67', 'P68'),
-	(24, 'P141', 'P35'),
-	(25, 'P130', 'P73'),
-	(26, 'P93', 'P13'),
-	(27, 'P15', 'P136'),
-	(28, 'P132', 'P10'),
-	(29, 'P92', 'P95'),
-	(30, 'P11', 'P145'),
-	(31, 'P94', 'P135'),
-	(32, 'P10', 'P9'),
-	(33, 'P67', 'P138'),
-	(34, 'P14', 'P22'),
-	(35, 'P130', 'P128'),
-	(36, 'P16', 'P111'),
-	(37, 'P93', 'P124'),
-	(38, 'P157', 'P59'),
-	(39, 'P12', 'P16'),
-	(40, 'P15', 'P16'),
-	(41, 'P141', 'P38'),
-	(42, 'P141', 'P40'),
-	(43, 'P2', 'P177'),
-	(44, 'P11', 'P96'),
-	(45, 'P11', 'P143'),
-	(46, 'P106', 'P165'),
-	(47, 'P67', 'P129'),
-	(48, 'P12', 'P11'),
-	(49, 'P160', 'P164'),
-	(50, 'P15', 'P134'),
-	(51, 'P176', 'P134'),
-	(52, 'P11', 'P14'),
-	(53, 'P12', 'P31'),
-	(54, 'P92', 'P94'),
-	(55, 'P11', 'P151'),
-	(56, 'P31', 'P112'),
-	(57, 'P125', 'P32'),
-	(58, 'P31', 'P110'),
-	(59, 'P12', 'P113'),
-	(60, 'P49', 'P109'),
-	(61, 'P141', 'P42'),
-	(62, 'P128', 'P65'),
-	(63, 'P175', 'P176'),
-	(64, 'P140', 'P34'),
-	(65, 'P67', 'P70'),
-	(66, 'P93', 'P99'),
-	(67, 'P11', 'P99'),
-	(68, 'P1', 'P48'),
-	(69, 'P10', 'P166'),
-	(70, 'P140', 'P41'),
-	(71, 'P11', 'P146'),
-	(72, 'P173', 'P174'),
-	(73, 'P14', 'P28'),
-	(74, 'P53', 'P156'),
-	(75, 'P157', 'P156'),
-	(76, 'P91', 'P180'),
-	(77, 'P49', 'P50'),
-	(78, 'P2', 'P137'),
-	(79, 'P174', 'P175'),
-	(80, 'P176', 'P182'),
-	(81, 'P185', 'P182'),
-	(82, 'P15', 'P17'),
-	(83, 'P16', 'P33'),
-	(84, 'P7', 'P161'),
-	(85, 'P11', 'P144');
-
-
---
--- Name: cidoc_class_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_i18n_id_seq', 1, false);
-
-
---
--- Name: cidoc_class_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_id_seq', 1, false);
-
-
---
--- Name: cidoc_class_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.cidoc_class_inheritance_id_seq', 1, false);
-
-
---
--- Name: property_i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_i18n_id_seq', 1, false);
-
-
---
--- Name: property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_id_seq', 1, false);
-
-
---
--- Name: property_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
---
-
-SELECT pg_catalog.setval('model.property_inheritance_id_seq', 1, false);
-
-
---
--- PostgreSQL database dump complete
---
+COMMIT;

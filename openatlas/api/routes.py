@@ -9,6 +9,7 @@ from openatlas.api.v02.endpoints.content.systemclass_count import \
     SystemClassCount
 from openatlas.api.v02.endpoints.display_image import DisplayImage
 from openatlas.api.v02.endpoints.entity.class_ import GetByClass
+from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.entity.entity import GetEntity
 from openatlas.api.v02.endpoints.entity.latest import GetLatest
 from openatlas.api.v02.endpoints.entity.linked_entities import GetLinkedEntities
@@ -17,7 +18,6 @@ from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v02.endpoints.entity.type_entities import GetTypeEntities
 from openatlas.api.v02.endpoints.entity.type_entities_all import \
     GetTypeEntitiesAll
-from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.node.node_entities import GetNodeEntities
 from openatlas.api.v02.endpoints.node.node_entities_all import \
     GetNodeEntitiesAll

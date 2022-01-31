@@ -4,7 +4,7 @@ Model
 .. toctree::
 
 The software automatically maps information to the international standard of the
-`CIDOC CRM <http://www.cidoc-crm.org/>`_. The CIDOC CRM was imported to the
+`CIDOC CRM <https://www.cidoc-crm.org/>`_. The CIDOC CRM was imported to the
 system, can be browsed and is used to verify link conformity between entities.
 
 Although it was paid much attention to design a web interface where users don't

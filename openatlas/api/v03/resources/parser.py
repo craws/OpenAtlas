@@ -81,7 +81,7 @@ entity_.add_argument(
     'export',
     type=str,
     help='{error_msg}',
-    choices='csv')
+    choices=('csv', 'csvNetwork'))
 entity_.add_argument(
     'format',
     type=str,
@@ -117,17 +117,18 @@ query.add_argument(
     action='append',
     help="{error_msg}")
 query.add_argument(
-    'classes',
+    'cidoc_classes',
     type=str,
     action='append',
     help="{error_msg}")
 query.add_argument(
-    'codes',
+    'view_classes',
     type=str,
     action='append',
     help="{error_msg}",
     case_sensitive=False,
     choices=(
+        'all',
         'actor',
         'event',
         'place',
@@ -144,11 +145,11 @@ query.add_argument(
     help="{error_msg}",
     case_sensitive=False,
     choices=(
-        'acquisition', 'activity', 'actor_appellation', 'administrative_unit',
-        'appellation', 'artifact', 'bibliography', 'edition', 'file',
-        'external_reference', 'feature', 'group', 'human_remains', 'move',
-        'object_location', 'person', 'place', 'source', 'reference_system',
-        'stratigraphic_unit', 'source_translation', 'type'))
+        'all', 'acquisition', 'activity', 'administrative_unit', 'appellation',
+        'artifact', 'bibliography', 'edition', 'file', 'external_reference',
+        'feature', 'group', 'human_remains', 'move', 'object_location',
+        'person', 'place', 'source', 'reference_system', 'stratigraphic_unit',
+        'source_translation', 'type'))
 
 image = default.copy()
 image.add_argument(

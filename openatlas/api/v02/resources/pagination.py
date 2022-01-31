@@ -1,5 +1,5 @@
 import itertools
-from typing import Any, Dict, List
+from typing import Any
 
 from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
     LastEntityError, NoEntityAvailable, TypeIDError
@@ -14,7 +14,7 @@ from openatlas.models.link import Link
 class Pagination:
 
     @staticmethod
-    def get_start_entity(total: List[int], parser: Dict[str, Any]) -> List[Any]:
+    def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
         if parser['first'] and int(parser['first']) in total:
             return list(itertools.islice(
                 total,
@@ -32,16 +32,16 @@ class Pagination:
 
     @staticmethod
     def get_by_page(
-            index: List[Dict[str, Any]],
-            parser: Dict[str, Any]) -> Dict[str, Any]:
+            index: list[dict[str, Any]],
+            parser: dict[str, Any]) -> dict[str, Any]:
         page = parser['page'] \
             if parser['page'] < index[-1]['page'] else index[-1]['page']
         return [entry['startId'] for entry in index if entry['page'] == page][0]
 
     @staticmethod
     def pagination(
-            entities: List[Entity],
-            parser: Dict[str, Any]) -> Dict[str, Any]:
+            entities: list[Entity],
+            parser: dict[str, Any]) -> dict[str, Any]:
         if not entities:
             raise NoEntityAvailable  # pragma: no cover
         if parser['type_id']:
@@ -69,8 +69,8 @@ class Pagination:
 
     @staticmethod
     def get_results(
-            new_entities: List[Entity],
-            parser: Dict[str, Any]) -> List[Dict[str, Any]]:
+            new_entities: list[Entity],
+            parser: dict[str, Any]) -> list[dict[str, Any]]:
         if parser['format'] == 'geojson':
             return [Pagination.get_geojson(new_entities, parser)]
         return Pagination.linked_places_result(
@@ -81,8 +81,8 @@ class Pagination:
 
     @staticmethod
     def get_entities_by_type(
-            entities: List[Entity],
-            parser: Dict[str, Any]) -> List[Entity]:
+            entities: list[Entity],
+            parser: dict[str, Any]) -> list[Entity]:
         new_entities = []
         for entity in entities:
             if any(ids in [key.id for key in entity.types]
@@ -92,9 +92,9 @@ class Pagination:
 
     @staticmethod
     def link_builder(
-            new_entities: List[Entity],
-            parser: Dict[str, Any],
-            inverse: bool = False) -> List[Link]:
+            new_entities: list[Entity],
+            parser: dict[str, Any],
+            inverse: bool = False) -> list[Link]:
         if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
                for i in parser['show']):
             entities = [e.id for e in new_entities[:int(parser['limit'])]]
@@ -104,10 +104,10 @@ class Pagination:
 
     @staticmethod
     def linked_places_result(
-            entities: List[Entity],
-            parser: Dict[str, str],
-            links: List[Link],
-            links_inverse: List[Link]) -> List[Dict[str, Any]]:
+            entities: list[Entity],
+            parser: dict[str, str],
+            links: list[Link],
+            links_inverse: list[Link]) -> list[dict[str, Any]]:
         return [
             LinkedPlaces.get_entity(
                 get_entity_by_id(entity.id) if 'names' in parser['show']
@@ -120,7 +120,7 @@ class Pagination:
 
     @staticmethod
     def get_geojson(
-            entity_limit: List[Entity],
-            parser: Dict[str, str]) -> Dict[str, Any]:
+            entity_limit: list[Entity],
+            parser: dict[str, str]) -> dict[str, Any]:
         return Geojson.return_output(
             Geojson.get_geojson(entity_limit[:int(parser['limit'])]))
