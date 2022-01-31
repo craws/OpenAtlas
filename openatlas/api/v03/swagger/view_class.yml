@@ -5,7 +5,7 @@ tags:
 description: Retrieves a json with a list of entities based on their OpenAtlas view class. Available categories are **actor**, **event**, **place**, **source**, **reference**, **object**. The result can also be filtered, ordered and manipulated through different parameters. By default results are orderd alphabetically and 20 entities are shown.
 parameters:
   - in: path
-    name: code
+    name: view_class
     description: Need to be an OpenAtlas menu item
     required: true
     schema:
@@ -33,6 +33,7 @@ parameters:
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
+  - $ref: '#/components/parameters/exportParam'
   - $ref: '#/components/parameters/pageParam'
 responses:
   '200':

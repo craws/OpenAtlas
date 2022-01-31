@@ -46,6 +46,7 @@ parameters:
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
+  - $ref: '#/components/parameters/exportParam'
   - $ref: '#/components/parameters/pageParam'
 responses:
   '200':

@@ -169,6 +169,18 @@
           "type": "string"
         }
       },
+      "exportParam": {
+        "description": "Result will be downloaded in the given format.",
+        "in": "query",
+        "name": "export",
+        "schema": {
+          "enum": [
+            "csv",
+            "csvNetwork"
+          ],
+          "type": "string"
+        }
+      },
       "typeParam": {
         "description": "The output will be filtered by the type_id. Only entities with this type ids will be display. The relation is in logical OR.",
         "in": "query",
