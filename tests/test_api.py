@@ -517,7 +517,14 @@ class ApiTests(TestBaseCase):
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
-                    export='csv'))
+                    export='csv')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    export='csvNetwork'))
             ]:
                 assert b'Shire' in rv.data
 
@@ -577,6 +584,8 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.view_class',
                     view_class='place',
+                    sort='desc',
+                    column='id',
                     type_id=boundary_mark.id)),
                 self.app.get(url_for('api_03.latest', latest=2)),
                 self.app.get(
@@ -595,14 +604,15 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.type_entities_all',
                     id_=relation_sub_id)),
-                self.app.get(
-                    url_for(
-                        'api_03.query',
-                        entities=location.id,
-                        classes='E18',
-                        codes='artifact',
-                        system_classes='person',
-                        last=actor.id)),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    classes='E18',
+                    codes='artifact',
+                    sort='desc',
+                    column='cidoc_class',
+                    system_classes='person',
+                    last=actor.id)),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
@@ -610,10 +620,9 @@ class ApiTests(TestBaseCase):
                     codes='artifact',
                     system_classes='person',
                     sort='desc',
-                    column='id',
+                    column='system_class',
                     download=True,
-                    actor=place.id))
-            ]:
+                    actor=place.id))]:
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
                 rv_page = rv['pagination']
@@ -777,8 +786,8 @@ class ApiTests(TestBaseCase):
             # Test Type Overview
             for rv in [
                 self.app.get(url_for('api_02.node_overview')),
-                    self.app.get(
-                           url_for('api_02.node_overview', download=True))]:
+                self.app.get(
+                    url_for('api_02.node_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['types'][0]['place']['Administrative unit']
                 assert bool([True for i in rv if

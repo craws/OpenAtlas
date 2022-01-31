@@ -5,7 +5,7 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     LastEntityError
 from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
-from openatlas.api.v03.resources.util import get_entity_by_id, link_builder
+from openatlas.api.v03.resources.util import get_entity_by_id, link_parser_check
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -67,16 +67,6 @@ def get_entities_formatted(
         parser,
         link_parser_check(limited_entities, parser),
         link_parser_check(limited_entities, parser, True))
-
-
-def link_parser_check(
-        new_entities: list[Entity],
-        parser: dict[str, Any],
-        inverse: bool = False) -> list[Link]:
-    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
-           for i in parser['show']):
-        return link_builder(new_entities, inverse)
-    return []
 
 
 def linked_places_result(

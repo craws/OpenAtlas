@@ -10,8 +10,8 @@ from openatlas.api.v03.resources.parser import entity_, query
 from openatlas.api.v03.resources.resolve_endpoints import resolve_entities, \
     resolve_entity
 from openatlas.api.v03.resources.util import get_by_cidoc_classes, \
-    get_by_system_classes, \
-    get_by_view, get_entities_by_ids, get_entities_linked_to_special_type, \
+    get_entities_by_system_classes, \
+    get_entities_by_view_classes, get_entities_by_ids, get_entities_linked_to_special_type, \
     get_entities_linked_to_special_type_recursive, \
     get_entities_linked_to_type_recursive, get_entity_by_id, \
     get_linked_entities_api
@@ -35,7 +35,7 @@ class GetBySystemClass(Resource):
     def get(system_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
-            get_by_system_classes([system_class]),
+            get_entities_by_system_classes([system_class]),
             entity_.parse_args(),
             system_class)
 
@@ -46,7 +46,7 @@ class GetByViewClass(Resource):
     def get(view_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
-            get_by_view([view_class]),
+            get_entities_by_view_classes([view_class]),
             entity_.parse_args(),
             view_class)
 
@@ -118,10 +118,10 @@ class GetQuery(Resource):
         if parser['entities']:
             entities.extend(get_entities_by_ids(parser['entities']))
         if parser['view_classes']:
-            entities.extend(get_by_view(
+            entities.extend(get_entities_by_view_classes(
                 [code_ for code_ in parser['view_classes']]))
         if parser['system_classes']:
-            entities.extend(get_by_system_classes(
+            entities.extend(get_entities_by_system_classes(
                 [classes for classes in parser['system_classes']]))
         if parser['cidoc_classes']:
             entities.extend(get_by_cidoc_classes(

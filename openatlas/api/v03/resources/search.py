@@ -5,7 +5,8 @@ from flask import g
 from openatlas.api.v03.resources.search_validation import \
     check_if_date, check_if_date_search
 from openatlas.api.v03.resources.util import \
-    flatten_list_and_remove_duplicates, get_linked_entities_id_api, get_links
+    flatten_list_and_remove_duplicates, get_all_links_inverse, \
+    get_linked_entities_id_api
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -75,7 +76,7 @@ def get_search_values(
 def search_for_value(
         values: Tuple[int, float],
         parameter: dict[str, Any]) -> list[int]:
-    links = get_links(values[0])
+    links = get_all_links_inverse(values[0])
     ids = []
     for link_ in links:
         if link_.description and search_entity(
