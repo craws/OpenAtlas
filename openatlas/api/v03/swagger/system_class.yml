@@ -11,27 +11,31 @@ parameters:
     schema:
       type: string
       enum:
+        - all
+        - administrative_unit
+        - type
         - acquisition
         - activity
-        - administrative_unit
+        - actor_actor_relation
+        - actor_function
         - appellation
         - artifact
         - bibliography
         - edition
         - external_reference
-        - feature
-        - file
+        - feature file
         - group
         - human_remains
+        - involvement
         - move
         - object_location
         - person
         - place
-        - source
+        - production
         - reference_system
-        - stratigraphic_unit
+        - source
         - source_translation
-        - type
+        - stratigraphic_unit
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'

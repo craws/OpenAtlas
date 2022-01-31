@@ -989,8 +989,8 @@ class ApiTests(TestBaseCase):
                     'api_03.query',
                     entities=place.id,
                     cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
+                    view_classes='all',
+                    system_classes='all',
                     format='lp',
                     search='{"entityDescription":[{"operator":"equal",'
                            '"values":["the shirE Was the Homeland of the'

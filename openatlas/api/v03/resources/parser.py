@@ -128,6 +128,7 @@ query.add_argument(
     help="{error_msg}",
     case_sensitive=False,
     choices=(
+        'all',
         'actor',
         'event',
         'place',
@@ -144,7 +145,7 @@ query.add_argument(
     help="{error_msg}",
     case_sensitive=False,
     choices=(
-        'acquisition', 'activity', 'administrative_unit', 'appellation',
+        'all', 'acquisition', 'activity', 'administrative_unit', 'appellation',
         'artifact', 'bibliography', 'edition', 'file', 'external_reference',
         'feature', 'group', 'human_remains', 'move', 'object_location',
         'person', 'place', 'source', 'reference_system', 'stratigraphic_unit',

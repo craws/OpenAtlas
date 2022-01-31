@@ -11,12 +11,17 @@ parameters:
     schema:
       type: string
       enum:
+        - all
         - actor
+        - artifact
+        - file
         - event
         - place
         - reference
+        - reference_system
         - source
-        - object
+        - type
+        - source_translation
   - $ref: '#/components/parameters/limitParam'
   - $ref: '#/components/parameters/columnParam'
   - $ref: '#/components/parameters/sortParam'

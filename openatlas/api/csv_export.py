@@ -122,31 +122,30 @@ def export_csv_for_network_analysis(
         entities: list[Entity],
         parser: dict[str, Any]) -> Response:
     archive = BytesIO()
-    with zipfile.ZipFile(archive, 'w') as zf:
+    with zipfile.ZipFile(archive, 'w') as zipped_file:
         for key, frame in get_entities_grouped_by_class(entities).items():
-            with zf.open(f'{key}.csv', 'w') as file:
+            with zipped_file.open(f'{key}.csv', 'w') as file:
                 file.write(bytes(
                     pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
-        with zf.open('links.csv', 'w') as file:
+        with zipped_file.open('links.csv', 'w') as file:
             link_frame = [build_link_dataframe(link_) for link_ in
                           (link_parser_check(entities, parser) +
                            link_parser_check(entities, parser, True))]
             file.write(bytes(
                 pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
-
     return Response(
         archive.getvalue(),
         mimetype='application/zip',
-        headers={'Content-Disposition': f'attachment;filename=test.zip'})
+        headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})
 
 
 def get_entities_grouped_by_class(entities: list[Entity]) -> dict[str, Any]:
     entities += get_linked_entities_api([e.id for e in entities])
     entities = remove_duplicate_entities(entities)
     grouped_entities = {}
-    for class_, entities in groupby(
+    for class_, entities_ in groupby(
             sorted(entities, key=lambda entity: entity.class_.name),
             key=lambda entity: entity.class_.name):
         grouped_entities[class_] = \
-            [build_entity_dataframe(entity) for entity in entities]
+            [build_entity_dataframe(entity) for entity in entities_]
     return grouped_entities

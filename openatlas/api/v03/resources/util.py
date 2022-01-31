@@ -78,7 +78,14 @@ def replace_empty_list_values_in_dict_with_none(
     return data
 
 
+def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
+    if not all(cc in g.cidoc_classes for cc in class_codes):
+        raise InvalidCidocClassCode
+    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
+
+
 def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
+    codes = list(g.view_class_mapping.keys()) if 'all' in codes else codes
     if not all(c in g.view_class_mapping for c in codes):
         raise InvalidCodeError
     view_classes = flatten_list_and_remove_duplicates(
@@ -86,13 +93,9 @@ def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
     return Entity.get_by_class(view_classes, types=True, aliases=True)
 
 
-def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
-    if not all(cc in g.cidoc_classes for cc in class_codes):
-        raise InvalidCidocClassCode
-    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
-
-
 def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
+    system_classes = list(g.classes.keys()) \
+        if 'all' in system_classes else system_classes
     if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError
     return Entity.get_by_class(system_classes, types=True, aliases=True)
