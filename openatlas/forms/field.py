@@ -16,22 +16,23 @@ from openatlas.util.util import get_base_table_data
 
 
 class RemovableListInput(TextInput):
-    def __call__(self, field: RemovableListField, *args, **kwargs):
+    def __call__(
+            self,
+            field: RemovableListField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
         [name, index] = field.id.split('-')
         return super().__call__(field, **kwargs) + render_template(
             'forms/removable_list_field.html',
             name=name,
-            id=index,
-        )
+            id=index)
 
 
 class RemovableListField(Field):
     widget = RemovableListInput()
 
-    def _value(self):
+    def _value(self) -> str:
         return self.data
-
-
 
 
 class TableMultiSelect(HiddenInput):

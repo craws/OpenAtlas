@@ -52,7 +52,7 @@ class GetGeometricEntities(Resource):
         endpoint="api_03.geometric_entities")
     def get() -> Union[int, Response, tuple[Any, int]]:
         parser = gis.parse_args()
-        output = {
+        output: dict[str, Any] = {
             'type': 'FeatureCollection',
             'features': GetGeometricEntities.get_geometries(parser)}
         if parser['count']:
