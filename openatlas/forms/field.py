@@ -5,13 +5,33 @@ from typing import Any
 
 from flask import g, render_template
 from flask_login import current_user
-from wtforms import FloatField, HiddenField
-from wtforms.widgets import HiddenInput
+from wtforms import FloatField, HiddenField, Field
+from wtforms.widgets import HiddenInput, TextInput
+
 
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data
+
+
+class RemovableListInput(TextInput):
+    def __call__(self, field: RemovableListField, *args, **kwargs):
+        [name, index] = field.id.split('-')
+        return super().__call__(field, **kwargs) + render_template(
+            'forms/removable_list_field.html',
+            name=name,
+            id=index,
+        )
+
+
+class RemovableListField(Field):
+    widget = RemovableListInput()
+
+    def _value(self):
+        return self.data
+
+
 
 
 class TableMultiSelect(HiddenInput):

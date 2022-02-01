@@ -1,0 +1,50 @@
+{% if id == '0' %}
+    <button type="button" id="add-{{ name }}-{{ id }}" class="add-{{ name }} btn-secondary btn-xsm">+</button>
+{% else %}
+    <button type="button" id="remove-{{ name }}-{{ id }}" class="remove-{{ name }} btn-secondary btn-xsm">-</button>
+{% endif %}
+
+{% if id == '0' %}
+    <script>
+        let name = '{{name}}';
+        let length = 0;
+        let lastIndex = 0;
+
+        const initializeValues = () => {
+            let elements = $(`ul[id='${name}'] li`);
+            length = elements.length;
+            lastIndex = length
+        }
+
+        $(`.add-${name}`).click(function () {
+            if (length === 0)
+                initializeValues();
+
+            const label = `<label for="${name}-${lastIndex}"></label>`
+            const input = `<input id="${name}-${lastIndex}" name="${name}-${lastIndex}" type="text"/>`;
+            const button = `<button type="button" id="remove-${name}-${lastIndex}" class="remove-${name} btn-secondary btn-xsm">-</button>`;
+
+            $(`#add-${name}-0`).parent().parent().children().eq(length - 1).after(`<li>${label}${input} ${button}</li>`)
+            length++;
+            lastIndex++;
+        })
+
+        $(`ul[id='${name}']`).on('click', `.remove-${name}`, function (e) {
+            if (length === 0)
+                initializeValues();
+            const id = e.target.id;
+            $(`#${id}`).parent().remove();
+            length--;
+        })
+    </script>
+    <style>
+        input[id^={{ name }}] {
+            width: calc(15.6em - 24px - 4px);
+            margin-bottom: 4px;
+
+        }
+        button.add-{{ name }}, button.remove-{{ name }} {
+            width: 24px;
+        }
+    </style>
+{% endif %}
