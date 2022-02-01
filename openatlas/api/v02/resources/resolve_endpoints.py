@@ -10,7 +10,7 @@ from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v02.templates.nodes import NodeTemplate
-from openatlas.api.csv_export import export_entities
+from openatlas.api.csv_export import export_entities_csv
 from openatlas.models.entity import Entity
 
 
@@ -26,7 +26,7 @@ def resolve_entities(
         file_name: Union[int, str]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
-        return export_entities(entities, file_name)
+        return export_entities_csv(entities, file_name)
     result = Pagination.pagination(entities, parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(

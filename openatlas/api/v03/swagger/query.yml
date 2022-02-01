@@ -10,12 +10,12 @@ parameters:
     schema:
       type: number
   - in: query
-    name: classes
+    name: cidoc_classes
     description: Need to be a entity class code of the CIDOC CRM (e.g. E21, E18, E33). For further information visit https://redmine.craws.net/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping
     schema:
       type: string
   - in: query
-    name: codes
+    name: view_classes
     description: Need to be an OpenAtlas menu items
     schema:
       type: string
@@ -64,6 +64,7 @@ parameters:
   - $ref: '#/components/parameters/countParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
+  - $ref: '#/components/parameters/exportParam'
   - $ref: '#/components/parameters/pageParam'
 responses:
   '200':

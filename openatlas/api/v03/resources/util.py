@@ -23,17 +23,11 @@ def get_entities_by_ids(ids: list[int]) -> list[Entity]:
 
 
 def get_all_links(entities: Union[int, list[int]]) -> list[Link]:
-    links = []
-    for link in Link.get_links(entities, list(g.properties)):
-        links.append(link)
-    return links
+    return Link.get_links(entities, list(g.properties))
 
 
 def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
-    links_inverse = []
-    for link in Link.get_links(entities, list(g.properties), inverse=True):
-        links_inverse.append(link)
-    return links_inverse
+    return Link.get_links(entities, list(g.properties), inverse=True)
 
 
 def get_license(entity: Entity) -> Optional[str]:
@@ -57,9 +51,8 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
 def link_builder(
         new_entities: list[Entity],
         inverse: bool = False) -> list[Link]:
-    entities = [e.id for e in new_entities]
-    return get_all_links_inverse(entities) \
-        if inverse else get_all_links(entities)
+    e = [e.id for e in new_entities]
+    return get_all_links_inverse(e) if inverse else get_all_links(e)
 
 
 def get_all_subunits_recursive(
@@ -85,32 +78,34 @@ def replace_empty_list_values_in_dict_with_none(
     return data
 
 
-def get_by_view(code_: str) -> list[Entity]:
-    if code_ not in g.view_class_mapping:
-        raise InvalidCodeError
-    return Entity.get_by_class(
-        g.view_class_mapping[code_],
-        types=True,
-        aliases=True)
-
-
-def get_by_class(class_code: str) -> list[Entity]:
-    if class_code not in g.cidoc_classes:
+def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
+    if not all(cc in g.cidoc_classes for cc in class_codes):
         raise InvalidCidocClassCode
-    return Entity.get_by_cidoc_class(class_code, types=True, aliases=True)
+    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
 
 
-def get_by_system(system_class: str) -> list[Entity]:
-    if system_class not in g.classes:
+def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
+    codes = list(g.view_class_mapping.keys()) if 'all' in codes else codes
+    if not all(c in g.view_class_mapping for c in codes):
+        raise InvalidCodeError
+    view_classes = flatten_list_and_remove_duplicates(
+        [g.view_class_mapping[view] for view in codes])
+    return Entity.get_by_class(view_classes, types=True, aliases=True)
+
+
+def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
+    system_classes = list(g.classes.keys()) \
+        if 'all' in system_classes else system_classes
+    if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError
-    return Entity.get_by_class(system_class, types=True, aliases=True)
+    return Entity.get_by_class(system_classes, types=True, aliases=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
     return [item for sublist in list_ for item in sublist if item not in list_]
 
 
-def get_linked_entities_api(id_: int) -> list[Entity]:
+def get_linked_entities_api(id_: Union[int, list[int]]) -> list[Entity]:
     domain_entity = [link_.range for link_ in get_all_links(id_)]
     range_entity = [link_.domain for link_ in get_all_links_inverse(id_)]
     return [*range_entity, *domain_entity]
@@ -120,10 +115,6 @@ def get_linked_entities_id_api(id_: int) -> list[Entity]:
     domain_ids = [link_.range.id for link_ in get_all_links(id_)]
     range_ids = [link_.domain.id for link_ in get_all_links_inverse(id_)]
     return [*range_ids, *domain_ids]
-
-
-def get_links(id_: int) -> list[Link]:
-    return [link_ for link_ in get_all_links_inverse(id_)]
 
 
 def get_entities_linked_to_type_recursive(
@@ -167,3 +158,29 @@ def get_entities_by_type(
                for ids in parser['type_id']):
             new_entities.append(entity)
     return new_entities
+
+
+def get_key(entity: Entity, parser: str) -> str:
+    if parser == 'cidoc_class':
+        return entity.cidoc_class.name
+    if parser == 'system_class':
+        return entity.class_.name
+    return getattr(entity, parser)
+
+
+def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
+    seen = set()  # type: ignore
+    seen_add = seen.add  # Do not change, faster than always call seen.add(e.id)
+    return [
+        entity for entity in entities
+        if not (entity.id in seen or seen_add(entity.id))]
+
+
+def link_parser_check(
+        new_entities: list[Entity],
+        parser: dict[str, Any],
+        inverse: bool = False) -> list[Link]:
+    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
+           for i in parser['show']):
+        return link_builder(new_entities, inverse)
+    return []

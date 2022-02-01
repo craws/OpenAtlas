@@ -9,8 +9,9 @@ from openatlas.api.v03.resources.error import InvalidLimitError, \
 from openatlas.api.v03.resources.parser import entity_, query
 from openatlas.api.v03.resources.resolve_endpoints import resolve_entities, \
     resolve_entity
-from openatlas.api.v03.resources.util import get_by_class, get_by_system, \
-    get_by_view, get_entities_by_ids, get_entities_linked_to_special_type, \
+from openatlas.api.v03.resources.util import get_by_cidoc_classes, \
+    get_entities_by_system_classes, \
+    get_entities_by_view_classes, get_entities_by_ids, get_entities_linked_to_special_type, \
     get_entities_linked_to_special_type_recursive, \
     get_entities_linked_to_type_recursive, get_entity_by_id, \
     get_linked_entities_api
@@ -23,7 +24,7 @@ class GetByCidocClass(Resource):
     def get(cidoc_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
-            get_by_class(cidoc_class),
+            get_by_cidoc_classes([cidoc_class]),
             entity_.parse_args(),
             cidoc_class)
 
@@ -34,7 +35,7 @@ class GetBySystemClass(Resource):
     def get(system_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
-            get_by_system(system_class),
+            get_entities_by_system_classes([system_class]),
             entity_.parse_args(),
             system_class)
 
@@ -42,10 +43,10 @@ class GetBySystemClass(Resource):
 class GetByViewClass(Resource):
     @staticmethod
     @swag_from("../swagger/view_class.yml", endpoint="api_03.view_class")
-    def get(view_class: str) -> Union[
-        tuple[Resource, int], Response, dict[str, Any]]:
+    def get(view_class: str) \
+            -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
-            get_by_view(view_class),
+            get_entities_by_view_classes([view_class]),
             entity_.parse_args(),
             view_class)
 
@@ -108,23 +109,23 @@ class GetQuery(Resource):
     @swag_from("../swagger/query.yml", endpoint="api_03.query")
     def get() -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parser = query.parse_args()
-        if not parser['entities'] \
-                and not parser['codes'] \
-                and not parser['classes'] \
-                and not parser['system_classes']:
+        if not any([parser['entities'],
+                    parser['cidoc_classes'],
+                    parser['view_classes'],
+                    parser['system_classes']]):
             raise QueryEmptyError
         entities = []
         if parser['entities']:
             entities.extend(get_entities_by_ids(parser['entities']))
-        if parser['codes']:
-            for code_ in parser['codes']:
-                entities.extend(get_by_view(code_))
+        if parser['view_classes']:
+            entities.extend(get_entities_by_view_classes(
+                [code_ for code_ in parser['view_classes']]))
         if parser['system_classes']:
-            for system_class in parser['system_classes']:
-                entities.extend(get_by_system(system_class))
-        if parser['classes']:
-            for class_ in parser['classes']:
-                entities.extend(get_by_class(class_))
+            entities.extend(get_entities_by_system_classes(
+                [classes for classes in parser['system_classes']]))
+        if parser['cidoc_classes']:
+            entities.extend(get_by_cidoc_classes(
+                [classes for classes in parser['cidoc_classes']]))
         return resolve_entities(entities, parser, 'query')
 
 
