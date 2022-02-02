@@ -699,3 +699,17 @@ tr:hover {
 .dropdown-menu.show {
   width: auto!important;
 }
+
+span[id^="value-type-switcher-"]{
+  transition: 100ms all ease-in ;
+}
+
+.rotate-90{
+  transform: rotate(90deg);
+}
+
+.value-type-expander {
+  position: absolute;
+  top: -0.1em;
+  left: -1.7em;
+}
