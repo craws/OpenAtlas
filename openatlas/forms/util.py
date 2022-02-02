@@ -152,7 +152,7 @@ def process_form_data(
                 if 'administrative_units' not in data:
                     data['administrative_units'] = []
                 data['administrative_units'] += value
-            else:
+            elif entity.class_.view != 'type':
                 data['links']['delete'].add('P2')
                 data['links']['insert'].append({
                     'property': 'P2',
@@ -269,7 +269,7 @@ def process_form_data(
                 'property': 'P128',
                 'range': form.artifact.data,
                 'inverse': True})
-    elif entity.class_.view == 'type' and 'classes' not in form:  # is sub type
+    elif entity.class_.view == 'type' and 'classes' not in form:  # is subtype
         type_ = origin if isinstance(origin, Type) else entity
         root = g.types[type_.root[0]] if type_.root else type_
         super_id = g.types[type_.root[-1]] if type_.root else type_

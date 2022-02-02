@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '7.0.3': ['2022-02-02', {
+            'fix': {
+                '1634': 'Value Type with Subtype error'}}],
         '7.0.2': ['2022-01-20', {
             'fix': {
                 '1632': 'Multiple flag gets lost when updating a hierarchy'}}],

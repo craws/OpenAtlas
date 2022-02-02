@@ -13,6 +13,17 @@ is working.
 
     service apache2 restart
 
+### 7.0.x to 7.0.3
+Execute **install/upgrade/7.0.3.sql** after making backups.
+
+It deletes possible wrong links created because of bug #1634
+If 7.1.0. sql is already available (in develop at point of writing this) you
+can skip this because it's included there too.
+
+
+### 7.0.1 to 7.0.2
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 7.0.0 to 7.0.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
