@@ -152,7 +152,7 @@ def process_form_data(
                 if 'administrative_units' not in data:
                     data['administrative_units'] = []
                 data['administrative_units'] += value
-            else:
+            elif entity.class_.view != 'type':
                 data['links']['delete'].add('P2')
                 data['links']['insert'].append({
                     'property': 'P2',

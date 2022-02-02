@@ -10,6 +10,14 @@ Update web.settings SET value = '7.1.0' WHERE name = 'database_version';
 UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');
 UPDATE model.entity SET name = 'Source translation' WHERE name = 'Source Translation';
 
+-- Deletes possible wrong links created because of bug #1634
+DELETE FROM model.link WHERE id in (
+    SELECT l.id FROM model.link l
+    JOIN model.entity d ON l.domain_id = d.id AND d.openatlas_class_name = 'type'
+    JOIN model.entity r ON l.range_id = r.id AND r.openatlas_class_name = 'type'
+    WHERE l.property_code = 'P2'
+);
+
 -- Remove created, modified fields in model tables
 ALTER TABLE model.cidoc_class DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
 ALTER TABLE model.cidoc_class_inheritance DROP COLUMN IF EXISTS created, DROP COLUMN IF EXISTS modified;
