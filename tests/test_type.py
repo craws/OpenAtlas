@@ -110,6 +110,20 @@ class TypeTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=dimension_type.subs[0]))
             assert b'Dimensions' in rv.data
 
+            # Test parent value type view after creating a sub subtype
+            rv = self.app.post(
+                url_for(
+                    'insert',
+                    class_='type',
+                    origin_id=dimension_type.subs[0]),
+                data={
+                    'name': "Sub sub type",
+                    dimension_type.id: dimension_type.subs[0]},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            rv = self.app.get(url_for('view', id_=dimension_type.subs[0]))
+            assert b'Sub sub type' in rv.data
+
             # Untyped entities
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
