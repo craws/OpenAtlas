@@ -6,18 +6,15 @@ from flask_restful import Resource
 from openatlas import app
 from openatlas.api.v03.resources.error import AccessDeniedError
 from openatlas.api.v03.resources.parser import image
+from openatlas.api.v03.resources.util import get_license
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
         entity = Entity.get_by_id(int(Pathlib_path(filename).stem), types=True)
-        license_ = None
-        for node in entity.types:
-            if node.root and node.root[0] == Type.get_hierarchy('License').id:
-                license_ = node.name
+        license_ = get_license(entity)
         if not license_:
             raise AccessDeniedError
         parser = image.parse_args()
