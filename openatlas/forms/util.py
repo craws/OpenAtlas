@@ -20,7 +20,7 @@ from openatlas.util.util import sanitize, uc_first
 
 
 def get_link_type(form: Any) -> Optional[Entity]:
-    # Returns base type of a link form, e.g. involvement between actor and event
+    # Returns base type of link form, e.g. involvement between actor and event
     for field in form:
         if isinstance(field, TreeField) and field.data:
             return g.types[int(field.data)]

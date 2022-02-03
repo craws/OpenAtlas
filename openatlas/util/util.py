@@ -202,7 +202,7 @@ def get_entity_data(
     # Dates
     from_link = ''
     to_link = ''
-    if entity.class_.name == 'move':  # Add places to dates if it's a move
+    if entity.class_.name == 'move':  # Add places to the dates if it's a move
         if place_from := entity.get_linked_entity('P27'):
             from_link = \
                 link(place_from.get_linked_entity_safe('P53', True)) + ' '
@@ -650,6 +650,25 @@ def button_bar(buttons: list[Any]) -> str:
 
 
 @app.template_filter()
+def button_icon(
+        icon: str,
+        url: Optional[str] = None,
+        css: Optional[str] = 'primary',
+        id_: Optional[str] = None,
+        onclick: Optional[str] = None) -> str:
+    tag = 'a' if url else 'span'
+    css_class = 'btn btn-xsm' if css == '' else app.config['CSS']['button'][css]
+    return Markup(f"""
+        <{tag}
+            {f'href="{url}"' if url else ''}
+            {f'id="{id_}"' if id_ else ''}
+            class="{css_class}"
+            {f'onclick="{onclick}"' if onclick else ''}>
+                <i class="fa {icon}"></i>
+            </{tag}>""")
+
+
+@app.template_filter()
 def display_citation_example(code: str) -> str:
     if code != 'reference':
         return ''
@@ -850,10 +869,10 @@ def display_form(
                 html += add_form_row(
                     field,
                     label,
-                    button(
-                        _('show'),
+                    button_icon(
+                        'fa-chevron-right',
                         onclick=f'switch_value_type({type_.id})',
-                        css='secondary',
+                        css='',
                         id_=f'value-type-switcher-{type_.id}'))
                 html += display_value_type_fields(form, type_)
                 continue
@@ -898,20 +917,45 @@ def display_form(
 def display_value_type_fields(
         form: Any,
         type_: Type,
-        root: Optional[Type] = None) -> str:
+        root: Optional[Type] = None,
+        hierarchy_level: Optional[int] = 0) -> str:
     html = ''
     root = root if root else type_
     for sub_id in type_.subs:
         sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
+        expand_button = button_icon(
+            'fa-chevron-right',
+            onclick=f'switch_value_type({sub.id})',
+            css='',
+            id_=f'value-type-switcher-{sub.id}') if len(sub.subs) != 0 else ''
         html += f"""
-            <div class="table-row value-type-switch{root.id}">
-                <div>{sub.name}</div>
-                <div class="table-cell">
-                    {field(class_='value-type')} {sub.description}
+        <div class="mt-2 table-row value-type-switch{type_.id}">
+            <div></div>
+            <div class="table-cell ">
+                <div class="d-flex">
+                    <div
+                        class="d-flex justify-content-between"
+                        style="width:16.15em;"
+                    >
+                        <div
+                            class="ml-{hierarchy_level}
+                            position-relative text-wrap"
+                        >
+                            <div class="value-type-expander">
+                                {expand_button}
+                            </div>
+                            {sub.name}
+                        </div>
+                        {field(class_='value-type')}
+                    </div>
+                    <span class="ml-1">
+                        {sub.description if sub.description is not None else ''}
+                    </span>
                 </div>
+                {display_value_type_fields(form, sub, root, hierarchy_level+1)}
             </div>
-            {display_value_type_fields(form, sub, root)}"""
+        </div>"""
     return html
 
 
