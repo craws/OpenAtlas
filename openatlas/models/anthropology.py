@@ -4,11 +4,6 @@ from flask import g
 
 from openatlas.models.entity import Entity
 
-# Todo:
-# - if saved one of the sex features types are shown as default type
-# - if entity is updated, feature types get deleted
-# - remove default
-
 
 class SexEstimation:
 
