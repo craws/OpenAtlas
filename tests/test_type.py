@@ -27,10 +27,6 @@ class TypeTest(TestBaseCase):
             rv = self.app.get(
                 url_for('insert', class_='type', origin_id=actor_type.id))
             assert b'Actor actor relation' in rv.data
-            rv = self.app.post(
-                url_for('insert', class_='type', origin_id=actor_type.id),
-                data={'name_search': 'new'})
-            assert b'Inverse' in rv.data
             data = {
                 'name': 'My secret type',
                 'name_inverse': 'Do I look inverse?',
@@ -93,12 +89,18 @@ class TypeTest(TestBaseCase):
             assert b'Male' in rv.data
 
             # Administrative unit
+            admin_unit_id = Type.get_hierarchy('Administrative unit').id
             rv = self.app.get(
-                url_for(
-                    'view',
-                    id_=Type.get_hierarchy('Administrative unit').id),
-                follow_redirects=True)
+                url_for('view', id_=admin_unit_id), follow_redirects=True)
             assert b'Austria' in rv.data
+            rv = self.app.post(
+                url_for(
+                    'insert',
+                    class_='administrative_unit',
+                    origin_id=g.types[admin_unit_id].subs[0]),
+                data={'name': 'admin unit'},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
 
             # Value type
             rv = self.app.get(

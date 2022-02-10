@@ -151,7 +151,8 @@ class Entity:
             self.update_attributes(data['attributes'])
         if 'aliases' in data:
             self.update_aliases(data['aliases'])
-        if 'administrative_units' in data:
+        if 'administrative_units' in data \
+                and self.class_.name != 'administrative_unit':
             self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
             redirect_link_id = self.update_links(data['links'], new)
