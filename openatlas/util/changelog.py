@@ -1,6 +1,9 @@
 class Changelog:
 
     versions = {
+        '7.0.4': ['2022-02-10', {
+            'fix': {
+                '1616': 'Error at inserting an administrative unit'}}],
         '7.0.3': ['2022-02-02', {
             'fix': {
                 '1634': 'Value Type with Subtype error'}}],
