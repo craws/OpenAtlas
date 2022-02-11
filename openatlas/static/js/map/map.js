@@ -110,13 +110,11 @@ if (gisPointAll) {
     });
 }
 
-
 cluster.addLayer(pointLayer);
 map.addLayer(cluster);
 markerControls.Cluster = cluster;
 //map.addLayer(pointLayer);
 markerControls.Markers = pointLayer;
-
 
 if (gisPolygonAll) {
     polygonLayer = new L.GeoJSON(gisPolygonAll, {
@@ -254,10 +252,10 @@ for (i = 0; i < overlays.length; i++) {
         overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
     }
     if (((overlays[i].boundingBox).length) === 3) {
-        var topleft    = L.latLng(overlays[i].boundingBox[0]);
+      var topleft    = L.latLng(overlays[i].boundingBox[0]);
 	    var topright   = L.latLng(overlays[i].boundingBox[1]);
 	    var bottomleft = L.latLng(overlays[i].boundingBox[2]);
-        overlay = L.imageOverlay.rotated('/display/' + overlays[i].image, topleft, topright, bottomleft)
+      overlay = L.imageOverlay.rotated('/display/' + overlays[i].image, topleft, topright, bottomleft)
     }
     UnitControls[overlays[i].name] = overlay;
     overlay.addTo(map)
@@ -346,7 +344,6 @@ geoSearchControl.on('select', function (e) {
 
 map.addControl(geoSearchControl);
 
-
 function setObjectId(e) {
     layer = e.layer;
     editLayer = e.layer;
@@ -408,19 +405,19 @@ function setPopup(feature, layer, mode) {
     layer.bindPopup(buildPopup(feature, 'view', selected));
 }
 
-//filter to get polygons from the geojson
+// Filter to get polygons from the geojson
 function polygonFilter(feature) {
     if (feature.geometry.type === "Polygon")
         return true
 }
 
-//filter to get points from the geojson
+// Filter to get points from the geojson
 function pointFilter(feature) {
     if (feature.geometry.type === "Point")
         return true
 }
 
-//filter to get linestrings from the geojson
+// Filter to get linestrings from the geojson
 function lineFilter(feature) {
     if (feature.geometry.type === "Linestring")
         return true

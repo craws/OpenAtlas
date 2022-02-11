@@ -6,35 +6,35 @@
 
 {% if id == '0' %}
     <script>
-        let name = '{{name}}';
-        let length = 0;
-        let lastIndex = 0;
+        let rlf_name = '{{name}}';
+        let rlf_length = 0;
+        let rlf_lastIndex = 0;
 
-        const initializeValues = () => {
-            let elements = $(`ul[id='${name}'] li`);
-            length = elements.length;
-            lastIndex = length
+        const rlf_initializeValues = () => {
+            let rlf_elements = $(`ul[id='${rlf_name}'] li`);
+            rlf_length = rlf_elements.length;
+            rlf_lastIndex = rlf_length
         }
 
-        $(`.add-${name}`).click(function () {
-            if (length === 0)
-                initializeValues();
+        $(`.add-${rlf_name}`).click(function () {
+            if (rlf_length === 0)
+                rlf_initializeValues();
 
-            const label = `<label for="${name}-${lastIndex}"></label>`
-            const input = `<input id="${name}-${lastIndex}" name="${name}-${lastIndex}" type="text"/>`;
-            const button = `<button type="button" id="remove-${name}-${lastIndex}" class="remove-${name} btn-secondary btn-xsm">-</button>`;
+            const rlf_label = `<label for="${rlf_name}-${rlf_lastIndex}"></label>`
+            const rlf_input = `<input id="${rlf_name}-${rlf_lastIndex}" name="${rlf_name}-${rlf_lastIndex}" type="text"/>`;
+            const rlf_button = `<button type="button" id="remove-${rlf_name}-${rlf_lastIndex}" class="remove-${rlf_name} btn-secondary btn-xsm">-</button>`;
 
-            $(`#add-${name}-0`).parent().parent().children().eq(length - 1).after(`<li>${label}${input} ${button}</li>`)
-            length++;
-            lastIndex++;
+            $(`#add-${rlf_name}-0`).parent().parent().children().eq(rlf_length - 1).after(`<li>${rlf_label}${rlf_input} ${rlf_button}</li>`)
+            rlf_length++;
+            rlf_lastIndex++;
         })
 
-        $(`ul[id='${name}']`).on('click', `.remove-${name}`, function (e) {
-            if (length === 0)
-                initializeValues();
-            const id = e.target.id;
-            $(`#${id}`).parent().remove();
-            length--;
+        $(`ul[id='${rlf_name}']`).on('click', `.remove-${rlf_name}`, function (e) {
+            if (rlf_length === 0)
+                rlf_initializeValues();
+            const rlf_id = e.target.id;
+            $(`#${rlf_id}`).parent().remove();
+            rlf_length--;
         })
     </script>
     <style>

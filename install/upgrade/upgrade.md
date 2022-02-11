@@ -36,19 +36,6 @@ At admin/mail the port should be the default mail submission port **587**
 (in most cases). If you got port **25** there, you might want to change it. You
 should check results with the test mail function there afterwards.
 
-### 7.0.x to 7.0.3
-Execute **install/upgrade/7.0.3.sql** after making backups.
-
-It deletes possible wrong links created because of bug #1634
-If 7.1.0. sql is already available (in develop at point of writing this) you
-can skip this because it's included there too.
-
-### 7.0.1 to 7.0.2
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 7.0.0 to 7.0.1
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
 ### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are
 using Debian upgrade it to 11 (bullseye).
@@ -58,18 +45,6 @@ packages for the update.
 
 If you upgrade a Debian system to bullseye be sure to have the new postgis
 packages installed (see install.md) before you upgrade database clusters.
-
-### 6.6.x to 6.6.4
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 6.6.x to 6.6.3
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 6.6.x to 6.6.2
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 6.6.0 to 6.6.1
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.5.x to 6.6.0
 
@@ -98,19 +73,10 @@ be accessed via:
 
     /api/0.3/<endpoint>
 
-### 6.5.1 to 6.5.2
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 6.5.0 to 6.5.1
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
 ### 6.4.x to 6.5.0
 Install python3-rdflib and python3-rdflib-jsonld for the RDF feature (#1184):
 
     # apt install python3-rdflib python3-rdflib-jsonld
-
-### 6.4.0 to 6.4.1
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.3.0 to 6.4.0
 Execute **install/upgrade/6.4.0.sql** after making backups. This will activate
@@ -139,9 +105,6 @@ If you get the error "not overwriting existing 'static/package.json'",
 delete this file and try again.
 
 ### 6.2.x to 6.3.0
-A code base update (e.g. with git pull) and an Apache restart is sufficient.
-
-### 6.2.0 to 6.2.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
 ### 6.1.0 to 6.2.0
