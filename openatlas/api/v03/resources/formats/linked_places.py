@@ -107,7 +107,7 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
         for link in links:
             if link.range.id == type_.id and link.description:
                 type_dict['value'] = link.description
-                if type_.description:
+                if link.range.id == type_.id and type_.description:
                     type_dict['unit'] = type_.description
         types.append(type_dict)
     return types
