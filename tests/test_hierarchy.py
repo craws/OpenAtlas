@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -16,7 +18,7 @@ class HierarchyTest(TestBaseCase):
                     ['file', 'group', 'move', 'person', 'place', 'source'],
                 'multiple': True,
                 'description': 'Very important!'}
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('hierarchy_insert', category='custom'),
                 follow_redirects=True,
                 data=data)

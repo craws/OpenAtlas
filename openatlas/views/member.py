@@ -18,9 +18,7 @@ from openatlas.util.util import required_group
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/member/insert/<int:origin_id>/<code>', methods=['POST', 'GET'])
 @required_group('contributor')
-def member_insert(
-        origin_id: int,
-        code: Optional[str] = 'member') -> Union[str, Response]:
+def member_insert(origin_id: int, code: str = 'member') -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     form = build_form('actor_function', code=code)
     form.member_origin_id.data = origin.id

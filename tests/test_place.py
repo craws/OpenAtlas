@@ -1,14 +1,15 @@
 import os
 import pathlib
+from typing import Any
 
 from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -16,7 +17,7 @@ class PlaceTest(TestBaseCase):
 
     def test_place(self) -> None:
         with app.app_context():
-            rv = self.app.get(url_for('insert', class_='place'))
+            rv: Any = self.app.get(url_for('insert', class_='place'))
             assert b'+ Place' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

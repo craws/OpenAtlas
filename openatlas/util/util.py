@@ -918,7 +918,7 @@ def display_value_type_fields(
         form: Any,
         type_: Type,
         root: Optional[Type] = None,
-        hierarchy_level: Optional[int] = 0) -> str:
+        level: int = 0) -> str:
     html = ''
     root = root if root else type_
     for sub_id in type_.subs:
@@ -932,16 +932,12 @@ def display_value_type_fields(
         html += f"""
         <div class="mt-2 table-row value-type-switch{type_.id}">
             <div></div>
-            <div class="table-cell ">
+            <div class="table-cell">
                 <div class="d-flex">
                     <div
-                        class="d-flex justify-content-between"
-                        style="width:16.15em;"
-                    >
-                        <div
-                            class="ml-{hierarchy_level}
-                            position-relative text-wrap"
-                        >
+                            class="d-flex justify-content-between"
+                            style="width:16.15em;">
+                        <div class="ml-{level} position-relative text-wrap">
                             <div class="value-type-expander">
                                 {expand_button}
                             </div>
@@ -950,10 +946,10 @@ def display_value_type_fields(
                         {field(class_='value-type')}
                     </div>
                     <span class="ml-1">
-                        {sub.description if sub.description is not None else ''}
+                        {sub.description if sub.description else ''}
                     </span>
                 </div>
-                {display_value_type_fields(form, sub, root, hierarchy_level+1)}
+                {display_value_type_fields(form, sub, root, level+1)}
             </div>
         </div>"""
     return html
