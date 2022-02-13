@@ -4,7 +4,7 @@ import ast
 from typing import Any, Optional, Union
 
 import numpy
-from flask import g, session
+from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -43,8 +43,8 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
         label = uc_first(field.label.text)
         if profile and field.name in current_user.settings:
             value = current_user.settings[field.name]
-        elif field.name in session['settings']:
-            value = session['settings'][field.name]
+        elif field.name in g.settings:
+            value = g.settings[field.name]
         else:  # pragma: no cover
             value = ''  # In case of a missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
@@ -76,17 +76,17 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = current_user.settings[field.name]
             continue
         if field.name in ['log_level']:
-            field.data = int(session['settings'][field.name])
+            field.data = int(g.settings[field.name])
             continue
         if field.name in [
                 'mail_recipients_feedback',
                 'file_upload_allowed_extension']:
-            field.data = ' '.join(session['settings'][field.name])
+            field.data = ' '.join(g.settings[field.name])
             continue
-        if field.name not in session['settings']:  # pragma: no cover
+        if field.name not in g.settings:  # pragma: no cover
             field.data = ''  # In case of a missing setting after an update
             continue
-        field.data = session['settings'][field.name]
+        field.data = g.settings[field.name]
 
 
 def process_form_data(

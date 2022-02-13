@@ -2,7 +2,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from typing import Any
 
-from flask import session
+from flask import g
 
 from openatlas import app
 from openatlas.database.cidoc_class import CidocClass as Db
@@ -28,8 +28,8 @@ class CidocClass:
         from openatlas import get_locale
         if get_locale() in self.i18n:
             return self.i18n[get_locale()]
-        if session['settings']['default_language'] in self.i18n:
-            return self.i18n[session['settings']['default_language']]
+        if g.settings['default_language'] in self.i18n:
+            return self.i18n[g.settings['default_language']]
         return getattr(self, '_name')  # pragma: no cover
 
     @staticmethod

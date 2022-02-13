@@ -19,7 +19,7 @@
   <div style="float:left;margin-left:2em;">
     <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
     <div class="toolbar">
-      {% if settings.logo_file_id %}
+      {% if g.settings.logo_file_id %}
         {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
       {% else %}
         {{ _('choose custom logo')|button(url_for('admin_logo')) }}

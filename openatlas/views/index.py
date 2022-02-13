@@ -115,18 +115,17 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
-    settings = session['settings']
     form = FeedbackForm()
-    if form.validate_on_submit() and settings['mail']:  # pragma: no cover
+    if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
         body = \
             f'{form.subject.data} from {current_user.username} ' \
             f'({current_user.id}) {current_user.email} at ' \
             f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                f"{uc_first(form.subject.data)} from {settings['site_name']}",
+                f"{uc_first(form.subject.data)} from {g.settings['site_name']}",
                 body,
-                settings['mail_recipients_feedback']):
+                g.settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:
             flash(_('error mail send'), 'error')

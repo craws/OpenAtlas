@@ -1,7 +1,7 @@
 <div id="profile-image-div">
     {% set url = url_for('display_file', filename=path.name) %}
     {% set src = url %}
-    {% set style = 'max-width:' + session.settings.profile_image_width + 'px;' %}
+    {% set style = 'max-width:' + g.settings.profile_image_width + 'px;' %}
     {% set ext = config.DISPLAY_FILE_EXTENSIONS %}
     {% if resized %}
         {% set src = resized %}
