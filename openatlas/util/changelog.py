@@ -5,10 +5,10 @@ versions = {
             '1285': 'Improved value types display',
             '1593': 'Adding multiple aliases at once instead one at a time',
             '1629': 'Improved mail function',
+            '1624': 'Minor improvements and refactor',
             '1599': 'API: Search parameter include all subtypes',
             '1600': 'API: Search for values in value types',
-            '1623': 'API: Show types for view name',
-            '1624': 'Refactor'},
+            '1623': 'API: Show types for view name'},
         'fix': {
             '1626':
                 "API: typed_entities doesn't show types in geojson format"}}],
