@@ -174,8 +174,11 @@
 {% with messages = get_flashed_messages(with_categories=true) %}
   {% if messages %}
     {% for category, message in messages %}
-      <div class="alert alert-{{ category }}" role="alert">
+      <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
         {{ message|uc_first }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="{{ _('close')|uc_first }}">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
     {% endfor %}
   {% endif %}
