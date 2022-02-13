@@ -17,7 +17,7 @@ DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
-SECRET_KEY = 'CHANGE ME'
+SECRET_KEY = 'CHANGE ME'  # Used for cookies
 
 # Files with these extensions are can be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = \
