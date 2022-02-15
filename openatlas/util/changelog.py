@@ -1,4 +1,5 @@
 versions = {
+    '7.2.0': ['TBA', {}],
     '7.1.0': ['2022-02-15', {
         'feature': {
             '1506': 'Update CIDOC CRM to 7.1.1',
