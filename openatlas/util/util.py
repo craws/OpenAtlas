@@ -714,7 +714,7 @@ def breadcrumb(crumbs: list[Any]) -> str:
     for item in crumbs:
         if not item:
             continue  # e.g. if a dynamic generated URL has no origin parameter
-        elif isinstance(item, (Entity, Project, User)):
+        if isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
             items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')

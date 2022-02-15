@@ -1,5 +1,5 @@
 import ast
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
