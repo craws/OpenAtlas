@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 from werkzeug.exceptions import abort
 
@@ -36,7 +38,7 @@ class UserTests(TestBaseCase):
                 if not logged_in_user:
                     abort(404)  # pragma: no cover
                 logged_in_user.remove_newsletter()
-            rv = self.app.get(url_for('user_insert'))
+            rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]

@@ -3,7 +3,7 @@
   {{ form|display_form('login-form') }}
   {% if config.DEMO_MODE %}
     <p>User: Demolina, Pass: Demolina</p>
-  {% elif session.settings.mail %}
+  {% elif g.settings.mail %}
     <p>
       <a href="{{ url_for('reset_password') }}">{{ _('Forgot your password?') }}</a>
     </p>

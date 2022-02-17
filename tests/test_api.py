@@ -8,9 +8,8 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
     InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
-    LastEntityError, \
-    NoEntityAvailable, NoSearchStringError, QueryEmptyError, TypeIDError, \
-    ValueNotIntegerError
+    LastEntityError,  NoEntityAvailable, NoSearchStringError, QueryEmptyError, \
+    TypeIDError, ValueNotIntegerError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem

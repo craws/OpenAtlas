@@ -47,7 +47,7 @@ def get_locale() -> str:
         return session['language']
     best_match = request.accept_languages.best_match(
         app.config['LANGUAGES'].keys())
-    return best_match if best_match else session['settings']['default_language']
+    return best_match if best_match else g.settings['default_language']
 
 
 @app.before_request
@@ -63,7 +63,7 @@ def before_request() -> None:
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid overhead for files if not using Apache with static alias
     open_connection(app.config)
-    session['settings'] = Settings.get_settings()
+    g.settings = Settings.get_settings()
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
     g.properties = CidocProperty.get_all()
@@ -77,12 +77,12 @@ def before_request() -> None:
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = \
-        session['settings']['file_upload_max_size'] * 1024 * 1024
+        g.settings['file_upload_max_size'] * 1024 * 1024
 
     if request.path.startswith('/api/'):
         ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
         if not current_user.is_authenticated \
-                and not session['settings']['api_public'] \
+                and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
             raise AccessDeniedError  # pragma: no cover
 

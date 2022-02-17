@@ -10,7 +10,7 @@
             document.location.href = data.node.original.href;
         });
         $("#{{ name }}-tree-search").keyup(function() {
-            if (this.value.length >= {{ session.settings.minimum_jstree_search }}) {
+            if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
                 $("#{{ name }}-tree").jstree("search", $(this).val());
             }
         });

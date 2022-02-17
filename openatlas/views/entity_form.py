@@ -1,7 +1,7 @@
 import os
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, session, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -132,7 +132,7 @@ def add_crumbs(
                 sibling_count += 1
     siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
     return crumbs + \
-           [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -214,7 +214,7 @@ def insert_files(
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
             file.save(str(app.config['UPLOAD_DIR'] / new_name))
             filenames.append(new_name)
-            if session['settings']['image_processing']:
+            if g.settings['image_processing']:
                 resize_image(new_name)
             if len(form.file.data) > 1:
                 form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'

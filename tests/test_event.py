@@ -1,9 +1,11 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -13,7 +15,7 @@ class EventTest(TestBaseCase):
         with app.app_context():
             # Create entities for event
             place_name = 'Lewis and Clark'
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('insert', class_='place'),
                 data={
                     'name': place_name,

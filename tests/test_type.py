@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import g, url_for
 
 from openatlas import app
@@ -20,7 +22,7 @@ class TypeTest(TestBaseCase):
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
-            rv = self.app.get(url_for('view', id_=historical_type.subs[0]))
+            rv: Any = self.app.get(url_for('view', id_=historical_type.subs[0]))
             assert b'Historical place' in rv.data
             rv = self.app.get(url_for('type_index'))
             assert b'Actor actor relation' in rv.data

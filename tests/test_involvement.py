@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -11,7 +13,7 @@ class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
         with app.app_context():
-            rv = self.app.post(
+            rv: Any = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
                     'name': 'Event Horizon',

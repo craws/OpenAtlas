@@ -15,7 +15,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 import numpy
 from bcrypt import hashpw
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -324,25 +324,25 @@ def send_mail(
         Set log_body to False for sensitive data, e.g. password mails
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
-    settings = session['settings']
-    if not settings['mail'] or not recipients:
+    if not g.settings['mail'] or not recipients:
         return False
-    mail_user = settings['mail_transport_username']
-    from_ = f"{settings['mail_from_name']} <{settings['mail_from_email']}>"
+    from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
     try:
         with smtplib.SMTP(
-                settings['mail_transport_host'],
-                settings['mail_transport_port']) as smtp:
+                g.settings['mail_transport_host'],
+                g.settings['mail_transport_port']) as smtp:
             smtp.starttls()
-            if settings['mail_transport_username']:
-                smtp.login(mail_user, app.config['MAIL_PASSWORD'])
+            if g.settings['mail_transport_username']:
+                smtp.login(
+                    g.settings['mail_transport_username'],
+                    app.config['MAIL_PASSWORD'])
             for recipient in recipients:
                 msg = MIMEText(text, _charset='utf-8')
                 msg['From'] = from_
                 msg['To'] = recipient.strip()
                 msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
                 smtp.sendmail(
-                    settings['mail_from_email'],
+                    g.settings['mail_from_email'],
                     recipient, msg.as_string())
             log_text = \
                 f'Mail from {from_} to {", ".join(recipients)} ' \
@@ -350,11 +350,17 @@ def send_mail(
             log_text += f' Content: {text}' if log_body else ''
             logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
-        logger.log('error', 'mail', f'Error mail login for {mail_user}', e)
+        logger.log(
+            'error',
+            'mail',
+            f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        logger.log('error', 'mail', f'Error send mail for {mail_user}', e)
+        logger.log(
+            'error',
+            'mail',
+            f"Error send mail for {g.settings['mail_transport_username']}", e)
         flash(_('error mail send'), 'error')
         return False
     return True
@@ -366,11 +372,10 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
     if not is_authorized('manager'):
         return ''
     warnings = []
-    if app.config['DATABASE_VERSION'] != \
-            session['settings']['database_version']:
+    if app.config['DATABASE_VERSION'] != g.settings['database_version']:
         warnings.append(
             f"Database version {app.config['DATABASE_VERSION']} is needed but "
-            f"current version is {session['settings']['database_version']}")
+            f"current version is {g.settings['database_version']}")
     for path in app.config['WRITABLE_DIRS']:
         if not os.access(path, os.W_OK):
             warnings.append(
@@ -709,7 +714,7 @@ def breadcrumb(crumbs: list[Any]) -> str:
     for item in crumbs:
         if not item:
             continue  # e.g. if a dynamic generated URL has no origin parameter
-        elif isinstance(item, (Entity, Project, User)):
+        if isinstance(item, (Entity, Project, User)):
             items.append(link(item))
         elif isinstance(item, list):
             items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')
@@ -778,8 +783,7 @@ def display_profile_image(entity: Entity) -> str:
         return ''  # pragma: no cover
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
-    if session['settings']['image_processing']\
-            and check_processed_image(path.name):
+    if g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(entity.image_id, size):
             resized = url_for('display_file', filename=path_.name, size=size)
     return Markup(
@@ -918,7 +922,7 @@ def display_value_type_fields(
         form: Any,
         type_: Type,
         root: Optional[Type] = None,
-        hierarchy_level: Optional[int] = 0) -> str:
+        level: int = 0) -> str:
     html = ''
     root = root if root else type_
     for sub_id in type_.subs:
@@ -932,16 +936,12 @@ def display_value_type_fields(
         html += f"""
         <div class="mt-2 table-row value-type-switch{type_.id}">
             <div></div>
-            <div class="table-cell ">
+            <div class="table-cell">
                 <div class="d-flex">
                     <div
-                        class="d-flex justify-content-between"
-                        style="width:16.15em;"
-                    >
-                        <div
-                            class="ml-{hierarchy_level}
-                            position-relative text-wrap"
-                        >
+                            class="d-flex justify-content-between"
+                            style="width:16.15em;">
+                        <div class="ml-{level} position-relative text-wrap">
                             <div class="value-type-expander">
                                 {expand_button}
                             </div>
@@ -950,10 +950,10 @@ def display_value_type_fields(
                         {field(class_='value-type')}
                     </div>
                     <span class="ml-1">
-                        {sub.description if sub.description is not None else ''}
+                        {sub.description if sub.description else ''}
                     </span>
                 </div>
-                {display_value_type_fields(form, sub, root, hierarchy_level+1)}
+                {display_value_type_fields(form, sub, root, level+1)}
             </div>
         </div>"""
     return html

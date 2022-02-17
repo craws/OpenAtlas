@@ -1,6 +1,6 @@
 <script>
     var geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
-    var geoNamesUsername =  '{{ session.settings.geonames_username }}';
+    var geoNamesUsername =  '{{ g.settings.geonames_username }}';
     var gisPointAll =        {{ gis_data.gisPointAll|safe }};
     var gisPointSupers =     {{ gis_data.gisPointSupers|safe }};
     var gisPointSubs =       {{ gis_data.gisPointSubs|safe }};
@@ -17,8 +17,8 @@
     var mapMaxZoom             = {{ current_user.settings.map_zoom_max }}
     var mapDefaultZoom         =  {{ current_user.settings.map_zoom_default }}
     var map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
-    var maxClusterRadius        = {{ session.settings.map_cluster_max_radius }};
-    var disableClusteringAtZoom = {{ session.settings.map_cluster_disable_at_zoom }};
+    var maxClusterRadius        = {{ g.settings.map_cluster_max_radius }};
+    var disableClusteringAtZoom = {{ g.settings.map_cluster_disable_at_zoom }};
     translate.save    = '{{ _('save')|uc_first|safe }}';
     translate.edit    = '{{ _('edit')|uc_first|safe }}';
     translate.delete  = '{{ _('delete')|uc_first|safe }}';

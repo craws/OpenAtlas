@@ -15,7 +15,8 @@ from wtforms.validators import (
 
 from openatlas import app
 from openatlas.forms.field import (
-    TableField, TableMultiField, TreeField, TreeMultiField, ValueFloatField, RemovableListField)
+    TableField, TableMultiField, TreeField, TreeMultiField, ValueFloatField,
+    RemovableListField)
 from openatlas.forms.populate import pre_populate_form
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
@@ -73,10 +74,7 @@ def build_form(
             else [InputRequired()],
             render_kw={'autofocus': True}))
     if 'alias' in FORMS[class_]:
-        setattr(
-            Form,
-            'alias',
-            FieldList(RemovableListField('')));
+        setattr(Form, 'alias', FieldList(RemovableListField('')))
     if class_ in g.classes and g.classes[class_].hierarchies:
         add_types(Form, class_)
     add_fields(Form, class_, code, entity, origin)

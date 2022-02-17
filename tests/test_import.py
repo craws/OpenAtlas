@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Any
 
 from flask import url_for
 
@@ -12,7 +13,7 @@ class ImportTest(TestBaseCase):
     def test_import(self) -> None:
         with app.app_context():
             # Projects
-            rv = self.app.get(url_for('import_project_insert'))
+            rv: Any = self.app.get(url_for('import_project_insert'))
             assert b'Name *' in rv.data
             rv = self.app.post(
                 url_for('import_project_insert'),

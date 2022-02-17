@@ -25,7 +25,7 @@ Please refer to [install.md](install.md) for requirements and installation.
 # Team
 
 **Stefan Eichert** - Idea, Concept and Data Modelling
-([stefan.eichert@univie.ac.at](mailto:stefan.eichert@univie.ac.at))
+([stefan.eichert@nhm-wien.ac.at](mailto:stefan.eichert@nhm-wien.ac.at))
 
 **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))

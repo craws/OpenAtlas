@@ -3,7 +3,7 @@ from pathlib import Path
 
 from openatlas import app
 
-VERSION = '7.1.0'
+VERSION = '7.2.0'
 DATABASE_VERSION = '7.1.0'
 DEMO_MODE = False  # If activated some options are disabled, login is pre filled
 IS_UNIT_TEST = False
@@ -17,7 +17,7 @@ DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
-SECRET_KEY = 'CHANGE ME'
+SECRET_KEY = 'CHANGE ME'  # Used for cookies
 
 # Files with these extensions are can be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = \
