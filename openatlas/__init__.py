@@ -18,7 +18,7 @@ csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 # Use test database if running tests
 INSTANCE = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 
-app.config.from_object('config')
+app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 

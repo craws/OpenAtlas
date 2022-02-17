@@ -1,4 +1,4 @@
-# Settings from config.py can be overwritten here (which is not tracked by git)
+# Settings from config/default.py can be overwritten here
 
 DATABASE_PASS = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'  # Used for cookies
