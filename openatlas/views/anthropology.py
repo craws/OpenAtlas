@@ -11,6 +11,7 @@ from openatlas import app
 from openatlas.models.anthropology import SexEstimation
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
+from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, required_group, uc_first
 
 
@@ -34,10 +35,14 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
             button(
                 _('edit'),
                 url_for('anthropology_sex_update', id_=entity.id)))
+    table = Table(
+        ['name', 'value'],
+        rows=[[type_.name, value] for type_, value in entity.types.items()])
     return render_template(
         'anthropology/sex.html',
         entity=entity,
         buttons=buttons,
+        table=table,
         crumbs=[
             entity,
             [_('anthropological analyzes'),
