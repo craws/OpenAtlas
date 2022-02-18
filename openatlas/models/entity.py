@@ -25,7 +25,6 @@ class Entity:
     def __init__(self, data: dict[str, Any]) -> None:
 
         self.id = data['id']
-        self.standard_type = None
         self.name = data['name']
         self.description = data['description']
         self.created = data['created']
@@ -39,22 +38,22 @@ class Entity:
         self.location: Optional[Entity] = None  # Respective location if a place
         self.info_data: dict[str, Union[str, list[str], None]]
 
+        self.standard_type = None
+        self.types: dict[Type, str] = {}
+        if 'types' in data and data['types']:
+            for item in data['types']:  # f1 = type id, f2 = value
+                type_ = g.types[item['f1']]
+                self.types[type_] = item['f2']
+                if type_.category == 'standard':
+                    self.standard_type = type_
+
         self.aliases: dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
-            for alias in data['aliases']:
-                # f1 = alias id, f2 = alias name
+            for alias in data['aliases']: # f1 = alias id, f2 = alias name
                 self.aliases[alias['f1']] = alias['f2']
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
                 key=lambda item_: item_[1])}
-
-        self.types: dict[Type, str] = {}
-        if 'types' in data and data['types']:
-            for item in data['types']:
-                type_ = g.types[item['f1']]  # f1 = type id, f2 = value
-                self.types[type_] = item['f2']
-                if type_.category == 'standard':
-                    self.standard_type = type_
 
         # Dates
         self.begin_from = None
