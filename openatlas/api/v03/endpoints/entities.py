@@ -10,8 +10,8 @@ from openatlas.api.v03.resources.parser import entity_, query
 from openatlas.api.v03.resources.resolve_endpoints import resolve_entities, \
     resolve_entity
 from openatlas.api.v03.resources.util import get_by_cidoc_classes, \
-    get_entities_by_system_classes, \
-    get_entities_by_view_classes, get_entities_by_ids, get_entities_linked_to_special_type, \
+    get_entities_by_ids, get_entities_by_system_classes, \
+    get_entities_by_view_classes, get_entities_linked_to_special_type, \
     get_entities_linked_to_special_type_recursive, \
     get_entities_linked_to_type_recursive, get_entity_by_id, \
     get_linked_entities_api
@@ -118,14 +118,13 @@ class GetQuery(Resource):
         if parser['entities']:
             entities.extend(get_entities_by_ids(parser['entities']))
         if parser['view_classes']:
-            entities.extend(get_entities_by_view_classes(
-                [code_ for code_ in parser['view_classes']]))
+            entities.extend(
+                get_entities_by_view_classes(parser['view_classes']))
         if parser['system_classes']:
-            entities.extend(get_entities_by_system_classes(
-                [classes for classes in parser['system_classes']]))
+            entities.extend(
+                get_entities_by_system_classes(parser['system_classes']))
         if parser['cidoc_classes']:
-            entities.extend(get_by_cidoc_classes(
-                [classes for classes in parser['cidoc_classes']]))
+            entities.extend(get_by_cidoc_classes(parser['cidoc_classes']))
         return resolve_entities(entities, parser, 'query')
 
 

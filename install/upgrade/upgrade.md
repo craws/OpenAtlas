@@ -34,7 +34,8 @@ sites might be needed.
 #### Mail function change
 At admin/mail the port should be the default mail submission port **587**
 (in most cases). If you got port **25** there, you might want to change it. You
-should check results with the test mail function there afterwards.
+can check the functionality with the **Send test mail** function there
+afterwards.
 
 ### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are

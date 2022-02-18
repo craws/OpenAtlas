@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import session
+from flask import g, session
 
 from openatlas import app
 from openatlas.database.content import Content as Db
@@ -32,7 +32,7 @@ def get_translation(name: str, lang: Optional[str] = None) -> str:
         return translations[lang]  # pragma: no cover, can be used by API
     if translations[session['language']]:
         return translations[session['language']]
-    return translations[session['settings']['default_language']]
+    return translations[g.settings['default_language']]
 
 
 def update_content(data: list[dict[str, str]]) -> None:

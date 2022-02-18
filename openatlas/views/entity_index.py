@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional, Union
 
-from flask import flash, g, render_template, session, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -51,7 +51,7 @@ def get_table(view: str) -> Table:
     header = g.table_headers[view]
     if view == 'file':
         header = ['date'] + header
-        if session['settings']['image_processing'] \
+        if g.settings['image_processing'] \
                 and current_user.settings['table_show_icons']:
             header.insert(1, _('icon'))
     table = Table(header)
@@ -71,7 +71,7 @@ def get_table(view: str) -> Table:
                 g.file_stats[entity.id]['ext']
                 if entity.id in g.file_stats else 'N/A',
                 entity.description]
-            if session['settings']['image_processing'] \
+            if g.settings['image_processing'] \
                     and current_user.settings['table_show_icons']:
                 data.insert(1, file_preview(entity.id))
             table.rows.append(data)

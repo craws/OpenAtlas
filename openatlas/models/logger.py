@@ -1,6 +1,6 @@
 from typing import Any, Union
 
-from flask import request, session
+from flask import g, request
 from flask_login import current_user
 
 from openatlas import app
@@ -18,7 +18,7 @@ class Logger:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels.keys())[
             list(log_levels.values()).index(priority_)]
-        if int(session['settings']['log_level']) < priority:  # pragma: no cover
+        if int(g.settings['log_level']) < priority:  # pragma: no cover
             return
         Db.log({
             'priority': priority,

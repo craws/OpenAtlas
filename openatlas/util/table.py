@@ -23,7 +23,7 @@ class Table:
         self.order = order if order else ''
         self.defs = defs if defs else []
 
-    def display(self, name: Optional[str] = 'default') -> str:
+    def display(self, name: str = 'default') -> str:
         if not self.rows:
             return Markup(f"<p>{uc_first(_('no entries'))}</p>")
         self.defs.append({

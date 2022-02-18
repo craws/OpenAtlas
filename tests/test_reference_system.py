@@ -3,8 +3,8 @@ from typing import Any
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.type import Type
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -12,7 +12,7 @@ class ReferenceSystemTest(TestBaseCase):
 
     def test_reference_system(self) -> None:
         with app.app_context():
-            rv = self.app.get(url_for('index', view='reference_system'))
+            rv: Any = self.app.get(url_for('index', view='reference_system'))
             assert b'GeoNames' in rv.data
             geonames = ReferenceSystem.get_by_name('GeoNames')
             wikidata = ReferenceSystem.get_by_name('Wikidata')

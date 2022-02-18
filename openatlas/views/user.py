@@ -1,7 +1,7 @@
 from typing import Optional, Union
 
 import bcrypt
-from flask import abort, flash, render_template, request, session, url_for
+from flask import abort, flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -61,8 +61,7 @@ class UserForm(FlaskForm):
                 self.password.errors.append(_('error passwords must match'))
                 self.password2.errors.append(_('error passwords must match'))
                 valid = False
-            if len(self.password.data) < \
-                    session['settings']['minimum_password_length']:
+            if len(self.password.data) < g.settings['minimum_password_length']:
                 self.password.errors.append(_('error password too short'))
                 valid = False
         return valid
@@ -193,7 +192,7 @@ def user_update(id_: int) -> Union[str, Response]:
 def user_insert() -> Union[str, Response]:
     form = UserForm()
     form.group.choices = get_groups()
-    if not session['settings']['mail']:
+    if not g.settings['mail']:
         del form.send_info
     if form.validate_on_submit():
         user_id = User.insert({
@@ -207,11 +206,10 @@ def user_insert() -> Union[str, Response]:
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
         flash(_('user created'), 'info')
-        if session['settings']['mail'] \
-                and form.send_info.data:  # pragma: no cover
+        if g.settings['mail'] and form.send_info.data:  # pragma: no cover
             subject = _(
                 'Your account information for %(sitename)s',
-                sitename=session['settings']['site_name'])
+                sitename=g.settings['site_name'])
             body = _('Account information for %(username)s',
                      username=form.username.data) + \
                 f" {_('at')} {request.scheme}://{request.headers['Host']}\n\n" \

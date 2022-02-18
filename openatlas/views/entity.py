@@ -1,6 +1,6 @@
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -129,7 +129,7 @@ def view(id_: int) -> Union[str, Response]:
 
     if 'file' in tabs \
             and current_user.settings['table_show_icons'] \
-            and session['settings']['image_processing']:
+            and g.settings['image_processing']:
         tabs['file'].table.header.insert(1, uc_first(_('icon')))
         for row in tabs['file'].table.rows:
             row.insert(
@@ -182,7 +182,7 @@ def get_profile_image_table_link(
             _('unset'),
             url_for('file_remove_profile_image', entity_id=entity.id))
     if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
-            session['settings']['image_processing']
+            g.settings['image_processing']
             and extension in app.config['ALLOWED_IMAGE_EXT']):
         return link(
             _('set'),
