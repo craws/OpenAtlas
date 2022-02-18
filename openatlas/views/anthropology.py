@@ -54,11 +54,10 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def anthropology_sex_update(id_: int) -> Union[str, Response]:
 
-    # Build the form with selects for features
-    class Form(FlaskForm):  # type: ignore
+    class Form(FlaskForm):
         pass
 
-    entity = Entity.get_by_id(id_)
+    entity = Entity.get_by_id(id_, types=True)
 
     choices = [(option, option) for option in SexEstimation.options.keys()]
     for features in SexEstimation.features.values():
@@ -77,6 +76,7 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
                     default='Not preserved',
                     description=description))
     setattr(Form, 'save', SubmitField(_('save')))
+
     form = Form()
 
     #  Add type information to features
@@ -93,6 +93,9 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         SexEstimation.save(entity, data)
         return redirect(url_for('anthropology_sex', id_=entity.id))
 
+    # Fill in data
+    for type_, value in entity.types.items():
+        getattr(form, type_.name).data = value
 
     return render_template(
         'anthropology/sex_update.html',
