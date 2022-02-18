@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.models.anthropology import SexEstimation
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.util import required_group, uc_first
+from openatlas.util.util import button, is_authorized, required_group, uc_first
 
 
 @app.route('/anthropology/index/<int:id_>')
@@ -28,9 +28,16 @@ def anthropology_index(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def anthropology_sex(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
+    buttons = []
+    if is_authorized('contributor'):
+        buttons.append(
+            button(
+                _('edit'),
+                url_for('anthropology_sex_update', id_=entity.id)))
     return render_template(
         'anthropology/sex.html',
         entity=entity,
+        buttons=buttons,
         crumbs=[
             entity,
             [_('anthropological analyzes'),

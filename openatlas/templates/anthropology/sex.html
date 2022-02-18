@@ -1,9 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
+    {{ buttons|button_bar }}
     <h1>{{ _('sex estimation')|uc_first }} - {{ entity.name }}</h1>
-    {% if 'contributor'|is_authorized %}
-        {{ _('edit')|button(url_for('anthropology_sex_update', id_=entity.id)) }}
-    {% endif %}
     {% for type, value in entity.types.items() %}
         {{ type.name }} - {{ value }}<br>
     {% endfor %}
