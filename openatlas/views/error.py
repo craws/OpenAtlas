@@ -8,7 +8,7 @@ from openatlas.api.v02.resources.error import MethodNotAllowedError
 
 
 @app.errorhandler(400)
-def bad_request(e: Exception) -> tuple[Any, int]:  # pragma: no cover
+def bad_request(e: Exception) -> tuple[Any, int]:
     return render_template(
         'error/400.html',
         crumbs=['400 - Bad Request'], e=e), 400
@@ -23,7 +23,7 @@ def forbidden(e: Exception) -> tuple[Union[dict[str, str], str], int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> tuple[Union[dict[str, str], str], int]:
-    if request.path.startswith('/api/'):  # pragma: nocover
+    if request.path.startswith('/api/'):  # pragma: no cover
         return jsonify({
             'message': 'Endpoint not found',
             "url": request.url,
