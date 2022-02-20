@@ -34,8 +34,10 @@ class UserTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                if alice := User.get_by_username('Alice'):
-                    alice.remove_newsletter()
+                alice = User.get_by_username('Alice')
+                if not alice:
+                    abort(404)  # pragma: no cover, this is only for Mypy
+                alice.remove_newsletter()
             rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)
