@@ -51,7 +51,7 @@ def admin_index(
             if not user \
                     or user.id == current_user.id \
                     or (user.group == 'admin' and not is_authorized('admin')):
-                abort(403)  # pragma: no cover
+                abort(403)
             User.delete(id_)
             flash(_('user deleted'), 'info')
         elif action == 'remove_logo':

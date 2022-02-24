@@ -40,7 +40,7 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
-        abort(404)  # pragma: nocover
+        abort(404)  # pragma: no cover
 
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
