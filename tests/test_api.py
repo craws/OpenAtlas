@@ -8,7 +8,7 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
     InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
-    LastEntityError,  NoEntityAvailable, NoSearchStringError, QueryEmptyError, \
+    LastEntityError, NoEntityAvailable, NoSearchStringError, QueryEmptyError, \
     TypeIDError, ValueNotIntegerError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -427,10 +427,14 @@ class ApiTests(TestBaseCase):
 
             # Test entity in GeoJSON format
             for rv in [
-                self.app.get(url_for('api_02.entity', id_=place.id,
-                                     format='geojson')),
-                self.app.get(url_for('api_03.entity', id_=place.id,
-                                     format='geojson'))]:
+                self.app.get(url_for(
+                    'api_02.entity',
+                    id_=place.id,
+                    format='geojson')),
+                self.app.get(url_for(
+                    'api_03.entity',
+                    id_=place.id,
+                    format='geojson'))]:
                 rv = rv.get_json()
                 rv = rv['features'][0]
                 assert ApiTests.get_bool(
@@ -483,10 +487,18 @@ class ApiTests(TestBaseCase):
                     'api_03.entity',
                     id_=place.id,
                     format='xml')),
-                self.app.get(
-                    url_for('api_02.entity', id_=place.id, export='csv')),
-                self.app.get(
-                    url_for('api_03.entity', id_=place.id, export='csv')),
+                self.app.get(url_for(
+                    'api_02.entity',
+                    id_=place.id,
+                    export='csv')),
+                self.app.get(url_for(
+                    'api_03.entity',
+                    id_=place.id,
+                    export='csv')),
+                self.app.get(url_for(
+                    'api_03.entity',
+                    id_=place.id,
+                    export='csvNetwork')),
                 self.app.get(url_for(
                     'api_02.code',
                     code='place',
