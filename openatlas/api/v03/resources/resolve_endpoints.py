@@ -67,6 +67,8 @@ def resolve_entity(
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
     if parser['export'] == 'csv':
         return export_entities_csv(entity, entity.name)
+    if parser['export'] == 'csvNetwork':
+        return export_csv_for_network_analysis([entity], parser)
     result = get_entity_formatted(entity, parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(

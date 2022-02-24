@@ -23,7 +23,10 @@ def export_entities_csv(
     return Response(
         pd.DataFrame(data=frames).to_csv(),
         mimetype='text/csv',
-        headers={'Content-Disposition': f'attachment;filename={name}.csv'})
+        headers={
+            'Content-Disposition':
+                f'attachment;'
+                f'filename={name.encode("utf8").decode("unicode-escape")}.csv'})
 
 
 def build_entity_dataframe(
