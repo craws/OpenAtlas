@@ -1,5 +1,8 @@
 versions = {
-    '7.2.0': ['TBA', {}],
+    '7.2.0': ['TBA', {
+        'feature': {
+            '1491': 'API: CSV export for network analysis',
+            '1406': 'Update OpenAtlas Website'}}],
     '7.1.0': ['2022-02-15', {
         'feature': {
             '1506': 'Update CIDOC CRM to 7.1.1',
