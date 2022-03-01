@@ -47,6 +47,3 @@ def get_geojson_dict(
             'end_comment': entity.end_comment,
             'types':
                 [': '.join([type_.name]) for type_ in entity.types.keys()]}})
-
-
-

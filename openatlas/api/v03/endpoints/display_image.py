@@ -8,7 +8,6 @@ from openatlas.api.v03.resources.error import AccessDeniedError
 from openatlas.api.v03.resources.parser import image
 from openatlas.api.v03.resources.util import get_license
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 from openatlas.util.image_processing import check_processed_image
 
 

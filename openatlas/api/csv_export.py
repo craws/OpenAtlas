@@ -26,7 +26,8 @@ def export_entities_csv(
         headers={
             'Content-Disposition':
                 f'attachment;'
-                f'filename={name.encode("utf8").decode("unicode-escape")}.csv'})
+                f'filename='
+                f'{str(name).encode("utf8").decode("unicode-escape")}.csv'})
 
 
 def build_entity_dataframe(

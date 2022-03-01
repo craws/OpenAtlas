@@ -81,6 +81,7 @@ def replace_empty_list_values_in_dict_with_none(
 
 
 def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
+    class_codes = list(g.cidoc_classes) if 'all' in class_codes else class_codes
     if not all(cc in g.cidoc_classes for cc in class_codes):
         raise InvalidCidocClassCode
     return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
