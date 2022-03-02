@@ -2,16 +2,20 @@ from typing import Any, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
+from wtforms import BooleanField, SubmitField
 
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, sanitize
+from openatlas.util.util import display_form, link, required_group, sanitize, \
+    uc_first
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -50,7 +54,7 @@ def type_index() -> str:
         crumbs=[_('types')])
 
 
-@app.route('/type/delete/<int:id_>', methods=['POST', 'GET'])
+@app.route('/type/delete/<int:id_>')
 @required_group('editor')
 def type_delete(id_: int) -> Response:
     type_ = g.types[id_]
@@ -61,6 +65,35 @@ def type_delete(id_: int) -> Response:
     flash(_('entity deleted'), 'info')
     return redirect(
         url_for('view', id_=root.id) if root else url_for('type_index'))
+
+
+@app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
+@required_group('editor')
+def type_delete_recursive(id_: int) -> Response:
+
+    class Form(FlaskForm):
+        confirm_delete = BooleanField(_('test_label'))
+        save = SubmitField(uc_first(_('move entities')))
+
+    type_ = g.types[id_]
+    if type_.category == 'system':
+        abort(403)
+    root = g.types[type_.root[0]] if type_.root else None
+    form = Form()
+    if form.validate_on_submit():
+        1/0
+        type_.delete()
+        flash(_('entity deleted'), 'info')
+        return redirect(
+            url_for('view', id_=root.id) if root else url_for('type_index'))
+    return render_template(
+        'form.html',
+        form=display_form(form),
+        crumbs=[
+            [_('types'), url_for('type_index')],
+            root,
+            type_,
+            _('delete')])
 
 
 @app.route('/type/move/<int:id_>', methods=['POST', 'GET'])

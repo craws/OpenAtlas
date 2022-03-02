@@ -580,9 +580,12 @@ def delete_link(name: str, url: str) -> str:
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def display_delete_link(entity: Entity) -> str:
-    if entity.id in g.types:
+def display_delete_link(entity: Union[Entity, Type]) -> str:
+    from openatlas.models.type import Type
+    if isinstance(entity, Type):
         url = url_for('type_delete', id_=entity.id)
+        if entity.count or entity.subs:
+            url = url_for('type_delete_recursive', id_=entity.id)
     else:
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
     confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
