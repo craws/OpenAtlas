@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 7.1.0 to 7.1.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 7.0.x to 7.1.0
 
 Execute **install/upgrade/7.1.0.sql** after making backups and reading release
