@@ -5,7 +5,7 @@ from openatlas import app
 
 VERSION = '7.2.0'
 DATABASE_VERSION = '7.1.0'
-DEMO_MODE = False  # If activated some options are disabled, login is pre filled
+DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}

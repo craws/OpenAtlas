@@ -3,6 +3,10 @@ versions = {
         'feature': {
             '1491': 'API: CSV export for network analysis',
             '1406': 'Update OpenAtlas Website'}}],
+    '7.1.1': ['2022-03-04', {
+        'fix': {
+            '1649': 'Minor label error in model image',
+            '1650': 'Obsolete database version in install SQL'}}],
     '7.1.0': ['2022-02-15', {
         'feature': {
             '1506': 'Update CIDOC CRM to 7.1.1',
