@@ -68,7 +68,7 @@
         selectFromTree("{{ field.id }}", data.node.id, data.node.text);
     });
     $("#{{ field.id }}-tree-search").keyup(function() {
-        if (this.value.length >= {{ session.settings.minimum_jstree_search }}) {
+        if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
             $("#{{ field.id }}-tree").jstree("search", $(this).val());
         }
         else if (this.value.length == 0) {

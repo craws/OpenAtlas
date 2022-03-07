@@ -5,7 +5,7 @@ import secrets
 import string
 from typing import Any, Optional
 
-from flask import session
+from flask import g, session
 from flask_login import UserMixin, current_user
 
 from openatlas.database.user import User as Db
@@ -65,12 +65,12 @@ class User(UserMixin):
         Db.update_language(self.id, current_user.settings['language'])
 
     def login_attempts_exceeded(self) -> bool:
-        failed_login_tries = int(session['settings']['failed_login_tries'])
         if not self.login_last_failure \
-                or self.login_failed_count < failed_login_tries:
+                or self.login_failed_count < \
+                int(g.settings['failed_login_tries']):
             return False
-        forget = int(session['settings']['failed_login_forget_minutes'])
-        unlocked = self.login_last_failure + datetime.timedelta(minutes=forget)
+        unlocked = self.login_last_failure + datetime.timedelta(
+            minutes=int(g.settings['failed_login_forget_minutes']))
         if unlocked > datetime.datetime.now():
             return True
         return False  # pragma no cover - no waiting in tests
@@ -150,11 +150,11 @@ class User(UserMixin):
             'table_show_aliases': True,
             'table_show_icons': False,
             'show_email': False}
-        for setting in session['settings']:
+        for setting in g.settings:
             if setting in \
                     ['map_zoom_max', 'map_zoom_default', 'table_rows'] \
                     or setting.startswith('module_'):
-                settings[setting] = session['settings'][setting]
+                settings[setting] = g.settings[setting]
         for row in Db.get_settings(user_id):
             settings[row['name']] = row['value']
             if row['name'] in ['table_rows']:
@@ -164,8 +164,7 @@ class User(UserMixin):
     @staticmethod
     def generate_password(
             length: Optional[int] = None) -> str:  # pragma no cover
-        length = length if length \
-            else session['settings']['random_password_length']
+        length = length if length else g.settings['random_password_length']
         return ''.join(
             secrets.choice(
                 string.ascii_uppercase + string.digits) for _ in range(length))

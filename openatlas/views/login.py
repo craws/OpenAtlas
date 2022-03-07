@@ -3,7 +3,7 @@ from typing import Optional, Union
 
 import bcrypt
 from bcrypt import hashpw
-from flask import abort, flash, render_template, request, session, url_for
+from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import (
     LoginManager, current_user, login_required, login_user, logout_user)
@@ -101,8 +101,7 @@ def reset_password() -> Union[str, Response]:
     if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))
     form = PasswordResetForm()
-    settings = session['settings']
-    if form.validate_on_submit() and settings['mail']:  # pragma: no cover
+    if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
         if user := User.get_by_email(form.email.data):
             code = User.generate_password()
             user.password_reset_code = code
@@ -112,7 +111,7 @@ def reset_password() -> Union[str, Response]:
             link = f"{request.scheme}://{request.headers['Host']}{url}"
             subject = _(
                 'Password reset request for %(site_name)s',
-                site_name=settings['site_name'])
+                site_name=g.settings['site_name'])
             body = _(
                 'We received a password reset request for %(username)s',
                 username=user.username)
@@ -121,7 +120,7 @@ def reset_password() -> Union[str, Response]:
                 f"{_('reset password link')}:\n\n" \
                 f"{link}\n\n" \
                 f"{_('The link is valid for')} " \
-                f"{settings['reset_confirm_hours']} {_('hours')}."
+                f"{g.settings['reset_confirm_hours']} {_('hours')}."
             email = form.email.data
             if send_mail(subject, body, form.email.data):
                 flash(
@@ -152,7 +151,7 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
         logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
-    hours = session['settings']['reset_confirm_hours']
+    hours = g.settings['reset_confirm_hours']
     if datetime.datetime.now() > \
             user.password_reset_date + datetime.timedelta(hours=hours):
         logger.log('info', 'auth', 'reset code expired')
@@ -166,9 +165,8 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
     user.password_reset_date = None
     user.login_failed_count = 0
     user.update()
-    subject = _(
-        'New password for %(sitename)s',
-        sitename=session['settings']['site_name'])
+    subject = \
+        _('New password for %(sitename)s', sitename=g.settings['site_name'])
     body = _('New password for %(username)s', username=user.username) + ' '
     body += f"{_('at')} {request.scheme}://{request.headers['Host']}:\n\n"
     body += f"{uc_first(_('username'))}: {user.username}\n"

@@ -13,6 +13,9 @@ is working.
 
     service apache2 restart
 
+### 7.1.0 to 7.1.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 7.0.x to 7.1.0
 
 Execute **install/upgrade/7.1.0.sql** after making backups and reading release
@@ -34,7 +37,8 @@ sites might be needed.
 #### Mail function change
 At admin/mail the port should be the default mail submission port **587**
 (in most cases). If you got port **25** there, you might want to change it. You
-should check results with the test mail function there afterwards.
+can check the functionality with the **Send test mail** function there
+afterwards.
 
 ### 6.6.x to 7.0.0
 WARNING - this is a major release and requires software upgrades. If you are

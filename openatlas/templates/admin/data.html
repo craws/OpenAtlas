@@ -20,7 +20,7 @@
         {% endif %}
     </div>
 {% endif %}
-{% if 'admin'|is_authorized and session.settings.image_processing %}
+{% if 'admin'|is_authorized and g.settings.image_processing %}
     <div class="toolbar">
         <h1>{{ _('image processing')|uc_first }}</h1>
         {{ 'admin/file'|manual }}

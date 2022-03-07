@@ -1,6 +1,6 @@
 import ast
 
-from flask import request, session
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
@@ -64,14 +64,14 @@ def validate(self: FlaskForm) -> bool:
 
     # File
     if request.files:
-        ext = session['settings']['file_upload_allowed_extension']
         for file_ in request.files.getlist('file'):
             if not file_:  # pragma: no cover
                 self.file.errors.append(_('no file to upload'))
                 valid = False
             elif not (
                     '.' in file_.filename
-                    and file_.filename.rsplit('.', 1)[1].lower() in ext):
+                    and file_.filename.rsplit('.', 1)[1].lower() in
+                    g.settings['file_upload_allowed_extension']):
                 self.file.errors.append(_('file type not allowed'))
                 valid = False
 

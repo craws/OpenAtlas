@@ -46,7 +46,7 @@ class OpenatlasClass:
             new_types_allowed: bool,
             standard_type_id: Optional[int] = None,
             color: Optional[str] = None,
-            write_access: Optional[str] = 'contributor',
+            write_access: str = 'contributor',
             icon: Optional[str] = None) -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))

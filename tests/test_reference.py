@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -10,7 +12,7 @@ class ReferenceTest(TestBaseCase):
     def test_reference(self) -> None:
         with app.app_context():
             # Reference insert
-            rv = self.app.get(url_for('insert', class_='bibliography'))
+            rv: Any = self.app.get(url_for('insert', class_='bibliography'))
             assert b'+ Bibliography' in rv.data
             rv = self.app.get(url_for('insert', class_='edition'))
             assert b'+ Edition' in rv.data

@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 
 from openatlas import app
@@ -10,7 +12,7 @@ class SourceTest(TestBaseCase):
     def test_source(self) -> None:
         with app.app_context():
             # Source insert
-            rv = self.app.get(url_for('insert', class_='source'))
+            rv: Any = self.app.get(url_for('insert', class_='source'))
             assert b'+ Source' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

@@ -37,6 +37,8 @@ def type_index() -> str:
     types: dict[str, dict[Entity, str]] = \
         {'standard': {}, 'custom': {}, 'place': {}, 'value': {}, 'system': {}}
     for type_ in [type_ for type_ in g.types.values() if not type_.root]:
+        if type_.category not in types:
+            continue # pragma: no cover, remove after anthropology features
         types[type_.category][type_] = render_template(
             'forms/tree_select_item.html',
             name=sanitize(type_.name),

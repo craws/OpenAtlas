@@ -8,6 +8,7 @@ from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.api.v02.resources.parser import image
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
+from openatlas.util.image_processing import check_processed_image
 
 
 class DisplayImage(Resource):
@@ -25,7 +26,7 @@ class DisplayImage(Resource):
             return send_file(
                 f"{app.config['UPLOAD_DIR']}/{filename}",
                 as_attachment=True)
-        if parser['image_size']:
+        if parser['image_size'] and check_processed_image(filename):
             size = app.config['IMAGE_SIZE'][parser['image_size']]
             return send_from_directory(
                 f"{app.config['RESIZED_IMAGES']}/{size}",

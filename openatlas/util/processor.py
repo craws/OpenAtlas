@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Union
 
-from flask import session, url_for
+from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import StringField
@@ -17,12 +17,12 @@ class GlobalSearchForm(FlaskForm):
 @app.context_processor
 def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     def get_logo() -> str:
-        if session['settings']['logo_file_id']:
-            ext = get_file_extension(int(session['settings']['logo_file_id']))
+        if g.settings['logo_file_id']:
+            ext = get_file_extension(int(g.settings['logo_file_id']))
             if ext != 'N/A':
                 return url_for(
                     'display_logo',
-                    filename=f"{session['settings']['logo_file_id']}{ext}")
+                    filename=f"{g.settings['logo_file_id']}{ext}")
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
     return dict(
         get_logo=get_logo(),

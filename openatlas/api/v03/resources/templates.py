@@ -52,18 +52,15 @@ def geometries_template() -> dict[str, Any]:
 
 def linked_places_template(show: str) -> dict[str, Type[String]]:
     title = {'title': fields.String}
-
     depictions = {
         '@id': fields.String,
         'title': fields.String,
         'license': fields.String,
         'url': fields.String}
-
     links = {
         'type': fields.String,
         'identifier': fields.String,
         'referenceSystem': fields.String}
-
     types = {
         'identifier': fields.String,
         'label': fields.String,
@@ -71,19 +68,12 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'hierarchy': fields.String,
         'value': fields.Float,
         'unit': fields.String}
-
     names = {'alias': fields.String}
-
     start = {'earliest': fields.String, 'latest': fields.String}
-
     end = {'earliest': fields.String, 'latest': fields.String}
-
     description = {'value': fields.String}
-
     timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
-
     when = {'timespans': fields.List(fields.Nested(timespans))}
-
     relations = {
         'label': fields.String,
         'relationTo': fields.String,
@@ -92,7 +82,6 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'relationDescription': fields.String,
         'type': fields.String,
         'when': fields.Nested(when)}
-
     feature = {
         '@id': fields.String,
         'type': fields.String,
@@ -103,22 +92,16 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
 
     if 'when' in show:
         feature['when'] = fields.Nested(when)
-
     if 'types' in show:
         feature['types'] = fields.List(fields.Nested(types))
-
     if 'relations' in show:
         feature['relations'] = fields.List(fields.Nested(relations))
-
     if 'names' in show:
         feature['names'] = fields.List(fields.Nested(names))
-
     if 'links' in show:
         feature['links'] = fields.List(fields.Nested(links))
-
     if 'depictions' in show:
         feature['depictions'] = fields.List(fields.Nested(depictions))
-
     feature['geometry'] = fields.Raw
 
     return {
@@ -206,6 +189,7 @@ def subunit_template(id_: str) -> dict[str, List]:
         'geometry': fields.Raw,
         'children': fields.List(fields.Integer),
         'properties': fields.Nested(properties)}
+
     return {id_: fields.List(fields.Nested(json))}
 
 
@@ -240,7 +224,6 @@ def type_overview_template() -> dict[str, Any]:
         'url': fields.String,
         'label': fields.String,
         'children': fields.List(fields.Raw)}
-
     type_details = {
         'id': fields.Integer,
         'name': fields.String,

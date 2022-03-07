@@ -2,8 +2,6 @@ from flask_restful import reqparse
 
 from openatlas import app
 
-app.config['BUNDLE_ERRORS'] = True
-
 default = reqparse.RequestParser()
 default.add_argument(
     'download',

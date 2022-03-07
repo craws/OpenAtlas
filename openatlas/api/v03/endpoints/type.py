@@ -7,7 +7,7 @@ from flask_restful import Resource, marshal
 from openatlas.api.v03.resources.formats.thanados import get_subunits
 from openatlas.api.v03.resources.parser import default, entity_
 from openatlas.api.v03.resources.resolve_endpoints import download, \
-    resolve_subunit
+    resolve_subunits
 from openatlas.api.v03.resources.templates import type_overview_template, \
     type_tree_template
 from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
@@ -20,11 +20,10 @@ class GetTypeOverview(Resource):
     @staticmethod
     @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[tuple[Resource, int], Response]:
-        parser = default.parse_args()
-        node = GetTypeOverview.get_node_overview()
-        if parser['download']:
-            return download(node, type_overview_template(), 'types')
-        return marshal(node, type_overview_template()), 200
+        types = GetTypeOverview.get_node_overview()
+        if default.parse_args()['download']:
+            return download(types, type_overview_template(), 'types')
+        return marshal(types, type_overview_template()), 200
 
     @staticmethod
     def get_node_overview() -> dict[str, dict[Entity, str]]:
@@ -62,9 +61,8 @@ class GetTypeTree(Resource):
     @staticmethod
     @swag_from("../swagger/type_tree.yml", endpoint="api_03.type_tree")
     def get() -> Union[tuple[Resource, int], Response]:
-        parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
-        if parser['download']:
+        if entity_.parse_args()['download']:
             return download(type_tree, type_tree_template(), 'type_tree')
         return marshal(type_tree, type_tree_template()), 200
 
@@ -93,7 +91,7 @@ class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        return resolve_subunit(
+        return resolve_subunits(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
             entity_.parse_args(),
             str(id_))

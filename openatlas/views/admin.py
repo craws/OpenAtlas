@@ -4,7 +4,7 @@ import math
 import os
 from typing import Any, Optional, Union
 
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -51,7 +51,7 @@ def admin_index(
             if not user \
                     or user.id == current_user.id \
                     or (user.group == 'admin' and not is_authorized('admin')):
-                abort(403)  # pragma: no cover
+                abort(403)
             User.delete(id_)
             flash(_('user deleted'), 'info')
         elif action == 'remove_logo':
@@ -92,11 +92,10 @@ def admin_index(
     form = None
     if is_authorized('admin'):
         form = TestMailForm()
-        if form.validate_on_submit() \
-                and session['settings']['mail']:  # pragma: no cover
+        if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
             subject = _(
                 'Test mail from %(site_name)s',
-                site_name=session['settings']['site_name'])
+                site_name=g.settings['site_name'])
             body = _(
                 'This test mail was sent by %(username)s',
                 username=current_user.username)
@@ -119,7 +118,6 @@ def admin_index(
             content=render_template(
                 'admin/file.html',
                 info=get_form_settings(FilesForm()),
-                settings=session['settings'],
                 disk_space_info=get_disk_space_info())),
         'user': Tab(
             _('user'),
@@ -128,8 +126,7 @@ def admin_index(
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
                 button(_('newsletter'), url_for('admin_newsletter'))
-                if is_authorized('manager') and session['settings']['mail']
-                else '',
+                if is_authorized('manager') and g.settings['mail'] else '',
                 button(_('user'), url_for('user_insert'))
                 if is_authorized('manager') else ''])}
     if is_authorized('admin'):
@@ -148,7 +145,7 @@ def admin_index(
             buttons=[
                 manual('admin/mail'),
                 button(_('edit'), url_for('admin_settings', category='mail'))])
-        if session['settings']['mail']:
+        if g.settings['mail']:
             tabs['email'].content += display_form(form)
     if is_authorized('manager'):
         tabs['modules'] = Tab(
@@ -471,13 +468,13 @@ def admin_orphans() -> str:
             lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
         tabs[
             'unlinked' if entity.class_.view else 'orphans'].table.rows.append([
-            link(entity),
-            link(entity.class_),
-            link(entity.standard_type),
-            entity.class_.label,
-            format_date(entity.created),
-            format_date(entity.modified),
-            entity.description])
+                link(entity),
+                link(entity.class_),
+                link(entity.standard_type),
+                entity.class_.label,
+                format_date(entity.created),
+                format_date(entity.modified),
+                entity.description])
 
     # Orphaned file entities with no corresponding file
     entity_file_ids = []
@@ -564,7 +561,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 @app.route('/admin/logo/<int:id_>')
 @required_group('manager')
 def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
-    if session['settings']['logo_file_id']:
+    if g.settings['logo_file_id']:
         abort(418)  # pragma: no cover - Logo already set
     if id_:
         Settings.set_logo(id_)

@@ -2,7 +2,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from typing import Any
 
-from flask import g, session
+from flask import g
 
 from openatlas import app
 from openatlas.database.cidoc_property import CidocProperty as Db
@@ -30,9 +30,8 @@ class CidocProperty:
         locale_session = get_locale()
         if locale_session in self.i18n:
             return self.i18n[locale_session]
-        locale_default = session['settings']['default_language']
-        if locale_default in self.i18n:
-            return self.i18n[locale_default]
+        if g.settings['default_language'] in self.i18n:
+            return self.i18n[g.settings['default_language']]
         return getattr(self, '_name')  # pragma: no cover
 
     @property
@@ -41,9 +40,8 @@ class CidocProperty:
         locale_session = get_locale()
         if locale_session in self.i18n_inverse:
             return self.i18n_inverse[locale_session]
-        locale_default = session['settings']['default_language']
-        if locale_default in self.i18n_inverse:
-            return self.i18n_inverse[locale_default]
+        if g.settings['default_language'] in self.i18n_inverse:
+            return self.i18n_inverse[g.settings['default_language']]
         return getattr(self, '_name_inverse')  # pragma: no cover
 
     def find_object(self, attr: str, class_id: int) -> bool:

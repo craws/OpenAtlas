@@ -1,3 +1,5 @@
+from typing import Any
+
 from flask import url_for
 from werkzeug.exceptions import abort
 
@@ -32,11 +34,11 @@ class UserTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                logged_in_user = User.get_by_username('Alice')
-                if not logged_in_user:
-                    abort(404)  # pragma: no cover
-                logged_in_user.remove_newsletter()
-            rv = self.app.get(url_for('user_insert'))
+                alice = User.get_by_username('Alice')
+                if not alice:
+                    abort(404)  # pragma: no cover, this is only for Mypy
+                alice.remove_newsletter()
+            rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
@@ -52,7 +54,7 @@ class UserTests(TestBaseCase):
 
             rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
-            rv = self.app.get(url_for('user_update', id_=logged_in_user.id))
+            rv = self.app.get(url_for('user_update', id_=alice.id))
             assert b'Alice' in rv.data
             data['description'] = 'The warrant officer'
             rv = self.app.post(
@@ -75,7 +77,10 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('user_activity', data=data))
             assert b'Activity' in rv.data
 
-            # Test missing permission
+            # Test errors
+            rv = self.app.get(
+                url_for('admin_index', action='delete_user', id_=alice.id))
+            assert b'403 - Forbidden' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data

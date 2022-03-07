@@ -4,10 +4,12 @@ will be needed.
 
 This software was developed and tested on Linux/Debian 10 (codename "bullseye")
 and the easiest way to install would be on a Debian 10 system following these
-instructions.
+instructions. It may work on other Linux distributions or even on non Linux
+systems but would need substantially more knowledge about server administration.
 
-It may work on other Linux distributions or even on non Linux systems but would
-need substantially more knowledge about server administration.
+Feel free to also consult our own
+[documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
+we use to set up new Debian servers for OpenAtlas installations.
 
 ## Requirements
 
