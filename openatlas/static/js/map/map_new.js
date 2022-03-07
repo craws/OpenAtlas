@@ -117,13 +117,11 @@ const cluster = L.markerClusterGroup({
 cluster.addLayer(pointLayer);
 map.addLayer(cluster);
 
-console.log(pointLayer._layers)
 
 baseMaps.Landscape.addTo(map);
 
-
 if (gisSelected?.length > 0) map.fitBounds(L.featureGroup([selectedLayer]).getBounds(), { maxZoom: mapDefaultZoom });
-else if (!!pointLayer) map.fitBounds(pointLayer.getBounds(), { maxZoom: mapDefaultZoom });
+else if (Object.keys(pointLayer?.getBounds()).length !== 0) map.fitBounds(pointLayer.getBounds(), { maxZoom: mapDefaultZoom });
 else map.setView([30, 0], 2);
 
 
