@@ -49,24 +49,40 @@
     {% endif %}
 
 </script>
+<link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
+<link rel="stylesheet" href="/static/css/map.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css">
+
+<script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
+<!--
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css">
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.css">
-<link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.Default.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/zoomdisplay/leaflet.zoomdisplay.css">
-<link rel="stylesheet" href="/static/css/map.css">
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet-groupedlayercontrol-gh-pages/dist/leaflet.groupedlayercontrol.min.css">
 
 <script src="/static/vendor/leaflet-1.3.4/leaflet.js"></script>
-<script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/zoomdisplay/leaflet.zoomdisplay.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/fullscreen/Leaflet.fullscreen.min.js"></script>
-<!-- Using modified version of leaflet-geonames for result list hack -->
-<script src="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.js"></script>
+ Using modified version of leaflet-geonames for result list hack 
+
 <script src="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/leaflet.markercluster.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/leaflet-groupedlayercontrol-gh-pages/dist/leaflet.groupedlayercontrol.min.js"></script>
 <script src="/static/node_modules/leaflet-imageoverlay-rotated/Leaflet.ImageOverlay.Rotated.js"></script>
+-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.css" integrity="sha512-mQ77VzAakzdpWdgfL/lM1ksNy89uFgibRQANsNneSTMD/bj0Y/8+94XMwYhnbzx8eki2hrbPpDm0vD0CiT2lcg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/MarkerCluster.Default.css" integrity="sha512-6ZCLMiYwTeli2rVh3XAPxy3YoR5fVxGdH/pz+KMCzRY2M65Emgkw00Yqmhh8qLGeYQ3LbVZGdmOX9KUjSKr0TA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-geosearch/3.6.0/geosearch.min.css" integrity="sha512-aXlinnCE2X7IVkXBPdOg1fEwQ6VjRO73q6B9Nm/g3qDGWdOlbcmnR8kbOPQpIdMNZ+UKUA90dL3dxprm8HD+ZQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/1.5.3/leaflet.markercluster.js" integrity="sha512-OFs3W4DIZ5ZkrDhBFtsCP6JXtMEDGmhl0QPlmWYBJay40TT1n3gt2Xuw8Pf/iezgW9CdabjkNChRqozl/YADmg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-groupedlayercontrol/0.6.1/leaflet.groupedlayercontrol.min.js" ></script>
+<script src="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.js"></script>
+<button onclick="testknopf()" style="z-index:99999;position:fixed;bottom:0;left:0;">Hallo</button>

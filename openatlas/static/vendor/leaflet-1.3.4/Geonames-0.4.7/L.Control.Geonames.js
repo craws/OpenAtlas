@@ -56,7 +56,7 @@ L.Control.Geonames = L.Control.extend({
         var form = L.DomUtil.create('form', '', this._container);
         L.DomEvent.addListener(form, 'submit', this._search, this);
 
-        var input = this._input = L.DomUtil.create('input', '', form);
+        var input = this._input = L.DomUtil.create('input', 'full-height', form);
         input.type = 'search';
         input.placeholder = this.options.placeholder;
 
