@@ -169,10 +169,6 @@ function deleteGeometry(featureId) {
     deleteIdList.push(featureId);
 }
 
-function testknopf() {
-    updateHiddenInputFields();
-}
-
 function drawGeometry(shapeType) {
     openForm(shapeType);
     drawLayerIsArea = false;
