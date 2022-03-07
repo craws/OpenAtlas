@@ -5,6 +5,8 @@
 <link rel="stylesheet" href="/static/node_modules/leaflet.markercluster/dist/MarkerCluster.css">
 <link rel="stylesheet" href="/static/node_modules/leaflet.markercluster/dist/MarkerCluster.Default.css">
 <link rel="stylesheet" href="/static/node_modules/leaflet-groupedlayercontrol/dist/leaflet.groupedlayercontrol.min.css">
+<link rel="stylesheet" href="/static/node_modules/leaflet.fullscreen/Control.FullScreen.css">
+
 <script>
     var geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
     var geoNamesUsername =  '{{ g.settings.geonames_username }}';
@@ -55,6 +57,7 @@
         ];
     {% endif %}
 </script>
+<script src="/static/node_modules/leaflet.fullscreen/Control.FullScreen.js"></script>
 <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
 <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
 <script src="/static/node_modules/leaflet.markercluster/dist/leaflet.markercluster.js" ></script>
