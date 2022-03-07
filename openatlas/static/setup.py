@@ -8,7 +8,7 @@ package_json = {
         "huebee": "^2.0.0",
         "jquery-ui-dist": "^1.13.1",
         "jquery-validation": "^1.19.3",
-        "jstree": "^3.3.8",
+        "jstree": "^3.3.12",
         "datatables.net": "^1.11.5",
         "datatables.net-dt": "^1.11.5",
         "datatables.net-buttons": "^2.2.2",
