@@ -1,4 +1,4 @@
-map = L.map('map', { maxZoom: mapMaxZoom, fullscreenControl: true });
+map = L.map('map', {maxZoom: mapMaxZoom, fullscreenControl: true});
 
 L.control.scale().addTo(map);
 // Icons
@@ -38,6 +38,38 @@ const siblingsMarker = L.icon({
     popupAnchor: [0, -34]
 });
 
+const myCircleStyle = {
+    "color": "#000000",
+    "weight": 1,
+    "fillOpacity": 0.8,
+    "fillColor": "#007bd9",
+    "radius": 10
+};
+
+const siblingStyle = {
+    "color": "rgb(111,111,111)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+const superStyle = {
+    "color": "rgb(255,231,191)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+const subStyle = {
+    "color": "rgb(39,207,59)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
 // Define base layers
 const OpenStreetMap_HOT = L.tileLayer('https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     maxZoom: 25,
@@ -69,15 +101,14 @@ const baseMaps = {
 
 
 // Filter to get different types from the geojson
-const pointFilter = (feature) => feature.geometry?.type === "Point";
-const polygonFilter = (feature) => feature.geometry?.type === "Polygon";
-const lineFilter = (feature) => feature.geometry?.type === "Linestring";
-
+const pointFilter = (feature) => feature?.geometry?.type === "Point";
+const polygonFilter = (feature) => feature?.geometry?.type === "Polygon";
+const lineFilter = (feature) => feature?.geometry?.type === "LineString";
 
 
 const gisAll = [...gisPointAll,
-...gisPolygonAll,
-...gisLineAll];
+    ...gisPolygonAll,
+    ...gisLineAll];
 const gisSelected = [
     ...gisPointSelected,
     ...gisLineSelected,
@@ -88,25 +119,76 @@ const pointLayer = new L.GeoJSON(gisAll, {
     filter: pointFilter,
     onEachFeature: setPopup(false),
     pointToLayer: function (feature, latlng) {
-        if (window.location.pathname == '/place') {
-            return L.marker(latlng);
-        }
-        return L.marker(latlng, { icon: grayMarker });
+        return L.circleMarker(latlng, myCircleStyle);
+
     }
 });
 const polygonLayer = new L.GeoJSON(gisAll, {
     onEachFeature: setPopup(false),
-    style: { color: '#9A9A9A' },
+    style: {color: '#9A9A9A'},
     filter: polygonFilter,
 });
 const linestringLayer = new L.GeoJSON(gisAll, {
     onEachFeature: setPopup(false),
-    style: { color: '#9A9A9A' },
+    style: {color: '#9A9A9A'},
     filter: lineFilter,
 });
-let selectedLayer = L.geoJson(gisSelected, { onEachFeature: setPopup(true) }).addTo(map);
+let selectedLayer = L.geoJson(gisSelected, {onEachFeature: setPopup(true)}).addTo(map);
 
-
+//supers
+const pointLayerSupers = new L.GeoJSON(gisPointSupers, {
+    filter: pointFilter,
+    onEachFeature: setPopup(false),
+    pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {icon: superMarker});
+    },
+});
+const polygonLayerSupers = new L.GeoJSON(gisPointSupers, {
+    filter: polygonFilter,
+    style: superStyle,
+    onEachFeature: setPopup(false),
+});
+const linestringLayerSupers = new L.GeoJSON(gisPointSupers, {
+    filter: lineFilter,
+    style: superStyle,
+    onEachFeature: setPopup(false),
+});
+//siblings
+const pointLayerSiblings = new L.GeoJSON(gisPointSibling, {
+    filter: pointFilter,
+    onEachFeature: setPopup(false),
+    pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {icon: siblingsMarker});
+    },
+});
+const polygonLayerSiblings = new L.GeoJSON(gisPointSibling, {
+    filter: polygonFilter,
+    style: siblingStyle,
+    onEachFeature: setPopup(false),
+});
+const linestringLayerSiblings = new L.GeoJSON(gisPointSibling, {
+    filter: lineFilter,
+    style: siblingStyle,
+    onEachFeature: setPopup(false),
+});
+//subs
+const pointLayerSubs = new L.GeoJSON(gisPointSubs, {
+    filter: pointFilter,
+    onEachFeature: setPopup(false),
+    pointToLayer: function (feature, latlng) {
+        return L.marker(latlng, {icon: subsMarker});
+    },
+});
+const polygonLayerSubs = new L.GeoJSON(gisPointSubs, {
+    filter: polygonFilter,
+    style: subStyle,
+    onEachFeature: setPopup(false),
+});
+const linestringLayerSubs = new L.GeoJSON(gisPointSubs, {
+    filter: lineFilter,
+    style: subStyle,
+    onEachFeature: setPopup(false),
+});
 
 //clustering
 const cluster = L.markerClusterGroup({
@@ -120,10 +202,9 @@ map.addLayer(cluster);
 
 baseMaps.Landscape.addTo(map);
 
-if (gisSelected?.length > 0) map.fitBounds(L.featureGroup([selectedLayer]).getBounds(), { maxZoom: mapDefaultZoom });
-else if (Object.keys(pointLayer?.getBounds()).length !== 0) map.fitBounds(pointLayer.getBounds(), { maxZoom: mapDefaultZoom });
+if (gisSelected?.length > 0) map.fitBounds(L.featureGroup([selectedLayer]).getBounds(), {maxZoom: mapDefaultZoom});
+else if (Object.keys(pointLayer?.getBounds()).length !== 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: mapDefaultZoom});
 else map.setView([30, 0], 2);
-
 
 //controll grouped layers
 const groupedOverlays = {
@@ -135,6 +216,17 @@ const groupedOverlays = {
         Polygons: polygonLayer,
         Linestrings: linestringLayer
     },
+    "Subunits": {
+        ...(pointLayerSupers?.getLayers().length > 0 && {SuperPoints: pointLayerSupers}),
+        ...(polygonLayerSupers?.getLayers().length > 0 && {SuperPolygons: polygonLayerSupers}),
+        ...(linestringLayerSupers?.getLayers().length > 0 && {SuperLines: linestringLayerSupers}),
+        ...(pointLayerSiblings?.getLayers().length > 0 && {SiblingPoints: pointLayerSiblings}),
+        ...(polygonLayerSiblings?.getLayers().length > 0 && {SiblingPolygons: polygonLayerSiblings}),
+        ...(linestringLayerSiblings?.getLayers().length > 0 && {SiblingLines: linestringLayerSiblings}),
+        ...(pointLayerSubs?.getLayers().length > 0 && {SubPoints: pointLayerSubs}),
+        ...(polygonLayerSubs?.getLayers().length > 0 && {SubPolys: polygonLayerSubs}),
+        ...(linestringLayerSubs?.getLayers().length > 0 && {SubLines: linestringLayerSubs}),
+    }
 }
 const GroupOptions = {
     exclusiveGroups: ["Places"],
@@ -191,10 +283,10 @@ function buildPopup(feature, action = 'view', selected = false) {
             <div style="max-height:140px;overflow-y:auto"> ${feature.properties.description || ''}</div>
             <div id="buttonBar">
             
-            ${selected && (window.location.href.includes('update') ||window.location.href.includes('insert')) ?
-                `<button id="editButton" onclick="editGeometry(${feature.properties.id})">${translate['edit']}</button>
+            ${selected && (window.location.href.includes('update') || window.location.href.includes('insert')) ?
+        `<button id="editButton" onclick="editGeometry(${feature.properties.id})">${translate['edit']}</button>
                  <button id="deleteButton" onclick="deleteGeometry(${feature.properties.id})">${translate['delete']}</button>` :
-                `<button  onclick="window.location.href='/entity/${feature.properties.objectId}'">${translate['details']}</button>`}
+        `<button  onclick="window.location.href='/entity/${feature.properties.objectId}'">${translate['details']}</button>`}
             
             </div >
         </div > `;
