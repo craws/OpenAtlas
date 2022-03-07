@@ -22,6 +22,9 @@ For newer JavaScript libraries being used NPM packages have to be upgraded:
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
 
+In case you get a warning in the last step about not overwriting existing
+'../package.json', delete this file manually and try again.
+
 ### 7.1.0 to 7.1.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
