@@ -1,8 +1,13 @@
 versions = {
     '7.2.0': ['TBA', {
         'feature': {
+            '1628': 'New maps',
+            '1151': 'Map marker improvements',
             '1491': 'API: CSV export for network analysis',
-            '1406': 'Update OpenAtlas Website'}}],
+            '1406': 'Update OpenAtlas Website'},
+        'fix': {
+            '1588': 'Map problems adding geometries after deleting geometries',
+            '1594': 'NPM warnings during install'}}],
     '7.1.1': ['2022-03-04', {
         'fix': {
             '1649': 'Minor label error in model image',
