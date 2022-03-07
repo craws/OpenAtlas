@@ -13,6 +13,15 @@ is working.
 
     service apache2 restart
 
+### 7.1.x to 7.2.0
+
+For newer JavaScript libraries being used NPM packages have to be upgraded:
+
+    $ pip3 install calmjs
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
 ### 7.1.0 to 7.1.1
 A code base update (e.g. with git pull) and an Apache restart is sufficient.
 
