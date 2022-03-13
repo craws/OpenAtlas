@@ -1,10 +1,12 @@
 
 BEGIN;
 
--- Todo: add this to install SQL
-
+-- Todo: add to install SQL and update database versions and install SQLs
 
 -- #1445: Tool - Anthropological sex estimation
+
+INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
+    ('type_anthropology',    'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
     ('E55', 'type', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
