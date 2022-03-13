@@ -19,7 +19,7 @@ class Api:
             parameters={
                 'codes': tuple(code if isinstance(code, list) else [code])},
             parser=parser)
-        sql = Entity.build_sql(types=True) + f"""
+        sql = Entity.select_sql(types=True) + f"""
             WHERE cidoc_class_code IN %(codes)s {sql_parts['clause']} 
             GROUP BY e.id
             ORDER BY {', '.join(parser['column'])} {parser['sort']};"""
@@ -35,7 +35,7 @@ class Api:
                 'class': tuple(
                     classes if isinstance(classes, list) else [classes])},
             parser=parser)
-        sql = Entity.build_sql(types=True, aliases=True) + f"""
+        sql = Entity.select_sql(types=True, aliases=True) + f"""
             WHERE e.openatlas_class_name IN %(class)s {sql_parts['clause']}
             GROUP BY e.id
             ORDER BY {', '.join(parser['column'])} {parser['sort']};"""

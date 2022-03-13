@@ -11,7 +11,7 @@ class Entity:
             types: bool = False,
             aliases: bool = False) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(types, aliases) +
+            Entity.select_sql(types, aliases) +
             ' WHERE e.id = %(id)s GROUP BY e.id;',
             {'id': id_})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
@@ -24,7 +24,7 @@ class Entity:
         if not ids:
             return []
         g.cursor.execute(
-            Entity.build_sql(types, aliases) +
+            Entity.select_sql(types, aliases) +
             ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name',
             {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -66,7 +66,7 @@ class Entity:
             types: bool = False,
             aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(types, aliases) +
+            Entity.select_sql(types, aliases) +
             ' WHERE e.openatlas_class_name IN %(class)s GROUP BY e.id;',
             {'class': tuple(
                 classes if isinstance(classes, list) else [classes])})
@@ -78,7 +78,7 @@ class Entity:
             types: bool = False,
             aliases: bool = False) -> list[dict[str, Any]]:
         g.cursor.execute(
-            Entity.build_sql(types, aliases) +
+            Entity.select_sql(types, aliases) +
             'WHERE e.cidoc_class_code IN %(codes)s GROUP BY e.id;',
             {'codes': tuple(code if isinstance(code, list) else [code])})
         return [dict(row) for row in g.cursor.fetchall()]
@@ -107,7 +107,7 @@ class Entity:
 
     @staticmethod
     def get_latest(classes: list[str], limit: int) -> list[dict[str, Any]]:
-        sql = Entity.build_sql() + """
+        sql = Entity.select_sql() + """
             WHERE e.openatlas_class_name IN %(codes)s GROUP BY e.id
             ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(classes), 'limit': limit})
@@ -172,7 +172,7 @@ class Entity:
             {'ids': tuple(ids)})
 
     @staticmethod
-    def build_sql(types: bool = False, aliases: bool = False) -> str:
+    def select_sql(types: bool = False, aliases: bool = False) -> str:
         sql = """
             SELECT
                 e.id,
@@ -219,7 +219,7 @@ class Entity:
             desc: bool = False,
             own: bool = False,
             user_id: Optional[int] = None) -> list[dict[str, Any]]:
-        sql = Entity.build_sql() + """
+        sql = Entity.select_sql() + """
             {user_clause}
             WHERE (UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
             {description_clause})
