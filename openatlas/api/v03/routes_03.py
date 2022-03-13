@@ -5,8 +5,7 @@ from openatlas.api.v03.endpoints.content import ClassMapping, \
 from openatlas.api.v03.endpoints.display_image import DisplayImage
 from openatlas.api.v03.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
-    GetLatest, \
-    GetQuery, GetTypeEntities, GetTypeEntitiesAll
+    GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
 from openatlas.api.v03.endpoints.type import GetSubunits, GetTypeOverview, \
     GetTypeTree
 

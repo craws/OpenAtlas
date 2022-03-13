@@ -14,6 +14,7 @@ class IndexTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('index_changelog'))
             assert b'2.0.0' in rv.data
+            assert b'is needed but current version is' not in rv.data
             self.app.get(url_for('index_content', item='contact'))
             self.app.get(url_for('set_locale', language='en'))
 

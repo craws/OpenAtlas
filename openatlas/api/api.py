@@ -38,30 +38,21 @@ app.config['SWAGGER'] = {
         "rule_filter": lambda rule: rule.endpoint.startswith('api_03')}],
     "specs_route": "/swagger/"}
 
-cors = CORS(
-    app,
-    resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
+CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ALLOWANCE']}})
+
+Swagger(app, parse=False, template_file="api/swagger.json")
+
 api_bp = Blueprint('api', __name__, url_prefix='/api')
-api_bp_02 = Blueprint('api_02', __name__, url_prefix='/api/0.2')
-api_bp_03 = Blueprint('api_03', __name__, url_prefix='/api/0.3')
-swagger = Swagger(app, parse=False, template_file="api/swagger.json")
-
-api = Api(
-    api_bp,
-    catch_all_404s=False,
-    errors=errors)  # Establish connection between API and APP
-api_02 = Api(
-    api_bp_02,
-    catch_all_404s=False,
-    errors=error_v02)
-api_03 = Api(
-    api_bp_03,
-    catch_all_404s=False,
-    errors=errors)
-
+api = Api(api_bp, catch_all_404s=False, errors=errors)
 add_routes(api)
 app.register_blueprint(api_bp)
+
+api_bp_02 = Blueprint('api_02', __name__, url_prefix='/api/0.2')
+api_02 = Api(api_bp_02, catch_all_404s=False, errors=error_v02)
 add_routes(api_02)
 app.register_blueprint(api_bp_02)
+
+api_bp_03 = Blueprint('api_03', __name__, url_prefix='/api/0.3')
+api_03 = Api(api_bp_03, catch_all_404s=False, errors=errors)
 add_routes_v03(api_03)
 app.register_blueprint(api_bp_03)

@@ -31,13 +31,13 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.api import api  # New routes
+from openatlas.api import api
 from openatlas.util import processor
 from openatlas.util.util import convert_size
 from openatlas.views import (
-    admin, ajax, anthropology, entity, entity_index, entity_form, export, file,
-    hierarchy, index, involvement, imports, link, login, member, model, note,
-    overlay, profile, reference, relation, reference_system, search, sql,
+    admin, ajax, anthropology, entity, entity_index, entity_form, error, export,
+    file, hierarchy, index, involvement, imports, link, login, member, model,
+    note, overlay, profile, reference, relation, reference_system, search, sql,
     type as type_, user)
 
 

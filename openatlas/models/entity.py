@@ -261,7 +261,7 @@ class Entity:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
-            return sanitize(name_parts[1][:-1], 'type')  # remove close bracket
+            return sanitize(name_parts[1][:-1], 'type')  # Remove close bracket
         return name_parts[0]
 
     @staticmethod

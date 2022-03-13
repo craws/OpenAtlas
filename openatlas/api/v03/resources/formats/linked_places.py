@@ -4,11 +4,10 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.v03.resources.util import \
-    get_license, replace_empty_list_values_in_dict_with_none, to_camel_case
+    get_geometries, get_license, get_reference_systems, \
+    replace_empty_list_values_in_dict_with_none, to_camel_case
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.util import get_file_path
 
 
@@ -27,35 +26,21 @@ def get_entity(
                         f"{entity.cidoc_class.i18n['en']}",
             'systemClass': entity.class_.name,
             'properties': {'title': entity.name},
-            'types': get_node(entity, links)
-            if 'types' in parser['show'] else None,
-            'depictions': get_file(links_inverse)
-            if 'depictions' in parser['show'] else None,
-            'when': {'timespans': [get_time(entity)]}
-            if 'when' in parser['show'] else None,
+            'types': get_lp_types(entity, links)
+                if 'types' in parser['show'] else None,
+            'depictions': get_lp_file(links_inverse)
+                if 'depictions' in parser['show'] else None,
+            'when': {'timespans': [get_lp_time(entity)]}
+                if 'when' in parser['show'] else None,
             'links': get_reference_systems(links_inverse)
-            if 'links' in parser['show'] else None,
+                if 'links' in parser['show'] else None,
             'descriptions': [{'value': entity.description}],
             'names': [{"alias": value} for value in entity.aliases.values()]
-            if entity.aliases and 'names' in parser['show'] else None,
+                if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
-            if 'geometry' in parser['show'] else None,
-            'relations': get_links(links, links_inverse)
-            if 'relations' in parser['show'] else None})]}
-
-
-def get_geometries(
-        entity: Entity,
-        links: list[Link]) -> Union[dict[str, Any], None]:
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
-        return get_geoms_by_entity(get_location_id(links))
-    if entity.class_.name == 'object_location':
-        return get_geoms_by_entity(entity.id)
-    return None
-
-
-def get_location_id(links: list[Link]) -> int:
-    return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
+                if 'geometry' in parser['show'] else None,
+            'relations': get_lp_links(links, links_inverse)
+                if 'relations' in parser['show'] else None})]}
 
 
 def relation_type(link_: Link, inverse: bool = False) -> str:
@@ -79,10 +64,10 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
         'type': to_camel_case(link_.type.name) if link_.type else None,
         'relationDescription': link_.description,
         'when': {'timespans': [
-            get_time(link_.domain if inverse else link_.range)]}}
+            get_lp_time(link_.domain if inverse else link_.range)]}}
 
 
-def get_links(
+def get_lp_links(
         links: list[Link],
         links_inverse: list[Link]) -> list[dict[str, str]]:
     out = []
@@ -93,7 +78,7 @@ def get_links(
     return out
 
 
-def get_file(links_inverse: list[Link]) -> list[dict[str, str]]:
+def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
     files = []
     for link in links_inverse:
         if link.domain.class_.name != 'file':
@@ -110,27 +95,25 @@ def get_file(links_inverse: list[Link]) -> list[dict[str, str]]:
     return files
 
 
-def get_node(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
-    nodes = []
-    for node in entity.types:
-        nodes_dict = {
+def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
+    types = []
+    for type_ in entity.types:
+        type_dict = {
             'identifier': url_for(
-                'api_03.entity',
-                id_=node.id,
-                _external=True),
-            'label': node.name}
+                'api_03.entity', id_=type_.id, _external=True),
+            'label': type_.name,
+            'hierarchy': ' > '.join(map(
+                str, [g.types[root].name for root in type_.root]))}
         for link in links:
-            if link.range.id == node.id and link.description:
-                nodes_dict['value'] = link.description
-                if link.range.id == node.id and node.description:
-                    nodes_dict['unit'] = node.description
-        hierarchy = [g.types[root].name for root in node.root]
-        nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
-        nodes.append(nodes_dict)
-    return nodes
+            if link.range.id == type_.id and link.description:
+                type_dict['value'] = link.description
+                if link.range.id == type_.id and type_.description:
+                    type_dict['unit'] = type_.description
+        types.append(type_dict)
+    return types
 
 
-def get_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
+def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
     return {
         'start': {
             'earliest': str(entity.begin_from),
@@ -140,25 +123,3 @@ def get_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
             'earliest': str(entity.end_from),
             'latest': str(entity.end_to),
             'comment': entity.end_comment}}
-
-
-def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
-    geoms = Gis.get_by_id(entity_id)
-    if len(geoms) == 1:
-        return geoms[0]
-    return {'type': 'GeometryCollection', 'geometries': geoms}
-
-
-def get_reference_systems(
-        links_inverse: list[Link]) -> list[dict[str, Any]]:
-    ref = []
-    for link_ in links_inverse:
-        if not isinstance(link_.domain, ReferenceSystem):
-            continue
-        system = g.reference_systems[link_.domain.id]
-        identifier = system.resolver_url if system.resolver_url else ''
-        ref.append({
-            'identifier': f"{identifier}{link_.description}",
-            'type': to_camel_case(g.types[link_.type.id].name),
-            'referenceSystem': system.name})
-    return ref
