@@ -5,6 +5,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 from flask import abort, g
 
 from openatlas import logger
+from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.util.util import datetime64_to_timestamp, timestamp_to_datetime64
@@ -188,7 +189,14 @@ class Link:
             entity: Entity,
             codes: list[str],
             inverse: bool = False) -> None:
-        # Implement a special type delete without anthropological types
+        if 'P2' in codes and not inverse:
+            if anthro_types := Anthropology.get_types(entity.id):
+                print('skipping P2')
+                Db.remove_types(
+                    entity.id, [row['link_id'] for row in anthro_types])
+                codes.remove('P2')
+                if not codes:
+                    return
         Db.delete_by_codes(entity.id, codes, inverse)
 
     @staticmethod

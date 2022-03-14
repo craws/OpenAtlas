@@ -4,6 +4,7 @@ from flask import g
 
 from openatlas.database.anthropology import Anthropology
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 
 
 class SexEstimation:
@@ -165,7 +166,12 @@ class SexEstimation:
                     return values['type_id']
 
     @staticmethod
-    def save(entity: Entity, data: Dict[str, str]) -> None:
+    def save(
+            entity: Entity,
+            data: Dict[str, str],
+            types: [Dict[str, Any]]) -> None:
+        for dict_ in types:
+            Link.delete_(dict_['link_id'])
         for key, item in data.items():
             entity.link('P2', g.types[SexEstimation.get_by_name(key)], item)
         print(f'This values {data}')

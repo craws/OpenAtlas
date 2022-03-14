@@ -8,6 +8,7 @@ from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField
 
 from openatlas import app
+from openatlas.database.anthropology import Anthropology
 from openatlas.models.anthropology import SexEstimation
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -38,7 +39,9 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
     type_ids = SexEstimation.get_types(entity)
     table = Table(
         ['name', 'value'],
-        rows=[[g.types[data['id']].name, data['description']] for data in type_ids])
+        rows=[
+            [g.types[data['id']].name, data['description']]
+            for data in type_ids])
     return render_template(
         'anthropology/sex.html',
         entity=entity,
@@ -87,16 +90,18 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             type_ = g.types[type_id]
             SexEstimation.features[group.name][type_.name]['type_id'] = type_.id
 
+    types = Anthropology.get_types(entity.id)
+
     if form.validate_on_submit():
         data = form.data
         data.pop('save')
         data.pop('csrf_token')
-        SexEstimation.save(entity, data)
+        SexEstimation.save(entity, data, types)
         return redirect(url_for('anthropology_sex', id_=entity.id))
 
     # Fill in data
-    for type_, value in entity.types.items():
-        getattr(form, type_.name).data = value
+    for dict_ in types:
+        getattr(form, g.types[dict_['id']].name).data = dict_['description']
 
     return render_template(
         'anthropology/sex_update.html',

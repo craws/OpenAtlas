@@ -9,7 +9,7 @@ class Anthropology:
     def get_types(id_: int) -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT e.id, l.description
+            SELECT e.id, l.id AS link_id, l.description
             FROM model.entity e
             JOIN model.link l ON l.range_id = e.id
                 AND l.domain_id = %(id)s
