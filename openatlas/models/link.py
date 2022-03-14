@@ -188,6 +188,7 @@ class Link:
             entity: Entity,
             codes: list[str],
             inverse: bool = False) -> None:
+        # Implement a special type delete without anthropological types
         Db.delete_by_codes(entity.id, codes, inverse)
 
     @staticmethod

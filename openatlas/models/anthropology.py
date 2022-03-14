@@ -1,7 +1,8 @@
-from typing import Dict
+from typing import Any, Dict
 
 from flask import g
 
+from openatlas.database.anthropology import Anthropology
 from openatlas.models.entity import Entity
 
 
@@ -106,7 +107,9 @@ class SexEstimation:
                 'male': 'single curve'},
             'Os coxae': {
                 'value': 2,
-                'female': 'low, broad, with spreading alae ossis illii and low muscle relief',
+                'female':
+                    'low, broad, with spreading alae ossis illii and '
+                    'low muscle relief',
                 'male': 'high, narrow, with strong muscle relief'},
             'Foramen obturatum': {
                 'value': 2,
@@ -134,8 +137,12 @@ class SexEstimation:
                 'male': 'wide, in plane of iliac surface'},
             'Sacrum': {
                 'value': 1,
-                'female': 'sacral ala broader than body of S1, curvature ectends from S3 to S5',
-                'male': 'sacral ala narrower than S1, curvature ectends from S1 to S5'},
+                'female':
+                    'sacral ala broader than body of S1, curvature ectends '
+                    'from S3 to S5',
+                'male':
+                    'sacral ala narrower than S1, curvature ectends '
+                    'from S1 to S5'},
             'Fossa acetabuli': {
                 'value': 1,
                 'female': 'small, faces antero-laterally',
@@ -152,12 +159,9 @@ class SexEstimation:
 
     @staticmethod
     def get_by_name(feature_name):
-        print(feature_name)
         for group in SexEstimation.features.values():
             for name, values in group.items():
-                print(name)
                 if name == feature_name:
-                    print(feature_name)
                     return values['type_id']
 
     @staticmethod
@@ -165,3 +169,7 @@ class SexEstimation:
         for key, item in data.items():
             entity.link('P2', g.types[SexEstimation.get_by_name(key)], item)
         print(f'This values {data}')
+
+    @staticmethod
+    def get_types(entity: Entity) -> list[dict[str, Any]]:
+        return Anthropology.get_types(entity.id)

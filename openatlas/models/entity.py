@@ -43,6 +43,8 @@ class Entity:
         if 'types' in data and data['types']:
             for item in data['types']:  # f1 = type id, f2 = value
                 type_ = g.types[item['f1']]
+                if type_.class_.name == 'type_anthropology':
+                    continue
                 self.types[type_] = item['f2']
                 if type_.category == 'standard':
                     self.standard_type = type_

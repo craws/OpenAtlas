@@ -35,9 +35,10 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
             button(
                 _('edit'),
                 url_for('anthropology_sex_update', id_=entity.id)))
+    type_ids = SexEstimation.get_types(entity)
     table = Table(
         ['name', 'value'],
-        rows=[[type_.name, value] for type_, value in entity.types.items()])
+        rows=[[g.types[data['id']].name, data['description']] for data in type_ids])
     return render_template(
         'anthropology/sex.html',
         entity=entity,
