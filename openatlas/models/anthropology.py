@@ -1,10 +1,11 @@
-from typing import Any, Dict
+from typing import Any, Dict, Union
 
 from flask import g
 
 from openatlas.database.anthropology import Anthropology
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.type import Type
 
 
 class SexEstimation:
@@ -159,6 +160,40 @@ class SexEstimation:
                 'male': 'pronounced'}}}
 
     @staticmethod
+    def calculate(entity: Entity) -> Union[float, None]:
+        types = Anthropology.get_types(entity.id)
+        if not types:
+            return None
+        result = 0
+        weight = 0
+
+        # to do: remove code duplication from view
+        for group_id in Type.get_types('Features for sexing'):
+            group = g.types[group_id]
+            for type_id in group.subs:
+                type_ = g.types[type_id]
+                SexEstimation.features[group.name][type_.name][
+                    'type_id'] = type_.id
+
+        for row in types:
+            if row['description'] in ['', 'Not preserved']:
+                continue
+            name = g.types[row['id']].name
+            feature = SexEstimation.get_by_name2(name)
+            result += feature['value'] * SexEstimation.options[row['description']]
+            weight += feature['value']
+        if weight == 0:
+            return None
+        return round((result / weight), 2)
+
+    @staticmethod
+    def get_by_name2(feature_name):
+        for group in SexEstimation.features.values():
+            for name, values in group.items():
+                if name == feature_name:
+                    return values
+
+    @staticmethod
     def get_by_name(feature_name):
         for group in SexEstimation.features.values():
             for name, values in group.items():
@@ -174,7 +209,6 @@ class SexEstimation:
             Link.delete_(dict_['link_id'])
         for key, item in data.items():
             entity.link('P2', g.types[SexEstimation.get_by_name(key)], item)
-        print(f'This values {data}')
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:

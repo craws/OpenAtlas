@@ -3,5 +3,6 @@
     <h1>{{ _('anthropological analyzes')|uc_first }} - {{ entity.name }}</h1>
     <p>
         {{ _('sex estimation')|button(url_for('anthropology_sex', id_=entity.id)) }}
+        {{ result }}
     </p>
 {% endblock %}

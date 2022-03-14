@@ -20,9 +20,14 @@ from openatlas.util.util import button, is_authorized, required_group, uc_first
 @required_group('readonly')
 def anthropology_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
+    result = 'Ferembach et al. 1979: N/A'
+    calculation = SexEstimation.calculate(entity)
+    if calculation is not None:
+        result = f'Ferembach et al. 1979: {calculation}'
     return render_template(
         'anthropology/index.html',
         entity=entity,
+        result=result,
         crumbs=[entity, _('anthropological analyzes')])
 
 
@@ -62,7 +67,6 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         pass
 
     entity = Entity.get_by_id(id_, types=True)
-
     choices = [(option, option) for option in SexEstimation.options.keys()]
     for features in SexEstimation.features.values():
         for feature, values in features.items():
@@ -80,7 +84,6 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
                     default='Not preserved',
                     description=description))
     setattr(Form, 'save', SubmitField(_('save')))
-
     form = Form()
 
     #  Add type information to features
@@ -91,7 +94,6 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             SexEstimation.features[group.name][type_.name]['type_id'] = type_.id
 
     types = Anthropology.get_types(entity.id)
-
     if form.validate_on_submit():
         data = form.data
         data.pop('save')
