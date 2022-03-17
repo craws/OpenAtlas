@@ -180,7 +180,8 @@ class SexEstimation:
                 continue
             name = g.types[row['id']].name
             feature = SexEstimation.get_by_name2(name)
-            result += feature['value'] * SexEstimation.options[row['description']]
+            result += \
+                feature['value'] * SexEstimation.options[row['description']]
             weight += feature['value']
         if weight == 0:
             return None
