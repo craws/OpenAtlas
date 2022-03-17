@@ -1,33 +1,39 @@
 from typing import Union
 
-from flask import g, render_template, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField
 
-from openatlas import app
+from openatlas import app, logger
 from openatlas.database.anthropology import Anthropology
+from openatlas.database.connect import Transaction
 from openatlas.models.anthropology import SexEstimation
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
-from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, required_group, uc_first
+
+
+def print_result(entity) -> str:
+    html = 'Ferembach et al. 1979: <span style="font-weight:bold;">N/A</span>'
+    calculation = SexEstimation.calculate(entity)
+    if calculation is not None:
+        html = \
+            f'Ferembach et al. 1979: ' \
+            f'<span style="font-weight:bold;">{calculation}</span>'
+    return Markup(html)
 
 
 @app.route('/anthropology/index/<int:id_>')
 @required_group('readonly')
 def anthropology_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
-    result = 'Ferembach et al. 1979: N/A'
-    calculation = SexEstimation.calculate(entity)
-    if calculation is not None:
-        result = f'Ferembach et al. 1979: {calculation}'
     return render_template(
         'anthropology/index.html',
         entity=entity,
-        result=result,
+        result=print_result(entity),
         crumbs=[entity, _('anthropological analyzes')])
 
 
@@ -41,17 +47,22 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
             button(
                 _('edit'),
                 url_for('anthropology_sex_update', id_=entity.id)))
-    type_ids = SexEstimation.get_types(entity)
-    table = Table(
-        ['name', 'value'],
-        rows=[
-            [g.types[data['id']].name, data['description']]
-            for data in type_ids])
+    data = []
+    for item in SexEstimation.get_types(entity):
+        type_ = g.types[item['id']]
+        feature = SexEstimation.features[type_.name]
+        data.append({
+            'name': type_.name,
+            'category': feature['category'],
+            'feature_value': feature['value'],
+            'option_value': SexEstimation.options[item['description']],
+            'value': item['description']})
     return render_template(
         'anthropology/sex.html',
         entity=entity,
         buttons=buttons,
-        table=table,
+        data=data,
+        result=print_result(entity),
         crumbs=[
             entity,
             [_('anthropological analyzes'),
@@ -76,26 +87,26 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             Form,
             feature,
             SelectField(
-                uc_first(feature.replace('_', ' ')),
+                f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
                 choices=choices,
                 default='Not preserved',
                 description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
 
-    #  Add type information to features
-    for group_id in Type.get_types('Features for sexing'):
-        group = g.types[group_id]
-        for type_id in group.subs:
-            type_ = g.types[type_id]
-            SexEstimation.features[type_.name]['id'] = type_.id
-
     types = Anthropology.get_types(entity.id)
     if form.validate_on_submit():
         data = form.data
         data.pop('save')
         data.pop('csrf_token')
-        SexEstimation.save(entity, data, types)
+        try:
+            Transaction.begin()
+            SexEstimation.save(entity, data, types)
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         return redirect(url_for('anthropology_sex', id_=entity.id))
 
     # Fill in data

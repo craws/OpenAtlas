@@ -188,19 +188,20 @@ class SexEstimation:
             'male': 'pronounced'}}
 
     @staticmethod
-    def calculate(entity: Entity) -> Union[float, None]:
-        types = Anthropology.get_types(entity.id)
-        if not types:
-            return None
-        result = 0
-        weight = 0
-
-        # to do: remove code duplication from view
+    def prepare_feature_types() -> None:
         for category_id in Type.get_types('Features for sexing'):
             for id_ in g.types[category_id].subs:
                 SexEstimation.features[g.types[id_].name]['id'] = \
                     g.types[id_].id
 
+    @staticmethod
+    def calculate(entity: Entity) -> Union[float, None]:
+        types = Anthropology.get_types(entity.id)
+        if not types:
+            return None
+        SexEstimation.prepare_feature_types()
+        result = 0
+        weight = 0
         for row in types:
             if row['description'] not in ['', 'Not preserved']:
                 feature = SexEstimation.get_by_name(g.types[row['id']].name)
@@ -224,6 +225,7 @@ class SexEstimation:
             types: [Dict[str, Any]]) -> None:
         for dict_ in types:
             Link.delete_(dict_['link_id'])
+        SexEstimation.prepare_feature_types()
         for name, item in data.items():
             entity.link(
                 'P2', g.types[SexEstimation.get_by_name(name)['id']],
