@@ -39,7 +39,6 @@ def type_index() -> str:
         'custom': {},
         'place': {},
         'value': {},
-        'anthropology': {},
         'system': {}}
     for type_ in [type_ for type_ in g.types.values() if not type_.root]:
         if type_.category not in types:

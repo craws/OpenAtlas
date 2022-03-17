@@ -189,11 +189,12 @@ class Link:
             entity: Entity,
             codes: list[str],
             inverse: bool = False) -> None:
-        if 'P2' in codes and not inverse:
-            if anthro_types := Anthropology.get_types(entity.id):
-                print('skipping P2')
+        if entity.class_.name == 'stratigraphic_unit' \
+                and 'P2' in codes \
+                and not inverse:
+            if anthropological_data := Anthropology.get_types(entity.id):
                 Db.remove_types(
-                    entity.id, [row['link_id'] for row in anthro_types])
+                    entity.id, [row['link_id'] for row in anthropological_data])
                 codes.remove('P2')
                 if not codes:
                     return

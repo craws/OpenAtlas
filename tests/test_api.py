@@ -765,12 +765,8 @@ class ApiTests(TestBaseCase):
                     format='geojson'))]:
                 rv = rv.get_json()
                 rv = rv['results'][0]['features'][0]
-                assert ApiTests.get_bool(
-                    rv['properties'],
-                    '@id')
-                assert ApiTests.get_bool(
-                    rv['properties'],
-                    'systemClass')
+                assert ApiTests.get_bool(rv['properties'], '@id')
+                assert ApiTests.get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
 
@@ -796,36 +792,30 @@ class ApiTests(TestBaseCase):
 
             # Test Type Overview
             for rv in [
-                self.app.get(url_for('api_02.node_overview')),
-                self.app.get(
-                    url_for('api_02.node_overview', download=True))]:
+                    self.app.get(url_for('api_02.node_overview')),
+                    self.app.get(url_for('api_02.node_overview', download=True))
+            ]:
                 rv = rv.get_json()
                 rv = rv['types'][0]['place']['Administrative unit']
-                assert bool([True for i in rv if
-                             i['label'] == 'Austria'])
+                assert bool([True for i in rv if i['label'] == 'Austria'])
 
             for rv in [
-                self.app.get(url_for(
-                    'api_03.type_overview')),
-                self.app.get(url_for(
-                    'api_03.type_overview', download=True))]:
+                self.app.get(url_for('api_03.type_overview')),
+                self.app.get(url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()
                 rv = rv['place'][0]['children'][0]
                 assert bool(rv['label'] == 'Austria')
 
             # Test Type Tree
             for rv in [
-                self.app.get(url_for(
-                    'api_02.type_tree')),
-                self.app.get(url_for(
-                    'api_02.type_tree', download=True))]:
+                self.app.get(url_for('api_02.type_tree')),
+                self.app.get(url_for('api_02.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'][0])
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
-                self.app.get(url_for(
-                    'api_03.type_tree', download=True))]:
+                self.app.get(url_for('api_03.type_tree', download=True))]:
                 rv = rv.get_json()
                 assert bool(rv['typeTree'])
 

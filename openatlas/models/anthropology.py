@@ -208,9 +208,7 @@ class SexEstimation:
                 result += \
                     feature['value'] * SexEstimation.options[row['description']]
                 weight += feature['value']
-        if weight == 0:
-            return None
-        return round((result / weight), 2)
+        return None if weight == 0 else round((result / weight), 2)
 
     @staticmethod
     def get_by_name(name):

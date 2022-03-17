@@ -97,8 +97,8 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
     types = Anthropology.get_types(entity.id)
     if form.validate_on_submit():
         data = form.data
-        data.pop('save')
-        data.pop('csrf_token')
+        data.pop('save', None)
+        data.pop('csrf_token', None)
         try:
             Transaction.begin()
             SexEstimation.save(entity, data, types)
