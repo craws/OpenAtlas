@@ -78,7 +78,7 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         pass
 
     entity = Entity.get_by_id(id_, types=True)
-    choices = [(option, option) for option in SexEstimation.options.keys()]
+    choices = [(option, option) for option in SexEstimation.options]
     for feature, values in SexEstimation.features.items():
         description = ''
         if values['female'] or values['male']:
@@ -93,7 +93,6 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
                 description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
-
     types = Anthropology.get_types(entity.id)
     if form.validate_on_submit():
         data = form.data

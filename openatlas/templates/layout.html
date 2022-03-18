@@ -93,7 +93,7 @@
       </div>
     {% endif %}
     <div class="btn-group btn-group-toggle">
-      {% for language in config.LANGUAGES.keys()|sort %}
+      {% for language in config.LANGUAGES|sort %}
         {% if 'language' in session and session.language == language %}
           <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
         {% else %}

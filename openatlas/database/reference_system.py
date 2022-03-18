@@ -93,6 +93,4 @@ class ReferenceSystem:
             WHERE property_code = 'P67'
                 AND domain_id IN %(systems_ids)s
                 AND range_id = %(entity_id)s;""",
-            {
-                'systems_ids': tuple(g.reference_systems.keys()),
-                'entity_id': entity_id})
+            {'systems_ids': tuple(g.reference_systems), 'entity_id': entity_id})

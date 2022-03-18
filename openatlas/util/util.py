@@ -901,8 +901,8 @@ def display_form(
                     form.insert_continue_human_remains(class_=class_))
             html += add_form_row(
                 field,
-                label='',  # Setting this to '' keeps the button row label empty
-                value=f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
+                '',  # Setting label to '' keeps the button row label empty
+                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):

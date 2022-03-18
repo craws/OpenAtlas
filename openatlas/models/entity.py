@@ -51,7 +51,7 @@ class Entity:
 
         self.aliases: dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
-            for alias in data['aliases']: # f1 = alias id, f2 = alias name
+            for alias in data['aliases']:  # f1 = alias id, f2 = alias name
                 self.aliases[alias['f1']] = alias['f2']
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
@@ -395,7 +395,7 @@ class Entity:
 
     @staticmethod
     def get_overview_counts() -> dict[str, int]:
-        return Db.get_overview_counts(g.class_view_mapping.keys())
+        return Db.get_overview_counts(g.class_view_mapping)
 
     @staticmethod
     def get_orphans() -> list[Entity]:
@@ -404,8 +404,7 @@ class Entity:
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
         return [
-            Entity(row)
-            for row in Db.get_latest(g.class_view_mapping.keys(), limit)]
+            Entity(row) for row in Db.get_latest(g.class_view_mapping, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:

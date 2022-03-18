@@ -38,6 +38,6 @@ class CidocClass:
         for row in Db.get_hierarchy():
             classes[row['super_code']].sub.append(row['sub_code'])
             classes[row['sub_code']].super.append(row['super_code'])
-        for row in Db.get_translations(app.config['LANGUAGES'].keys()):
+        for row in Db.get_translations(app.config['LANGUAGES']):
             classes[row['class_code']].i18n[row['language_code']] = row['text']
         return classes
