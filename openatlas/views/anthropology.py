@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import SelectField, SubmitField
+from wtforms import RadioField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.database.anthropology import Anthropology
@@ -83,10 +83,18 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         description = ''
         if values['female'] or values['male']:
             description = f"Female: {values['female']}, male: {values['male']}"
+        #setattr(
+        #    Form,
+        #    feature,
+        #    SelectField(
+        #        f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
+        #        choices=choices,
+        #        default='Not preserved',
+        #        description=description))
         setattr(
             Form,
             feature,
-            SelectField(
+            RadioField(
                 f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
                 choices=choices,
                 default='Not preserved',
