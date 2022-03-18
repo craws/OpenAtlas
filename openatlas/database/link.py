@@ -6,7 +6,7 @@ from flask import g
 class Link:
 
     @staticmethod
-    def remove_types(id_: int, exclude_ids: list[int]):
+    def remove_types(id_: int, exclude_ids: list[int]) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.link
@@ -25,8 +25,8 @@ class Link:
                 description,
                 type_id,
                 begin_from, begin_to, begin_comment,
-                end_from, end_to, end_comment)
-            = (
+                end_from, end_to, end_comment
+            ) = (
                 %(property_code)s,
                 %(domain_id)s,
                 %(range_id)s,

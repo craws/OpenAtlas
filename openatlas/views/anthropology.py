@@ -16,7 +16,7 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import button, is_authorized, required_group, uc_first
 
 
-def print_result(entity) -> str:
+def print_result(entity: Entity) -> str:
     html = 'Ferembach et al. 1979: <span style="font-weight:bold;">N/A</span>'
     calculation = SexEstimation.calculate(entity)
     if calculation is not None:
