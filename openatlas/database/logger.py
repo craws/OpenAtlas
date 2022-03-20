@@ -7,10 +7,13 @@ class Logger:
 
     @staticmethod
     def log(data: dict[str, Any]) -> None:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             INSERT INTO web.system_log (priority, type, message, user_id, info)
             VALUES (%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)
-            RETURNING id;""", data)
+            RETURNING id;
+            """,
+            data)
 
     @staticmethod
     def get_system_logs(
@@ -24,7 +27,8 @@ class Logger:
             WHERE priority <= %(priority)s
             {' AND user_id = %(user_id)s' if int(user_id) > 0 else ''}
             ORDER BY created DESC
-            {' LIMIT %(limit)s' if int(limit) > 0 else ''};""",
+            {' LIMIT %(limit)s' if int(limit) > 0 else ''};
+            """,
             {'limit': limit, 'priority': priority, 'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -37,7 +41,8 @@ class Logger:
         g.cursor.execute(
             """
             INSERT INTO web.user_log (user_id, entity_id, action)
-            VALUES (%(user_id)s, %(entity_id)s, %(action)s);""",
+            VALUES (%(user_id)s, %(entity_id)s, %(action)s);
+            """,
             {'user_id': user_id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
@@ -52,9 +57,13 @@ class Logger:
         row_insert = g.cursor.fetchone()
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
         row_update = g.cursor.fetchone()
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT project_id, origin_id, user_id
-            FROM import.entity WHERE entity_id = %(id)s;""", {'id': entity_id})
+            FROM import.entity
+            WHERE entity_id = %(id)s;
+            """,
+            {'id': entity_id})
         row_import = g.cursor.fetchone()
         return {
             'creator_id': row_insert['user_id'] if row_insert else None,

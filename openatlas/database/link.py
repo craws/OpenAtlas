@@ -17,7 +17,8 @@ class Link:
 
     @staticmethod
     def update(data: dict[str, Any]) -> None:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             UPDATE model.link SET (
                 property_code,
                 domain_id,
@@ -34,24 +35,29 @@ class Link:
                 %(type_id)s,
                 %(begin_from)s, %(begin_to)s, %(begin_comment)s,
                 %(end_from)s, %(end_to)s, %(end_comment)s)
-            WHERE id = %(id)s;""", data)
+            WHERE id = %(id)s;
+            """,
+            data)
 
     @staticmethod
     def insert(data: dict[str, Any]) -> int:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             INSERT INTO model.link (
                 property_code,
                 domain_id,
                 range_id,
                 description,
-                type_id)
-            VALUES (
+                type_id
+            ) VALUES (
                 %(property_code)s,
                 %(domain_id)s,
                 %(range_id)s,
                 %(description)s,
                 %(type_id)s)
-            RETURNING id;""", data)
+            RETURNING id;
+            """,
+            data)
         return g.cursor.fetchone()['id']
 
     @staticmethod
@@ -111,15 +117,18 @@ class Link:
     def delete_by_codes(
             entity_id: int,
             codes: list[str], inverse: bool = False) -> None:
-        sql = f"""
+        g.cursor.execute(
+            f"""
             DELETE FROM model.link
             WHERE property_code IN %(codes)s
-                AND {'range_id' if inverse else 'domain_id'} = %(id)s;"""
-        g.cursor.execute(sql, {'id': entity_id, 'codes': tuple(codes)})
+                AND {'range_id' if inverse else 'domain_id'} = %(id)s;
+            """,
+            {'id': entity_id, 'codes': tuple(codes)})
 
     @staticmethod
     def get_by_id(id_: int) -> dict[str, Any]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 l.id,
                 l.property_code,
@@ -137,36 +146,46 @@ class Link:
                     AS end_from, l.end_comment,
                 COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
-            WHERE l.id = %(id)s;""", {'id': id_})
+            WHERE l.id = %(id)s;
+            """,
+            {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
     def get_links_by_type(type_id: int) -> list[dict[str, Any]]:
-        g.cursor.execute("""
-            SELECT id, domain_id, range_id from model.link
-            WHERE type_id = %(type_id)s;""", {'type_id': type_id})
+        g.cursor.execute(
+            """
+            SELECT id, domain_id, range_id
+            FROM model.link
+            WHERE type_id = %(type_id)s;
+            """,
+            {'type_id': type_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_(id_: int) -> None:
         g.cursor.execute(
-            "DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+            "DELETE FROM model.link WHERE id = %(id)s;",
+            {'id': id_})
 
     @staticmethod
     def get_cidoc_links() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT DISTINCT
                 l.property_code,
                 d.cidoc_class_code AS domain_code,
                 r.cidoc_class_code AS range_code
             FROM model.link l
             JOIN model.entity d ON l.domain_id = d.id
-            JOIN model.entity r ON l.range_id = r.id;""")
+            JOIN model.entity r ON l.range_id = r.id;
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_links(data: dict[str, Any]) -> list[dict[str, int]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 l.id,
                 l.property_code,
@@ -179,12 +198,15 @@ class Link:
             JOIN model.entity r ON l.range_id = r.id
             WHERE l.property_code = %(property_code)s
                 AND d.cidoc_class_code = %(domain_code)s
-                AND r.cidoc_class_code = %(range_code)s;""", data)
+                AND r.cidoc_class_code = %(range_code)s;
+            """,
+            data)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_link_duplicates() -> list[dict[str, int]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 COUNT(*) AS count,
                 domain_id,
@@ -194,7 +216,8 @@ class Link:
                 type_id,
                 begin_from, begin_to, begin_comment,
                 end_from, end_to, end_comment
-            FROM model.link GROUP BY
+            FROM model.link
+            GROUP BY
                 domain_id,
                 range_id,
                 property_code,
@@ -202,13 +225,16 @@ class Link:
                 type_id,
                 begin_from, begin_to, begin_comment,
                 end_from, end_to, end_comment
-            HAVING COUNT(*) > 1""")
+            HAVING COUNT(*) > 1
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_link_duplicates() -> int:
-        g.cursor.execute("""
-            DELETE FROM model.link l WHERE l.id NOT IN (
+        g.cursor.execute(
+            """
+            DELETE FROM model.link l
+            WHERE l.id NOT IN (
                 SELECT id FROM (
                     SELECT DISTINCT ON (
                         domain_id,
@@ -218,13 +244,17 @@ class Link:
                         type_id,
                         begin_from, begin_to, begin_comment,
                         end_from, end_to, end_comment) *
-                    FROM model.link) AS temp_table);""")
+                    FROM model.link) AS temp_table);
+            """)
         return g.cursor.rowcount
 
     @staticmethod
     def check_single_type_duplicates(ids: list[int]) -> list[int]:
-        g.cursor.execute("""
-            SELECT domain_id FROM model.link
+        g.cursor.execute(
+            """
+            SELECT domain_id
+            FROM model.link
             WHERE property_code = 'P2' AND range_id IN %(ids)s
-            GROUP BY domain_id HAVING COUNT(*) > 1;""", {'ids': tuple(ids)})
+            GROUP BY domain_id
+            HAVING COUNT(*) > 1;""", {'ids': tuple(ids)})
         return [row['domain_id'] for row in g.cursor.fetchall()]
