@@ -7,7 +7,8 @@ class Date:
 
     @staticmethod
     def get_invalid_dates() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT id FROM model.entity WHERE
                 begin_from > begin_to OR end_from > end_to
                 OR (
@@ -17,12 +18,14 @@ class Date:
                 OR (
                     begin_to IS NOT NULL
                     AND end_to IS NOT NULL
-                    AND begin_to > end_to);""")
+                    AND begin_to > end_to);
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_link_dates() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT id FROM model.link WHERE
                 begin_from > begin_to OR end_from > end_to
                 OR (
@@ -32,12 +35,14 @@ class Date:
                 OR (
                     begin_to IS NOT NULL
                     AND end_to IS NOT NULL
-                    AND begin_to > end_to);""")
+                    AND begin_to > end_to);
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def invalid_involvement_dates() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT l.id FROM model.entity actor
             JOIN model.link l ON actor.id = l.range_id
                 AND l.property_code IN ('P11', 'P14', 'P22', 'P23')
@@ -60,5 +65,6 @@ class Date:
                 OR (l.begin_to IS NOT NULL AND event.end_to IS NOT NULL
                     AND l.begin_to > event.end_to)
                 OR (l.end_from IS NOT NULL AND event.end_to IS NOT NULL
-                    AND l.end_from > event.end_to);""")
+                    AND l.end_from > event.end_to);
+            """)
         return [dict(row) for row in g.cursor.fetchall()]

@@ -16,22 +16,24 @@ class User:
 
     @staticmethod
     def update(data: dict[str, Any]) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             UPDATE web.user
             SET (
                 username, password, real_name, info, email, active,
                 login_last_success, login_last_failure, login_failed_count,
                 group_id, password_reset_code, password_reset_date,
-                unsubscribe_code)
-            = (
+                unsubscribe_code
+            ) = (
                 %(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s,
                 %(active)s, %(login_last_success)s, %(login_last_failure)s,
                 %(login_failed_count)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
                 %(password_reset_code)s, %(password_reset_date)s,
                 %(unsubscribe_code)s)
-            WHERE id = %(id)s;"""
-        g.cursor.execute(sql, data)
+            WHERE id = %(id)s;
+            """,
+            data)
 
     @staticmethod
     def update_settings(
@@ -42,8 +44,8 @@ class User:
             """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, %(name)s, %(value)s)
-            ON CONFLICT (user_id, name)
-            DO UPDATE SET "value" = excluded.value;""",
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;
+            """,
             {'user_id': user_id, 'name': name, 'value': value})
 
     @staticmethod
@@ -51,7 +53,8 @@ class User:
         g.cursor.execute(
             """
             DELETE FROM web.user_settings
-            WHERE name = 'newsletter' AND user_id = %(user_id)s;""",
+            WHERE name = 'newsletter' AND user_id = %(user_id)s;
+            """,
             {'user_id': user_id})
 
     @staticmethod
@@ -60,53 +63,58 @@ class User:
             """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, 'language', %(value)s)
-            ON CONFLICT (user_id, name)
-            DO UPDATE SET "value" = excluded.value;""",
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;
+            """,
             {'user_id': user_id, 'value': value})
 
     @staticmethod
     def get_all() -> list[dict[str, Any]]:
-        g.cursor.execute(User.sql + ' ORDER BY username;')
+        g.cursor.execute(f'{User.sql} ORDER BY username;')
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_bookmarks(user_id: int) -> list[int]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT entity_id
             FROM web.user_bookmarks
-            WHERE user_id = %(user_id)s;""", {'user_id': user_id})
+            WHERE user_id = %(user_id)s;
+            """,
+            {'user_id': user_id})
         return [row['entity_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_id(user_id: int) -> Optional[dict[str, Any]]:
-        g.cursor.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        g.cursor.execute(
+            f'{User.sql} WHERE u.id = %(id)s;',
+            {'id': user_id})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            User.sql + ' WHERE u.password_reset_code = %(code)s;',
+            f'{User.sql} WHERE u.password_reset_code = %(code)s;',
             {'code': code})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
     def get_by_email(email: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            User.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);',
+            f'{User.sql} WHERE LOWER(u.email) = LOWER(%(email)s);',
             {'email': email})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
     def get_by_username(username: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            User.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);',
+            f'{User.sql} WHERE LOWER(u.username) = LOWER(%(username)s);',
             {'username': username})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
     @staticmethod
     def get_by_unsubscribe_code(code: str) -> Optional[dict[str, Any]]:
         g.cursor.execute(
-            User.sql + ' WHERE u.unsubscribe_code = %(code)s;',
+            f'{User.sql} WHERE u.unsubscribe_code = %(code)s;',
             {'code': code})
         return dict(g.cursor.fetchone()) if g.cursor.rowcount else None
 
@@ -115,15 +123,22 @@ class User:
             limit: int,
             user_id: int,
             action: str) -> list[dict[str, Any]]:
-        sql = """
+        g.cursor.execute(
+            f"""
             SELECT
-                id, user_id, entity_id, created, action, 'ignore' AS ignore
-            FROM web.user_log WHERE TRUE"""
-        sql += ' AND user_id = %(id)s' if int(user_id) else ''
-        sql += ' AND action = %(action)s' if action != 'all' else ''
-        sql += ' ORDER BY created DESC'
-        sql += ' LIMIT %(limit)s' if int(limit) else ''
-        g.cursor.execute(sql, {'limit': limit, 'id': user_id, 'action': action})
+                id, user_id, 
+                entity_id, 
+                created, 
+                action, 
+                'ignore' AS ignore
+            FROM web.user_log 
+            WHERE TRUE
+                {'AND user_id = %(id)s' if int(user_id) else ''}
+                {'AND action = %(action)s' if action != 'all' else ''}
+            ORDER BY created DESC
+            {'LIMIT %(limit)s' if int(limit) else ''}
+            """,
+            {'limit': limit, 'id': user_id, 'action': action})
         return g.cursor.fetchall()
 
     @staticmethod
@@ -132,13 +147,15 @@ class User:
             """
             SELECT COUNT(*)
             FROM web.user_log
-            WHERE user_id = %(user_id)s AND action = 'insert';""",
+            WHERE user_id = %(user_id)s AND action = 'insert';
+            """,
             {'user_id': user_id})
         return g.cursor.fetchone()['count']
 
     @staticmethod
     def insert(data: dict[str, Any]) -> int:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             INSERT INTO web.user (
                 username, real_name, info, email, active, password, group_id)
             VALUES (
@@ -149,7 +166,9 @@ class User:
                 %(active)s,
                 %(password)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
-            RETURNING id;""", data)
+            RETURNING id;
+            """,
+            data)
         return g.cursor.fetchone()['id']
 
     @staticmethod
@@ -168,7 +187,8 @@ class User:
         g.cursor.execute(
             """
             INSERT INTO web.user_bookmarks (user_id, entity_id)
-            VALUES (%(user_id)s, %(entity_id)s);""",
+            VALUES (%(user_id)s, %(entity_id)s);
+            """,
             {'user_id': user_id, 'entity_id': entity_id})
 
     @staticmethod
@@ -176,7 +196,8 @@ class User:
         g.cursor.execute(
             """
             DELETE FROM web.user_bookmarks
-            WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;""",
+            WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;
+            """,
             {'user_id': user_id, 'entity_id': entity_id})
 
     @staticmethod
@@ -185,7 +206,9 @@ class User:
             """
             SELECT "name", value
             FROM web.user_settings
-            WHERE user_id = %(user_id)s;""", {'user_id': user_id})
+            WHERE user_id = %(user_id)s;
+            """,
+            {'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -197,24 +220,31 @@ class User:
             SELECT id, created, public, text, user_id
             FROM web.user_notes
             WHERE entity_id = %(entity_id)s
-                AND (public IS TRUE or user_id = %(user_id)s);""",
+                AND (public IS TRUE or user_id = %(user_id)s);
+            """,
             {'entity_id': entity_id, 'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_notes_by_user_id(user_id: int) -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT id, created, public, text, user_id, entity_id
             FROM web.user_notes
-            WHERE user_id = %(user_id)s;""", {'user_id': user_id})
+            WHERE user_id = %(user_id)s;
+            """,
+            {'user_id': user_id})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_note_by_id(id_: int) -> dict[str, Any]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT id, created, public, text, user_id, entity_id
             FROM web.user_notes
-            WHERE id = %(id)s;""", {'id': id_})
+            WHERE id = %(id)s;
+            """,
+            {'id': id_})
         return dict(g.cursor.fetchone())
 
     @staticmethod
@@ -223,21 +253,25 @@ class User:
             entity_id: int,
             note: str,
             public: bool) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO web.user_notes (user_id, entity_id, text, public)
-            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s);"""
-        g.cursor.execute(sql, {
-            'user_id': user_id,
-            'entity_id': entity_id,
-            'text': note,
-            'public': public})
+            VALUES (%(user_id)s, %(entity_id)s, %(text)s, %(public)s);
+            """, {
+                'user_id': user_id,
+                'entity_id': entity_id,
+                'text': note,
+                'public': public})
 
     @staticmethod
     def update_note(id_: int, note: str, public: bool) -> None:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             UPDATE web.user_notes
             SET text = %(text)s, public = %(public)s
-            WHERE id = %(id)s;""", {'id': id_, 'text': note, 'public': public})
+            WHERE id = %(id)s;
+            """,
+            {'id': id_, 'text': note, 'public': public})
 
     @staticmethod
     def delete_note(id_: int) -> None:
