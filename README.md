@@ -34,7 +34,7 @@ Please refer to [install.md](install.md) for requirements and installation.
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 
 **Nina Richards** - Bioarchaeological Expertise
-([nina.brundke@oeaw.ac.at](mailto:nina.brundke@oeaw.ac.at))
+([nina.richards@oeaw.ac.at](mailto:nina.richards@oeaw.ac.at))
 
 **Christoph Hoffmann** - Frontend Development
 ([christoph.hoffmann@oeaw.ac.at](mailto:christoph.hoffmann@oeaw.ac.at))
