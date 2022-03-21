@@ -749,15 +749,27 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
     return {key: data[key] for key in sorted(data.keys())}
 
 
+def display_anthropological_analysis(entity) -> str:
+    from openatlas.views.anthropology import print_result
+    if result := print_result(entity):
+        return Markup(
+            f"<h2>{uc_first(_('anthropological analyses'))}</h2>"
+            f"<p>{result}</p>")
+    return ''
+
+
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
+    html = ''
+    if entity.class_.name == 'stratigraphic_unit':
+        html += display_anthropological_analysis(entity)
     if not entity.description:
-        return ''
+        return html
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return Markup(f"""
+    return html + Markup(f"""
         <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}

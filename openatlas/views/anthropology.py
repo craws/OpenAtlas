@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import RadioField, SelectField, SubmitField
+from wtforms import SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.database.anthropology import Anthropology
@@ -16,14 +16,28 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import button, is_authorized, required_group, uc_first
 
 
+def name_result(result: float) -> str:
+
+    # Needed for translations
+    _('female')
+    _('likely female')
+    _('indifferent')
+    _('likely male')
+    _('male')
+
+    for label, value in SexEstimation.result.items():
+        if result < value:
+            return _(label)
+
+
 def print_result(entity: Entity) -> str:
-    html = 'Ferembach et al. 1979: <span style="font-weight:bold;">N/A</span>'
     calculation = SexEstimation.calculate(entity)
-    if calculation is not None:
-        html = \
-            f'Ferembach et al. 1979: ' \
-            f'<span style="font-weight:bold;">{calculation}</span>'
-    return Markup(html)
+    if calculation is None:
+        return ''
+    return Markup(
+        'Ferembach et al. 1979: '
+        f'<span class="anthro-result">{calculation}</span>'
+        f' - {_("corresponds to")} "{name_result(calculation)}"')
 
 
 @app.route('/anthropology/index/<int:id_>')
@@ -83,22 +97,14 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
         description = ''
         if values['female'] or values['male']:
             description = f"Female: {values['female']}, male: {values['male']}"
-        #setattr(
-        #    Form,
-        #    feature,
-        #    SelectField(
-        #        f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
-        #        choices=choices,
-        #        default='Not preserved',
-        #        description=description))
         setattr(
-            Form,
-            feature,
-            RadioField(
-                f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
-                choices=choices,
-                default='Not preserved',
-                description=description))
+           Form,
+           feature,
+           SelectField(
+               f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
+               choices=choices,
+               default='Not preserved',
+               description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
     types = Anthropology.get_types(entity.id)
