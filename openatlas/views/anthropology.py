@@ -78,7 +78,7 @@ def sex(id_: int) -> Union[str, Response]:
         result=print_result(entity),
         crumbs=[
             entity,
-            [_('anthropological analyzes'),
+            [_('anthropological analyses'),
              url_for('anthropology_index', id_=entity.id)],
             _('sex estimation')])
 
@@ -132,7 +132,7 @@ def sex_update(id_: int) -> Union[str, Response]:
         form=form,
         crumbs=[
             entity,
-            [_('anthropological analyzes'),
+            [_('anthropological analyses'),
              url_for('anthropology_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])

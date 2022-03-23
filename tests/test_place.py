@@ -361,7 +361,7 @@ class PlaceTest(TestBaseCase):
                 url_for('anthropology_index', id_=stratigraphic_id))
             assert b'Sex estimation' in rv.data
             rv = self.app.get(url_for('sex', id_=stratigraphic_id))
-            assert b'Anthropological analyzes' in rv.data
+            assert b'Anthropological analyses' in rv.data
             rv = self.app.post(
                 url_for('sex_update', id_=stratigraphic_id),
                 follow_redirects=True,
