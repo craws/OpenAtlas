@@ -27,6 +27,7 @@ def name_result(result: float) -> str:
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
+    return ''  # pragma: no cover
 
 
 def print_result(entity: Entity) -> str:

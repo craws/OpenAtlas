@@ -24,7 +24,7 @@ def search(data: dict[str, Any]) -> list[Entity]:
             data['own'],
             current_user.id):
         if row['openatlas_class_name'] == 'appellation':
-            entity = Link.get_linked_entity(row['id'], 'P1', True)
+            entity = Link.get_linked_entity_safe(row['id'], 'P1', True)
             if entity.class_.name not in data['classes']:
                 continue
         else:
