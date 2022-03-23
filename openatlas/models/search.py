@@ -12,9 +12,10 @@ from openatlas.models.link import Link
 def search(data: dict[str, Any]) -> list[Entity]:
     if not data['term']:
         return []
-    if 'person' in data['classes'] or 'place' in data['classes']:
+    if 'person' in data['classes'] \
+            or 'place' in data['classes'] \
+            or 'group' in data['classes']:
         data['classes'].append('appellation')
-
     entities = []
     for row in Db.search(
             data['term'],
@@ -24,6 +25,8 @@ def search(data: dict[str, Any]) -> list[Entity]:
             current_user.id):
         if row['openatlas_class_name'] == 'appellation':
             entity = Link.get_linked_entity(row['id'], 'P1', True)
+            if entity.class_.name not in data['classes']:
+                continue
         else:
             entity = Entity(row)
         if entity and check_dates(entity, data):
