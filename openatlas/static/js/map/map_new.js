@@ -204,7 +204,7 @@ baseMaps.Landscape.addTo(map);
 
 const allSelectedLayer = [selectedLayer, pointLayerSupers,pointLayerSiblings,pointLayerSubs,];
 const allSelected = [...gisSelected, ...gisPointSupers, ...gisPointSibling, ...gisPointSubs];
-if (allSelected?.length > 0) map.fitBounds(L.featureGroup(allSelectedLayer).getBounds(), {maxZoom: mapDefaultZoom});
+if (allSelected.filter(pointFilter)?.length > 0) map.fitBounds(L.featureGroup(allSelectedLayer).getBounds(), {maxZoom: mapDefaultZoom});
 else if (Object.keys(pointLayer?.getBounds()).length !== 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: mapDefaultZoom});
 else map.setView([30, 0], 2);
 
