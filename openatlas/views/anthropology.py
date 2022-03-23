@@ -12,7 +12,8 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
-from openatlas.util.util import button, is_authorized, required_group, uc_first
+from openatlas.util.util import (
+    button, is_authorized, manual, required_group, uc_first)
 
 
 def name_result(result: float) -> str:
@@ -41,18 +42,22 @@ def print_result(entity: Entity) -> str:
 @required_group('readonly')
 def anthropology_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
+    buttons = [
+        manual('tools/anthropological_analyses'),
+        button('sex estimation', url_for('sex', id_=entity.id)),
+        print_result(entity)]
     return render_template(
         'anthropology/index.html',
         entity=entity,
-        result=print_result(entity),
-        crumbs=[entity, _('anthropological analyzes')])
+        buttons=buttons,
+        crumbs=[entity, _('anthropological analyses')])
 
 
 @app.route('/anthropology/sex/<int:id_>')
 @required_group('readonly')
 def sex(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
-    buttons = []
+    buttons = [manual('tools/anthropological_analyses')]
     if is_authorized('contributor'):
         buttons.append(button(_('edit'), url_for('sex_update', id_=entity.id)))
     data = []
@@ -121,8 +126,9 @@ def sex_update(id_: int) -> Union[str, Response]:
         getattr(form, g.types[dict_['id']].name).data = dict_['description']
 
     return render_template(
-        'anthropology/sex_update.html',
+        'display_form.html',
         entity=entity,
+        manual_page='tools/anthropological_analyses',
         form=form,
         crumbs=[
             entity,

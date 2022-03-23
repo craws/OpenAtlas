@@ -15,7 +15,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
     (SELECT id FROM web.group WHERE name = 'admin'));
 
 INSERT INTO web.settings (name, value) VALUES
-    ('database_version', '7.1.0'),
+    ('database_version', '7.2.0'),
     ('api_public', ''),
     ('default_language', 'en'),
     ('table_rows', '25'),

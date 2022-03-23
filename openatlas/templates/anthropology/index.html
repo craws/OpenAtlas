@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-    <h1>{{ _('anthropological analyzes')|uc_first }} - {{ entity.name }}</h1>
-    <p>
-        {{ _('sex estimation')|button(url_for('sex', id_=entity.id)) }}
-        {{ result }}
-    </p>
+  <h1>{{ _('anthropological analyzes')|uc_first }} - {{ entity.name }}</h1>
+  {{ buttons|button_bar }}
 {% endblock %}
