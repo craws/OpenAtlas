@@ -9,22 +9,19 @@ from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField
 
 from openatlas import app, logger
-from openatlas.database.anthropology import Anthropology
 from openatlas.database.connect import Transaction
-from openatlas.models.anthropology import SexEstimation
+from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
 from openatlas.util.util import button, is_authorized, required_group, uc_first
 
 
 def name_result(result: float) -> str:
-
     # Needed for translations
     _('female')
     _('likely female')
     _('indifferent')
     _('likely male')
     _('male')
-
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
@@ -53,14 +50,11 @@ def anthropology_index(id_: int) -> Union[str, Response]:
 
 @app.route('/anthropology/sex/<int:id_>')
 @required_group('readonly')
-def anthropology_sex(id_: int) -> Union[str, Response]:
+def sex(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
     buttons = []
     if is_authorized('contributor'):
-        buttons.append(
-            button(
-                _('edit'),
-                url_for('anthropology_sex_update', id_=entity.id)))
+        buttons.append(button(_('edit'), url_for('sex_update', id_=entity.id)))
     data = []
     for item in SexEstimation.get_types(entity):
         type_ = g.types[item['id']]
@@ -86,7 +80,7 @@ def anthropology_sex(id_: int) -> Union[str, Response]:
 
 @app.route('/anthropology/sex/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def anthropology_sex_update(id_: int) -> Union[str, Response]:
+def sex_update(id_: int) -> Union[str, Response]:
 
     class Form(FlaskForm):
         pass
@@ -107,7 +101,7 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
                description=description))
     setattr(Form, 'save', SubmitField(_('save')))
     form = Form()
-    types = Anthropology.get_types(entity.id)
+    types = get_types(entity.id)
     if form.validate_on_submit():
         data = form.data
         data.pop('save', None)
@@ -120,7 +114,7 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('anthropology_sex', id_=entity.id))
+        return redirect(url_for('sex', id_=entity.id))
 
     # Fill in data
     for dict_ in types:
@@ -134,5 +128,5 @@ def anthropology_sex_update(id_: int) -> Union[str, Response]:
             entity,
             [_('anthropological analyzes'),
              url_for('anthropology_index', id_=entity.id)],
-            [_('sex estimation'), url_for('anthropology_sex', id_=entity.id)],
+            [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])

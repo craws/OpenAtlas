@@ -360,20 +360,19 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('anthropology_index', id_=stratigraphic_id))
             assert b'Sex estimation' in rv.data
-            rv = self.app.get(url_for('anthropology_sex', id_=stratigraphic_id))
-            assert b'N/A' in rv.data
+            rv = self.app.get(url_for('sex', id_=stratigraphic_id))
+            assert b'Anthropological analyzes' in rv.data
             rv = self.app.post(
-                url_for('anthropology_sex_update', id_=stratigraphic_id),
+                url_for('sex_update', id_=stratigraphic_id),
                 follow_redirects=True,
                 data={'Glabella': 'Female'})
             assert b'-2.0' in rv.data
             rv = self.app.post(
-                url_for('anthropology_sex_update', id_=stratigraphic_id),
+                url_for('sex_update', id_=stratigraphic_id),
                 follow_redirects=True,
                 data={'Glabella': 'Female'})
             assert b'-2.0' in rv.data
-            rv = self.app.get(
-                url_for('anthropology_sex_update', id_=stratigraphic_id))
+            rv = self.app.get(url_for('sex_update', id_=stratigraphic_id))
             assert b'Glabella' in rv.data
             rv = self.app.post(
                 url_for('update', id_=stratigraphic_id),

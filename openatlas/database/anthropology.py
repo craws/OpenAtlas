@@ -14,6 +14,7 @@ class Anthropology:
             JOIN model.link l ON l.range_id = e.id
                 AND l.domain_id = %(id)s
                 AND l.property_code = 'P2'
-                AND e.openatlas_class_name = 'type_anthropology'""",
+                AND e.openatlas_class_name = 'type_anthropology';
+            """,
             {'id': id_})
         return [dict(row) for row in g.cursor.fetchall()]

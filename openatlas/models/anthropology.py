@@ -2,10 +2,14 @@ from typing import Any, Union
 
 from flask import g
 
-from openatlas.database.anthropology import Anthropology
+from openatlas.database.anthropology import Anthropology as Db
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
+
+
+def get_types(id_: int) -> list[dict[str, Any]]:
+    return Db.get_types(id_)
 
 
 class SexEstimation:
@@ -204,7 +208,7 @@ class SexEstimation:
 
     @staticmethod
     def calculate(entity: Entity) -> Union[float, None]:
-        types = Anthropology.get_types(entity.id)
+        types = get_types(entity.id)
         if not types:
             return None
         SexEstimation.prepare_feature_types()
@@ -230,4 +234,4 @@ class SexEstimation:
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:
-        return Anthropology.get_types(entity.id)
+        return get_types(entity.id)

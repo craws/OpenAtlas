@@ -749,21 +749,17 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
     return {key: data[key] for key in sorted(data.keys())}
 
 
-def display_anthropological_analysis(entity) -> str:
-    from openatlas.views.anthropology import print_result
-    if result := print_result(entity):
-        return Markup(
-            f"<h2>{uc_first(_('anthropological analyses'))}</h2>"
-            f"<p>{result}</p>")
-    return ''
-
-
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
     html = ''
-    if entity.class_.name == 'stratigraphic_unit':
-        html += display_anthropological_analysis(entity)
+    if isinstance(entity, Entity) \
+            and entity.class_.name == 'stratigraphic_unit':
+        from openatlas.views.anthropology import print_result
+        if result := print_result(entity):
+            html += \
+                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                f"<p>{result}</p>"
     if not entity.description:
         return html
     label = _('description')
@@ -780,7 +776,8 @@ def description(entity: Union[Entity, Project]) -> str:
 def download_button(entity: Entity) -> str:
     if entity.image_id:
         if path := get_file_path(entity.image_id):
-            return Markup(button(
+            return Markup(
+                button(
                     _('download'),
                     url_for('download_file', filename=path.name)))
     return ''  # pragma: no cover
