@@ -748,7 +748,8 @@ class ApiTests(TestBaseCase):
                                 'title'] == place.name)
 
             # Test Entities count
-            for rv in [self.app.get(url_for(
+            for rv in [
+                self.app.get(url_for(
                     'api_02.query',
                     entities=location.id,
                     classes='E18',
