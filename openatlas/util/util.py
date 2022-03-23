@@ -902,7 +902,7 @@ def display_form(
             html += add_form_row(
                 field,
                 label='',  # Setting this to '' keeps the button row label empty
-                value=f'<div class="toolbar">{" ".join(buttons)}</div>')
+                value=f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):

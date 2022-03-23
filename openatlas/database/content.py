@@ -15,5 +15,6 @@ class Content:
             INSERT INTO web.i18n (name, language, text)
             VALUES (%(name)s, %(language)s, %(text)s)
             ON CONFLICT (name, language)
-            DO UPDATE set text = %(text)s;""",
+            DO UPDATE set text = %(text)s;
+            """,
             {'name': name, 'language': language, 'text': text})

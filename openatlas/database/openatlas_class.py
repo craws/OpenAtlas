@@ -7,16 +7,19 @@ class OpenAtlasClass:
 
     @staticmethod
     def get_class_count() -> dict[str, int]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT oc.name, COUNT(e.id) AS count
             FROM model.openatlas_class oc
             LEFT JOIN model.entity e ON oc.name = e.openatlas_class_name
-            GROUP BY oc.name;""")
+            GROUP BY oc.name;
+            """)
         return {row['name']: row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_classes() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 c.id,
                 c.name,
@@ -40,5 +43,6 @@ class OpenAtlasClass:
                 SELECT json_agg(reference_system_id) AS system_ids FROM (
                     SELECT reference_system_id
                     FROM web.reference_system_openatlas_class ro
-                    WHERE c.name = ro.openatlas_class_name) y) y""")
+                    WHERE c.name = ro.openatlas_class_name) y) y;
+            """)
         return [dict(row) for row in g.cursor.fetchall()]

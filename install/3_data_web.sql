@@ -1,3 +1,4 @@
+-- Information needed in the web application, e.g. users
 
 INSERT INTO web.group (name) VALUES
     ('admin'),

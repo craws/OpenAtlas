@@ -4,7 +4,16 @@
     height: calc(100vh - 205px);
     width: 100%;
 }
+#popup{
+    display: flex;
+    flex-direction: column;
+}
 
+
+#popup #buttonBar{
+    margin-top: 15px;
+    white-space:nowrap;
+}
 .mapFormDiv {
     padding: 6px 8px;
     background: white;
@@ -12,66 +21,45 @@
     box-shadow: 0 0 15px rgba(0,0,0,0.2);
     border-radius: 5px;
 }
-
 svg.svg-inline--fa {
     font-size: 1.2em;
 }
-
-/* overwrite the icon size above for the manual icon */
 a.manual svg.svg-inline--fa {
     font-size: 1em;
 }
-
-#geometryForm {
+.mapFormDiv {
     width: 300px;
-    overflow: hidden;
-}
+    position:relative;
+    display: flex;
+    flex-direction: column;
 
-#geometryForm textarea {
-    font: 10pt "Helvetica New", Arial, Helvetica, sans-serif;
-    float: right;
-    width: 96%;
-    resize: vertical;
 }
-
-#geometryForm label {
-    float: left;
-    margin-top: 3px;
-    padding-top: 5px
+.mapFormDiv input{
+    width: 100%;
+    box-sizing:border-box;
+    -moz-box-sizing:border-box;
 }
-
-#geometryForm input {
-    float: right;
-    margin-left: 15px;
+.mapFormDiv textarea{
+    margin-top:5px;
+    resize: none;
 }
-
-#inputFormTitle {
+.mapFormDiv #inputFormTitle{
+    text-transform: capitalize;
     font-weight: bold;
     font-style: normal;
 }
-
-#nameField {
-    width: 96%;
-    display: block;
-}
-
-#saveButton {
-    float: right;
-    margin-top: 1em;
-    margin-left: 1em;
-}
-
 #closeButton {
     color: #ccc;
     cursor: pointer;
-    float: right;
+    position: absolute;
+    top:5px;
+    right: 5px;
 }
 
-#popup {
-    width: 120px;
+.full-height {
+    height: 100%;
 }
 
-#popup input {
-    width: 50px;
-    margin: 3px;
+#coordinatesDiv input.error {
+    border: 5px solid #ffdddd;
 }
