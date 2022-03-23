@@ -761,7 +761,7 @@ def description(entity: Union[Entity, Project]) -> str:
                 f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
                 f"<p>{result}</p>"
     if not entity.description:
-        return html
+        return  Markup(html)
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')

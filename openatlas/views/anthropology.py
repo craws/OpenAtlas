@@ -23,6 +23,7 @@ def name_result(result: float) -> str:
     _('indifferent')
     _('likely male')
     _('male')
+    _('corresponds to')
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
@@ -44,7 +45,7 @@ def anthropology_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
     buttons = [
         manual('tools/anthropological_analyses'),
-        button('sex estimation', url_for('sex', id_=entity.id)),
+        button(_('sex estimation'), url_for('sex', id_=entity.id)),
         print_result(entity)]
     return render_template(
         'anthropology/index.html',
