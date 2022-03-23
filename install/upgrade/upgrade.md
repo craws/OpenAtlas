@@ -14,8 +14,9 @@ is working.
     service apache2 restart
 
 ### 7.1.x to 7.2.0
+Execute **install/upgrade/7.2.0.sql** after making backups
 
-For newer JavaScript libraries being used NPM packages have to be upgraded:
+For the new map system NPM packages have to be upgraded:
 
     $ pip3 install calmjs
     $ cd openatlas/static

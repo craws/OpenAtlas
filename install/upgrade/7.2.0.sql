@@ -1,7 +1,10 @@
+-- Upgrade 7.1.x to 7.2.0
+-- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;
 
--- Todo: add to install SQL and update database versions and install SQLs
+-- Raise database version
+UPDATE web.settings SET value = '7.2.0' WHERE name = 'database_version';
 
 -- #1445: Tool - Anthropological sex estimation
 
