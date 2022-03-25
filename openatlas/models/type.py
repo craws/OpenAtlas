@@ -28,6 +28,7 @@ class Type(Entity):
         types = {}
         for row in \
                 Db.get_types('type', 'P127') + \
+                Db.get_types('type_anthropology', 'P127') + \
                 Db.get_types('administrative_unit', 'P89'):
             type_ = Type(row)
             types[type_.id] = type_

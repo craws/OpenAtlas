@@ -42,7 +42,8 @@ class ReferenceSystem:
                 rs.website_url, 
                 rs.resolver_url, 
                 rs.identifier_example, 
-                rs.system, rs.entity_id;
+                rs.system, 
+                rs.entity_id;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
 

@@ -2,7 +2,8 @@
 
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
     ('administrative_unit',  'E53', false, false, false, 'contributor', NULL,      'mdi-map-marker', NULL),
-    ('type',                 'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL);
+    ('type',                 'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL),
+    ('type_anthropology',    'E55', false, true,  false, 'admin',      NULL,      NULL,             NULL);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
     ('E55', 'type', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.'),
@@ -246,6 +247,100 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
     ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
 
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
+    ('E55', 'type_anthropology', 'Features for sexing', 'Bone features used for biological sex estimation of human remains.'),
+    ('E55', 'type_anthropology', 'Skull', NULL),
+    ('E55', 'type_anthropology', 'Mandible', NULL),
+    ('E55', 'type_anthropology', 'Pelvis', NULL),
+    ('E55', 'type_anthropology', 'Robusticity', NULL);
+
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM model.entity WHERE name='Skull'), (SELECT id FROM model.entity WHERE name='Features for sexing')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Mandible'), (SELECT id FROM model.entity WHERE name='Features for sexing')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Pelvis'), (SELECT id FROM model.entity WHERE name='Features for sexing')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Robusticity'), (SELECT id FROM model.entity WHERE name='Features for sexing'));
+
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
+    ('E55', 'type_anthropology', 'Glabella'),
+    ('E55', 'type_anthropology', 'Arcus superciliaris'),
+    ('E55', 'type_anthropology', 'Tuber frontalis and parietalis'),
+    ('E55', 'type_anthropology', 'Inclinatio frontalis'),
+    ('E55', 'type_anthropology', 'Processus mastoideus'),
+    ('E55', 'type_anthropology', 'Relief of planum nuchale'),
+    ('E55', 'type_anthropology', 'Protuberantia occipitalis externa'),
+    ('E55', 'type_anthropology', 'Processus zygomaticus'),
+    ('E55', 'type_anthropology', 'Os zygomaticum'),
+    ('E55', 'type_anthropology', 'Crista supramastoideum'),
+    ('E55', 'type_anthropology', 'Margo supraorbitalis'),
+    ('E55', 'type_anthropology', 'Shape of orbita');
+
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM model.entity WHERE name='Glabella'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Arcus superciliaris'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Tuber frontalis and parietalis'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Inclinatio frontalis'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Processus mastoideus'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Relief of planum nuchale'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Protuberantia occipitalis externa'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Processus zygomaticus'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Os zygomaticum'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Crista supramastoideum'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Margo supraorbitalis'), (SELECT id FROM model.entity WHERE name='Skull')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Shape of orbita'), (SELECT id FROM model.entity WHERE name='Skull'));
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
+    ('E55', 'type_anthropology', 'Overall apperence'),
+    ('E55', 'type_anthropology', 'Mentum'),
+    ('E55', 'type_anthropology', 'Angulus'),
+    ('E55', 'type_anthropology', 'Margo inferior (M2)'),
+    ('E55', 'type_anthropology', 'Angle');
+
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM model.entity WHERE name='Overall apperence'), (SELECT id FROM model.entity WHERE name='Mandible')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Mentum'), (SELECT id FROM model.entity WHERE name='Mandible')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Angulus'), (SELECT id FROM model.entity WHERE name='Mandible')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Margo inferior (M2)'), (SELECT id FROM model.entity WHERE name='Mandible')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Angle'), (SELECT id FROM model.entity WHERE name='Mandible'));
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
+    ('E55', 'type_anthropology', 'Sulcus praeauricularis'),
+    ('E55', 'type_anthropology', 'Incisura ischiadica major'),
+    ('E55', 'type_anthropology', 'Angulus pubis'),
+    ('E55', 'type_anthropology', 'Arc composé'),
+    ('E55', 'type_anthropology', 'Os coxae'),
+    ('E55', 'type_anthropology', 'Foramen obturatum'),
+    ('E55', 'type_anthropology', 'Corpus ossis ischii'),
+    ('E55', 'type_anthropology', 'Crista iliaca'),
+    ('E55', 'type_anthropology', 'Fossa iliaca'),
+    ('E55', 'type_anthropology', 'Pelvis major'),
+    ('E55', 'type_anthropology', 'Auricular area'),
+    ('E55', 'type_anthropology', 'Sacrum'),
+    ('E55', 'type_anthropology', 'Fossa acetabuli');
+
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM model.entity WHERE name='Sulcus praeauricularis'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Incisura ischiadica major'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Angulus pubis'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Arc composé'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Os coxae'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Foramen obturatum'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Corpus ossis ischii'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Crista iliaca'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Fossa iliaca'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Pelvis major'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Auricular area'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Sacrum'), (SELECT id FROM model.entity WHERE name='Pelvis')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Fossa acetabuli'), (SELECT id FROM model.entity WHERE name='Pelvis'));
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name) VALUES
+    ('E55', 'type_anthropology', 'Humerus'),
+    ('E55', 'type_anthropology', 'Femur');
+
+INSERT INTO model.link (property_code, domain_id, range_id) VALUES
+    ('P127', (SELECT id FROM model.entity WHERE name='Humerus'), (SELECT id FROM model.entity WHERE name='Robusticity')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Femur'), (SELECT id FROM model.entity WHERE name='Robusticity'));
+
 INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM model.entity WHERE name='Actor function'), 'Actor function', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='Actor actor relation'), 'Actor actor relation', 'standard', False, True),
@@ -257,6 +352,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
     ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
+    ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'anthropology',False , False),
     ((SELECT id FROM model.entity WHERE name='Historical place'), 'Historical place', 'place', True, False),
     ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),

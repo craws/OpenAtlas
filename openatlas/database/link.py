@@ -6,6 +6,16 @@ from flask import g
 class Link:
 
     @staticmethod
+    def remove_types(id_: int, exclude_ids: list[int]) -> None:
+        g.cursor.execute(
+            """
+            DELETE FROM model.link
+            WHERE property_code = 'P2'
+                AND domain_id = %(id)s
+                AND id NOT IN %(exclude_ids)s;""",
+            {'id': id_, 'exclude_ids': tuple(exclude_ids)})
+
+    @staticmethod
     def update(data: dict[str, Any]) -> None:
         g.cursor.execute(
             """

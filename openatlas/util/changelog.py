@@ -1,9 +1,11 @@
 versions = {
     '7.2.0': ['TBA', {
         'feature': {
+            '1445': 'Anthropological sex estimation',
             '1628': 'New maps',
             '1151': 'Map marker improvements',
             '1491': 'API: CSV export for network analysis',
+            '1639': 'Refactor',
             '1406': 'Update OpenAtlas Website'},
         'fix': {
             '1588': 'Map problems adding geometries after deleting geometries',

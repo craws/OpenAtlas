@@ -35,9 +35,9 @@ from openatlas.api import api
 from openatlas.util import processor
 from openatlas.util.util import convert_size
 from openatlas.views import (
-    admin, ajax, entity, entity_index, entity_form, error, export, file,
-    hierarchy, index, involvement, imports, link, login, member, model, note,
-    overlay, profile, reference, relation, reference_system, search, sql,
+    admin, ajax, anthropology, entity, entity_index, entity_form, error, export,
+    file, hierarchy, index, involvement, imports, link, login, member, model,
+    note, overlay, profile, reference, relation, reference_system, search, sql,
     type as type_, user)
 
 
@@ -45,8 +45,7 @@ from openatlas.views import (
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
-    best_match = request.accept_languages.best_match(
-        app.config['LANGUAGES'].keys())
+    best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
     return best_match if best_match else g.settings['default_language']
 
 

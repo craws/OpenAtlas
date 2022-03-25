@@ -793,12 +793,8 @@ class ApiTests(TestBaseCase):
                     format='geojson'))]:
                 rv = rv.get_json()
                 rv = rv['results'][0]['features'][0]
-                assert ApiTests.get_bool(
-                    rv['properties'],
-                    '@id')
-                assert ApiTests.get_bool(
-                    rv['properties'],
-                    'systemClass')
+                assert ApiTests.get_bool(rv['properties'], '@id')
+                assert ApiTests.get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
 

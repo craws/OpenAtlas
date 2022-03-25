@@ -11,3 +11,4 @@ Tools
    network
    model
    api
+   anthropological_analyses

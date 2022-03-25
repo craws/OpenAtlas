@@ -2,7 +2,7 @@
 {% block content %}
     <form method="post">
         {{ form.csrf_token }}
-        {% for language in languages %}
+        {% for language in config.LANGUAGES %}
             <p>{{ language|upper }}</p>
             {{ form[language](class='tinymce') }}<br>
         {% endfor %}

@@ -752,12 +752,20 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
+    html = ''
+    if isinstance(entity, Entity) \
+            and entity.class_.name == 'stratigraphic_unit':
+        from openatlas.views.anthropology import print_result
+        if result := print_result(entity):
+            html += \
+                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                f"<p>{result}</p>"
     if not entity.description:
-        return ''
+        return  Markup(html)
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return Markup(f"""
+    return html + Markup(f"""
         <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
@@ -768,7 +776,8 @@ def description(entity: Union[Entity, Project]) -> str:
 def download_button(entity: Entity) -> str:
     if entity.image_id:
         if path := get_file_path(entity.image_id):
-            return Markup(button(
+            return Markup(
+                button(
                     _('download'),
                     url_for('download_file', filename=path.name)))
     return ''  # pragma: no cover
@@ -901,8 +910,8 @@ def display_form(
                     form.insert_continue_human_remains(class_=class_))
             html += add_form_row(
                 field,
-                label='',  # Setting this to '' keeps the button row label empty
-                value=f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
+                '',  # Setting label to '' keeps the button row label empty
+                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):

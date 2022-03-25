@@ -69,7 +69,7 @@ def admin_index(
                 'last login',
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
-        'content': Table(['name'] + list(app.config['LANGUAGES'].keys()))}
+        'content': Table(['name'] + list(app.config['LANGUAGES']))}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email \
@@ -85,7 +85,7 @@ def admin_index(
             format_number(count) if count else ''])
     for item, languages in get_content().items():
         content = [uc_first(_(item))]
-        for language in app.config['LANGUAGES'].keys():
+        for language in app.config['LANGUAGES']:
             content.append(sanitize(languages[language], 'text'))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         tables['content'].rows.append(content)
@@ -188,8 +188,7 @@ def admin_content(item: str) -> Union[str, Response]:
     _('legal_notice_for_frontend')
     _('contact_for_frontend')
     _('site_name_for_frontend')
-    languages = app.config['LANGUAGES'].keys()
-    for language in languages:
+    for language in app.config['LANGUAGES']:
         setattr(
             ContentForm,
             language,
@@ -198,7 +197,7 @@ def admin_content(item: str) -> Union[str, Response]:
     form = ContentForm()
     if form.validate_on_submit():
         data = []
-        for language in app.config['LANGUAGES'].keys():
+        for language in app.config['LANGUAGES']:
             data.append({
                 'name': item,
                 'language': language,
@@ -206,13 +205,12 @@ def admin_content(item: str) -> Union[str, Response]:
         update_content(data)
         flash(_('info update'), 'info')
         return redirect(f"{url_for('admin_index')}#tab-content")
-    for language in languages:
+    for language in app.config['LANGUAGES']:
         form.__getattribute__(language).data = get_content()[item][language]
     return render_template(
         'admin/content.html',
         item=item,
         form=form,
-        languages=languages,
         title=_('content'),
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)])
 
