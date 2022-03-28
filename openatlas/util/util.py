@@ -765,7 +765,8 @@ def description(entity: Union[Entity, Project]) -> str:
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return html + Markup(f"""
+    return Markup(f"""
+        {html}
         <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
