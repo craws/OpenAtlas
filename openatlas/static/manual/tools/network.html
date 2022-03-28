@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Network visualization &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Model" href="model.html" />
     <link rel="prev" title="Map" href="map.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -113,7 +112,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -148,13 +146,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Tools</a> &raquo;</li>
         
@@ -163,7 +159,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -183,54 +179,54 @@
 available at one of the <strong>Network visualization</strong> buttons at the <a class="reference internal" href="../overview.html"><span class="doc">Overview</span></a>.</p>
 <div class="figure align-left" id="id2">
 <img alt="../_images/network_classic.png" src="../_images/network_classic.png" />
-<p class="caption"><span class="caption-text">Classic</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">Classic</span></p>
 </div>
 <div class="figure align-left" id="id3">
 <img alt="../_images/network_2d.png" src="../_images/network_2d.png" />
-<p class="caption"><span class="caption-text">2D</span><a class="headerlink" href="#id3" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">2D</span></p>
 </div>
 <div class="figure align-left" id="id4">
 <img alt="../_images/network_3d.png" src="../_images/network_3d.png" />
-<p class="caption"><span class="caption-text">3D</span><a class="headerlink" href="#id4" title="Permalink to this image">¶</a></p>
+<p class="caption"><span class="caption-text">3D</span></p>
 </div>
 <div class="section" id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Zoom with mouse wheel</p></li>
-<li><p>Drag and drop one node with the left mouse button to move the node</p></li>
-<li><p>Drag and drop the background with the left mouse button to move around</p></li>
+<li>Zoom with mouse wheel</li>
+<li>Drag and drop one node with the left mouse button to move the node</li>
+<li>Drag and drop the background with the left mouse button to move around</li>
 </ul>
 <div class="section" id="d">
 <h3>2D<a class="headerlink" href="#d" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Select a node with the left mouse button to only show its direct connections</p></li>
+<li>Select a node with the left mouse button to only show its direct connections</li>
 </ul>
 </div>
 <div class="section" id="id1">
 <h3>3D<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Select a node with the left mouse button to only show its direct connections</p></li>
-<li><p>Drag and drop the background with the left mouse button to rotate</p></li>
-<li><p>Drag and drop the background with the right mouse button to pan</p></li>
+<li>Select a node with the left mouse button to only show its direct connections</li>
+<li>Drag and drop the background with the left mouse button to rotate</li>
+<li>Drag and drop the background with the right mouse button to pan</li>
 </ul>
 </div>
 </div>
 <div class="section" id="options">
 <h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Classes</strong> - you can change the node color of classes</p></li>
-<li><p><strong>Show orphans</strong> - if selected nodes without any connections are shown too</p></li>
-<li><p><strong>Width</strong> - the width of the resulting image in pixel</p></li>
-<li><p><strong>Height</strong> - the height of the resulting image in pixel</p></li>
-<li><p><strong>Charge</strong> - a parameter for the distance between entries which are not connected</p></li>
-<li><p><strong>Distance</strong> - a parameter for the distance between connected entries</p></li>
+<li><strong>Classes</strong> - you can change the node color of classes</li>
+<li><strong>Show orphans</strong> - if selected nodes without any connections are shown too</li>
+<li><strong>Width</strong> - the width of the resulting image in pixel</li>
+<li><strong>Height</strong> - the height of the resulting image in pixel</li>
+<li><strong>Charge</strong> - a parameter for the distance between entries which are not connected</li>
+<li><strong>Distance</strong> - a parameter for the distance between connected entries</li>
 </ul>
 </div>
 <div class="section" id="in-case-of-performance-issues">
 <h2>In case of performance issues<a class="headerlink" href="#in-case-of-performance-issues" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>Check if your browser has hardware acceleration enabled</p></li>
-<li><p>Try different browsers, some are faster than others when dealing with large data sets</p></li>
+<li>Check if your browser has hardware acceleration enabled</li>
+<li>Try different browsers, some are faster than others when dealing with large data sets</li>
 </ul>
 </div>
 <div class="section" id="download">
@@ -244,10 +240,16 @@ available at one of the <strong>Network visualization</strong> buttons at the <a
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="model.html" class="btn btn-neutral float-right" title="Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="model.html" class="btn btn-neutral float-right" title="Model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -256,14 +258,7 @@ available at one of the <strong>Network visualization</strong> buttons at the <a
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -274,6 +269,7 @@ available at one of the <strong>Network visualization</strong> buttons at the <a
 
 
 </footer>
+
         </div>
       </div>
 
@@ -281,6 +277,7 @@ available at one of the <strong>Network visualization</strong> buttons at the <a
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

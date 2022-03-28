@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>User &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="General" href="general.html" />
     <link rel="prev" title="Admin" href="index.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -117,7 +116,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,13 +150,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Admin</a> &raquo;</li>
         
@@ -167,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -191,93 +187,93 @@ the system if <strong>Send account information</strong> is checked.</p>
 <div class="section" id="form-fields">
 <h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><strong>Active</strong> - if not checked the user cannot log in anymore. Keeping inactive users can be useful to keep associated information e.g. about created and modified entities.</p></li>
-<li><p><strong>Group</strong> - defines the access level of a user, see table below</p></li>
-<li><p><strong>Username</strong> - required to login and displayed in advanced view of created/modified entries</p></li>
-<li><p><strong>Email</strong> - required for e.g. resetting the password</p></li>
-<li><p><strong>Full name</strong> - optional but makes it easier for other to be identified. Can be edited in <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</p></li>
-<li><p><strong>Info</strong> - a free text field for additional information</p></li>
+<li><strong>Active</strong> - if not checked the user cannot log in anymore. Keeping inactive users can be useful to keep associated information e.g. about created and modified entities.</li>
+<li><strong>Group</strong> - defines the access level of a user, see table below</li>
+<li><strong>Username</strong> - required to login and displayed in advanced view of created/modified entries</li>
+<li><strong>Email</strong> - required for e.g. resetting the password</li>
+<li><strong>Full name</strong> - optional but makes it easier for other to be identified. Can be edited in <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</li>
+<li><strong>Info</strong> - a free text field for additional information</li>
 </ul>
 </div>
 <div class="section" id="groups">
 <h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
 <p>Guest is the default for users who aren’t logged in.</p>
-<table class="docutils align-default">
+<table border="1" class="docutils">
 <colgroup>
-<col style="width: 28%" />
-<col style="width: 9%" />
-<col style="width: 12%" />
-<col style="width: 10%" />
-<col style="width: 19%" />
-<col style="width: 14%" />
-<col style="width: 9%" />
+<col width="28%" />
+<col width="9%" />
+<col width="12%" />
+<col width="10%" />
+<col width="19%" />
+<col width="14%" />
+<col width="9%" />
 </colgroup>
-<thead>
-<tr class="row-odd"><th class="head"></th>
-<th class="head"><p>Admin</p></th>
-<th class="head"><p>Manager</p></th>
-<th class="head"><p>Editor</p></th>
-<th class="head"><p>Contributor</p></th>
-<th class="head"><p>Readonly</p></th>
-<th class="head"><p>Guest</p></th>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">Admin</th>
+<th class="head">Manager</th>
+<th class="head">Editor</th>
+<th class="head">Contributor</th>
+<th class="head">Readonly</th>
+<th class="head">Guest</th>
 </tr>
 </thead>
-<tbody>
-<tr class="row-even"><td><p>Browse data</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
+<tbody valign="top">
+<tr class="row-even"><td>Browse data</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-odd"><td><p>Edit data</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
+<tr class="row-odd"><td>Edit data</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-even"><td><p>Edit types</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-even"><td>Edit types</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-odd"><td><p>Add custom types</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-odd"><td>Add custom types</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-even"><td><p>Import/Export</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-even"><td>Import/Export</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-odd"><td><p>User management</p></td>
-<td><p>yes</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-odd"><td>User management</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
-<tr class="row-even"><td><p>Site settings</p></td>
-<td><p>yes</p></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<tr class="row-even"><td>Site settings</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
 </tr>
 </tbody>
 </table>
@@ -289,10 +285,16 @@ the system if <strong>Send account information</strong> is checked.</p>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="general.html" class="btn btn-neutral float-right" title="General" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Admin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="general.html" class="btn btn-neutral float-right" title="General" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Admin" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -301,14 +303,7 @@ the system if <strong>Send account information</strong> is checked.</p>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -319,6 +314,7 @@ the system if <strong>Send account information</strong> is checked.</p>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -326,6 +322,7 @@ the system if <strong>Send account information</strong> is checked.</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Search &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Profile" href="profile.html" />
     <link rel="prev" title="Tools" href="index.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -113,7 +112,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -148,13 +146,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Tools</a> &raquo;</li>
         
@@ -163,7 +159,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -181,23 +177,22 @@
 </div>
 <p>The global search finds entities containing the search term in their name or aliases. It is:</p>
 <ul class="simple">
-<li><p>Not case sensitive, e.g. <strong>aDa lovelacE</strong> will find <strong>Ada Lovelace</strong></p></li>
-<li><p>Full text, e.g. <strong>da Love</strong> will find <strong>Ada Lovelace</strong></p></li>
-<li><p>Unaccented, e.g. <strong>Lovē</strong> will find <strong>Love</strong> and vice-versa</p></li>
-<li><p>You can use <em>%</em> as a placeholder, e.g. <strong>Ada L%ce</strong> will find <strong>Ada Lovelace</strong></p></li>
+<li>Not case sensitive, e.g. <strong>aDa lovelacE</strong> will find <strong>Ada Lovelace</strong></li>
+<li>Full text, e.g. <strong>da Love</strong> will find <strong>Ada Lovelace</strong></li>
+<li>Unaccented, e.g. <strong>Lovē</strong> will find <strong>Love</strong> and vice-versa</li>
+<li>You can use <em>%</em> as a placeholder, e.g. <strong>Ada L%ce</strong> will find <strong>Ada Lovelace</strong></li>
 </ul>
 <p>After clicking on the search button in the top right you will be redirected to a result page where
 more options are available:</p>
 <ul class="simple">
-<li><p><strong>Only entities edited by me</strong> - show only entities which you have created or edited.</p></li>
-<li><p><strong>Also search in description</strong> - searches in description and date comments</p></li>
-<li><p><strong>Classes</strong> - search only in selected classes, e.g. Place</p></li>
-<li><p><strong>Dates</strong></p>
-<ul>
-<li><p>This filter is only active if at least the <strong>from</strong> or <strong>to</strong> year is filled out.</p></li>
-<li><p>If only a year is provide the <strong>from</strong> date will be <strong>YYYY-01-01</strong>, the <strong>to</strong> date will be <strong>YYYY-12-31</strong></p></li>
-<li><p>If only a year and a month is provided it will be the last of this month.</p></li>
-<li><p>If the option <strong>Include dateless entities</strong> is checked, entities without dates will be found too.</p></li>
+<li><strong>Only entities edited by me</strong> - show only entities which you have created or edited.</li>
+<li><strong>Also search in description</strong> - searches in description and date comments</li>
+<li><strong>Classes</strong> - search only in selected classes, e.g. Place</li>
+<li><strong>Dates</strong><ul>
+<li>This filter is only active if at least the <strong>from</strong> or <strong>to</strong> year is filled out.</li>
+<li>If only a year is provide the <strong>from</strong> date will be <strong>YYYY-01-01</strong>, the <strong>to</strong> date will be <strong>YYYY-12-31</strong></li>
+<li>If only a year and a month is provided it will be the last of this month.</li>
+<li>If the option <strong>Include dateless entities</strong> is checked, entities without dates will be found too.</li>
 </ul>
 </li>
 </ul>
@@ -211,10 +206,16 @@ to 1560</strong> will be found when the <strong>from year</strong> value is <str
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="profile.html" class="btn btn-neutral float-right" title="Profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="profile.html" class="btn btn-neutral float-right" title="Profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -223,14 +224,7 @@ to 1560</strong> will be found when the <strong>from year</strong> value is <str
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -241,6 +235,7 @@ to 1560</strong> will be found when the <strong>from year</strong> value is <str
 
 
 </footer>
+
         </div>
       </div>
 
@@ -248,6 +243,7 @@ to 1560</strong> will be found when the <strong>from year</strong> value is <str
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {
