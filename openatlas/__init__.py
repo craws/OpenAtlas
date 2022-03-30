@@ -16,7 +16,8 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use test database if running tests
-INSTANCE = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
+INSTANCE = 'production' if 'test_runner.py' or 'nose2' \
+                           not in sys.argv[0] else 'testing'
 
 app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
@@ -31,22 +32,21 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.api import api  # New routes
+from openatlas.api import api
 from openatlas.util import processor
 from openatlas.util.util import convert_size
 from openatlas.views import (
-    admin, ajax, entity, entity_index, entity_form, export, file, hierarchy,
-    index, involvement, imports, link, login, member, model, note, overlay,
-    profile, reference, relation, reference_system, search, sql, type as type_,
-    user)
+    admin, ajax, anthropology, entity, entity_index, entity_form, error, export,
+    file, hierarchy, index, involvement, imports, link, login, member, model,
+    note, overlay, profile, reference, relation, reference_system, search, sql,
+    type as type_, user)
 
 
 @babel.localeselector
 def get_locale() -> str:
     if 'language' in session:
         return session['language']
-    best_match = request.accept_languages.best_match(
-        app.config['LANGUAGES'].keys())
+    best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
     return best_match if best_match else g.settings['default_language']
 
 

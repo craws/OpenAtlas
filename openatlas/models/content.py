@@ -17,7 +17,7 @@ def get_content() -> dict[str, dict[str, str]]:
             'legal_notice_for_frontend',
             'contact_for_frontend',
             'site_name_for_frontend']:
-        content[name] = {lang: '' for lang in app.config['LANGUAGES'].keys()}
+        content[name] = {lang: '' for lang in app.config['LANGUAGES']}
     for row in Db.get_content():
         content[row['name']][row['language']] = row['text']
     return content

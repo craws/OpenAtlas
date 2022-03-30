@@ -29,7 +29,8 @@ class GetNodeOverview(Resource):
             'custom': {},
             'place': {},
             'value': {},
-            'system': {}}
+            'system': {},
+            'anthropology': {}}
         for node in g.types.values():
             if node.root:
                 continue

@@ -18,7 +18,7 @@ class ReferenceSystem(Entity):
         self.resolver_url = row['resolver_url']
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
-            list(self.types.keys())[0].id if self.types else None
+            list(self.types)[0].id if self.types else None
         self.count = row['count']
         self.system = row['system']
         self.classes: list[str] = []
@@ -40,7 +40,7 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
-        abort(404)  # pragma: nocover
+        abort(404)  # pragma: no cover
 
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):

@@ -1,7 +1,6 @@
-import datetime
-from typing import Any, Union
+from typing import Union
 
-from flask import flash, g, jsonify, render_template, request, session, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -11,7 +10,6 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.api.v02.resources.error import MethodNotAllowedError
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -144,48 +142,6 @@ def index_content(item: str) -> str:
         text=get_translation(item),
         title=_(_(item)),
         crumbs=[_(item)])
-
-
-@app.errorhandler(400)
-def bad_request(e: Exception) -> tuple[Any, int]:  # pragma: no cover
-    return render_template('400.html', crumbs=['400 - Bad Request'], e=e), 400
-
-
-@app.errorhandler(403)
-def forbidden(e: Exception) -> tuple[Union[dict[str, str], str], int]:
-    return render_template('403.html', crumbs=['403 - Forbidden'], e=e), 403
-
-
-@app.errorhandler(404)
-def page_not_found(e: Exception) -> tuple[Union[dict[str, str], str], int]:
-    if request.path.startswith('/api/'):  # pragma: nocover
-        return jsonify({
-            'message': 'Endpoint not found',
-            "url": request.url,
-            "timestamp": datetime.datetime.now(),
-            'status': 404}), 404
-    return render_template(
-        '404.html',
-        crumbs=['404 - File not found'],
-        e=e), 404
-
-
-@app.errorhandler(405)  # pragma: no cover
-def method_not_allowed(_e: Exception) -> tuple[Union[dict[str, str], str], int]:
-    raise MethodNotAllowedError
-
-
-@app.errorhandler(418)
-def invalid_id(e: Exception) -> tuple[str, int]:
-    return render_template('418.html', crumbs=["418 - I’m a teapot"], e=e), 418
-
-
-@app.errorhandler(422)
-def unprocessable_entity(e: Exception) -> tuple[str, int]:  # pragma: no cover
-    return render_template(
-        '422.html',
-        crumbs=['422 - Unprocessable entity'],
-        e=e), 422
 
 
 @app.route('/changelog')

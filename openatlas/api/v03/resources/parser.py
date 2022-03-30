@@ -2,8 +2,6 @@ from flask_restful import reqparse
 
 from openatlas import app
 
-app.config['BUNDLE_ERRORS'] = True
-
 default = reqparse.RequestParser()
 default.add_argument(
     'download',
@@ -22,7 +20,7 @@ language.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    choices=app.config['LANGUAGES'].keys())
+    choices=app.config['LANGUAGES'])
 
 entity_ = default.copy()
 entity_.add_argument(

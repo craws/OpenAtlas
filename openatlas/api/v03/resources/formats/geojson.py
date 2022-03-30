@@ -1,5 +1,7 @@
 from typing import Any, Optional, Union
 
+from openatlas.api.v03.resources.util import \
+    replace_empty_list_values_in_dict_with_none
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -9,11 +11,11 @@ def get_geojson(entities: list[Entity]) -> dict[str, Any]:
     out = []
     for entity in entities:
         if geoms := [
-            get_entity(entity, geom)
-                for geom in get_geom(entity)]:
+            get_geojson_dict(entity, geom)
+            for geom in get_geom(entity)]:
             out.extend(geoms)
         else:
-            out.append(get_entity(entity))
+            out.append(get_geojson_dict(entity))
     return {'type': 'FeatureCollection', 'features': out}
 
 
@@ -26,10 +28,10 @@ def get_geom(entity: Entity) -> Union[list[dict[str, Any]], list[Any]]:
     return []
 
 
-def get_entity(
+def get_geojson_dict(
         entity: Entity,
         geom: Optional[dict[str, Any]] = None) -> dict[str, Any]:
-    features = {
+    return replace_empty_list_values_in_dict_with_none({
         'type': 'Feature',
         'geometry': geom,
         'properties': {
@@ -43,14 +45,4 @@ def get_entity(
             'end_earliest': entity.end_from,
             'end_latest': entity.end_to,
             'end_comment': entity.end_comment,
-            'types': get_node(entity)
-        }}
-    return features
-
-
-def get_node(entity: Entity) -> Optional[list[str]]:
-    nodes = []
-    for node in entity.types:
-        out = [node.name]
-        nodes.append(': '.join(out))
-    return nodes if nodes else None
+            'types': [': '.join([type_.name]) for type_ in entity.types]}})

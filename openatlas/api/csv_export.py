@@ -7,7 +7,8 @@ from typing import Any, Union
 import pandas as pd
 from flask import Response, g
 
-from openatlas.api.v03.resources.util import get_linked_entities_api, \
+from openatlas.api.v03.resources.util import get_all_links, \
+    get_all_links_inverse, get_linked_entities_api, \
     link_parser_check, remove_duplicate_entities
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -22,13 +23,17 @@ def export_entities_csv(
     return Response(
         pd.DataFrame(data=frames).to_csv(),
         mimetype='text/csv',
-        headers={'Content-Disposition': f'attachment;filename={name}.csv'})
+        headers={
+            'Content-Disposition':
+                f'attachment;'
+                f'filename='
+                f'{str(name).encode("utf8").decode("unicode-escape")}.csv'})
 
 
 def build_entity_dataframe(
         entity: Entity,
         relations: bool = False) -> dict[str, Any]:
-    geom = get_geom_entry(entity)
+    geom = get_csv_geom_entry(entity)
     data = {
         'id': str(entity.id),
         'name': entity.name,
@@ -44,9 +49,9 @@ def build_entity_dataframe(
         'geom_type': geom['type'],
         'coordinates': geom['coordinates']}
     if relations:
-        for key, value in get_links(entity).items():
+        for key, value in get_csv_links(entity).items():
             data[key] = ' | '.join(list(map(str, value)))  # pragma: no cover
-        for key, value in get_node(entity).items():
+        for key, value in get_csv_types(entity).items():
             data[key] = ' | '.join(list(map(str, value)))
     return data
 
@@ -67,30 +72,30 @@ def build_link_dataframe(link: Link) -> dict[str, Any]:
         'end_comment': link.end_comment}
 
 
-def get_node(entity: Entity) -> dict[Any, list[Any]]:
-    nodes: dict[str, Any] = defaultdict(list)
-    for node in entity.types:
-        hierarchy = [g.types[root].name for root in node.root]
+def get_csv_types(entity: Entity) -> dict[Any, list[Any]]:
+    types: dict[str, Any] = defaultdict(list)
+    for type_ in entity.types:
+        hierarchy = [g.types[root].name for root in type_.root]
         value = ''
-        for link in Link.get_links(entity.id):  # pragma: no cover
-            if link.range.id == node.id and link.description:
+        for link in get_all_links(entity.id):
+            if link.range.id == type_.id and link.description:
                 value += link.description
-                if link.range.id == node.id and node.description:
-                    value += node.description
+                if link.range.id == type_.id and type_.description:
+                    value += f' {type_.description}'
         key = ' > '.join(map(str, hierarchy))
-        nodes[key].append(node.name + (': ' + value if value else ''))
-    return nodes
+        types[key].append(type_.name + (': ' + value if value else ''))
+    return types
 
 
-def get_links(entity: Entity) -> dict[str, Any]:  # pragma: no cover
+def get_csv_links(entity: Entity) -> dict[str, Any]:
     links: dict[str, Any] = defaultdict(list)
-    for link in Link.get_links(entity.id):
-        key = f"""{link.property.i18n['en'].replace(' ', '_')}
-              _{link.range.class_.name}"""
+    for link in get_all_links(entity.id):
+        key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
+              f"{link.range.class_.name}"
         links[key].append(link.range.name)
-    for link in Link.get_links(entity.id, inverse=True):
-        key = f"""{link.property.i18n['en'].replace(' ', '_')}
-              _{link.range.class_.name}"""
+    for link in get_all_links_inverse(entity.id):
+        key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
+              f"{link.range.class_.name}"
         if link.property.i18n_inverse['en']:
             key = link.property.i18n_inverse['en'].replace(' ', '_')
             key += '_' + link.domain.class_.name
@@ -99,17 +104,17 @@ def get_links(entity: Entity) -> dict[str, Any]:  # pragma: no cover
     return links
 
 
-def get_geom_entry(entity: Entity) -> dict[str, None]:
+def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
     geom = {'type': None, 'coordinates': None}
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        geom = get_geometry(
+        geom = get_csv_geometry(
             Link.get_linked_entity_safe(entity.id, 'P53'))
     elif entity.class_.name == 'object_location':
-        geom = get_geometry(entity)
+        geom = get_csv_geometry(entity)
     return geom
 
 
-def get_geometry(entity: Entity) -> dict[str, Any]:
+def get_csv_geometry(entity: Entity) -> dict[str, Any]:
     if entity.cidoc_class.code != 'E53':
         return {'type': None, 'coordinates': None}  # pragma: no cover
     geoms = Gis.get_by_id(entity.id)

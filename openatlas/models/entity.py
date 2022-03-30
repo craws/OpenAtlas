@@ -25,7 +25,6 @@ class Entity:
     def __init__(self, data: dict[str, Any]) -> None:
 
         self.id = data['id']
-        self.standard_type = None
         self.name = data['name']
         self.description = data['description']
         self.created = data['created']
@@ -39,22 +38,24 @@ class Entity:
         self.location: Optional[Entity] = None  # Respective location if a place
         self.info_data: dict[str, Union[str, list[str], None]]
 
+        self.standard_type = None
+        self.types: dict[Type, str] = {}
+        if 'types' in data and data['types']:
+            for item in data['types']:  # f1 = type id, f2 = value
+                type_ = g.types[item['f1']]
+                if type_.class_.name == 'type_anthropology':
+                    continue
+                self.types[type_] = item['f2']
+                if type_.category == 'standard':
+                    self.standard_type = type_
+
         self.aliases: dict[int, str] = {}
         if 'aliases' in data and data['aliases']:
-            for alias in data['aliases']:
-                # f1 = alias id, f2 = alias name
+            for alias in data['aliases']:  # f1 = alias id, f2 = alias name
                 self.aliases[alias['f1']] = alias['f2']
             self.aliases = {k: v for k, v in sorted(
                 self.aliases.items(),
                 key=lambda item_: item_[1])}
-
-        self.types: dict[Type, str] = {}
-        if 'types' in data and data['types']:
-            for item in data['types']:
-                type_ = g.types[item['f1']]  # f1 = type id, f2 = value
-                self.types[type_] = item['f2']
-                if type_.category == 'standard':
-                    self.standard_type = type_
 
         # Dates
         self.begin_from = None
@@ -262,7 +263,7 @@ class Entity:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
-            return sanitize(name_parts[1][:-1], 'type')  # remove close bracket
+            return sanitize(name_parts[1][:-1], 'type')  # Remove close bracket
         return name_parts[0]
 
     @staticmethod
@@ -394,7 +395,7 @@ class Entity:
 
     @staticmethod
     def get_overview_counts() -> dict[str, int]:
-        return Db.get_overview_counts(g.class_view_mapping.keys())
+        return Db.get_overview_counts(g.class_view_mapping)
 
     @staticmethod
     def get_orphans() -> list[Entity]:
@@ -403,8 +404,7 @@ class Entity:
     @staticmethod
     def get_latest(limit: int) -> list[Entity]:
         return [
-            Entity(row)
-            for row in Db.get_latest(g.class_view_mapping.keys(), limit)]
+            Entity(row) for row in Db.get_latest(g.class_view_mapping, limit)]
 
     @staticmethod
     def set_profile_image(id_: int, origin_id: int) -> None:

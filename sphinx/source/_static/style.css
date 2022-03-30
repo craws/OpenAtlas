@@ -1,9 +1,9 @@
 @charset "UTF-8";
 
 .rst-content a, .rst-content a:visited {
-    color: #2980B9;
+  color: #2980B9;
 }
 
 .wy-side-nav-search > div.version {
-    color: white;
+  color: white;
 }

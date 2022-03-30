@@ -6,8 +6,8 @@ from pathlib import Path
 root_path = os.getcwd() + '/openatlas'
 
 VERSION = '7.2.0'
-DATABASE_VERSION = '7.1.0'
-DEMO_MODE = False  # If activated some options are disabled, login is pre filled
+DATABASE_VERSION = '7.2.0'
+DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}

@@ -7,11 +7,11 @@ from flask_restful import Resource, marshal
 from openatlas.api.v03.resources.formats.thanados import get_subunits
 from openatlas.api.v03.resources.parser import default, entity_
 from openatlas.api.v03.resources.resolve_endpoints import download, \
-    resolve_subunit
+    resolve_subunits
 from openatlas.api.v03.resources.templates import type_overview_template, \
     type_tree_template
 from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
-    get_entity_by_id, link_builder
+    get_entity_by_id, link_builder, remove_duplicate_entities
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -20,11 +20,10 @@ class GetTypeOverview(Resource):
     @staticmethod
     @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[tuple[Resource, int], Response]:
-        parser = default.parse_args()
-        node = GetTypeOverview.get_node_overview()
-        if parser['download']:
-            return download(node, type_overview_template(), 'types')
-        return marshal(node, type_overview_template()), 200
+        types = GetTypeOverview.get_node_overview()
+        if default.parse_args()['download']:
+            return download(types, type_overview_template(), 'types')
+        return marshal(types, type_overview_template()), 200
 
     @staticmethod
     def get_node_overview() -> dict[str, dict[Entity, str]]:
@@ -33,7 +32,8 @@ class GetTypeOverview(Resource):
             'custom': [],
             'place': [],
             'value': [],
-            'system': []}
+            'system': [],
+            'anthropology': []}
         for node in g.types.values():
             if node.root:
                 continue
@@ -62,9 +62,8 @@ class GetTypeTree(Resource):
     @staticmethod
     @swag_from("../swagger/type_tree.yml", endpoint="api_03.type_tree")
     def get() -> Union[tuple[Resource, int], Response]:
-        parser = entity_.parse_args()
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
-        if parser['download']:
+        if entity_.parse_args()['download']:
             return download(type_tree, type_tree_template(), 'type_tree')
         return marshal(type_tree, type_tree_template()), 200
 
@@ -93,7 +92,7 @@ class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        return resolve_subunit(
+        return resolve_subunits(
             GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
             entity_.parse_args(),
             str(id_))
@@ -103,17 +102,25 @@ class GetSubunits(Resource):
         root = entity
         hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
         entities = [entity for dict_ in hierarchy for entity in dict_]
+        type_links_inverse = GetSubunits.get_type_links_inverse(entities)
         links = link_builder(entities)
         links_inverse = link_builder(entities, True)
         return [
             get_subunits(
-                list(entity.keys())[0],
-                entity[(list(entity.keys())[0])],
+                list(entity)[0],
+                entity[(list(entity)[0])],
                 [link_ for link_ in links if
-                 link_.domain.id == list(entity.keys())[0].id],
+                 link_.domain.id == list(entity)[0].id],
                 [link_ for link_ in links_inverse if
-                 link_.range.id == list(entity.keys())[0].id],
+                 link_.range.id == list(entity)[0].id],
                 root,
                 max(entity.modified for entity in entities if entity.modified),
+                type_links_inverse,
                 parser)
             for entity in hierarchy]
+
+    @staticmethod
+    def get_type_links_inverse(entities):
+        types = remove_duplicate_entities(
+            [type_ for entity in entities for type_ in entity.types])
+        return link_builder(types, True)

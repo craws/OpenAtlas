@@ -48,7 +48,7 @@ def populate_reference_systems(form: FlaskForm, item: Entity) -> None:
         # Can't use isinstance for class check here
         link_.domain.id: link_ for link_ in item.get_links('P67', True)
         if link_.domain.class_.name == 'reference_system'}
-    for key in form.data.keys():
+    for key in form.data:
         field = getattr(form, key)
         if field.id.startswith('reference_system_id_'):
             system_id = int(field.id.replace('reference_system_id_', ''))

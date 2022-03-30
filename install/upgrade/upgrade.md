@@ -13,6 +13,22 @@ is working.
 
     service apache2 restart
 
+### 7.1.x to 7.2.0
+Execute **install/upgrade/7.2.0.sql** after making backups
+
+For the new map system NPM packages have to be upgraded:
+
+    $ pip3 install calmjs
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
+In case you get a warning in the last step about not overwriting existing
+'../package.json', delete this file manually and try again.
+
+### 7.1.0 to 7.1.1
+A code base update (e.g. with git pull) and an Apache restart is sufficient.
+
 ### 7.0.x to 7.1.0
 
 Execute **install/upgrade/7.1.0.sql** after making backups and reading release

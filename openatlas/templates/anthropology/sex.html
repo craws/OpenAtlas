@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block content %}
+  {{ buttons|button_bar }}
+  <h1>{{ _('sex estimation')|uc_first }} - {{ entity.name }}</h1>
+  <p>
+    {{ result }}
+  </p>
+  <div class="data-table">
+    {% set ns = namespace(category='') %}
+    {% for type_ in data %}
+      {% if ns.category != type_.category %}
+        <div class="table-row">
+          <div style="font-weight:bold;">{{ type_.category }}</div>
+        </div>
+        {% set ns.category = type_.category %}
+      {% endif %}
+      <div class="table-row">
+        <div>&nbsp;&nbsp;{{ type_.name }}</div>
+        <div>{{ type_.feature_value }}</div>
+        <div>{{ type_.value }}</div>
+        <div style="text-align:right;">
+          {% if type_.option_value %}
+            {{ type_.option_value }}
+          {% endif %}
+        </div>
+        {% if type_.option_value %}
+          <div>
+            =
+          </div>
+          <div style="font-weight:bold;text-align:right;">
+            {{ type_.feature_value * type_.option_value }}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+  </div>
+{% endblock %}

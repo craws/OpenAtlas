@@ -7,7 +7,8 @@ class ReferenceSystem:
 
     @staticmethod
     def get_all() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT
                 e.id, e.name,
                 e.cidoc_class_code,
@@ -41,7 +42,9 @@ class ReferenceSystem:
                 rs.website_url, 
                 rs.resolver_url, 
                 rs.identifier_example, 
-                rs.system, rs.entity_id;""")
+                rs.system, 
+                rs.entity_id;
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -51,7 +54,8 @@ class ReferenceSystem:
                 """
                 INSERT INTO web.reference_system_openatlas_class (
                     reference_system_id, openatlas_class_name)
-                VALUES (%(entity_id)s, %(name)s);""",
+                VALUES (%(entity_id)s, %(name)s);
+                """,
                 {'entity_id': entity_id, 'name': name})
 
     @staticmethod
@@ -60,29 +64,44 @@ class ReferenceSystem:
             """
             DELETE FROM web.reference_system_openatlas_class
             WHERE reference_system_id = %(reference_system_id)s
-                AND openatlas_class_name = %(class_name)s;""",
+                AND openatlas_class_name = %(class_name)s;
+            """,
             {'reference_system_id': entity_id, 'class_name': class_name})
 
     @staticmethod
     def update_system(data: dict[str, Any]) -> None:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             UPDATE web.reference_system
-            SET (name, website_url, resolver_url, identifier_example)
-            = (
+            SET (
+                name, 
+                website_url, 
+                resolver_url, 
+                identifier_example
+            ) = (
                 %(name)s,
                 %(website_url)s,
                 %(resolver_url)s,
                 %(identifier_example)s)
-            WHERE entity_id = %(entity_id)s;""", data)
+            WHERE entity_id = %(entity_id)s;
+            """,
+            data)
 
     @staticmethod
     def insert_system(data: dict[str, Any]) -> None:
         g.cursor.execute(
             """
             INSERT INTO web.reference_system (
-                entity_id, name, website_url, resolver_url)
+                entity_id,
+                name,
+                website_url,
+                resolver_url)
             VALUES (
-                %(entity_id)s, %(name)s, %(website_url)s, %(resolver_url)s);""",
+                %(entity_id)s,
+                %(name)s,
+                %(website_url)s,
+                %(resolver_url)s);
+            """,
             data)
 
     @staticmethod
@@ -92,7 +111,7 @@ class ReferenceSystem:
             DELETE FROM model.link l
             WHERE property_code = 'P67'
                 AND domain_id IN %(systems_ids)s
-                AND range_id = %(entity_id)s;""",
-            {
+                AND range_id = %(entity_id)s;
+            """, {
                 'systems_ids': tuple(g.reference_systems.keys()),
                 'entity_id': entity_id})

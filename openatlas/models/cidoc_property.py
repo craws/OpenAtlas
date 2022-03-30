@@ -71,7 +71,7 @@ class CidocProperty:
         for row in Db.get_hierarchy():
             properties[row['super_code']].sub.append(row['sub_code'])
             properties[row['sub_code']].super.append(row['super_code'])
-        for row in Db.get_translations(app.config['LANGUAGES'].keys()):
+        for row in Db.get_translations(app.config['LANGUAGES']):
             properties[row['property_code']].i18n[row['language_code']] = \
                 row['text']
             properties[row['property_code']].i18n_inverse[

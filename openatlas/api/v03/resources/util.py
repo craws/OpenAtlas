@@ -7,7 +7,9 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidSearchSyntax, \
     InvalidSystemClassError
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 
 
 def get_entity_by_id(id_: int) -> Entity:
@@ -31,9 +33,9 @@ def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
 
 
 def get_license(entity: Entity) -> Optional[str]:
-    for node in entity.types:
-        if g.types[node.root[0]].name == 'License':
-            return node.name
+    for type_ in entity.types:
+        if g.types[type_.root[0]].name == 'License':
+            return type_.name
     return None
 
 
@@ -79,13 +81,14 @@ def replace_empty_list_values_in_dict_with_none(
 
 
 def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
+    class_codes = list(g.cidoc_classes) if 'all' in class_codes else class_codes
     if not all(cc in g.cidoc_classes for cc in class_codes):
         raise InvalidCidocClassCode
     return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
 
 
 def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
-    codes = list(g.view_class_mapping.keys()) if 'all' in codes else codes
+    codes = list(g.view_class_mapping) if 'all' in codes else codes
     if not all(c in g.view_class_mapping for c in codes):
         raise InvalidCodeError
     view_classes = flatten_list_and_remove_duplicates(
@@ -94,7 +97,7 @@ def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
 
 
 def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
-    system_classes = list(g.classes.keys()) \
+    system_classes = list(g.classes) \
         if 'all' in system_classes else system_classes
     if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError
@@ -184,3 +187,42 @@ def link_parser_check(
            for i in parser['show']):
         return link_builder(new_entities, inverse)
     return []
+
+
+def get_reference_systems(
+        links_inverse: list[Link]) -> list[dict[str, Any]]:
+    ref = []
+    for link_ in links_inverse:
+        if not isinstance(link_.domain, ReferenceSystem):
+            continue
+        system = g.reference_systems[link_.domain.id]
+        identifier = system.resolver_url if system.resolver_url else ''
+        ref.append({
+            'referenceURL': system.website_url,
+            'id': link_.description,
+            'resolverURL': system.resolver_url,
+            'identifier': f"{identifier}{link_.description}",
+            'type': to_camel_case(g.types[link_.type.id].name),
+            'referenceSystem': system.name})
+    return ref
+
+
+def get_geometries(
+        entity: Entity,
+        links: list[Link]) -> Union[dict[str, Any], None]:
+    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
+        return get_geoms_by_entity(get_location_id(links))
+    if entity.class_.name == 'object_location':
+        return get_geoms_by_entity(entity.id)
+    return None
+
+
+def get_location_id(links: list[Link]) -> int:
+    return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
+
+
+def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
+    geoms = Gis.get_by_id(entity_id)
+    if len(geoms) == 1:
+        return geoms[0]
+    return {'type': 'GeometryCollection', 'geometries': geoms}

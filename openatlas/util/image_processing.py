@@ -22,7 +22,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
         if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
             return image_resizing(name, file_format, size)
         return False  # pragma: no cover
-    except Exception as e:
+    except OSError as e:
         logger.log(
             'info',
             'image processing',
@@ -52,7 +52,7 @@ def check_processed_image(filename: str) -> bool:
             return loop_through_processed_folders(
                 filename.rsplit('.', 1)[0].lower(),
                 file_format)
-    except Exception as e:  # pragma: no cover
+    except OSError as e:  # pragma: no cover
         logger.log(
             'info',
             'image processing',
@@ -81,7 +81,7 @@ def create_folder(folder: Path) -> bool:
     try:
         folder.mkdir()
         return True
-    except Exception as e:  # pragma: no cover
+    except OSError as e:  # pragma: no cover
         logger.log('info', 'image processing', 'failed to create a folder', e)
         return False
 
