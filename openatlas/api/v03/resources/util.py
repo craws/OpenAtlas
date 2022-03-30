@@ -88,7 +88,7 @@ def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
 
 
 def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
-    codes = list(g.view_class_mapping.keys()) if 'all' in codes else codes
+    codes = list(g.view_class_mapping) if 'all' in codes else codes
     if not all(c in g.view_class_mapping for c in codes):
         raise InvalidCodeError
     view_classes = flatten_list_and_remove_duplicates(
@@ -97,7 +97,7 @@ def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
 
 
 def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
-    system_classes = list(g.classes.keys()) \
+    system_classes = list(g.classes) \
         if 'all' in system_classes else system_classes
     if not all(sc in g.classes for sc in system_classes):
         raise InvalidSystemClassError

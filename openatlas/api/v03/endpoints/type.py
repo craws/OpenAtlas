@@ -107,12 +107,12 @@ class GetSubunits(Resource):
         links_inverse = link_builder(entities, True)
         return [
             get_subunits(
-                list(entity.keys())[0],
-                entity[(list(entity.keys())[0])],
+                list(entity)[0],
+                entity[(list(entity)[0])],
                 [link_ for link_ in links if
-                 link_.domain.id == list(entity.keys())[0].id],
+                 link_.domain.id == list(entity)[0].id],
                 [link_ for link_ in links_inverse if
-                 link_.range.id == list(entity.keys())[0].id],
+                 link_.range.id == list(entity)[0].id],
                 root,
                 max(entity.modified for entity in entities if entity.modified),
                 type_links_inverse,

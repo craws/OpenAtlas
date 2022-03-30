@@ -12,7 +12,7 @@ def get_geojson(entities: list[Entity]) -> dict[str, Any]:
     for entity in entities:
         if geoms := [
             get_geojson_dict(entity, geom)
-                for geom in get_geom(entity)]:
+            for geom in get_geom(entity)]:
             out.extend(geoms)
         else:
             out.append(get_geojson_dict(entity))
@@ -45,5 +45,4 @@ def get_geojson_dict(
             'end_earliest': entity.end_from,
             'end_latest': entity.end_to,
             'end_comment': entity.end_comment,
-            'types':
-                [': '.join([type_.name]) for type_ in entity.types.keys()]}})
+            'types': [': '.join([type_.name]) for type_ in entity.types]}})
