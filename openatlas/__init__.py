@@ -16,7 +16,8 @@ app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use test database if running tests
-INSTANCE = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
+INSTANCE = 'production' if 'test_runner.py' or 'nose2' \
+                           not in sys.argv[0] else 'testing'
 
 app.config.from_object('config')
 app.config.from_pyfile(f'{INSTANCE}.py')
