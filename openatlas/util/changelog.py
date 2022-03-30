@@ -5,6 +5,7 @@ versions = {
             '1628': 'New maps',
             '1151': 'Map marker improvements',
             '1491': 'API: CSV export for network analysis',
+            '1672': 'API: External references for types in subunits endpoint',
             '1639': 'Refactor',
             '1406': 'Update OpenAtlas Website'},
         'fix': {
