@@ -8,6 +8,7 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
+from psycopg2 import extras
 
 from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
@@ -62,7 +63,8 @@ def before_request() -> None:
 
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid overhead for files if not using Apache with static alias
-    open_connection(app.config)
+    g.db = open_connection(app.config)
+    g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
