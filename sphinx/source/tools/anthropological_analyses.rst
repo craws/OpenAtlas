@@ -79,8 +79,8 @@ The product is then divided by the sum of the weighting values used.
 The result is called sex ratio and can take values between -2 and 2.
 The following types are assigned:
 
-* -2 to -0.7: 		*female*
-* -0.69 to -0.31: 	*likely female*
-* -0.3 to 0.3: 		*indifferent* (sex determination not possible)
-* 0.3 to 0.69: 		*likely male*
-* 0.70 to 2:		*female*
+* -2 to -0.7: 		**female**
+* -0.69 to -0.31: 	**likely female**
+* -0.3 to 0.3: 		**indifferent** (sex determination not possible)
+* 0.3 to 0.69: 		**likely male**
+* 0.70 to 2:		**male**

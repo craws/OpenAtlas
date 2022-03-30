@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Export &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Execute SQL" href="execute_sql.html" />
     <link rel="prev" title="Import" href="import.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -117,7 +116,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,13 +150,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Admin</a> &raquo;</li>
         
@@ -167,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -188,32 +184,31 @@
 <h2>Export SQL<a class="headerlink" href="#export-sql" title="Permalink to this headline">¶</a></h2>
 <p>When clicking the <strong>Export SQL</strong> button a new SQL dump will be created with pg_dump.</p>
 <ul class="simple">
-<li><p>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses, is included.</p></li>
-<li><p>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</p></li>
-<li><p>If the directory isn’t writable, a warning will be shown</p></li>
-<li><p>SQL dumps are saved in the <strong>export/sql</strong> folder</p></li>
-<li><p>File names begin with date and time e.g. 2018-08-23_1533_dump.sql.</p></li>
+<li>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses, is included.</li>
+<li>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</li>
+<li>If the directory isn’t writable, a warning will be shown</li>
+<li>SQL dumps are saved in the <strong>export/sql</strong> folder</li>
+<li>File names begin with date and time e.g. 2018-08-23_1533_dump.sql.</li>
 </ul>
 </div>
 <div class="section" id="export-csv">
 <h2>Export CSV<a class="headerlink" href="#export-csv" title="Permalink to this headline">¶</a></h2>
 <p>When clicking the <strong>Export CSV</strong> button a new CSV export file for all marked tables will be created.</p>
 <ul class="simple">
-<li><p>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</p></li>
-<li><p>If the directory isn’t writable, a warning will be shown</p></li>
-<li><p>CSV exports are saved in the <strong>export/csv</strong> folder</p></li>
-<li><p>File names are constructed from the date, database schema and table name e.g. 2018-08-23_1533_model_class.csv</p></li>
+<li>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</li>
+<li>If the directory isn’t writable, a warning will be shown</li>
+<li>CSV exports are saved in the <strong>export/csv</strong> folder</li>
+<li>File names are constructed from the date, database schema and table name e.g. 2018-08-23_1533_model_class.csv</li>
 </ul>
 <div class="section" id="options">
 <h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p><strong>Export as ZIP and add info file</strong> - files are compressed with an info file (date, username, domain)</p></li>
-<li><p><strong>Created and modified dates</strong> - additional columns for creation and last modified dates</p></li>
-<li><p><strong>GIS format</strong></p>
-<ul>
-<li><p><strong>Coordinates</strong> - eg. “15.4498 47.0659”, for polygons a <a class="reference external" href="https://postgis.net/docs/ST_PointOnSurface.html">ST_PointOnSurface</a> will be calculated</p></li>
-<li><p><strong>WKT</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text">Well known text</a> e.g. POINT (15.4498 47.0659)</p></li>
-<li><p><strong>PostGIS geometry</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/PostGIS#Features">PostGIS</a> geometry format</p></li>
+<li><strong>Export as ZIP and add info file</strong> - files are compressed with an info file (date, username, domain)</li>
+<li><strong>Created and modified dates</strong> - additional columns for creation and last modified dates</li>
+<li><strong>GIS format</strong><ul>
+<li><strong>Coordinates</strong> - eg. “15.4498 47.0659”, for polygons a <a class="reference external" href="https://postgis.net/docs/ST_PointOnSurface.html">ST_PointOnSurface</a> will be calculated</li>
+<li><strong>WKT</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text">Well known text</a> e.g. POINT (15.4498 47.0659)</li>
+<li><strong>PostGIS geometry</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/PostGIS#Features">PostGIS</a> geometry format</li>
 </ul>
 </li>
 </ul>
@@ -226,10 +221,16 @@
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="execute_sql.html" class="btn btn-neutral float-right" title="Execute SQL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="import.html" class="btn btn-neutral float-left" title="Import" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="execute_sql.html" class="btn btn-neutral float-right" title="Execute SQL" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="import.html" class="btn btn-neutral float-left" title="Import" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -238,14 +239,7 @@
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -256,6 +250,7 @@
 
 
 </footer>
+
         </div>
       </div>
 
@@ -263,6 +258,7 @@
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

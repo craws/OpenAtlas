@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Import &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Export" href="export.html" />
     <link rel="prev" title="Data integrity checks" href="data_integrity_checks.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -117,7 +116,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,13 +150,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Admin</a> &raquo;</li>
         
@@ -167,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -187,29 +183,29 @@
 from <a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
 Currently lists can be imported containing:</p>
 <ul class="simple">
-<li><p>Name</p></li>
-<li><p>Description</p></li>
-<li><p>Dates</p></li>
-<li><p>GIS data</p></li>
-<li><p>Types</p></li>
-<li><p>origin_id</p></li>
+<li>Name</li>
+<li>Description</li>
+<li>Dates</li>
+<li>GIS data</li>
+<li>Types</li>
+<li>origin_id</li>
 </ul>
 <div class="section" id="preparations">
 <h2>Preparations<a class="headerlink" href="#preparations" title="Permalink to this headline">¶</a></h2>
 <p>Automatic imports can be dangerous for data integrity and it may be very time consuming to reverse them so we strongly advise:</p>
 <ul class="simple">
-<li><p>SQL backups <strong>before</strong> import, an existing backup not older than a day is enforced</p></li>
-<li><p>Use the preview (enabled by default) and check if the data looks alright</p></li>
+<li>SQL backups <strong>before</strong> import, an existing backup not older than a day is enforced</li>
+<li>Use the preview (enabled by default) and check if the data looks alright</li>
 </ul>
 <p>The import operation is encapsulated in a transaction, meaning if there is an error in the script,
 nothing will be imported.</p>
 <p><strong>The file:</strong></p>
 <ul class="simple">
-<li><p>Take a look at the <a class="reference download internal" download="" href="../_downloads/c252be00e4e00a8d8fbe6ca68143f1c4/example.csv"><code class="xref download docutils literal notranslate"><span class="pre">example.csv</span></code></a></p></li>
-<li><p>Make sure the extension is spelled correctly in lower case e.g. my_data.csv</p></li>
-<li><p>In the first line should be the header names</p></li>
-<li><p>Each following line is one data set. Values are separated by commas</p></li>
-<li><p>Text can be enclosed in double quotes, especially if the contain commas</p></li>
+<li>Take a look at the <a class="reference download internal" download="" href="../_downloads/c252be00e4e00a8d8fbe6ca68143f1c4/example.csv"><code class="xref download docutils literal notranslate"><span class="pre">example.csv</span></code></a></li>
+<li>Make sure the extension is spelled correctly in lower case e.g. my_data.csv</li>
+<li>In the first line should be the header names</li>
+<li>Each following line is one data set. Values are separated by commas</li>
+<li>Text can be enclosed in double quotes, especially if the contain commas</li>
 </ul>
 </div>
 <div class="section" id="projects">
@@ -227,16 +223,16 @@ later.</p>
 <p>The header can contain following titles. Columns with other titles won’t get imported but shown as
 an error message.</p>
 <ul class="simple">
-<li><p><strong>name</strong> - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these wont get imported.</p></li>
-<li><p><strong>description</strong> - a description can be provided</p></li>
-<li><p><strong>origin_id</strong> - optional but useful to trace it back. It has to be <strong>unique per project</strong> so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them</p></li>
-<li><p><strong>begin_from</strong> - used for dates, see below</p></li>
-<li><p><strong>begin_to</strong> - used for dates, see below</p></li>
-<li><p><strong>end_from</strong> - used for dates, see below</p></li>
-<li><p><strong>end_to</strong> - used for dates, see below</p></li>
-<li><p><strong>type_ids</strong> - used to link to types, see below</p></li>
-<li><p><strong>northing</strong> - only available for places, see below</p></li>
-<li><p><strong>easting</strong> - only available for places, see below</p></li>
+<li><strong>name</strong> - required, an error will be displayed if the header is missing. A warning will be displayed, if names in data rows are missing and these wont get imported.</li>
+<li><strong>description</strong> - a description can be provided</li>
+<li><strong>origin_id</strong> - optional but useful to trace it back. It has to be <strong>unique per project</strong> so if you have multiple like a person and place with id = 1 you can prefix them in the document e.g. person_1, place_1 before importing them</li>
+<li><strong>begin_from</strong> - used for dates, see below</li>
+<li><strong>begin_to</strong> - used for dates, see below</li>
+<li><strong>end_from</strong> - used for dates, see below</li>
+<li><strong>end_to</strong> - used for dates, see below</li>
+<li><strong>type_ids</strong> - used to link to types, see below</li>
+<li><strong>northing</strong> - only available for places, see below</li>
+<li><strong>easting</strong> - only available for places, see below</li>
 </ul>
 <div class="section" id="dates">
 <h3>Dates<a class="headerlink" href="#dates" title="Permalink to this headline">¶</a></h3>
@@ -244,9 +240,9 @@ an error message.</p>
 You can also use time spans in combinations with the fields <strong>begin_to</strong> and <strong>end_to</strong>,
 see: <a class="reference internal" href="../form/date.html"><span class="doc">Date</span></a></p>
 <ul class="simple">
-<li><p>If the date format is incorrect they will be displayed in red and won’t be imported</p></li>
-<li><p>Missing values for time spans will be discarded silently, e.g. a valid value in <strong>begin_to</strong> but an empty value in <strong>begin_from</strong></p></li>
-<li><p>There are no advanced checks between dates e.g. end dates can be before begin dates. You should check them after the import at <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></p></li>
+<li>If the date format is incorrect they will be displayed in red and won’t be imported</li>
+<li>Missing values for time spans will be discarded silently, e.g. a valid value in <strong>begin_to</strong> but an empty value in <strong>begin_from</strong></li>
+<li>There are no advanced checks between dates e.g. end dates can be before begin dates. You should check them after the import at <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></li>
 </ul>
 </div>
 <div class="section" id="types">
@@ -254,9 +250,9 @@ see: <a class="reference internal" href="../form/date.html"><span class="doc">Da
 <p>It is possible to link entities to types at the import which can be very useful e.g. if you have
 a custom type <strong>Case studies</strong> to link them all in one go.</p>
 <ul class="simple">
-<li><p>Type ids can be entered at the column <strong>type_ids</strong></p></li>
-<li><p>You can enter multiple separated with a space</p></li>
-<li><p>The id of a type can be looked up at the detail view of a type</p></li>
+<li>Type ids can be entered at the column <strong>type_ids</strong></li>
+<li>You can enter multiple separated with a space</li>
+<li>The id of a type can be looked up at the detail view of a type</li>
 </ul>
 </div>
 <div class="section" id="places">
@@ -266,17 +262,17 @@ the <a class="reference external" href="https://gisgeography.com/wgs84-world-geo
 Coordinates will only be imported if a columns <strong>northing</strong> (latitude) and <strong>easting</strong> (Longitude)
 is present and rows contain number values.</p>
 <ul class="simple">
-<li><p><strong>northing</strong> - number value</p></li>
-<li><p><strong>easting</strong> - number value</p></li>
+<li><strong>northing</strong> - number value</li>
+<li><strong>easting</strong> - number value</li>
 </ul>
 </div>
 </div>
 <div class="section" id="import-options">
 <h2>Import options<a class="headerlink" href="#import-options" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p><strong>File</strong> - select the file you’ll want to import</p></li>
-<li><p><strong>Preview</strong> - if this option is selected, nothing will be imported and you see a preview</p></li>
-<li><p><strong>Check for duplicates</strong> - if selected the chosen class e.g. person will be searched for already existing names. The search is not case sensitive e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If duplicates are found a warning is printed but this doesn’t stop the import so check it before with the preview.</p></li>
+<li><strong>File</strong> - select the file you’ll want to import</li>
+<li><strong>Preview</strong> - if this option is selected, nothing will be imported and you see a preview</li>
+<li><strong>Check for duplicates</strong> - if selected the chosen class e.g. person will be searched for already existing names. The search is not case sensitive e.g. “King Arthur” would be found even it is spelled “KiNg ArThUr”. If duplicates are found a warning is printed but this doesn’t stop the import so check it before with the preview.</li>
 </ul>
 </div>
 <div class="section" id="after-the-import">
@@ -295,10 +291,16 @@ project it was imported, which user did the import and the origin_id value.</p>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="export.html" class="btn btn-neutral float-right" title="Export" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="data_integrity_checks.html" class="btn btn-neutral float-left" title="Data integrity checks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="export.html" class="btn btn-neutral float-right" title="Export" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="data_integrity_checks.html" class="btn btn-neutral float-left" title="Data integrity checks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -307,14 +309,7 @@ project it was imported, which user did the import and the origin_id value.</p>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -325,6 +320,7 @@ project it was imported, which user did the import and the origin_id value.</p>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -332,6 +328,7 @@ project it was imported, which user did the import and the origin_id value.</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

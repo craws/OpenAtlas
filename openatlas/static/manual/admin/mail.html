@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Mail &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Modules" href="modules.html" />
     <link rel="prev" title="General" href="general.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -117,7 +116,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,13 +150,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Admin</a> &raquo;</li>
         
@@ -167,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -186,16 +182,16 @@
 <p>After changes are made use the test function to ensure that users can reset
 their passwords.</p>
 <ul class="simple">
-<li><p><strong>Email</strong> - if not checked all email functions are disabled</p></li>
-<li><p><strong>Username</strong> - leave empty to send mails without login or set a password
-(MAIL_PASSWORD) in instance/production.py to send mails with authentication</p></li>
-<li><p><strong>Host</strong> - e.g. smtp.example.net</p></li>
-<li><p><strong>Port</strong> - e.g. 587</p></li>
-<li><p><strong>Email from</strong> - displayed in emails</p></li>
-<li><p><strong>From name</strong> - displayed in emails</p></li>
-<li><p><strong>Recipients feedback</strong> - email addresses (use space as separator) to receive
+<li><strong>Email</strong> - if not checked all email functions are disabled</li>
+<li><strong>Username</strong> - leave empty to send mails without login or set a password
+(MAIL_PASSWORD) in instance/production.py to send mails with authentication</li>
+<li><strong>Host</strong> - e.g. smtp.example.net</li>
+<li><strong>Port</strong> - e.g. 587</li>
+<li><strong>Email from</strong> - displayed in emails</li>
+<li><strong>From name</strong> - displayed in emails</li>
+<li><strong>Recipients feedback</strong> - email addresses (use space as separator) to receive
 mails from the feedback form. The first address is also displayed as feedback
-contact.</p></li>
+contact.</li>
 </ul>
 </div>
 
@@ -204,10 +200,16 @@ contact.</p></li>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="modules.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="general.html" class="btn btn-neutral float-left" title="General" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="modules.html" class="btn btn-neutral float-right" title="Modules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="general.html" class="btn btn-neutral float-left" title="General" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -216,14 +218,7 @@ contact.</p></li>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -234,6 +229,7 @@ contact.</p></li>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -241,6 +237,7 @@ contact.</p></li>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

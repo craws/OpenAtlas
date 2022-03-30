@@ -176,6 +176,7 @@ const polygonLayerSiblings = new L.GeoJSON(gisPointSibling, {
   style: siblingStyle,
   onEachFeature: setPopup(false),
 });
+map.addLayer(polygonLayerSiblings);
 const linestringLayerSiblings = new L.GeoJSON(gisPointSibling, {
   filter: lineFilter,
   style: siblingStyle,

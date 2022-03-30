@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Archaeological data &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Profession" href="profession.html" />
     <link rel="prev" title="Types" href="types.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -108,7 +107,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -143,13 +141,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Examples</a> &raquo;</li>
         
@@ -158,7 +154,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -177,14 +173,14 @@
 <p>The steps mentioned below describe how to enter archaeological data into OpenAtlas.
 The following elements are involved in the procedure:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: the archaeological site itself (Level 1)</p></li>
-<li><p><a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>: a subunit of the place, e.g. graves, buildings, and pits. A place can consist of multiple subunits (Level 2)</p></li>
-<li><p><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>: a subunit of the feature, e.g. burial. A feature can consist of multiple subunits (Level 3)</p></li>
-<li><p><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: an archaeological artifact, e.g. coin or knife (Level 4)</p></li>
-<li><p><a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>: subunits of a burial, e.g. bones and teeth that carry anthropological information (Level 4)</p></li>
-<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</p></li>
-<li><p><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>: citation, e.g. book or article written a bout the site or any of the subunits</p></li>
-<li><p><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>: an image or other file concerning the site or any of its subunits</p></li>
+<li><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: the archaeological site itself (Level 1)</li>
+<li><a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a>: a subunit of the place, e.g. graves, buildings, and pits. A place can consist of multiple subunits (Level 2)</li>
+<li><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>: a subunit of the feature, e.g. burial. A feature can consist of multiple subunits (Level 3)</li>
+<li><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: an archaeological artifact, e.g. coin or knife (Level 4)</li>
+<li><a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a>: subunits of a burial, e.g. bones and teeth that carry anthropological information (Level 4)</li>
+<li><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</li>
+<li><a class="reference internal" href="../entity/reference.html"><span class="doc">Reference</span></a>: citation, e.g. book or article written a bout the site or any of the subunits</li>
+<li><a class="reference internal" href="../entity/file.html"><span class="doc">File</span></a>: an image or other file concerning the site or any of its subunits</li>
 </ul>
 <img alt="../_images/sub_unit.jpg" src="../_images/sub_unit.jpg" />
 <div class="section" id="adding-a-new-place">
@@ -193,14 +189,14 @@ The following elements are involved in the procedure:</p>
 <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>. In the OpenAtlas database a place is a physical thing that has a certain position and or extend in
 space that can be connected to various other information (temporal, spatial, events, sources etc.).</p>
 <ul class="simple">
-<li><p>Click on <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> in the <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> and create a new entry by using the <strong>+ Place</strong> button</p></li>
-<li><p>State the site’s name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. Burial Site or Settlement</p></li>
-<li><p>Use the magnifier button on the map to add the site to the map as well as a GeoNames reference if desired</p></li>
-<li><p>Add further information, e.g. evidence, an alias, a date or a description if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>To add a citation click the <strong>Reference tab</strong></p></li>
-<li><p>If you want to add an image e.g. a plot or photo of the site use the <strong>File tab</strong></p></li>
+<li>Click on <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> in the <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> and create a new entry by using the <strong>+ Place</strong> button</li>
+<li>State the site’s name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. Burial Site or Settlement</li>
+<li>Use the magnifier button on the map to add the site to the map as well as a GeoNames reference if desired</li>
+<li>Add further information, e.g. evidence, an alias, a date or a description if available</li>
+<li>Press <strong>Insert</strong> to save the entry</li>
+<li>To add a citation click the <strong>Reference tab</strong></li>
+<li>If you want to add an image e.g. a plot or photo of the site use the <strong>File tab</strong></li>
 </ul>
 </div>
 <div class="section" id="adding-a-feature-to-the-site">
@@ -208,11 +204,11 @@ space that can be connected to various other information (temporal, spatial, eve
 <p>Next, a <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> connected to the <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> will be created.
 This feature can be a grave of a graveyard, a building of a settlement, etc.</p>
 <ul class="simple">
-<li><p>Click on the <strong>Feature Tab</strong> and create a new entry by using the <strong>+ Feature</strong> button</p></li>
-<li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list</p></li>
-<li><p>Add further information, e.g. dimensions or a description</p></li>
-<li><p>Press <strong>Insert and add stratigraphic unit</strong> to save the entry and go on with the workflow</p></li>
+<li>Click on the <strong>Feature Tab</strong> and create a new entry by using the <strong>+ Feature</strong> button</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list</li>
+<li>Add further information, e.g. dimensions or a description</li>
+<li>Press <strong>Insert and add stratigraphic unit</strong> to save the entry and go on with the workflow</li>
 </ul>
 <p>If you want to link the created feature to a different citation or add an image you can use <strong>Insert</strong> and add those
 information or go back later and do it then. In this case you would have to click the <strong>Stratigraphic unit Tab</strong> and the
@@ -223,11 +219,11 @@ information or go back later and do it then. In this case you would have to clic
 <p>Every <a class="reference internal" href="../entity/feature.html"><span class="doc">Feature</span></a> can consist of one or more <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>.
 For a grave this would be the burial or a burial and the backfilling.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add stratigraphic unit in the before mentioned step, you can directly enter a stratigraphic unit connected to the created feature</p></li>
-<li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. burial or interface</p></li>
-<li><p>Add additional information on the stratigraphic unit if available</p></li>
-<li><p>Press <strong>Insert and add artifact</strong> or <strong>Insert an add human remains</strong> to go on with the workflow</p></li>
+<li>By clicking Insert and add stratigraphic unit in the before mentioned step, you can directly enter a stratigraphic unit connected to the created feature</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. burial or interface</li>
+<li>Add additional information on the stratigraphic unit if available</li>
+<li>Press <strong>Insert and add artifact</strong> or <strong>Insert an add human remains</strong> to go on with the workflow</li>
 </ul>
 </div>
 <div class="section" id="adding-an-artifact-to-the-stratigraphic-unit">
@@ -235,12 +231,12 @@ For a grave this would be the burial or a burial and the backfilling.</p>
 <p>The following steps add a <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> to the before created <a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Stratigraphic unit</span></a>. You can now add grave goods to a burial or
 artifacts to a certain layer of the feature.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add artifact in the before mentioned step, you can directly connect an artifact to the newly created stratigraphic unit</p></li>
-<li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. pottery or a finger ring</p></li>
-<li><p>Add additional information if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>Add a file if desired by using the <strong>File</strong> tab</p></li>
+<li>By clicking Insert and add artifact in the before mentioned step, you can directly connect an artifact to the newly created stratigraphic unit</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. pottery or a finger ring</li>
+<li>Add additional information if available</li>
+<li>Press <strong>Insert</strong> to save the entry</li>
+<li>Add a file if desired by using the <strong>File</strong> tab</li>
 </ul>
 <p>You can also enter an artifact by going to the stratigraphic unit you want to link the artifact to. Click the <strong>Artifact tab</strong> and
 <strong>+ Artifact</strong> afterwards.</p>
@@ -253,12 +249,12 @@ measurements, discoloration, or additional information. Please note that additio
 be entered via custom types in the stratigraphic unit entry mask, e.g. biological sex, gender,
 and age of an individual.</p>
 <ul class="simple">
-<li><p>By clicking Insert and add human remains in the before mentioned creation of a stratigraphic unit, you can directly connect human remains to it</p></li>
-<li><p>Choose a descriptive name</p></li>
-<li><p>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. femur or canine</p></li>
-<li><p>Add additional information if available</p></li>
-<li><p>Press <strong>Insert</strong> to save the entry</p></li>
-<li><p>Add a file if desired by using the <strong>File</strong> tab</p></li>
+<li>By clicking Insert and add human remains in the before mentioned creation of a stratigraphic unit, you can directly connect human remains to it</li>
+<li>Choose a descriptive name</li>
+<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. femur or canine</li>
+<li>Add additional information if available</li>
+<li>Press <strong>Insert</strong> to save the entry</li>
+<li>Add a file if desired by using the <strong>File</strong> tab</li>
 </ul>
 <p>You can also enter <a class="reference internal" href="../entity/human_remains.html"><span class="doc">Human remains</span></a> by going to the stratigraphic unit you want to link the information to. Click the
 <strong>Human remains tab</strong> and <strong>+ Human remains button</strong> afterwards.</p>
@@ -270,10 +266,16 @@ and age of an individual.</p>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="profession.html" class="btn btn-neutral float-right" title="Profession" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="types.html" class="btn btn-neutral float-left" title="Types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="profession.html" class="btn btn-neutral float-right" title="Profession" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="types.html" class="btn btn-neutral float-left" title="Types" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -282,14 +284,7 @@ and age of an individual.</p>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -300,6 +295,7 @@ and age of an individual.</p>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -307,6 +303,7 @@ and age of an individual.</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

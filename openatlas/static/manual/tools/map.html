@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Map &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Network visualization" href="network.html" />
     <link rel="prev" title="Notes" href="notes.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -113,7 +112,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -148,13 +146,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Tools</a> &raquo;</li>
         
@@ -163,7 +159,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -183,10 +179,10 @@
 <div class="section" id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the upper left corner.</p></li>
-<li><p>You can drag the content with the mouse (left click and hold)</p></li>
-<li><p>Change the basemap at the layer button in the upper right corner.</p></li>
-<li><p>Switch to full screen with the rectangle in the upper left.</p></li>
+<li>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the upper left corner.</li>
+<li>You can drag the content with the mouse (left click and hold)</li>
+<li>Change the basemap at the layer button in the upper right corner.</li>
+<li>Switch to full screen with the rectangle in the upper left.</li>
 </ul>
 </div>
 <div class="section" id="search">
@@ -198,10 +194,10 @@
 <h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this headline">¶</a></h2>
 <p>When in insert or update mode of a place you have following options available (can be combined):</p>
 <ul class="simple">
-<li><p>Set a marker/point at the position where the physical thing is located.</p></li>
-<li><p>Draw a line connected to a physical objects spatial characteristics, e.g. the course of a road.</p></li>
-<li><p>Draw the shape of a physical thing if the precise extend is known.</p></li>
-<li><p>Draw the area in which the physical thing is located. E.g. if its precise shape is not known but known to be within a certain area.</p></li>
+<li>Set a marker/point at the position where the physical thing is located.</li>
+<li>Draw a line connected to a physical objects spatial characteristics, e.g. the course of a road.</li>
+<li>Draw the shape of a physical thing if the precise extend is known.</li>
+<li>Draw the area in which the physical thing is located. E.g. if its precise shape is not known but known to be within a certain area.</li>
 </ul>
 </div>
 <div class="section" id="id1">
@@ -221,9 +217,9 @@ be visible on the map by default and can be toggled at map layer button at the u
 After adding an image file in the file tab you can click <strong>add</strong> in the overlay column to enter
 coordinates (Easting and Northing) for:</p>
 <ul class="simple">
-<li><p>top left corner</p></li>
-<li><p>top right corner</p></li>
-<li><p>bottom left corner</p></li>
+<li>top left corner</li>
+<li>top right corner</li>
+<li>bottom left corner</li>
 </ul>
 <p>of the image to position it on the map.
 The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326).</p>
@@ -235,10 +231,16 @@ The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326)
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="network.html" class="btn btn-neutral float-right" title="Network visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="notes.html" class="btn btn-neutral float-left" title="Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="network.html" class="btn btn-neutral float-right" title="Network visualization" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="notes.html" class="btn btn-neutral float-left" title="Notes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -247,14 +249,7 @@ The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326)
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -265,6 +260,7 @@ The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326)
 
 
 </footer>
+
         </div>
       </div>
 
@@ -272,6 +268,7 @@ The coordinates need to be in <strong>WGS84</strong> decimal degrees (EPSG 4326)
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {
