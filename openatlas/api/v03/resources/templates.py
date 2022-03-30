@@ -134,11 +134,6 @@ def geojson_pagination() -> dict[str, Any]:
 
 
 def subunit_template(id_: str) -> dict[str, List]:
-    standard_type = {
-        'name': fields.String,
-        'id': fields.Integer,
-        'rootId': fields.Integer,
-        'path': fields.String}
     timespan = {
         'earliestBegin': fields.String,
         'latestBegin': fields.String,
@@ -147,7 +142,16 @@ def subunit_template(id_: str) -> dict[str, List]:
     external_references = {
         'type': fields.String,
         'identifier': fields.String,
-        'referenceSystem': fields.String}
+        'referenceSystem': fields.String,
+        'resolverURL': fields.String,
+        'referenceURL': fields.String,
+        'id': fields.String}
+    standard_type = {
+        'name': fields.String,
+        'id': fields.Integer,
+        'rootId': fields.Integer,
+        'path': fields.String,
+        'externalReferences': fields.List(fields.Nested(external_references))}
     references = {
         'id': fields.Integer,
         'abbreviation': fields.String,
@@ -165,7 +169,8 @@ def subunit_template(id_: str) -> dict[str, List]:
         'name': fields.String,
         'path': fields.String,
         'value': fields.Float,
-        'unit': fields.String}
+        'unit': fields.String,
+        'externalReferences': fields.List(fields.Nested(external_references))}
     properties = {
         'name': fields.String,
         'aliases': fields.List(fields.String),

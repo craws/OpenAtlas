@@ -198,6 +198,9 @@ def get_reference_systems(
         system = g.reference_systems[link_.domain.id]
         identifier = system.resolver_url if system.resolver_url else ''
         ref.append({
+            'referenceURL': system.website_url,
+            'id': link_.description,
+            'resolverURL': system.resolver_url,
             'identifier': f"{identifier}{link_.description}",
             'type': to_camel_case(g.types[link_.type.id].name),
             'referenceSystem': system.name})

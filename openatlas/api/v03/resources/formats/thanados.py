@@ -18,6 +18,7 @@ def get_subunits(
         links_inverse: list[Link],
         root: Entity,
         latest_mod_rec: datetime,
+        type_links_inverse: list[Link],
         parser: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
         'id': entity.id,
@@ -32,7 +33,12 @@ def get_subunits(
         'latestModRec': latest_mod_rec,
         'geometry': get_geometries_thanados(entity, links, parser),
         'children': get_children(children, parser) if children else None,
-        'properties': get_properties(entity, links, links_inverse, parser)})
+        'properties': get_properties(
+            entity,
+            links,
+            links_inverse,
+            type_links_inverse,
+            parser)})
 
 
 def get_geometries_thanados(
@@ -79,30 +85,20 @@ def get_properties(
         entity: Entity,
         links: list[Link],
         links_inverse: list[Link],
+        type_links_inverse: list[Link],
         parser: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
         'standardType':
-            get_standard_type(entity.standard_type)
+            get_standard_type(entity.standard_type, type_links_inverse, parser)
             if entity.standard_type else None,
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),
         'files': get_file(links_inverse, parser),
-        'types': get_types(entity, links, parser)})
-
-
-def get_standard_type(type_: Type) -> dict[str, Any]:
-    types_dict = {
-        'id': type_.id,
-        'name': type_.name}
-    hierarchy = [g.types[root].name for root in type_.root]
-    hierarchy.reverse()
-    types_dict['path'] = ' > '.join(map(str, hierarchy))
-    types_dict['rootId'] = type_.root[0]
-    return types_dict
+        'types': get_types(entity, links, type_links_inverse, parser)})
 
 
 def get_aliases(entity: Entity, parser: dict[str, Any]) -> list[Any]:
@@ -166,17 +162,36 @@ def get_file(
     return files
 
 
+def get_standard_type(type_: Type, type_links_inverse,
+                      parser: dict[str, Any]) -> dict[str, Any]:
+    type_ref_link = [link for link in type_links_inverse
+                     if link.range.id == type_.id]
+    types_dict = {
+        'id': type_.id,
+        'name': type_.name,
+        'externalReferences': get_ref_system(type_ref_link, parser)}
+    hierarchy = [g.types[root].name for root in type_.root]
+    hierarchy.reverse()
+    types_dict['path'] = ' > '.join(map(str, hierarchy))
+    types_dict['rootId'] = type_.root[0]
+    return types_dict
+
+
 def get_types(
         entity: Entity,
         links: list[Link],
+        type_links_inverse: list[Link],
         parser: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     types = []
     for type_ in entity.types:
         if type_.category == 'standard':
             continue
+        type_ref_link = [link for link in type_links_inverse if
+                         link.range.id == type_.id]
         types_dict = {
             'id': type_.id,
-            'name': type_.name}
+            'name': type_.name,
+            'externalReferences': get_ref_system(type_ref_link, parser)}
         for link in links:
             if link.range.id == type_.id and link.description:
                 types_dict['value'] = link.description
