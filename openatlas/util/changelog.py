@@ -4,6 +4,7 @@ versions = {
             '1445': 'Anthropological sex estimation',
             '1628': 'New maps',
             '1151': 'Map marker improvements',
+            '1677': 'Adding a requirements.txt for alternative installation',
             '1491': 'API: CSV export for network analysis',
             '1672': 'API: External references for types in subunits endpoint',
             '1639': 'Refactor',
