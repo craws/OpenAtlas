@@ -140,7 +140,8 @@ class Link:
         from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         return Entity.get_by_ids(
-            Db.get_linked_entities(id_, codes, inverse),
+            Db.get_linked_entities_inverse(id_, codes) if inverse
+            else Db.get_linked_entities(id_, codes),
             types=types)
 
     @staticmethod
