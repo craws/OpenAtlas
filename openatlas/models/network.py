@@ -15,7 +15,7 @@ class Network:
         mapping = Db.get_object_mapping()
         classes = [c.name for c in g.classes.values() if c.network_color]
         properties = [
-            'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74',
+            'P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P52', 'P67', 'P74',
             'P107', 'OA7', 'OA8', 'OA9']
         entities: set[int] = set()
         nodes = []
