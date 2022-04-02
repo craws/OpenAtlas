@@ -162,10 +162,12 @@ def get_file(
     return files
 
 
-def get_standard_type(type_: Type, type_links_inverse,
-                      parser: dict[str, Any]) -> dict[str, Any]:
-    type_ref_link = [link for link in type_links_inverse
-                     if link.range.id == type_.id]
+def get_standard_type(
+        type_: Type,
+        type_links_inverse: list[Link],
+        parser: dict[str, Any]) -> dict[str, Any]:
+    type_ref_link = \
+        [link for link in type_links_inverse if link.range.id == type_.id]
     types_dict = {
         'id': type_.id,
         'name': type_.name,

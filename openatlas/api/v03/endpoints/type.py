@@ -13,6 +13,7 @@ from openatlas.api.v03.resources.templates import type_overview_template, \
 from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
     get_entity_by_id, link_builder, remove_duplicate_entities
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.type import Type
 
 
@@ -120,7 +121,7 @@ class GetSubunits(Resource):
             for entity in hierarchy]
 
     @staticmethod
-    def get_type_links_inverse(entities):
+    def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
         types = remove_duplicate_entities(
             [type_ for entity in entities for type_ in entity.types])
         return link_builder(types, True)
