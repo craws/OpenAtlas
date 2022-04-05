@@ -7,6 +7,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
+from openatlas.api.v03.resources.util import \
+    get_entities_linked_to_type_recursive
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.forms.util import process_form_data
@@ -60,6 +62,16 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         abort(403)
     form = build_form('hierarchy', hierarchy)
     form.classes.choices = Type.get_class_choices(hierarchy)
+
+    entities = get_entities_linked_to_type_recursive(id_, [])
+    check_for_duplicates = set()
+    for entity in entities:
+        if entity.id in check_for_duplicates:
+            break
+        else:
+            check_for_duplicates.add(entity.id)
+
+
     if hasattr(form, 'multiple') and form.multiple.data:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
