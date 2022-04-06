@@ -65,17 +65,16 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
 
     entities = get_entities_linked_to_type_recursive(id_, [])
     check_for_duplicates = set()
-    multiple = False
+    has_multiple_links = False
     for entity in entities:
         if entity.id in check_for_duplicates:
-            multiple = True
-            print('break')
+            has_multiple_links = True
             break
         else:
             check_for_duplicates.add(entity.id)
+    hierarchy.multiple = has_multiple_links
 
-
-    if hasattr(form, 'multiple') and form.multiple.data and multiple:
+    if hasattr(form, 'multiple') and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
         if form.name.data != hierarchy.name and Type.get_types(form.name.data):
@@ -151,8 +150,8 @@ def is_multiple(
         category: str,
         hierarchy: Optional[Type] = None) -> bool:
     if category == 'value' \
-        or (hierarchy and hierarchy.multiple) \
-        or (
+            or (hierarchy and hierarchy.multiple) \
+            or (
             hasattr(form, 'multiple')
             and form.multiple
             and form.multiple.data):
