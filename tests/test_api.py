@@ -106,7 +106,8 @@ class ApiTests(TestBaseCase):
 
                 # Creation of actor (Frodo)
                 actor = insert_entity(
-                    'Frodo', 'person',
+                    'Frodo',
+                    'person',
                     description='That is Frodo')
 
                 alias2 = insert_entity('The ring bearer', 'appellation')
