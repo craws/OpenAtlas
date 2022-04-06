@@ -7,15 +7,14 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
-from openatlas.api.v03.resources.util import \
-    get_entities_linked_to_type_recursive
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_form
 from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, sanitize, uc_first
+from openatlas.util.util import get_entities_linked_to_type_recursive, link, \
+    required_group, sanitize, uc_first
 
 
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
@@ -62,18 +61,15 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         abort(403)
     form = build_form('hierarchy', hierarchy)
     form.classes.choices = Type.get_class_choices(hierarchy)
-
-    entities = get_entities_linked_to_type_recursive(id_, [])
     check_for_duplicates = set()
     has_multiple_links = False
-    for entity in entities:
+    for entity in get_entities_linked_to_type_recursive(id_, []):
         if entity.id in check_for_duplicates:
             has_multiple_links = True
             break
         else:
             check_for_duplicates.add(entity.id)
     hierarchy.multiple = has_multiple_links
-
     if hasattr(form, 'multiple') and hierarchy.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():

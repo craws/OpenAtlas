@@ -1023,3 +1023,16 @@ def datetime64_to_timestamp(
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
     return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
+
+
+def get_entities_linked_to_type_recursive(
+        id_: int,
+        data: list[Entity]) -> list[Entity]:
+    for entity in g.types[id_].get_linked_entities(
+            ['P2', 'P89'],
+            inverse=True,
+            types=True):
+        data.append(entity)
+    for sub_id in g.types[id_].subs:
+        get_entities_linked_to_type_recursive(sub_id, data)
+    return data
