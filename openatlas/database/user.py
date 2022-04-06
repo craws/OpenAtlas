@@ -126,12 +126,12 @@ class User:
         g.cursor.execute(
             f"""
             SELECT
-                id, user_id, 
-                entity_id, 
-                created, 
-                action, 
+                id, user_id,
+                entity_id,
+                created,
+                action,
                 'ignore' AS ignore
-            FROM web.user_log 
+            FROM web.user_log
             WHERE TRUE
                 {'AND user_id = %(id)s' if int(user_id) else ''}
                 {'AND action = %(action)s' if action != 'all' else ''}

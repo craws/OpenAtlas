@@ -50,10 +50,8 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
         raise InvalidSearchSyntax from e
 
 
-def link_builder(
-        new_entities: list[Entity],
-        inverse: bool = False) -> list[Link]:
-    e = [e.id for e in new_entities]
+def link_builder(entities: list[Entity], inverse: bool = False) -> list[Link]:
+    e = [entity.id for entity in entities]
     return get_all_links_inverse(e) if inverse else get_all_links(e)
 
 
@@ -180,12 +178,12 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
 
 
 def link_parser_check(
-        new_entities: list[Entity],
+        entities: list[Entity],
         parser: dict[str, Any],
         inverse: bool = False) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return link_builder(new_entities, inverse)
+        return link_builder(entities, inverse)
     return []
 
 

@@ -1,13 +1,12 @@
 import itertools
 from typing import Any
 
-from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    LastEntityError
+from openatlas.api.v03.resources.error import (
+    EntityDoesNotExistError, LastEntityError)
 from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
-from openatlas.api.v03.resources.util import get_entity_by_id, link_parser_check
+from openatlas.api.v03.resources.util import link_parser_check
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 
 
 def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
@@ -57,29 +56,28 @@ def pagination(
 
 
 def get_entities_formatted(
-        new_entities: list[Entity],
+        entities_all: list[Entity],
         parser: dict[str, Any]) -> list[dict[str, Any]]:
-    limited_entities = new_entities[:int(parser['limit'])]
+    entities = entities_all[:int(parser['limit'])]
     if parser['format'] == 'geojson':
-        return [get_geojson(limited_entities)]
-    return linked_places_result(
-        limited_entities,
-        parser,
-        link_parser_check(limited_entities, parser),
-        link_parser_check(limited_entities, parser, True))
+        return [get_geojson(entities)]
 
-
-def linked_places_result(
-        entities: list[Entity],
-        parser: dict[str, str],
-        links: list[Link],
-        links_inverse: list[Link]) -> list[dict[str, Any]]:
-    return [
-        get_entity(
-            get_entity_by_id(entity.id) if 'names' in parser['show']
-            else entity,
-            [link_ for link_ in links if link_.domain.id == entity.id],
-            [link_ for link_ in links_inverse if
-             link_.range.id == entity.id],
-            parser)
-        for entity in entities]
+    entities_dict: dict[str, Any] = {}
+    for entity in entities:
+        entities_dict[entity.id] = {
+            'entity': entity,
+            'links': [],
+            'links_inverse': []}
+    for link_ in link_parser_check(entities, parser):
+        entities_dict[link_.domain.id]['links'].append(link_)
+    for link_ in link_parser_check(entities, parser, True):
+        entities_dict[link_.range.id]['links_inverse'].append(link_)
+    result = []
+    for item in entities_dict.values():
+        result.append(
+            get_entity(
+                item['entity'],
+                item['links'],
+                item['links_inverse'],
+                parser))
+    return result

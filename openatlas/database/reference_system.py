@@ -20,7 +20,7 @@ class ReferenceSystem:
                 rs.resolver_url,
                 rs.identifier_example,
                 rs.system,
-                COUNT(l.id) AS count,                
+                COUNT(l.id) AS count,
                 array_to_json(
                     array_agg((t.range_id, t.description))
                         FILTER (WHERE t.range_id IS NOT NULL)
@@ -32,17 +32,17 @@ class ReferenceSystem:
             LEFT JOIN model.link t ON e.id = t.domain_id
                 AND t.property_code = 'P2'
             GROUP BY
-                e.id, 
-                e.name, 
-                e.cidoc_class_code, 
-                e.description, 
-                e.openatlas_class_name, 
-                e.created, 
-                e.modified, 
-                rs.website_url, 
-                rs.resolver_url, 
-                rs.identifier_example, 
-                rs.system, 
+                e.id,
+                e.name,
+                e.cidoc_class_code,
+                e.description,
+                e.openatlas_class_name,
+                e.created,
+                e.modified,
+                rs.website_url,
+                rs.resolver_url,
+                rs.identifier_example,
+                rs.system,
                 rs.entity_id;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
@@ -74,9 +74,9 @@ class ReferenceSystem:
             """
             UPDATE web.reference_system
             SET (
-                name, 
-                website_url, 
-                resolver_url, 
+                name,
+                website_url,
+                resolver_url,
                 identifier_example
             ) = (
                 %(name)s,

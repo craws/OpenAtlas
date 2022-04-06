@@ -250,8 +250,8 @@ class Entity:
                 AND (
                     UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
                     {description_clause if desc else ''}
-                )                
-            GROUP BY e.id 
+                )
+            GROUP BY e.id
             ORDER BY e.name;
             """, {
                 'term': f'%{term}%',
