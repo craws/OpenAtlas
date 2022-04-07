@@ -224,3 +224,5 @@ def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
+

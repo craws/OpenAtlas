@@ -11,7 +11,7 @@ from openatlas.models.link import Link
 from openatlas.util.util import get_file_path
 
 
-def get_entity(
+def get_linked_places_entity(
         entity: Entity,
         links: list[Link],
         links_inverse: list[Link],

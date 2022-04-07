@@ -90,8 +90,7 @@ entity_.add_argument(
     'type_id',
     type=int,
     help='{error_msg}',
-    action='append'
-)
+    action='append')
 
 gis = default.copy()
 gis.add_argument(
