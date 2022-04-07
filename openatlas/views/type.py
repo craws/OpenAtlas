@@ -134,8 +134,7 @@ def show_multiple_linked_entities(id_: int) -> str:
     for entity in get_entities_linked_to_type_recursive(id_, []):
         if entity.id in linked_entities:
             multiple_linked_entities.append(entity)
-        else:
-            linked_entities.add(entity.id)
+        linked_entities.add(entity.id)
     table = Table(['name', 'class', 'first', 'last', 'description'])
     for entity in multiple_linked_entities:
         table.rows.append([
