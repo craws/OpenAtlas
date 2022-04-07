@@ -118,19 +118,6 @@ def get_linked_entities_id_api(id_: int) -> list[Entity]:
     return [*range_ids, *domain_ids]
 
 
-def get_entities_linked_to_type_recursive(
-        id_: int,
-        data: list[Entity]) -> list[Entity]:
-    for entity in g.types[id_].get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
-        data.append(entity)
-    for sub_id in g.types[id_].subs:
-        get_entities_linked_to_type_recursive(sub_id, data)
-    return data
-
-
 def get_entities_linked_to_special_type(id_: int) -> list[Entity]:
     domain_ids = [link_['domain_id'] for link_ in
                   Link.get_links_by_type(g.types[id_])]
