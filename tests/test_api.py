@@ -720,7 +720,7 @@ class ApiTests(TestBaseCase):
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
-                    limit=1,
+                    limit=0,
                     first=actor2.id))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 8)

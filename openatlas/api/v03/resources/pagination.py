@@ -38,6 +38,7 @@ def pagination(
         parser: dict[str, Any]) -> dict[str, Any]:
     total = [e.id for e in entities]
     count = len(total)
+    parser['limit'] = count if parser['limit'] == 0 else parser['limit']
     e_list = list(itertools.islice(total, 0, None, int(parser['limit'])))
     index = [{'page': num + 1, 'startId': i} for num, i in enumerate(e_list)]
     parser['first'] = get_by_page(index, parser) \
