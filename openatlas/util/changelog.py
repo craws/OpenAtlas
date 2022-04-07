@@ -1,5 +1,12 @@
 versions = {
-    '7.3.0': ['TBA', {}],
+    '7.3.0': ['TBA', {
+        'features': {
+            '1655': 'API: Performance improvement',
+        },
+        'fix': {
+            '1683': 'Broken table sorting for CIDOC columns'
+        }
+    }],
     '7.2.0': ['2022-04-02', {
         'feature': {
             '1445': 'Anthropological sex estimation',
