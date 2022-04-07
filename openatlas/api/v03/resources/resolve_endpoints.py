@@ -5,8 +5,8 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.csv_export import export_csv_for_network_analysis, \
-    export_entities_csv
+from openatlas.api.csv_export import (
+    export_csv_for_network_analysis, export_entities_csv)
 from openatlas.api.v03.resources.error import NoEntityAvailable, TypeIDError
 from openatlas.api.v03.resources.formats.geojson import get_geojson
 from openatlas.api.v03.resources.formats.linked_places import get_entity
@@ -14,14 +14,14 @@ from openatlas.api.v03.resources.formats.rdf import rdf_output
 from openatlas.api.v03.resources.formats.xml import subunit_xml
 from openatlas.api.v03.resources.pagination import pagination
 from openatlas.api.v03.resources.search import search
-from openatlas.api.v03.resources.search_validation import \
-    iterate_validation
-from openatlas.api.v03.resources.templates import geojson_collection_template, \
-    geojson_pagination, linked_place_pagination, \
-    linked_places_template, subunit_template
-from openatlas.api.v03.resources.util import get_all_links, \
-    get_all_links_inverse, get_entities_by_type, get_key, parser_str_to_dict, \
-    remove_duplicate_entities
+from openatlas.api.v03.resources.search_validation import (
+    iterate_validation)
+from openatlas.api.v03.resources.templates import (
+    geojson_collection_template, geojson_pagination, linked_place_pagination,
+    linked_places_template, subunit_template)
+from openatlas.api.v03.resources.util import (
+    get_all_links, get_all_links_inverse, get_entities_by_type, get_key,
+    parser_str_to_dict, remove_duplicate_entities)
 from openatlas.models.entity import Entity
 
 

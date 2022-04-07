@@ -7,9 +7,9 @@ from typing import Any, Union
 import pandas as pd
 from flask import Response, g
 
-from openatlas.api.v03.resources.util import get_all_links, \
-    get_all_links_inverse, get_linked_entities_api, \
-    link_parser_check, remove_duplicate_entities
+from openatlas.api.v03.resources.util import (
+    get_all_links, get_all_links_inverse, get_linked_entities_api,
+    link_parser_check, remove_duplicate_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

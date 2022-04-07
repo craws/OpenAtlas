@@ -3,9 +3,9 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    InvalidCidocClassCode, InvalidCodeError, InvalidSearchSyntax, \
-    InvalidSystemClassError
+from openatlas.api.v03.resources.error import (
+    EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
+    InvalidSearchSyntax, InvalidSystemClassError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

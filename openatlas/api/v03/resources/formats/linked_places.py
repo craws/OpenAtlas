@@ -3,9 +3,9 @@ from typing import Any, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.util import \
-    get_geometries, get_license, get_reference_systems, \
-    replace_empty_list_values_in_dict_with_none, to_camel_case
+from openatlas.api.v03.resources.util import (
+    get_geometries, get_license, get_reference_systems,
+    replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_path
@@ -27,20 +27,20 @@ def get_entity(
             'systemClass': entity.class_.name,
             'properties': {'title': entity.name},
             'types': get_lp_types(entity, links)
-                if 'types' in parser['show'] else None,
+            if 'types' in parser['show'] else None,
             'depictions': get_lp_file(links_inverse)
-                if 'depictions' in parser['show'] else None,
+            if 'depictions' in parser['show'] else None,
             'when': {'timespans': [get_lp_time(entity)]}
-                if 'when' in parser['show'] else None,
+            if 'when' in parser['show'] else None,
             'links': get_reference_systems(links_inverse)
-                if 'links' in parser['show'] else None,
+            if 'links' in parser['show'] else None,
             'descriptions': [{'value': entity.description}],
             'names': [{"alias": value} for value in entity.aliases.values()]
-                if entity.aliases and 'names' in parser['show'] else None,
+            if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
-                if 'geometry' in parser['show'] else None,
+            if 'geometry' in parser['show'] else None,
             'relations': get_lp_links(links, links_inverse)
-                if 'relations' in parser['show'] else None})]}
+            if 'relations' in parser['show'] else None})]}
 
 
 def relation_type(link_: Link, inverse: bool = False) -> str:

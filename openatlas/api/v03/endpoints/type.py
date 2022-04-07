@@ -6,12 +6,13 @@ from flask_restful import Resource, marshal
 
 from openatlas.api.v03.resources.formats.thanados import get_subunits
 from openatlas.api.v03.resources.parser import default, entity_
-from openatlas.api.v03.resources.resolve_endpoints import download, \
-    resolve_subunits
-from openatlas.api.v03.resources.templates import type_overview_template, \
-    type_tree_template
-from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
-    get_entity_by_id, link_builder, remove_duplicate_entities
+from openatlas.api.v03.resources.resolve_endpoints import (
+    download, resolve_subunits)
+from openatlas.api.v03.resources.templates import (
+    type_overview_template, type_tree_template)
+from openatlas.api.v03.resources.util import (
+    get_all_subunits_recursive, get_entity_by_id, link_builder,
+    remove_duplicate_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
