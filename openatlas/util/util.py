@@ -599,11 +599,10 @@ def link(
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
-            url=url,
-            class_=class_,
-            js=f'onclick="{js}"' if js else '',
-            label=(uc_first(str(object_))) if uc_first_ else object_)
+        js = f'onclick="{js}"' if js else ''
+        label = uc_first(str(object_)) if uc_first_ else object_
+        class_ = 'class="{class_}"' if class_ else ''
+        return f'<a href="{url}" {class_} {js}>{label}</a>'
     if isinstance(object_, Entity):
         return link(
             object_.name,
@@ -761,7 +760,7 @@ def description(entity: Union[Entity, Project]) -> str:
                 f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
                 f"<p>{result}</p>"
     if not entity.description:
-        return  Markup(html)
+        return Markup(html)
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
