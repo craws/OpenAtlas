@@ -8,11 +8,11 @@
       {% for category in types %}
         <li class="nav-item">
           <a
-                  class="nav-link"
-                  data-toggle="tab"
-                  role="tab"
-                  aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
-                  href="#menu-tab-{{ category }}">
+              class="nav-link"
+              data-toggle="tab"
+              role="tab"
+              aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
+              href="#menu-tab-{{ category }}">
             {{ _(category + ' types')|uc_first }}
           </a>
         </li>
@@ -28,12 +28,12 @@
                 <div class="card-header accordionheader"
                      id="heading-{{ type_.id }}">
                   <button
-                          class="btn btn-link collapsed"
-                          type="button"
-                          data-toggle="collapse"
-                          data-target="#collapse-{{ type_.id }}"
-                          aria-expanded="true"
-                          aria-controls="collapse-{{ type_.id }}">
+                    class="btn btn-link collapsed"
+                    type="button"
+                    data-toggle="collapse"
+                    data-target="#collapse-{{ type_.id }}"
+                    aria-expanded="true"
+                    aria-controls="collapse-{{ type_.id }}">
                     {{ type_.name }}
                   </button>
                 </div>
@@ -44,12 +44,12 @@
                       <div class="col-6 contentbox">
                         <div class="toolbar">
                           <input
-                                  class="tree-filter"
-                                  id="{{ type_.name|sanitize }}-tree-search"
-                                  placeholder="{{ _('type to search')|uc_first }}"
-                                  name="name_search"
-                                  style="width:8em;"
-                                  type="text">
+                            class="tree-filter"
+                            id="{{ type_.name|sanitize }}-tree-search"
+                            placeholder="{{ _('type to search')|uc_first }}"
+                            name="name_search"
+                            style="width:8em;"
+                            type="text">
                           {% if 'editor'|is_authorized and type_.category != 'system' %}
                             {{ ''|button(url_for('insert', class_='type' if category != 'place' else 'administrative_unit', origin_id=type_.id)) }}
                           {% endif %}
