@@ -132,7 +132,7 @@
         }
       },
       "limitParam": {
-        "description": "integer of entities returned per page",
+        "description": "Integer of entities returned per page. 0 means no limit is set. Default is 20.",
         "in": "query",
         "name": "limit",
         "schema": {
