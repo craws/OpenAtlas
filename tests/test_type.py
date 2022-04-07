@@ -157,6 +157,11 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
 
+            # Multiple linked entities
+            rv = self.app.get(
+                url_for('show_multiple_linked_entities', id_=sex_type.id))
+            assert b'Frodo' in rv.data
+
             # Multiple disabled
             self.app.post(
                 url_for('hierarchy_update', id_=sex_type.id),

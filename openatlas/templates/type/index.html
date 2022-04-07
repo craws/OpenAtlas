@@ -1,121 +1,132 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="toolbar">
-  {{ 'entity/type'|manual }}
-</div>
-<div>
-  <ul class="nav nav-tabs" role="tablist">
-    {% for category in types %}
-      <li class="nav-item">
-        <a
-            class="nav-link"
-            data-toggle="tab"
-            role="tab"
-            aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
-            href="#menu-tab-{{category}}">
-          {{ _(category + ' types')|uc_first }}
-        </a>
-      </li>
-    {% endfor %}
-  </ul>
-  <div class="tab-content" id="menuTabContent">
-    {% for category in types %}
-      <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}" style="padding: 0;">
-        <div class="accordion" id="TypeAccordion">
-          {% for type_, tree in types[category].items() %}
-            <div class="card">
-              <div class="card-header accordionheader" id="heading-{{ type_.id }}">
-                <button
-                    class="btn btn-link collapsed"
-                    type="button"
-                    data-toggle="collapse"
-                    data-target="#collapse-{{ type_.id }}"
-                    aria-expanded="true"
-                    aria-controls="collapse-{{ type_.id }}">
-                  {{ type_.name }}
-                </button>
-              </div>
-              <div id="collapse-{{ type_.id }}" class="collapse" aria-labelledby="headingOne" data-parent="#TypeAccordion">
-                <div class="card-body">
-                  <div class="row">
-                    <div class="col-6 contentbox">
-                      <div class="toolbar">
-                        <input
-                            class="tree-filter"
-                            id="{{ type_.name|sanitize }}-tree-search"
-                            placeholder="{{ _('type to search')|uc_first }}"
-                            name="name_search"
-                            style="width:8em;"
-                            type="text">
-                        {% if 'editor'|is_authorized and type_.category != 'system' %}
-                          {{ ''|button(url_for('insert', class_='type' if category != 'place' else 'administrative_unit', origin_id=type_.id)) }}
-                        {% endif %}
-                        {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-                          {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
-                          {% if not type_.system and type_.count < 1 and not type_.subs %}
-                            {{ _('delete')|button(
+  <div class="toolbar">
+    {{ 'entity/type'|manual }}
+  </div>
+  <div>
+    <ul class="nav nav-tabs" role="tablist">
+      {% for category in types %}
+        <li class="nav-item">
+          <a
+                  class="nav-link"
+                  data-toggle="tab"
+                  role="tab"
+                  aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
+                  href="#menu-tab-{{ category }}">
+            {{ _(category + ' types')|uc_first }}
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="tab-content" id="menuTabContent">
+      {% for category in types %}
+        <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}"
+             style="padding: 0;">
+          <div class="accordion" id="TypeAccordion">
+            {% for type_, tree in types[category].items() %}
+              <div class="card">
+                <div class="card-header accordionheader"
+                     id="heading-{{ type_.id }}">
+                  <button
+                          class="btn btn-link collapsed"
+                          type="button"
+                          data-toggle="collapse"
+                          data-target="#collapse-{{ type_.id }}"
+                          aria-expanded="true"
+                          aria-controls="collapse-{{ type_.id }}">
+                    {{ type_.name }}
+                  </button>
+                </div>
+                <div id="collapse-{{ type_.id }}" class="collapse"
+                     aria-labelledby="headingOne" data-parent="#TypeAccordion">
+                  <div class="card-body">
+                    <div class="row">
+                      <div class="col-6 contentbox">
+                        <div class="toolbar">
+                          <input
+                                  class="tree-filter"
+                                  id="{{ type_.name|sanitize }}-tree-search"
+                                  placeholder="{{ _('type to search')|uc_first }}"
+                                  name="name_search"
+                                  style="width:8em;"
+                                  type="text">
+                          {% if 'editor'|is_authorized and type_.category != 'system' %}
+                            {{ ''|button(url_for('insert', class_='type' if category != 'place' else 'administrative_unit', origin_id=type_.id)) }}
+                          {% endif %}
+                          {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+                            {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
+                            {% if not type_.system and type_.count < 1 and not type_.subs %}
+                              {{ _('delete')|button(
                               url_for('hierarchy_delete', id_=type_.id),
                               onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');") }}
+                            {% endif %}
                           {% endif %}
+                        </div>
+                        {{ tree|safe }}
+                      </div>
+                      <div class="col-5 contentbox">
+                        {% if not type_.value_type %}
+                          <p>
+                            <strong>{{ _('selection')|uc_first }}</strong>:
+                            {{ _('multiple') if type_.multiple else _('single') }}
+                          </p>
+                        {% endif %}
+                        {% if type_.classes %}
+                          <p style="margin-top:0;">
+                            <strong>{{ _('classes')|uc_first }}</strong>:
+                            {% for class_ in type_.classes %}
+                              {{ g.classes[class_].label }}{{ "," if not loop.last }}
+                            {% endfor %}
+                          </p>
+                        {% endif %}
+                        {% if type_.classes and type_.name not in config.PROPERTY_TYPES %}
+                          <p style="margin-top:0;">
+                            {{ _('untyped entities')|uc_first }}:
+                            <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
+                          </p>
+                        {% endif %}
+                        {% if type_.multiple %}
+                          <p style="margin-top:0;">
+                            {{ _('multiple linked entities')|uc_first }}:
+                            <a href="{{ url_for('show_multiple_linked_entities', id_=type_.id) }}">{{ _('show') }}</a>
+                          </p>
+                        {% endif %}
+                        {% if type_.description %}
+                          <div class="description">
+                            <h2>{{ _('description')|uc_first }}</h2>
+                            <p>{{ type_.description }}</p>
+                          </div>
                         {% endif %}
                       </div>
-                      {{ tree|safe }}
-                    </div>
-                    <div class="col-5 contentbox">
-                      {% if not type_.value_type %}
-                        <p>
-                          <strong>{{ _('selection')|uc_first }}</strong>:
-                          {{ _('multiple') if type_.multiple else _('single') }}
-                        </p>
-                      {% endif %}
-                      {% if type_.classes %}
-                        <p style="margin-top:0;">
-                          <strong>{{ _('classes')|uc_first }}</strong>:
-                          {% for class_ in type_.classes %}
-                            {{ g.classes[class_].label }}{{ "," if not loop.last }}
-                          {% endfor %}
-                        </p>
-                      {% endif %}
-                      {% if type_.classes and type_.name not in config.PROPERTY_TYPES %}
-                        {{ _('untyped entities')|uc_first }}:
-                        <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
-                      {% endif %}
-                      {% if type_.description %}
-                        <div class="description">
-                          <h2>{{ _('description')|uc_first }}</h2>
-                          <p>{{ type_.description }}</p>
-                        </div>
-                      {% endif %}
                     </div>
                   </div>
                 </div>
+                <div style="clear:both;"></div>
+                {{ tree|safe }}
               </div>
-              <div style="clear:both;"></div>
-              {{ tree|safe }}
-            </div>
-          {% endfor %}
-          {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-            <span style="margin:1em;">
+            {% endfor %}
+            {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+              <span style="margin:1em;">
               {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
             </span>
-          {% endif %}
+            {% endif %}
+          </div>
         </div>
-      </div>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
-</div>
 {% endblock %}
 
 {% block script %}
   <script>
-    $(document).ready(function () {
-      if (location.hash) {
-        let url = location.href.replace(/\/$/, "");
-        const hash = url.split("#");
-        if (hash[1] == 'menu-tab-standard') $('#menu-tab-standard').tab('show');
-      } else {
-        $('#menu-tab-standard').tab('show');
-      }
-    });
+      $(document).ready(function () {
+          if (location.hash) {
+              let url = location.href.replace(/\/$/, "");
+              const hash = url.split("#");
+              if (hash[1] == 'menu-tab-standard') $('#menu-tab-standard').tab('show');
+          } else {
+              $('#menu-tab-standard').tab('show');
+          }
+      });
   </script>
 {% endblock %}
