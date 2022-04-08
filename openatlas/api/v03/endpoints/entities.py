@@ -12,10 +12,10 @@ from openatlas.api.v03.resources.resolve_endpoints import (
 from openatlas.api.v03.resources.util import (
     get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
     get_entities_by_view_classes, get_entities_linked_to_special_type,
-    get_entities_linked_to_special_type_recursive,
-    get_entities_linked_to_type_recursive, get_entity_by_id,
+    get_entities_linked_to_special_type_recursive, get_entity_by_id,
     get_linked_entities_api)
 from openatlas.models.entity import Entity
+from openatlas.util.util import get_entities_linked_to_type_recursive
 
 
 class GetByCidocClass(Resource):
