@@ -26,14 +26,14 @@ ALTER TABLE model.gis_id_seq OWNER TO openatlas;
 ALTER SEQUENCE model.gis_id_seq OWNED BY model.gis.id;
 ALTER TABLE ONLY model.gis ALTER COLUMN id SET DEFAULT nextval('model.gis_id_seq'::regclass);
 ALTER TABLE ONLY model.gis ADD CONSTRAINT gis_pkey PRIMARY KEY (id);
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.gis FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 ALTER TABLE ONLY model.gis ADD CONSTRAINT gis_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
-INSERT INTO model.gis(id, entity_id, name, description, type, created, modified, geom_point) SELECT id, entity_id, name, description, type, created, modified, geom FROM gis.point;
-INSERT INTO model.gis(id, entity_id, name, description, type, created, modified, geom_linestring) SELECT id, entity_id, name, description, type, created, modified, geom FROM gis.linestring;
-INSERT INTO model.gis(id, entity_id, name, description, type, created, modified, geom_polygon) SELECT id, entity_id, name, description, type, created, modified, geom FROM gis.polygon;
+INSERT INTO model.gis(entity_id, name, description, type, created, modified, geom_point)      SELECT entity_id, name, description, type, created, modified, geom FROM gis.point;
+INSERT INTO model.gis(entity_id, name, description, type, created, modified, geom_linestring) SELECT entity_id, name, description, type, created, modified, geom FROM gis.linestring;
+INSERT INTO model.gis(entity_id, name, description, type, created, modified, geom_polygon)    SELECT entity_id, name, description, type, created, modified, geom FROM gis.polygon;
 
 UPDATE model.gis SET type = lower(type); -- Clean up type names that are (wrongly) capitalized
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.gis FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 DROP SCHEMA gis CASCADE;
 
 END;
