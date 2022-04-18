@@ -45,6 +45,7 @@ ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fke
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_openatlas_class_name_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
@@ -53,9 +54,6 @@ ALTER TABLE IF EXISTS ONLY model.cidoc_class_i18n DROP CONSTRAINT IF EXISTS clas
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
-ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
 DROP TRIGGER IF EXISTS update_modified ON web.user_settings;
 DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
 DROP TRIGGER IF EXISTS update_modified ON web.user_bookmarks;
@@ -67,12 +65,10 @@ DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_openatlas_class;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
 DROP TRIGGER IF EXISTS update_modified ON model.link;
+DROP TRIGGER IF EXISTS update_modified ON model.gis;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
-DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
-DROP TRIGGER IF EXISTS update_modified ON gis.point;
-DROP TRIGGER IF EXISTS update_modified ON gis.linestring;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
@@ -110,6 +106,7 @@ ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_cod
 ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_pkey;
 ALTER TABLE IF EXISTS ONLY model.openatlas_class DROP CONSTRAINT IF EXISTS openatlas_class_name_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
+ALTER TABLE IF EXISTS ONLY model.gis DROP CONSTRAINT IF EXISTS gis_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.cidoc_class DROP CONSTRAINT IF EXISTS class_name_key;
@@ -122,9 +119,6 @@ ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
 ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_pkey;
-ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_pkey;
-ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_pkey;
-ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_pkey;
 ALTER TABLE IF EXISTS web.user_settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_notes ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_log ALTER COLUMN id DROP DEFAULT;
@@ -144,15 +138,13 @@ ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.openatlas_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.gis ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.cidoc_class ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS gis.polygon ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS gis.point ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS gis.linestring ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE IF EXISTS web.user_settings_id_seq;
 DROP TABLE IF EXISTS web.user_settings;
 DROP SEQUENCE IF EXISTS web.user_notes_id_seq;
@@ -192,6 +184,8 @@ DROP SEQUENCE IF EXISTS model.openatlas_class_id_seq;
 DROP TABLE IF EXISTS model.openatlas_class;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
+DROP SEQUENCE IF EXISTS model.gis_id_seq;
+DROP TABLE IF EXISTS model.gis;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
 DROP SEQUENCE IF EXISTS model.cidoc_class_inheritance_id_seq;
@@ -204,34 +198,11 @@ DROP SEQUENCE IF EXISTS import.project_id_seq;
 DROP TABLE IF EXISTS import.project;
 DROP SEQUENCE IF EXISTS import.entity_id_seq;
 DROP TABLE IF EXISTS import.entity;
-DROP SEQUENCE IF EXISTS gis.polygon_id_seq;
-DROP TABLE IF EXISTS gis.polygon;
-DROP SEQUENCE IF EXISTS gis.point_id_seq;
-DROP TABLE IF EXISTS gis.point;
-DROP SEQUENCE IF EXISTS gis.linestring_id_seq;
-DROP TABLE IF EXISTS gis.linestring;
 DROP FUNCTION IF EXISTS model.update_modified();
 DROP FUNCTION IF EXISTS model.delete_entity_related();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
 DROP SCHEMA IF EXISTS import;
-DROP SCHEMA IF EXISTS gis;
---
--- Name: gis; Type: SCHEMA; Schema: -; Owner: openatlas
---
-
-CREATE SCHEMA gis;
-
-
-ALTER SCHEMA gis OWNER TO openatlas;
-
---
--- Name: SCHEMA gis; Type: COMMENT; Schema: -; Owner: openatlas
---
-
-COMMENT ON SCHEMA gis IS 'All geospatial information is stored here';
-
-
 --
 -- Name: import; Type: SCHEMA; Schema: -; Owner: openatlas
 --
@@ -334,123 +305,6 @@ ALTER FUNCTION model.update_modified() OWNER TO openatlas;
 SET default_tablespace = '';
 
 SET default_table_access_method = heap;
-
---
--- Name: linestring; Type: TABLE; Schema: gis; Owner: openatlas
---
-
-CREATE TABLE gis.linestring (
-    id integer NOT NULL,
-    entity_id integer NOT NULL,
-    name text,
-    description text,
-    type text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(LineString,4326)
-);
-
-
-ALTER TABLE gis.linestring OWNER TO openatlas;
-
---
--- Name: linestring_id_seq; Type: SEQUENCE; Schema: gis; Owner: openatlas
---
-
-CREATE SEQUENCE gis.linestring_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE gis.linestring_id_seq OWNER TO openatlas;
-
---
--- Name: linestring_id_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: openatlas
---
-
-ALTER SEQUENCE gis.linestring_id_seq OWNED BY gis.linestring.id;
-
-
---
--- Name: point; Type: TABLE; Schema: gis; Owner: openatlas
---
-
-CREATE TABLE gis.point (
-    id integer NOT NULL,
-    entity_id integer NOT NULL,
-    name text,
-    description text,
-    type text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(Point,4326)
-);
-
-
-ALTER TABLE gis.point OWNER TO openatlas;
-
---
--- Name: point_id_seq; Type: SEQUENCE; Schema: gis; Owner: openatlas
---
-
-CREATE SEQUENCE gis.point_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE gis.point_id_seq OWNER TO openatlas;
-
---
--- Name: point_id_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: openatlas
---
-
-ALTER SEQUENCE gis.point_id_seq OWNED BY gis.point.id;
-
-
---
--- Name: polygon; Type: TABLE; Schema: gis; Owner: openatlas
---
-
-CREATE TABLE gis.polygon (
-    id integer NOT NULL,
-    entity_id integer NOT NULL,
-    name text,
-    description text,
-    type text,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(Polygon,4326)
-);
-
-
-ALTER TABLE gis.polygon OWNER TO openatlas;
-
---
--- Name: polygon_id_seq; Type: SEQUENCE; Schema: gis; Owner: openatlas
---
-
-CREATE SEQUENCE gis.polygon_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE gis.polygon_id_seq OWNER TO openatlas;
-
---
--- Name: polygon_id_seq; Type: SEQUENCE OWNED BY; Schema: gis; Owner: openatlas
---
-
-ALTER SEQUENCE gis.polygon_id_seq OWNED BY gis.polygon.id;
-
 
 --
 -- Name: entity; Type: TABLE; Schema: import; Owner: openatlas
@@ -685,6 +539,49 @@ ALTER TABLE model.entity_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE model.entity_id_seq OWNED BY model.entity.id;
+
+
+--
+-- Name: gis; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE model.gis (
+    id integer NOT NULL,
+    entity_id integer NOT NULL,
+    name text,
+    description text,
+    type text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone,
+    geom_point public.geometry(Point,4326),
+    geom_polygon public.geometry(Polygon,4326),
+    geom_linestring public.geometry(LineString,4326),
+    CONSTRAINT check_only_one_is_not_null CHECK ((num_nonnulls(geom_point, geom_linestring, geom_polygon) = 1))
+);
+
+
+ALTER TABLE model.gis OWNER TO openatlas;
+
+--
+-- Name: gis_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE model.gis_id_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE model.gis_id_seq OWNER TO openatlas;
+
+--
+-- Name: gis_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE model.gis_id_seq OWNED BY model.gis.id;
 
 
 --
@@ -1468,27 +1365,6 @@ ALTER SEQUENCE web.user_settings_id_seq OWNED BY web.user_settings.id;
 
 
 --
--- Name: linestring id; Type: DEFAULT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.linestring ALTER COLUMN id SET DEFAULT nextval('gis.linestring_id_seq'::regclass);
-
-
---
--- Name: point id; Type: DEFAULT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.point ALTER COLUMN id SET DEFAULT nextval('gis.point_id_seq'::regclass);
-
-
---
--- Name: polygon id; Type: DEFAULT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.polygon ALTER COLUMN id SET DEFAULT nextval('gis.polygon_id_seq'::regclass);
-
-
---
 -- Name: entity id; Type: DEFAULT; Schema: import; Owner: openatlas
 --
 
@@ -1528,6 +1404,13 @@ ALTER TABLE ONLY model.cidoc_class_inheritance ALTER COLUMN id SET DEFAULT nextv
 --
 
 ALTER TABLE ONLY model.entity ALTER COLUMN id SET DEFAULT nextval('model.entity_id_seq'::regclass);
+
+
+--
+-- Name: gis id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.gis ALTER COLUMN id SET DEFAULT nextval('model.gis_id_seq'::regclass);
 
 
 --
@@ -1664,30 +1547,6 @@ ALTER TABLE ONLY web.user_settings ALTER COLUMN id SET DEFAULT nextval('web.user
 
 
 --
--- Name: linestring linestring_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.linestring
-    ADD CONSTRAINT linestring_pkey PRIMARY KEY (id);
-
-
---
--- Name: point point_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.point
-    ADD CONSTRAINT point_pkey PRIMARY KEY (id);
-
-
---
--- Name: polygon polygon_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.polygon
-    ADD CONSTRAINT polygon_pkey PRIMARY KEY (id);
-
-
---
 -- Name: entity entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
@@ -1781,6 +1640,14 @@ ALTER TABLE ONLY model.cidoc_class
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: gis gis_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.gis
+    ADD CONSTRAINT gis_pkey PRIMARY KEY (id);
 
 
 --
@@ -2080,27 +1947,6 @@ ALTER TABLE ONLY web."user"
 
 
 --
--- Name: linestring update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.linestring FOR EACH ROW EXECUTE FUNCTION model.update_modified();
-
-
---
--- Name: point update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.point FOR EACH ROW EXECUTE FUNCTION model.update_modified();
-
-
---
--- Name: polygon update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.polygon FOR EACH ROW EXECUTE FUNCTION model.update_modified();
-
-
---
 -- Name: project update_modified; Type: TRIGGER; Schema: import; Owner: openatlas
 --
 
@@ -2119,6 +1965,13 @@ CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECU
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.entity FOR EACH ROW EXECUTE FUNCTION model.update_modified();
+
+
+--
+-- Name: gis update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.gis FOR EACH ROW EXECUTE FUNCTION model.update_modified();
 
 
 --
@@ -2199,30 +2052,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW E
 
 
 --
--- Name: linestring linestring_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.linestring
-    ADD CONSTRAINT linestring_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: point point_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.point
-    ADD CONSTRAINT point_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: polygon polygon_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
---
-
-ALTER TABLE ONLY gis.polygon
-    ADD CONSTRAINT polygon_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: entity entity_entity_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
 --
 
@@ -2284,6 +2113,14 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.entity
     ADD CONSTRAINT entity_openatlas_class_name_fkey FOREIGN KEY (openatlas_class_name) REFERENCES model.openatlas_class(name) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: gis gis_entity_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.gis
+    ADD CONSTRAINT gis_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
