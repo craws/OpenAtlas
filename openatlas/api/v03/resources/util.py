@@ -149,14 +149,14 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
 
 def get_all_links(
         entities: Union[int, list[int]],
-        codes: Optional[list[str]] = None) -> list[Link]:
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes)
 
 
 def get_all_links_inverse(
         entities: Union[int, list[int]],
-        codes: Optional[list[str]] = None) -> list[Link]:
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes, inverse=True)
 

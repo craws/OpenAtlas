@@ -17,17 +17,14 @@ def get_subunit(
         entity: Entity,
         links: list[Link],
         links_inverse: list[Link],
-        type_links_inverse: list[Link],
+        ext_reference_links: list[Link],
         root_id: int,
         latest_mod_rec: datetime,
         parser: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
         'id': entity.id,
         'rootId': root_id,
-        # Todo: parentID takes to much time
-        'parentId':
-            entity.get_linked_entity_safe('P46', inverse=True).id
-            if entity.id != root_id else None,
+        'parentId': get_parent(links_inverse),
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
@@ -39,8 +36,15 @@ def get_subunit(
             entity,
             links,
             links_inverse,
-            type_links_inverse,
+            ext_reference_links,
             parser)})
+
+
+def get_parent(links: list[Link]) -> Optional[int]:
+    for link_ in links:
+        if link_.property.code == 'P46':
+            return link_.domain.id
+    return None
 
 
 def get_geometries_thanados(
@@ -79,7 +83,8 @@ def transform_coords(coords: list[float]) -> list[dict[str, Any]]:
 def get_children(
         links: list[Link],
         parser: dict[str, Any]) -> Union[list[int], list[dict[str, Any]]]:
-    children = [link_.range.id for link_ in links if link_.property.code == 'P46']
+    children = [link_.range.id for link_ in links if
+                link_.property.code == 'P46']
     return [{'child': child} for child in children] \
         if parser['format'] == 'xml' else children
 
@@ -88,20 +93,20 @@ def get_properties(
         entity: Entity,
         links: list[Link],
         links_inverse: list[Link],
-        type_links_inverse: list[Link],
+        ext_reference_links: list[Link],
         parser: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
         'name': entity.name,
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
         'standardType':
-            get_standard_type(entity.standard_type, type_links_inverse, parser)
+            get_standard_type(entity.standard_type, ext_reference_links, parser)
             if entity.standard_type else None,
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),
         'references': get_references(links_inverse, parser),
         'files': get_file(links_inverse, parser),
-        'types': get_types(entity, links, type_links_inverse, parser)})
+        'types': get_types(entity, links, ext_reference_links, parser)})
 
 
 def get_aliases(entity: Entity, parser: dict[str, Any]) -> list[Any]:
@@ -167,10 +172,10 @@ def get_file(
 
 def get_standard_type(
         type_: Type,
-        type_links_inverse: list[Link],
+        ext_reference_links: list[Link],
         parser: dict[str, Any]) -> dict[str, Any]:
     type_ref_link = \
-        [link for link in type_links_inverse if link.range.id == type_.id]
+        [link for link in ext_reference_links if link.range.id == type_.id]
     types_dict = {
         'id': type_.id,
         'name': type_.name,
@@ -185,13 +190,13 @@ def get_standard_type(
 def get_types(
         entity: Entity,
         links: list[Link],
-        type_links_inverse: list[Link],
+        ext_reference_links: list[Link],
         parser: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     types = []
     for type_ in entity.types:
         if type_.category == 'standard':
             continue
-        type_ref_link = [link for link in type_links_inverse if
+        type_ref_link = [link for link in ext_reference_links if
                          link.range.id == type_.id]
         types_dict = {
             'id': type_.id,
@@ -216,24 +221,20 @@ def get_subunits_from_id(
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     root_id = entity.id
     entities = get_all_subunits_recursive(entity, [])
-    type_links_inverse = get_type_links_inverse(entities)
+    ext_reference_links = get_type_links_inverse(entities)
     entities_dict: dict[str, Any] = {}
     for entity in entities:
         entities_dict[entity.id] = {
             'entity': entity,
             'links': [],
             'links_inverse': [],
-            'type_links_inverse': type_links_inverse}
-
-    entities_ids = [entity.id for entity in entities]
-    for link_ in get_all_links(entities_ids):
+            'ext_reference_links': ext_reference_links}
+    for link_ in get_all_links([*entities_dict.keys()]):
         entities_dict[link_.domain.id]['links'].append(link_)
-    for link_ in get_all_links_inverse(entities_ids):
+    for link_ in get_all_links_inverse([*entities_dict.keys()]):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
-
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
-
     result = []
     for item in entities_dict.values():
         result.append(
@@ -241,7 +242,7 @@ def get_subunits_from_id(
                 item['entity'],
                 item['links'],
                 item['links_inverse'],
-                item['type_links_inverse'],
+                item['ext_reference_links'],
                 root_id,
                 latest_modified,
                 parser))
@@ -251,4 +252,6 @@ def get_subunits_from_id(
 def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
     types = remove_duplicate_entities(
         [type_ for entity in entities for type_ in entity.types])
-    return get_all_links_inverse([type_.id for type_ in types])
+    links = get_all_links_inverse([type_.id for type_ in types], 'P67')
+    return [link_ for link_ in links if
+            link_.domain.class_.name == 'reference_system']
