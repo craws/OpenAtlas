@@ -157,6 +157,15 @@
           "type": "string"
         }
       },
+      "relationTypeParam": {
+        "description": "Select which relations are shown",
+        "in": "query",
+        "name": "relation_type",
+        "schema": {
+          "example": "P2",
+          "type": "string"
+        }
+      },
       "sortParam": {
         "description": "Result will be sorted asc/desc (default column is name)",
         "in": "query",
