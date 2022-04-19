@@ -44,14 +44,10 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
 
 def get_all_subunits_recursive(
         entity: Entity,
-        data: list[dict[Entity, Any]]) -> list[dict[Any, Any]]:
+        data: list[Entity]) -> list[Entity]:
+    data.append(entity)
     if entity.class_.name not in ['artifact', 'human_remains']:
-        sub_entities = entity.get_linked_entities('P46', types=True)
-        data[-1] = {entity: sub_entities if sub_entities else None}
-        if sub_entities:
-            for e in sub_entities:
-                data.append({e: []})
-        if sub_entities:
+        if sub_entities := entity.get_linked_entities('P46', types=True):
             for e in sub_entities:
                 get_all_subunits_recursive(e, data)
     return data
@@ -153,14 +149,14 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
 
 def get_all_links(
         entities: Union[int, list[int]],
-        codes: Optional[list[str]] = None) -> list[Link]:
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes)
 
 
 def get_all_links_inverse(
         entities: Union[int, list[int]],
-        codes: Optional[list[str]] = None) -> list[Link]:
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes, inverse=True)
 

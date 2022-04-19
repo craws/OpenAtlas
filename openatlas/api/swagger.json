@@ -38,17 +38,6 @@
           "type": "boolean"
         }
       },
-      "exportParam": {
-        "description": "Select to which format the output is downloaded",
-        "in": "query",
-        "name": "export",
-        "schema": {
-          "enum": [
-            "csv"
-          ],
-          "type": "string"
-        }
-      },
       "filterParam": {
         "description": "Specify request with custom SQL filter method. ",
         "deprecated": true,
@@ -722,12 +711,6 @@
           },
           "label": {
             "type": "string"
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewChildren"
-            }
           }
         }
       },
