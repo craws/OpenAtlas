@@ -618,6 +618,7 @@ class ApiTests(TestBaseCase):
                     view_class='place',
                     sort='desc',
                     column='id',
+                    relation_type='P2',
                     type_id=boundary_mark.id)),
                 self.app.get(url_for(
                     'api_03.latest', latest=2)),

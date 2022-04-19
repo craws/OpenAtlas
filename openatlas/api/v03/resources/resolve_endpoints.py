@@ -24,7 +24,8 @@ from openatlas.api.v03.resources.templates import (
 from openatlas.api.v03.resources.util import (
     get_all_links, get_all_links_inverse, get_entities_by_type,
     get_key,
-    link_parser_check, parser_str_to_dict, remove_duplicate_entities)
+    link_parser_check, link_parser_check_inverse, parser_str_to_dict,
+    remove_duplicate_entities)
 from openatlas.models.entity import Entity
 
 
@@ -169,7 +170,7 @@ def get_entities_formatted(
             'links_inverse': []}
     for link_ in link_parser_check(entities, parser):
         entities_dict[link_.domain.id]['links'].append(link_)
-    for link_ in link_parser_check(entities, parser, True):
+    for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
     result = []
     for item in entities_dict.values():
