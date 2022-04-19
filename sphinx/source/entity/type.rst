@@ -8,9 +8,12 @@ can be accessed and edited via the **Types** :doc:`/ui/menu` item. With this
 feature the model and user interface can be adapted for specific research
 interests.
 
+* The root type description is shown in forms as a mouse over text at
+  the **i** icon
 * You can checked **untyped entities** at the type overview with clicking the
   **show** link
-* Type descriptions are shown in forms as a mouse over text at the **i** icon
+* You can checked **multiple linked entities** at the type overview with
+  clicking the **show** link
 * A more detailed description on how to enter new types can be found
   :doc:`here</examples/types>`
 
@@ -29,10 +32,14 @@ Custom types
 Custom types can be created, deleted and renamed. The default installation
 comes with one example custom type **Sex** which is used for actor.
 
-* Can be set to allow single or multiple choices (once multiple can't be revert
-  to single later)
-* Can be used for multiple classes,  e.g. a hierarchy "importance" for places,
-  actors and groups
+* Can be set to allow single or multiple choices
+* Can be used for multiple classes, e.g. a hierarchy "case study" for places,
+  actors and events
+
+If you want to change an existing **multiple type to single** but the
+multiple checkbox is greyed out and not selectable it means that at least one
+entity already used multiple. You can check these entries at the type overview
+at **multiple linked entities**.
 
 Value types
 -----------
