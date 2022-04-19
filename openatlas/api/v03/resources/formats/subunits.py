@@ -15,26 +15,26 @@ from openatlas.util.util import get_file_path
 
 def get_subunit(
         entity: Entity,
-        children: list[Entity],
         links: list[Link],
         links_inverse: list[Link],
-        root: Entity,
-        latest_mod_rec: datetime,
         type_links_inverse: list[Link],
+        root_id: int,
+        latest_mod_rec: datetime,
         parser: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
         'id': entity.id,
-        'rootId': root.id,
+        'rootId': root_id,
+        # Todo: parentID takes to much time
         'parentId':
             entity.get_linked_entity_safe('P46', inverse=True).id
-            if entity.id != root.id else None,
+            if entity.id != root_id else None,
         'openatlasClassName': entity.class_.name,
         'crmClass': entity.cidoc_class.code,
         'created': str(entity.created),
         'modified': str(entity.modified),
         'latestModRec': latest_mod_rec,
         'geometry': get_geometries_thanados(entity, links, parser),
-        'children': get_children(children, parser) if children else None,
+        'children': get_children(links, parser),
         'properties': get_properties(
             entity,
             links,
@@ -77,10 +77,11 @@ def transform_coords(coords: list[float]) -> list[dict[str, Any]]:
 
 
 def get_children(
-        children: list[Entity],
+        links: list[Link],
         parser: dict[str, Any]) -> Union[list[int], list[dict[str, Any]]]:
-    return [{'child': child.id} if parser['format'] == 'xml'
-            else child.id for child in children]
+    children = [link_.range.id for link_ in links if link_.property.code == 'P46']
+    return [{'child': child} for child in children] \
+        if parser['format'] == 'xml' else children
 
 
 def get_properties(
@@ -213,26 +214,38 @@ def get_types(
 def get_subunits_from_id(
         entity: Entity,
         parser: dict[str, Any]) -> list[dict[str, Any]]:
-    root = entity
-    hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
-    entities = [entity for dict_ in hierarchy for entity in dict_]
-    entities_ids = [entity.id for entity in entities]
+    root_id = entity.id
+    entities = get_all_subunits_recursive(entity, [])
     type_links_inverse = get_type_links_inverse(entities)
-    links = get_all_links(entities_ids)
-    links_inverse = get_all_links_inverse(entities_ids)
-    return [
-        get_subunit(
-            list(entity)[0],
-            entity[(list(entity)[0])],
-            [link_ for link_ in links if
-             link_.domain.id == list(entity)[0].id],
-            [link_ for link_ in links_inverse if
-             link_.range.id == list(entity)[0].id],
-            root,
-            max(entity.modified for entity in entities if entity.modified),
-            type_links_inverse,
-            parser)
-        for entity in hierarchy]
+    entities_dict: dict[str, Any] = {}
+    for entity in entities:
+        entities_dict[entity.id] = {
+            'entity': entity,
+            'links': [],
+            'links_inverse': [],
+            'type_links_inverse': type_links_inverse}
+
+    entities_ids = [entity.id for entity in entities]
+    for link_ in get_all_links(entities_ids):
+        entities_dict[link_.domain.id]['links'].append(link_)
+    for link_ in get_all_links_inverse(entities_ids):
+        entities_dict[link_.range.id]['links_inverse'].append(link_)
+
+    latest_modified = max(
+        entity.modified for entity in entities if entity.modified)
+
+    result = []
+    for item in entities_dict.values():
+        result.append(
+            get_subunit(
+                item['entity'],
+                item['links'],
+                item['links_inverse'],
+                item['type_links_inverse'],
+                root_id,
+                latest_modified,
+                parser))
+    return result
 
 
 def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
