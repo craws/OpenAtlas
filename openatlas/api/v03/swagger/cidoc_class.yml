@@ -8,6 +8,7 @@ parameters:
     name: cidoc_class
     description: Need to be a valid CIDOC CRM class code (e.g. E21, E18, E33)
     required: true
+    example: E21
     schema:
       type: string
   - $ref: '#/components/parameters/limitParam'
