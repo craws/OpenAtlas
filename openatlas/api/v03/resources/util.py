@@ -170,9 +170,9 @@ def link_parser_check(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        codes = parser['relation_type'] + ['P53'] \
-            if parser['relation_type'] else None
-        return get_all_links([entity.id for entity in entities], codes)
+        return get_all_links(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
     return []
 
 
@@ -181,10 +181,23 @@ def link_parser_check_inverse(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        codes = parser['relation_type'] + ['P53'] \
-            if parser['relation_type'] else None
-        return get_all_links_inverse([entity.id for entity in entities], codes)
+        return get_all_links_inverse(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
     return []
+
+
+def get_properties_for_links(parser: dict[str, Any]) -> Optional[list[str]]:
+    if parser['relation_type']:
+        codes = [code for code in parser['relation_type']]
+        if 'geometry' in parser['show']:
+            codes.append('P53')
+        if 'types' in parser['show']:
+            codes.append('P2')
+        if any(i in ['depictions', 'links'] for i in parser['show']):
+            codes.append('P67')
+        return codes
+    return None
 
 
 def get_reference_systems(

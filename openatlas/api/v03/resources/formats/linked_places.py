@@ -39,7 +39,7 @@ def get_linked_places_entity(
             if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
             if 'geometry' in parser['show'] else None,
-            'relations': get_lp_links(links, links_inverse)
+            'relations': get_lp_links(links, links_inverse, parser)
             if 'relations' in parser['show'] else None})]}
 
 
@@ -69,12 +69,19 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
 
 def get_lp_links(
         links: list[Link],
-        links_inverse: list[Link]) -> list[dict[str, str]]:
+        links_inverse: list[Link],
+        parser: dict[str, Any]) -> list[dict[str, str]]:
+    properties = parser['relation_type'] \
+        if parser['relation_type'] else list(g.properties)
     out = []
     for link_ in links:
-        out.append(link_dict(link_))
+        if link_.property.code in properties:
+            out.append(link_dict(link_))
+        continue
     for link_ in links_inverse:
-        out.append(link_dict(link_, inverse=True))
+        if link_.property.code in properties:
+            out.append(link_dict(link_, inverse=True))
+        continue
     return out
 
 
