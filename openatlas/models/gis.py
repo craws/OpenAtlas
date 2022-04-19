@@ -103,21 +103,21 @@ class Gis:
                 extra['siblings'].append(item)
             else:
                 all_[shape].append(item)
-            # if row['polygon'] and row['polygon_point']:
-            #     polygon_point_item = dict(item)  # Make a copy
-            #     polygon_point_item['geometry'] = json.loads(
-            #         row['polygon_point'])
-            #     if row['object_id'] in object_ids:
-            #         selected['polygon_point'].append(polygon_point_item)
-            #     elif row['object_id'] and structure and \
-            #             row['object_id'] == structure['super_id']:
-            #         extra['supers'].append(polygon_point_item)
-            #     elif row['object_id'] in subunit_ids:  # pragma no cover
-            #         extra['subs'].append(polygon_point_item)
-            #     elif row['object_id'] in sibling_ids:  # pragma no cover
-            #         extra['siblings'].append(polygon_point_item)
-            #     else:
-            #         all_['point'].append(polygon_point_item)
+            if row['polygon_point']:
+                polygon_point_item = dict(item)  # Make a copy
+                polygon_point_item['geometry'] = json.loads(
+                    row['polygon_point'])
+                if row['object_id'] in object_ids:
+                    selected['polygon_point'].append(polygon_point_item)
+                elif row['object_id'] and structure and \
+                        row['object_id'] == structure['super_id']:
+                    extra['supers'].append(polygon_point_item)
+                elif row['object_id'] in subunit_ids:  # pragma no cover
+                    extra['subs'].append(polygon_point_item)
+                elif row['object_id'] in sibling_ids:  # pragma no cover
+                    extra['siblings'].append(polygon_point_item)
+                else:
+                    all_['point'].append(polygon_point_item)
         return {
             'gisPointAll': json.dumps(all_['point']),
             'gisPointSelected': json.dumps(selected['point']),

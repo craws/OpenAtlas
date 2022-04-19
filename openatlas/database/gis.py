@@ -42,9 +42,6 @@ class Gis:
 
     @staticmethod
     def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
-        #polygon_sql = '' if shape != 'polygon' else \
-        #    ' public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom))' \
-        #    ' AS polygon_point, '
         g.cursor.execute(
             f"""
             SELECT
@@ -56,6 +53,9 @@ class Gis:
                 public.ST_AsGeoJSON(geom_point) AS point,
                 public.ST_AsGeoJSON(geom_linestring) AS linestring,
                 public.ST_AsGeoJSON(geom_polygon) AS polygon,
+                CASE WHEN geom_polygon IS NULL THEN NULL ELSE
+                    public.ST_AsGeoJSON(public.ST_PointOnSurface(geom_polygon))
+                    END AS polygon_point,
                 object.name AS object_name,
                 object.description AS object_desc,
                 string_agg(CAST(t.range_id AS text), ',') AS types
