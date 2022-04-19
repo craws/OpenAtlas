@@ -12,31 +12,30 @@ class Gis:
         g.cursor.execute(
             f"""
             SELECT
-                id,
-                name,
-                description,
-                type,
+                g.id,
+                g.name,
+                g.description,
+                g.type,
                 public.ST_AsGeoJSON(geom_point) AS point,
                 public.ST_AsGeoJSON(geom_linestring) AS linestring,
-                public.ST_AsGeoJSON(geom_polygon) AS polygon,
+                public.ST_AsGeoJSON(geom_polygon) AS polygon
             FROM model.entity place
             JOIN model.gis g ON place.id = g.entity_id
             WHERE place.id = %(id_)s;
             """,
             {'id_': id_})
         for row in g.cursor.fetchall():
-            geometry = ast.literal_eval(row['geojson'])
+            if row['point']:
+                geometry = ast.literal_eval(row['point'])
+            elif row['linestring']:  # pragma: no cover
+                geometry = ast.literal_eval(row['linestring'])
+            else:  # pragma: no cover
+                geometry = ast.literal_eval(row['polygon'])
             geometry['title'] = row['name'].replace('"', '\"') \
                 if row['name'] else ''
             geometry['description'] = \
                 row['description'].replace('"', '\"') \
                 if row['description'] else ''
-            if row['point']:
-                geometry['geom'] = row['point']
-            elif row['linestring']:
-                geometry['geom'] = row['linestring']
-            else:
-                geometry['geom'] = row['polygon']
             geometries.append(geometry)
         return geometries
 
@@ -81,9 +80,7 @@ class Gis:
             SELECT st_isvalid(
                 public.ST_SetSRID(
                     public.ST_GeomFromGeoJSON(%(geojson)s),
-                    4326
-                )
-            );
+                    4326));
             """,
             {'geojson': geometry})
         return bool(g.cursor.fetchone()['st_isvalid'])
@@ -92,7 +89,12 @@ class Gis:
     def insert(data: dict[str, Any], shape: str) -> None:
         g.cursor.execute(
             f"""
-            INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
+            INSERT INTO model.gis (
+                entity_id,
+                name,
+                description,
+                type,
+                geom_{shape})
             VALUES (
                 %(entity_id)s,
                 %(name)s,
@@ -106,7 +108,12 @@ class Gis:
     def insert_import(data: dict[str, Any]) -> None:
         g.cursor.execute(
             """
-            INSERT INTO gis.point (entity_id, name, description, type, geom)
+            INSERT INTO model.gis (
+                entity_id,
+                name,
+                description,
+                type,
+                geom_point)
             VALUES (
                 %(entity_id)s,
                 '',
@@ -119,11 +126,5 @@ class Gis:
     @staticmethod
     def delete_by_entity_id(id_: int) -> None:
         g.cursor.execute(
-            'DELETE FROM gis.point WHERE entity_id = %(id)s;',
-            {'id': id_})
-        g.cursor.execute(
-            'DELETE FROM gis.linestring WHERE entity_id = %(id)s;',
-            {'id': id_})
-        g.cursor.execute(
-            'DELETE FROM gis.polygon WHERE entity_id = %(id)s;',
+            'DELETE FROM model.gis WHERE entity_id = %(id)s;',
             {'id': id_})

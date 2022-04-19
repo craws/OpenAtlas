@@ -27,9 +27,9 @@ def csv_export(form: FlaskForm) -> None:
             shutil.rmtree(path)  # pragma: no cover
         path.mkdir()
     tables = {
-        'model_cidoc_class': ['id', 'name', 'code'],
-        'model_cidoc_class_inheritance': ['id', 'super_code', 'sub_code'],
-        'model_entity': [
+        'cidoc_class': ['id', 'name', 'code'],
+        'cidoc_class_inheritance': ['id', 'super_code', 'sub_code'],
+        'entity': [
             'id',
             'name',
             'description',
@@ -40,7 +40,7 @@ def csv_export(form: FlaskForm) -> None:
             "replace(to_char(end_from, 'yyyy-mm-dd BC'), ' AD', '')",
             "replace(to_char(end_to, 'yyyy-mm-dd BC'), ' AD', '')",
             'end_comment'],
-        'model_link': [
+        'link': [
             'id',
             'property_code',
             'domain_id',
@@ -53,35 +53,38 @@ def csv_export(form: FlaskForm) -> None:
             "replace(to_char(end_from, 'yyyy-mm-dd BC'), ' AD', '')",
             "replace(to_char(end_to, 'yyyy-mm-dd BC'), ' AD', '')",
             'end_comment'],
-        'model_property': [
+        'property': [
             'id', 'code', 'range_class_code', 'domain_class_code', 'name',
             'name_inverse'],
-        'model_property_inheritance': ['id', 'super_code', 'sub_code'],
-        'gis_point': ['id', 'entity_id', 'name', 'description', 'type'],
-        'gis_linestring': ['id', 'entity_id', 'name', 'description', 'type'],
-        'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type']}
-    gis_tables = ['gis_point', 'gis_linestring', 'gis_polygon']
+        'property_inheritance': ['id', 'super_code', 'sub_code'],
+        'gis': ['id', 'entity_id', 'name', 'description', 'type']}
     for table, fields in tables.items():
         if getattr(form, table).data:
             if form.timestamps.data:
                 fields.append('created')
                 fields.append('modified')
-            if table in gis_tables:
+            if table == 'gis':
                 if form.gis_format.data == 'wkt':
-                    fields.append("ST_AsText(geom)")
+                    fields += [
+                        'ST_AsText(geom_point) AS point',
+                        'ST_AsText(geom_linestring) AS linestring',
+                        'ST_AsText(geom_polygon) AS polygon']
                 elif form.gis_format.data == 'coordinates':
-                    if table == 'gis_point':
-                        fields.append(
-                            "ST_X(geom) || ' ' || ST_Y(geom) AS coordinates")
-                    else:
-                        fields.append("""
-                            ST_X(public.ST_PointOnSurface(geom)) || ' ' ||
-                            ST_Y(public.ST_PointOnSurface(geom))
-                            AS polygon_center_point""")
+                    fields += [
+                        "ST_X(geom_point) || ' ' || ST_Y(geom_point) "
+                        "AS coordinates",
+                        "ST_X(public.ST_PointOnSurface(geom_linestring)) "
+                        "|| ' ' || "
+                        "ST_Y(public.ST_PointOnSurface(geom_linestring)) "
+                        "AS linestring_center_point",
+                        "ST_X(public.ST_PointOnSurface(geom_polygon)) "
+                        "|| ' ' || "
+                        "ST_Y(public.ST_PointOnSurface(geom_polygon)) "
+                        "AS polygon_center_point"]
                 else:
-                    fields.append('geom')
+                    fields += ['geom_point', 'geom_linestring', 'geom_polygon']
             data_frame = psql.read_sql(
-                f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};",
+                f"SELECT {','.join(fields)} FROM model.{table};",
                 g.db)
             data_frame.to_csv(path / f'{date}_{table}.csv', index=False)
     if form.zip.data:
