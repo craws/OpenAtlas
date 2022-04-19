@@ -4,16 +4,15 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v03.resources.formats.thanados import get_subunits
+from openatlas.api.v03.resources.formats.subunits import get_subunits_from_id
 from openatlas.api.v03.resources.parser import default, entity_
-from openatlas.api.v03.resources.resolve_endpoints import download, \
-    resolve_subunits
-from openatlas.api.v03.resources.templates import type_overview_template, \
-    type_tree_template
-from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
-    get_entity_by_id, link_builder, remove_duplicate_entities
+from openatlas.api.v03.resources.resolve_endpoints import (
+    download, resolve_subunits)
+from openatlas.api.v03.resources.templates import (
+    type_overview_template, type_tree_template)
+from openatlas.api.v03.resources.util import (
+    get_entity_by_id)
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.type import Type
 
 
@@ -93,35 +92,6 @@ class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        return resolve_subunits(
-            GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
-            entity_.parse_args(),
-            str(id_))
-
-    @staticmethod
-    def iterate(entity: Entity, parser: dict[str, Any]) -> list[dict[str, Any]]:
-        root = entity
-        hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
-        entities = [entity for dict_ in hierarchy for entity in dict_]
-        type_links_inverse = GetSubunits.get_type_links_inverse(entities)
-        links = link_builder(entities)
-        links_inverse = link_builder(entities, True)
-        return [
-            get_subunits(
-                list(entity)[0],
-                entity[(list(entity)[0])],
-                [link_ for link_ in links if
-                 link_.domain.id == list(entity)[0].id],
-                [link_ for link_ in links_inverse if
-                 link_.range.id == list(entity)[0].id],
-                root,
-                max(entity.modified for entity in entities if entity.modified),
-                type_links_inverse,
-                parser)
-            for entity in hierarchy]
-
-    @staticmethod
-    def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
-        types = remove_duplicate_entities(
-            [type_ for entity in entities for type_ in entity.types])
-        return link_builder(types, True)
+        parser = entity_.parse_args()
+        subunits = get_subunits_from_id(get_entity_by_id(id_), parser)
+        return resolve_subunits(subunits, parser, str(id_))

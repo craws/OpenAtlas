@@ -4,19 +4,18 @@ from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
-from openatlas.api.v03.resources.error import InvalidLimitError, \
-    InvalidSubunitError, QueryEmptyError
+from openatlas.api.v03.resources.error import (
+    InvalidLimitError, InvalidSubunitError, QueryEmptyError)
 from openatlas.api.v03.resources.parser import entity_, query
-from openatlas.api.v03.resources.resolve_endpoints import resolve_entities, \
-    resolve_entity
-from openatlas.api.v03.resources.util import get_by_cidoc_classes, \
-    get_entities_by_ids, get_entities_by_system_classes, \
-    get_entities_by_view_classes, get_entities_linked_to_special_type, \
-    get_entities_linked_to_special_type_recursive, \
-    get_entity_by_id, \
-    get_linked_entities_api
-from openatlas.util.util import get_entities_linked_to_type_recursive
+from openatlas.api.v03.resources.resolve_endpoints import (
+    resolve_entities, resolve_entity)
+from openatlas.api.v03.resources.util import (
+    get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
+    get_entities_by_view_classes, get_entities_linked_to_special_type,
+    get_entities_linked_to_special_type_recursive, get_entity_by_id,
+    get_linked_entities_api)
 from openatlas.models.entity import Entity
+from openatlas.util.util import get_entities_linked_to_type_recursive
 
 
 class GetByCidocClass(Resource):

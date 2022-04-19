@@ -4,11 +4,11 @@ from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource
 
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
-    InvalidSubunitError
+from openatlas.api.v02.resources.error import (
+    EntityDoesNotExistError, InvalidSubunitError)
 from openatlas.api.v02.resources.parser import default
-from openatlas.api.v02.resources.resolve_endpoints import get_node_dict, \
-    resolve_node_parser
+from openatlas.api.v02.resources.resolve_endpoints import (
+    get_node_dict, resolve_node_parser)
 from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
@@ -25,7 +25,6 @@ class GetSubunitHierarchy(Resource):
             id_)
 
     @staticmethod
-
     def get_subunit_hierarchy(id_: int) -> list[dict[str, Any]]:
         try:
             entity = get_entity_by_id(id_)

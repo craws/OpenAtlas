@@ -3,15 +3,17 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.util import get_geometries, get_license, \
-    get_reference_systems, replace_empty_list_values_in_dict_with_none
+from openatlas.api.v03.resources.util import (
+    get_all_links, get_all_links_inverse, get_all_subunits_recursive,
+    get_geometries, get_license, get_reference_systems,
+    remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
 from openatlas.util.util import get_file_path
 
 
-def get_subunits(
+def get_subunit(
         entity: Entity,
         children: list[Entity],
         links: list[Link],
@@ -206,3 +208,34 @@ def get_types(
     if parser['format'] == 'xml':
         return [{'type': type_} for type_ in types]
     return types
+
+
+def get_subunits_from_id(
+        entity: Entity,
+        parser: dict[str, Any]) -> list[dict[str, Any]]:
+    root = entity
+    hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
+    entities = [entity for dict_ in hierarchy for entity in dict_]
+    entities_ids = [entity.id for entity in entities]
+    type_links_inverse = get_type_links_inverse(entities)
+    links = get_all_links(entities_ids)
+    links_inverse = get_all_links_inverse(entities_ids)
+    return [
+        get_subunit(
+            list(entity)[0],
+            entity[(list(entity)[0])],
+            [link_ for link_ in links if
+             link_.domain.id == list(entity)[0].id],
+            [link_ for link_ in links_inverse if
+             link_.range.id == list(entity)[0].id],
+            root,
+            max(entity.modified for entity in entities if entity.modified),
+            type_links_inverse,
+            parser)
+        for entity in hierarchy]
+
+
+def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
+    types = remove_duplicate_entities(
+        [type_ for entity in entities for type_ in entity.types])
+    return get_all_links_inverse([type_.id for type_ in types])

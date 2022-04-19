@@ -3,9 +3,9 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    InvalidCidocClassCode, InvalidCodeError, InvalidSearchSyntax, \
-    InvalidSystemClassError
+from openatlas.api.v03.resources.error import (
+    EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
+    InvalidSearchSyntax, InvalidSystemClassError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -24,14 +24,6 @@ def get_entities_by_ids(ids: list[int]) -> list[Entity]:
     return Entity.get_by_ids(ids, types=True, aliases=True)
 
 
-def get_all_links(entities: Union[int, list[int]]) -> list[Link]:
-    return Link.get_links(entities, list(g.properties))
-
-
-def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
-    return Link.get_links(entities, list(g.properties), inverse=True)
-
-
 def get_license(entity: Entity) -> Optional[str]:
     for type_ in entity.types:
         if g.types[type_.root[0]].name == 'License':
@@ -48,11 +40,6 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
         return [ast.literal_eval(p) for p in parser]
     except Exception as e:
         raise InvalidSearchSyntax from e
-
-
-def link_builder(entities: list[Entity], inverse: bool = False) -> list[Link]:
-    e = [entity.id for entity in entities]
-    return get_all_links_inverse(e) if inverse else get_all_links(e)
 
 
 def get_all_subunits_recursive(
@@ -164,14 +151,53 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
         if not (entity.id in seen or seen_add(entity.id))]
 
 
+def get_all_links(
+        entities: Union[int, list[int]],
+        codes: Optional[list[str]] = None) -> list[Link]:
+    codes = list(g.properties) if not codes else codes
+    return Link.get_links(entities, codes)
+
+
+def get_all_links_inverse(
+        entities: Union[int, list[int]],
+        codes: Optional[list[str]] = None) -> list[Link]:
+    codes = list(g.properties) if not codes else codes
+    return Link.get_links(entities, codes, inverse=True)
+
+
 def link_parser_check(
         entities: list[Entity],
-        parser: dict[str, Any],
-        inverse: bool = False) -> list[Link]:
+        parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return link_builder(entities, inverse)
+        return get_all_links(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
     return []
+
+
+def link_parser_check_inverse(
+        entities: list[Entity],
+        parser: dict[str, Any]) -> list[Link]:
+    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
+           for i in parser['show']):
+        return get_all_links_inverse(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
+    return []
+
+
+def get_properties_for_links(parser: dict[str, Any]) -> Optional[list[str]]:
+    if parser['relation_type']:
+        codes = [code for code in parser['relation_type']]
+        if 'geometry' in parser['show']:
+            codes.append('P53')
+        if 'types' in parser['show']:
+            codes.append('P2')
+        if any(i in ['depictions', 'links'] for i in parser['show']):
+            codes.append('P67')
+        return codes
+    return None
 
 
 def get_reference_systems(

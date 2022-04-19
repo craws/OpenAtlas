@@ -5,16 +5,16 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.csv_export import export_entities_csv
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.formats.rdf import rdf_output
 from openatlas.api.v02.resources.parser import entity_
 from openatlas.api.v02.resources.resolve_endpoints import download
-from openatlas.api.v02.resources.util import get_all_links, \
-    get_all_links_inverse, get_entity_by_id
+from openatlas.api.v02.resources.util import (
+    get_all_links, get_all_links_inverse, get_entity_by_id)
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
-from openatlas.api.csv_export import export_entities_csv
 from openatlas.models.entity import Entity
 
 
