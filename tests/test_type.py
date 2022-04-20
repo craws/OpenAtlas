@@ -176,7 +176,3 @@ class TypeTest(TestBaseCase):
                 data={'multiple': True})
             rv = self.app.get(url_for('hierarchy_update', id_=sex_type.id))
             assert b'disabled="disabled" id="multiple"' in rv.data
-
-
-
-

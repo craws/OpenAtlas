@@ -1038,7 +1038,7 @@ def get_entities_linked_to_type_recursive(
 
 
 def check_inconsistent_type_links(entity: Entity) -> bool:
-    type_dict = {}
+    type_dict: dict[int, int] = {}
     for type_ in entity.types:
         if type_.root[0] in type_dict:
             type_dict[type_.root[0]] += 1
