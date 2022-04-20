@@ -312,6 +312,7 @@ class PlaceTest(TestBaseCase):
                     origin_id=feat_id),
                 data=data)
             stratigraphic_id = rv.location.split('/')[-1]
+
             # Create a stratigraphic unit "sibling"
             self.app.get(
                 url_for('insert', class_='place', origin_id=stratigraphic_id))
@@ -355,10 +356,33 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get('/')
             assert b'My human remains' in rv.data
 
+            # Anthropological features
+            rv = self.app.get(
+                url_for('anthropology_index', id_=stratigraphic_id))
+            assert b'Sex estimation' in rv.data
+            rv = self.app.get(url_for('sex', id_=stratigraphic_id))
+            assert b'Anthropological analyses' in rv.data
+            rv = self.app.post(
+                url_for('sex_update', id_=stratigraphic_id),
+                follow_redirects=True,
+                data={'Glabella': 'Female'})
+            assert b'-2.0' in rv.data
+            rv = self.app.post(
+                url_for('sex_update', id_=stratigraphic_id),
+                follow_redirects=True,
+                data={'Glabella': 'Female'})
+            assert b'-2.0' in rv.data
+            rv = self.app.get(url_for('sex_update', id_=stratigraphic_id))
+            assert b'Glabella' in rv.data
+            rv = self.app.post(
+                url_for('update', id_=stratigraphic_id),
+                data={'name': 'New name'},
+                follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+
             rv = self.app.get(url_for('view', id_=feat_id))
             assert b'not a bug' in rv.data
-            rv = self.app.get(url_for('view', id_=stratigraphic_id))
-            assert b'a stratigraphic unit' in rv.data
+
             rv = self.app.get(url_for('view', id_=find_id))
             assert b'You never' in rv.data
             rv = self.app.get(

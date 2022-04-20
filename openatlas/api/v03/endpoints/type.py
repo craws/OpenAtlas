@@ -4,14 +4,14 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.v03.resources.formats.thanados import get_subunits
+from openatlas.api.v03.resources.formats.subunits import get_subunits_from_id
 from openatlas.api.v03.resources.parser import default, entity_
-from openatlas.api.v03.resources.resolve_endpoints import download, \
-    resolve_subunits
-from openatlas.api.v03.resources.templates import type_overview_template, \
-    type_tree_template
-from openatlas.api.v03.resources.util import get_all_subunits_recursive, \
-    get_entity_by_id, link_builder
+from openatlas.api.v03.resources.resolve_endpoints import (
+    download, resolve_subunits)
+from openatlas.api.v03.resources.templates import (
+    type_overview_template, type_tree_template)
+from openatlas.api.v03.resources.util import (
+    get_entity_by_id)
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -32,7 +32,8 @@ class GetTypeOverview(Resource):
             'custom': [],
             'place': [],
             'value': [],
-            'system': []}
+            'system': [],
+            'anthropology': []}
         for node in g.types.values():
             if node.root:
                 continue
@@ -91,27 +92,6 @@ class GetSubunits(Resource):
     @staticmethod
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        return resolve_subunits(
-            GetSubunits.iterate(get_entity_by_id(id_), entity_.parse_args()),
-            entity_.parse_args(),
-            str(id_))
-
-    @staticmethod
-    def iterate(entity: Entity, parser: dict[str, Any]) -> list[dict[str, Any]]:
-        root = entity
-        hierarchy = get_all_subunits_recursive(entity, [{entity: []}])
-        entities = [entity for dict_ in hierarchy for entity in dict_]
-        links = link_builder(entities)
-        links_inverse = link_builder(entities, True)
-        return [
-            get_subunits(
-                list(entity.keys())[0],
-                entity[(list(entity.keys())[0])],
-                [link_ for link_ in links if
-                 link_.domain.id == list(entity.keys())[0].id],
-                [link_ for link_ in links_inverse if
-                 link_.range.id == list(entity.keys())[0].id],
-                root,
-                max(entity.modified for entity in entities if entity.modified),
-                parser)
-            for entity in hierarchy]
+        parser = entity_.parse_args()
+        subunits = get_subunits_from_id(get_entity_by_id(id_), parser)
+        return resolve_subunits(subunits, parser, str(id_))

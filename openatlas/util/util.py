@@ -602,11 +602,10 @@ def link(
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
-            url=url,
-            class_=class_,
-            js=f'onclick="{js}"' if js else '',
-            label=(uc_first(str(object_))) if uc_first_ else object_)
+        js = f'onclick="{js}"' if js else ''
+        label = uc_first(str(object_)) if uc_first_ else object_
+        class_ = 'class="{class_}"' if class_ else ''
+        return f'<a href="{url}" {class_} {js}>{label}</a>'
     if isinstance(object_, Entity):
         return link(
             object_.name,
@@ -755,12 +754,21 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
 @app.template_filter()
 def description(entity: Union[Entity, Project]) -> str:
     from openatlas.models.entity import Entity
+    html = ''
+    if isinstance(entity, Entity) \
+            and entity.class_.name == 'stratigraphic_unit':
+        from openatlas.views.anthropology import print_result
+        if result := print_result(entity):
+            html += \
+                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                f"<p>{result}</p>"
     if not entity.description:
-        return ''
+        return Markup(html)
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
     return Markup(f"""
+        {html}
         <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
@@ -771,7 +779,8 @@ def description(entity: Union[Entity, Project]) -> str:
 def download_button(entity: Entity) -> str:
     if entity.image_id:
         if path := get_file_path(entity.image_id):
-            return Markup(button(
+            return Markup(
+                button(
                     _('download'),
                     url_for('download_file', filename=path.name)))
     return ''  # pragma: no cover
@@ -904,8 +913,8 @@ def display_form(
                     form.insert_continue_human_remains(class_=class_))
             html += add_form_row(
                 field,
-                label='',  # Setting this to '' keeps the button row label empty
-                value=f'<div class="toolbar">{" ".join(buttons)}</div>')
+                '',  # Setting label to '' keeps the button row label empty
+                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
             continue
 
         if field.id.startswith('reference_system_id_'):
@@ -1016,3 +1025,16 @@ def datetime64_to_timestamp(
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
     return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
+
+
+def get_entities_linked_to_type_recursive(
+        id_: int,
+        data: list[Entity]) -> list[Entity]:
+    for entity in g.types[id_].get_linked_entities(
+            ['P2', 'P89'],
+            inverse=True,
+            types=True):
+        data.append(entity)
+    for sub_id in g.types[id_].subs:
+        get_entities_linked_to_type_recursive(sub_id, data)
+    return data

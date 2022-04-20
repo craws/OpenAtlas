@@ -4,7 +4,7 @@
 BEGIN;
 
 -- Raise database version
-Update web.settings SET value = '7.1.0' WHERE name = 'database_version';
+UPDATE web.settings SET value = '7.1.0' WHERE name = 'database_version';
 
 -- Fixing possible inconsistencies for source translation type
 UPDATE web.hierarchy SET name = 'Source translation', category = 'standard' WHERE name IN ('Source Translation', 'Source translation');

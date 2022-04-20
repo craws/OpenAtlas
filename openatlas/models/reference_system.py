@@ -18,7 +18,7 @@ class ReferenceSystem(Entity):
         self.resolver_url = row['resolver_url']
         self.placeholder = row['identifier_example']
         self.precision_default_id = \
-            list(self.types.keys())[0].id if self.types else None
+            list(self.types)[0].id if self.types else None
         self.count = row['count']
         self.system = row['system']
         self.classes: list[str] = []

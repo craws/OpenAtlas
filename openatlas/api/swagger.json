@@ -38,17 +38,6 @@
           "type": "boolean"
         }
       },
-      "exportParam": {
-        "description": "Select to which format the output is downloaded",
-        "in": "query",
-        "name": "export",
-        "schema": {
-          "enum": [
-            "csv"
-          ],
-          "type": "string"
-        }
-      },
       "filterParam": {
         "description": "Specify request with custom SQL filter method. ",
         "deprecated": true,
@@ -132,7 +121,7 @@
         }
       },
       "limitParam": {
-        "description": "integer of entities returned per page",
+        "description": "Integer of entities returned per page. 0 means no limit is set. Default is 20.",
         "in": "query",
         "name": "limit",
         "schema": {
@@ -154,6 +143,15 @@
             "depictions",
             "not"
           ],
+          "type": "string"
+        }
+      },
+      "relationTypeParam": {
+        "description": "Select which relations are shown",
+        "in": "query",
+        "name": "relation_type",
+        "schema": {
+          "example": "P2",
           "type": "string"
         }
       },
@@ -713,12 +711,6 @@
           },
           "label": {
             "type": "string"
-          },
-          "children": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/TypeOverviewChildren"
-            }
           }
         }
       },

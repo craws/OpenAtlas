@@ -16,10 +16,9 @@ class Logger:
             message: str,
             info: Union[str, Exception, None] = None) -> None:
         log_levels = app.config['LOG_LEVELS']
-        priority = list(log_levels.keys())[
-            list(log_levels.values()).index(priority_)]
-        if int(g.settings['log_level']) < priority:  # pragma: no cover
-            return
+        priority = list(log_levels)[list(log_levels.values()).index(priority_)]
+        if int(g.settings['log_level']) < priority:
+            return  # pragma: no cover
         Db.log({
             'priority': priority,
             'type': type_,

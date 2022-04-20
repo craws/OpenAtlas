@@ -10,7 +10,8 @@ class Gis:
     def get_by_id(id_: int) -> list[dict[str, Any]]:
         geometries = []
         for shape in ['point', 'polygon', 'linestring']:
-            g.cursor.execute(f"""
+            g.cursor.execute(
+                f"""
                 SELECT
                     {shape}.id,
                     {shape}.name,
@@ -19,7 +20,9 @@ class Gis:
                     public.ST_AsGeoJSON({shape}.geom) AS geojson
                 FROM model.entity place
                 JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
-                WHERE place.id = %(id_)s;""", {'id_': id_})
+                WHERE place.id = %(id_)s;
+                """,
+                {'id_': id_})
             for row in g.cursor.fetchall():
                 geometry = ast.literal_eval(row['geojson'])
                 geometry['title'] = row['name'].replace('"', '\"') \
@@ -35,7 +38,8 @@ class Gis:
         polygon_sql = '' if shape != 'polygon' else \
             ' public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom))' \
             ' AS polygon_point, '
-        sql = f"""
+        g.cursor.execute(
+            f"""
             SELECT
                 object.id AS object_id,
                 {shape}.id,
@@ -56,22 +60,29 @@ class Gis:
                 AND l.property_code = 'P53'
                 AND (object.openatlas_class_name = 'place'
                 OR object.id IN %(extra_ids)s)
-            GROUP BY object.id, {shape}.id;"""
-        g.cursor.execute(sql, {'extra_ids': tuple(extra_ids)})
+            GROUP BY object.id, {shape}.id;
+            """,
+            {'extra_ids': tuple(extra_ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def test_geom(geometry: str) -> bool:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT st_isvalid(
                 public.ST_SetSRID(
                     public.ST_GeomFromGeoJSON(%(geojson)s),
-                    4326));""", {'geojson': geometry})
+                    4326
+                )
+            );
+            """,
+            {'geojson': geometry})
         return bool(g.cursor.fetchone()['st_isvalid'])
 
     @staticmethod
     def insert(data: dict[str, Any], shape: str) -> None:
-        sql = f"""
+        g.cursor.execute(
+            f"""
             INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
             VALUES (
                 %(entity_id)s,
@@ -79,12 +90,13 @@ class Gis:
                 %(description)s,
                 %(type)s,
                 public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
-        """
-        g.cursor.execute(sql, data)
+            """,
+            data)
 
     @staticmethod
     def insert_import(data: dict[str, Any]) -> None:
-        sql = """
+        g.cursor.execute(
+            """
             INSERT INTO gis.point (entity_id, name, description, type, geom)
             VALUES (
                 %(entity_id)s,
@@ -92,14 +104,17 @@ class Gis:
                 %(description)s,
                 'centerpoint',
                 public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
-        """
-        g.cursor.execute(sql, data)
+            """,
+            data)
 
     @staticmethod
     def delete_by_entity_id(id_: int) -> None:
         g.cursor.execute(
-            'DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': id_})
+            'DELETE FROM gis.point WHERE entity_id = %(id)s;',
+            {'id': id_})
         g.cursor.execute(
-            'DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': id_})
+            'DELETE FROM gis.linestring WHERE entity_id = %(id)s;',
+            {'id': id_})
         g.cursor.execute(
-            'DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': id_})
+            'DELETE FROM gis.polygon WHERE entity_id = %(id)s;',
+            {'id': id_})

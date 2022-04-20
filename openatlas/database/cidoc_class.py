@@ -7,11 +7,13 @@ class CidocClass:
 
     @staticmethod
     def get_classes() -> list[dict[str, Any]]:
-        g.cursor.execute("""
+        g.cursor.execute(
+            """
             SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
             FROM model.cidoc_class c
             LEFT JOIN model.entity e ON c.code = e.cidoc_class_code
-            GROUP BY (c.id, c.name, c.comment);""")
+            GROUP BY (c.id, c.name, c.comment);
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -25,6 +27,7 @@ class CidocClass:
         g.cursor.execute(
             """
             SELECT class_code, language_code, text FROM model.cidoc_class_i18n
-            WHERE language_code IN %(language_codes)s;""",
+            WHERE language_code IN %(language_codes)s;
+            """,
             {'language_codes': tuple(language_codes)})
         return [dict(row) for row in g.cursor.fetchall()]

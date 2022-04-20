@@ -1,12 +1,12 @@
 import itertools
 from typing import Any
 
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
-    LastEntityError, NoEntityAvailable, TypeIDError
+from openatlas.api.v02.resources.error import (
+    EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
-from openatlas.api.v02.resources.util import get_all_links, \
-    get_all_links_inverse, get_entity_by_id
+from openatlas.api.v02.resources.util import (
+    get_all_links, get_all_links_inverse, get_entity_by_id)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 

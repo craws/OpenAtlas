@@ -22,7 +22,7 @@ language.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    choices=app.config['LANGUAGES'].keys())
+    choices=app.config['LANGUAGES'])
 
 entity_ = default.copy()
 entity_.add_argument(

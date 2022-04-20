@@ -6,8 +6,8 @@ from flask_restful import Resource
 
 from openatlas.api.v02.resources.parser import entity_
 from openatlas.api.v02.resources.resolve_endpoints import resolve_entities
-from openatlas.api.v02.resources.util import get_all_links, \
-    get_all_links_inverse
+from openatlas.api.v02.resources.util import (
+    get_all_links, get_all_links_inverse)
 from openatlas.models.entity import Entity
 
 

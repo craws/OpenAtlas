@@ -20,7 +20,7 @@ language.add_argument(
     type=str,
     help='{error_msg}',
     case_sensitive=False,
-    choices=app.config['LANGUAGES'].keys())
+    choices=app.config['LANGUAGES'])
 
 entity_ = default.copy()
 entity_.add_argument(
@@ -90,8 +90,18 @@ entity_.add_argument(
     'type_id',
     type=int,
     help='{error_msg}',
-    action='append'
-)
+    action='append')
+entity_.add_argument(
+    'type_id',
+    type=int,
+    help='{error_msg}',
+    action='append')
+entity_.add_argument(
+    'relation_type',
+    type=str,
+    help='{error_msg}',
+    action='append')
+
 
 gis = default.copy()
 gis.add_argument(
