@@ -1035,3 +1035,16 @@ def get_entities_linked_to_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)
     return data
+
+
+def check_inconsistent_type_links(entity: Entity) -> bool:
+    type_dict = {}
+    for type_ in entity.types:
+        if type_.root[0] in type_dict:
+            type_dict[type_.root[0]] += 1
+        else:
+            type_dict[type_.root[0]] = 1
+    for key, value in type_dict.items():
+        if value > 1 and not g.types[key].multiple:
+            return True
+    return False

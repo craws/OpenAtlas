@@ -1,5 +1,10 @@
 <div class="row">
     <div class="col-6">
+        {% if type_check %}
+          <div class="error">
+            {{ _("Warning: Inconsistent type data, please report this.") }}
+          </div>
+        {% endif %}
         <div class="toolbar">
             {{ ('entity/' + entity.class_.view)|manual }}
             {{ buttons|join(' ') }}

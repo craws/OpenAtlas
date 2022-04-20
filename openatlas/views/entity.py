@@ -20,7 +20,8 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, display_delete_link, format_date, get_base_table_data,
+    button, check_inconsistent_type_links, display_delete_link, format_date,
+    get_base_table_data,
     get_entity_data, get_file_path, is_authorized, link, required_group,
     uc_first)
 from openatlas.views.entity_index import file_preview
@@ -163,7 +164,8 @@ def view(id_: int) -> Union[str, Response]:
         gis_data=gis_data,
         structure=place_structure,
         overlays=overlays,
-        title=entity.name)
+        title=entity.name,
+        type_check=check_inconsistent_type_links(entity))
     return render_template(
         'tabs.html',
         tabs=tabs,
