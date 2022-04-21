@@ -3,7 +3,7 @@
     {% if problematic_type_id %}
       <div class="error">
         {{ _('Editing is disabled because of multiple links to the single type') }}
-        "{{ g.types[problematic_type_id].name }}".
+        {{ g.types[problematic_type_id]|link|safe }}.
         {{ _('Please consult the manual about link duplicates') }}: {{'admin/data_integrity_checks'|manual }}
       </div>
     {% endif %}
