@@ -21,8 +21,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
 from openatlas.util.util import (
-    check_inconsistent_type_links, is_authorized, link, required_group,
-    was_modified)
+    is_authorized, link, required_group, was_modified)
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
@@ -61,7 +60,7 @@ def insert(
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
-    if check_inconsistent_type_links(entity):
+    if entity.check_for_too_many_links_for_single_type():
         abort(422)
     place_info = get_place_info_for_update(entity)
     form = build_form(
