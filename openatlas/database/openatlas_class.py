@@ -38,7 +38,9 @@ class OpenAtlasClass:
                 SELECT json_agg(hierarchy_id) AS hierarchies FROM (
                     SELECT hierarchy_id
                     FROM web.hierarchy_openatlas_class hc
-                    WHERE c.name = hc.openatlas_class_name) x) x,
+                    JOIN web.hierarchy h ON hc.hierarchy_id = h.id
+                    WHERE c.name = hc.openatlas_class_name
+                    ORDER BY h.name) x) x,
             LATERAL (
                 SELECT json_agg(reference_system_id) AS system_ids FROM (
                     SELECT reference_system_id

@@ -67,7 +67,7 @@ RDF_FORMATS = {
 JSON_FORMATS = {
     'lp': 'application/json',
     'geojson': 'application/json'}
-API_FORMATS = {**RDF_FORMATS, **JSON_FORMATS}
+API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

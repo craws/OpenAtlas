@@ -33,7 +33,6 @@ from openatlas.models.logger import Logger
 logger = Logger()
 
 from openatlas.api import api
-from openatlas.util import processor
 from openatlas.util.util import convert_size
 from openatlas.views import (
     admin, ajax, anthropology, entity, entity_index, entity_form, error, export,

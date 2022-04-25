@@ -222,16 +222,16 @@ def get_subunits_from_id(
     root_id = entity.id
     entities = get_all_subunits_recursive(entity, [])
     ext_reference_links = get_type_links_inverse(entities)
-    entities_dict: dict[str, Any] = {}
+    entities_dict: dict[int, Any] = {}
     for entity in entities:
         entities_dict[entity.id] = {
             'entity': entity,
             'links': [],
             'links_inverse': [],
             'ext_reference_links': ext_reference_links}
-    for link_ in get_all_links([*entities_dict.keys()]):
+    for link_ in get_all_links(list(entities_dict.keys())):
         entities_dict[link_.domain.id]['links'].append(link_)
-    for link_ in get_all_links_inverse([*entities_dict.keys()]):
+    for link_ in get_all_links_inverse(list(entities_dict.keys())):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
