@@ -13,6 +13,13 @@ is working.
 
     service apache2 restart
 
+### 7.2.0 to 7.3.0
+Execute **install/upgrade/7.3.0.sql** after making backups
+
+In this update the GIS tables were merged and put into the model schema. The
+(now empty) GIS schema was deleted. So take care of these changes in case other
+applications are using direct database access.
+
 ### 7.1.x to 7.2.0
 Execute **install/upgrade/7.2.0.sql** after making backups
 
