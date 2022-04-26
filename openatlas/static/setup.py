@@ -3,8 +3,9 @@ from setuptools import setup
 package_json = {
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
+        "@popperjs/core": "^2.11.5",
         "bootstrap-autocomplete": "2.3.7",
-        "bootstrap": "^4.6.1",
+        "bootstrap": "^5.1.3",
         "d3": "^5.16.0",
         "datatables.net-bs4": "^1.11.5",
         "datatables.net-buttons-dt": "^1.7.1",
@@ -22,7 +23,6 @@ package_json = {
         "leaflet.fullscreen": "2.2.0",
         "leaflet.markercluster": "^1.5.3",
         "leaflet": "^1.7.1",
-        "popper.js": "^1.16.1",
         "save-svg-as-png": "^1.4.17",
         "tinymce": "^5.10.3",
     }
