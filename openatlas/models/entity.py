@@ -35,7 +35,7 @@ class Entity:
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.linked_places: list[Entity] = []  # Related places for map
-        self.location: Optional[Entity] = None  # Respective location if a place
+        self.location: Optional[Entity] = None  # Respective location if place
         self.info_data: dict[str, Union[str, list[str], None]]
 
         self.standard_type = None
@@ -128,7 +128,8 @@ class Entity:
         # range_ = string value from a form, can be empty, int or int list
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
-        ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
+        ids = [int(id_) for id_ in ids] \
+            if isinstance(ids, list) else [int(ids)]
         Link.insert(self, code, Entity.get_by_ids(ids), description, inverse)
 
     def get_links(
@@ -183,12 +184,13 @@ class Entity:
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
             'begin_comment':
-                str(self.begin_comment).strip() if self.begin_comment else None,
+                str(self.begin_comment).strip()
+                if self.begin_comment else None,
             'end_comment':
                 str(self.end_comment).strip() if self.end_comment else None,
             'description':
-                sanitize(self.description, 'text') if self.description else None
-        })
+                sanitize(self.description, 'text')
+                if self.description else None})
 
     def update_aliases(self, aliases: list[str]) -> None:
         delete_ids = []
@@ -302,7 +304,8 @@ class Entity:
                 if g.classes[class_].alias_allowed:
                     aliases = True
                     break
-        return [Entity(row) for row in Db.get_by_class(classes, types, aliases)]
+        return [
+            Entity(row) for row in Db.get_by_class(classes, types, aliases)]
 
     @staticmethod
     def get_by_view(
@@ -343,8 +346,8 @@ class Entity:
             code: Union[str, list[str]],
             types: bool = False,
             aliases: bool = False) -> list[Entity]:
-        return \
-            [Entity(row) for row in Db.get_by_cidoc_class(code, types, aliases)]
+        return [
+            Entity(row) for row in Db.get_by_cidoc_class(code, types, aliases)]
 
     @staticmethod
     def get_by_id(
@@ -424,4 +427,5 @@ class Entity:
 
     @staticmethod
     def get_entities_linked_to_itself() -> list[Entity]:
-        return [Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
+        return [
+            Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]

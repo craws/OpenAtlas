@@ -143,7 +143,9 @@ class Gis:
                         'entity_id': entity.id,
                         'name': sanitize(item['properties']['name'], 'text'),
                         'description':
-                            sanitize(item['properties']['description'], 'text'),
+                            sanitize(
+                                item['properties']['description'],
+                                'text'),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
 

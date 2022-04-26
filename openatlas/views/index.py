@@ -121,7 +121,8 @@ def index_feedback() -> Union[str, Response]:
             f'{request.headers["Host"]}\n\n' \
             f'{form.description.data}'
         if send_mail(
-                f"{uc_first(form.subject.data)} from {g.settings['site_name']}",
+                f"{uc_first(form.subject.data)} "
+                f"from {g.settings['site_name']}",
                 body,
                 g.settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')

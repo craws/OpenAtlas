@@ -19,17 +19,26 @@ class MemberTests(TestBaseCase):
             rv = self.app.get(url_for('member_insert', origin_id=group.id))
             assert b'Actor function' in rv.data
             rv = self.app.post(
-                url_for('member_insert', origin_id=actor.id, code='membership'),
+                url_for(
+                    'member_insert',
+                    origin_id=actor.id,
+                    code='membership'),
                 data={'group': str([group.id])},
                 follow_redirects=True)
             assert b'Space Marines' in rv.data
             rv = self.app.post(
-                url_for('member_insert', origin_id=actor.id, code='membership'),
+                url_for(
+                    'member_insert',
+                    origin_id=actor.id,
+                    code='membership'),
                 data={'group': str([group.id]), 'continue_': 'yes'},
                 follow_redirects=True)
             assert b'Space Marines' in rv.data
             rv = self.app.post(
-                url_for('member_insert', origin_id=group.id, code='membership'),
+                url_for(
+                    'member_insert',
+                    origin_id=group.id,
+                    code='membership'),
                 data={'group': str([group.id])})
             assert b"link to itself" in rv.data
             rv = self.app.post(

@@ -49,7 +49,9 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=precision))
             assert b'Asgard' in rv.data
             rv = self.app.get(
-                url_for('view', id_=ReferenceSystem.get_by_name('GeoNames').id))
+                url_for(
+                    'view',
+                    id_=ReferenceSystem.get_by_name('GeoNames').id))
             assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{

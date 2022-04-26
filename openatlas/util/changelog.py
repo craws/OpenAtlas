@@ -630,4 +630,4 @@ versions = {
         'feature': {
             '':
                 'Initial version based on the "Zend Base" project from '
-                '<a  target="_blank" href="https://craws.net">craws.net</a>'}}]}
+                '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}

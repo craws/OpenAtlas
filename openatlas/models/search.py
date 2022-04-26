@@ -44,7 +44,11 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
         return bool(data['include_dateless'])
     begin_ok = False
     end_ok = False
-    dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
+    dates = [
+        entity.begin_from,
+        entity.begin_to,
+        entity.end_from,
+        entity.end_to]
     if not data['from_date']:
         begin_ok = True  # pragma: no cover
     else:

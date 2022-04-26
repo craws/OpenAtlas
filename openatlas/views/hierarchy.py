@@ -1,8 +1,7 @@
-from typing import Optional, Union
+from typing import Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -129,7 +128,10 @@ def remove_class(id_: int, class_name: str) -> Response:
         Type.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'remove class from hierarchy failed', e)
+        logger.log(
+            'error',
+            'database',
+            'remove class from hierarchy failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 

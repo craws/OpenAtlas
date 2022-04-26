@@ -47,7 +47,7 @@ class IndexTests(TestBaseCase):
             app.config['WRITABLE_DIRS'].append(Path(app.root_path) / 'error')
             app.config['DATABASE_VERSION'] = 'error'
             rv = self.app.get('/')
-            assert b'OpenAtlas with default password is still active' in rv.data
+            assert b'OpenAtlas with default password is still' in rv.data
             assert b'Database version error is needed but current' in rv.data
             assert b'Directory not writable' in rv.data
 

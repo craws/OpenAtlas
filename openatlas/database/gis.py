@@ -89,7 +89,8 @@ class Gis:
                 %(name)s,
                 %(description)s,
                 %(type)s,
-                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
+                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326)
+            );
             """,
             data)
 
@@ -103,7 +104,8 @@ class Gis:
                 '',
                 %(description)s,
                 'centerpoint',
-                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
+                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326)
+            );
             """,
             data)
 

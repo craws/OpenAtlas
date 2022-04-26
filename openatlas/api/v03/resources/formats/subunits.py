@@ -100,7 +100,10 @@ def get_properties(
         'aliases': get_aliases(entity, parser),
         'description': entity.description,
         'standardType':
-            get_standard_type(entity.standard_type, ext_reference_links, parser)
+            get_standard_type(
+                entity.standard_type,
+                ext_reference_links,
+                parser)
             if entity.standard_type else None,
         'timespan': get_timespans(entity),
         'externalReferences': get_ref_system(links_inverse, parser),

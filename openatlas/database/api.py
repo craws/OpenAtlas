@@ -20,7 +20,7 @@ class Api:
                 'codes': tuple(code if isinstance(code, list) else [code])},
             parser=parser)
         sql = Entity.select_sql(types=True) + f"""
-            WHERE cidoc_class_code IN %(codes)s {sql_parts['clause']} 
+            WHERE cidoc_class_code IN %(codes)s {sql_parts['clause']}
             GROUP BY e.id
             ORDER BY {', '.join(parser['column'])} {parser['sort']};"""
         g.cursor.execute(sql, sql_parts['parameters'])

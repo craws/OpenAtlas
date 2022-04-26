@@ -81,8 +81,8 @@ def csv_export(form: FlaskForm) -> None:
                 else:
                     fields.append('geom')
             data_frame = psql.read_sql(
-                f"SELECT {','.join(fields)} FROM {table.replace('_', '.', 1)};",
-                g.db)
+                f"SELECT {','.join(fields)} "
+                f"FROM {table.replace('_', '.', 1)};", g.db)
             data_frame.to_csv(path / f'{date}_{table}.csv', index=False)
     if form.zip.data:
         info = \

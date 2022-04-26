@@ -53,7 +53,8 @@ class UserForm(FlaskForm):
                 and User.get_by_username(self.username.data):
             self.username.errors.append(_('error username exists'))
             valid = False
-        if user_email != self.email.data and User.get_by_email(self.email.data):
+        if user_email != self.email.data \
+                and User.get_by_email(self.email.data):
             self.email.errors.append(_('error email exists'))
             valid = False
         if getattr(self, 'password'):
@@ -210,9 +211,11 @@ def user_insert() -> Union[str, Response]:
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=g.settings['site_name'])
-            body = _('Account information for %(username)s',
-                     username=form.username.data) + \
-                f" {_('at')} {request.scheme}://{request.headers['Host']}\n\n" \
+            body = \
+                _('Account information for %(username)s',
+                  username=form.username.data) + \
+                f" {_('at')} {request.scheme}" \
+                f"://{request.headers['Host']}\n\n" \
                 f"{uc_first(_('username'))}: {form.username.data}\n" \
                 f"{uc_first(_('password'))}: {form.password.data}\n"
             if send_mail(subject, body, form.email.data, False):

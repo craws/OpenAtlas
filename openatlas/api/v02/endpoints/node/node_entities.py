@@ -15,7 +15,9 @@ class GetNodeEntities(Resource):
     @swag_from("../swagger/nodes.yml", endpoint="api_02.node_entities")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_node_parser(
-            {"nodes": GetNodeEntities.get_node(id_)}, default.parse_args(), id_)
+            {"nodes": GetNodeEntities.get_node(id_)},
+            default.parse_args(),
+            id_)
 
     @staticmethod
     def get_node(id_: int) -> list[dict[str, Any]]:

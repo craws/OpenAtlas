@@ -23,7 +23,8 @@ class Logger:
             'priority': priority,
             'type': type_,
             'message': message,
-            'user_id': current_user.id if hasattr(current_user, 'id') else None,
+            'user_id': current_user.id
+            if hasattr(current_user, 'id') else None,
             'info': '{method} {path}{info}'.format(
                 path=request.path,
                 method=request.method,
