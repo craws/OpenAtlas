@@ -12,7 +12,7 @@ tinymce.init({
 
 $(document).ready(function () {
 
-  $('[data-toggle="popover"]').popover(); // Popovers init
+  $('[data-bs-toggle="popover"]').popover(); // Popovers init
 
   /* DataTables - sort for checkbox columns */
   $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
@@ -99,7 +99,7 @@ $(document).ready(function () {
     $(`a[href="#menu-tab-standard"]`).tab('show');
   }
 
-  $('a[data-toggle="tab"]').on("click", function () {
+  $('a[data-bs-toggle="tab"]').on("click", function () {
     let newUrl;
     const hash = $(this).attr("href");
     newUrl = url.split("#")[0] + hash;

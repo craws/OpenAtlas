@@ -9,7 +9,7 @@
         <li class="nav-item">
           <a
               class="nav-link"
-              data-toggle="tab"
+              data-bs-toggle="tab"
               role="tab"
               aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
               href="#menu-tab-{{ category }}">
@@ -30,7 +30,7 @@
                   <button
                     class="btn btn-link collapsed"
                     type="button"
-                    data-toggle="collapse"
+                    data-bs-toggle="collapse"
                     data-target="#collapse-{{ type_.id }}"
                     aria-expanded="true"
                     aria-controls="collapse-{{ type_.id }}">

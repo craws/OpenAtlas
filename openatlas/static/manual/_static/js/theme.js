@@ -79,23 +79,23 @@ function ThemeNav () {
         // Set up javascript UX bits
         $(document)
             // Shift nav in mobile when clicking the menu.
-            .on('click', "[data-toggle='wy-nav-top']", function() {
-                $("[data-toggle='wy-nav-shift']").toggleClass("shift");
-                $("[data-toggle='rst-versions']").toggleClass("shift");
+            .on('click', "[data-bs-toggle='wy-nav-top']", function() {
+                $("[data-bs-toggle='wy-nav-shift']").toggleClass("shift");
+                $("[data-bs-toggle='rst-versions']").toggleClass("shift");
             })
 
             // Nav menu link click operations
             .on('click', ".wy-menu-vertical .current ul li a", function() {
                 var target = $(this);
                 // Close menu when you click a link.
-                $("[data-toggle='wy-nav-shift']").removeClass("shift");
-                $("[data-toggle='rst-versions']").toggleClass("shift");
+                $("[data-bs-toggle='wy-nav-shift']").removeClass("shift");
+                $("[data-bs-toggle='rst-versions']").toggleClass("shift");
                 // Handle dynamic display of l3 and l4 nav lists
                 self.toggleCurrent(target);
                 self.hashChange();
             })
-            .on('click', "[data-toggle='rst-current-version']", function() {
-                $("[data-toggle='rst-versions']").toggleClass("shift-up");
+            .on('click', "[data-bs-toggle='rst-current-version']", function() {
+                $("[data-bs-toggle='rst-versions']").toggleClass("shift-up");
             })
 
         // Make tables responsive
