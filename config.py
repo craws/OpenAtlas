@@ -90,5 +90,5 @@ CSS = {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-secondary btn-xsm'}}
 
-# Property types work differently than regular types, e.g. no move functionality
+# Property types work differently, e.g. no move functionality
 PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']

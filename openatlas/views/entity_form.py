@@ -307,7 +307,10 @@ def get_redirect_url(
         origin: Union[Entity, None] = None,
         redirect_link_id: Union[int, None] = None) -> str:
     if redirect_link_id and origin:
-        return url_for('link_update', id_=redirect_link_id, origin_id=origin.id)
+        return url_for(
+            'link_update',
+            id_=redirect_link_id,
+            origin_id=origin.id)
     url = url_for('view', id_=entity.id)
     if origin and entity.class_.name not in \
             ('administrative_unit', 'source_translation', 'type'):

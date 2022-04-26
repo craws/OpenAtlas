@@ -57,7 +57,8 @@ class ReferenceSystemTest(TestBaseCase):
             assert b'Website URL' in rv.data
             data = {
                 'name': 'GeoNames',
-                Type.get_hierarchy('External reference match').id: precision_id,
+                Type.get_hierarchy('External reference match').id:
+                    precision_id,
                 'website_url': 'https://www.geonames2.org/',
                 'resolver_url': 'https://www.geonames2.org/',
                 'placeholder': ''}

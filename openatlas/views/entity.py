@@ -135,7 +135,8 @@ def view(id_: int) -> Union[str, Response]:
             row.insert(
                 1,
                 file_preview(
-                    int(row[0].replace('<a href="/entity/', '').split('"')[0])))
+                    int(row[0].replace('<a href="/entity/', '').split('"')[0]))
+            )
 
     place_structure = None
     gis_data = None
@@ -506,7 +507,10 @@ def add_tabs_for_event(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in ['subs', 'source', 'actor']:
         tabs[name] = Tab(name, entity=entity)
-    for sub_event in entity.get_linked_entities('P9', inverse=True, types=True):
+    for sub_event in entity.get_linked_entities(
+            'P9',
+            inverse=True,
+            types=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
     tabs['actor'].table.header.insert(5, _('activity'))
     for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -544,7 +548,8 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     for link_ in entity.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
-        data.append(remove_link(range_.name, link_, entity, range_.class_.name))
+        data.append(
+            remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     for link_ in entity.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -622,7 +627,8 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
         data.append(link_.description)
         data.append(edit_link(
             url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        data.append(remove_link(range_.name, link_, entity, range_.class_.name))
+        data.append(
+            remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs
 
@@ -641,7 +647,11 @@ def add_tabs_for_source(entity: Entity) -> dict[str, Tab]:
     for link_ in entity.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
-        data.append(remove_link(range_.name, link_, entity, range_.class_.name))
+        data.append(remove_link(
+            range_.name,
+            link_,
+            entity,
+            range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs
 
@@ -651,7 +661,8 @@ def add_note_tab(entity: Entity) -> Tab:
     for note in current_user.get_notes_by_entity_id(entity.id):
         data = [
             format_date(note['created']),
-            uc_first(_('public')) if note['public'] else uc_first(_('private')),
+            uc_first(_('public'))
+            if note['public'] else uc_first(_('private')),
             link(User.get_by_id(note['user_id'])),
             note['text'],
             f'<a href="{url_for("note_view", id_=note["id"])}">'

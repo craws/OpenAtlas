@@ -81,8 +81,8 @@ def search_for_value(
     for link_ in links:
         if link_.description and search_entity(
                 entity_values=[float(link_.description)]
-                if parameter['operator']
-                   in ['equal', 'notEqual'] else float(link_.description),
+                if parameter['operator'] in ['equal', 'notEqual']
+                else float(link_.description),
                 operator_=parameter['operator'],
                 search_values=[values[1]],
                 logical_operator=parameter['logicalOperator'],

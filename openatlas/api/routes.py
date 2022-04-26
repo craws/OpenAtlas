@@ -12,7 +12,8 @@ from openatlas.api.v02.endpoints.entity.class_ import GetByClass
 from openatlas.api.v02.endpoints.entity.code import GetByCode
 from openatlas.api.v02.endpoints.entity.entity import GetEntity
 from openatlas.api.v02.endpoints.entity.latest import GetLatest
-from openatlas.api.v02.endpoints.entity.linked_entities import GetLinkedEntities
+from openatlas.api.v02.endpoints.entity.linked_entities import (
+    GetLinkedEntities)
 from openatlas.api.v02.endpoints.entity.query import GetQuery
 from openatlas.api.v02.endpoints.entity.system_class import GetBySystemClass
 from openatlas.api.v02.endpoints.entity.type_entities import GetTypeEntities

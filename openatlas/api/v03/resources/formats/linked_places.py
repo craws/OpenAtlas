@@ -92,7 +92,10 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             continue
         path = get_file_path(link.domain.id)
         files.append({
-            '@id': url_for('api_03.entity', id_=link.domain.id, _external=True),
+            '@id': url_for(
+                'api_03.entity',
+                id_=link.domain.id,
+                _external=True),
             'title': link.domain.name,
             'license': get_license(link.domain),
             'url': url_for(

@@ -34,7 +34,8 @@ class GeneralForm(FlaskForm):
     minimum_password_length = IntegerField(_('minimum password length'))
     reset_confirm_hours = IntegerField(_('reset confirm hours'))
     failed_login_tries = IntegerField(_('failed login tries'))
-    failed_login_forget_minutes = IntegerField(_('failed login forget minutes'))
+    failed_login_forget_minutes = IntegerField(
+        _('failed login forget minutes'))
     minimum_jstree_search = IntegerField(_('minimum jstree search'))
     image_processing = BooleanField(_('image processing'))
     save = SubmitField(_('save'))
@@ -120,8 +121,10 @@ class DisplayForm(FlaskForm):
         choices=list(app.config['TABLE_ROWS'].items()),
         coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
-    table_show_icons = BooleanField(_('show icons in tables'))
-    entity_show_dates = BooleanField(_('show created and modified information'))
+    table_show_icons = BooleanField(
+        _('show icons in tables'))
+    entity_show_dates = BooleanField(
+        _('show created and modified information'))
     entity_show_import = BooleanField(_('show import information'))
     entity_show_class = BooleanField(_('show CIDOC class'))
     entity_show_api = BooleanField(_('show API links'))

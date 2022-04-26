@@ -81,7 +81,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">{uc_first(_("types"))}</a>'
+                f'class="nav-item nav-link {active}">' \
+                f'{uc_first(_("types"))}</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
@@ -498,7 +499,8 @@ def add_reference_systems_to_form(form: Any) -> str:
         html += add_form_row(
             field,
             field.label,
-            f'{field(class_=class_)} {precision_field.label} {precision_field}',
+            f'{field(class_=class_)} {precision_field.label} '
+            f'{precision_field}',
             row_css=f'external-reference {switch_class}')
     return html
 
@@ -539,8 +541,8 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def external_url(url: Union[str, None]) -> str:
     return \
-        f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' \
-        if url else ''
+        f'<a target="blank_" rel="noopener noreferrer" href="{url}">' \
+        f'{url}</a>' if url else ''
 
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
@@ -645,7 +647,7 @@ def button(
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}
-            {f'id="{id_}"' if id_ else ''} 
+            {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
 
@@ -665,7 +667,8 @@ def button_icon(
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
-    css_class = 'btn btn-xsm' if css == '' else app.config['CSS']['button'][css]
+    css_class = 'btn btn-xsm' if css == '' \
+        else app.config['CSS']['button'][css]
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}

@@ -25,4 +25,5 @@ class GetByClass(Resource):
     def get_by_class(class_code: str, parser: dict[str, Any]) -> list[Entity]:
         if class_code not in g.cidoc_classes:
             raise InvalidCidocClassCode  # pragma: no cover
-        return [Entity(row) for row in Db.get_by_class_code(class_code, parser)]
+        return [
+            Entity(row) for row in Db.get_by_class_code(class_code, parser)]

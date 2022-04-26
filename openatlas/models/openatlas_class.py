@@ -50,7 +50,8 @@ class OpenatlasClass:
             icon: Optional[str] = None) -> None:
         self.name = name
         self.label = uc_first(_(name.replace('_', ' ')))
-        self.cidoc_class = g.cidoc_classes[cidoc_class] if cidoc_class else None
+        self.cidoc_class = g.cidoc_classes[cidoc_class] \
+            if cidoc_class else None
         self.hierarchies = hierarchies
         self.standard_type_id = standard_type_id
         self.network_color = color
