@@ -77,19 +77,22 @@ class TableSelect(HiddenInput):
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
         selection = ''
         if field.id in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-            table = Table(['code', 'name'], order=[[0, 'desc']], defs=[
-                {'orderDataType': 'cidoc-model', 'targets': [0]},
-                {'sType': 'numeric', 'targets': [0]}])
+            table = Table(
+                ['code', 'name'],
+                defs=[
+                    {'orderDataType': 'cidoc-model', 'targets': [0]},
+                    {'sType': 'numeric', 'targets': [0]}])
             for id_, entity in (
                     g.properties if field.id == 'cidoc_property'
                     else g.cidoc_classes).items():
-                table.rows.append([
-                    f"""
-                    <a href="#" onclick="selectFromTable(
+                onclick = f'''
+                    onclick=(selectFromTable(
                         this,
                         '{field.id}',
                         '{id_}',
-                        '{entity.code} {entity.name}');">{entity.code}</a>""",
+                        '{entity.code} {entity.name}');"'''
+                table.rows.append([
+                    f'<a href="#" {onclick}>{entity.code}</a>',
                     entity.name])
         else:
             aliases = current_user.settings['table_show_aliases']

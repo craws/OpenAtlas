@@ -38,6 +38,8 @@ class HierarchyTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
+            rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
+            assert b'checked class="" id="multiple"' in rv.data
 
             rv = self.app.get(url_for('hierarchy_insert', category='custom'))
             assert b'+ Custom' in rv.data

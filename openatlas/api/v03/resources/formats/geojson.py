@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
-from openatlas.api.v03.resources.util import \
-    replace_empty_list_values_in_dict_with_none
+from openatlas.api.v03.resources.util import (
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

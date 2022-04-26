@@ -7,9 +7,9 @@ from typing import Any, Union
 import pandas as pd
 from flask import Response, g
 
-from openatlas.api.v03.resources.util import get_all_links, \
-    get_all_links_inverse, get_linked_entities_api, \
-    link_parser_check, remove_duplicate_entities
+from openatlas.api.v03.resources.util import (
+    get_all_links, get_all_links_inverse, get_linked_entities_api,
+    link_parser_check, link_parser_check_inverse, remove_duplicate_entities)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -135,7 +135,7 @@ def export_csv_for_network_analysis(
         with zipped_file.open('links.csv', 'w') as file:
             link_frame = [build_link_dataframe(link_) for link_ in
                           (link_parser_check(entities, parser) +
-                           link_parser_check(entities, parser, True))]
+                           link_parser_check_inverse(entities, parser))]
             file.write(bytes(
                 pd.DataFrame(data=link_frame).to_csv(), encoding='utf8'))
     return Response(

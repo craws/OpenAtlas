@@ -106,7 +106,8 @@ class ApiTests(TestBaseCase):
 
                 # Creation of actor (Frodo)
                 actor = insert_entity(
-                    'Frodo', 'person',
+                    'Frodo',
+                    'person',
                     description='That is Frodo')
 
                 alias2 = insert_entity('The ring bearer', 'appellation')
@@ -617,6 +618,7 @@ class ApiTests(TestBaseCase):
                     view_class='place',
                     sort='desc',
                     column='id',
+                    relation_type='P2',
                     type_id=boundary_mark.id)),
                 self.app.get(url_for(
                     'api_03.latest', latest=2)),
@@ -720,7 +722,7 @@ class ApiTests(TestBaseCase):
                     cidoc_classes='E18',
                     view_classes='artifact',
                     system_classes='person',
-                    limit=1,
+                    limit=0,
                     first=actor2.id))]:
                 rv = rv.get_json()
                 assert bool(rv['pagination']['entities'] == 8)

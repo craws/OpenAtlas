@@ -24,6 +24,10 @@ from openatlas.util.util import (
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # Delete before showing index to prevent additional redirects
+        if current_user.group == 'contributor':  # pragma: no cover
+            info = logger.get_log_info(delete_id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                abort(403)
         if url := delete_entity(delete_id):
             return redirect(url)
     return render_template(

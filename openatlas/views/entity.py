@@ -155,15 +155,17 @@ def view(id_: int) -> Union[str, Response]:
     if not gis_data:  # Has to be after get_entity_data()
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
+    problematic_type_id = entity.check_for_too_many_links_for_single_type()
     tabs['note'] = add_note_tab(entity)
     tabs['info'].content = render_template(
         'entity/view.html',
-        buttons=add_buttons(entity),
+        buttons=add_buttons(entity, bool(problematic_type_id)),
         entity=entity,
         gis_data=gis_data,
         structure=place_structure,
         overlays=overlays,
-        title=entity.name)
+        title=entity.name,
+        problematic_type_id=problematic_type_id)
     return render_template(
         'tabs.html',
         tabs=tabs,
@@ -221,7 +223,7 @@ def add_crumbs(
     return crumbs
 
 
-def add_buttons(entity: Entity) -> list[str]:
+def add_buttons(entity: Entity, type_problem: bool = False) -> list[str]:
     if not is_authorized(entity.class_.write_access):
         return []  # pragma: no cover
     buttons = []
@@ -238,7 +240,8 @@ def add_buttons(entity: Entity) -> list[str]:
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         buttons.append(display_delete_link(entity))
     else:
-        buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
+        if not type_problem:
+            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         if entity.class_.view != 'place' \
                 or not entity.get_linked_entities('P46'):
             buttons.append(display_delete_link(entity))

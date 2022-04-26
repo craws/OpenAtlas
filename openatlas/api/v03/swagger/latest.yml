@@ -11,6 +11,7 @@ parameters:
     schema:
       type: number
   - $ref: '#/components/parameters/showParam'
+  - $ref: '#/components/parameters/relationTypeParam'
   - $ref: '#/components/parameters/downloadParam'
   - $ref: '#/components/parameters/formatParam'
   - $ref: '#/components/parameters/exportParam'

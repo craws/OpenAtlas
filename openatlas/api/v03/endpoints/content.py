@@ -7,8 +7,11 @@ from flask_restful import Resource, marshal
 from openatlas import app
 from openatlas.api.v03.resources.parser import gis, language
 from openatlas.api.v03.resources.resolve_endpoints import download
-from openatlas.api.v03.resources.templates import class_overview_template, \
-    content_template, geometries_template, overview_template
+from openatlas.api.v03.resources.templates import (
+    class_overview_template,
+    content_template,
+    geometries_template,
+    overview_template)
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis

@@ -266,6 +266,18 @@ class Entity:
             return sanitize(name_parts[1][:-1], 'type')  # Remove close bracket
         return name_parts[0]
 
+    def check_for_too_many_links_for_single_type(self) -> Optional[int]:
+        type_dict: dict[int, int] = {}
+        for type_ in self.types:
+            if type_.root[0] in type_dict:
+                type_dict[type_.root[0]] += 1
+            else:
+                type_dict[type_.root[0]] = 1
+        for id_, count in type_dict.items():
+            if count > 1 and not g.types[id_].multiple:
+                return id_
+        return None
+
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [

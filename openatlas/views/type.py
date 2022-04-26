@@ -11,7 +11,8 @@ from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, sanitize
+from openatlas.util.util import get_entities_linked_to_type_recursive, link, \
+    required_group, sanitize
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -122,4 +123,32 @@ def show_untyped_entities(id_: int) -> str:
             [_('types'),
              url_for('type_index')],
             link(hierarchy),
+            _('untyped entities')])
+
+
+@app.route('/type/multiple_linked/<int:id_>')
+@required_group('editor')
+def show_multiple_linked_entities(id_: int) -> str:
+    linked_entities = set()
+    multiple_linked_entities = []
+    for entity in get_entities_linked_to_type_recursive(id_, []):
+        if entity.id in linked_entities:
+            multiple_linked_entities.append(entity)
+        linked_entities.add(entity.id)
+    table = Table(['name', 'class', 'first', 'last', 'description'])
+    for entity in multiple_linked_entities:
+        table.rows.append([
+            link(entity),
+            entity.class_.label,
+            entity.first,
+            entity.last,
+            entity.description])
+    return render_template(
+        'table.html',
+        entity=g.types[id_],
+        table=table,
+        crumbs=[
+            [_('types'),
+             url_for('type_index')],
+            link(g.types[id_]),
             _('untyped entities')])

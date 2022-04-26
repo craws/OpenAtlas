@@ -3,9 +3,9 @@ from typing import Any, Optional, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    InvalidCidocClassCode, InvalidCodeError, InvalidSearchSyntax, \
-    InvalidSystemClassError
+from openatlas.api.v03.resources.error import (
+    EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
+    InvalidSearchSyntax, InvalidSystemClassError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -22,14 +22,6 @@ def get_entity_by_id(id_: int) -> Entity:
 
 def get_entities_by_ids(ids: list[int]) -> list[Entity]:
     return Entity.get_by_ids(ids, types=True, aliases=True)
-
-
-def get_all_links(entities: Union[int, list[int]]) -> list[Link]:
-    return Link.get_links(entities, list(g.properties))
-
-
-def get_all_links_inverse(entities: Union[int, list[int]]) -> list[Link]:
-    return Link.get_links(entities, list(g.properties), inverse=True)
 
 
 def get_license(entity: Entity) -> Optional[str]:
@@ -50,23 +42,12 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
         raise InvalidSearchSyntax from e
 
 
-def link_builder(
-        new_entities: list[Entity],
-        inverse: bool = False) -> list[Link]:
-    e = [e.id for e in new_entities]
-    return get_all_links_inverse(e) if inverse else get_all_links(e)
-
-
 def get_all_subunits_recursive(
         entity: Entity,
-        data: list[dict[Entity, Any]]) -> list[dict[Any, Any]]:
+        data: list[Entity]) -> list[Entity]:
+    data.append(entity)
     if entity.class_.name not in ['artifact', 'human_remains']:
-        sub_entities = entity.get_linked_entities('P46', types=True)
-        data[-1] = {entity: sub_entities if sub_entities else None}
-        if sub_entities:
-            for e in sub_entities:
-                data.append({e: []})
-        if sub_entities:
+        if sub_entities := entity.get_linked_entities('P46', types=True):
             for e in sub_entities:
                 get_all_subunits_recursive(e, data)
     return data
@@ -120,19 +101,6 @@ def get_linked_entities_id_api(id_: int) -> list[Entity]:
     return [*range_ids, *domain_ids]
 
 
-def get_entities_linked_to_type_recursive(
-        id_: int,
-        data: list[Entity]) -> list[Entity]:
-    for entity in g.types[id_].get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
-        data.append(entity)
-    for sub_id in g.types[id_].subs:
-        get_entities_linked_to_type_recursive(sub_id, data)
-    return data
-
-
 def get_entities_linked_to_special_type(id_: int) -> list[Entity]:
     domain_ids = [link_['domain_id'] for link_ in
                   Link.get_links_by_type(g.types[id_])]
@@ -179,14 +147,53 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
         if not (entity.id in seen or seen_add(entity.id))]
 
 
+def get_all_links(
+        entities: Union[int, list[int]],
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
+    codes = list(g.properties) if not codes else codes
+    return Link.get_links(entities, codes)
+
+
+def get_all_links_inverse(
+        entities: Union[int, list[int]],
+        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
+    codes = list(g.properties) if not codes else codes
+    return Link.get_links(entities, codes, inverse=True)
+
+
 def link_parser_check(
-        new_entities: list[Entity],
-        parser: dict[str, Any],
-        inverse: bool = False) -> list[Link]:
+        entities: list[Entity],
+        parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return link_builder(new_entities, inverse)
+        return get_all_links(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
     return []
+
+
+def link_parser_check_inverse(
+        entities: list[Entity],
+        parser: dict[str, Any]) -> list[Link]:
+    if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
+           for i in parser['show']):
+        return get_all_links_inverse(
+            [entity.id for entity in entities],
+            get_properties_for_links(parser))
+    return []
+
+
+def get_properties_for_links(parser: dict[str, Any]) -> Optional[list[str]]:
+    if parser['relation_type']:
+        codes = [code for code in parser['relation_type']]
+        if 'geometry' in parser['show']:
+            codes.append('P53')
+        if 'types' in parser['show']:
+            codes.append('P2')
+        if any(i in ['depictions', 'links'] for i in parser['show']):
+            codes.append('P67')
+        return codes
+    return None
 
 
 def get_reference_systems(
