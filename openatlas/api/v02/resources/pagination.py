@@ -1,12 +1,12 @@
 import itertools
 from typing import Any
 
-from openatlas.api.v02.resources.error import EntityDoesNotExistError, \
-    LastEntityError, NoEntityAvailable, TypeIDError
+from openatlas.api.v02.resources.error import (
+    EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
-from openatlas.api.v02.resources.util import get_all_links, \
-    get_all_links_inverse, get_entity_by_id
+from openatlas.api.v02.resources.util import (
+    get_all_links, get_all_links_inverse, get_entity_by_id)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -14,7 +14,9 @@ from openatlas.models.link import Link
 class Pagination:
 
     @staticmethod
-    def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
+    def get_start_entity(
+            total: list[int],
+            parser: dict[str, Any]) -> list[Any]:
         if parser['first'] and int(parser['first']) in total:
             return list(itertools.islice(
                 total,
@@ -36,7 +38,8 @@ class Pagination:
             parser: dict[str, Any]) -> dict[str, Any]:
         page = parser['page'] \
             if parser['page'] < index[-1]['page'] else index[-1]['page']
-        return [entry['startId'] for entry in index if entry['page'] == page][0]
+        return [
+            entry['startId'] for entry in index if entry['page'] == page][0]
 
     @staticmethod
     def pagination(

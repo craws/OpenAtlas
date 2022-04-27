@@ -23,7 +23,11 @@ from openatlas.util.util import (
 @app.route('/index/<view>/<int:delete_id>')
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
-    if delete_id:  # Delete before showing index to prevent additional redirects
+    if delete_id:  # Delete before showing index to prevent additional redirect
+        if current_user.group == 'contributor':  # pragma: no cover
+            info = logger.get_log_info(delete_id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                abort(403)
         if url := delete_entity(delete_id):
             return redirect(url)
     return render_template(
@@ -96,7 +100,9 @@ def get_table(view: str) -> Table:
 def file_preview(entity_id: int) -> str:
     size = app.config['IMAGE_SIZE']['table']
     parameter = f"loading='lazy' alt='image' width='{size}'"
-    if icon_path := get_file_path(entity_id, app.config['IMAGE_SIZE']['table']):
+    if icon_path := get_file_path(
+            entity_id,
+            app.config['IMAGE_SIZE']['table']):
         url = url_for('display_file', filename=icon_path.name, size=size)
         return f"<img src='{url}' {parameter}>"
     path = get_file_path(entity_id)

@@ -93,7 +93,12 @@ def import_project_view(id_: int) -> str:
                 project=project)),
         'entities': Tab(
             'entities',
-            table=Table(['name', 'class', 'description', 'origin ID', 'date']))}
+            table=Table([
+                'name',
+                'class',
+                'description',
+                'origin ID',
+                'date']))}
     for entity in Entity.get_by_project_id(id_):
         tabs['entities'].table.rows.append([
             link(entity),
@@ -230,7 +235,11 @@ def import_data(project_id: int, class_: str) -> str:
                             and not is_float(row[item]):  # pragma: no cover
                         value = f'<span class="error">{value}</span>'
                         invalid_geoms = True  # pragma: no cover
-                    if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
+                    if item in [
+                            'begin_from',
+                            'begin_to',
+                            'end_from',
+                            'end_to']:
                         if not value:
                             value = ''
                         else:
@@ -295,8 +304,8 @@ def import_data(project_id: int, class_: str) -> str:
                     project,
                     class_label])
 
-        if not form.preview.data and checked_data and \
-                (not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']):
+        if not form.preview.data and checked_data and (
+                not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']):
             Transaction.begin()
             try:
                 Import.import_data(project, class_, checked_data)

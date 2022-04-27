@@ -184,7 +184,7 @@ class Entity:
             {'id': id_})
 
     @staticmethod
-    def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related()
+    def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related
         g.cursor.execute(
             'DELETE FROM model.entity WHERE id IN %(ids)s;',
             {'ids': tuple(ids)})
@@ -250,8 +250,8 @@ class Entity:
                 AND (
                     UNACCENT(LOWER(e.name)) LIKE UNACCENT(LOWER(%(term)s))
                     {description_clause if desc else ''}
-                )                
-            GROUP BY e.id 
+                )
+            GROUP BY e.id
             ORDER BY e.name;
             """, {
                 'term': f'%{term}%',

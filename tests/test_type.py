@@ -22,7 +22,9 @@ class TypeTest(TestBaseCase):
                 place.link('P2', g.types[dimension_type.subs[0]], '46')
                 location = place.get_linked_entity_safe('P53')
                 location.link('P89', g.types[historical_type.subs[0]])
-            rv: Any = self.app.get(url_for('view', id_=historical_type.subs[0]))
+
+            rv: Any = self.app.get(
+                url_for('view', id_=historical_type.subs[0]))
             assert b'Historical place' in rv.data
             rv = self.app.get(url_for('type_index'))
             assert b'Actor actor relation' in rv.data
@@ -132,12 +134,14 @@ class TypeTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Connor MacLeod')
-            rv = self.app.get(url_for('show_untyped_entities', id_=sex_type.id))
+            rv = self.app.get(
+                url_for('show_untyped_entities', id_=sex_type.id))
             assert b'Connor MacLeod' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor.link('P2', g.types[sex_type.subs[0]])
-            rv = self.app.get(url_for('show_untyped_entities', id_=sex_type.id))
+            rv = self.app.get(
+                url_for('show_untyped_entities', id_=sex_type.id))
             assert b'No entries' in rv.data
 
             # Delete
@@ -149,3 +153,29 @@ class TypeTest(TestBaseCase):
                 url_for('type_delete', id_=sub_type_id),
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                frodo = insert_entity('Frodo', 'person')
+                frodo.link(
+                    'P2',
+                    Entity.get_by_id(Type.get_hierarchy('Sex').subs[0]))
+                frodo.link(
+                    'P2',
+                    Entity.get_by_id(Type.get_hierarchy('Sex').subs[1]))
+
+            # Check invalid multiple type links
+            rv = self.app.get(url_for('update', id_=frodo.id))
+            assert b'422' in rv.data
+
+            # Multiple linked entities
+            rv = self.app.get(
+                url_for('show_multiple_linked_entities', id_=sex_type.id))
+            assert b'Frodo' in rv.data
+
+            # Multiple disabled
+            self.app.post(
+                url_for('hierarchy_update', id_=sex_type.id),
+                data={'multiple': True})
+            rv = self.app.get(url_for('hierarchy_update', id_=sex_type.id))
+            assert b'disabled="disabled" id="multiple"' in rv.data

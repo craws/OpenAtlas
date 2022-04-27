@@ -1,12 +1,24 @@
 versions = {
-    '7.2.0': ['TBA', {
+    '7.3.0': ['TBA', {
+        'features': {
+            '1388': 'Allow contributor group to delete only own entries',
+            '1501': 'Set multiple choice types to single type',
+            '1698': 'Prevent accidentally deletion of type links',
+            '1631': 'Join database GIS tables',
+            '1655': 'API: Performance improvement',
+            '1697': 'Refactor'},
+        'fix': {
+            '1683': 'Broken table sorting for CIDOC columns'}}],
+    '7.2.0': ['2022-04-02', {
         'feature': {
             '1445': 'Anthropological sex estimation',
             '1628': 'New maps',
             '1151': 'Map marker improvements',
+            '1680': 'Add new connections to the network visualization',
             '1491': 'API: CSV export for network analysis',
             '1672': 'API: External references for types in subunits endpoint',
             '1639': 'Refactor',
+            '1677': 'Adding a requirements.txt for alternative installation',
             '1406': 'Update OpenAtlas Website'},
         'fix': {
             '1588': 'Map problems adding geometries after deleting geometries',
@@ -619,4 +631,4 @@ versions = {
         'feature': {
             '':
                 'Initial version based on the "Zend Base" project from '
-                '<a  target="_blank" href="https://craws.net">craws.net</a>'}}]}
+                '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}

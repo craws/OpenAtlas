@@ -1,8 +1,8 @@
 from typing import Any, Union
 
-from openatlas.api.v03.resources.error import FilterColumnError, \
-    FilterLogicalOperatorError, FilterOperatorError, NoSearchStringError, \
-    ValueNotIntegerError
+from openatlas.api.v03.resources.error import (
+    FilterColumnError, FilterLogicalOperatorError, FilterOperatorError,
+    NoSearchStringError, ValueNotIntegerError)
 
 logical_operators: list[str] = ['and', 'or']
 str_categories: list[str] = [

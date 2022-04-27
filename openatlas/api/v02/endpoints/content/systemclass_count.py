@@ -4,8 +4,8 @@ from flasgger import swag_from
 from flask import Response
 from flask_restful import Resource, marshal
 
-from openatlas.api.v02.templates.systemclass_count import \
-    SystemClsCountTemplate
+from openatlas.api.v02.templates.systemclass_count import (
+    SystemClsCountTemplate)
 from openatlas.models.entity import Entity
 
 

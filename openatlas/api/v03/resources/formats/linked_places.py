@@ -3,15 +3,15 @@ from typing import Any, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.util import \
-    get_geometries, get_license, get_reference_systems, \
-    replace_empty_list_values_in_dict_with_none, to_camel_case
+from openatlas.api.v03.resources.util import (
+    get_geometries, get_license, get_reference_systems,
+    replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_path
 
 
-def get_entity(
+def get_linked_places_entity(
         entity: Entity,
         links: list[Link],
         links_inverse: list[Link],
@@ -27,20 +27,20 @@ def get_entity(
             'systemClass': entity.class_.name,
             'properties': {'title': entity.name},
             'types': get_lp_types(entity, links)
-                if 'types' in parser['show'] else None,
+            if 'types' in parser['show'] else None,
             'depictions': get_lp_file(links_inverse)
-                if 'depictions' in parser['show'] else None,
+            if 'depictions' in parser['show'] else None,
             'when': {'timespans': [get_lp_time(entity)]}
-                if 'when' in parser['show'] else None,
+            if 'when' in parser['show'] else None,
             'links': get_reference_systems(links_inverse)
-                if 'links' in parser['show'] else None,
+            if 'links' in parser['show'] else None,
             'descriptions': [{'value': entity.description}],
             'names': [{"alias": value} for value in entity.aliases.values()]
-                if entity.aliases and 'names' in parser['show'] else None,
+            if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
-                if 'geometry' in parser['show'] else None,
-            'relations': get_lp_links(links, links_inverse)
-                if 'relations' in parser['show'] else None})]}
+            if 'geometry' in parser['show'] else None,
+            'relations': get_lp_links(links, links_inverse, parser)
+            if 'relations' in parser['show'] else None})]}
 
 
 def relation_type(link_: Link, inverse: bool = False) -> str:
@@ -69,12 +69,19 @@ def link_dict(link_: Link, inverse: bool = False) -> dict[str, Any]:
 
 def get_lp_links(
         links: list[Link],
-        links_inverse: list[Link]) -> list[dict[str, str]]:
+        links_inverse: list[Link],
+        parser: dict[str, Any]) -> list[dict[str, str]]:
+    properties = parser['relation_type'] \
+        if parser['relation_type'] else list(g.properties)
     out = []
     for link_ in links:
-        out.append(link_dict(link_))
+        if link_.property.code in properties:
+            out.append(link_dict(link_))
+        continue
     for link_ in links_inverse:
-        out.append(link_dict(link_, inverse=True))
+        if link_.property.code in properties:
+            out.append(link_dict(link_, inverse=True))
+        continue
     return out
 
 
@@ -85,7 +92,10 @@ def get_lp_file(links_inverse: list[Link]) -> list[dict[str, str]]:
             continue
         path = get_file_path(link.domain.id)
         files.append({
-            '@id': url_for('api_03.entity', id_=link.domain.id, _external=True),
+            '@id': url_for(
+                'api_03.entity',
+                id_=link.domain.id,
+                _external=True),
             'title': link.domain.name,
             'license': get_license(link.domain),
             'url': url_for(

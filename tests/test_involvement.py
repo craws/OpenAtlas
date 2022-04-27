@@ -30,7 +30,8 @@ class InvolvementTests(TestBaseCase):
                 involvement = Type.get_hierarchy('Involvement')
 
             # Add involvement
-            rv = self.app.get(url_for('involvement_insert', origin_id=actor.id))
+            rv = self.app.get(
+                url_for('involvement_insert', origin_id=actor.id))
             assert b'Involvement' in rv.data
             rv = self.app.post(
                 url_for('involvement_insert', origin_id=actor.id),

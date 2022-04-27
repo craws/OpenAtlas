@@ -218,7 +218,8 @@ errors = {
         "timestamp": datetime.datetime.now(),
         "status": 404},
     "InvalidSearchSyntax": {
-        "message": "The search syntax contains errors. Please read the manual.",
+        "message":
+            "The search syntax contains errors. Please read the manual.",
         "title": "Incorrect search syntax",
         "timestamp": datetime.datetime.now(),
         "status": 404},

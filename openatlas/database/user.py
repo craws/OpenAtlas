@@ -126,12 +126,12 @@ class User:
         g.cursor.execute(
             f"""
             SELECT
-                id, user_id, 
-                entity_id, 
-                created, 
-                action, 
+                id, user_id,
+                entity_id,
+                created,
+                action,
                 'ignore' AS ignore
-            FROM web.user_log 
+            FROM web.user_log
             WHERE TRUE
                 {'AND user_id = %(id)s' if int(user_id) else ''}
                 {'AND action = %(action)s' if action != 'all' else ''}
@@ -179,7 +179,8 @@ class User:
 
     @staticmethod
     def get_users_for_form() -> list[tuple[int, str]]:
-        g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
+        g.cursor.execute(
+            'SELECT id, username FROM web.user ORDER BY username;')
         return [(row['id'], row['username']) for row in g.cursor.fetchall()]
 
     @staticmethod

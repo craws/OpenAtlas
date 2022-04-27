@@ -39,7 +39,7 @@ class ActorTests(TestBaseCase):
                 'residence': residence_id,
                 'begins_in': residence_id,
                 'ends_in': residence_id,
-                'description': 'Susan Alexandra Weaver is an American actress.',
+                'description': 'Susan Alexandra Weaver is an American actress',
                 'begin_year_from': '-1949',
                 'begin_month_from': '10',
                 'begin_day_from': '8',

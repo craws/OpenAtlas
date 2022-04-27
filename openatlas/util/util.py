@@ -81,7 +81,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">{uc_first(_("types"))}</a>'
+                f'class="nav-item nav-link {active}">' \
+                f'{uc_first(_("types"))}</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
@@ -498,7 +499,8 @@ def add_reference_systems_to_form(form: Any) -> str:
         html += add_form_row(
             field,
             field.label,
-            f'{field(class_=class_)} {precision_field.label} {precision_field}',
+            f'{field(class_=class_)} {precision_field.label} '
+            f'{precision_field}',
             row_css=f'external-reference {switch_class}')
     return html
 
@@ -539,8 +541,8 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def external_url(url: Union[str, None]) -> str:
     return \
-        f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' \
-        if url else ''
+        f'<a target="blank_" rel="noopener noreferrer" href="{url}">' \
+        f'{url}</a>' if url else ''
 
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
@@ -584,6 +586,10 @@ def display_delete_link(entity: Entity) -> str:
     if entity.id in g.types:
         url = url_for('type_delete', id_=entity.id)
     else:
+        if current_user.group == 'contributor':  # pragma: no cover
+            info = logger.get_log_info(entity.id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                return ''
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
     confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
     return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
@@ -599,11 +605,10 @@ def link(
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
-        return '<a href="{url}" class="{class_}" {js}>{label}</a>'.format(
-            url=url,
-            class_=class_,
-            js=f'onclick="{js}"' if js else '',
-            label=(uc_first(str(object_))) if uc_first_ else object_)
+        js = f'onclick="{js}"' if js else ''
+        label = uc_first(str(object_)) if uc_first_ else object_
+        class_ = 'class="{class_}"' if class_ else ''
+        return f'<a href="{url}" {class_} {js}>{label}</a>'
     if isinstance(object_, Entity):
         return link(
             object_.name,
@@ -642,7 +647,7 @@ def button(
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}
-            {f'id="{id_}"' if id_ else ''} 
+            {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
 
@@ -662,7 +667,8 @@ def button_icon(
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
-    css_class = 'btn btn-xsm' if css == '' else app.config['CSS']['button'][css]
+    css_class = 'btn btn-xsm' if css == '' \
+        else app.config['CSS']['button'][css]
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}
@@ -761,7 +767,7 @@ def description(entity: Union[Entity, Project]) -> str:
                 f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
                 f"<p>{result}</p>"
     if not entity.description:
-        return  Markup(html)
+        return Markup(html)
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
@@ -1023,3 +1029,16 @@ def datetime64_to_timestamp(
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
     return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
+
+
+def get_entities_linked_to_type_recursive(
+        id_: int,
+        data: list[Entity]) -> list[Entity]:
+    for entity in g.types[id_].get_linked_entities(
+            ['P2', 'P89'],
+            inverse=True,
+            types=True):
+        data.append(entity)
+    for sub_id in g.types[id_].subs:
+        get_entities_linked_to_type_recursive(sub_id, data)
+    return data

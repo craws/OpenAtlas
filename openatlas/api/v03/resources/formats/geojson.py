@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
-from openatlas.api.v03.resources.util import \
-    replace_empty_list_values_in_dict_with_none
+from openatlas.api.v03.resources.util import (
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -10,9 +10,8 @@ from openatlas.models.link import Link
 def get_geojson(entities: list[Entity]) -> dict[str, Any]:
     out = []
     for entity in entities:
-        if geoms := [
-            get_geojson_dict(entity, geom)
-            for geom in get_geom(entity)]:
+        if geoms := \
+                [get_geojson_dict(entity, geom) for geom in get_geom(entity)]:
             out.extend(geoms)
         else:
             out.append(get_geojson_dict(entity))

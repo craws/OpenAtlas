@@ -42,7 +42,8 @@ def validate(self: FlaskForm) -> bool:
                         and f'{prefix}_to' in dates \
                         and dates[f'{prefix}_from'] > dates[f'{prefix}_to']:
                     field = getattr(self, f'{prefix}_day_from')
-                    field.errors.append(_('First date cannot be after second.'))
+                    field.errors.append(
+                        _('First date cannot be after second.'))
                     valid = False
         if 'begin_from' in dates and 'end_from' in dates:
             field = getattr(self, 'begin_day_from')
@@ -97,7 +98,8 @@ def validate(self: FlaskForm) -> bool:
                 valid = False
                 field.errors.append(uc_first(_('precision required')))
             if field.label.text == 'Wikidata':
-                if field.data[0].upper() != 'Q' or not field.data[1:].isdigit():
+                if field.data[0].upper() != 'Q' \
+                        or not field.data[1:].isdigit():
                     field.errors.append(uc_first(_('wrong id format') + '.'))
                     valid = False
                 else:

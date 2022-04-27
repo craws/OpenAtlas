@@ -49,7 +49,7 @@ class Overlay:
         g.cursor.execute(
             """
             SELECT id, place_id, image_id, bounding_box
-            FROM web.map_overlay 
+            FROM web.map_overlay
             WHERE id = %(id)s;
             """,
             {'id': id_})

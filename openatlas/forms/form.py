@@ -214,7 +214,7 @@ def add_value_type_fields(form: Any, subs: list[int]) -> None:
 def add_types(form: Any, class_: str) -> None:
     types = OrderedDict(
         {id_: g.types[id_] for id_ in g.classes[class_].hierarchies})
-    if g.classes[class_].standard_type_id in types:  # Move standard type to top
+    if g.classes[class_].standard_type_id in types:  # Standard type to top
         types.move_to_end(g.classes[class_].standard_type_id, last=False)
     for type_ in types.values():
         if type_.multiple:
@@ -318,7 +318,8 @@ def add_fields(
         setattr(form, 'placeholder', StringField(_('example ID')))
         precision_id = str(Type.get_hierarchy('External reference match').id)
         setattr(form, precision_id, TreeField(precision_id))
-        if choices := ReferenceSystem.get_class_choices(entity):  # type: ignore
+        if choices := ReferenceSystem.get_class_choices(
+                entity):  # type: ignore
             setattr(form, 'classes', SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
@@ -363,7 +364,9 @@ def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
             [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
         return uc_first(_('no entries'))
-    return render_template('forms/form_table.html', table=table.display(class_))
+    return render_template(
+        'forms/form_table.html',
+        table=table.display(class_))
 
 
 def build_move_form(type_: Type) -> FlaskForm:

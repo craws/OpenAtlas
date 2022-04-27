@@ -1,4 +1,4 @@
-# This script is for developing purposes and is not needed to install OpenAtlas.
+# This script is for developing purposes and not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
 # Currently we are using CIDOC CRM 7.7.1 (October 2021) from

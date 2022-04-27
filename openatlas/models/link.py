@@ -8,7 +8,8 @@ from openatlas import logger
 from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.util.util import datetime64_to_timestamp, timestamp_to_datetime64
+from openatlas.util.util import (
+    datetime64_to_timestamp, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -140,7 +141,8 @@ class Link:
         from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         return Entity.get_by_ids(
-            Db.get_linked_entities(id_, codes, inverse),
+            Db.get_linked_entities_inverse(id_, codes) if inverse
+            else Db.get_linked_entities(id_, codes),
             types=types)
 
     @staticmethod
@@ -194,7 +196,8 @@ class Link:
                 and not inverse:
             if anthropological_data := Anthropology.get_types(entity.id):
                 Db.remove_types(
-                    entity.id, [row['link_id'] for row in anthropological_data])
+                    entity.id,
+                    [row['link_id'] for row in anthropological_data])
                 codes.remove('P2')
                 if not codes:
                     return

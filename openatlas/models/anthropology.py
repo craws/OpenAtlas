@@ -216,7 +216,8 @@ class SexEstimation:
         weight = 0
         for row in types:
             if row['description'] not in ['', 'Not preserved']:
-                value = SexEstimation.features[g.types[row['id']].name]['value']
+                value = SexEstimation.features[
+                    g.types[row['id']].name]['value']
                 weight += value
                 result += value * SexEstimation.options[row['description']]
         return None if weight == 0 else round(result / weight, 2)
@@ -230,7 +231,9 @@ class SexEstimation:
             Link.delete_(dict_['link_id'])
         SexEstimation.prepare_feature_types()
         for name, item in data.items():
-            entity.link('P2', g.types[SexEstimation.features[name]['id']], item)
+            entity.link(
+                'P2',
+                g.types[SexEstimation.features[name]['id']], item)
 
     @staticmethod
     def get_types(entity: Entity) -> list[dict[str, Any]]:

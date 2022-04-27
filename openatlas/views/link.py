@@ -164,7 +164,10 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
         try:
             link_.delete()
             link_ = Link.get_by_id(
-                event.link(form.activity.data, actor, form.description.data)[0])
+                event.link(
+                    form.activity.data,
+                    actor,
+                    form.description.data)[0])
             link_.set_dates(process_form_dates(form))
             link_.type = get_link_type(form)
             link_.update()

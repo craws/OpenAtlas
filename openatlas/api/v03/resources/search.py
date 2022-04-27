@@ -2,11 +2,11 @@ from typing import Any, Tuple, Union
 
 from flask import g
 
-from openatlas.api.v03.resources.search_validation import \
-    check_if_date, check_if_date_search
-from openatlas.api.v03.resources.util import \
-    flatten_list_and_remove_duplicates, get_all_links_inverse, \
-    get_linked_entities_id_api
+from openatlas.api.v03.resources.search_validation import (
+    check_if_date, check_if_date_search)
+from openatlas.api.v03.resources.util import (
+    flatten_list_and_remove_duplicates, get_all_links_inverse,
+    get_linked_entities_id_api)
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -48,9 +48,9 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
             parameter.update({
                 "search_values": get_search_values(category, i),
                 "logical_operator": i['logicalOperator']
-                    if 'logicalOperator' in i else 'or',
+                if 'logicalOperator' in i else 'or',
                 "operator": 'equal'
-                    if category == "valueTypeID" else i['operator'],
+                if category == "valueTypeID" else i['operator'],
                 "category": category,
                 "is_date": check_if_date_search(category)})
     return parameter
@@ -81,8 +81,8 @@ def search_for_value(
     for link_ in links:
         if link_.description and search_entity(
                 entity_values=[float(link_.description)]
-                    if parameter['operator']
-                        in ['equal', 'notEqual'] else float(link_.description),
+                if parameter['operator'] in ['equal', 'notEqual']
+                else float(link_.description),
                 operator_=parameter['operator'],
                 search_values=[values[1]],
                 logical_operator=parameter['logicalOperator'],

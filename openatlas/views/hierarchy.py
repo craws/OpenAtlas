@@ -1,8 +1,7 @@
-from typing import Optional, Union
+from typing import Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -13,7 +12,9 @@ from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, sanitize, uc_first
+from openatlas.util.util import (
+    get_entities_linked_to_type_recursive, link, required_group, sanitize,
+    uc_first)
 
 
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
@@ -32,7 +33,8 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
                 type_,  # type: ignore
                 category,
                 form.classes.data,
-                is_multiple(form, category))
+                (category == 'value' or
+                 (hasattr(form, 'multiple') and form.multiple.data))),
             type_.update(process_form_data(form, type_))
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -60,7 +62,14 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         abort(403)
     form = build_form('hierarchy', hierarchy)
     form.classes.choices = Type.get_class_choices(hierarchy)
-    if hasattr(form, 'multiple') and form.multiple.data:
+    linked_entities = set()
+    has_multiple_links = False
+    for entity in get_entities_linked_to_type_recursive(id_, []):
+        if entity.id in linked_entities:
+            has_multiple_links = True
+            break
+        linked_entities.add(entity.id)
+    if hasattr(form, 'multiple') and has_multiple_links:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
         if form.name.data != hierarchy.name and Type.get_types(form.name.data):
@@ -72,7 +81,11 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                     hierarchy,
                     sanitize(form.name.data),
                     form.classes.data,
-                    is_multiple(form, hierarchy.category, hierarchy))
+                    multiple=(
+                            hierarchy.category == 'value'
+                            or (hasattr(form, 'multiple')
+                                and form.multiple.data)
+                            or has_multiple_links))
                 hierarchy.update(process_form_data(form, hierarchy))
                 Transaction.commit()
             except Exception as e:  # pragma: no cover
@@ -115,7 +128,10 @@ def remove_class(id_: int, class_name: str) -> Response:
         Type.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'remove class from hierarchy failed', e)
+        logger.log(
+            'error',
+            'database',
+            'remove class from hierarchy failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 
@@ -129,17 +145,3 @@ def hierarchy_delete(id_: int) -> Response:
     type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('type_index'))
-
-
-def is_multiple(
-        form: FlaskForm,
-        category: str,
-        hierarchy: Optional[Type] = None) -> bool:
-    if category == 'value' \
-        or (hierarchy and hierarchy.multiple) \
-        or (
-            hasattr(form, 'multiple')
-            and form.multiple
-            and form.multiple.data):
-        return True
-    return False  # pragma: no cover

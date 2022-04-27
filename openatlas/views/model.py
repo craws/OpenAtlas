@@ -89,7 +89,10 @@ def openatlas_class_index() -> str:
         'add type',
         _('color'),
         _('icon'),
-        'count'])
+        'count'],
+        defs=[
+            {'orderDataType': 'cidoc-model', 'targets': [1]},
+            {'sType': 'numeric', 'targets': [1]}])
     class_count = OpenatlasClass.get_class_count()
     for class_ in g.classes.values():
         table.rows.append([
@@ -151,7 +154,7 @@ def property_index() -> str:
         defs=[
             {'className': 'dt-body-right', 'targets': 7},
             {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
-            {'sType': 'numeric', 'targets': [0]}])
+            {'sType': 'numeric', 'targets': [0, 3, 5]}])
     for property_ in properties.values():
         table.rows.append([
             link(property_),
