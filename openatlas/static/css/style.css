@@ -617,7 +617,10 @@ div.data-table div.display-none {
 }
 
 .table tr {
-  line-height: 0.3;
+  line-height: 0.9;
+}
+.table tr p{
+  margin:  0.2rem 0 0.2rem 0;
 }
 
 .toolbar {
