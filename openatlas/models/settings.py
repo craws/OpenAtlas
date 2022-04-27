@@ -8,7 +8,7 @@ class Settings:
 
     @staticmethod
     def get_settings() -> dict[str, Any]:
-        settings: dict[str, Union[int, str, list[str]]] = {}
+        settings: dict[str, Any] = {}
         for name in Settings.MODULES:  # Set empty in case it doesn't exist
             settings[f'module_{name}'] = ''
         for row in Db.get_settings():

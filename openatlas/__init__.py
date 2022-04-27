@@ -63,6 +63,7 @@ def before_request() -> None:
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid files overhead if not using Apache with static alias
     g.db = open_connection(app.config)
+    g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
