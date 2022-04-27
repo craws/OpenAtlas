@@ -38,21 +38,42 @@ cursor = db.cursor(cursor_factory=extras.DictCursor)
 settings = Settings.get_settings(cursor)
 
 
+def database_upgrade():
+    print(f"{VERSION} OpenAtlas version")
+    print(f"{DATABASE_VERSION} Database version required")
+
+    check_database_version_exist()
+    print(f"{settings['database_version']} Installed database version")
+
+    check_database_version_supported()
+    check_upgrade_needed()
+
+
 def end_output():
     print(f'Execution time: {int(time.time() - start)} seconds')
     exit()
 
 
-print(f"{VERSION} OpenAtlas version")
-print(f"{DATABASE_VERSION} Database version required")
-print(f"{settings['database_version']} Installed database version")
-print('')
-if DATABASE_VERSION == settings['database_version']:
-    print(
-        'The current database version already matches the required one. '
-        'Have a nice day.')
-    end_output()
+def check_database_version_exist():
+    if 'database_version' not in settings:
+        print(
+            'Sadly, this database is too old to be upgraded automatically '
+            '(database version unknown).')
+        end_output()
 
-if VERSION not in database_versions:
-    print(f"Sadly, version {VERSION} isn't supported for automatic upgrades.")
-    end_output()
+
+def check_upgrade_needed():
+    if DATABASE_VERSION == settings['database_version']:
+        print(
+            'The current database version already matches the required one. '
+            'Have a nice day.')
+        end_output()
+
+
+def check_database_version_supported():
+    if VERSION not in database_versions:
+        print(f"Sadly, version {VERSION} isn't supported for automatic upgrades.")
+        end_output()
+
+
+database_upgrade()
