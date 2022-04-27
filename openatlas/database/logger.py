@@ -46,7 +46,7 @@ class Logger:
             {'user_id': user_id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
-    def get_log_for_advanced_view(entity_id: str) -> dict[str, Any]:
+    def get_log_for_advanced_view(entity_id: int) -> dict[str, Any]:
         sql = """
             SELECT ul.created, ul.user_id, ul.entity_id, u.username
             FROM web.user_log ul
