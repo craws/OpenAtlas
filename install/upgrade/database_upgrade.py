@@ -29,15 +29,10 @@ for item in config:
     except:
         pass
 
-
-print(f"{VERSION} OpenAtlas version")
-print(f"{DATABASE_VERSION} Database version required")
-
 db = open_connection(config)
 cursor = db.cursor(cursor_factory=extras.DictCursor)
 settings = Settings.get_settings(cursor)
-database_version = ''
-for item in settings:
-    if item['name'] == 'database_version':
-        database_version = item['value']
-print(f"{database_version} Installed database version")
+
+print(f"{VERSION} OpenAtlas version")
+print(f"{DATABASE_VERSION} Database version required")
+print(f"{settings['database_version']} Installed database version")
