@@ -954,7 +954,7 @@ def display_value_type_fields(
                     <div
                             class="d-flex justify-content-between"
                             style="width:16.15em;">
-                        <div class="ml-{level} position-relative text-wrap">
+                        <div class="ms-{level} position-relative text-wrap">
                             <div class="value-type-expander">
                                 {expand_button}
                             </div>
@@ -962,7 +962,7 @@ def display_value_type_fields(
                         </div>
                         {field(class_='value-type')}
                     </div>
-                    <span class="ml-1">
+                    <span class="ms-1">
                         {sub.description if sub.description else ''}
                     </span>
                 </div>

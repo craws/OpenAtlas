@@ -1,5 +1,5 @@
 <div class="btn-toolbar">
-    <div class="btn-group mr-2">
+    <div class="btn-group me-2">
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='lp') }}"
            target="_blank">
@@ -10,7 +10,7 @@
             <i class="fas fa-download"></i>
         </a>
     </div>
-    <div class="btn-group mr-2">
+    <div class="btn-group me-2">
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='geojson') }}"
            target="_blank">
@@ -22,7 +22,7 @@
         </a>
     </div>
 
-    <div class="btn-group mr-2">
+    <div class="btn-group me-2">
         <a class="{{ config.CSS.button.primary }}"
            href=" {{ url_for('api.entity', id_=entity.id, format='xml') }}"
            target="_blank">
@@ -50,7 +50,7 @@
         </a>
     </div>
 
-    <div class="btn-group mr-2">
+    <div class="btn-group me-2">
         <a class="{{ config.CSS.button.primary }}"
            href="{{ url_for('api.entity', id_=entity.id, export='csv') }}">
             CSV
