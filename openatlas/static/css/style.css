@@ -718,3 +718,8 @@ span[id^="value-type-switcher-"]{
   top: -0.1em;
   left: -1.7em;
 }
+
+.breadcrumb{
+  padding: .75rem 1rem !important;
+  background-color: #e9ecef !important;
+}
