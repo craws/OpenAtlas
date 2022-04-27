@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from openatlas import open_connection
 from openatlas.database.settings import Settings
+from config.database_versions import database_versions
 from config.default import (
     DATABASE_PASS, VERSION, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
     DATABASE_HOST, DATABASE_PORT)
@@ -50,4 +51,8 @@ if DATABASE_VERSION == settings['database_version']:
     print(
         'The current database version already matches the required one. '
         'Have a nice day.')
+    end_output()
+
+if VERSION not in database_versions:
+    print(f"Sadly, version {VERSION} isn't supported for automatic upgrades.")
     end_output()
