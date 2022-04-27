@@ -103,7 +103,7 @@
       "langParam": {
         "description": "Select output language",
         "in": "query",
-        "name": "language",
+        "name": "lang",
         "schema": {
           "enum": [
             "en",
