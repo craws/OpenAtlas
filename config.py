@@ -4,7 +4,7 @@ from pathlib import Path
 from openatlas import app
 
 VERSION = '7.3.0'
-DATABASE_VERSION = '7.2.0'
+DATABASE_VERSION = '7.3.0'
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
@@ -67,7 +67,7 @@ RDF_FORMATS = {
 JSON_FORMATS = {
     'lp': 'application/json',
     'geojson': 'application/json'}
-API_FORMATS = {**RDF_FORMATS, **JSON_FORMATS}
+API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
@@ -90,5 +90,5 @@ CSS = {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-secondary btn-xsm'}}
 
-# Property types work differently than regular types, e.g. no move functionality
+# Property types work differently, e.g. no move functionality
 PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']

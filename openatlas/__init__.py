@@ -33,13 +33,12 @@ from openatlas.models.logger import Logger
 logger = Logger()
 
 from openatlas.api import api
-from openatlas.util import processor
 from openatlas.util.util import convert_size
 from openatlas.views import (
-    admin, ajax, anthropology, entity, entity_index, entity_form, error, export,
-    file, hierarchy, index, involvement, imports, link, login, member, model,
-    note, overlay, profile, reference, relation, reference_system, search, sql,
-    type as type_, user)
+    admin, ajax, anthropology, entity, entity_index, entity_form, error,
+    export, file, hierarchy, index, involvement, imports, link, login, member,
+    model, note, overlay, profile, reference, relation, reference_system,
+    search, sql, type as type_, user)
 
 
 @babel.localeselector
@@ -61,7 +60,7 @@ def before_request() -> None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Avoid overhead for files if not using Apache with static alias
+        return  # Avoid file overhead if not using Apache with static alias
     open_connection(app.config)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()

@@ -65,7 +65,9 @@ class ImageTest(TestBaseCase):
                 copyfile(src_png, dst_png)
 
                 file2 = insert_entity('Test_File2', 'file')
-                file2.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
+                file2.link(
+                    'P2',
+                    g.types[Type.get_hierarchy('License').subs[0]])
                 file2_name = f'{file2.id}.jpeg'
                 src2_png = \
                     pathlib.Path(app.root_path) \
@@ -134,9 +136,11 @@ class ImageTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Resized orphaned images were deleted' in rv.data
 
-            rv = self.app.get(url_for('index', view='file', delete_id=file.id))
+            rv = self.app.get(
+                url_for('index', view='file', delete_id=file.id))
             assert b'The entry has been deleted' in rv.data
-            rv = self.app.get(url_for('index', view='file', delete_id=file2.id))
+            rv = self.app.get(
+                url_for('index', view='file', delete_id=file2.id))
             assert b'The entry has been deleted' in rv.data
 
             shutil.rmtree(

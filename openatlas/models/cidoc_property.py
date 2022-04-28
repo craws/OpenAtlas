@@ -60,7 +60,10 @@ class CidocProperty:
             valid_subs: list[int]) -> bool:
         for sub_id in valid_subs:
             if sub_id == class_id or \
-                    self.find_subs(attr, class_id, g.cidoc_classes[sub_id].sub):
+                    self.find_subs(
+                        attr,
+                        class_id,
+                        g.cidoc_classes[sub_id].sub):
                 return True
         return False
 

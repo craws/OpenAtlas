@@ -29,19 +29,17 @@ class ExportCsvForm(FlaskForm):
             ('coordinates', _('coordinates')),
             ('wkt', 'WKT'),
             ('postgis', 'PostGIS Geometry')])
-    model_cidoc_class = BooleanField('model.cidoc_class', default=True)
-    model_cidoc_class_inheritance = BooleanField(
-        'model.cidoc_class_inheritance',
+    cidoc_class = BooleanField('cidoc class', default=True)
+    cidoc_class_inheritance = BooleanField(
+        'cidoc class inheritance',
         default=True)
-    model_entity = BooleanField('model.entity', default=True)
-    model_link = BooleanField('model.link', default=True)
-    model_property = BooleanField('model.property', default=True)
-    model_property_inheritance = BooleanField(
-        'model.property_inheritance',
+    entity = BooleanField('entity', default=True)
+    link = BooleanField('link', default=True)
+    property = BooleanField('property', default=True)
+    property_inheritance = BooleanField(
+        'property inheritance',
         default=True)
-    gis_point = BooleanField('gis.point', default=True)
-    gis_linestring = BooleanField('gis.linestring', default=True)
-    gis_polygon = BooleanField('gis.polygon', default=True)
+    gis = BooleanField('gis', default=True)
     save = SubmitField(uc_first(_('export CSV')))
 
 

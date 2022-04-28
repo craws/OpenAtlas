@@ -62,7 +62,8 @@ def replace_empty_list_values_in_dict_with_none(
 
 
 def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
-    class_codes = list(g.cidoc_classes) if 'all' in class_codes else class_codes
+    class_codes = list(g.cidoc_classes) \
+        if 'all' in class_codes else class_codes
     if not all(cc in g.cidoc_classes for cc in class_codes):
         raise InvalidCidocClassCode
     return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
@@ -141,7 +142,7 @@ def get_key(entity: Entity, parser: str) -> str:
 
 def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
     seen = set()  # type: ignore
-    seen_add = seen.add  # Do not change, faster than always call seen.add(e.id)
+    seen_add = seen.add  # Do not change, faster than always call seen.add()
     return [
         entity for entity in entities
         if not (entity.id in seen or seen_add(entity.id))]

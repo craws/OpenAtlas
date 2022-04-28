@@ -1,4 +1,4 @@
--- Information needed in the web application, e.g. users
+-- Information needed for the web application, e.g. users groups
 
 INSERT INTO web.group (name) VALUES
     ('admin'),
@@ -15,7 +15,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
     (SELECT id FROM web.group WHERE name = 'admin'));
 
 INSERT INTO web.settings (name, value) VALUES
-    ('database_version', '7.2.0'),
+    ('database_version', '7.3.0'),
     ('api_public', ''),
     ('default_language', 'en'),
     ('table_rows', '25'),

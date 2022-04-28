@@ -6,9 +6,9 @@ from flask import g
 class Settings:
 
     @staticmethod
-    def get_settings() -> list[dict[str, str]]:
+    def get_settings() -> dict[str, str]:
         g.cursor.execute("SELECT name, value FROM web.settings;")
-        return [dict(row) for row in g.cursor.fetchall()]
+        return {row['name']: row['value'] for row in g.cursor.fetchall()}
 
     @staticmethod
     def update(field_name: str, value: Any) -> None:

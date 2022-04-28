@@ -1,22 +1,25 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
+from pathlib import Path
 from typing import Any, Optional, Union
 
 import numpy
-from flask import g
+from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
+from wtforms import StringField
 
+from openatlas import app
 from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import sanitize, uc_first
+from openatlas.util.util import get_file_extension, sanitize, uc_first
 
 
 def get_link_type(form: Any) -> Optional[Entity]:
@@ -459,3 +462,22 @@ def form_to_datetime64(
     except ValueError:
         return None
     return date_time
+
+
+class GlobalSearchForm(FlaskForm):
+    term = StringField('', render_kw={"placeholder": _('search term')})
+
+
+@app.context_processor
+def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
+    def get_logo() -> str:
+        if g.settings['logo_file_id']:
+            ext = get_file_extension(int(g.settings['logo_file_id']))
+            if ext != 'N/A':
+                return url_for(
+                    'display_logo',
+                    filename=f"{g.settings['logo_file_id']}{ext}")
+        return str(Path('/static') / 'images' / 'layout' / 'logo.png')
+    return dict(
+        get_logo=get_logo(),
+        search_form=GlobalSearchForm(prefix='global'))

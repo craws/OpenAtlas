@@ -146,4 +146,7 @@ def profile_password() -> Union[str, Response]:
         'user/password.html',
         form=form,
         title=_('profile'),
-        crumbs=[[_('profile'), url_for('profile_index')], _('change password')])
+        crumbs=[
+            [_('profile'),
+             url_for('profile_index')],
+            _('change password')])

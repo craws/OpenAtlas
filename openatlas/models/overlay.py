@@ -28,8 +28,10 @@ class Overlay:
             'place_id': data['place_id'],
             'link_id': data['link_id'],
             'bounding_box':
-                f"[[{data['top_left_northing']}, {data['top_left_easting']}], "
-                f"[{data['top_right_northing']}, {data['top_right_easting']}], "
+                f"[[{data['top_left_northing']}, "
+                f"{data['top_left_easting']}], "
+                f"[{data['top_right_northing']}, "
+                f"{data['top_right_easting']}], "
                 f"[{data['bottom_left_northing']}, "
                 f"{data['bottom_left_easting']}]]"})
 
@@ -39,8 +41,10 @@ class Overlay:
             'image_id': data['image_id'],
             'place_id': data['place_id'],
             'bounding_box':
-                f"[[{data['top_left_northing']}, {data['top_left_easting']}], "
-                f"[{data['top_right_northing']}, {data['top_right_easting']}], "
+                f"[[{data['top_left_northing']}, "
+                f"{data['top_left_easting']}], "
+                f"[{data['top_right_northing']}, "
+                f"{data['top_right_easting']}], "
                 f"[{data['bottom_left_northing']}, "
                 f"{data['bottom_left_easting']}]]"})
 

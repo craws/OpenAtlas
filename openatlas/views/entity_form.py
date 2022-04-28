@@ -60,6 +60,8 @@ def insert(
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
+    if entity.check_for_too_many_links_for_single_type():
+        abort(422)
     place_info = get_place_info_for_update(entity)
     form = build_form(
         entity.class_.name,
@@ -305,7 +307,10 @@ def get_redirect_url(
         origin: Union[Entity, None] = None,
         redirect_link_id: Union[int, None] = None) -> str:
     if redirect_link_id and origin:
-        return url_for('link_update', id_=redirect_link_id, origin_id=origin.id)
+        return url_for(
+            'link_update',
+            id_=redirect_link_id,
+            origin_id=origin.id)
     url = url_for('view', id_=entity.id)
     if origin and entity.class_.name not in \
             ('administrative_unit', 'source_translation', 'type'):

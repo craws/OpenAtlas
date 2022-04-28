@@ -80,6 +80,7 @@ class FilterLogicalOperatorError(Exception):
 class TypeIDError(Exception):
     pass
 
+
 class LastEntityError(Exception):
     pass
 

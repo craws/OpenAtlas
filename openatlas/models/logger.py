@@ -23,7 +23,8 @@ class Logger:
             'priority': priority,
             'type': type_,
             'message': message,
-            'user_id': current_user.id if hasattr(current_user, 'id') else None,
+            'user_id': current_user.id
+            if hasattr(current_user, 'id') else None,
             'info': '{method} {path}{info}'.format(
                 path=request.path,
                 method=request.method,
@@ -45,7 +46,7 @@ class Logger:
         Db.log_user(entity_id, current_user.id, action)
 
     @staticmethod
-    def get_log_info(entity_id: str) -> dict[str, Any]:
+    def get_log_info(entity_id: int) -> dict[str, Any]:
         from openatlas.models.user import User
         from openatlas.models.imports import Import
         data = Db.get_log_for_advanced_view(entity_id)
