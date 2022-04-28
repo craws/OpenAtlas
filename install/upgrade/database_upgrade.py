@@ -1,6 +1,12 @@
 # Script for upgrading the database to the current (software) version
-# Usage from project root:
+#
+# A backup will be made before any database changes happen and although it is
+# fully implemented and tested we still consider this script experimental.
+#
+# To use it, execute from project root:
 # python3 install/upgrade/database_upgrade.py
+#
+
 import os
 import sys
 import time
@@ -8,14 +14,15 @@ from pathlib import Path
 
 from psycopg2 import extras
 
+
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from config.database_versions import application_database_versions
+from config.database_versions import DATABASE_VERSIONS
 from config.default import (
     DATABASE_PASS, VERSION, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
     DATABASE_HOST, DATABASE_PORT)
 from instance import production
-from openatlas import open_connection
+from openatlas.database.connect import open_connection
 from openatlas.database.settings import Settings
 from openatlas.models.export import sql_export
 
@@ -39,79 +46,70 @@ cursor = db.cursor(cursor_factory=extras.DictCursor)
 settings = Settings.get_settings(cursor)
 
 
-def database_upgrade():
+def database_upgrade() -> None:
     print(f"{VERSION} OpenAtlas version")
     print(f"{DATABASE_VERSION} Database version required")
-
     check_database_version_exist()
     print(f"{settings['database_version']} Installed database version")
-
     check_database_version_supported()
     check_upgrade_needed()
-    # backup_database()
-    execute_upgrade_sqls()
+    backup_database()
+    execute_upgrade()
 
 
-def execute_upgrade_sqls():
-    reversed_ = dict(reversed(list(application_database_versions.items())))
+def execute_upgrade() -> None:
     is_before = True
     current_version = settings['database_version']
-    for application_version, database_version in reversed_.items():
-        if not is_before and current_version != database_version:
-            print(f'Need to upgrade {current_version} to {database_version}')
-            filename = f'{database_version}.sql'
+    for version in reversed(DATABASE_VERSIONS):
+        if not is_before and current_version != version:
+            print(f'Upgrade {current_version} to {version}: start')
+            filename = f'{version}.sql'
             install_path = Path(os.getcwd()) / 'install'
             sql_file_path = None
             for path in install_path.rglob(filename):
                 sql_file_path = path
                 break
             if not sql_file_path:
-                print(f'{filename} not found in {install_path}')
-                print('Script is aborting.')
-                end_output()
+                finish(f'{filename} not found in {install_path}. Aborting')
             try:
-                with open(sql_file_path, 'r') as sql_file:
+                with open(str(sql_file_path), 'r') as sql_file:
                     cursor.execute(sql_file.read())
             except Exception as e:
-                print(f'Import of {sql_file_path} failed. {e}')
-                end_output()
-            current_version = database_version
-        if database_version == settings['database_version']:
+                finish(f'Import of {sql_file_path} failed. {e}')
+            print(f'Upgrade {current_version} to {version}: success')
+            current_version = version
+        if version == settings['database_version']:
             is_before = False
+    finish('Script finished successful')
 
 
-def check_database_version_exist():
+def check_database_version_exist() -> None:
     if 'database_version' not in settings:
-        print(
-            'The database is too old to be upgraded automatically '
+        finish(
+            'The database seems to be too old to be upgraded automatically '
             '(database version unknown).')
-        end_output()
 
 
-def check_upgrade_needed():
+def check_upgrade_needed() -> None:
     if DATABASE_VERSION == settings['database_version']:
-        print(
-            'The current database version already matches the required one. '
-            'Have a nice day.')
-        end_output()
+        finish('Current database version already matches the required one.')
 
 
-def check_database_version_supported():
-    if VERSION not in application_database_versions:
-        print(f"Version {VERSION} isn't supported for automatic upgrades.")
-        end_output()
+def check_database_version_supported() -> None:
+    if VERSION not in DATABASE_VERSIONS:
+        finish(f"Version {VERSION} isn't supported for automatic upgrades.")
 
 
-def backup_database():
-    print('Start database backup')
+def backup_database() -> None:
+    print('Database backup: start')
     if sql_export('_from_database_upgrade_script'):
-        print('Successful backup of database.')
+        print('Database backup: successful backup at openatlas/export/sql/')
     else:
-        print(f'\nDatabase backup failed.')
-        end_output()
+        finish(f'Database backup failed.')
 
 
-def end_output():
+def finish(message: str) -> None:
+    print(f'\n{message}')
     print(f'Execution time: {int(time.time() - start)} seconds')
     exit()
 

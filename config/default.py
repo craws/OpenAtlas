@@ -1,12 +1,12 @@
 # Don't edit this file. To override settings please use instance/production.py
-import os
 from pathlib import Path
 
+from config.database_versions import DATABASE_VERSIONS
 
-root_path = os.getcwd() + '/openatlas'
+root_path = Path(__file__).parent.parent / 'openatlas'
 
 VERSION = '7.3.0'
-DATABASE_VERSION = '7.3.0'
+DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
