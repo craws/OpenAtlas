@@ -2,6 +2,7 @@
 #
 # A backup will be made before any database changes happen and although it is
 # fully implemented and tested we still consider this script experimental.
+# Also, you should only do this with the official main branch of OpenAtlas.
 #
 # To use it, execute from project root:
 # python3 install/upgrade/database_upgrade.py
