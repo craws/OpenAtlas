@@ -76,7 +76,7 @@ def execute_upgrade() -> None:
                 with open(str(sql_file_path), 'r') as sql_file:
                     cursor.execute(sql_file.read())
             except Exception as e:
-                finish(f'Import of {sql_file_path} failed. {e}')
+                finish(f'Import of {sql_file_path} failed.\n{e}')
             print(f'Upgrade {current_version} to {version}: success')
             current_version = version
         if version == settings['database_version']:
