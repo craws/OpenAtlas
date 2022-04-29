@@ -1045,3 +1045,4 @@ def get_entities_linked_to_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)
     return data
+

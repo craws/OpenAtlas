@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block content %}
+     {{ form|display_form()}}
+        <p class="text-danger">
+          {{ _('be aware that every subtyp will also be deleted ')|uc_first }}
+      </p>
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows %}
+                    <li class="nav-item">
+                        <a
+                            class="nav-link {% if loop.first %}active{% endif %}"
+                            data-toggle="tab"
+                            role="tab"
+                            aria-selected="{% if active %}true{% else %}false{% endif %}"
+                            href="#tab-{{ tab.name|replace('_', '-') }}">
+                                {{ _(tab.name|replace('_', ' '))|uc_first }}
+                                {% if tab.table.rows|length %}
+                                    <span class="tab-counter">{{ '{0:,}'.format(tab.table.rows|length) }}</span>
+                                {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for tab in tabs.values() if tab.content or tab.buttons or tab.table.rows %}
+                    <div
+                        class="tab-pane fade {% if loop.index == 1 %}show active{% endif %}"
+                        role="tabpanel"
+                        id="tab-{{ tab.name|replace('_', '-')}}">
+                            {{ tab.buttons|button_bar }}
+                            {% if tab.content %}
+                                {{ tab.content|safe }}
+                            {% endif %}
+                            {% if tab.table.rows %}
+                                {{ tab.table.display(tab.name) }}
+                            {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

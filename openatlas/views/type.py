@@ -12,10 +12,13 @@ from openatlas.database.connect import Transaction
 from openatlas.forms.form import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    display_form, get_entities_linked_to_type_recursive, link, required_group,
+    display_form, get_entities_linked_to_type_recursive, link,
+    required_group,
     sanitize, uc_first)
+from openatlas.views.entity import add_tabs_for_type_delete
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -74,25 +77,26 @@ def type_delete(id_: int) -> Response:
 @app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> Response:
-
-    class Form(FlaskForm):
-        confirm_delete = BooleanField(_('test_label'))
-        save = SubmitField(uc_first(_('move entities')))
+    class DeleteRecursiveTypesForm(FlaskForm):
+        confirm_delete = BooleanField(_('i now the risk'), default=False)
+        save = SubmitField(uc_first(_('delete type and remove all links')))
 
     type_ = g.types[id_]
     if type_.category == 'system':
         abort(403)
     root = g.types[type_.root[0]] if type_.root else None
-    form = Form()
-    if form.validate_on_submit():
-        1/0
+    form = DeleteRecursiveTypesForm()
+    if form.validate_on_submit() and form.confirm_delete.data:
+        for sub in Type.get_all_sub_ids_recursive(type_):
+            sub.delete()
         type_.delete()
-        flash(_('entity deleted'), 'info')
+        flash(_('entities deleted'), 'info')
         return redirect(
             url_for('view', id_=root.id) if root else url_for('type_index'))
     return render_template(
-        'form.html',
-        form=display_form(form),
+        'type/delete.html',
+        form=form,
+        tabs=add_tabs_for_type_delete(type_),
         crumbs=[
             [_('types'), url_for('type_index')],
             root,

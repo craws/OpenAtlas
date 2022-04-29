@@ -21,7 +21,8 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, display_delete_link, format_date, get_base_table_data,
-    get_entity_data, get_file_path, is_authorized, link, required_group,
+    get_entities_linked_to_type_recursive, get_entity_data, get_file_path,
+    is_authorized, link, required_group,
     uc_first)
 from openatlas.views.entity_index import file_preview
 from openatlas.views.link import AddReferenceForm
@@ -367,6 +368,28 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             data.append(format_number(item.types[entity]))
         data.append(item.class_.label)
         data.append(item.description)
+        tabs['entities'].table.rows.append(data)
+    if not tabs['entities'].table.rows:
+        # If no entities available get links with this type_id
+        tabs['entities'].table.header = [_('domain'), _('range')]
+        for row in Link.get_links_by_type(entity):
+            tabs['entities'].table.rows.append([
+                link(Entity.get_by_id(row['domain_id'])),
+                link(Entity.get_by_id(row['range_id']))])
+    return tabs
+
+
+def add_tabs_for_type_delete(entity: Type) -> dict[str, Tab]:
+    tabs = {
+        'subs': Tab('subs', entity=entity),
+        'entities': Tab('entities', entity=entity)}
+    for sub in Type.get_all_sub_ids_recursive(entity):
+        tabs['subs'].table.rows.append([
+            link(sub),
+            sub.count,
+            sub.description])
+    for item in get_entities_linked_to_type_recursive(entity.id, []):
+        data = [link(item), item.class_.label, item.description]
         tabs['entities'].table.rows.append(data)
     if not tabs['entities'].table.rows:
         # If no entities available get links with this type_id

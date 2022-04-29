@@ -202,6 +202,16 @@ class Type(Entity):
         return subs
 
     @staticmethod
+    def get_all_sub_ids_recursive(
+            type_: Type,
+            subs: Optional[list[int]] = None) -> list[Type]:
+        subs = subs if subs else []
+        for sub_id in type_.subs:
+            subs.append(g.types[sub_id])
+            Type.get_all_sub_ids_recursive(g.types[sub_id], subs)
+        return subs
+
+    @staticmethod
     def get_form_count(root_type: Type, class_name: str) -> Optional[int]:
         if type_ids := Type.get_all_sub_ids(root_type):
             return Db.get_form_count(class_name, type_ids)
