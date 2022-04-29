@@ -82,7 +82,7 @@ def type_delete_recursive(id_: int) -> Response:
         save = SubmitField(uc_first(_('delete type and remove all links')))
 
     type_ = g.types[id_]
-    if type_.category == 'system':
+    if type_.category in ('standard', 'system'):
         abort(403)
     root = g.types[type_.root[0]] if type_.root else None
     form = DeleteRecursiveTypesForm()
