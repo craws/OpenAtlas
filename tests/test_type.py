@@ -1,3 +1,4 @@
+from pprint import pprint
 from typing import Any
 
 from flask import g, url_for
@@ -179,3 +180,30 @@ class TypeTest(TestBaseCase):
                 data={'multiple': True})
             rv = self.app.get(url_for('hierarchy_update', id_=sex_type.id))
             assert b'disabled="disabled" id="multiple"' in rv.data
+
+            # Delete recursively
+            rv = self.app.get(
+                url_for('hierarchy_delete', id_=sex_type.id),
+                follow_redirects=True)
+            assert b'Be aware!' in rv.data
+
+            rv = self.app.get(
+                url_for('type_delete_recursive', id_=sex_type.subs[0]),
+                follow_redirects=True)
+            assert b'Be aware!' in rv.data
+
+            rv = self.app.post(
+                url_for('type_delete_recursive', id_=sex_type.id))
+            assert b'This field is required.' in rv.data
+
+            rv = self.app.post(
+                url_for('type_delete_recursive', id_=sex_type.id),
+                data={'confirm_delete': True},
+                follow_redirects=True)
+            assert b'Types deleted' in rv.data
+
+            rv = self.app.post(
+                url_for('type_delete_recursive', id_=actor_type.id),
+                data={'confirm_delete': True},
+                follow_redirects=True)
+            assert b'403 - Forbidden' in rv.data

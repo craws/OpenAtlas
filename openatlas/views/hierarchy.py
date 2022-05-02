@@ -140,7 +140,7 @@ def remove_class(id_: int, class_name: str) -> Response:
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     type_ = g.types[id_]
-    if type_.category in ('standard', 'system'):
+    if type_.category in ('standard', 'system', 'place'):
         abort(403)
     if type_.subs:
         return redirect(url_for('type_delete_recursive', id_=id_))
