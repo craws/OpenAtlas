@@ -1,14 +1,18 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from flask import g
+from psycopg2.extras import DictCursor
 
 
 class Settings:
 
     @staticmethod
-    def get_settings() -> dict[str, str]:
-        g.cursor.execute("SELECT name, value FROM web.settings;")
-        return {row['name']: row['value'] for row in g.cursor.fetchall()}
+    def get_settings(
+            cursor: Optional[DictCursor] = None) -> dict[str, str]:
+        if not cursor:
+            cursor = g.cursor
+        cursor.execute("SELECT name, value FROM web.settings;")
+        return {row['name']: row['value'] for row in cursor.fetchall()}
 
     @staticmethod
     def update(field_name: str, value: Any) -> None:

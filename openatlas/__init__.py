@@ -8,6 +8,7 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
+from psycopg2 import extras
 
 from openatlas.api.v02.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
@@ -19,7 +20,7 @@ INSTANCE = 'production'
 if 'test_runner.py' in sys.argv[0] or 'nose2' in sys.argv[0]:
     INSTANCE = 'testing'  # Use test database if running tests
 
-app.config.from_object('config')
+app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
@@ -60,8 +61,10 @@ def before_request() -> None:
     from openatlas.models.reference_system import ReferenceSystem
 
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Avoid file overhead if not using Apache with static alias
-    open_connection(app.config)
+        return  # Avoid files overhead if not using Apache with static alias
+    g.db = open_connection(app.config)
+    g.db.autocommit = True
+    g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)
     g.settings = Settings.get_settings()
     session['language'] = get_locale()
     g.cidoc_classes = CidocClass.get_all()
