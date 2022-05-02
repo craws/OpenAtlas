@@ -379,11 +379,11 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
     return tabs
 
 
-def add_tabs_for_type_delete(entity: Type) -> dict[str, Tab]:
+def add_tabs_for_delete_type(entity: Type) -> dict[str, Tab]:
     tabs = {
         'subs': Tab('subs', entity=entity),
         'entities': Tab('entities', entity=entity)}
-    for sub in Type.get_all_sub_ids_recursive(entity):
+    for sub in Type.get_all_subs(entity):
         tabs['subs'].table.rows.append([
             link(sub),
             sub.count,
@@ -391,13 +391,6 @@ def add_tabs_for_type_delete(entity: Type) -> dict[str, Tab]:
     for item in get_entities_linked_to_type_recursive(entity.id, []):
         data = [link(item), item.class_.label, item.description]
         tabs['entities'].table.rows.append(data)
-    if not tabs['entities'].table.rows:
-        # If no entities available get links with this type_id
-        tabs['entities'].table.header = [_('domain'), _('range')]
-        for row in Link.get_links_by_type(entity):
-            tabs['entities'].table.rows.append([
-                link(Entity.get_by_id(row['domain_id'])),
-                link(Entity.get_by_id(row['range_id']))])
     return tabs
 
 

@@ -202,13 +202,13 @@ class Type(Entity):
         return subs
 
     @staticmethod
-    def get_all_sub_ids_recursive(
+    def get_all_subs(
             type_: Type,
             subs: Optional[list[int]] = None) -> list[Type]:
         subs = subs if subs else []
         for sub_id in type_.subs:
             subs.append(g.types[sub_id])
-            Type.get_all_sub_ids_recursive(g.types[sub_id], subs)
+            Type.get_all_subs(g.types[sub_id], subs)
         return subs
 
     @staticmethod

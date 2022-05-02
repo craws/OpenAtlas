@@ -6,6 +6,7 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, SubmitField
+from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
@@ -15,10 +16,10 @@ from openatlas.models.type import Type
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    display_form, get_entities_linked_to_type_recursive, link,
+    get_entities_linked_to_type_recursive, link,
     required_group,
     sanitize, uc_first)
-from openatlas.views.entity import add_tabs_for_type_delete
+from openatlas.views.entity import add_tabs_for_delete_type
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -78,30 +79,34 @@ def type_delete(id_: int) -> Response:
 @required_group('editor')
 def type_delete_recursive(id_: int) -> Response:
     class DeleteRecursiveTypesForm(FlaskForm):
-        confirm_delete = BooleanField(_('i now the risk'), default=False)
-        save = SubmitField(uc_first(_('delete type and remove all links')))
+        confirm_delete = BooleanField(
+            _('i now the risk'),
+            default=False, validators=[InputRequired()])
+        save = SubmitField(uc_first(_('delete types and remove all links')))
 
     type_ = g.types[id_]
-    if type_.category in ('standard', 'system'):
-        abort(403)
     root = g.types[type_.root[0]] if type_.root else None
+    if type_.category in ('standard', 'system', 'place') and not root:
+        abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
-        for sub in Type.get_all_sub_ids_recursive(type_):
+        for sub in Type.get_all_subs(type_):
             sub.delete()
         type_.delete()
-        flash(_('entities deleted'), 'info')
+        flash(_('types deleted'), 'info')
         return redirect(
             url_for('view', id_=root.id) if root else url_for('type_index'))
+    tabs = {'info': Tab('info', content=form)}
+    tabs |= add_tabs_for_delete_type(type_)
+    crumbs = [[_('types'), url_for('type_index')]]
+    if root:
+        crumbs += [g.types[type_id] for type_id in type_.root]
+    crumbs += [type_, _('delete')]
     return render_template(
         'type/delete.html',
+        tabs=tabs,
         form=form,
-        tabs=add_tabs_for_type_delete(type_),
-        crumbs=[
-            [_('types'), url_for('type_index')],
-            root,
-            type_,
-            _('delete')])
+        crumbs=crumbs)
 
 
 @app.route('/type/move/<int:id_>', methods=['POST', 'GET'])
