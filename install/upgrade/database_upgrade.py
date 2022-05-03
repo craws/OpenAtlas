@@ -106,7 +106,7 @@ def backup_database() -> None:
     if sql_export('_from_database_upgrade_script'):
         print('Database backup: successful backup at openatlas/export/sql/')
     else:
-        finish(f'Database backup failed.')
+        finish('Database backup failed.')
 
 
 def finish(message: str) -> None:

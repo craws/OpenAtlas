@@ -1,4 +1,3 @@
-from pprint import pprint
 from typing import Any
 
 from flask import g, url_for
@@ -185,12 +184,12 @@ class TypeTest(TestBaseCase):
             rv = self.app.get(
                 url_for('hierarchy_delete', id_=sex_type.id),
                 follow_redirects=True)
-            assert b'Be aware!' in rv.data
+            assert b'Warning' in rv.data
 
             rv = self.app.get(
                 url_for('type_delete_recursive', id_=sex_type.subs[0]),
                 follow_redirects=True)
-            assert b'Be aware!' in rv.data
+            assert b'Warning' in rv.data
 
             rv = self.app.post(
                 url_for('type_delete_recursive', id_=sex_type.id))

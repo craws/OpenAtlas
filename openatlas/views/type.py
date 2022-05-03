@@ -17,7 +17,6 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     get_entities_linked_to_type_recursive, link, required_group, sanitize)
-from openatlas.views.entity import add_tabs_for_delete_type
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -75,7 +74,7 @@ def type_delete(id_: int) -> Response:
 
 @app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def type_delete_recursive(id_: int) -> Response:
+def type_delete_recursive(id_: int) -> Union[str, Response]:
     class DeleteRecursiveTypesForm(FlaskForm):
         confirm_delete = BooleanField(
             _("I'm sure to delete this type, it's subs and links"),
@@ -95,13 +94,25 @@ def type_delete_recursive(id_: int) -> Response:
         flash(_('types deleted'), 'info')
         return redirect(
             url_for('view', id_=root.id) if root else url_for('type_index'))
-    tabs = {'info': Tab(
-        'info',
-        content=_(
-            'Warning: this type has subs and/or links to entities (see tabs). '
-            'Please check if you want to delete these subs and links too.'),
-        form=form)}
-    tabs |= add_tabs_for_delete_type(type_)
+    tabs = {
+        'info': Tab(
+            'info',
+            content=_(
+                'Warning: this type has subs and/or links to entities '
+                '(see tabs). Please check if you want to delete these subs '
+                'and links too.'),
+            form=form),
+        'subs': Tab('subs', entity=type_),
+        'entities': Tab('entities', entity=type_)}
+    for sub_id in Type.get_all_sub_ids(type_):
+        sub = g.types[sub_id]
+        tabs['subs'].table.rows.append([
+            link(sub),
+            sub.count,
+            sub.description])
+    for item in get_entities_linked_to_type_recursive(type_.id, []):
+        data = [link(item), item.class_.label, item.description]
+        tabs['entities'].table.rows.append(data)
     crumbs = [[_('types'), url_for('type_index')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]

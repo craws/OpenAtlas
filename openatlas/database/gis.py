@@ -10,7 +10,7 @@ class Gis:
     def get_by_id(id_: int) -> list[dict[str, Any]]:
         geometries = []
         g.cursor.execute(
-            f"""
+            """
             SELECT
                 g.id,
                 g.name,
@@ -42,7 +42,7 @@ class Gis:
     @staticmethod
     def get_all(extra_ids: list[int]) -> list[dict[str, Any]]:
         g.cursor.execute(
-            f"""
+            """
             SELECT
                 object.id AS object_id,
                 g.entity_id AS location_id,
