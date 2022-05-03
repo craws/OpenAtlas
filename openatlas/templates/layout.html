@@ -17,12 +17,11 @@
   <link rel="stylesheet" href="/static/css/style.css?v={{ config.VERSION }}">
   <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
   <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
-  <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
   <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
   <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
   <script src="/static/node_modules/tinymce/tinymce.min.js"></script>
-  <script src="/static/node_modules/popper.js/dist/umd/popper.min.js"></script>
-  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+  <script src="/static/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
   <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
   <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
   <script src="/static/node_modules/bootstrap-autocomplete/dist/latest/bootstrap-autocomplete.min.js"></script>
@@ -138,9 +137,9 @@
           <div
               class="iconbutton"
               data-bs-toggle="popover"
-              data-placement="bottom"
-              data-content="{{ _('contact')|uc_first }}"
-              data-trigger="hover">
+              data-bs-placement="bottom"
+              data-bs-content="{{ _('contact')|uc_first }}"
+              data-bs-trigger="hover">
             <a href="{{ url_for('index_content', item='contact') }}">
               <span><i class="fas fa-at"></i></span>
             </a>
@@ -148,11 +147,11 @@
         {% endif %}
         {% if 'legal_notice'|display_content_translation %}
           <div
-              class="iconbutton"
+              class="iconbutton d-inline-block"
               data-bs-toggle="popover"
-              data-placement="bottom"
-              data-content="{{ _('legal_notice')|uc_first }}"
-              data-trigger="hover">
+              data-bs-placement="bottom"
+              data-bs-content="{{ _('legal_notice')|uc_first }}"
+              data-bs-trigger="hover">
             <a href="{{ url_for('index_content', item='legal_notice') }}">
               <span><i class="fas fa-balance-scale"></i></span>
             </a>
