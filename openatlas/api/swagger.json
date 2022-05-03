@@ -885,7 +885,7 @@
           "end": {
             "$ref": "#/components/schemas/TimeDetailModel"
           },
-          "first": {
+          "start": {
             "$ref": "#/components/schemas/TimeDetailModel"
           }
         },
