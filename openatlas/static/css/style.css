@@ -615,9 +615,13 @@ div.data-table div.display-none {
 .navbar {
   width: 100%;
 }
-
+.table{
+  --bs-table-hover-bg: rgba(0, 0, 0, 0.1);
+  border-top: rgba(0, 0, 0, 0.1) solid 1px;
+}
 .table tr {
   line-height: 0.9;
+  height: 2rem;
 }
 .table tr p{
   margin:  0.2rem 0 0.2rem 0;
@@ -690,10 +694,6 @@ div.data-table div.display-none {
   margin: 0.5em;
   padding: 0.5em;
   background-color: #f8f9fa!important;
-}
-
-tr:hover {
-  background-color: rgba(0,0,0,0.1) !important;
 }
 
 .btn-xsm {
