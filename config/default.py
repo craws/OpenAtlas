@@ -1,10 +1,12 @@
 # Don't edit this file. To override settings please use instance/production.py
 from pathlib import Path
 
-from openatlas import app
+from config.database_versions import DATABASE_VERSIONS
+
+root_path = Path(__file__).parent.parent / 'openatlas'
 
 VERSION = '7.3.0'
-DATABASE_VERSION = '7.3.0'
+DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
@@ -27,11 +29,11 @@ DISPLAY_FILE_EXTENSIONS = \
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
-EXPORT_DIR = Path(app.root_path) / 'export'
-UPLOAD_DIR = Path(app.root_path) / 'uploads'
+EXPORT_DIR = Path(root_path) / 'export'
+UPLOAD_DIR = Path(root_path) / 'uploads'
 
 # Image processing
-PROCESSED_IMAGE_DIR = Path(app.root_path) / 'processed_images'
+PROCESSED_IMAGE_DIR = Path(root_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',

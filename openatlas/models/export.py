@@ -2,6 +2,7 @@ import os
 import shutil
 import subprocess
 from datetime import datetime
+from typing import Optional
 
 import pandas.io.sql as psql
 from flask import g, request
@@ -99,11 +100,10 @@ def csv_export(form: FlaskForm) -> None:
         shutil.rmtree(path)
 
 
-def sql_export() -> bool:
+def sql_export(postfix: Optional[str] = '') -> bool:
     file = \
-        app.config['EXPORT_DIR'] \
-        / 'sql' \
-        / f'{current_date_for_filename()}_dump.sql'
+        app.config['EXPORT_DIR'] / 'sql' \
+        / f'{current_date_for_filename()}_dump{postfix}.sql'
     if os.name == 'posix':
         command = \
             "pg_dump " \
