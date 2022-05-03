@@ -7,12 +7,14 @@ default.add_argument(
     'download',
     type=bool,
     help='{error_msg}',
-    default=False)
+    default=False,
+    choices=(True, False))
 default.add_argument(
     'count',
     type=bool,
     help='{error_msg}',
-    default=False)
+    default=False,
+    choices=(True, False))
 
 language = default.copy()
 language.add_argument(
@@ -101,7 +103,6 @@ entity_.add_argument(
     type=str,
     help='{error_msg}',
     action='append')
-
 
 gis = default.copy()
 gis.add_argument(

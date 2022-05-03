@@ -45,6 +45,7 @@ class Gis:
             f"""
             SELECT
                 object.id AS object_id,
+                g.entity_id AS location_id,
                 g.id,
                 g.name,
                 g.description,
