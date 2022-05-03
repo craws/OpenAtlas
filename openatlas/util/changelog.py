@@ -3,6 +3,7 @@ versions = {
         'features': {
             '1388': 'Allow contributor group to delete only own entries',
             '1501': 'Set multiple choice types to single type',
+            '1498': 'Remove types with subs and/or linked entities',
             '1698': 'Prevent accidentally deletion of type links',
             '1604': 'Script for database upgrades',
             '1631': 'Join database GIS tables',
