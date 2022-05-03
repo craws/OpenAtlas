@@ -298,14 +298,9 @@ label[for="description"] {
   width: 95%;
 }
 
-#map-info-display-ext {
-  vertical-align: center;
-  width: 5%;
-}
+
 
 .extend-icon {
-  position: absolute;
-  top: 50%;
   cursor: pointer;
 }
 

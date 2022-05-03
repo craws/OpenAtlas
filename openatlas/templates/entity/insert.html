@@ -22,17 +22,18 @@
                     <div id='map-info-display' style="float:left;">
                         {{ form|display_form(manual_page='entity/' + view_name) }}
                     </div>
-                    <div id="map-info-display-ext">
-                        <span class="extend-icon" id="extend-form-icon">
-                            <i class="fas fa-arrow-right" title="Enlarge Form"></i>
-                        </span>
-                        <span class="extend-icon" id="extend-map-icon" style="display: none;">
-                            <i class="fas fa-arrow-left " title="Enlarge Map"></i>
-                        </span>
-                    </div>
+                    
                 </div>
             </div>
-            <div class="col-xl-8">
+            <div class="col-xl-8 d-flex align-items-center">
+                <div class="pe-4 d-none d-lg-inline">
+                    <span class="extend-icon" id="extend-form-icon">
+                        <i class="fas fa-arrow-right" title="Enlarge Form"></i>
+                    </span>
+                    <span class="extend-icon" id="extend-map-icon" style="display: none;">
+                        <i class="fas fa-arrow-left " title="Enlarge Map"></i>
+                    </span>
+                </div>
                 <div id="map" class="map"></div>
             </div>
             <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">

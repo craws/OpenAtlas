@@ -147,14 +147,14 @@ $(document).ready(function () {
         if(a.currentTarget.id === 'extend-form-icon') {
             $('#extend-form-icon').hide();
             $('#extend-map-icon').show();
-            $('.col-xl-4').toggleClass("col-xl-4").toggleClass("col-xl-11");
-            $('.col-xl-8').toggleClass("col-xl-8").toggleClass("col-xl-1");
+            $('.col-xl-4').toggleClass("col-xl-4").toggleClass("col-xl-10");
+            $('.col-xl-8').toggleClass("col-xl-8").toggleClass("col-xl-2");
             return;
         }
         $('#extend-form-icon').show();
         $('#extend-map-icon').hide();
-        $('.col-xl-11').toggleClass("col-xl-11").toggleClass("col-xl-4");
-        $('.col-xl-1').toggleClass("col-xl-1").toggleClass("col-xl-8");
+        $('.col-xl-10').toggleClass("col-xl-10").toggleClass("col-xl-4");
+        $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
     });
 
 });
