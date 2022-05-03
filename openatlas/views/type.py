@@ -16,9 +16,7 @@ from openatlas.models.type import Type
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    get_entities_linked_to_type_recursive, link,
-    required_group,
-    sanitize, uc_first)
+    get_entities_linked_to_type_recursive, link, required_group, sanitize)
 from openatlas.views.entity import add_tabs_for_delete_type
 
 
@@ -80,9 +78,10 @@ def type_delete(id_: int) -> Response:
 def type_delete_recursive(id_: int) -> Response:
     class DeleteRecursiveTypesForm(FlaskForm):
         confirm_delete = BooleanField(
-            _('i now the risk'),
-            default=False, validators=[InputRequired()])
-        save = SubmitField(uc_first(_('delete types and remove all links')))
+            _("I'm sure to delete this type, it's subs and links"),
+            default=False,
+            validators=[InputRequired()])
+        save = SubmitField(_('delete types and remove all links'))
 
     type_ = g.types[id_]
     root = g.types[type_.root[0]] if type_.root else None
@@ -96,16 +95,20 @@ def type_delete_recursive(id_: int) -> Response:
         flash(_('types deleted'), 'info')
         return redirect(
             url_for('view', id_=root.id) if root else url_for('type_index'))
-    tabs = {'info': Tab('info', content=form)}
+    tabs = {'info': Tab(
+        'info',
+        content=_(
+            'Warning: this type has subs and/or links to entities (see tabs). '
+            'Please check if you want to delete these subs and links too.'),
+        form=form)}
     tabs |= add_tabs_for_delete_type(type_)
     crumbs = [[_('types'), url_for('type_index')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
     crumbs += [type_, _('delete')]
     return render_template(
-        'type/delete.html',
+        'tabs.html',
         tabs=tabs,
-        form=form,
         crumbs=crumbs)
 
 
