@@ -678,7 +678,10 @@ div.data-table div.display-none {
 .accordionheader {
   padding: initial!important;
 }
-
+.accordion-button{
+  padding: 0.5rem 1.25rem;
+  font-size: inherit;
+}
 .tooltipicon {
   color: #007bff;
 }
@@ -703,7 +706,12 @@ tr:hover {
   border-radius: .2rem;
   margin-bottom: 0.15em;
 }
-
+.btn-link{
+  text-decoration: none;
+}
+.btn-link:hover, .btn-link:focus{
+  text-decoration: underline;
+}
 .dropdown-menu.show {
   width: auto!important;
 }
@@ -714,6 +722,7 @@ span[id^="value-type-switcher-"]{
 
 .rotate-90{
   transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
 }
 
 .value-type-expander {

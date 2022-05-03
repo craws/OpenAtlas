@@ -22,24 +22,24 @@
       {% for category in types %}
         <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}"
              style="padding: 0;">
-          <div class="accordion" id="TypeAccordion">
+          <div class="accordion accordion-flush" id="TypeAccordion-{{ category }}">
             {% for type_, tree in types[category].items() %}
-              <div class="card">
-                <div class="card-header accordionheader"
+              <div class="accordion-item">
+                <div class="accordionheader"
                      id="heading-{{ type_.id }}">
                   <button
-                    class="btn btn-link collapsed"
+                  class="accordion-button {{ 'collapsed' if (types[category].items()|length != 1)}}"
                     type="button"
                     data-bs-toggle="collapse"
                     data-bs-target="#collapse-{{ type_.id }}"
-                    aria-expanded="true"
+                    aria-expanded="{{types[category].items()|length == 1}}"
                     aria-controls="collapse-{{ type_.id }}">
                     {{ type_.name }}
                   </button>
                 </div>
-                <div id="collapse-{{ type_.id }}" class="collapse"
-                     aria-labelledby="headingOne" data-parent="#TypeAccordion">
-                  <div class="card-body">
+                <div id="collapse-{{ type_.id }}" class="accordion-collapse collapse {{ 'show' if (types[category].items()|length == 1)}}"
+                     aria-labelledby="headingOne" data-bs-parent="#TypeAccordion-{{ category }}">
+                  <div class="accordion-body">
                     <div class="row">
                       <div class="col-6 contentbox">
                         <div class="toolbar">
@@ -106,9 +106,9 @@
               </div>
             {% endfor %}
             {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-              <span style="margin:1em;">
+              <div style="padding:0.5rem 1.25rem;">
               {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
-            </span>
+              </div>
             {% endif %}
           </div>
         </div>
