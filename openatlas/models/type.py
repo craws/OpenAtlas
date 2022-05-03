@@ -196,19 +196,10 @@ class Type(Entity):
     def get_all_sub_ids(
             type_: Type,
             subs: Optional[list[int]] = None) -> list[int]:
-        subs = (subs if subs else []) + type_.subs
-        for sub_id in type_.subs:
-            Type.get_all_sub_ids(g.types[sub_id], subs)
-        return subs
-
-    @staticmethod
-    def get_all_subs(
-            type_: Type,
-            subs: Optional[list[int]] = None) -> list[Type]:
         subs = subs if subs else []
         for sub_id in type_.subs:
-            subs.append(g.types[sub_id])
-            Type.get_all_subs(g.types[sub_id], subs)
+            subs.append(sub_id)
+            Type.get_all_sub_ids(g.types[sub_id], subs)
         return subs
 
     @staticmethod

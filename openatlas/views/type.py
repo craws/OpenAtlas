@@ -90,8 +90,8 @@ def type_delete_recursive(id_: int) -> Response:
         abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
-        for sub in Type.get_all_subs(type_):
-            sub.delete()
+        for sub_id in Type.get_all_sub_ids(type_):
+            g.types[sub_id].delete()
         type_.delete()
         flash(_('types deleted'), 'info')
         return redirect(

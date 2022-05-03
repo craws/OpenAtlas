@@ -383,7 +383,8 @@ def add_tabs_for_delete_type(entity: Type) -> dict[str, Tab]:
     tabs = {
         'subs': Tab('subs', entity=entity),
         'entities': Tab('entities', entity=entity)}
-    for sub in Type.get_all_subs(entity):
+    for sub_id in Type.get_all_sub_ids(entity):
+        sub = g.types[sub_id]
         tabs['subs'].table.rows.append([
             link(sub),
             sub.count,
