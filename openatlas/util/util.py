@@ -584,6 +584,7 @@ def delete_link(name: str, url: str) -> str:
 
 def display_delete_link(entity: Union[Entity, Type]) -> str:
     from openatlas.models.type import Type
+    confirm = ''
     if isinstance(entity, Type):
         url = url_for('type_delete', id_=entity.id)
         if entity.count or entity.subs:
@@ -594,8 +595,11 @@ def display_delete_link(entity: Union[Entity, Type]) -> str:
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
+        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return button(
+        _('delete'),
+        url,
+        onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
 @app.template_filter()
@@ -1045,4 +1049,3 @@ def get_entities_linked_to_type_recursive(
     for sub_id in g.types[id_].subs:
         get_entities_linked_to_type_recursive(sub_id, data)
     return data
-
