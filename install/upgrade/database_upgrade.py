@@ -112,7 +112,7 @@ def backup_database() -> None:
 def finish(message: str) -> None:
     print(f'\n{message}')
     print(f'Execution time: {int(time.time() - start)} seconds')
-    exit()
+    sys.exit()
 
 
 database_upgrade()

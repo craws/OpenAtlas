@@ -33,8 +33,9 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
                 type_,  # type: ignore
                 category,
                 form.classes.data,
-                (category == 'value' or
-                 (hasattr(form, 'multiple') and form.multiple.data))),
+                bool(
+                    category == 'value' or
+                    (hasattr(form, 'multiple') and form.multiple.data)))
             type_.update(process_form_data(form, type_))
             Transaction.commit()
         except Exception as e:  # pragma: no cover

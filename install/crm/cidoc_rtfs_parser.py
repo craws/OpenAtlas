@@ -32,17 +32,12 @@ DATABASE_PASS = 'CHANGE ME'
 
 
 def connect() -> psycopg2.connect:
-    try:
-        connection_ = psycopg2.connect(
-            database=DATABASE_NAME,
-            user=DATABASE_USER,
-            password=DATABASE_PASS,
-            port=DATABASE_PORT,
-            host=DATABASE_HOST)
-        return connection_
-    except Exception as e:
-        print("Database connection error.")
-        raise Exception(e)
+    return psycopg2.connect(
+        database=DATABASE_NAME,
+        user=DATABASE_USER,
+        password=DATABASE_PASS,
+        port=DATABASE_PORT,
+        host=DATABASE_HOST)
 
 
 class Item:
