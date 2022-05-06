@@ -13,6 +13,7 @@ General
    :maxdepth: 1
 
    artifacts
+   move_event
    types
 
 
@@ -31,5 +32,7 @@ Historical
 .. toctree::
    :maxdepth: 1
 
-   profession
+   journey
    letters
+   profession
+
