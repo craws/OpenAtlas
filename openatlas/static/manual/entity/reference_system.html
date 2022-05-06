@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Reference System &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Form" href="../form/index.html" />
     <link rel="prev" title="File" href="file.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -117,7 +116,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -152,13 +150,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Entity</a> &raquo;</li>
         
@@ -167,7 +163,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -199,9 +195,9 @@ checked for a valid format.</p>
 <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of the confidence degree that
 concepts can be used interchangeable.</p>
 <ul class="simple">
-<li><p><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some
-information retrieval applications</p></li>
-<li><p><strong>Exact match</strong>: High degree of confidence that the concepts can be used interchangeably</p></li>
+<li><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some
+information retrieval applications</li>
+<li><strong>Exact match</strong>: High degree of confidence that the concepts can be used interchangeably</li>
 </ul>
 <p>E.g. if a historical project links the city of Vienna to Wikidata, a <strong>close match</strong> would be more
 suitable, because the Wikidata entry is more about the current city and not the historical one.</p>
@@ -210,15 +206,15 @@ suitable, because the Wikidata entry is more about the current city and not the 
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>Admins and manager can add, updated and delete external reference systems.</p>
 <ul class="simple">
-<li><p><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</p></li>
-<li><p><strong>Website URL</strong> - an URL to the project site of the reference system</p></li>
-<li><p><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
+<li><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</li>
+<li><strong>Website URL</strong> - an URL to the project site of the reference system</li>
+<li><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
 e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create together with a <strong>Q123</strong>
-identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></p></li>
-<li><p><strong>Example ID</strong> - an example id to show the desired format e.g. Q123 for Wikidata</p></li>
-<li><p><strong>External reference match</strong> - default precision selected in forms</p></li>
-<li><p><strong>Description</strong> - a short description, shown in forms when mouse over the <strong>i</strong> icon</p></li>
-<li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place is available</p></li>
+identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></li>
+<li><strong>Example ID</strong> - an example id to show the desired format e.g. Q123 for Wikidata</li>
+<li><strong>External reference match</strong> - default precision selected in forms</li>
+<li><strong>Description</strong> - a short description, shown in forms when mouse over the <strong>i</strong> icon</li>
+<li><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place is available</li>
 </ul>
 <p>Classes can be removed from a system by clicking on the tab with the corresponding class name and
 clicking the <strong>Remove</strong> button. This button is only available if there are no entities of this class
@@ -233,10 +229,16 @@ integrated and cannot be deleted but if desired they can be disabled by removing
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../form/index.html" class="btn btn-neutral float-right" title="Form" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="file.html" class="btn btn-neutral float-left" title="File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="../form/index.html" class="btn btn-neutral float-right" title="Form" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="file.html" class="btn btn-neutral float-left" title="File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -245,14 +247,7 @@ integrated and cannot be deleted but if desired they can be disabled by removing
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -263,6 +258,7 @@ integrated and cannot be deleted but if desired they can be disabled by removing
 
 
 </footer>
+
         </div>
       </div>
 
@@ -270,6 +266,7 @@ integrated and cannot be deleted but if desired they can be disabled by removing
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

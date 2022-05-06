@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Letters &mdash; OpenAtlas 7.2.0 documentation</title>
+  <title>Journey &mdash; OpenAtlas 7.2.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Profession" href="profession.html" />
-    <link rel="prev" title="Journey" href="journey.html" /> 
+    <link rel="next" title="Letters" href="letters.html" />
+    <link rel="prev" title="Archaeological data" href="archaeological_data.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -149,7 +149,7 @@
         
           <li><a href="index.html">Examples</a> &raquo;</li>
         
-      <li>Letters</li>
+      <li>Journey</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -166,71 +166,80 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="letters">
-<h1>Letters<a class="headerlink" href="#letters" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="journey">
+<h1>Journey<a class="headerlink" href="#journey" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The following steps describe how to enter a letter exchange event.
-The following elements are involved in the procedure:</p>
+<p>The following steps describe how to enter a journey as move event. For more
+information on move events in general see this <a class="reference internal" href="move_event.html"><span class="doc">tutorial</span></a>.
+On move events concerning artifacts, have a look at the
+<a class="reference internal" href="letters.html"><span class="doc">letter tutorial</span></a>.</p>
+<p>These steps describe how to enter a journey as special case of a <strong>move
+event</strong>. To create a new move event following elements are involved in the
+procedure:</p>
 <ul class="simple">
-<li><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a>: the physical presentation of the letter</li>
-<li><a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a>: the content of the letter</li>
+<li><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a>: the person/persons that went on a journey</li>
 <li><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a>: the <strong>Move</strong> of the letter from one place to another</li>
-<li><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: Start or end point of the letter exchange</li>
-<li><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a>: Sender/recipient of the letter</li>
+<li><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: Start or end point of the journey</li>
 <li><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</li>
 </ul>
-<div class="section" id="adding-an-artifact">
-<h2>Adding an artifact<a class="headerlink" href="#adding-an-artifact" title="Permalink to this headline">¶</a></h2>
-<p>The created artifact is the physical presentation of the letter and the following data concerns the object
-e.g. the begin date would be the creation of the letter, the description can be used to record e.g. the
-material of the object.</p>
+<div class="section" id="adding-actors">
+<h2>Adding actors<a class="headerlink" href="#adding-actors" title="Permalink to this headline">¶</a></h2>
+<p>If not all <a class="reference internal" href="../entity/actor.html"><span class="doc">actors</span></a> involved in the journey were
+entered into the database already, add them via a click on the respective
+tab in the <a class="reference internal" href="../ui/menu.html"><span class="doc">menu</span></a>. Here, click the <strong>+ Person</strong> button to get to
+the
+form. As for all other forms, a name is required to save the data.
+<strong>Please note</strong>, that that only individuals entered as person can be linked
+to a move event later on. This is <strong>not possible</strong> for groups, as a move of
+one or more groups can not be mapped with the current version of CIDOC CRM.</p>
+</div>
+<div class="section" id="adding-locations">
+<h2>Adding locations<a class="headerlink" href="#adding-locations" title="Permalink to this headline">¶</a></h2>
+<p>If not all <a class="reference internal" href="../entity/place.html"><span class="doc">locations</span></a> involved in the journey were
+entered into the database already, add them via a click on the respective
+tab in the <a class="reference internal" href="../ui/menu.html"><span class="doc">menu</span></a>. Here, click the <strong>+ Place</strong> button to get to
+the
+form. As for all other forms, a name is required to save the data.</p>
+</div>
+<div class="section" id="creating-the-move-event">
+<h2>Creating the move event<a class="headerlink" href="#creating-the-move-event" title="Permalink to this headline">¶</a></h2>
+<p>The following steps will create a move event:</p>
 <ul class="simple">
-<li>Click on <a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> in the <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> and create a new entry by using the <strong>+ Artifact</strong> button</li>
-<li>Choose a descriptive name</li>
-<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. letter</li>
-<li>Add further information as date or description if available</li>
-<li>Press <strong>Insert</strong> to save the entry</li>
+<li>Click on the <strong>Event</strong> tab in the menu then use the <strong>+ Move</strong> button</li>
+<li>Fill out the form, for more information see the <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>.</li>
+<li><strong>Please note</strong>: do not link a person in this form if the journey was taken willingly.
+Link here only people who have not traveled of their own free will - think,
+for example, of a prisoner transport or the translation of relics. To see
+how to link (voluntary) travelers correctly, see below.</li>
+<li><strong>Please also note</strong>: Use <strong>preceeding event</strong> to document multiple
+parts of a trip. Unlike <strong>sub events</strong>, these can be put in a chronological
+order. Sub events are there to capture events that happen at the same time
+(for more information see <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>).</li>
+<li>Click the <strong>Insert</strong> button to save the data or <strong>Insert and continue</strong> button to save and start to enter another move event</li>
 </ul>
 </div>
-<div class="section" id="adding-a-source">
-<h2>Adding a source<a class="headerlink" href="#adding-a-source" title="Permalink to this headline">¶</a></h2>
-<p>With <a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a> you can record the content of said letter. For example, if there are copies of
-the letter, they all have the same text (= source).</p>
-<ul class="simple">
-<li>Click on <a class="reference internal" href="../entity/source.html"><span class="doc">Source</span></a> in the menu and create a new entry by using the <strong>+ Source</strong> button</li>
-<li>Choose a descriptive name</li>
-<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list</li>
-<li>Click on <strong>Artifact</strong> and choose the before created letter from the list</li>
-<li>Press <strong>Insert</strong> to save the entry</li>
+<div class="section" id="link-actors-to-the-journey">
+<h2>Link actors to the journey<a class="headerlink" href="#link-actors-to-the-journey" title="Permalink to this headline">¶</a></h2>
+<p>To link actors (who have made a journey of their own free will) to the created
+entry click on the blue <strong>Actor</strong> button on the landing page of the respective
+move event.</p>
+<ul>
+<li><p class="first">Here, the Link button can be used to link people already entered into the database. The following information can be entered via the form:</p>
+<blockquote>
+<div><ul class="simple">
+<li>under type you can define the role of the actor in the journey; if
+there is no suitable entry in the list, a new type can be created
+depending on the user’s authorization, see the <a class="reference internal" href="types.html"><span class="doc">types
+tutorial</span></a>.</li>
+<li>the actor can be changed afterwards via the Change button</li>
+<li>the form of participation can be determined</li>
+<li>in addition, dates and a description in the form of a free text are possible</li>
 </ul>
-<p>It is important to link the artifact to the source in this way to reflect that it is the source written
-on the letter.
-If you would link it using the tab <strong>Artifact</strong> it means the source refers to the artifact instead.</p>
-</div>
-<div class="section" id="adding-the-move-event">
-<h2>Adding the move event<a class="headerlink" href="#adding-the-move-event" title="Permalink to this headline">¶</a></h2>
-<p>This creates an entry concerning the movement of the letter.</p>
-<ul class="simple">
-<li>After saving the source, you can see the linked artifact with its name in the source view and click on it</li>
-<li>In the artifact view click on the <strong>Event</strong> tab in the menu and create a new move with the <strong>+ Move</strong> button</li>
-<li>Choose a descriptive name</li>
-<li>Select an appropriate <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list, e.g. letter exchange</li>
-<li>With <em>from</em> and <em>to</em> you can choose the starting and ending location of the move</li>
-<li>The respective artifact should already be preset</li>
-<li>If available, enter the dates for the letter exchange</li>
-<li>Press <strong>Insert</strong> to save the entry</li>
-</ul>
-</div>
-<div class="section" id="adding-sender-and-recipient">
-<h2>Adding sender and recipient<a class="headerlink" href="#adding-sender-and-recipient" title="Permalink to this headline">¶</a></h2>
-<p>Now you can link one actor at a time to the move event by the following steps.</p>
-<ul class="simple">
-<li>Open the created event by clicking on it in the event tab of the move</li>
-<li>Click on the <strong>Actor</strong> tab</li>
-<li>Either link an already entered person with <strong>Link</strong> or create a new one with <strong>+ Person</strong> button</li>
-<li>When entering the involvement information, choose the actor and add the respective type (sender/recipient)</li>
-<li>Press <strong>Insert</strong> to save the entry</li>
+</div></blockquote>
+</li>
+<li><p class="first">via <strong>+person</strong> or <strong>+group</strong> new actors can be created and then linked to the move event</p>
+</li>
 </ul>
 </div>
 </div>
@@ -243,10 +252,10 @@ If you would link it using the tab <strong>Artifact</strong> it means the source
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="profession.html" class="btn btn-neutral float-right" title="Profession" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="letters.html" class="btn btn-neutral float-right" title="Letters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="journey.html" class="btn btn-neutral float-left" title="Journey" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="archaeological_data.html" class="btn btn-neutral float-left" title="Archaeological data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
