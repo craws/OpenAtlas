@@ -196,8 +196,9 @@ class Type(Entity):
     def get_all_sub_ids(
             type_: Type,
             subs: Optional[list[int]] = None) -> list[int]:
-        subs = (subs if subs else []) + type_.subs
+        subs = subs if subs else []
         for sub_id in type_.subs:
+            subs.append(sub_id)
             Type.get_all_sub_ids(g.types[sub_id], subs)
         return subs
 

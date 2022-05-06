@@ -5,6 +5,7 @@ from typing import Optional, TYPE_CHECKING
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
@@ -32,7 +33,8 @@ class Tab:
             content: Optional[str] = None,
             table: Optional[Table] = None,
             buttons: Optional[list[str]] = None,
-            entity: Optional[Entity] = None) -> None:
+            entity: Optional[Entity] = None,
+            form: Optional[FlaskForm] = None) -> None:
 
         self.name = name
         self.content = content
@@ -41,6 +43,7 @@ class Tab:
         self.table = table if table else Table()
         self.set_table_headers(name, entity)
         self.buttons: list[str] = []
+        self.form = form
         if is_authorized('contributor'):
             self.set_buttons(name, buttons, entity)
 

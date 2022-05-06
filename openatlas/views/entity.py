@@ -231,8 +231,7 @@ def add_buttons(entity: Entity, type_problem: bool = False) -> list[str]:
     if isinstance(entity, Type):
         if entity.root and entity.category != 'system':
             buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            if not entity.count and not entity.subs:
-                buttons.append(display_delete_link(entity))
+            buttons.append(display_delete_link(entity))
     elif isinstance(entity, ReferenceSystem):
         buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
         if not entity.classes and not entity.system:

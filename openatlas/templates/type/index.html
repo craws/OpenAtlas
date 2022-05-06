@@ -55,10 +55,15 @@
                           {% endif %}
                           {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
                             {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
-                            {% if not type_.system and type_.count < 1 and not type_.subs %}
-                              {{ _('delete')|button(
-                              url_for('hierarchy_delete', id_=type_.id),
-                              onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');") }}
+                            {% if not type_.system %}
+                              {% if type_.count > 0 or type_.subs %}
+                                test{{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id)) }}
+                              {% else %}
+                                {{ _('delete')|button(
+                                url_for('hierarchy_delete', id_=type_.id),
+                                onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');") }}
+                              {% endif %}
+
                             {% endif %}
                           {% endif %}
                         </div>

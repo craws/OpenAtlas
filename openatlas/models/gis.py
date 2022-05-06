@@ -79,6 +79,7 @@ class Gis:
                     'objectId': row['object_id'],
                     'objectName': row['object_name'].replace('"', '\"'),
                     'objectDescription': object_desc,
+                    'locationId': row['location_id'],
                     'id': row['id'],
                     'name': row['name'].replace('"', '\"')
                     if row['name'] else '',
