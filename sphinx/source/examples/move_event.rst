@@ -30,12 +30,12 @@ information:
   select the event from a list of already entered events. If the event you are
   looking for cannot be found in this list, please add it via **Event** in the
   menu and then link it
-* you can add one or more **preceding events**, for more information see
+* you can add a **preceding event**, for more information see
   above or the :doc:`journey` tutorial
 * via **from** you can add a location from where the move event started,
-  think the starting point of a journey or the place a letter was send from.
+  think of the starting point of a journey or the place a letter was sent from.
   You can choose a location from a list of already added locations. If the
-  place  you are looking for is not in this list yet, please add it via
+  place you are looking for is not in this list yet, please add it via
   **Place** menu and then link it
 * via **to**, you can add the end location of the move event. For more
   information check **from** (above in this tutorial)
@@ -43,7 +43,7 @@ information:
   can choose the artifact from a list of already entered artifacts. If the
   artifact is not entered into the database yet, use **Artifact** in the
   menu to create an entry and link it here
-* if a **person** was move by the event, choose the person from a list
+* if a **person** was moved by the event, choose the person from a list
   of already entered actors. If the actor is not entered into the database
   already, use the **Actor** tab in the menu to create an entry and link it
   here. **Please note**, only people who did not participate in a move event of
