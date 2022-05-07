@@ -57,7 +57,7 @@
                             {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
                             {% if not type_.system %}
                               {% if type_.count > 0 or type_.subs %}
-                                test{{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id)) }}
+                                {{ _('delete')|button(url_for('hierarchy_delete', id_=type_.id)) }}
                               {% else %}
                                 {{ _('delete')|button(
                                 url_for('hierarchy_delete', id_=type_.id),
