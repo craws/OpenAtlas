@@ -34,10 +34,13 @@ Can be linked via tabs to
 
 Move
 ****
+
 * **From** - a :doc:`place` as a start point
 * **To** - a :doc:`place` as a destination point
 * :doc:`artifact` - to select artifacts that were moved
 * :doc:`Person <actor>` - to select persons that were moved
+
+For step by step instructions have a look at our :doc:`/examples/index`.
 
 Acquisition
 ***********
