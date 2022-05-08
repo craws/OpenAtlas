@@ -1,10 +1,11 @@
 versions = {
-    '7.3.0': ['TBA', {
+    '7.3.0': ['2022-05-08', {
         'features': {
             '1388': 'Allow contributor group to delete only own entries',
             '1498': 'Remove types with subs and/or linked entities',
             '1501': 'Set multiple choice types to single type',
             '1698': 'Prevent accidentally deletion of type links',
+            '1700': 'Step by step examples for move events in manual',
             '1604': 'Script for database upgrades',
             '1631': 'Join database GIS tables',
             '1655': 'API: Performance improvement',
