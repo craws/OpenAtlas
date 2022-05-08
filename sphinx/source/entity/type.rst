@@ -10,10 +10,9 @@ interests.
 
 * The root type description is shown in forms as a mouse over text at
   the **i** icon
-* You can checked **untyped entities** at the type overview with clicking the
-  **show** link
-* You can checked **multiple linked entities** at the type overview with
-  clicking the **show** link
+* **Untyped entities** can be checked at the type overview
+* **Multiple linked entities** can be checked at the type overview, useful if
+  switching to single
 * A more detailed description on how to enter new types can be found
   :doc:`here</examples/types>`
 
