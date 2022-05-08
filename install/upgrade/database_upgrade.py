@@ -107,7 +107,7 @@ def backup_database() -> None:
         finish(
             f'Directory for database backup not writeable ({path}). Aborting!')
     print('Database backup: start')
-    if sql_export('_from_database_upgrade_script'):
+    if sql_export('_before_database_upgrade_script'):
         print(f'Database backup: successful backup at {path}')
     else:
         finish('Database backup failed.')
