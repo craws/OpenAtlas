@@ -97,7 +97,7 @@ def check_upgrade_needed() -> None:
 
 
 def check_database_version_supported() -> None:
-    if VERSION not in DATABASE_VERSIONS:
+    if DATABASE_VERSION not in DATABASE_VERSIONS:
         finish(f"Version {VERSION} isn't supported for automatic upgrades.")
 
 
