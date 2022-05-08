@@ -21,7 +21,7 @@ After updating the software you could use the new database upgrade script:
 
 or execute **install/upgrade/7.3.0.sql** after making backups.
 
-Afterwards you an Apache restart will be needed.
+Afterwards an Apache restart will be needed.
 
 The **gis** schema tables were merged into one table to the model schema
 (#1631). In case external applications depend on direct database access you
