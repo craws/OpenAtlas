@@ -17,7 +17,7 @@ is working.
 
 Beginning from 6.6.0 you could also use the database update script. It is still
 experimental but there are no know issues and a backup is made before changes
-happen.
+happen. You still should read the upgrade notes about important information.
 
 *Limitations*
 You should only do this with the official main branch of OpenAtlas.
@@ -29,6 +29,7 @@ update the SQL files accordingly before.
     $: git pull origin main
     #: python3 install/upgrade/database_upgrade.py
     #: service apache2 restart
+
 
 ### 7.2.0 to 7.3.0
 
