@@ -14,11 +14,22 @@ is working.
     service apache2 restart
 
 ### 7.2.0 to 7.3.0
-Execute **install/upgrade/7.3.0.sql** after making backups
 
-In this update the GIS tables were merged and put into the model schema. The
-(now empty) GIS schema was deleted. So take care of these changes in case other
-applications are using direct database access.
+After updating the software you could use the new database upgrade script:
+
+    python3 install/upgrade/database_upgrade.py
+
+or execute **install/upgrade/7.3.0.sql** after making backups.
+
+Afterwards you an Apache restart will be needed.
+
+The **gis** schema tables were merged into one table to the model schema
+(#1631). In case external applications depend on direct database access you
+should take care about that.
+
+With the next release (7.4.0) the API version **0.2** will be deprecated and
+version **0.3** will be the new default. Version 0.2. will still be available
+(probably about 2 releases) until it will be removed.
 
 ### 7.1.x to 7.2.0
 Execute **install/upgrade/7.2.0.sql** after making backups
