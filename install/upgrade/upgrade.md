@@ -19,13 +19,13 @@ Beginning from 6.6.0 you could also use the database update script. It is still
 experimental but there are no know issues and a backup is made before changes
 happen. You still should read the upgrade notes about important information.
 
-*Limitations*
+**Limitations**
 
 You should only do this with the official main branch of OpenAtlas.
 if the database owner is not called "openatlas" (default) you will have to
 update the SQL files accordingly before.
 
-*Usage*
+**Usage**
 
     $: git pull origin main
     #: python3 install/upgrade/database_upgrade.py
