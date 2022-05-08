@@ -20,6 +20,7 @@ experimental but there are no know issues and a backup is made before changes
 happen. You still should read the upgrade notes about important information.
 
 *Limitations*
+
 You should only do this with the official main branch of OpenAtlas.
 if the database owner is not called "openatlas" (default) you will have to
 update the SQL files accordingly before.
