@@ -58,8 +58,7 @@ def admin_index(
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
     tables = {
-        'user': Table(
-            [
+        'user': Table([
                 'username',
                 'name',
                 'group',

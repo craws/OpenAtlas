@@ -102,9 +102,12 @@ def check_database_version_supported() -> None:
 
 
 def backup_database() -> None:
+    path = config['EXPORT_DIR'] / 'sql'
+    if not os.access(path, os.W_OK):
+        finish(f'Directory for database backup not writeable ({path}).')
     print('Database backup: start')
     if sql_export('_from_database_upgrade_script'):
-        print('Database backup: successful backup at openatlas/export/sql/')
+        print(f'Database backup: successful backup at {path}')
     else:
         finish('Database backup failed.')
 
