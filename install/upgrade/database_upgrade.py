@@ -21,7 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 from config.database_versions import DATABASE_VERSIONS
 from config.default import (
     DATABASE_PASS, VERSION, DATABASE_VERSION, DATABASE_NAME, DATABASE_USER,
-    DATABASE_HOST, DATABASE_PORT)
+    DATABASE_HOST, DATABASE_PORT, EXPORT_DIR)
 from instance import production
 from openatlas.database.connect import open_connection
 from openatlas.database.settings import Settings
@@ -102,9 +102,13 @@ def check_database_version_supported() -> None:
 
 
 def backup_database() -> None:
+    path = EXPORT_DIR / 'sql'
+    if not os.access(path, os.W_OK):
+        finish(
+            f'Directory for database backup not writeable ({path}). Aborting!')
     print('Database backup: start')
     if sql_export('_from_database_upgrade_script'):
-        print('Database backup: successful backup at openatlas/export/sql/')
+        print(f'Database backup: successful backup at {path}')
     else:
         finish('Database backup failed.')
 
