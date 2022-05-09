@@ -77,7 +77,7 @@ class ApiTests(TestBaseCase):
                 feature.modified = str(datetime.now())
 
                 # Adding stratigraphic to place
-                strati = insert_entity('Kitchen', 'stratigraphic_unit', feature)
+                strati = insert_entity('Bar', 'stratigraphic_unit', feature)
                 strati.created = str(datetime.now())
                 strati.modified = str(datetime.now())
 
@@ -160,9 +160,9 @@ class ApiTests(TestBaseCase):
 
             # ---Content Endpoints---
             # ClassMapping
-            for rv in [self.app.get(url_for('api_02.class_mapping')).get_json(),
-                       self.app.get(
-                           url_for('api_03.class_mapping')).get_json()]:
+            for rv in [
+                    self.app.get(url_for('api_02.class_mapping')).get_json(),
+                    self.app.get(url_for('api_03.class_mapping')).get_json()]:
                 assert ApiTests.get_class_mapping(rv)
 
             # Content
@@ -1016,8 +1016,9 @@ class ApiTests(TestBaseCase):
                     view_classes='artifact',
                     system_classes='person',
                     format='lp',
-                    search="""{"endTo":[{"operator":"greaterThanEqual",
-                        "values":["2019-03-01"],"logicalOperator":"and"}]}""")),
+                    search=
+                    '{"endTo":[{"operator":"greaterThanEqual", '
+                    '"values":["2019-03-01"],"logicalOperator":"and"}]}')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -1122,7 +1123,7 @@ class ApiTests(TestBaseCase):
             # subunit_hierarchy/
             rv = self.app.get(url_for(
                 'api_02.subunit_hierarchy', id_=place.id)).get_json()
-            assert bool(rv['nodes'][1]['label'] == 'Kitchen')
+            assert bool(rv['nodes'][1]['label'] == 'Bar')
 
             # subunits/
             for rv in [

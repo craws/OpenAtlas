@@ -179,7 +179,8 @@ class User:
 
     @staticmethod
     def get_users_for_form() -> list[tuple[int, str]]:
-        g.cursor.execute('SELECT id, username FROM web.user ORDER BY username;')
+        g.cursor.execute(
+            'SELECT id, username FROM web.user ORDER BY username;')
         return [(row['id'], row['username']) for row in g.cursor.fetchall()]
 
     @staticmethod

@@ -1,8 +1,7 @@
-from typing import Optional, Union
+from typing import Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -34,8 +33,9 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
                 type_,  # type: ignore
                 category,
                 form.classes.data,
-                (category == 'value' or
-                 (hasattr(form, 'multiple') and form.multiple.data))),
+                bool(
+                    category == 'value' or
+                    (hasattr(form, 'multiple') and form.multiple.data)))
             type_.update(process_form_data(form, type_))
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -129,7 +129,10 @@ def remove_class(id_: int, class_name: str) -> Response:
         Type.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'remove class from hierarchy failed', e)
+        logger.log(
+            'error',
+            'database',
+            'remove class from hierarchy failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 
@@ -138,8 +141,10 @@ def remove_class(id_: int, class_name: str) -> Response:
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     type_ = g.types[id_]
-    if type_.category in ('standard', 'system') or type_.subs or type_.count:
+    if type_.category in ('standard', 'system', 'place'):
         abort(403)
+    if type_.subs:
+        return redirect(url_for('type_delete_recursive', id_=id_))
     type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('type_index'))

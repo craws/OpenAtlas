@@ -10,9 +10,8 @@ from openatlas.models.link import Link
 def get_geojson(entities: list[Entity]) -> dict[str, Any]:
     out = []
     for entity in entities:
-        if geoms := [
-            get_geojson_dict(entity, geom)
-            for geom in get_geom(entity)]:
+        if geoms := \
+                [get_geojson_dict(entity, geom) for geom in get_geom(entity)]:
             out.extend(geoms)
         else:
             out.append(get_geojson_dict(entity))

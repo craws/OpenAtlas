@@ -14,7 +14,8 @@ from openatlas.models.entity import Entity
 class GetByCode(Resource):
     @staticmethod
     @swag_from("../swagger/code.yml", endpoint="api_02.code")
-    def get(code: str) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
+    def get(code: str) -> \
+            Union[tuple[Resource, int], Response, dict[str, Any]]:
         parsed = entity_.parse_args()
         return resolve_entities(
             GetByCode.get_by_view(code, parsed),

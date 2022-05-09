@@ -88,11 +88,11 @@ class RelationTests(TestBaseCase):
             assert b'Connor' in rv.data
             rv = self.app.post(
                 url_for('link_update', id_=link_id, origin_id=actor.id),
-                data={'description': 'There can be only one!', 'inverse': True},
+                data={'description': 'There can be only one', 'inverse': True},
                 follow_redirects=True)
             assert b'only one' in rv.data
             rv = self.app.post(
                 url_for('link_update', id_=link_id2, origin_id=actor.id),
-                data={'description': 'There can be only one!', 'inverse': None},
+                data={'description': 'There can be only one', 'inverse': None},
                 follow_redirects=True)
             assert b'only one' in rv.data

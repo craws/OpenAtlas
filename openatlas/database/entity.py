@@ -184,7 +184,7 @@ class Entity:
             {'id': id_})
 
     @staticmethod
-    def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related()
+    def delete(ids: list[int]) -> None:  # Triggers psql delete_entity_related
         g.cursor.execute(
             'DELETE FROM model.entity WHERE id IN %(ids)s;',
             {'ids': tuple(ids)})

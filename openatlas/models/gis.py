@@ -57,58 +57,68 @@ class Gis:
                 + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
 
-        for shape in ['point', 'polygon', 'linestring']:
-            place_root = Type.get_hierarchy('Place')
-            for row in Db.get_by_shape(shape, extra_ids):
-                description = row['description'].replace('"', '\"') \
-                    if row['description'] else ''
-                object_desc = row['object_desc'].replace('"', '\"') \
-                    if row['object_desc'] else ''
-                item = {
-                    'type': 'Feature',
-                    'geometry': json.loads(row['geojson']),
-                    'properties': {
-                        'objectId': row['object_id'],
-                        'objectName': row['object_name'].replace('"', '\"'),
-                        'objectDescription': object_desc,
-                        'id': row['id'],
-                        'name': row['name'].replace('"', '\"')
-                        if row['name'] else '',
-                        'description': description,
-                        'shapeType': row['type']}}
-                if 'types' in row and row['types']:
-                    type_ids = ast.literal_eval(f"[{row['types']}]")
-                    for type_id in list(set(type_ids)):
-                        type_ = g.types[type_id]
-                        if type_.root and type_.root[0] == place_root.id:
-                            item['properties']['objectType'] = \
-                                type_.name.replace('"', '\"')
-                            break
-                if structure and row['object_id'] == structure['super_id']:
-                    extra['supers'].append(item)
-                elif row['object_id'] in object_ids:
-                    selected[shape].append(item)
+        place_root = Type.get_hierarchy('Place')
+        for row in Db.get_all(extra_ids):
+            description = row['description'].replace('"', '\"') \
+                if row['description'] else ''
+            object_desc = row['object_desc'].replace('"', '\"') \
+                if row['object_desc'] else ''
+            if row['point']:
+                shape = 'point'
+                geojson = row['point']
+            elif row['linestring']:
+                shape = 'linestring'
+                geojson = row['linestring']
+            else:
+                shape = 'polygon'
+                geojson = row['polygon']
+            item = {
+                'type': 'Feature',
+                'geometry': json.loads(geojson),
+                'properties': {
+                    'objectId': row['object_id'],
+                    'objectName': row['object_name'].replace('"', '\"'),
+                    'objectDescription': object_desc,
+                    'locationId': row['location_id'],
+                    'id': row['id'],
+                    'name': row['name'].replace('"', '\"')
+                    if row['name'] else '',
+                    'description': description,
+                    'shapeType': row['type']}}
+            if 'types' in row and row['types']:
+                type_ids = ast.literal_eval(f"[{row['types']}]")
+                for type_id in list(set(type_ids)):
+                    type_ = g.types[type_id]
+                    if type_.root and type_.root[0] == place_root.id:
+                        item['properties']['objectType'] = \
+                            type_.name.replace('"', '\"')
+                        break
+
+            if structure and row['object_id'] == structure['super_id']:
+                extra['supers'].append(item)
+            elif row['object_id'] in object_ids:
+                selected[shape].append(item)
+            elif row['object_id'] in subunit_ids:  # pragma no cover
+                extra['subs'].append(item)
+            elif row['object_id'] in sibling_ids:  # pragma no cover
+                extra['siblings'].append(item)
+            else:
+                all_[shape].append(item)
+            if row['polygon_point']:
+                polygon_point_item = dict(item)  # Make a copy
+                polygon_point_item['geometry'] = json.loads(
+                    row['polygon_point'])
+                if row['object_id'] in object_ids:
+                    selected['polygon_point'].append(polygon_point_item)
+                elif row['object_id'] and structure and \
+                        row['object_id'] == structure['super_id']:
+                    extra['supers'].append(polygon_point_item)
                 elif row['object_id'] in subunit_ids:  # pragma no cover
-                    extra['subs'].append(item)
+                    extra['subs'].append(polygon_point_item)
                 elif row['object_id'] in sibling_ids:  # pragma no cover
-                    extra['siblings'].append(item)
+                    extra['siblings'].append(polygon_point_item)
                 else:
-                    all_[shape].append(item)
-                if 'polygon_point' in row:
-                    polygon_point_item = dict(item)  # Make a copy
-                    polygon_point_item['geometry'] = json.loads(
-                        row['polygon_point'])
-                    if row['object_id'] in object_ids:
-                        selected['polygon_point'].append(polygon_point_item)
-                    elif row['object_id'] and structure and \
-                            row['object_id'] == structure['super_id']:
-                        extra['supers'].append(polygon_point_item)
-                    elif row['object_id'] in subunit_ids:  # pragma no cover
-                        extra['subs'].append(polygon_point_item)
-                    elif row['object_id'] in sibling_ids:  # pragma no cover
-                        extra['siblings'].append(polygon_point_item)
-                    else:
-                        all_['point'].append(polygon_point_item)
+                    all_['point'].append(polygon_point_item)
         return {
             'gisPointAll': json.dumps(all_['point']),
             'gisPointSelected': json.dumps(selected['point']),
@@ -143,7 +153,9 @@ class Gis:
                         'entity_id': entity.id,
                         'name': sanitize(item['properties']['name'], 'text'),
                         'description':
-                            sanitize(item['properties']['description'], 'text'),
+                            sanitize(
+                                item['properties']['description'],
+                                'text'),
                         'type': item['properties']['shapeType'],
                         'geojson': json.dumps(item['geometry'])})
 

@@ -57,28 +57,26 @@ class ExportTest(TestBaseCase):
                 follow_redirects=True,
                 data={
                     'zip': True,
-                    'model_cidoc_class': True,
-                    'model_cidoc_class_inheritance': True,
-                    'model_entity': True,
-                    'model_link': True,
-                    'model_property': True,
-                    'model_property_inheritance': True,
-                    'gis_linestring': True,
-                    'gis_polygon': True,
-                    'gis_point': True,
+                    'cidoc_class': True,
+                    'cidoc_class_inheritance': True,
+                    'entity': True,
+                    'link': True,
+                    'property': True,
+                    'property_inheritance': True,
+                    'gis': True,
                     'gis_format': 'wkt'})
             assert b'Data was exported as CSV' in rv.data
             data = {
-                'model_class': True,
+                'class': True,
                 'timestamps': True,
-                'gis_polygon': True,
+                'gis': True,
                 'gis_format': 'postgis'}
             rv = self.app.post(
                 url_for('export_csv'),
                 follow_redirects=True,
                 data=data)
             assert b'Data was exported as CSV' in rv.data
-            data['gis_point'] = True
+            data['gis'] = True
             data['gis_format'] = 'coordinates'
             rv = self.app.post(
                 url_for('export_csv'),
@@ -95,9 +93,6 @@ class ExportTest(TestBaseCase):
                 follow_redirects=True)
             assert b'File deleted' in rv.data
             rv = self.app.get(
-                url_for(
-                    'delete_export',
-                    type_='csv',
-                    filename='non_existing'),
+                url_for('delete_export', type_='csv', filename='non_existing'),
                 follow_redirects=True)
             assert b'An error occurred when trying to delete the f' in rv.data

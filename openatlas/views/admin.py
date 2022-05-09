@@ -34,8 +34,8 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_file_path, is_authorized, link, manual, required_group,
-    sanitize, send_mail, uc_first)
+    format_datetime, get_file_path, is_authorized, link, manual,
+    required_group, sanitize, send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -58,8 +58,7 @@ def admin_index(
             Settings.set_logo()
             return redirect(f"{url_for('admin_index')}#tab-file")
     tables = {
-        'user': Table(
-            [
+        'user': Table([
                 'username',
                 'name',
                 'group',
@@ -92,7 +91,8 @@ def admin_index(
     form = None
     if is_authorized('admin'):
         form = TestMailForm()
-        if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
+        if form.validate_on_submit() \
+                and g.settings['mail']:  # pragma: no cover
             subject = _(
                 'Test mail from %(site_name)s',
                 site_name=g.settings['site_name'])
@@ -212,7 +212,8 @@ def admin_content(item: str) -> Union[str, Response]:
         item=item,
         form=form,
         title=_('content'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)])
+        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)]
+    )
 
 
 @app.route('/admin/check_links')
@@ -270,7 +271,8 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a> {type_.name}')
+                    f'<a href="{url}">{uc_first(_("remove"))}</a>'
+                    f'{type_.name}')
             table.rows.append([
                 link(row['entity']),
                 row['entity'].class_.name,
@@ -463,9 +465,11 @@ def admin_orphans() -> str:
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
 
     for entity in filter(
-            lambda x: not isinstance(x, ReferenceSystem), Entity.get_orphans()):
+            lambda x: not isinstance(x, ReferenceSystem),
+            Entity.get_orphans()):
         tabs[
-            'unlinked' if entity.class_.view else 'orphans'].table.rows.append([
+            'unlinked'
+            if entity.class_.view else 'orphans'].table.rows.append([
                 link(entity),
                 link(entity.class_),
                 link(entity.standard_type),
@@ -585,7 +589,10 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         'admin/logo.html',
         table=table,
         title=_('logo'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-files"], _('logo')])
+        crumbs=[[
+            _('admin'),
+            f"{url_for('admin_index')}#tab-files"],
+            _('logo')])
 
 
 @app.route('/admin/log', methods=['POST', 'GET'])

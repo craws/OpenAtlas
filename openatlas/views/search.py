@@ -32,7 +32,10 @@ class SearchForm(FlaskForm):
     # Date fields
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
-    validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
+    validator_year = [
+        Optional(),
+        NumberRange(min=-4713, max=9999),
+        NoneOf([0])]
     begin_year = IntegerField(
         render_kw={'placeholder': _('YYYY')},
         validators=validator_year)

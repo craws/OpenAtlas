@@ -81,7 +81,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">{uc_first(_("types"))}</a>'
+                f'class="nav-item nav-link {active}">' \
+                f'{uc_first(_("types"))}</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
@@ -498,7 +499,8 @@ def add_reference_systems_to_form(form: Any) -> str:
         html += add_form_row(
             field,
             field.label,
-            f'{field(class_=class_)} {precision_field.label} {precision_field}',
+            f'{field(class_=class_)} {precision_field.label} '
+            f'{precision_field}',
             row_css=f'external-reference {switch_class}')
     return html
 
@@ -539,8 +541,8 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def external_url(url: Union[str, None]) -> str:
     return \
-        f'<a target="blank_" rel="noopener noreferrer" href="{url}">{url}</a>' \
-        if url else ''
+        f'<a target="blank_" rel="noopener noreferrer" href="{url}">' \
+        f'{url}</a>' if url else ''
 
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
@@ -580,17 +582,24 @@ def delete_link(name: str, url: str) -> str:
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
-def display_delete_link(entity: Entity) -> str:
-    if entity.id in g.types:
+def display_delete_link(entity: Union[Entity, Type]) -> str:
+    from openatlas.models.type import Type
+    confirm = ''
+    if isinstance(entity, Type):
         url = url_for('type_delete', id_=entity.id)
+        if entity.count or entity.subs:
+            url = url_for('type_delete_recursive', id_=entity.id)
     else:
         if current_user.group == 'contributor':  # pragma: no cover
             info = logger.get_log_info(entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-    confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(_('delete'), url, onclick=f"return confirm('{confirm}')")
+        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return button(
+        _('delete'),
+        url,
+        onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
 @app.template_filter()
@@ -645,7 +654,7 @@ def button(
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}
-            {f'id="{id_}"' if id_ else ''} 
+            {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
 
@@ -665,7 +674,8 @@ def button_icon(
         id_: Optional[str] = None,
         onclick: Optional[str] = None) -> str:
     tag = 'a' if url else 'span'
-    css_class = 'btn btn-xsm' if css == '' else app.config['CSS']['button'][css]
+    css_class = 'btn btn-xsm' if css == '' \
+        else app.config['CSS']['button'][css]
     return Markup(f"""
         <{tag}
             {f'href="{url}"' if url else ''}

@@ -64,7 +64,8 @@ def login() -> Union[str, Response]:
                 if user.active:
                     login_user(user)
                     session['login_previous_success'] = user.login_last_success
-                    session['login_previous_failures'] = user.login_failed_count
+                    session['login_previous_failures'] = \
+                        user.login_failed_count
                     if user.settings['language']:
                         session['language'] = user.settings['language']
                     user.login_last_success = datetime.datetime.now()
@@ -79,7 +80,10 @@ def login() -> Union[str, Response]:
                     f'Inactive login try {user.username}')
                 flash(_('error inactive'), 'error')
             else:
-                logger.log('notice', 'auth', f'Wrong password: {user.username}')
+                logger.log(
+                    'notice',
+                    'auth',
+                    f'Wrong password: {user.username}')
                 user.login_failed_count += 1
                 user.login_last_failure = datetime.datetime.now()
                 user.update()

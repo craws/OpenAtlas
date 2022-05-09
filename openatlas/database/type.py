@@ -138,7 +138,9 @@ class Type:
         return g.cursor.fetchone()['count']
 
     @staticmethod
-    def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
+    def remove_class_from_hierarchy(
+            class_name: str,
+            hierarchy_id: int) -> None:
         g.cursor.execute(
             """
             DELETE FROM web.hierarchy_openatlas_class

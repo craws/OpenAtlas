@@ -86,7 +86,7 @@ class TableSelect(HiddenInput):
                     g.properties if field.id == 'cidoc_property'
                     else g.cidoc_classes).items():
                 onclick = f'''
-                    onclick=(selectFromTable(
+                    onclick="selectFromTable(
                         this,
                         '{field.id}',
                         '{id_}',

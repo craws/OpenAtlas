@@ -116,7 +116,8 @@ class Type(Entity):
         return items
 
     @staticmethod
-    def get_class_choices(root: Optional[Type] = None) -> list[tuple[int, str]]:
+    def get_class_choices(
+            root: Optional[Type] = None) -> list[tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
             if class_.new_types_allowed \
@@ -195,8 +196,9 @@ class Type(Entity):
     def get_all_sub_ids(
             type_: Type,
             subs: Optional[list[int]] = None) -> list[int]:
-        subs = (subs if subs else []) + type_.subs
+        subs = subs if subs else []
         for sub_id in type_.subs:
+            subs.append(sub_id)
             Type.get_all_sub_ids(g.types[sub_id], subs)
         return subs
 
@@ -207,7 +209,8 @@ class Type(Entity):
         return None
 
     @staticmethod
-    def remove_class_from_hierarchy(class_name: str, hierarchy_id: int) -> None:
+    def remove_class_from_hierarchy(
+            class_name: str, hierarchy_id: int) -> None:
         Db.remove_class_from_hierarchy(class_name, hierarchy_id)
 
     @staticmethod

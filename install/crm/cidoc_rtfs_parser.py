@@ -1,4 +1,4 @@
-# This script is for developing purposes and is not needed to install OpenAtlas.
+# This script is for developing purposes and not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
 # Currently we are using CIDOC CRM 7.7.1 (October 2021) from
@@ -32,17 +32,12 @@ DATABASE_PASS = 'CHANGE ME'
 
 
 def connect() -> psycopg2.connect:
-    try:
-        connection_ = psycopg2.connect(
-            database=DATABASE_NAME,
-            user=DATABASE_USER,
-            password=DATABASE_PASS,
-            port=DATABASE_PORT,
-            host=DATABASE_HOST)
-        return connection_
-    except Exception as e:
-        print("Database connection error.")
-        raise Exception(e)
+    return psycopg2.connect(
+        database=DATABASE_NAME,
+        user=DATABASE_USER,
+        password=DATABASE_PASS,
+        port=DATABASE_PORT,
+        host=DATABASE_HOST)
 
 
 class Item:

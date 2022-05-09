@@ -13,6 +13,43 @@ is working.
 
     service apache2 restart
 
+## New automatic upgrades
+
+Beginning from 6.6.0 you could also use the database update script. It is still
+experimental but there are no know issues and a backup is made before changes
+happen. You still should read the upgrade notes about important information.
+
+**Limitations**
+
+* You should only do this with the official main branch of OpenAtlas.
+* If the database owner is not called "openatlas" (default) you will have to
+  update the SQL files accordingly before.
+
+**Usage**
+
+    $: git pull origin main
+    #: python3 install/upgrade/database_upgrade.py
+    #: service apache2 restart
+
+
+### 7.2.0 to 7.3.0
+
+After updating the software you could use the new database upgrade script:
+
+    python3 install/upgrade/database_upgrade.py
+
+or execute **install/upgrade/7.3.0.sql** after making backups.
+
+Afterwards an Apache restart will be needed.
+
+The **gis** schema tables were merged into one table to the model schema
+(#1631). In case external applications depend on direct database access you
+should take care about that.
+
+With the next release (7.4.0) the API version **0.2** will be deprecated and
+version **0.3** will be the new default. Version 0.2. will still be available
+(probably about 2 releases) until it will be removed.
+
 ### 7.1.x to 7.2.0
 Execute **install/upgrade/7.2.0.sql** after making backups
 
