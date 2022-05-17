@@ -109,12 +109,6 @@ class TableSelect(HiddenInput):
                     ['activity', 'acquisition', 'move', 'production'],
                     types=True,
                     aliases=aliases)
-            elif field.id.startswith('event_'):
-                class_ = 'event'
-                entities = Entity.get_by_view(
-                    'event',
-                    types=True,
-                    aliases=aliases)
             else:
                 class_ = field.id
                 entities = Entity.get_by_view(
