@@ -36,6 +36,7 @@ FORMS = {
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
     'bibliography': ['name', 'description', 'continue'],
     'edition': ['name', 'description', 'continue'],
+    'event': ['name', 'date', 'description', 'continue'],
     'external_reference': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
@@ -244,7 +245,8 @@ def add_fields(
     elif class_ in view_class_mapping['event']:
         setattr(form, 'event_id', HiddenField())
         setattr(form, 'event', TableField(_('sub event of')))
-        setattr(form, 'event_preceding', TableField(_('preceding event')))
+        if class_ in ['activity', 'acquisition', 'move', 'production']:
+            setattr(form, 'event_preceding', TableField(_('preceding event')))
         if class_ in ['activity', 'acquisition', 'production']:
             setattr(form, 'place', TableField(_('location')))
         if class_ == 'acquisition':
