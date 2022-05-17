@@ -1,5 +1,8 @@
 versions = {
-    '7.4.0': ['TBA', {}],
+    '7.4.0': ['TBA', {
+        'features': {
+            '1620': 'Natural events'}
+    }],
     '7.3.0': ['2022-05-08', {
         'features': {
             '1388': 'Allow contributor group to delete only own entries',

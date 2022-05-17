@@ -7,6 +7,7 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 * **Activity** - the most common, e.g. a battle, a meeting or a wedding
 * **Acquisition** - mapping a change of property
+* **Event** - used for event not performed by actors, e.g. natural disaster
 * **Move** - movement of artifacts or persons
 * **Production** - creation of artifacts
 
