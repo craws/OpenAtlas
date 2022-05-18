@@ -10,7 +10,7 @@ class Network:
     @staticmethod
     def get_network_json(
             colors: dict[str, str],
-            hide_orphans: bool,
+            show_orphans: bool,
             dimensions: Optional[int]) -> Optional[str]:
         mapping = Db.get_object_mapping()
         classes = [c.name for c in g.classes.values() if c.network_color]
@@ -44,7 +44,7 @@ class Network:
                 'target': range_id})
             edge_entity_ids.add(domain_id)
             edge_entity_ids.add(range_id)
-        if hide_orphans:
+        if not show_orphans:
             nodes[:] = [d for d in nodes if int(d['id']) in edge_entity_ids]
         return str({
             'nodes': nodes,
