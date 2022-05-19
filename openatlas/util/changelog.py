@@ -1,7 +1,8 @@
 versions = {
     '7.4.0': ['TBA', {
         'features': {
-            '1620': 'Natural events'}
+            '1620': 'Natural events',
+            '1581': 'Upgrade Bootstrap to 5'}
     }],
     '7.3.0': ['2022-05-08', {
         'features': {

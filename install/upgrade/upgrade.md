@@ -22,6 +22,16 @@ base, then run the database upgrade script, then restart Apache:
 ### 7.3.0 to 7.4.0
 7.4.0.sql is needed (wil be taken care of by the database upgrade script).
 
+NPM packages need to be upgraded for the Bootstrap upgrade:
+
+    $ pip3 install calmjs
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
+In case you get a warning in the last step about not overwriting existing
+'../package.json', delete this file manually and try again.
+
 ### 7.2.0 to 7.3.0
 7.3.0.sql is needed (wil be taken care of by the database upgrade script).
 
