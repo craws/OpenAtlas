@@ -205,7 +205,7 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'P9',
                 'range': form.event.data})
-        if form.event_preceding.data:
+        if hasattr(form, 'event_preceding') and form.event_preceding.data:
             data['links']['insert'].append({
                 'property': 'P134',
                 'range': form.event_preceding.data,

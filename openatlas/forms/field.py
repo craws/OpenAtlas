@@ -103,10 +103,10 @@ class TableSelect(HiddenInput):
                     'place',
                     types=True,
                     aliases=aliases)
-            elif field.id.startswith('event_'):
+            elif field.id == 'event_preceding':
                 class_ = 'event'
-                entities = Entity.get_by_view(
-                    'event',
+                entities = Entity.get_by_class(
+                    ['activity', 'acquisition', 'move', 'production'],
                     types=True,
                     aliases=aliases)
             else:

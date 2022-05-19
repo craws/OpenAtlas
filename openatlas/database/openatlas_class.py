@@ -45,6 +45,7 @@ class OpenAtlasClass:
                 SELECT json_agg(reference_system_id) AS system_ids FROM (
                     SELECT reference_system_id
                     FROM web.reference_system_openatlas_class ro
-                    WHERE c.name = ro.openatlas_class_name) y) y;
+                    WHERE c.name = ro.openatlas_class_name) y) y
+            ORDER BY c.name;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
