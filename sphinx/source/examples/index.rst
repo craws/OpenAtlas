@@ -14,6 +14,8 @@ General
 
    artifacts
    move_event
+   places
+   reference_systems
    types
 
 
@@ -35,4 +37,3 @@ Historical
    journey
    letters
    profession
-

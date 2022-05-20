@@ -45,7 +45,7 @@
    
   <div class="wy-grid-for-nav">
     
-    <nav data-bs-toggle="wy-nav-shift" class="wy-nav-side">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
           
@@ -121,12 +121,12 @@
       </div>
     </nav>
 
-    <section data-bs-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
 
       
       <nav class="wy-nav-top" aria-label="top navigation">
         
-          <i data-bs-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">OpenAtlas</a>
         
       </nav>
@@ -183,28 +183,33 @@
 <h1>Reference System<a class="headerlink" href="#reference-system" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>For step by step instructions have a look at our
+<a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a>.</p>
 <p>Reference systems can be used to link entities to external sources, e.g. to
-<a class="reference external" href="https://www.wikidata.org/">Wikidata</a>  or <a class="reference external" href="https://www.geonames.org/">GeoNames</a>
-which are already included in the default application. You can see a list of available systems by
-clicking the <strong>Reference system</strong> button on the start page. Links consists of an identifier (ID)
-and a precision.</p>
+<a class="reference external" href="https://www.wikidata.org/">Wikidata</a>  or
+<a class="reference external" href="https://www.geonames.org/">GeoNames</a>
+which are already included in the default application. You can see a list of
+available systems by clicking the <strong>Reference system</strong> button on the start
+page. Links consists of an identifier (ID) and a precision.</p>
 <div class="section" id="id">
 <h2>ID<a class="headerlink" href="#id" title="Permalink to this headline">¶</a></h2>
-<p>The identifier of the entity in the external reference system. For GeoNames and Wikidata it will be
-checked for a valid format.</p>
+<p>The identifier of the entity in the external reference system. For GeoNames
+and Wikidata it will be checked for a valid format.</p>
 </div>
 <div class="section" id="precision">
 <h2>Precision<a class="headerlink" href="#precision" title="Permalink to this headline">¶</a></h2>
-<p>When linking to an external reference a precision is required. Available options are the
-<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of the confidence degree that
-concepts can be used interchangeable.</p>
+<p>When linking to an external reference a precision is required. Available
+options are the <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions
+of the confidence degree that concepts can be used interchangeable.</p>
 <ul class="simple">
-<li><p><strong>Close match</strong>: Concepts are sufficiently similar that they can be used interchangeably in some
-information retrieval applications</p></li>
-<li><p><strong>Exact match</strong>: High degree of confidence that the concepts can be used interchangeably</p></li>
+<li><p><strong>Close match</strong>: Concepts are sufficiently similar that they can be used
+interchangeably in some information retrieval applications</p></li>
+<li><p><strong>Exact match</strong>: High degree of confidence that the concepts can be used
+interchangeably</p></li>
 </ul>
-<p>E.g. if a historical project links the city of Vienna to Wikidata, a <strong>close match</strong> would be more
-suitable, because the Wikidata entry is more about the current city and not the historical one.</p>
+<p>E.g. if a historical project links the city of Vienna to Wikidata, a
+<strong>close match</strong> would be more suitable, because the Wikidata entry is more
+about the current city and not the historical one.</p>
 </div>
 <div class="section" id="configuration">
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
@@ -213,18 +218,24 @@ suitable, because the Wikidata entry is more about the current city and not the 
 <li><p><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</p></li>
 <li><p><strong>Website URL</strong> - an URL to the project site of the reference system</p></li>
 <li><p><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
-e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create together with a <strong>Q123</strong>
+e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create
+together with a <strong>Q123</strong>
 identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></p></li>
-<li><p><strong>Example ID</strong> - an example id to show the desired format e.g. Q123 for Wikidata</p></li>
+<li><p><strong>Example ID</strong> - an example id to show the desired format e.g. Q123
+for Wikidata</p></li>
 <li><p><strong>External reference match</strong> - default precision selected in forms</p></li>
-<li><p><strong>Description</strong> - a short description, shown in forms when mouse over the <strong>i</strong> icon</p></li>
-<li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place is available</p></li>
+<li><p><strong>Description</strong> - a short description, shown in forms when mouse over
+the <strong>i</strong> icon</p></li>
+<li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place
+is available</p></li>
 </ul>
-<p>Classes can be removed from a system by clicking on the tab with the corresponding class name and
-clicking the <strong>Remove</strong> button. This button is only available if there are no entities of this class
-linked to the reference system.</p>
-<p>Reference systems can be deleted only if no classes are attached to it. Wikidata and GeoNames are
-integrated and cannot be deleted but if desired they can be disabled by removing the classes.</p>
+<p>Classes can be removed from a system by clicking on the tab with the
+corresponding class name and clicking the <strong>Remove</strong> button. This button is
+only available if there are no entities of this class linked to the reference
+system.</p>
+<p>Reference systems can be deleted only if no classes are attached to it.
+Wikidata and GeoNames are integrated and cannot be deleted but if desired they
+can be disabled by removing the classes.</p>
 </div>
 </div>
 
