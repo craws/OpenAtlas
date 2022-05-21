@@ -177,9 +177,7 @@
     {% for category, message in messages %}
       <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
         {{ message|uc_first }}
-        <button type="button" class="close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}">
-          <span aria-hidden="true">&times;</span>
-        </button>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}"></button>
       </div>
     {% endfor %}
   {% endif %}
