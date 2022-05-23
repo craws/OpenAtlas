@@ -6,7 +6,8 @@ from openatlas.api.v03.endpoints.display_image import DisplayImage
 from openatlas.api.v03.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
     GetLatest, GetQuery, GetTypeEntities, GetTypeEntitiesAll
-from openatlas.api.v03.endpoints.type import GetSubunits, GetTypeOverview, \
+from openatlas.api.v03.endpoints.type import GetSubunits, GetTypeByViewClass, \
+    GetTypeOverview, \
     GetTypeTree
 
 
@@ -56,6 +57,10 @@ def add_routes_v03(api: Api) -> None:
         GetTypeTree,
         '/type_tree/',
         endpoint="type_tree")
+    api.add_resource(
+        GetTypeByViewClass,
+        '/type_by_view_class/',
+        endpoint="type_by_view_class")
     api.add_resource(
         GetSubunits,
         '/subunits/<int:id_>',

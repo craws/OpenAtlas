@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Type, Union
 
 from flask_restful import fields
@@ -69,6 +70,7 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'hierarchy': fields.String,
         'value': fields.Float,
         'unit': fields.String}
+
     names = {'alias': fields.String}
     start = {'earliest': fields.String, 'latest': fields.String}
     end = {'earliest': fields.String, 'latest': fields.String}
@@ -242,6 +244,24 @@ def type_overview_template() -> dict[str, Any]:
         'custom': fields.List(fields.Nested(type_details)),
         'value': fields.List(fields.Nested(type_details)),
         'system': fields.List(fields.Nested(type_details))}
+
+
+def type_by_view_class_template(types) -> dict[str, Any]:
+    children = {
+        'id': fields.Integer,
+        'url': fields.String,
+        'label': fields.String,
+        'children': fields.List(fields.Raw)}
+    type_details = {
+        'id': fields.Integer,
+        'name': fields.String,
+        'viewClass': fields.List(fields.String),
+        'children': fields.List(fields.Nested(children))}
+
+    dict_: dict[str, Any] = defaultdict()
+    for key in types:
+        dict_[key] = fields.List(fields.Nested(type_details))
+    return dict_
 
 
 def class_overview_template() -> dict[str, Type[String]]:
