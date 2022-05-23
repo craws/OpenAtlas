@@ -841,6 +841,16 @@ class ApiTests(TestBaseCase):
                 rv = rv['place'][0]['children'][0]
                 assert bool(rv['label'] == 'Austria')
 
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.type_by_view_class')),
+                self.app.get(url_for(
+                    'api_03.type_by_view_class',
+                    download=True))]:
+                rv = rv.get_json()
+                rv = rv['place'][0]['children'][0]
+                assert bool(rv['label'] == 'Boundary Mark')
+
             # Test Type Tree
             for rv in [
                 self.app.get(url_for(
