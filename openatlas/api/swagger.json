@@ -642,6 +642,160 @@
         },
         "type": "object"
       },
+            "TypesByViewClassModel": {
+        "properties": {
+          "actor_actor_relation": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "actor_function": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "artifact": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "bibliography": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "stratigraphic_unit": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "human_remains": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "acquisition": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "activity": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "edition": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "feature": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "file": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "group": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "move": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "person": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "place": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "source": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "event": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "production": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "external_reference": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "involvement": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          },
+          "source_translation": {
+            "items": {
+              "$ref": "#/components/schemas/TypesByViewClassEntry"
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "TypesByViewClassEntry": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "viewClass": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TypeOverviewChildren"
+            }
+          }
+        }
+      },
       "TypeOverviewModel": {
         "properties": {
           "custom": {

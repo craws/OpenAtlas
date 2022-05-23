@@ -255,7 +255,7 @@ def type_by_view_class_template(types) -> dict[str, Any]:
     type_details = {
         'id': fields.Integer,
         'name': fields.String,
-        'viewClass': fields.List(fields.String),
+        'category': fields.String,
         'children': fields.List(fields.Nested(children))}
 
     dict_: dict[str, Any] = defaultdict()

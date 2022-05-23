@@ -29,32 +29,28 @@ def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
     return items
 
 
-def get_type_overview_dict(type_: Type) -> dict[str, list[Any]]:
-    return {
-        "id": type_.id,
-        "name": type_.name,
-        "viewClass": type_.classes,
-        "children": walk_type_tree(Type.get_types(type_.name))}
-
-
 class GetTypeByViewClass(Resource):
     @staticmethod
     @swag_from("../swagger/type_by_view_class.yml",
                endpoint="api_03.type_by_view_class")
     def get() -> Union[tuple[Resource, int], Response]:
-        types = GetTypeByViewClass.get_type_overview()
+        types = GetTypeByViewClass.get_type_by_view()
         if default.parse_args()['download']:
             return download(types, type_by_view_class_template(types), 'types')
         return marshal(types, type_by_view_class_template(types)), 200
 
     @staticmethod
-    def get_type_overview() -> dict[str, dict[Entity, str]]:
+    def get_type_by_view() -> dict[str, dict[Entity, str]]:
         types: dict[str, Any] = defaultdict(list)
-        for node in g.types.values():
-            if node.root:
+        for type_ in g.types.values():
+            if type_.root:
                 continue
-            for class_ in node.classes:
-                types[class_].append(get_type_overview_dict(node))
+            for class_ in type_.classes:
+                types[class_].append({
+                    "id": type_.id,
+                    "name": type_.name,
+                    "category": type_.category,
+                    "children": walk_type_tree(Type.get_types(type_.name))})
         return types
 
 
@@ -79,7 +75,11 @@ class GetTypeOverview(Resource):
         for node in g.types.values():
             if node.root:
                 continue
-            nodes[node.category].append(get_type_overview_dict(node))
+            nodes[node.category].append({
+                "id": node.id,
+                "name": node.name,
+                "viewClass": node.classes,
+                "children": walk_type_tree(Type.get_types(node.name))})
         return nodes
 
 
