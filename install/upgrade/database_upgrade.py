@@ -69,13 +69,13 @@ def execute_upgrade() -> None:
         if not is_before and current_version != version:
             print(f'Upgrade {current_version} to {version}: start')
             filename = f'{version}.sql'
-            install_path = Path(os.getcwd()) / 'install'
+            upgrade_sql_path = Path(__file__).parent
             sql_file_path = None
-            for path in install_path.rglob(filename):
+            for path in upgrade_sql_path.rglob(filename):
                 sql_file_path = path
                 break
             if not sql_file_path:
-                finish(f'{filename} not found in {install_path}. Aborting')
+                finish(f'{filename} not found in {upgrade_sql_path}. Aborting')
             try:
                 with open(str(sql_file_path), 'r') as sql_file:
                     cursor.execute(sql_file.read())
