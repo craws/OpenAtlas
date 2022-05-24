@@ -93,7 +93,7 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.begins_in.data = first.get_linked_entity_safe('P53', True).id
         if last := entity.get_linked_entity('OA9'):
             form.ends_in.data = last.get_linked_entity_safe('P53', True).id
-    elif entity.class_.name == 'artifact':
+    elif entity.class_.name in ['artifact', 'human_remains']:
         owner = entity.get_linked_entity('P52')
         form.actor.data = owner.id if owner else None
     elif entity.class_.view == 'event':

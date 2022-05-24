@@ -240,7 +240,7 @@ def add_fields(
                 'actor',
                 TableMultiField(_('actor'), [InputRequired()]))
             setattr(form, 'relation_origin_id', HiddenField())
-    elif class_ == 'artifact':
+    elif class_ in ['artifact', 'human_remains']:
         setattr(form, 'actor', TableField(_('owned by')))
     elif class_ in view_class_mapping['event']:
         setattr(form, 'event_id', HiddenField())

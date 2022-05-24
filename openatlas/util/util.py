@@ -252,7 +252,7 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-    elif entity.class_.view == 'artifact':
+    elif entity.class_.name in ['artifact', 'human_remains']:
         data[_('source')] = \
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
