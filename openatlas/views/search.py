@@ -30,6 +30,9 @@ class SearchForm(FlaskForm):
     search = SubmitField(_('search'))
 
     # Date fields
+    validator_second = [Optional(), NumberRange(min=1, max=60)]
+    validator_minute = [Optional(), NumberRange(min=1, max=60)]
+    validator_hour = [Optional(), NumberRange(min=1, max=24)]
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
     validator_year = [
@@ -45,6 +48,15 @@ class SearchForm(FlaskForm):
     begin_day = IntegerField(
         render_kw={'placeholder': 1},
         validators=validator_day)
+    begin_hour = IntegerField(
+        render_kw={'placeholder': 1},
+        validators=validator_hour)
+    begin_minute = IntegerField(
+        render_kw={'placeholder': 1},
+        validators=validator_minute)
+    begin_second = IntegerField(
+        render_kw={'placeholder': 1},
+        validators=validator_second)
     end_year = IntegerField(
         render_kw={'placeholder': _('YYYY')},
         validators=validator_year)
@@ -54,6 +66,15 @@ class SearchForm(FlaskForm):
     end_day = IntegerField(
         render_kw={'placeholder': 31},
         validators=validator_day)
+    end_hour = IntegerField(
+        render_kw={'placeholder': 24},
+        validators=validator_hour)
+    end_minute = IntegerField(
+        render_kw={'placeholder': 60},
+        validators=validator_minute)
+    end_second = IntegerField(
+        render_kw={'placeholder': 60},
+        validators=validator_second)
     include_dateless = BooleanField(_('Include dateless entities'))
 
     def validate(self) -> bool:
@@ -109,11 +130,17 @@ def build_search_table(form: FlaskForm) -> Table:
         'from_date': form_to_datetime64(
             form.begin_year.data,
             form.begin_month.data,
-            form.begin_day.data),
+            form.begin_day.data,
+            form.begin_hour.data,
+            form.begin_minute.data,
+            form.begin_second.data),
         'to_date': form_to_datetime64(
             form.end_year.data,
             form.end_month.data,
             form.end_day.data,
+            form.end_hour.data,
+            form.end_minute.data,
+            form.end_second.data,
             to_date=True)})
     for entity in entities:
         table.rows.append([
