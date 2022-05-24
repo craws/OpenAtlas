@@ -95,12 +95,12 @@ class Link:
                 l.modified,
                 e.name,
                 l.type_id,
-                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from, l.begin_comment,
-                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
-                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
             FROM model.link l
             JOIN model.entity e
                 ON l.{'domain' if inverse else 'range'}_id = e.id """
@@ -143,13 +143,13 @@ class Link:
                 l.created,
                 l.modified,
                 l.type_id,
-                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from, l.begin_comment,
-                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_to,
-                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
             FROM model.link l
             WHERE l.id = %(id)s;
             """,

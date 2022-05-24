@@ -405,6 +405,9 @@ def build_move_form(type_: Type) -> FlaskForm:
 
 
 def add_date_fields(form: Any) -> None:
+    validator_second = [OptionalValidator(), NumberRange(min=0, max=60)]
+    validator_minute = [OptionalValidator(), NumberRange(min=0, max=60)]
+    validator_hour = [OptionalValidator(), NumberRange(min=0, max=24)]
     validator_day = [OptionalValidator(), NumberRange(min=1, max=31)]
     validator_month = [OptionalValidator(), NumberRange(min=1, max=12)]
     validator_year = [
@@ -418,12 +421,24 @@ def add_date_fields(form: Any) -> None:
         render_kw={'placeholder': _('MM')}, validators=validator_month))
     setattr(form, 'begin_day_from', IntegerField(
         render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_hour_from', IntegerField(
+        render_kw={'placeholder': _('hh')}, validators=validator_hour))
+    setattr(form, 'begin_minute_from', IntegerField(
+        render_kw={'placeholder': _('mm')}, validators=validator_minute))
+    setattr(form, 'begin_second_from', IntegerField(
+        render_kw={'placeholder': _('ss')}, validators=validator_second))
     setattr(form, 'begin_year_to', IntegerField(
         render_kw={'placeholder': _('YYYY')}, validators=validator_year))
     setattr(form, 'begin_month_to', IntegerField(
         render_kw={'placeholder': _('MM')}, validators=validator_month))
     setattr(form, 'begin_day_to', IntegerField(
         render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'begin_hour_to', IntegerField(
+        render_kw={'placeholder': _('hh')}, validators=validator_hour))
+    setattr(form, 'begin_minute_to', IntegerField(
+        render_kw={'placeholder': _('mm')}, validators=validator_minute))
+    setattr(form, 'begin_second_to', IntegerField(
+        render_kw={'placeholder': _('ss')}, validators=validator_second))
     setattr(form, 'begin_comment', StringField(
         render_kw={'placeholder': _('comment')}))
     setattr(form, 'end_year_from', IntegerField(
@@ -432,11 +447,23 @@ def add_date_fields(form: Any) -> None:
         render_kw={'placeholder': _('MM')}, validators=validator_month))
     setattr(form, 'end_day_from', IntegerField(
         render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_hour_from', IntegerField(
+        render_kw={'placeholder': _('hh')}, validators=validator_hour))
+    setattr(form, 'end_minute_from', IntegerField(
+        render_kw={'placeholder': _('mm')}, validators=validator_minute))
+    setattr(form, 'end_second_from', IntegerField(
+        render_kw={'placeholder': _('ss')}, validators=validator_second))
     setattr(form, 'end_year_to', IntegerField(
         render_kw={'placeholder': _('YYYY')}, validators=validator_year))
     setattr(form, 'end_month_to', IntegerField(
         render_kw={'placeholder': _('MM')}, validators=validator_month))
     setattr(form, 'end_day_to', IntegerField(
         render_kw={'placeholder': _('DD')}, validators=validator_day))
+    setattr(form, 'end_hour_to', IntegerField(
+        render_kw={'placeholder': _('hh')}, validators=validator_hour))
+    setattr(form, 'end_minute_to', IntegerField(
+        render_kw={'placeholder': _('mm')}, validators=validator_minute))
+    setattr(form, 'end_second_to', IntegerField(
+        render_kw={'placeholder': _('ss')}, validators=validator_second))
     setattr(form, 'end_comment', StringField(
         render_kw={'placeholder': _('comment')}))

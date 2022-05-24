@@ -67,8 +67,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-            'source', 'event', 'actor', 'place', 'artifact', 'reference',
-            'type']:
+        'source', 'event', 'actor', 'place', 'artifact', 'reference',
+        'type']:
         active = ''
         request_parts = request.path.split('/')
         if (view_name == item) or request.path.startswith('/index/' + item):
@@ -159,8 +159,8 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-            f for f in path.iterdir()
-            if (path / f).is_file() and f.name != '.gitignore']:
+        f for f in path.iterdir()
+        if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -509,10 +509,14 @@ def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
     for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_hour_from', 'begin_minute_from', 'begin_second_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'begin_hour_to', 'begin_minute_to', 'begin_second_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_hour_from', 'end_minute_from', 'end_second_from',
+        'end_year_to', 'end_month_to', 'end_day_to',
+        'end_hour_to', 'end_minute_to', 'end_second_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -976,7 +980,7 @@ def display_value_type_fields(
                         {sub.description if sub.description else ''}
                     </span>
                 </div>
-                {display_value_type_fields(form, sub, root, level+1)}
+                {display_value_type_fields(form, sub, root, level + 1)}
             </div>
         </div>"""
     return html
@@ -1007,21 +1011,31 @@ def format_date_part(date: numpy.datetime64, part: str) -> str:
     if string.startswith('-') or string.startswith('0000'):
         bc = True
         string = string[1:]
+    string = string.replace('T', '-').replace(':', '-')
     parts = string.split('-')
     if part == 'year':  # If it's a negative year, add one year
         return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
     if part == 'month':
         return parts[1]
+    if part == 'hour':
+        return parts[3]
+    if part == 'minute':
+        return parts[4]
+    if part == 'second':
+        return parts[5]
     return parts[2]
 
 
 def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
     if not string:
         return None
+    string = string.split(' ')
     if 'BC' in string:
-        parts = string.split(' ')[0].split('-')
-        string = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}'
-    return numpy.datetime64(string.split(' ')[0])
+        parts = string[0].split('-')
+        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string[1]}'
+        return numpy.datetime64(date)
+    date = f'{string[0]}T{string[1]}'
+    return numpy.datetime64(date)
 
 
 def datetime64_to_timestamp(
@@ -1033,9 +1047,16 @@ def datetime64_to_timestamp(
     if string.startswith('-') or string.startswith('0000'):
         string = string[1:]
         postfix = ' BC'
+    string = string.replace('T', '-').replace(':', '-')
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
-    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
+    hour, minute, second = 0, 0, 0
+    if len(parts) > 3:
+        hour = parts[3]
+        minute = parts[4]
+        second = parts[5]
+    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}' \
+           f' {int(hour):02}:{int(minute):02}:{int(second):02}{postfix}'
 
 
 def get_entities_linked_to_type_recursive(
