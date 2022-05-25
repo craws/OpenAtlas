@@ -2,6 +2,7 @@ versions = {
     '7.4.0': ['TBA', {
         'features': {
             '1620': 'Natural events',
+            '1108': 'Current owner of human remains',
             '1581': 'Upgrade Bootstrap to 5',
             '1725': 'Additional step by step examples in the manual'},
         'fix': {
