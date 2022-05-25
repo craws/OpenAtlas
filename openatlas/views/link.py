@@ -50,7 +50,9 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
                 inverse=inverse)
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     if entity.class_.view == 'actor' and view == 'artifact':
-        excluded = Entity.get_by_link_property(property_code, 'artifact')
+        excluded = \
+            Entity.get_by_link_property(property_code, 'artifact') + \
+            Entity.get_by_link_property(property_code, 'human_remains')
     else:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
