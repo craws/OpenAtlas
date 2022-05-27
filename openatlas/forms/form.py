@@ -21,7 +21,6 @@ from openatlas.forms.populate import pre_populate_form
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.openatlas_class import view_class_mapping
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.table import Table
@@ -78,7 +77,8 @@ def get_form(
         setattr(Form, 'alias', FieldList(RemovableListField('')))
     if class_ in g.classes and g.classes[class_].hierarchies:
         add_types(Form, class_)
-    add_fields(Form, class_, code, entity, origin)
+    for id_, field in additional_fields(class_, code, entity, origin).items():
+        setattr(Form, id_, field)
     add_reference_systems(Form, class_)
     if 'date' in FORMS[class_]:
         add_date_fields(Form)
@@ -226,114 +226,141 @@ def add_types(form: Any, class_: str) -> None:
             add_value_type_fields(form, type_.subs)
 
 
-def add_fields(
-        form: Any,
+def additional_fields(
         class_: str,
         code: Union[str, None],
         entity: Union[Entity, Link, ReferenceSystem, Type, None],
-        origin: Union[Entity, Type, None]) -> None:
-    if class_ == 'actor_actor_relation':
-        setattr(form, 'inverse', BooleanField(_('inverse')))
-        if not entity:
-            setattr(
-                form,
-                'actor',
-                TableMultiField(_('actor'), [InputRequired()]))
-            setattr(form, 'relation_origin_id', HiddenField())
-    elif class_ in ['artifact', 'human_remains']:
-        setattr(form, 'actor', TableField(_('owned by')))
-    elif class_ in view_class_mapping['event']:
-        setattr(form, 'event_id', HiddenField())
-        setattr(form, 'event', TableField(_('sub event of')))
-        if class_ in ['activity', 'acquisition', 'move', 'production']:
-            setattr(form, 'event_preceding', TableField(_('preceding event')))
-        if class_ in ['activity', 'acquisition', 'production']:
-            setattr(form, 'place', TableField(_('location')))
-        if class_ == 'acquisition':
-            setattr(form, 'given_place', TableMultiField(_('given place')))
-        elif class_ == 'move':
-            setattr(form, 'place_from', TableField(_('from')))
-            setattr(form, 'place_to', TableField(_('to')))
-            setattr(form, 'artifact', TableMultiField())
-            setattr(form, 'person', TableMultiField())
-        elif class_ == 'production':
-            setattr(form, 'artifact', TableMultiField())
-    elif class_ == 'file' and not entity:
-        setattr(form, 'file', MultipleFileField(_('file'), [InputRequired()]))
-        if origin and origin.class_.view == 'reference':
-            setattr(form, 'page', StringField())
-    elif class_ == 'group':
-        setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField(_('begins in')))
-        setattr(form, 'ends_in', TableField(_('ends in')))
-    elif class_ == 'hierarchy':
-        if code == 'custom' or (
-                entity
-                and isinstance(entity, Type)
-                and entity.category != 'value'):
-            setattr(form, 'multiple', BooleanField(
-                _('multiple'),
-                description=_('tooltip hierarchy multiple')))
-        setattr(form, 'classes', SelectMultipleField(
-            _('classes'),
-            render_kw={'disabled': True},
-            description=_('tooltip hierarchy forms'),
-            choices=[],
-            option_widget=widgets.CheckboxInput(),
-            widget=widgets.ListWidget(prefix_label=False)))
-    elif class_ == 'involvement':
-        if not entity and origin:
-            involved_with = 'actor' \
-                if origin.class_.view == 'event' else 'event'
-            setattr(
-                form,
-                involved_with,
-                TableMultiField(_(involved_with), [InputRequired()]))
-        setattr(form, 'activity', SelectField(_('activity')))
-    elif class_ == 'actor_function' and not entity:
-        setattr(form, 'member_origin_id', HiddenField())
-        setattr(
-            form,
-            'actor' if code == 'member' else 'group',
-            TableMultiField(_('actor'), [InputRequired()]))
-    elif class_ in g.view_class_mapping['type']:
-        setattr(form, 'is_type_form', HiddenField())
+        origin: Union[Entity, Type, None]) -> dict[str, Any]:
+
+    # Preparations
+    involved_with = ''
+    if class_ == 'involvement' and not entity and origin:
+        involved_with = 'actor' if origin.class_.view == 'event' else 'event'
+    root_id = ''
+    directional = False
+    if class_ in ['administrative_unit', 'type']:
         type_ = entity if entity else origin
         if isinstance(type_, Type):
             root = g.types[type_.root[0]] if type_.root else type_
-            setattr(form, str(root.id), TreeField(str(root.id)))
-            if root.directional:
-                setattr(form, 'name_inverse', StringField(_('inverse')))
-    elif class_ == 'person':
-        setattr(form, 'residence', TableField(_('residence')))
-        setattr(form, 'begins_in', TableField(_('born in')))
-        setattr(form, 'ends_in', TableField(_('died in')))
-    elif class_ == 'reference_system':
-        setattr(
-            form,
-            'website_url',
-            StringField(_('website URL'), [OptionalValidator(), URL()]))
-        setattr(
-            form,
-            'resolver_url',
-            StringField(_('resolver URL'), [OptionalValidator(), URL()]))
-        setattr(form, 'placeholder', StringField(_('example ID')))
+            root_id = str(root.id)
+            directional = root.directional
+    precision_id = ''
+    choices = None
+    if class_ == 'reference_system':
         precision_id = str(Type.get_hierarchy('External reference match').id)
-        setattr(form, precision_id, TreeField(precision_id))
-        if choices := ReferenceSystem.get_class_choices(
-                entity):  # type: ignore
-            setattr(form, 'classes', SelectMultipleField(
+        choices = ReferenceSystem.get_class_choices(entity)
+
+    # It's not elegant to collect fields for every form at every form call. But
+    # it's much more readable than e.g. using a long if/elif and there are no
+    # database calls at this stage, so it has no high impact on performance.
+
+    fields: dict[str, dict[str, Any]] = {
+        'actor_actor_relation': {
+            'inverse': BooleanField(_('inverse')),
+            'actor': TableMultiField(_('actor'), [InputRequired()])
+            if not entity else '',
+            'relation_origin_id': HiddenField() if not entity else ''},
+        'actor_function': {
+            'member_origin_id': HiddenField() if not entity else None,
+            'actor' if code == 'member' else 'group':
+                TableMultiField(_('actor'), [InputRequired()])
+                if not entity else None},
+        'acquisition': {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'event_preceding': TableField(_('preceding event')),
+            'place': TableField(_('location')),
+            'given_place': TableMultiField(_('given place'))},
+        'activity': {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'event_preceding': TableField(_('preceding event')),
+            'place': TableField(_('location'))},
+        'administrative_unit': {
+            'is_type_form': HiddenField(),
+            root_id: TreeField(root_id) if root_id else None,
+            'name_inverse': StringField(_('inverse'))
+            if directional else None},
+        'artifact': {
+            'actor': TableField(_('owned by'))},
+        'event': {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'place': TableField(_('location'))},
+        'file': {
+            'file': MultipleFileField(_('file'), [InputRequired()])
+            if not entity else None,
+            'page': StringField()  # Needed to link file to ref. after insert
+            if not entity and origin and origin.class_.view == 'reference'
+            else None},
+        'group': {
+            'residence': TableField(_('residence')),
+            'begins_in': TableField(_('begins in')),
+            'ends_in': TableField(_('ends in'))},
+        'hierarchy': {
+            'multiple': BooleanField(
+                _('multiple'),
+                description=_('tooltip hierarchy multiple'))
+            if code == 'custom' or (
+                    entity
+                    and isinstance(entity, Type)
+                    and entity.category != 'value') else None,
+            'classes': SelectMultipleField(
+                _('classes'),
+                render_kw={'disabled': True},
+                description=_('tooltip hierarchy forms'),
+                choices=[],
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))},
+        'human_remains': {
+            'actor': TableField(_('owned by'))},
+        'involvement': {
+            involved_with: TableMultiField(_(involved_with), [InputRequired()])
+            if involved_with else None,
+            'activity': SelectField(_('activity'))},
+        'move': {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'event_preceding': TableField(_('preceding event')),
+            'place_from': TableField(_('from')),
+            'place_to': TableField(_('to')),
+            'artifact': TableMultiField(),
+            'person': TableMultiField()},
+        'person': {
+            'residence': TableField(_('residence')),
+            'begins_in': TableField(_('born in')),
+            'ends_in': TableField(_('died in'))},
+        'production': {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'event_preceding': TableField(_('preceding event')),
+            'place': TableField(_('location')),
+            'artifact': TableMultiField()},
+        'reference_system': {
+            'website_url':
+                StringField(_('website URL'), [OptionalValidator(), URL()]),
+            'resolver_url':
+                StringField(_('resolver URL'), [OptionalValidator(), URL()]),
+            'placeholder': StringField(_('example ID')),
+            precision_id: TreeField(precision_id),
+            'classes': SelectMultipleField(
                 _('classes'),
                 render_kw={'disabled': True},
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False)))
-    elif class_ == 'source':
-        setattr(
-            form,
-            'artifact',
-            TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source')))
+                widget=widgets.ListWidget(prefix_label=False))
+            if choices else None},
+        'source': {
+            'artifact': TableMultiField(description=_(
+                'Link artifacts as the information carrier of the source'))},
+        'type': {
+            'is_type_form': HiddenField(),
+            root_id: TreeField(root_id) if root_id else None,
+            'name_inverse': StringField(_('inverse'))
+            if directional else None}}
+    if class_ not in fields:
+        return {}
+    return {k: v for k, v in fields[class_].items() if k and v}
 
 
 def get_add_reference_form(class_: str) -> FlaskForm:
