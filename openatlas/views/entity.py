@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.forms.form import build_table_form
+from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -261,7 +261,7 @@ def entity_add_file(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'], inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    form = build_table_form(
+    form = get_table_form(
         'file',
         entity.get_linked_entities('P67', inverse=True))
     return render_template(
@@ -286,7 +286,7 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 request.form['checkbox_values'],
                 inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    form = build_table_form(
+    form = get_table_form(
         'source',
         entity.get_linked_entities('P67', inverse=True))
     return render_template(

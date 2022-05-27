@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form
+from openatlas.forms.form import get_form
 from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -19,7 +19,7 @@ from openatlas.util.util import required_group
 @required_group('contributor')
 def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form('involvement', origin=origin)
+    form = get_form('involvement', origin=origin)
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
     if origin.class_.name in ['acquisition', 'activity', 'production']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))

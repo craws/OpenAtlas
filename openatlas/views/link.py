@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
-from openatlas.forms.form import build_form, build_table_form
+from openatlas.forms.form import get_form, get_table_form
 from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -57,7 +57,7 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
         'form.html',
-        form=build_table_form(view, excluded),
+        form=get_table_form(view, excluded),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -88,7 +88,7 @@ def relation_update(
         origin: Entity) -> Union[str, Response]:
     origin = range_ if origin.id == range_.id else domain
     related = range_ if origin.id == domain.id else domain
-    form = build_form('actor_actor_relation', link_)
+    form = get_form('actor_actor_relation', link_)
     if form.validate_on_submit():
         Transaction.begin()
         try:
@@ -151,7 +151,7 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
 
 
 def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
-    form = build_form('involvement', link_)
+    form = get_form('involvement', link_)
     form.activity.choices = [('P11', g.properties['P11'].name)]
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)

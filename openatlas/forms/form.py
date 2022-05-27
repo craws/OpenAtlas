@@ -56,7 +56,7 @@ FORMS = {
     'type': ['name', 'date', 'description', 'continue']}
 
 
-def build_form(
+def get_form(
         class_: str,
         entity: Optional[Union[Entity, Link, Type]] = None,
         code: Optional[str] = None,
@@ -336,7 +336,7 @@ def add_fields(
                 'Link artifacts as the information carrier of the source')))
 
 
-def build_add_reference_form(class_: str) -> FlaskForm:
+def get_add_reference_form(class_: str) -> FlaskForm:
     class Form(FlaskForm):
         pass
 
@@ -346,7 +346,7 @@ def build_add_reference_form(class_: str) -> FlaskForm:
     return Form()
 
 
-def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
+def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """Returns a form with a list of entities with checkboxes."""
     if class_ == 'place':
         entities = Entity.get_by_class('place', types=True, aliases=True)
@@ -365,7 +365,8 @@ def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
             <input
                 id="selection-{entity.id}"
                 name="values"
-                type="checkbox" value="{entity.id}">"""
+                type="checkbox"
+                value="{entity.id}">"""
         table.rows.append(
             [input_] + get_base_table_data(entity, show_links=False))
     if not table.rows:
@@ -375,7 +376,7 @@ def build_table_form(class_: str, linked_entities: list[Entity]) -> str:
         table=table.display(class_))
 
 
-def build_move_form(type_: Type) -> FlaskForm:
+def get_move_form(type_: Type) -> FlaskForm:
     class Form(FlaskForm):
         is_type_form = HiddenField()
         checkbox_values = HiddenField()

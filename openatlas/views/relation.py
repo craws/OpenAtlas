@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form
+from openatlas.forms.form import get_form
 from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -19,7 +19,7 @@ from openatlas.util.util import required_group, uc_first
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form('actor_actor_relation')
+    form = get_form('actor_actor_relation')
     form.relation_origin_id.data = origin.id
     if form.validate_on_submit():
         Transaction.begin()

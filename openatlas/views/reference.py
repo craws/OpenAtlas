@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.forms.form import build_add_reference_form
+from openatlas.forms.form import get_add_reference_form
 from openatlas.models.entity import Entity
 from openatlas.util.util import required_group, uc_first
 
@@ -15,7 +15,7 @@ from openatlas.util.util import required_group, uc_first
 @required_group('contributor')
 def reference_add(id_: int, view: str) -> Union[str, Response]:
     reference = Entity.get_by_id(id_)
-    form = build_add_reference_form(view)
+    form = get_add_reference_form(view)
     if form.validate_on_submit():
         entity = Entity.get_by_id(getattr(form, view).data)
         reference.link('P67', entity, form.page.data)

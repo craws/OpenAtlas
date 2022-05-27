@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form
+from openatlas.forms.form import get_form
 from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -20,7 +20,7 @@ from openatlas.util.util import (
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> Union[str, Response]:
-    form = build_form('hierarchy', code=category)
+    form = get_form('hierarchy', code=category)
     form.classes.choices = Type.get_class_choices()
     if form.validate_on_submit():
         if Type.check_hierarchy_exists(form.name.data):
@@ -61,7 +61,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.types[id_]
     if hierarchy.category in ('standard', 'system'):
         abort(403)
-    form = build_form('hierarchy', hierarchy)
+    form = get_form('hierarchy', hierarchy)
     form.classes.choices = Type.get_class_choices(hierarchy)
     linked_entities = set()
     has_multiple_links = False

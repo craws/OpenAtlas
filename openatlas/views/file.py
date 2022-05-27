@@ -6,7 +6,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.forms.form import build_table_form
+from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.util import required_group
 
@@ -58,7 +58,7 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     return render_template(
         'form.html',
-        form=build_table_form(view, entity.get_linked_entities('P67')),
+        form=get_table_form(view, entity.get_linked_entities('P67')),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
