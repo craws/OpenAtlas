@@ -15,6 +15,7 @@ Form fields
 * :doc:`/form/date`
 * :doc:`/form/description`
 * :doc:`/tools/map`
+* **Owned by** - the :doc:`actor` who owns the artifact
 
 Can be linked via tabs to
 -------------------------

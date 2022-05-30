@@ -10,7 +10,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form
+from openatlas.forms.form import get_form
 from openatlas.forms.populate import populate_update_form
 from openatlas.forms.util import populate_insert_form, process_form_data
 from openatlas.models.entity import Entity
@@ -32,7 +32,7 @@ def insert(
         origin_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(class_, origin=origin)
+    form = get_form(class_, origin=origin)
     if form.validate_on_submit():
         if class_ == 'file':
             return redirect(insert_files(form, origin))
@@ -63,7 +63,7 @@ def update(id_: int) -> Union[str, Response]:
     if entity.check_for_too_many_links_for_single_type():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    form = build_form(
+    form = get_form(
         entity.class_.name,
         entity,
         location=place_info['location'])

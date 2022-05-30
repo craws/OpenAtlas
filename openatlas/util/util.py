@@ -177,7 +177,8 @@ def get_backup_file_data() -> dict[str, Any]:
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] \
+            or entity.class_.name == 'human_remains':
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -188,7 +189,8 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(
             g.file_stats[entity.id]['ext']
             if entity.id in g.file_stats else 'N/A')
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place'] \
+            or entity.class_.name == 'human_remains':
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
@@ -252,7 +254,7 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-    elif entity.class_.view == 'artifact':
+    elif entity.class_.name in ['artifact', 'human_remains']:
         data[_('source')] = \
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))

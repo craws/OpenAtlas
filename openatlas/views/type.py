@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_move_form
+from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.tab import Tab
@@ -131,7 +131,7 @@ def type_move_entities(id_: int) -> Union[str, Response]:
     root = g.types[type_.root[0]]
     if root.category == 'value':
         abort(403)  # pragma: no cover
-    form = build_move_form(type_)
+    form = get_move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()
         Type.move_entities(

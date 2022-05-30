@@ -1,13 +1,14 @@
 versions = {
     '7.4.0': ['TBA', {
-        'features': {
+        'feature': {
             '1620': 'Natural events',
+            '1108': 'Current owner of human remains',
             '1581': 'Upgrade Bootstrap to 5',
             '1725': 'Additional step by step examples in the manual'},
         'fix': {
             '1722': 'Resize layout issues with some sites'}}],
     '7.3.0': ['2022-05-08', {
-        'features': {
+        'feature': {
             '1388': 'Allow contributor group to delete only own entries',
             '1498': 'Remove types with subs and/or linked entities',
             '1501': 'Set multiple choice types to single type',

@@ -253,7 +253,7 @@ def process_form_data(
         data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data
-        if entity.class_.name == 'artifact':
+        if entity.class_.name in ['artifact', 'human_remains']:
             data['links']['delete'].add('P52')
             if form.actor.data:
                 data['links']['insert'].append({

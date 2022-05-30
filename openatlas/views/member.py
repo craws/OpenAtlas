@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import build_form
+from openatlas.forms.form import get_form
 from openatlas.forms.util import get_link_type, process_form_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -22,7 +22,7 @@ def member_insert(
         origin_id: int,
         code: str = 'member') -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form('actor_function', code=code)
+    form = get_form('actor_function', code=code)
     form.member_origin_id.data = origin.id
     if form.validate_on_submit():
         Transaction.begin()
@@ -68,7 +68,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    form = build_form('actor_function', link_)
+    form = get_form('actor_function', link_)
     if form.validate_on_submit():
         Transaction.begin()
         try:

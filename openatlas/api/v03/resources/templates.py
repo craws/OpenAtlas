@@ -246,7 +246,7 @@ def type_overview_template() -> dict[str, Any]:
         'system': fields.List(fields.Nested(type_details))}
 
 
-def type_by_view_class_template(types) -> dict[str, Any]:
+def type_by_view_class_template(types: dict[str, Any]) -> dict[str, Any]:
     children = {
         'id': fields.Integer,
         'url': fields.String,

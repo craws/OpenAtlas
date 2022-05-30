@@ -218,10 +218,16 @@ def get_reference_systems(
 def get_geometries(
         entity: Entity,
         links: list[Link]) -> Union[dict[str, Any], None]:
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
+    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
         return get_geoms_by_entity(get_location_id(links))
     if entity.class_.name == 'object_location':
         return get_geoms_by_entity(entity.id)
+    if entity.class_.view == 'actor':
+        geoms = [Gis.get_by_id(link_.range.id) for link_ in links
+                 if link_.property.code in ['P74', 'OA8', 'OA9']]
+        return {
+            'type': 'GeometryCollection',
+            'geometries': [geom for sublist in geoms for geom in sublist]}
     return None
 
 
