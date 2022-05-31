@@ -430,9 +430,9 @@ def form_to_datetime64(
         year: Any,
         month: Any,
         day: Any,
-        hour: Any,
-        minute: Any,
-        second: Any,
+        hour: Optional[Any] = None,
+        minute: Optional[Any] = None,
+        second: Optional[Any] = None,
         to_date: bool = False) -> Optional[numpy.datetime64]:
     if not year:
         return None

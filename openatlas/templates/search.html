@@ -13,9 +13,6 @@
       {{ form.begin_year(class_='year') }}
       {{ form.begin_month(class_='month') }}
       {{ form.begin_day(class_='day') }}
-      {{ form.begin_hour(class_='hour') }}
-      {{ form.begin_minute(class_='minute') }}
-      {{ form.begin_second(class_='second') }}
       {% if form.errors.begin_year %}
         <span class="error">{{ form.errors.begin_year[0]|safe }}</span>
       {% endif %}
@@ -24,10 +21,7 @@
       <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
       {{ form.end_year(class_='year') }}
       {{ form.end_month(class_='month') }}
-      {{ form.end_day(class_='day') }}
-      {{ form.end_hour(class_='hour') }}
-      {{ form.end_minute(class_='minute') }}
-      {{ form.end_second(class_='second') }} <br>
+      {{ form.end_day(class_='day') }} <br>
       {{ form.include_dateless }} {{ form.include_dateless.label }}
 
       <h2>{{ _('classes')|uc_first }}</h2>
