@@ -510,15 +510,18 @@ def add_reference_systems_to_form(form: Any) -> str:
 def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
-    for field_name in [
+    date_name = [
         'begin_year_from', 'begin_month_from', 'begin_day_from',
-        'begin_hour_from', 'begin_minute_from', 'begin_second_from',
         'begin_year_to', 'begin_month_to', 'begin_day_to',
-        'begin_hour_to', 'begin_minute_to', 'begin_second_to',
         'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']
+    if 'begin_hour_from' in form:
+        date_name += [
+        'begin_hour_from', 'begin_minute_from', 'begin_second_from',
+        'begin_hour_to', 'begin_minute_to', 'begin_second_to',
         'end_hour_from', 'end_minute_from', 'end_second_from',
-        'end_year_to', 'end_month_to', 'end_day_to',
-        'end_hour_to', 'end_minute_to', 'end_second_to']:
+        'end_hour_to', 'end_minute_to', 'end_second_to']
+    for field_name in date_name:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False

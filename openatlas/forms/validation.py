@@ -28,9 +28,12 @@ def validate(self: FlaskForm) -> bool:
                         getattr(self, f'{prefix}year{postfix}').data,
                         getattr(self, f'{prefix}month{postfix}').data,
                         getattr(self, f'{prefix}day{postfix}').data,
-                        getattr(self, f'{prefix}hour{postfix}').data,
-                        getattr(self, f'{prefix}minute{postfix}').data,
-                        getattr(self, f'{prefix}second{postfix}').data)
+                        getattr(self, f'{prefix}hour{postfix}').data
+                        if f'{prefix}hour{postfix}' in self else None,
+                        getattr(self, f'{prefix}minute{postfix}').data
+                        if f'{prefix}minute{postfix}' in self else None,
+                        getattr(self, f'{prefix}second{postfix}').data
+                        if f'{prefix}second{postfix}' in self else None)
                     if not date:
                         getattr(self, f'{prefix}day{postfix}').errors.append(
                             _('not a valid date'))

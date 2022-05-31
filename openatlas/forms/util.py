@@ -366,16 +366,16 @@ def process_form_dates(form: FlaskForm) -> dict[str, Any]:
             form.begin_year_from.data,
             form.begin_month_from.data,
             form.begin_day_from.data,
-            form.begin_hour_from.data,
-            form.begin_minute_from.data,
-            form.begin_second_from.data)
+            form.begin_hour_from.data if 'begin_hour_from' in form else None,
+            form.begin_minute_from.data if 'begin_hour_from' in form else None,
+            form.begin_second_from.data if 'begin_hour_from' in form else None)
         data['begin_to'] = form_to_datetime64(
             form.begin_year_to.data,
             form.begin_month_to.data,
             form.begin_day_to.data,
-            form.begin_hour_to.data,
-            form.begin_minute_to.data,
-            form.begin_second_to.data,
+            form.begin_hour_to.data if 'begin_hour_from' in form else None,
+            form.begin_minute_to.data if 'begin_hour_from' in form else None,
+            form.begin_second_to.data if 'begin_hour_from' in form else None,
             to_date=True)
     if hasattr(form, 'end_year_from') and form.end_year_from.data:
         data['end_comment'] = form.end_comment.data
@@ -383,16 +383,16 @@ def process_form_dates(form: FlaskForm) -> dict[str, Any]:
             form.end_year_from.data,
             form.end_month_from.data,
             form.end_day_from.data,
-            form.end_hour_from.data,
-            form.end_minute_from.data,
-            form.end_second_from.data)
+            form.end_hour_from.data if 'begin_hour_from' in form else None,
+            form.end_minute_from.data if 'begin_hour_from' in form else None,
+            form.end_second_from.data if 'begin_hour_from' in form else None)
         data['end_to'] = form_to_datetime64(
             form.end_year_to.data,
             form.end_month_to.data,
             form.end_day_to.data,
-            form.end_hour_to.data,
-            form.end_minute_to.data,
-            form.end_second_to.data,
+            form.end_hour_to.data if 'begin_hour_from' in form else None,
+            form.end_minute_to.data if 'begin_hour_from' in form else None,
+            form.end_second_to.data if 'begin_hour_from' in form else None,
             to_date=True)
     return data
 
@@ -513,3 +513,16 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     return dict(
         get_logo=get_logo(),
         search_form=GlobalSearchForm(prefix='global'))
+
+
+def check_if_entity_has_time(entity: Entity) -> bool:
+    if not entity:
+        return False
+    for item in [
+            entity.begin_from,
+            entity.begin_to,
+            entity.end_from,
+            entity.end_to]:
+        if '00:00:00' not in str(item):
+            return True
+    return False
