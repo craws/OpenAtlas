@@ -252,19 +252,19 @@ class ApiTests(TestBaseCase):
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['start'],
                     'earliest',
-                    '2018-01-31')
+                    '2018-01-31T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['start'],
                     'latest',
-                    '2018-03-01')
+                    '2018-03-01T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['end'],
                     'earliest',
-                    '2019-01-31')
+                    '2019-01-31T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['end'],
                     'latest',
-                    '2019-03-01')
+                    '2019-03-01T00:00:00')
                 assert ApiTests.get_bool(
                     rv['types'][0],
                     'identifier')
@@ -364,19 +364,19 @@ class ApiTests(TestBaseCase):
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['start'],
                     'earliest',
-                    '2018-01-31')
+                    '2018-01-31T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['start'],
                     'latest',
-                    '2018-03-01')
+                    '2018-03-01T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['end'],
                     'earliest',
-                    '2019-01-31')
+                    '2019-01-31T00:00:00')
                 assert ApiTests.get_bool(
                     rv['when']['timespans'][0]['end'],
                     'latest',
-                    '2019-03-01')
+                    '2019-03-01T00:00:00')
                 assert ApiTests.get_bool(
                     rv['types'][0],
                     'identifier')
