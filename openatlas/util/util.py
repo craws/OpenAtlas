@@ -1052,7 +1052,7 @@ def datetime64_to_timestamp(
     if string.startswith('-') or string.startswith('0000'):
         string = string[1:]
         postfix = ' BC'
-    string = string.replace('T', '-').replace(':', '-')
+    string = string.replace('T', '-').replace(':', '-').replace(' ', '-')
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
     hour, minute, second = 0, 0, 0

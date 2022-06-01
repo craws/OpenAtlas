@@ -523,6 +523,6 @@ def check_if_entity_has_time(entity: Entity) -> bool:
             entity.begin_to,
             entity.end_from,
             entity.end_to]:
-        if '00:00:00' not in str(item):
+        if '00:00:00' not in str(item) and item:
             return True
     return False

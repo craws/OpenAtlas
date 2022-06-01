@@ -2,10 +2,8 @@ import time
 from typing import Any, Optional, Union
 
 from flask import g
-from flask_login import current_user
 from flask_wtf import FlaskForm
 
-from openatlas.forms.util import check_if_entity_has_time
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
