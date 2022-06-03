@@ -250,9 +250,9 @@ def additional_fields(
             directional = root.directional
     precision_id = ''
     choices = None
-    if class_ == 'reference_system' and isinstance(entity, ReferenceSystem):
+    if class_ == 'reference_system':
         precision_id = str(Type.get_hierarchy('External reference match').id)
-        choices = ReferenceSystem.get_class_choices(entity)
+        choices = ReferenceSystem.get_class_choices(entity)  # type: ignore
 
     # It's not elegant to collect fields for every form at every form call, but
     # it's much more readable than e.g. using a long if/elif and there are no

@@ -66,7 +66,7 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def get_class_choices(
-            entity: Union[ReferenceSystem, None]) -> list[tuple[int, str]]:
+            entity: Optional[ReferenceSystem]) -> list[tuple[int, str]]:
         choices = []
         for class_ in g.classes.values():
             if not class_.reference_system_allowed \
