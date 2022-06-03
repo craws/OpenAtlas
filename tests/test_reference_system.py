@@ -18,7 +18,6 @@ class ReferenceSystemTest(TestBaseCase):
             wikidata = ReferenceSystem.get_by_name('Wikidata')
             precision_id = \
                 Type.get_hierarchy('External reference match').subs[0]
-
             rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'Resolver URL' in rv.data
             data: dict[Any, Any] = {
