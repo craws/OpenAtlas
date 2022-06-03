@@ -10,7 +10,7 @@ from wtforms import SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.models.anthropology import SexEstimation, get_types
+from openatlas.models.tools import SexEstimation, get_types
 from openatlas.models.entity import Entity
 from openatlas.util.util import (
     button, is_authorized, manual, required_group, uc_first)
@@ -30,7 +30,7 @@ def name_result(result: float) -> str:
     return ''  # pragma: no cover
 
 
-def print_result(entity: Entity) -> str:
+def print_sex_result(entity: Entity) -> str:
     calculation = SexEstimation.calculate(entity)
     if calculation is None:
         return ''
@@ -40,22 +40,38 @@ def print_result(entity: Entity) -> str:
         f' - {_("corresponds to")} "{name_result(calculation)}"')
 
 
-@app.route('/anthropology/index/<int:id_>')
+@app.route('/tools/index/<int:id_>')
 @required_group('readonly')
-def anthropology_index(id_: int) -> Union[str, Response]:
+def tools_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
-    buttons = [
+    dating_buttons = [
+        button(_('radiocarbon dating'), url_for('carbon', id_=entity.id)),]
+    sex_buttons = [
         manual('tools/anthropological_analyses'),
         button(_('sex estimation'), url_for('sex', id_=entity.id)),
-        print_result(entity)]
+        print_sex_result(entity)]
     return render_template(
-        'anthropology/index.html',
+        'tools/index.html',
         entity=entity,
-        buttons=buttons,
-        crumbs=[entity, _('anthropological analyses')])
+        dating_buttons=dating_buttons,
+        sex_buttons=sex_buttons,
+        crumbs=[entity, _('tools')])
 
 
-@app.route('/anthropology/sex/<int:id_>')
+@app.route('/tools/carbon/<int:id_>')
+@required_group('readonly')
+def carbon(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_, types=True)
+    return render_template(
+        'tools/carbon.html',
+        entity=entity,
+        crumbs=[
+            entity,
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            _('radiocarbon dating')])
+
+
+@app.route('/tools/sex/<int:id_>')
 @required_group('readonly')
 def sex(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
@@ -73,19 +89,18 @@ def sex(id_: int) -> Union[str, Response]:
             'option_value': SexEstimation.options[item['description']],
             'value': item['description']})
     return render_template(
-        'anthropology/sex.html',
+        'tools/sex.html',
         entity=entity,
         buttons=buttons,
         data=data,
-        result=print_result(entity),
+        result=print_sex_result(entity),
         crumbs=[
             entity,
-            [_('anthropological analyses'),
-             url_for('anthropology_index', id_=entity.id)],
+            [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
 
 
-@app.route('/anthropology/sex/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def sex_update(id_: int) -> Union[str, Response]:
 
@@ -134,7 +149,6 @@ def sex_update(id_: int) -> Union[str, Response]:
         form=form,
         crumbs=[
             entity,
-            [_('anthropological analyses'),
-             url_for('anthropology_index', id_=entity.id)],
+            [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])

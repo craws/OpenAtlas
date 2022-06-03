@@ -770,8 +770,8 @@ def description(entity: Union[Entity, Project]) -> str:
     html = ''
     if isinstance(entity, Entity) \
             and entity.class_.name == 'stratigraphic_unit':
-        from openatlas.views.anthropology import print_result
-        if result := print_result(entity):
+        from openatlas.views.tools import print_sex_result
+        if result := print_sex_result(entity):
             html += \
                 f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
                 f"<p>{result}</p>"

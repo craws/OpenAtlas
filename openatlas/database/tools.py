@@ -3,7 +3,7 @@ from typing import Any
 from flask import g
 
 
-class Anthropology:
+class Tools:
 
     @staticmethod
     def get_types(id_: int) -> list[dict[str, Any]]:

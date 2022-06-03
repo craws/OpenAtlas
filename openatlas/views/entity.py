@@ -247,7 +247,7 @@ def add_buttons(entity: Entity, type_problem: bool = False) -> list[str]:
             buttons.append(display_delete_link(entity))
     if entity.class_.name == 'stratigraphic_unit':
         buttons.append(
-            button(_('tools'), url_for('anthropology_index', id_=entity.id)))
+            button(_('tools'), url_for('tools_index', id_=entity.id)))
     return buttons
 
 
