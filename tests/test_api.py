@@ -8,7 +8,8 @@ from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
     FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
     InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
-    LastEntityError, NoEntityAvailable, NoSearchStringError, QueryEmptyError, \
+    LastEntityError, NoEntityAvailable, NoSearchStringError, NotAPlaceError, \
+    QueryEmptyError, \
     TypeIDError, ValueNotIntegerError
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -161,8 +162,8 @@ class ApiTests(TestBaseCase):
             # ---Content Endpoints---
             # ClassMapping
             for rv in [
-                    self.app.get(url_for('api_02.class_mapping')).get_json(),
-                    self.app.get(url_for('api_03.class_mapping')).get_json()]:
+                self.app.get(url_for('api_02.class_mapping')).get_json(),
+                self.app.get(url_for('api_03.class_mapping')).get_json()]:
                 assert ApiTests.get_class_mapping(rv)
 
             # Content
@@ -1179,6 +1180,10 @@ class ApiTests(TestBaseCase):
                 self.app.get(url_for(
                     'api_03.entity',
                     id_=233423424))
+            with self.assertRaises(NotAPlaceError):
+                self.app.get(url_for(
+                    'api_03.subunits',
+                    id_=actor.id))
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
                     'api_03.cidoc_class',

@@ -5,6 +5,7 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
+from openatlas.api.v03.resources.error import NotAPlaceError
 from openatlas.api.v03.resources.formats.subunits import get_subunits_from_id
 from openatlas.api.v03.resources.parser import default, entity_
 from openatlas.api.v03.resources.resolve_endpoints import (
@@ -118,5 +119,8 @@ class GetSubunits(Resource):
     @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parser = entity_.parse_args()
-        subunits = get_subunits_from_id(get_entity_by_id(id_), parser)
+        entity = get_entity_by_id(id_)
+        if not entity.class_.name == 'place':
+            raise NotAPlaceError
+        subunits = get_subunits_from_id(entity, parser)
         return resolve_subunits(subunits, parser, str(id_))

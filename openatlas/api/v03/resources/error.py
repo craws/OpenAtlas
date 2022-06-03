@@ -96,6 +96,11 @@ class InvalidSearchSyntax(Exception):
 class ValueNotIntegerError(Exception):
     pass
 
+class NotAPlaceError(Exception):
+    pass
+
+
+
 
 errors = {
     "InternalServerError": {
@@ -226,6 +231,12 @@ errors = {
     "ValueNotIntegerError": {
         "message": "The value is not a valid integer.",
         "title": "Not valid integer",
+        "timestamp": datetime.datetime.now(),
+        "status": 404},
+    "NotAPlaceError": {
+        "message": "The give ID is not a place. Please provide a valid place "
+                   "ID",
+        "title": "ID is not a place",
         "timestamp": datetime.datetime.now(),
         "status": 404}
 }
