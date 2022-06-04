@@ -65,7 +65,7 @@ $(document).ready(function () {
         }
     });
 
-    /* below section sets up jquery validate for various forms */
+    /* Below section sets up validation for various forms */
     // Enable validation for hidden fields
     let v = $.validator;
     v.setDefaults({
@@ -124,15 +124,15 @@ $(document).ready(function () {
         $("#password").val(random_password);
         $("#password2").val(random_password);
     })
-    //adding a generic submithandler to form validation
+
+    // Adding a generic submit handler to form validation
     .each(function () {
         $(this).validate({
             submitHandler: function (form) {
                 if (this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
                 if (this.submitButton.id === "insert_continue_sub") $('#continue_').val('sub');
                 if (this.submitButton.id === "insert_continue_human_remains") $('#continue_').val('human_remains');
-                $('input[type="submit"]').prop("disabled", true)
-                    .val('... in progress');
+                $('input[type="submit"]').prop("disabled", true).val('... in progress');
                 form.submit();
             },
         });
