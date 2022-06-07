@@ -113,8 +113,6 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'type':  # Filter letters, numbers, minus, brackets and spaces
-        return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
         stripper.feed(string)
