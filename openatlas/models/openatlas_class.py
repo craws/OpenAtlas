@@ -102,8 +102,7 @@ class OpenatlasClass:
             'member_of': [
                 'member of', 'function', 'first', 'last', 'description'],
             'note': ['date', 'visibility', 'user', 'note'],
-            'type': ['name', 'description'],
-            'place': ['name', 'type', 'begin', 'end', 'description'],
+            'place': ['name', 'class', 'type', 'begin', 'end', 'description'],
             'relation': ['relation', 'actor', 'first', 'last', 'description'],
             'reference': ['name', 'class', 'type', 'description'],
             'reference_system': [
@@ -111,7 +110,8 @@ class OpenatlasClass:
                 'default precision', 'description'],
             'source': ['name', 'type', 'description'],
             'subs': ['name', 'count', 'info'],
-            'text': ['text', 'type', 'content']}
+            'text': ['text', 'type', 'content'],
+            'type': ['name', 'description'],}
         for view in ['actor', 'artifact', 'event', 'place']:
             for class_ in view_class_mapping[view]:
                 headers[class_] = headers[view]

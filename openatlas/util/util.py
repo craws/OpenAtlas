@@ -177,8 +177,8 @@ def get_backup_file_data() -> dict[str, Any]:
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] \
-            or entity.class_.name == 'human_remains':
+    if entity.class_.view in [
+            'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
