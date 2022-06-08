@@ -10,7 +10,8 @@ versions = {
             '1595': 'API: Subunits for Ariadne and THANADOS',
             '1720': 'Refactoring'},
         'fix': {
-            '1722': 'Resize layout issues with some sites'}}],
+            '1722': 'Resize layout issues with some sites',
+            '1723': 'Information gets deleted from map'}}],
     '7.3.0': ['2022-05-08', {
         'feature': {
             '1388': 'Allow contributor group to delete only own entries',
