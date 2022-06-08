@@ -157,4 +157,8 @@ $(document).ready(function () {
         $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
     });
 
+    $( ".modal" ).on('shown.bs.modal', function(){
+        $(`#${this.id} input`)?.get(0)?.focus() 
+    });
+
 });
