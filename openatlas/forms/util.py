@@ -141,7 +141,7 @@ def process_form_data(
                         replace(')', '').strip()
                     name += ' (' + inverse + ')'
             if entity.class_.name == 'type':
-                name = sanitize(name, 'type')
+                name = sanitize(name, 'text')
             elif isinstance(entity, ReferenceSystem) and entity.system:
                 name = entity.name  # Prevent name changing of a system type
             data['attributes']['name'] = name
