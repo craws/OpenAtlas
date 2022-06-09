@@ -1034,9 +1034,20 @@
         },
         "type": "object"
       },
+      "TimeStartEndModel": {
+        "properties": {
+          "start": {
+            "$ref": "#/components/schemas/TimeDetailModel"
+          },
+          "end": {
+            "$ref": "#/components/schemas/TimeDetailModel"
+          }
+        },
+        "type": "object"
+      },
       "TimespansModel": {
         "items": {
-          "$ref": "#/components/schemas/TimeDetailModel"
+          "$ref": "#/components/schemas/TimeStartEndModel"
         },
         "type": "array"
       },
