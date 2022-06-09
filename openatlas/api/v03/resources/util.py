@@ -186,7 +186,7 @@ def link_parser_check_inverse(
 
 def get_properties_for_links(parser: dict[str, Any]) -> Optional[list[str]]:
     if parser['relation_type']:
-        codes = [code for code in parser['relation_type']]
+        codes = parser['relation_type']
         if 'geometry' in parser['show']:
             codes.append('P53')
         if 'types' in parser['show']:
