@@ -1035,15 +1035,10 @@
         "type": "object"
       },
       "TimespansModel": {
-        "properties": {
-          "end": {
-            "$ref": "#/components/schemas/TimeDetailModel"
-          },
-          "start": {
-            "$ref": "#/components/schemas/TimeDetailModel"
-          }
+        "items": {
+          "$ref": "#/components/schemas/TimeDetailModel"
         },
-        "type": "object"
+        "type": "array"
       },
       "TypeModel": {
         "properties": {
@@ -1137,10 +1132,7 @@
       "WhenModel": {
         "properties": {
           "timespans": {
-            "items": {
               "$ref": "#/components/schemas/TimespansModel"
-            },
-            "type": "array"
           }
         },
         "type": "object"
