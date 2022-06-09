@@ -85,8 +85,9 @@ def get_form(
     if 'date' in FORMS[class_]:
         add_date_fields(
             Form,
-            bool(current_user.settings['module_time']
-                 or check_if_entity_has_time(entity)))
+            bool(
+                current_user.settings['module_time']
+                or check_if_entity_has_time(entity)))
     if 'description' in FORMS[class_]:
         label = _('content') if class_ == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))

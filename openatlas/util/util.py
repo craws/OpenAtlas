@@ -544,8 +544,8 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = datetime64_to_timestamp(value)
-        return date_.lstrip('0') if date_ else ''
-    return value.date().isoformat()
+        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+    return value.date().isoformat().replace(' 00:00:00', '')
 
 
 def external_url(url: Union[str, None]) -> str:
