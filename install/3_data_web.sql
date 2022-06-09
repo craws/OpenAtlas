@@ -42,6 +42,7 @@ INSERT INTO web.settings (name, value) VALUES
     ('minimum_password_length', '12'),
     ('module_map_overlay', 'True'),
     ('module_sub_units', 'True'),
+    ('module_time', ''),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),
     ('reset_confirm_hours', '24'),

@@ -76,6 +76,9 @@ $(document).ready(function () {
         year: {number: true, min: -4713, max: 9999},
         month: {digits: true, min: 1, max: 12},
         day: {digits: true, min: 1, max: 31},
+        hour: {digits: true, min: 0, max: 23},
+        minute: {digits: true, min: 0, max: 59},
+        second: {digits: true, min: 0, max: 59},
         integer: {digits: true},
         signed_integer: {signedInteger: true},
         email: {email: true},
@@ -138,6 +141,15 @@ $(document).ready(function () {
         });
     });
 
+    //add required to reference precision if reference is set
+    $("[id^=reference_system_id]").on('change', function () {
+        const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
+        if (!this.value?.length)
+            select.removeClass('required');
+        else
+            select.addClass('required');
+    });
+
     $("div[id*='-modal']").on('shown.bs.modal', function () {
         $("input[id*='-tree-search']").focus();
         $("input[type='search']").focus();
@@ -155,6 +167,10 @@ $(document).ready(function () {
         $('#extend-map-icon').hide();
         $('.col-xl-10').toggleClass("col-xl-10").toggleClass("col-xl-4");
         $('.col-xl-2').toggleClass("col-xl-2").toggleClass("col-xl-8");
+    });
+
+    $( ".modal" ).on('shown.bs.modal', function(){
+        $(`#${this.id} input`)?.get(0)?.focus() 
     });
 
 });

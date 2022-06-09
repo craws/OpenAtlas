@@ -66,7 +66,7 @@ class SearchForm(FlaskForm):
             self.end_year.data,
             self.end_month.data,
             self.end_day.data,
-            True)
+            to_date=True)
         if from_date and to_date and from_date > to_date:
             self.begin_year.errors.append(
                 _('Begin dates cannot start after end dates.'))
