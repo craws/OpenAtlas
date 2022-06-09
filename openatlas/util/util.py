@@ -1032,12 +1032,12 @@ def format_date_part(date: numpy.datetime64, part: str) -> str:
 def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
     if not string:
         return None
-    string = string.split(' ')
-    if 'BC' in string:
-        parts = string[0].split('-')
-        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string[1]}'
+    string_list = string.split(' ')
+    if 'BC' in string_list:
+        parts = string_list[0].split('-')
+        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string_list[1]}'
         return numpy.datetime64(date)
-    return numpy.datetime64(f'{string[0]}T{string[1]}')
+    return numpy.datetime64(f'{string_list[0]}T{string_list[1]}')
 
 
 def datetime64_to_timestamp(
@@ -1052,14 +1052,16 @@ def datetime64_to_timestamp(
     string = string.replace('T', '-').replace(':', '-').replace(' ', '-')
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
-    hour, minute, second = 0, 0, 0
+    hour = 0
+    minute = 0
+    second = 0
     if len(parts) > 3:
-        hour = parts[3]
-        minute = parts[4]
-        second = parts[5]
+        hour = int(parts[3])
+        minute = int(parts[4])
+        second = int(parts[5])
     return \
-        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}' \
-        f' {int(hour):02}:{int(minute):02}:{int(second):02}{postfix}'
+        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02} ' \
+        f'{hour:02}:{minute:02}:{second:02}{postfix}'
 
 
 def get_entities_linked_to_type_recursive(
