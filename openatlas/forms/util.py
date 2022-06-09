@@ -515,7 +515,7 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
         search_form=GlobalSearchForm(prefix='global'))
 
 
-def check_if_entity_has_time(entity: Entity) -> bool:
+def check_if_entity_has_time(entity: Entity) -> bool:  # pragma: no cover
     if not entity:
         return False
     for item in [
