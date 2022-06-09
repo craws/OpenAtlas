@@ -67,8 +67,8 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         view_name = origin.class_.view
     html = ''
     for item in [
-        'source', 'event', 'actor', 'place', 'artifact', 'reference',
-        'type']:
+            'source', 'event', 'actor', 'place', 'artifact', 'reference',
+            'type']:
         active = ''
         request_parts = request.path.split('/')
         if (view_name == item) or request.path.startswith('/index/' + item):
@@ -158,7 +158,7 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file_date = None
     for file in [
         f for f in path.iterdir()
-        if (path / f).is_file() and f.name != '.gitignore']:
+            if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
@@ -515,10 +515,10 @@ def add_dates_to_form(form: Any) -> str:
         'end_year_to', 'end_month_to', 'end_day_to']
     if 'begin_hour_from' in form:
         date_name += [
-        'begin_hour_from', 'begin_minute_from', 'begin_second_from',
-        'begin_hour_to', 'begin_minute_to', 'begin_second_to',
-        'end_hour_from', 'end_minute_from', 'end_second_from',
-        'end_hour_to', 'end_minute_to', 'end_second_to']
+            'begin_hour_from', 'begin_minute_from', 'begin_second_from',
+            'begin_hour_to', 'begin_minute_to', 'begin_second_to',
+            'end_hour_from', 'end_minute_from', 'end_second_from',
+            'end_hour_to', 'end_minute_to', 'end_second_to']
     for field_name in date_name:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
@@ -1037,8 +1037,7 @@ def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
         parts = string[0].split('-')
         date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string[1]}'
         return numpy.datetime64(date)
-    date = f'{string[0]}T{string[1]}'
-    return numpy.datetime64(date)
+    return numpy.datetime64(f'{string[0]}T{string[1]}')
 
 
 def datetime64_to_timestamp(
@@ -1058,8 +1057,9 @@ def datetime64_to_timestamp(
         hour = parts[3]
         minute = parts[4]
         second = parts[5]
-    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}' \
-           f' {int(hour):02}:{int(minute):02}:{int(second):02}{postfix}'
+    return \
+        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}' \
+        f' {int(hour):02}:{int(minute):02}:{int(second):02}{postfix}'
 
 
 def get_entities_linked_to_type_recursive(

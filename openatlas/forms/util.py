@@ -59,8 +59,8 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
         if field.name in [
-            'mail_recipients_feedback',
-            'file_upload_allowed_extension']:
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             settings[label] = ' '.join(value)
     return settings
 
@@ -82,8 +82,8 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             field.data = int(g.settings[field.name])
             continue
         if field.name in [
-            'mail_recipients_feedback',
-            'file_upload_allowed_extension']:
+                'mail_recipients_feedback',
+                'file_upload_allowed_extension']:
             field.data = ' '.join(g.settings[field.name])
             continue
         if field.name not in g.settings:  # pragma: no cover
@@ -102,10 +102,10 @@ def process_form_data(
     for key, value in form.data.items():
         field_type = getattr(form, key).type
         if field_type in [
-            'TreeField',
-            'TreeMultiField',
-            'TableField',
-            'TableMultiField']:
+                'TreeField',
+                'TreeMultiField',
+                'TableField',
+                'TableMultiField']:
             if value:
                 ids = ast.literal_eval(value)
                 value = ids if isinstance(ids, list) else [int(ids)]
@@ -123,13 +123,13 @@ def process_form_data(
                 'placeholder',
                 'classes')) \
                 or field_type in [
-            'CSRFTokenField',
-            'HiddenField',
-            'MultipleFileField',
-            'SelectMultipleField',
-            'SubmitField',
-            'TableField',
-            'TableMultiField']:
+                'CSRFTokenField',
+                'HiddenField',
+                'MultipleFileField',
+                'SelectMultipleField',
+                'SubmitField',
+                'TableField',
+                'TableMultiField']:
             continue
         if key == 'name':
             name = form.data['name']

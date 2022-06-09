@@ -31,13 +31,13 @@ class ReferenceSystemTest(TestBaseCase):
                 data=data)
             assert b'An entry has been created.' in rv.data
             wikipedia_id = ReferenceSystem.get_by_name('Wikipedia').id
-            # rv = self.app.get(
-            #     url_for(
-            #         'index',
-            #         view='reference_system',
-            #         delete_id=wikipedia_id),
-            #     follow_redirects=True)
-            # assert b'Deletion not possible if classes are attached' in rv.data
+            rv = self.app.get(
+                url_for(
+                    'index',
+                    view='reference_system',
+                    delete_id=wikipedia_id),
+                follow_redirects=True)
+            assert b'Deletion not possible if classes are attached' in rv.data
             rv = self.app.get(
                 url_for(
                     'reference_system_remove_class',
