@@ -13,7 +13,7 @@ was used as standard.
 The API links at entity views are only visible for user who have activated
 **Show API links** in their :doc:`profile`.
 
-The base url of the current OpenAtlas API is api/0.2/
+The base url of the current OpenAtlas API is api/
 
 Settings: :doc:`/admin/api`
 
