@@ -3,11 +3,12 @@ versions = {
         'feature': {
             '1620': 'Natural events',
             '1108': 'Current owner of human remains',
+            '1574': 'Dates with hours and minutes',
             '1633': 'Allow special characters in type names',
             '1581': 'Upgrade Bootstrap to 5',
             '1725': 'Additional step by step examples in the manual',
-            '1727': 'API: Additional type_by_class_view endpoint',
             '1595': 'API: Subunits for Ariadne and THANADOS',
+            '1727': 'API: Additional type_by_class_view endpoint',
             '1720': 'Refactoring'},
         'fix': {
             '1722': 'Resize layout issues with some sites',
