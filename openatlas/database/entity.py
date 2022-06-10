@@ -203,10 +203,13 @@ class Entity:
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from,
                 e.begin_comment,
-                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
-                COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_from,
+                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
+                COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from,
                 e.end_comment,
-                COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to"""
+                COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to"""
         if types:
             sql += """
                 ,array_to_json(
