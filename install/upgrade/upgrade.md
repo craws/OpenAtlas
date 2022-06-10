@@ -20,7 +20,10 @@ base, then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.3.0 to 7.4.0
-7.4.0.sql is needed (wil be taken care of by the database upgrade script).
+7.4.0.sql is needed but wil be taken care of by the database upgrade script.
+
+The new stable API version is now 0.3 (instead 0.2). Systems using the API
+(e.g. presentation sites) should be checked and adapted if needed.
 
 NPM packages need to be upgraded for the Bootstrap upgrade:
 
