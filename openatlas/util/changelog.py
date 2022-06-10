@@ -13,7 +13,8 @@ versions = {
             '1720': 'Refactoring'},
         'fix': {
             '1722': 'Resize layout issues with some sites',
-            '1723': 'Information gets deleted from map'}}],
+            '1723': 'Information gets deleted from map',
+            '1744': 'API: Fixed bug with download and count parameter'}}],
     '7.3.0': ['2022-05-08', {
         'feature': {
             '1388': 'Allow contributor group to delete only own entries',
