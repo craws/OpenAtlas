@@ -3,7 +3,7 @@ versions = {
         'feature': {
             '1620': 'Natural events',
             '1108': 'Current owner of human remains',
-            '1574': 'Dates with hours and minutes',
+            '1574': 'Dates with hours, minutes and seconds',
             '1633': 'Allow special characters in type names',
             '1581': 'Upgrade Bootstrap to 5',
             '1725': 'Additional step by step examples in the manual',
