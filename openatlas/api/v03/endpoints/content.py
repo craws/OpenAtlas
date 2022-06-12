@@ -58,9 +58,9 @@ class GetGeometricEntities(Resource):
         output: dict[str, Any] = {
             'type': 'FeatureCollection',
             'features': GetGeometricEntities.get_geometries(parser)}
-        if parser['count']:
+        if parser['count'] == 'true':
             return jsonify(len(output['features']))
-        if parser['download']:
+        if parser['download'] == 'true':
             return download(output, geometries_template(), 'geometries')
         return marshal(output, geometries_template()), 200
 

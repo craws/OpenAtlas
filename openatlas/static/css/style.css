@@ -474,7 +474,11 @@ input[type="text"].value_input {
   width: 30em;
 }
 
-form input[type="text"].month, form input[type="text"].day {
+form input[type="text"].month,
+form input[type="text"].day,
+form input[type="text"].hour,
+form input[type="text"].minute,
+form input[type="text"].second {
   text-align: right;
   width: 2em;
 }

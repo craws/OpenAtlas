@@ -157,9 +157,9 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
     if key == "entitySystemClass":
         value = [entity.class_.name.lower()]
     if key == "typeName":
-        value = [node.name.lower() for node in entity.types]
+        value = [type_.name.lower() for type_ in entity.types]
     if key in ["typeID", "typeIDWithSubs"]:
-        value = [node.id for node in entity.types]
+        value = [type_.id for type_ in entity.types]
     if key == "beginFrom":
         value = check_if_date(str(entity.begin_from))
     if key == "beginTo":

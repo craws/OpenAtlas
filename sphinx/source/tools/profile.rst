@@ -32,6 +32,7 @@ to add them will disappear.
   (editor or above)
 * **Sub units** - to insert archeological sub units at places,
   see: :doc:`/entity/place`
+* **Time** - show time fields in forms, see :doc:`/form/date`
 
 Display
 -------

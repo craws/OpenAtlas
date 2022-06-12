@@ -268,7 +268,7 @@ function updateHiddenInputFields() {
 }
 
 function importGeonamesID(geo, popup) {
-    $('.GeoNames').val(geo.geonameId);
+    $('.GeoNames').val(geo.geonameId).change();
     popup._close();
 }
 
