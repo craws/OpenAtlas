@@ -66,22 +66,22 @@ class GetTypeOverview(Resource):
 
     @staticmethod
     def get_type_overview() -> dict[str, dict[Entity, str]]:
-        nodes: dict[str, Any] = {
+        types: dict[str, Any] = {
             'standard': [],
             'custom': [],
             'place': [],
             'value': [],
             'system': [],
             'anthropology': []}
-        for node in g.types.values():
-            if node.root:
+        for type_ in g.types.values():
+            if type_.root:
                 continue
-            nodes[node.category].append({
-                "id": node.id,
-                "name": node.name,
-                "viewClass": node.classes,
-                "children": walk_type_tree(Type.get_types(node.name))})
-        return nodes
+            types[type_.category].append({
+                "id": type_.id,
+                "name": type_.name,
+                "viewClass": type_.classes,
+                "children": walk_type_tree(Type.get_types(type_.name))})
+        return types
 
 
 class GetTypeTree(Resource):
@@ -99,19 +99,19 @@ class GetTypeTree(Resource):
                 for id_, type_ in Type.get_all().items()}
 
     @staticmethod
-    def serialize_to_json(node: Type) -> dict[str, Any]:
+    def serialize_to_json(type_: Type) -> dict[str, Any]:
         return {
-            'id': node.id,
-            'name': node.name,
-            'description': node.description,
-            'origin_id': node.origin_id,
-            'first': node.first,
-            'last': node.last,
-            'root': node.root,
-            'subs': node.subs,
-            'count': node.count,
-            'count_subs': node.count_subs,
-            'category': node.category}
+            'id': type_.id,
+            'name': type_.name,
+            'description': type_.description,
+            'origin_id': type_.origin_id,
+            'first': type_.first,
+            'last': type_.last,
+            'root': type_.root,
+            'subs': type_.subs,
+            'count': type_.count,
+            'count_subs': type_.count_subs,
+            'category': type_.category}
 
 
 class GetSubunits(Resource):

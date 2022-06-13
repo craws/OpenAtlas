@@ -20,11 +20,14 @@ class Type:
                 es.id AS super_id,
                 COUNT(l2.id) AS count,
                 COUNT(l3.id) AS count_property,
-                COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '')
+                COALESCE(to_char(e.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from,
-                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
-                COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from,
-                COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
+                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
+                COALESCE(to_char(e.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from,
+                COALESCE(to_char(e.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to,
                 e.begin_comment,
                 e.end_comment
             FROM model.entity e

@@ -113,8 +113,6 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'type':  # Filter letters, numbers, minus, brackets and spaces
-        return re.sub(r'([^\s\w()-]|_)+', '', string).strip()
     if mode == 'text':  # Remove HTML tags, keep linebreaks
         stripper = MLStripper()
         stripper.feed(string)
@@ -159,7 +157,7 @@ def get_backup_file_data() -> dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [
-            f for f in path.iterdir()
+        f for f in path.iterdir()
             if (path / f).is_file() and f.name != '.gitignore']:
         file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
@@ -177,8 +175,8 @@ def get_backup_file_data() -> dict[str, Any]:
 
 def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
     data: list[Any] = [format_name_and_aliases(entity, show_links)]
-    if entity.class_.view in ['actor', 'artifact', 'event', 'reference'] \
-            or entity.class_.name == 'human_remains':
+    if entity.class_.view in [
+            'actor', 'artifact', 'event', 'place', 'reference']:
         data.append(entity.class_.label)
     if entity.class_.standard_type_id:
         data.append(entity.standard_type.name if entity.standard_type else '')
@@ -510,11 +508,18 @@ def add_reference_systems_to_form(form: Any) -> str:
 def add_dates_to_form(form: Any) -> str:
     errors = {}
     valid_dates = True
-    for field_name in [
-            'begin_year_from', 'begin_month_from', 'begin_day_from',
-            'begin_year_to', 'begin_month_to', 'begin_day_to',
-            'end_year_from', 'end_month_from', 'end_day_from',
-            'end_year_to', 'end_month_to', 'end_day_to']:
+    date_name = [
+        'begin_year_from', 'begin_month_from', 'begin_day_from',
+        'begin_year_to', 'begin_month_to', 'begin_day_to',
+        'end_year_from', 'end_month_from', 'end_day_from',
+        'end_year_to', 'end_month_to', 'end_day_to']
+    if 'begin_hour_from' in form:
+        date_name += [
+            'begin_hour_from', 'begin_minute_from', 'begin_second_from',
+            'begin_hour_to', 'begin_minute_to', 'begin_second_to',
+            'end_hour_from', 'end_minute_from', 'end_second_from',
+            'end_hour_to', 'end_minute_to', 'end_second_to']
+    for field_name in date_name:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -537,8 +542,8 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
         return ''
     if isinstance(value, numpy.datetime64):
         date_ = datetime64_to_timestamp(value)
-        return date_.lstrip('0') if date_ else ''
-    return value.date().isoformat()
+        return date_.lstrip('0').replace(' 00:00:00', '') if date_ else ''
+    return value.date().isoformat().replace(' 00:00:00', '')
 
 
 def external_url(url: Union[str, None]) -> str:
@@ -978,7 +983,7 @@ def display_value_type_fields(
                         {sub.description if sub.description else ''}
                     </span>
                 </div>
-                {display_value_type_fields(form, sub, root, level+1)}
+                {display_value_type_fields(form, sub, root, level + 1)}
             </div>
         </div>"""
     return html
@@ -1009,21 +1014,30 @@ def format_date_part(date: numpy.datetime64, part: str) -> str:
     if string.startswith('-') or string.startswith('0000'):
         bc = True
         string = string[1:]
+    string = string.replace('T', '-').replace(':', '-')
     parts = string.split('-')
     if part == 'year':  # If it's a negative year, add one year
         return f'-{int(parts[0]) + 1}' if bc else f'{int(parts[0])}'
     if part == 'month':
         return parts[1]
+    if part == 'hour':
+        return parts[3]
+    if part == 'minute':
+        return parts[4]
+    if part == 'second':
+        return parts[5]
     return parts[2]
 
 
 def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
     if not string:
         return None
-    if 'BC' in string:
-        parts = string.split(' ')[0].split('-')
-        string = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}'
-    return numpy.datetime64(string.split(' ')[0])
+    string_list = string.split(' ')
+    if 'BC' in string_list:
+        parts = string_list[0].split('-')
+        date = f'-{int(parts[0]) - 1}-{parts[1]}-{parts[2]}T{string_list[1]}'
+        return numpy.datetime64(date)
+    return numpy.datetime64(f'{string_list[0]}T{string_list[1]}')
 
 
 def datetime64_to_timestamp(
@@ -1035,9 +1049,19 @@ def datetime64_to_timestamp(
     if string.startswith('-') or string.startswith('0000'):
         string = string[1:]
         postfix = ' BC'
+    string = string.replace('T', '-').replace(':', '-').replace(' ', '-')
     parts = string.split('-')
     year = int(parts[0]) + 1 if postfix else int(parts[0])
-    return f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02}{postfix}'
+    hour = 0
+    minute = 0
+    second = 0
+    if len(parts) > 3:
+        hour = int(parts[3])
+        minute = int(parts[4])
+        second = int(parts[5])
+    return \
+        f'{year:04}-{int(parts[1]):02}-{int(parts[2]):02} ' \
+        f'{hour:02}:{minute:02}:{second:02}{postfix}'
 
 
 def get_entities_linked_to_type_recursive(

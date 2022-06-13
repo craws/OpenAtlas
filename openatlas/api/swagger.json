@@ -1034,16 +1034,22 @@
         },
         "type": "object"
       },
-      "TimespansModel": {
+      "TimeStartEndModel": {
         "properties": {
-          "end": {
+          "start": {
             "$ref": "#/components/schemas/TimeDetailModel"
           },
-          "start": {
+          "end": {
             "$ref": "#/components/schemas/TimeDetailModel"
           }
         },
         "type": "object"
+      },
+      "TimespansModel": {
+        "items": {
+          "$ref": "#/components/schemas/TimeStartEndModel"
+        },
+        "type": "array"
       },
       "TypeModel": {
         "properties": {
@@ -1137,10 +1143,7 @@
       "WhenModel": {
         "properties": {
           "timespans": {
-            "items": {
               "$ref": "#/components/schemas/TimespansModel"
-            },
-            "type": "array"
           }
         },
         "type": "object"

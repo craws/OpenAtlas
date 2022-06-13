@@ -52,9 +52,9 @@ def resolve_entities(
         return Response(
             rdf_output(result['results'], parser),
             mimetype=app.config['RDF_FORMATS'][parser['format']])
-    if parser['count']:
+    if parser['count'] == 'true':
         return jsonify(result['pagination']['entities'])
-    if parser['download']:
+    if parser['download'] == 'true':
         return download(result, get_entities_template(parser), file_name)
     return marshal(result, get_entities_template(parser)), 200
 

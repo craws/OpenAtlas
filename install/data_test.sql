@@ -10,7 +10,8 @@ INSERT INTO web.user_settings (user_id, name, value) VALUES
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'table_show_icons', 'True'),
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_import', 'True'),
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_class', 'True'),
-    ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_api', 'True');
+    ((SELECT id FROM web.user WHERE username = 'Alice'), 'entity_show_api', 'True'),
+    ((SELECT id FROM web.user WHERE username = 'Alice'), 'module_time', 'True');
 
 -- Citation example
 INSERT INTO web.i18n (name, language, text) VALUES

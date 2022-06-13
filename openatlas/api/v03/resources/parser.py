@@ -5,16 +5,18 @@ from openatlas import app
 default = reqparse.RequestParser()
 default.add_argument(
     'download',
-    type=bool,
+    type=str,
     help='{error_msg}',
+    case_sensitive=False,
     default=False,
-    choices=(True, False))
+    choices=('true', 'false'))
 default.add_argument(
     'count',
-    type=bool,
+    type=str,
     help='{error_msg}',
+    case_sensitive=False,
     default=False,
-    choices=(True, False))
+    choices=('true', 'false'))
 
 language = default.copy()
 language.add_argument(

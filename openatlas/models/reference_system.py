@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 from flask import g
 from werkzeug.exceptions import abort

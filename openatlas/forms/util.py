@@ -123,25 +123,25 @@ def process_form_data(
                 'placeholder',
                 'classes')) \
                 or field_type in [
-                    'CSRFTokenField',
-                    'HiddenField',
-                    'MultipleFileField',
-                    'SelectMultipleField',
-                    'SubmitField',
-                    'TableField',
-                    'TableMultiField']:
+                'CSRFTokenField',
+                'HiddenField',
+                'MultipleFileField',
+                'SelectMultipleField',
+                'SubmitField',
+                'TableField',
+                'TableMultiField']:
             continue
         if key == 'name':
             name = form.data['name']
             if hasattr(form, 'name_inverse'):
                 name = form.name.data.replace('(', '').replace(')', '').strip()
                 if form.name_inverse.data.strip():
-                    inverse = form.name_inverse.data.\
-                        replace('(', '').\
+                    inverse = form.name_inverse.data. \
+                        replace('(', ''). \
                         replace(')', '').strip()
                     name += ' (' + inverse + ')'
             if entity.class_.name == 'type':
-                name = sanitize(name, 'type')
+                name = sanitize(name, 'text')
             elif isinstance(entity, ReferenceSystem) and entity.system:
                 name = entity.name  # Prevent name changing of a system type
             data['attributes']['name'] = name
@@ -240,9 +240,9 @@ def process_form_data(
             if form.place_from.data:
                 data['links']['insert'].append({
                     'property': 'P27',
-                    'range':  Link.get_linked_entity_safe(
-                         int(form.place_from.data),
-                         'P53')})
+                    'range': Link.get_linked_entity_safe(
+                        int(form.place_from.data),
+                        'P53')})
             if form.place_to.data:
                 data['links']['insert'].append({
                     'property': 'P26',
@@ -283,8 +283,8 @@ def process_form_data(
             if super_id != new_super.id:
                 data['links']['delete'].add(code)
                 data['links']['insert'].append({
-                     'property': code,
-                     'range': new_super})
+                    'property': code,
+                    'range': new_super})
     for link_ in data['links']['insert']:
         if isinstance(link_['range'], str):
             link_['range'] = form_string_to_entity_list(link_['range'])
@@ -365,22 +365,34 @@ def process_form_dates(form: FlaskForm) -> dict[str, Any]:
         data['begin_from'] = form_to_datetime64(
             form.begin_year_from.data,
             form.begin_month_from.data,
-            form.begin_day_from.data)
+            form.begin_day_from.data,
+            form.begin_hour_from.data if 'begin_hour_from' in form else None,
+            form.begin_minute_from.data if 'begin_hour_from' in form else None,
+            form.begin_second_from.data if 'begin_hour_from' in form else None)
         data['begin_to'] = form_to_datetime64(
             form.begin_year_to.data,
             form.begin_month_to.data,
             form.begin_day_to.data,
+            form.begin_hour_to.data if 'begin_hour_from' in form else None,
+            form.begin_minute_to.data if 'begin_hour_from' in form else None,
+            form.begin_second_to.data if 'begin_hour_from' in form else None,
             to_date=True)
     if hasattr(form, 'end_year_from') and form.end_year_from.data:
         data['end_comment'] = form.end_comment.data
         data['end_from'] = form_to_datetime64(
             form.end_year_from.data,
             form.end_month_from.data,
-            form.end_day_from.data)
+            form.end_day_from.data,
+            form.end_hour_from.data if 'begin_hour_from' in form else None,
+            form.end_minute_from.data if 'begin_hour_from' in form else None,
+            form.end_second_from.data if 'begin_hour_from' in form else None)
         data['end_to'] = form_to_datetime64(
             form.end_year_to.data,
             form.end_month_to.data,
             form.end_day_to.data,
+            form.end_hour_to.data if 'begin_hour_from' in form else None,
+            form.end_minute_to.data if 'begin_hour_from' in form else None,
+            form.end_second_to.data if 'begin_hour_from' in form else None,
             to_date=True)
     return data
 
@@ -418,6 +430,9 @@ def form_to_datetime64(
         year: Any,
         month: Any,
         day: Any,
+        hour: Optional[Any] = None,
+        minute: Optional[Any] = None,
+        second: Optional[Any] = None,
         to_date: bool = False) -> Optional[numpy.datetime64]:
     if not year:
         return None
@@ -457,8 +472,24 @@ def form_to_datetime64(
     else:
         day = '01'
 
+    if hour:
+        hour = f'{hour:02}'
+    else:
+        hour = '00'
+
+    if minute:
+        minute = f'{minute:02}'
+    else:
+        minute = '00'
+
+    if second:
+        second = f'{second:02}'
+    else:
+        second = '00'
+
     try:
-        date_time = numpy.datetime64(f'{year}-{month}-{day}')
+        date_time = numpy.datetime64(
+            f'{year}-{month}-{day}T{hour}:{minute}:{second}')
     except ValueError:
         return None
     return date_time
@@ -478,6 +509,22 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
                     'display_logo',
                     filename=f"{g.settings['logo_file_id']}{ext}")
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
+
     return dict(
         get_logo=get_logo(),
         search_form=GlobalSearchForm(prefix='global'))
+
+
+def check_if_entity_has_time(
+        entity: Optional[Union[Entity, Link, Type]]
+) -> bool:   # pragma: no cover
+    if not entity:
+        return False
+    for item in [
+            entity.begin_from,
+            entity.begin_to,
+            entity.end_from,
+            entity.end_to]:
+        if '00:00:00' not in str(item) and item:
+            return True
+    return False

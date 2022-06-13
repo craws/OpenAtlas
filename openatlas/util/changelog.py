@@ -1,12 +1,21 @@
 versions = {
-    '7.4.0': ['TBA', {
+    '7.5.0': ['TBA', {}],
+    '7.4.0': ['2022-06-10', {
         'feature': {
             '1620': 'Natural events',
             '1108': 'Current owner of human remains',
+            '1574': 'Dates with hours, minutes and seconds',
+            '1633': 'Allow special characters in type names',
             '1581': 'Upgrade Bootstrap to 5',
-            '1725': 'Additional step by step examples in the manual'},
+            '1725': 'Additional step by step examples in the manual',
+            '1675': 'API: 0.3 stable, 0.2 deprecated',
+            '1595': 'API: Subunits for Ariadne and THANADOS',
+            '1727': 'API: Additional type_by_class_view endpoint',
+            '1720': 'Refactoring'},
         'fix': {
-            '1722': 'Resize layout issues with some sites'}}],
+            '1722': 'Resize layout issues with some sites',
+            '1723': 'Information gets deleted from map',
+            '1744': 'API: Fixed bug with download and count parameter'}}],
     '7.3.0': ['2022-05-08', {
         'feature': {
             '1388': 'Allow contributor group to delete only own entries',
