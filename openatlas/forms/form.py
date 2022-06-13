@@ -77,7 +77,6 @@ def get_form(
 
     for id_, field in additional_fields(class_, code, entity, origin).items():
         setattr(Form, id_, field)
-    add_reference_systems(Form, class_)
     add_buttons(Form, class_, entity, origin)
     if not entity or (request and request.method != 'GET'):
         form = Form()
@@ -156,34 +155,6 @@ def add_buttons(
     return form
 
 
-def add_reference_systems(form: Any, class_: str) -> None:
-    precisions = [('', '')] + [
-        (str(g.types[id_].id), g.types[id_].name)
-        for id_ in Type.get_hierarchy('External reference match').subs]
-    systems = list(g.reference_systems.values())
-    systems.sort(key=lambda x: x.name.casefold())
-    for system in systems:
-        if class_ not in system.classes:
-            continue
-        setattr(
-            form,
-            f'reference_system_id_{system.id}',
-            StringField(
-                uc_first(system.name),
-                [OptionalValidator()],
-                description=system.description,
-                render_kw={
-                    'autocomplete': 'off',
-                    'placeholder': system.placeholder}))
-        setattr(
-            form,
-            f'reference_system_precision_{system.id}',
-            SelectField(
-                _('precision'),
-                choices=precisions,
-                default=system.precision_default_id))
-
-
 def additional_fields(
         class_: str,
         code: Union[str, None],
@@ -222,12 +193,6 @@ def additional_fields(
             'actor' if code == 'member' else 'group':
                 TableMultiField(_('actor'), [InputRequired()])
                 if not entity else None},
-        'acquisition': {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'event_preceding': TableField(_('preceding event')),
-            'place': TableField(_('location')),
-            'given_place': TableMultiField(_('given place'))},
         'activity': {
             'event_id': HiddenField(),
             'event': TableField(_('sub event of')),

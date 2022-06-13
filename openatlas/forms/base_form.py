@@ -9,39 +9,16 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    FieldList, HiddenField, IntegerField, StringField, TextAreaField)
+    FieldList, HiddenField, IntegerField, SelectField, StringField,
+    TextAreaField)
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
-
-from openatlas.forms.field import (RemovableListField, TreeField,
-                                   TreeMultiField, ValueFloatField)
+from openatlas.forms.field import (
+    RemovableListField, TreeField, TreeMultiField, ValueFloatField)
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-
-
-def add_types(form: Any, class_: str) -> None:
-    types = OrderedDict(
-        {id_: g.types[id_] for id_ in g.classes[class_].hierarchies})
-    if g.classes[class_].standard_type_id in types:  # Standard type to top
-        types.move_to_end(g.classes[class_].standard_type_id, last=False)
-    for type_ in types.values():
-        if type_.multiple:
-            setattr(form, str(type_.id), TreeMultiField(str(type_.id)))
-        else:
-            setattr(form, str(type_.id), TreeField(str(type_.id)))
-        if type_.category == 'value':
-            add_value_type_fields(form, type_.subs)
-
-
-def add_value_type_fields(form: Any, subs: list[int]) -> None:
-    for sub_id in subs:
-        sub = g.types[sub_id]
-        setattr(
-            form,
-            str(sub.id),
-            ValueFloatField(sub.name, [OptionalValidator()]))
-        add_value_type_fields(form, sub.subs)
+from openatlas.util.util import uc_first
 
 
 class BaseForm:
@@ -72,8 +49,10 @@ class BaseForm:
                 render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(Form, 'alias', FieldList(RemovableListField('')))
-        if name in g.classes and g.classes[name].hierarchies:
-            add_types(Form, name)
+        self.add_types(Form)
+        for id_, field in self.additional_fields().items():
+            setattr(Form, id_, field)
+        self.add_reference_systems(Form)
         if 'date' in self.fields:
             add_date_fields(
                 Form,
@@ -96,6 +75,50 @@ class BaseForm:
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.form = Form(obj=self.entity) if self.entity else Form()
 
+    def add_types(self, form: Any):
+        if self.name in g.classes and g.classes[self.name].hierarchies:
+            types = OrderedDict(
+                {id_: g.types[id_] for id_ in
+                 g.classes[self.name].hierarchies})
+            if g.classes[
+                    self.name].standard_type_id in types:  # Standard to top
+                types.move_to_end(
+                    g.classes[self.name].standard_type_id, last=False)
+            for type_ in types.values():
+                if type_.multiple:
+                    setattr(form, str(type_.id), TreeMultiField(str(type_.id)))
+                else:
+                    setattr(form, str(type_.id), TreeField(str(type_.id)))
+                if type_.category == 'value':
+                    add_value_type_fields(self, type_.subs)
+
+    def add_reference_systems(self, form: Any) -> None:
+        precisions = [('', '')] + [
+            (str(g.types[id_].id), g.types[id_].name)
+            for id_ in Type.get_hierarchy('External reference match').subs]
+        systems = list(g.reference_systems.values())
+        systems.sort(key=lambda x: x.name.casefold())
+        for system in systems:
+            if self.name not in system.classes:
+                continue
+            setattr(
+                form,
+                f'reference_system_id_{system.id}',
+                StringField(
+                    uc_first(system.name),
+                    [OptionalValidator()],
+                    description=system.description,
+                    render_kw={
+                        'autocomplete': 'off',
+                        'placeholder': system.placeholder}))
+            setattr(
+                form,
+                f'reference_system_precision_{system.id}',
+                SelectField(
+                    _('precision'),
+                    choices=precisions,
+                    default=system.precision_default_id))
+
     def additional_fields(self) -> dict[str, Any]:
         pass
 
@@ -114,6 +137,16 @@ def convert(value: str) -> list[int]:
         return []
     ids = ast.literal_eval(value)
     return ids if isinstance(ids, list) else [int(ids)]
+
+
+def add_value_type_fields(form: Any, subs: list[int]) -> None:
+    for sub_id in subs:
+        sub = g.types[sub_id]
+        setattr(
+            form,
+            str(sub.id),
+            ValueFloatField(sub.name, [OptionalValidator()]))
+        add_value_type_fields(form, sub.subs)
 
 
 def add_date_fields(form: Any, has_time: bool) -> None:
