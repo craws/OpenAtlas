@@ -4,7 +4,6 @@ from flask import g
 
 
 class User:
-
     sql = """
         SELECT
             u.id, u.username, u.password, u.active, u.real_name, u.info,
@@ -146,8 +145,10 @@ class User:
         g.cursor.execute(
             """
             SELECT COUNT(*)
-            FROM web.user_log
-            WHERE user_id = %(user_id)s AND action = 'insert';
+            FROM web.user_log l
+            JOIN model.entity e ON l.entity_id = e.id
+                AND l.user_id = %(user_id)s
+                AND l.action = 'insert';
             """,
             {'user_id': user_id})
         return g.cursor.fetchone()['count']
@@ -279,3 +280,16 @@ class User:
         g.cursor.execute(
             "DELETE FROM web.user_notes WHERE id = %(id)s;",
             {'id': id_})
+
+    @staticmethod
+    def get_user_entities(id_: int) -> list[int]:
+        g.cursor.execute(
+            '''
+            SELECT e.id
+            FROM web.user_log l
+            JOIN model.entity e ON l.entity_id = e.id
+                AND l.user_id = %(user_id)s
+                AND l.action = 'insert';
+            ''',
+            {'user_id': id_})
+        return [row['id'] for row in g.cursor.fetchall()]
