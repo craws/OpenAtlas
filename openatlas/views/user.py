@@ -168,14 +168,15 @@ def user_entities(id_: int) -> str:
         'begin',
         'end',
         'created'])
-    for entity in user.get_entities():
-        table.rows.append([
-            link(entity),
-            entity.class_.label,
-            link(entity.standard_type),
-            entity.first,
-            entity.last,
-            format_date(entity.created)])
+    if user:
+        for entity in user.get_entities():
+            table.rows.append([
+                link(entity),
+                entity.class_.label,
+                link(entity.standard_type),
+                entity.first,
+                entity.last,
+                format_date(entity.created)])
     return render_template(
         'table.html',
         table=table,

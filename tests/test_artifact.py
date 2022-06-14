@@ -76,7 +76,8 @@ class ArtifactTest(TestBaseCase):
                 url_for('index', view='artifact', delete_id=artifact.id))
             assert b'has been deleted' in rv.data
 
-            rv = self.app.get(url_for('user_view', id_=alice.id))
+            alice_id = alice.id if alice else 0  # Just for Mypy
+            rv = self.app.get(url_for('user_view', id_=alice_id))
             assert b'<a href="/admin/user/entities/2">1</a>' in rv.data
 
             # Insert and continue
@@ -86,9 +87,8 @@ class ArtifactTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(url_for('user_view', id_=alice.id))
+            rv = self.app.get(url_for('user_view', id_=alice_id))
             assert b'<a href="/admin/user/entities/2">2</a>' in rv.data
 
-            rv = self.app.get(url_for('user_entities', id_=alice.id))
+            rv = self.app.get(url_for('user_entities', id_=alice_id))
             assert b'This will be continued' in rv.data
-
