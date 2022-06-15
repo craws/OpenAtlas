@@ -65,19 +65,15 @@ def get_entity_form(
 def get_form(
         class_: str,
         entity: Optional[Union[Entity, Link, Type]] = None,
-        code: Optional[str] = None,
         origin: Union[Entity, Type, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
+
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
 
     if class_ == 'note':
         setattr(Form, 'public', BooleanField(_('public'), default=False))
-
-    for id_, field in additional_fields(class_, code, entity, origin).items():
-        setattr(Form, id_, field)
-    add_buttons(Form, class_, entity, origin)
     if not entity or (request and request.method != 'GET'):
         form = Form()
     else:
@@ -105,18 +101,8 @@ def add_buttons(
         name: str,
         entity: Union[Entity, Type, Link, None],
         origin: Optional[Entity] = None) -> FlaskForm:
-    setattr(form, 'save', SubmitField(_('save') if entity else _('insert')))
     if entity:
         return form
-    if 'continue' in FORMS[name] and (
-            name in ['involvement', 'artifact', 'human_remains',
-                     'source_translation', 'type']
-            or not origin):
-        setattr(
-            form,
-            'insert_and_continue',
-            SubmitField(uc_first(_('insert and continue'))))
-        setattr(form, 'continue_', HiddenField())
     insert_add = uc_first(_('insert and add')) + ' '
     if name == 'place':
         setattr(
@@ -296,7 +282,7 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
 
 def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
-    """Returns a form with a list of entities with checkboxes."""
+    """ Returns a form with a list of entities with checkboxes."""
     if class_ == 'place':
         entities = Entity.get_by_class('place', types=True, aliases=True)
     elif class_ == 'artifact':

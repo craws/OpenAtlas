@@ -10,7 +10,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     FieldList, HiddenField, IntegerField, SelectField, StringField,
-    TextAreaField)
+    SubmitField, TextAreaField)
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 from openatlas.forms.field import (
@@ -41,6 +41,7 @@ class BaseForm:
         class Form(FlaskForm):
             origin_id = HiddenField()
 
+        self.form_class = Form
         if 'name' in self.fields:
             setattr(Form, 'name', StringField(
                 _('URL') if name == 'external_reference' else _('name'),
@@ -54,8 +55,7 @@ class BaseForm:
             setattr(Form, id_, field)
         self.add_reference_systems(Form)
         if 'date' in self.fields:
-            add_date_fields(
-                Form,
+            self.add_date_fields(
                 bool(
                     current_user.settings['module_time']
                     or check_if_entity_has_time(entity)))
@@ -73,6 +73,7 @@ class BaseForm:
             setattr(Form, 'gis_points', HiddenField(default='[]'))
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
+        self.add_buttons()
         self.form = Form(obj=self.entity) if self.entity else Form()
 
     def add_types(self, form: Any):
@@ -90,7 +91,23 @@ class BaseForm:
                 else:
                     setattr(form, str(type_.id), TreeField(str(type_.id)))
                 if type_.category == 'value':
-                    add_value_type_fields(self, type_.subs)
+                    self.add_value_type_fields(type_.subs)
+
+    def add_buttons(self) -> None:
+        setattr(
+            self.form_class,
+            'save',
+            SubmitField(_('save') if self.entity else _('insert')))
+        if not self.entity and 'continue' in self.fields and (
+                self.name in [
+                    'involvement', 'artifact', 'human_remains',
+                    'source_translation', 'type']
+                or not self.origin):
+            setattr(
+                self.form_class,
+                'insert_and_continue',
+                SubmitField(uc_first(_('insert and continue'))))
+            setattr(self.form_class, 'continue_', HiddenField())
 
     def add_reference_systems(self, form: Any) -> None:
         precisions = [('', '')] + [
@@ -131,88 +148,186 @@ class BaseForm:
     def process_form_data(self, entity: Optional[Entity] = None) -> None:
         pass
 
+    def add_value_type_fields(self, subs: list[int]) -> None:
+        for sub_id in subs:
+            sub = g.types[sub_id]
+            setattr(
+                self.form_class,
+                str(sub.id),
+                ValueFloatField(sub.name, [OptionalValidator()]))
+            self.add_value_type_fields(sub.subs)
+
+    def add_date_fields(self, has_time: bool) -> None:
+        validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
+        validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
+        validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
+        validator_day = [OptionalValidator(), NumberRange(min=1, max=31)]
+        validator_month = [OptionalValidator(), NumberRange(min=1, max=12)]
+        validator_year = [
+            OptionalValidator(),
+            NumberRange(min=-4713, max=9999),
+            NoneOf([0])]
+
+        setattr(
+            self.form_class,
+            'begin_year_from',
+            IntegerField(
+                render_kw={'placeholder': _('YYYY')},
+                validators=validator_year))
+        setattr(
+            self.form_class,
+            'begin_month_from',
+            IntegerField(
+                render_kw={'placeholder': _('MM')},
+                validators=validator_month))
+        setattr(
+            self.form_class,
+            'begin_day_from',
+            IntegerField(
+                render_kw={'placeholder': _('DD')},
+                validators=validator_day))
+        if has_time:
+            setattr(
+                self.form_class,
+                'begin_hour_from',
+                IntegerField(
+                    render_kw={'placeholder': _('hh')},
+                    validators=validator_hour))
+            setattr(
+                self.form_class,
+                'begin_minute_from',
+                IntegerField(
+                    render_kw={'placeholder': _('mm')},
+                    validators=validator_minute))
+            setattr(
+                self.form_class,
+                'begin_second_from',
+                IntegerField(
+                    render_kw={'placeholder': _('ss')},
+                    validators=validator_second))
+        setattr(
+            self.form_class,
+            'begin_year_to',
+            IntegerField(
+                render_kw={'placeholder': _('YYYY')},
+                validators=validator_year))
+        setattr(
+            self.form_class,
+            'begin_month_to',
+            IntegerField(
+                render_kw={'placeholder': _('MM')},
+                validators=validator_month))
+        setattr(
+            self.form_class,
+            'begin_day_to',
+            IntegerField(
+                render_kw={'placeholder': _('DD')},
+                validators=validator_day))
+        if has_time:
+            setattr(
+                self.form_class,
+                'begin_hour_to',
+                IntegerField(
+                    render_kw={'placeholder': _('hh')},
+                    validators=validator_hour))
+            setattr(
+                self.form_class,
+                'begin_minute_to',
+                IntegerField(
+                    render_kw={'placeholder': _('mm')},
+                    validators=validator_minute))
+            setattr(
+                self.form_class,
+                'begin_second_to',
+                IntegerField(
+                    render_kw={'placeholder': _('ss')},
+                    validators=validator_second))
+        setattr(
+            self.form_class,
+            'begin_comment',
+            StringField(render_kw={'placeholder': _('comment')}))
+        setattr(
+            self.form_class,
+            'end_year_from',
+            IntegerField(
+                render_kw={'placeholder': _('YYYY')},
+                validators=validator_year))
+        setattr(
+            self.form_class,
+            'end_month_from',
+            IntegerField(
+                render_kw={'placeholder': _('MM')},
+                validators=validator_month))
+        setattr(
+            self.form_class,
+            'end_day_from',
+            IntegerField(
+                render_kw={'placeholder': _('DD')},
+                validators=validator_day))
+        if has_time:
+            setattr(
+                self.form_class,
+                'end_hour_from',
+                IntegerField(
+                    render_kw={'placeholder': _('hh')},
+                    validators=validator_hour))
+            setattr(
+                self.form_class,
+                'end_minute_from',
+                IntegerField(
+                    render_kw={'placeholder': _('mm')},
+                    validators=validator_minute))
+            setattr(
+                self.form_class,
+                'end_second_from',
+                IntegerField(
+                    render_kw={'placeholder': _('ss')},
+                    validators=validator_second))
+        setattr(
+            self.form_class,
+            'end_year_to',
+            IntegerField(
+                render_kw={'placeholder': _('YYYY')},
+                validators=validator_year))
+        setattr(
+            self.form_class,
+            'end_month_to',
+            IntegerField(
+                render_kw={'placeholder': _('MM')},
+                validators=validator_month))
+        setattr(
+            self.form_class,
+            'end_day_to',
+            IntegerField(
+                render_kw={'placeholder': _('DD')},
+                validators=validator_day))
+        if has_time:
+            setattr(
+                self.form_class,
+                'end_hour_to',
+                IntegerField(
+                    render_kw={'placeholder': _('hh')},
+                    validators=validator_hour))
+            setattr(
+                self.form_class,
+                'end_minute_to',
+                IntegerField(
+                    render_kw={'placeholder': _('mm')},
+                    validators=validator_minute))
+            setattr(
+                self.form_class,
+                'end_second_to',
+                IntegerField(
+                    render_kw={'placeholder': _('ss')},
+                    validators=validator_second))
+        setattr(
+            self.form_class,
+            'end_comment',
+            StringField(render_kw={'placeholder': _('comment')}))
+
 
 def convert(value: str) -> list[int]:
     if not value:
         return []
     ids = ast.literal_eval(value)
     return ids if isinstance(ids, list) else [int(ids)]
-
-
-def add_value_type_fields(form: Any, subs: list[int]) -> None:
-    for sub_id in subs:
-        sub = g.types[sub_id]
-        setattr(
-            form,
-            str(sub.id),
-            ValueFloatField(sub.name, [OptionalValidator()]))
-        add_value_type_fields(form, sub.subs)
-
-
-def add_date_fields(form: Any, has_time: bool) -> None:
-    validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
-    validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
-    validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
-    validator_day = [OptionalValidator(), NumberRange(min=1, max=31)]
-    validator_month = [OptionalValidator(), NumberRange(min=1, max=12)]
-    validator_year = [
-        OptionalValidator(),
-        NumberRange(min=-4713, max=9999),
-        NoneOf([0])]
-
-    setattr(form, 'begin_year_from', IntegerField(
-        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'begin_month_from', IntegerField(
-        render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'begin_day_from', IntegerField(
-        render_kw={'placeholder': _('DD')}, validators=validator_day))
-    if has_time:
-        setattr(form, 'begin_hour_from', IntegerField(
-            render_kw={'placeholder': _('hh')}, validators=validator_hour))
-        setattr(form, 'begin_minute_from', IntegerField(
-            render_kw={'placeholder': _('mm')}, validators=validator_minute))
-        setattr(form, 'begin_second_from', IntegerField(
-            render_kw={'placeholder': _('ss')}, validators=validator_second))
-    setattr(form, 'begin_year_to', IntegerField(
-        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'begin_month_to', IntegerField(
-        render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'begin_day_to', IntegerField(
-        render_kw={'placeholder': _('DD')}, validators=validator_day))
-    if has_time:
-        setattr(form, 'begin_hour_to', IntegerField(
-            render_kw={'placeholder': _('hh')}, validators=validator_hour))
-        setattr(form, 'begin_minute_to', IntegerField(
-            render_kw={'placeholder': _('mm')}, validators=validator_minute))
-        setattr(form, 'begin_second_to', IntegerField(
-            render_kw={'placeholder': _('ss')}, validators=validator_second))
-    setattr(form, 'begin_comment', StringField(
-        render_kw={'placeholder': _('comment')}))
-    setattr(form, 'end_year_from', IntegerField(
-        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'end_month_from', IntegerField(
-        render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'end_day_from', IntegerField(
-        render_kw={'placeholder': _('DD')}, validators=validator_day))
-    if has_time:
-        setattr(form, 'end_hour_from', IntegerField(
-            render_kw={'placeholder': _('hh')}, validators=validator_hour))
-        setattr(form, 'end_minute_from', IntegerField(
-            render_kw={'placeholder': _('mm')}, validators=validator_minute))
-        setattr(form, 'end_second_from', IntegerField(
-            render_kw={'placeholder': _('ss')}, validators=validator_second))
-    setattr(form, 'end_year_to', IntegerField(
-        render_kw={'placeholder': _('YYYY')}, validators=validator_year))
-    setattr(form, 'end_month_to', IntegerField(
-        render_kw={'placeholder': _('MM')}, validators=validator_month))
-    setattr(form, 'end_day_to', IntegerField(
-        render_kw={'placeholder': _('DD')}, validators=validator_day))
-    if has_time:
-        setattr(form, 'end_hour_to', IntegerField(
-            render_kw={'placeholder': _('hh')}, validators=validator_hour))
-        setattr(form, 'end_minute_to', IntegerField(
-            render_kw={'placeholder': _('mm')}, validators=validator_minute))
-        setattr(form, 'end_second_to', IntegerField(
-            render_kw={'placeholder': _('ss')}, validators=validator_second))
-    setattr(form, 'end_comment', StringField(
-        render_kw={'placeholder': _('comment')}))
