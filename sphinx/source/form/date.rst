@@ -3,6 +3,8 @@ Date
 
 .. toctree::
 
+CIDOC documentation: OA shortcuts OA8 (begins in) and OA9 (ends in)
+
 Date input fields in forms are initially hidden and can be shown with clicking on **Show** beside
 the **Date** label.
 

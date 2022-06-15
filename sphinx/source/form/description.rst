@@ -3,6 +3,9 @@ Description
 
 .. toctree::
 
+CIDOC documentation: :cidoc_entity:`E62 String<e62-string>`
+
+
 Used to add additional information.
 
 * A description can be searched for in the advanced :doc:`/tools/search`.

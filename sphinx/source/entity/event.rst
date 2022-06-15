@@ -3,13 +3,26 @@ Event
 
 .. toctree::
 
+CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
+:cidoc_entity:`E7 Activity<e7-activity>`,
+:cidoc_entity:`E8 Acquisition<e8-acquisition>`,
+:cidoc_entity:`E9 Move<e9-move>` and
+:cidoc_entity:`E12 Production<e12-production>`
+
 Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
-* **Activity** - the most common, e.g. a battle, a meeting or a wedding
-* **Acquisition** - mapping a change of property
-* **Event** - used for events not performed by actors, e.g. a natural disaster
-* **Move** - movement of artifacts or persons
-* **Production** - creation of artifacts
+* **Activity** (CIDOC documentation: :cidoc_entity:`E7 Activity<e7-activity>`)
+  - the most common, e.g. a battle, a meeting or a wedding
+* **Acquisition** (CIDOC documentation:
+  :cidoc_entity:`E8 Acquisition<e8-acquisition>`) - mapping a change of
+  property
+* **Event** (CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`)-
+  used for events not performed by actors, e.g. a natural
+  disaster
+* **Move** (CIDOC documentation: :cidoc_entity:`E9 Move<e9-move>`) -
+  movement of artifacts or persons
+* **Production** (CIDOC documentation:
+  :cidoc_entity:`E12 Production<e12-production>`) - creation of artifacts
 
 .. include:: navigation.rst
 

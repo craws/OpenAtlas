@@ -3,6 +3,9 @@ Source
 
 .. toctree::
 
+CIDOC documentation:
+:cidoc_entity:`E33 Linguistic Object<e33-linguistic-object>`
+
 Written sources, like for example medieval charters or letters, can be entered
 in OpenAtlas at the **Source** menu item.
 CIDOC documentation: :cidoc_entity:`e33-linguistic-object`
