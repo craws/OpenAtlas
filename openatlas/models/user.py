@@ -9,6 +9,7 @@ from flask import g, session
 from flask_login import UserMixin, current_user
 
 from openatlas.database.user import User as Db
+from openatlas.models.entity import Entity
 from openatlas.util.util import sanitize
 
 
@@ -77,6 +78,9 @@ class User(UserMixin):
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return Db.get_notes_by_entity_id(self.id, entity_id)
+
+    def get_entities(self) -> list[Entity]:
+        return Entity.get_by_ids(Db.get_user_entities(self.id), types=True)
 
     @staticmethod
     def get_all() -> list[User]:

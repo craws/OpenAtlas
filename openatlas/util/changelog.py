@@ -1,5 +1,8 @@
 versions = {
-    '7.5.0': ['TBA', {}],
+    '7.5.0': ['TBA', {
+        'feature': {
+            '1737': 'Improved user statistics'}
+    }],
     '7.4.0': ['2022-06-10', {
         'feature': {
             '1620': 'Natural events',

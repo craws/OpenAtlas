@@ -70,7 +70,11 @@ def admin_index(
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
     for user in User.get_all():
-        count = User.get_created_entities_count(user.id)
+        user_entities = ''
+        if count := User.get_created_entities_count(user.id):
+            user_entities = \
+                f'<a href="{url_for("user_entities", id_=user.id)}">' \
+                f'{format_number(count)}</a>'
         email = user.email \
             if is_authorized('manager') or user.settings['show_email'] else ''
         tables['user'].rows.append([
@@ -81,7 +85,7 @@ def admin_index(
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
-            format_number(count) if count else ''])
+            user_entities])
     for item, languages in get_content().items():
         content = [uc_first(_(item))]
         for language in app.config['LANGUAGES']:
