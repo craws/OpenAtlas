@@ -1,7 +1,9 @@
 versions = {
     '7.5.0': ['TBA', {
         'feature': {
-            '1737': 'Improved user statistics'}
+            '1737': 'Improved user statistics',
+            '1710': 'Manual: add CIDOC links for entity classes',
+            '1726': 'Manual: add FAQs'}
     }],
     '7.4.0': ['2022-06-10', {
         'feature': {
