@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; OpenAtlas 7.5.0 documentation</title>
+  <title>FAQ &mdash; OpenAtlas 7.5.0 documentation</title>
   
 
   
@@ -36,8 +36,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Entity" href="entity/index.html" />
-    <link rel="prev" title="OpenAtlas manual" href="index.html" /> 
+    <link rel="prev" title="Error Codes" href="troubleshooting/error_codes.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,9 +88,7 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Overview</a><ul class="simple">
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="entity/index.html">Entity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="form/index.html">Form</a></li>
 <li class="toctree-l1"><a class="reference internal" href="tools/index.html">Tools</a></li>
@@ -99,7 +96,9 @@
 <li class="toctree-l1"><a class="reference internal" href="ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="troubleshooting/index.html">Troubleshooting</a></li>
-<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">FAQ</a><ul class="simple">
+</ul>
+</li>
 </ul>
 
             
@@ -145,7 +144,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Overview</li>
+      <li>FAQ</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -162,19 +161,40 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="faq">
+<h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The overview page can be reached when clicking on the logo at the upper left.
-When logged in following is displayed:</p>
+<p>Here you can find answers to some frquently asked questions.</p>
+<p><strong>Why is it not possible to add custom types with a free text entry field
+the same way it is possible with numbers for value types?</strong></p>
+<p>A free text entry field would lead to lots of unstructured data.
+Unstructured data can not be processed automatically and would result in it
+not being presented nor searchable in the OpenAtlas system as well as in a
+frontend that presents your data. Therefore, we made the decision, not to
+include free text types into the OpenAtlas system. Solutions to this problem
+are very case specific, but you could:</p>
 <ul class="simple">
-<li>An overview table of already entered entities</li>
-<li>Links to manual, <a class="reference internal" href="tools/model.html"><span class="doc">Model</span></a> and <a class="reference internal" href="tools/network.html"><span class="doc">Network visualization</span></a></li>
-<li>A list of the latest entries</li>
-<li>Your bookmarks</li>
-<li>Your <a class="reference internal" href="tools/notes.html"><span class="doc">Notes</span></a></li>
+<li>use the already provided description fields to enter any type of free text
+(keep in mind that this also comes with restrictions on how to present this
+data in a frontend)</li>
+<li>create a new tree of project specific types for as many cases as possible
+and structure your data with them – for a step by step tutorial how to
+create new types, click <a class="reference internal" href="examples/types.html"><span class="doc">here</span></a>.</li>
 </ul>
+<p>We are more than happy to help you find a solution tailored to your
+project’s specific needs, so please don’t hesitate to reach out to us if you
+have any additional questions on this topic.</p>
+<p><strong>How can I enter professions into the OpenAtlas system?</strong></p>
+<p>A profession is not entered via a type as a lot of other information you
+will put into the database. You can enter a person’s profession by linking
+them to a group.
+This group consists of people with the same profession. Say you want to
+enter our lead developer Alex into the database: create a group named
+‘OpenAtlas’ and connect him to that group in the respective form. Here you
+can also pick the role he has in that group from a list of types. For a more
+detailed tutorial on how to enter professions, have a look
+<a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
 </div>
 
 
@@ -185,10 +205,8 @@ When logged in following is displayed:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="entity/index.html" class="btn btn-neutral float-right" title="Entity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="OpenAtlas manual" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="troubleshooting/error_codes.html" class="btn btn-neutral float-left" title="Error Codes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

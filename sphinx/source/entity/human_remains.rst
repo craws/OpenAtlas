@@ -3,6 +3,9 @@ Human remains
 
 .. toctree::
 
+CIDOC documentation:
+:cidoc_entity:`E20 Biological Object<e20-biological-object>`
+
 Human remains are used to record anthropological data based on single human bones. They are subunits of a :doc:`stratigraphic_unit`
 which itself is a subunit of :doc:`feature`. Please note that information on the biological sex, gender,
 and age of an individual can be entered in the stratigraphic unit entry mask. For an archaeological workflow example see

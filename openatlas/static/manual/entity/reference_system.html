@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Reference System &mdash; OpenAtlas 7.4.0 documentation</title>
+  <title>Reference System &mdash; OpenAtlas 7.5.0 documentation</title>
   
 
   
@@ -22,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.4.0
+                7.5.0
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
 </ul>
 
             
@@ -179,6 +180,8 @@
 <h1>Reference System<a class="headerlink" href="#reference-system" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>CIDOC documentation:
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e32-authority-document/version-7.1.1">E32 Authority Document</a></p>
 <p>For step by step instructions have a look at our
 <a class="reference internal" href="../examples/reference_systems.html"><span class="doc">References Systems</span></a>.</p>
 <p>Reference systems can be used to link entities to external sources, e.g. to
@@ -198,10 +201,10 @@ and Wikidata it will be checked for a valid format.</p>
 options are the <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions
 of the confidence degree that concepts can be used interchangeable.</p>
 <ul class="simple">
-<li><p><strong>Close match</strong>: Concepts are sufficiently similar that they can be used
-interchangeably in some information retrieval applications</p></li>
-<li><p><strong>Exact match</strong>: High degree of confidence that the concepts can be used
-interchangeably</p></li>
+<li><strong>Close match</strong>: Concepts are sufficiently similar that they can be used
+interchangeably in some information retrieval applications</li>
+<li><strong>Exact match</strong>: High degree of confidence that the concepts can be used
+interchangeably</li>
 </ul>
 <p>E.g. if a historical project links the city of Vienna to Wikidata, a
 <strong>close match</strong> would be more suitable, because the Wikidata entry is more
@@ -211,19 +214,19 @@ about the current city and not the historical one.</p>
 <h2>Configuration<a class="headerlink" href="#configuration" title="Permalink to this headline">¶</a></h2>
 <p>Admins and manager can add, updated and delete external reference systems.</p>
 <ul class="simple">
-<li><p><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</p></li>
-<li><p><strong>Website URL</strong> - an URL to the project site of the reference system</p></li>
-<li><p><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
+<li><strong>Name</strong> - e.g. Wikipedia; can not be changed for Wikidata or GeoNames</li>
+<li><strong>Website URL</strong> - an URL to the project site of the reference system</li>
+<li><strong>Resolver URL</strong> - an URL that can be linked to in combination with an ID,
 e.g. the resolver URL <strong>https://www.wikidata.org/wiki/</strong> would create
 together with a <strong>Q123</strong>
-identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></p></li>
-<li><p><strong>Example ID</strong> - an example id to show the desired format e.g. Q123
-for Wikidata</p></li>
-<li><p><strong>External reference match</strong> - default precision selected in forms</p></li>
-<li><p><strong>Description</strong> - a short description, shown in forms when mouse over
-the <strong>i</strong> icon</p></li>
-<li><p><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place
-is available</p></li>
+identifier the external link: <a class="reference external" href="https://www.wikidata.org/wiki/Q123">https://www.wikidata.org/wiki/Q123</a></li>
+<li><strong>Example ID</strong> - an example id to show the desired format e.g. Q123
+for Wikidata</li>
+<li><strong>External reference match</strong> - default precision selected in forms</li>
+<li><strong>Description</strong> - a short description, shown in forms when mouse over
+the <strong>i</strong> icon</li>
+<li><strong>Classes</strong> - a checkbox list of available classes, for GeoNames only place
+is available</li>
 </ul>
 <p>Classes can be removed from a system by clicking on the tab with the
 corresponding class name and clicking the <strong>Remove</strong> button. This button is

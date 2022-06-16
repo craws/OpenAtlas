@@ -3,6 +3,8 @@ Reference
 
 .. toctree::
 
+CIDOC documentation: :cidoc_entity:`E31 Document<e31-document>`
+
 Available reference classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 * **Bibliography** - e.g. book, inbook or article
