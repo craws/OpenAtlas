@@ -35,6 +35,7 @@ def insert(
     form_helper = get_entity_form(class_, origin)
     form = form_helper.form
     if form.validate_on_submit():
+        entity = insert_entity(form, class_)
         if class_ == 'file':
             return redirect(insert_files(form, origin))
         return redirect(save(form, class_=class_, origin=origin))
@@ -245,12 +246,6 @@ def save(
     Transaction.begin()
     action = 'update' if entity else 'insert'
     try:
-        if not entity:
-            if not class_:
-                abort(404)  # pragma: no cover, entity or class needed
-            entity = insert_entity(form, class_)
-            if class_ == 'source_translation' and origin:
-                origin.link('P73', entity)
         redirect_link_id = entity.update(
             data=process_form_data(form, entity, origin),
             new=(action == 'insert'))
@@ -286,8 +281,7 @@ def save(
     return url
 
 
-def insert_entity(form: FlaskForm, class_: str) \
-        -> Union[Entity, Type, ReferenceSystem]:
+def insert_entity(form_helper: Any) -> Union[Entity, ReferenceSystem, Type]:
     if class_ == 'reference_system':
         return ReferenceSystem.insert_system({
             'name': form.name.data,
@@ -299,6 +293,8 @@ def insert_entity(form: FlaskForm, class_: str) \
         entity.link(
             'P53',
             Entity.insert('object_location', f'Location of {form.name.data}'))
+    if class_ == 'source_translation' and origin:
+        origin.link('P73', entity)
     return entity
 
 

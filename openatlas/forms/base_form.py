@@ -22,7 +22,7 @@ from openatlas.util.util import uc_first
 
 
 class BaseForm:
-    name: str = ''
+    class_name: str = ''
     fields: list[str] = []
     form: FlaskForm = None
     entity: Optional[Entity] = None
