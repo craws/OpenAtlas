@@ -21,7 +21,7 @@ from openatlas.models.type import Type
 from openatlas.util.util import uc_first
 
 
-class BaseForm:
+class BaseFormManager:
     class_name: str = ''
     fields: list[str] = []
     form: FlaskForm = None

@@ -32,10 +32,10 @@ def insert(
         origin_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form_helper = get_entity_form(class_, origin)
-    form = form_helper.form
+    form_manager = get_entity_form(class_, origin)
+    form = form_manager.form
     if form.validate_on_submit():
-        entity = insert_entity(form, class_)
+        insert_entity(form_manager)
         if class_ == 'file':
             return redirect(insert_files(form, origin))
         return redirect(save(form, class_=class_, origin=origin))
@@ -281,20 +281,26 @@ def save(
     return url
 
 
-def insert_entity(form_helper: Any) -> Union[Entity, ReferenceSystem, Type]:
-    if class_ == 'reference_system':
+def insert_entity(form_manager: Any) -> Union[Entity, ReferenceSystem, Type]:
+    if form_manager.class_.name == 'reference_system':
         return ReferenceSystem.insert_system({
-            'name': form.name.data,
-            'description': form.description.data,
-            'website_url': form.website_url.data,
-            'resolver_url': form.resolver_url.data})
-    entity = Entity.insert(class_, form.name.data)
-    if class_ == 'artifact' or g.classes[class_].view == 'place':
+            'name': form_manager.form.name.data,
+            'description': form_manager.form.description.data,
+            'website_url': form_manager.form.website_url.data,
+            'resolver_url': form_manager.form.resolver_url.data})
+    entity = Entity.insert(
+        form_manager.class_.name,
+        form_manager.form.name.data)
+    if form_manager.class_.name == 'artifact' \
+            or g.classes[form_manager.class_.name].view == 'place':
         entity.link(
             'P53',
-            Entity.insert('object_location', f'Location of {form.name.data}'))
-    if class_ == 'source_translation' and origin:
-        origin.link('P73', entity)
+            Entity.insert(
+                'object_location',
+                f'Location of {form_manager.form.name.data}'))
+    if form_manager.class_.name == 'source_translation' \
+            and form_manager.origin:
+        form_manager.origin.link('P73', entity)
     return entity
 
 
