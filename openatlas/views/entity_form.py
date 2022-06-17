@@ -35,10 +35,9 @@ def insert(
     form_manager = get_entity_form(class_, origin)
     form = form_manager.form
     if form.validate_on_submit():
-        insert_entity(form_manager)
         if class_ == 'file':
             return redirect(insert_files(form, origin))
-        return redirect(save(form, class_=class_, origin=origin))
+        return redirect(save(form_manager))
     populate_insert_form(form, class_, origin)
     place_info = get_place_info_for_insert(g.classes[class_].view, origin)
     return render_template(
@@ -80,7 +79,7 @@ def update(id_: int) -> Union[str, Response]:
                 form=form,
                 entity=entity,
                 modifier=link(logger.get_log_info(entity.id)['modifier']))
-        return redirect(save(form, entity))
+        return redirect(save(form))
     populate_update_form(form, entity)
     if entity.class_.view in ['artifact', 'place']:
         entity.set_image_for_places()
@@ -238,20 +237,20 @@ def insert_files(
     return url
 
 
-def save(
-        form: FlaskForm,
-        entity: Optional[Entity] = None,
-        class_: Optional[str] = None,
-        origin: Optional[Entity] = None) -> Union[str, Response]:
+def save(form_manager: Any) -> Union[str, Response]:
     Transaction.begin()
-    action = 'update' if entity else 'insert'
+    action = 'update' if form_manager.entity else 'insert'
     try:
-        redirect_link_id = entity.update(
-            data=process_form_data(form, entity, origin),
-            new=(action == 'insert'))
-        logger.log_user(entity.id, action)
+        if not form_manager.entity:
+            form_manager.entity = insert_entity(form_manager)
+        form_manager.process_form_data()
+        # redirect_link_id = entity.update(
+        #    data=process_form_data(form, entity, origin),
+        #    new=(action == 'insert'))
+        logger.log_user(form_manager.entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(form, entity, origin, redirect_link_id)
+        url = url_for('index', view=g.classes[form_manager.class_.name].view)
+        # url = get_redirect_url(form, entity, origin, redirect_link_id)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -259,24 +258,28 @@ def save(
         Transaction.rollback()
         logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('index', view=g.classes[class_].view)
-        if action == 'update' and entity:
+        url = url_for('index', view=g.classes[form_manager.class_.name].view)
+        if action == 'update' and form_manager.entity:
             url = url_for(
                 'update',
-                id_=entity.id,
-                origin_id=origin.id if origin else None)
+                id_=form_manager.entity.id,
+                origin_id=form_manager.origin.id
+                if form_manager.origin else None)
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and entity:
+        if action == 'update' and form_manager.entity:
             url = url_for(
                 'update',
-                id_=entity.id,
-                origin_id=origin.id if origin else None)
+                id_=form_manager.entity.id,
+                origin_id=form_manager.origin.id
+                if form_manager.origin else None)
         else:
-            url = url_for('index', view=g.classes[class_].view)
-            if class_ in ['administrative_unit', 'type']:
+            url = url_for(
+                'index',
+                view=g.classes[form_manager.class_.name].view)
+            if form_manager.class_.name in ['administrative_unit', 'type']:
                 url = url_for('type_index')
     return url
 

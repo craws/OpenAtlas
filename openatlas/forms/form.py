@@ -57,7 +57,7 @@ def get_entity_form(
         origin: Optional[Entity] = None) -> base_form_manager.BaseFormManager:
     name = param.class_.name if isinstance(param, Entity) else param
     return getattr(entity_form_manager, f'{name.capitalize()}Form')(
-        name=name,
+        class_=g.classes[name],
         entity=param if isinstance(param, Entity) else None,
         origin=origin)
 

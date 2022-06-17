@@ -13,6 +13,8 @@ from wtforms import (
     SubmitField, TextAreaField)
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
+
+from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.forms.field import (
     RemovableListField, TreeField, TreeMultiField, ValueFloatField)
 from openatlas.forms.util import check_if_entity_has_time
@@ -22,7 +24,7 @@ from openatlas.util.util import uc_first
 
 
 class BaseFormManager:
-    class_name: str = ''
+    class_: OpenatlasClass
     fields: list[str] = []
     form: FlaskForm = None
     entity: Optional[Entity] = None
@@ -30,11 +32,11 @@ class BaseFormManager:
 
     def __init__(
             self,
-            name: str,
+            class_: OpenatlasClass,
             entity: Union[Entity, None],
             origin: Union[Entity, None]):
 
-        self.name = name
+        self.class_ = class_
         self.entity = entity
         self.origin = origin
 
@@ -44,8 +46,8 @@ class BaseFormManager:
         self.form_class = Form
         if 'name' in self.fields:
             setattr(Form, 'name', StringField(
-                _('URL') if name == 'external_reference' else _('name'),
-                [InputRequired(), URL()] if name == 'external_reference'
+                _('URL') if class_.name == 'external_reference' else _('name'),
+                [InputRequired(), URL()] if class_.name == 'external_reference'
                 else [InputRequired()],
                 render_kw={'autofocus': True}))
         if 'alias' in self.fields:
@@ -60,9 +62,10 @@ class BaseFormManager:
                     current_user.settings['module_time']
                     or check_if_entity_has_time(entity)))
         if 'description' in self.fields:
-            label = _('content') if name == 'source' else _('description')
+            label = _('content') \
+                if class_.name == 'source' else _('description')
             setattr(Form, 'description', TextAreaField(label))
-            if name == 'type':
+            if class_.name == 'type':
                 type_ = entity if entity else origin
                 if isinstance(type_, Type):
                     root = g.types[type_.root[0]] if type_.root else type_
@@ -77,14 +80,16 @@ class BaseFormManager:
         self.form = Form(obj=self.entity) if self.entity else Form()
 
     def add_types(self, form: Any):
-        if self.name in g.classes and g.classes[self.name].hierarchies:
+        if self.class_.name in g.classes \
+                and g.classes[self.class_.name].hierarchies:
             types = OrderedDict(
                 {id_: g.types[id_] for id_ in
-                 g.classes[self.name].hierarchies})
+                 g.classes[self.class_.name].hierarchies})
             if g.classes[
-                    self.name].standard_type_id in types:  # Standard to top
-                types.move_to_end(
-                    g.classes[self.name].standard_type_id, last=False)
+                    self.class_.name].standard_type_id in types:
+                types.move_to_end(  # Standard type to top
+                    g.classes[self.class_.name].standard_type_id,
+                    last=False)
             for type_ in types.values():
                 if type_.multiple:
                     setattr(form, str(type_.id), TreeMultiField(str(type_.id)))
@@ -99,7 +104,7 @@ class BaseFormManager:
             'save',
             SubmitField(_('save') if self.entity else _('insert')))
         if not self.entity and 'continue' in self.fields and (
-                self.name in [
+                self.class_.name in [
                     'involvement', 'artifact', 'human_remains',
                     'source_translation', 'type']
                 or not self.origin):
@@ -116,7 +121,7 @@ class BaseFormManager:
         systems = list(g.reference_systems.values())
         systems.sort(key=lambda x: x.name.casefold())
         for system in systems:
-            if self.name not in system.classes:
+            if self.class_.name not in system.classes:
                 continue
             setattr(
                 form,
