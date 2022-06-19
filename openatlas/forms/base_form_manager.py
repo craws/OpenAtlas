@@ -52,10 +52,10 @@ class BaseFormManager:
                 render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(Form, 'alias', FieldList(RemovableListField('')))
-        self.add_types(Form)
+        self.add_types()
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
-        self.add_reference_systems(Form)
+        self.add_reference_systems()
         if 'date' in self.fields:
             self.add_date_fields(
                 bool(
@@ -79,7 +79,7 @@ class BaseFormManager:
         self.add_buttons()
         self.form = Form(obj=self.entity) if self.entity else Form()
 
-    def add_types(self, form: Any):
+    def add_types(self):
         if self.class_.name in g.classes \
                 and g.classes[self.class_.name].hierarchies:
             types = OrderedDict(
@@ -92,9 +92,15 @@ class BaseFormManager:
                     last=False)
             for type_ in types.values():
                 if type_.multiple:
-                    setattr(form, str(type_.id), TreeMultiField(str(type_.id)))
+                    setattr(
+                        self.form_class,
+                        str(type_.id),
+                        TreeMultiField(str(type_.id)))
                 else:
-                    setattr(form, str(type_.id), TreeField(str(type_.id)))
+                    setattr(
+                        self.form_class,
+                        str(type_.id),
+                        TreeField(str(type_.id)))
                 if type_.category == 'value':
                     self.add_value_type_fields(type_.subs)
 
@@ -114,7 +120,7 @@ class BaseFormManager:
                 SubmitField(uc_first(_('insert and continue'))))
             setattr(self.form_class, 'continue_', HiddenField())
 
-    def add_reference_systems(self, form: Any) -> None:
+    def add_reference_systems(self) -> None:
         precisions = [('', '')] + [
             (str(g.types[id_].id), g.types[id_].name)
             for id_ in Type.get_hierarchy('External reference match').subs]
@@ -124,7 +130,7 @@ class BaseFormManager:
             if self.class_.name not in system.classes:
                 continue
             setattr(
-                form,
+                self.form_class,
                 f'reference_system_id_{system.id}',
                 StringField(
                     uc_first(system.name),
@@ -134,7 +140,7 @@ class BaseFormManager:
                         'autocomplete': 'off',
                         'placeholder': system.placeholder}))
             setattr(
-                form,
+                self.form_class,
                 f'reference_system_precision_{system.id}',
                 SelectField(
                     _('precision'),

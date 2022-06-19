@@ -20,6 +20,8 @@ from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.util import get_file_extension, sanitize, uc_first
+from wtforms.validators import (
+    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 
 
 def get_link_type(form: Any) -> Optional[Entity]:
