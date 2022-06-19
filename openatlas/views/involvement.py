@@ -9,7 +9,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_form
-from openatlas.forms.util import get_link_type, process_form_dates
+from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group
@@ -41,7 +41,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                             form.activity.data,
                             actor,
                             form.description.data)[0])
-                    link_.set_dates(process_form_dates(form))
+                    # link_.set_dates(process_form_dates(form))
                     link_.type = get_link_type(form)
                     link_.update()
             else:
@@ -52,7 +52,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                             form.activity.data,
                             origin,
                             form.description.data)[0])
-                    link_.set_dates(process_form_dates(form))
+                    # link_.set_dates(process_form_dates(form))
                     link_.type = get_link_type(form)
                     link_.update()
             Transaction.commit()

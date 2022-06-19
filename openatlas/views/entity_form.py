@@ -244,6 +244,8 @@ def save(form_manager: Any) -> Union[str, Response]:
         if not form_manager.entity:
             form_manager.entity = insert_entity(form_manager)
         form_manager.process_form_data()
+        form_manager.entity.update(
+            form_manager.data, new=bool(action == 'insert'))
         # redirect_link_id = entity.update(
         #    data=process_form_data(form, entity, origin),
         #    new=(action == 'insert'))

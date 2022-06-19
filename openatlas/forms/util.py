@@ -9,7 +9,6 @@ from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from wtforms import StringField
 
 from openatlas import app
@@ -17,11 +16,8 @@ from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import get_file_extension, sanitize, uc_first
-from wtforms.validators import (
-    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
+from openatlas.util.util import get_file_extension, uc_first
 
 
 def get_link_type(form: Any) -> Optional[Entity]:
@@ -99,90 +95,7 @@ def process_form_data(
         entity: Entity,
         origin: Optional[Entity] = None) -> dict[str, Any]:
     data: dict[str, Any] = {
-        'attributes': process_form_dates(form),
         'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
-    for key, value in form.data.items():
-        field_type = getattr(form, key).type
-        if field_type in [
-                'TreeField',
-                'TreeMultiField',
-                'TableField',
-                'TableMultiField']:
-            if value:
-                ids = ast.literal_eval(value)
-                value = ids if isinstance(ids, list) else [int(ids)]
-            else:
-                value = []
-        if key.startswith((
-                'begin_',
-                'end_',
-                'name_inverse',
-                'multiple',
-                'page',
-                'reference_system_precision_',
-                'website_url',
-                'resolver_url',
-                'placeholder',
-                'classes')) \
-                or field_type in [
-                'CSRFTokenField',
-                'HiddenField',
-                'MultipleFileField',
-                'SelectMultipleField',
-                'SubmitField',
-                'TableField',
-                'TableMultiField']:
-            continue
-        if key == 'name':
-            name = form.data['name']
-            if hasattr(form, 'name_inverse'):
-                name = form.name.data.replace('(', '').replace(')', '').strip()
-                if form.name_inverse.data.strip():
-                    inverse = form.name_inverse.data. \
-                        replace('(', ''). \
-                        replace(')', '').strip()
-                    name += ' (' + inverse + ')'
-            if entity.class_.name == 'type':
-                name = sanitize(name, 'text')
-            elif isinstance(entity, ReferenceSystem) and entity.system:
-                name = entity.name  # Prevent name changing of a system type
-            data['attributes']['name'] = name
-        elif key == 'description':
-            data['attributes'][key] = form.data[key]
-        elif key == 'alias':
-            data['aliases'] = value
-        elif field_type in ['TreeField', 'TreeMultiField']:
-            if g.types[int(getattr(form, key).id)].class_.name \
-                    == 'administrative_unit':
-                if 'administrative_units' not in data:
-                    data['administrative_units'] = []
-                data['administrative_units'] += value
-            elif entity.class_.view != 'type':
-                data['links']['delete'].add('P2')
-                data['links']['insert'].append({
-                    'property': 'P2',
-                    'range': [g.types[id_] for id_ in value]})
-        elif field_type == 'ValueFloatField':
-            if value is not None:  # Allow the number zero
-                data['links']['insert'].append({
-                    'property': 'P2',
-                    'description': value,
-                    'range': g.types[int(key)]})
-        elif key.startswith('reference_system_id_'):
-            system = Entity.get_by_id(
-                int(key.replace('reference_system_id_', '')))
-            precision_field = getattr(form, key.replace('id_', 'precision_'))
-            data['links']['delete_reference_system'] = True
-            if value:
-                data['links']['insert'].append({
-                    'property': 'P67',
-                    'range': system,
-                    'description': value,
-                    'type_id': precision_field.data,
-                    'inverse': True})
-        else:  # pragma: no cover
-            abort(418, f'Form field error: {key}, {field_type}, value={value}')
-
     if entity.class_.view == 'actor':
         data['links']['delete'].update(['P74', 'OA8', 'OA9'])
         if form.residence.data:
@@ -355,47 +268,6 @@ def process_origin_data(
             'range': origin,
             'return_link_id': True,
             'inverse': True})
-    return data
-
-
-def process_form_dates(form: FlaskForm) -> dict[str, Any]:
-    data = {
-        'begin_from': None, 'begin_to': None, 'begin_comment': None,
-        'end_from': None, 'end_to': None, 'end_comment': None}
-    if hasattr(form, 'begin_year_from') and form.begin_year_from.data:
-        data['begin_comment'] = form.begin_comment.data
-        data['begin_from'] = form_to_datetime64(
-            form.begin_year_from.data,
-            form.begin_month_from.data,
-            form.begin_day_from.data,
-            form.begin_hour_from.data if 'begin_hour_from' in form else None,
-            form.begin_minute_from.data if 'begin_hour_from' in form else None,
-            form.begin_second_from.data if 'begin_hour_from' in form else None)
-        data['begin_to'] = form_to_datetime64(
-            form.begin_year_to.data,
-            form.begin_month_to.data,
-            form.begin_day_to.data,
-            form.begin_hour_to.data if 'begin_hour_from' in form else None,
-            form.begin_minute_to.data if 'begin_hour_from' in form else None,
-            form.begin_second_to.data if 'begin_hour_from' in form else None,
-            to_date=True)
-    if hasattr(form, 'end_year_from') and form.end_year_from.data:
-        data['end_comment'] = form.end_comment.data
-        data['end_from'] = form_to_datetime64(
-            form.end_year_from.data,
-            form.end_month_from.data,
-            form.end_day_from.data,
-            form.end_hour_from.data if 'begin_hour_from' in form else None,
-            form.end_minute_from.data if 'begin_hour_from' in form else None,
-            form.end_second_from.data if 'begin_hour_from' in form else None)
-        data['end_to'] = form_to_datetime64(
-            form.end_year_to.data,
-            form.end_month_to.data,
-            form.end_day_to.data,
-            form.end_hour_to.data if 'begin_hour_from' in form else None,
-            form.end_minute_to.data if 'begin_hour_from' in form else None,
-            form.end_second_to.data if 'begin_hour_from' in form else None,
-            to_date=True)
     return data
 
 

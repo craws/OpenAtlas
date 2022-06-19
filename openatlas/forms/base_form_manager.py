@@ -8,6 +8,7 @@ from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from wtforms import (
     FieldList, HiddenField, IntegerField, SelectField, StringField,
     SubmitField, TextAreaField)
@@ -17,10 +18,11 @@ from wtforms.validators import (
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.forms.field import (
     RemovableListField, TreeField, TreeMultiField, ValueFloatField)
-from openatlas.forms.util import check_if_entity_has_time
+from openatlas.forms.util import check_if_entity_has_time, form_to_datetime64
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
+from openatlas.util.util import sanitize, uc_first
 
 
 class BaseFormManager:
@@ -29,6 +31,7 @@ class BaseFormManager:
     form: FlaskForm = None
     entity: Optional[Entity] = None
     origin: Optional[Entity] = None
+    data: dict[str, Any] = {}
 
     def __init__(
             self,
@@ -156,8 +159,151 @@ class BaseFormManager:
     def populate_update(self) -> None:
         pass
 
-    def process_form_data(self, entity: Optional[Entity] = None) -> None:
-        pass
+    def process_form_data(self):
+        data: dict[str, Any] = {
+            'attributes': self.process_form_dates(),
+            'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
+        for key, value in self.form.data.items():
+            field_type = getattr(self.form, key).type
+            if field_type in [
+                    'TreeField',
+                    'TreeMultiField',
+                    'TableField',
+                    'TableMultiField']:
+                if value:
+                    ids = ast.literal_eval(value)
+                    value = ids if isinstance(ids, list) else [int(ids)]
+                else:
+                    value = []
+            if key.startswith((
+                    'begin_',
+                    'end_',
+                    'name_inverse',
+                    'multiple',
+                    'page',
+                    'reference_system_precision_',
+                    'website_url',
+                    'resolver_url',
+                    'placeholder',
+                    'classes')) \
+                    or field_type in [
+                        'CSRFTokenField',
+                        'HiddenField',
+                        'MultipleFileField',
+                        'SelectMultipleField',
+                        'SubmitField',
+                        'TableField',
+                        'TableMultiField']:
+                continue
+            if key == 'name':
+                name = self.form.data['name']
+                if hasattr(self.form, 'name_inverse'):
+                    name = self.form.name.data.replace(
+                        '(', '').replace(')', '').strip()
+                    if self.form.name_inverse.data.strip():
+                        inverse = self.form.name_inverse.data. \
+                            replace('(', ''). \
+                            replace(')', '').strip()
+                        name += ' (' + inverse + ')'
+                if self.entity.class_.name == 'type':
+                    name = sanitize(name, 'text')
+                elif isinstance(self.entity, ReferenceSystem) \
+                        and self.entity.system:
+                    name = self.entity.name  # Don't change the name
+                    # type
+                data['attributes']['name'] = name
+            elif key == 'description':
+                data['attributes'][key] = self.form.data[key]
+            elif key == 'alias':
+                data['aliases'] = value
+            elif field_type in ['TreeField', 'TreeMultiField']:
+                if g.types[int(getattr(self.form, key).id)].class_.name \
+                        == 'administrative_unit':
+                    if 'administrative_units' not in data:
+                        data['administrative_units'] = []
+                    data['administrative_units'] += value
+                elif self.entity.class_.view != 'type':
+                    data['links']['delete'].add('P2')
+                    data['links']['insert'].append({
+                        'property': 'P2',
+                        'range': [g.types[id_] for id_ in value]})
+            elif field_type == 'ValueFloatField':
+                if value is not None:  # Allow the number zero
+                    data['links']['insert'].append({
+                        'property': 'P2',
+                        'description': value,
+                        'range': g.types[int(key)]})
+            elif key.startswith('reference_system_id_'):
+                system = Entity.get_by_id(
+                    int(key.replace('reference_system_id_', '')))
+                precision_field = getattr(
+                    self.form,
+                    key.replace('id_', 'precision_'))
+                data['links']['delete_reference_system'] = True
+                if value:
+                    data['links']['insert'].append({
+                        'property': 'P67',
+                        'range': system,
+                        'description': value,
+                        'type_id': precision_field.data,
+                        'inverse': True})
+            else:  # pragma: no cover
+                abort(418, f'Form error: {key}, {field_type}, value={value}')
+        self.data = data
+
+    def process_form_dates(self) -> dict[str, Any]:
+        data = {
+            'begin_from': None, 'begin_to': None, 'begin_comment': None,
+            'end_from': None, 'end_to': None, 'end_comment': None}
+        if hasattr(self.form, 'begin_year_from') \
+                and self.form.begin_year_from.data:
+            data['begin_comment'] = self.form.begin_comment.data
+            data['begin_from'] = form_to_datetime64(
+                self.form.begin_year_from.data,
+                self.form.begin_month_from.data,
+                self.form.begin_day_from.data,
+                self.form.begin_hour_from.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.begin_minute_from.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.begin_second_from.data
+                if 'begin_hour_from' in self.form else None)
+            data['begin_to'] = form_to_datetime64(
+                self.form.begin_year_to.data,
+                self.form.begin_month_to.data,
+                self.form.begin_day_to.data,
+                self.form.begin_hour_to.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.begin_minute_to.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.begin_second_to.data
+                if 'begin_hour_from' in self.form else None,
+                to_date=True)
+        if hasattr(self.form, 'end_year_from') \
+                and self.form.end_year_from.data:
+            data['end_comment'] = self.form.end_comment.data
+            data['end_from'] = form_to_datetime64(
+                self.form.end_year_from.data,
+                self.form.end_month_from.data,
+                self.form.end_day_from.data,
+                self.form.end_hour_from.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.end_minute_from.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.end_second_from.data
+                if 'begin_hour_from' in self.form else None)
+            data['end_to'] = form_to_datetime64(
+                self.form.end_year_to.data,
+                self.form.end_month_to.data,
+                self.form.end_day_to.data,
+                self.form.end_hour_to.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.end_minute_to.data
+                if 'begin_hour_from' in self.form else None,
+                self.form.end_second_to.data
+                if 'begin_hour_from' in self.form else None,
+                to_date=True)
+        return data
 
     def add_value_type_fields(self, subs: list[int]) -> None:
         for sub_id in subs:
