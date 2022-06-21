@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
+from openatlas.forms import base_form_manager
 from openatlas.forms.form import get_entity_form, get_form
 from openatlas.forms.populate import populate_update_form
 from openatlas.forms.util import populate_insert_form, process_form_data
@@ -204,6 +205,7 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
 def insert_files(
         form: FlaskForm,
         origin: Optional[Entity] = None) -> Union[str, Response]:
+    # Todo: adapt new forms
     filenames = []
     url = url_for('index', view=g.classes['file'].view)
     try:
@@ -211,7 +213,7 @@ def insert_files(
         entity_name = form.name.data.strip()
         for count, file in enumerate(form.file.data):
             entity = Entity.insert('file', file.filename)
-            url = get_redirect_url(form, entity, origin)
+            url = get_redirect_url(form)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')
             new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
@@ -246,13 +248,9 @@ def save(form_manager: Any) -> Union[str, Response]:
         form_manager.process_form_data()
         form_manager.entity.update(
             form_manager.data, new=bool(action == 'insert'))
-        # redirect_link_id = entity.update(
-        #    data=process_form_data(form, entity, origin),
-        #    new=(action == 'insert'))
         logger.log_user(form_manager.entity.id, action)
         Transaction.commit()
-        url = url_for('index', view=g.classes[form_manager.class_.name].view)
-        # url = get_redirect_url(form, entity, origin, redirect_link_id)
+        url = get_redirect_url(form_manager)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -309,47 +307,49 @@ def insert_entity(form_manager: Any) -> Union[Entity, ReferenceSystem, Type]:
     return entity
 
 
-def get_redirect_url(
-        form: FlaskForm,
-        entity: Entity,
-        origin: Union[Entity, None] = None,
-        redirect_link_id: Union[int, None] = None) -> str:
-    if redirect_link_id and origin:
-        return url_for(
-            'link_update',
-            id_=redirect_link_id,
-            origin_id=origin.id)
-    url = url_for('view', id_=entity.id)
-    if origin and entity.class_.name not in \
+def get_redirect_url(manager: base_form_manager.BaseFormManager) -> str:
+    # if redirect_link_id and origin:
+    #    return url_for(
+    #        'link_update',
+    #        id_=redirect_link_id,
+    #        origin_id=origin.id)
+    url = url_for('view', id_=manager.entity.id)
+    if manager.origin and manager.entity.class_.name not in \
             ('administrative_unit', 'source_translation', 'type'):
-        url = f"{url_for('view', id_=origin.id)}#tab-{entity.class_.view}"
-        if entity.class_.name == 'file':
-            url = f"{url_for('view', id_=origin.id)}#tab-file"
-        elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit'] \
-                and entity.class_.view != 'actor':
-            url = url_for('view', id_=entity.id)
-    if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+        url = \
+            f"{url_for('view', id_=manager.origin.id)}" \
+            f"#tab-{manager.entity.class_.view}"
+        if manager.entity.class_.name == 'file':
+            url = f"{url_for('view', id_=manager.origin.id)}#tab-file"
+        elif manager.origin.class_.view \
+                in ['place', 'feature', 'stratigraphic_unit'] \
+                and manager.entity.class_.view != 'actor':
+            url = url_for('view', id_=manager.entity.id)
+    if hasattr(manager.form, 'continue_') \
+            and manager.form.continue_.data == 'yes':
         url = url_for(
             'insert',
-            class_=entity.class_.name,
-            origin_id=origin.id if origin else None)
-        if entity.class_.name in ('administrative_unit', 'type') and origin:
-            root_id = origin.root[0] \
-                if isinstance(origin, Type) and origin.root else origin.id
-            super_id = getattr(form, str(root_id)).data
+            class_=manager.entity.class_.name,
+            origin_id=manager.origin.id if manager.origin else None)
+        if manager.entity.class_.name in ('administrative_unit', 'type') \
+                and manager.origin:
+            root_id = manager.origin.root[0] \
+                if isinstance(manager.origin, Type) and manager.origin.root \
+                else manager.origin.id
+            super_id = getattr(manager.form, str(root_id)).data
             url = url_for(
                 'insert',
-                class_=entity.class_.name,
+                class_=manager.entity.class_.name,
                 origin_id=str(super_id) if super_id else root_id)
-    elif hasattr(form, 'continue_') \
-            and form.continue_.data in ['sub', 'human_remains']:
-        class_ = form.continue_.data
+    elif hasattr(manager.form, 'continue_') \
+            and manager.form.continue_.data in ['sub', 'human_remains']:
+        class_ = manager.form.continue_.data
         if class_ == 'sub':
-            if entity.class_.name == 'place':
+            if manager.entity.class_.name == 'place':
                 class_ = 'feature'
-            elif entity.class_.name == 'feature':
+            elif manager.entity.class_.name == 'feature':
                 class_ = 'stratigraphic_unit'
-            elif entity.class_.name == 'stratigraphic_unit':
+            elif manager.entity.class_.name == 'stratigraphic_unit':
                 class_ = 'artifact'
-        url = url_for('insert', class_=class_, origin_id=entity.id)
+        url = url_for('insert', class_=class_, origin_id=manager.entity.id)
     return url
