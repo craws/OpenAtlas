@@ -17,8 +17,6 @@ def pre_populate_form(
     #    populate_reference_systems(form, item)
     if isinstance(item, ReferenceSystem) and item.system:
         form.name.render_kw['readonly'] = 'readonly'
-    if isinstance(item, Entity) and item.class_.view == 'event':
-        form.event_id.data = item.id
     return form
 
 
@@ -41,9 +39,7 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         super_event = entity.get_linked_entity('P9')
         form.event.data = super_event.id if super_event else ''
         preceding = entity.get_linked_entity('P134', True)
-        if entity.class_.name in \
-                ['activity', 'acquisition', 'move', 'production']:
-            form.event_preceding.data = preceding.id if preceding else ''
+        form.event_preceding.data = preceding.id if preceding else ''
         if entity.class_.name == 'move':
             if place_from := entity.get_linked_entity('P27'):
                 form.place_from.data = \
@@ -63,9 +59,6 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
         else:
             if place := entity.get_linked_entity('P7'):
                 form.place.data = place.get_linked_entity_safe('P53', True).id
-        if entity.class_.name == 'acquisition':
-            form.given_place.data = \
-                [entity.id for entity in entity.get_linked_entities('P24')]
         if entity.class_.name == 'production':
             form.artifact.data = \
                 [entity.id for entity in entity.get_linked_entities('P108')]

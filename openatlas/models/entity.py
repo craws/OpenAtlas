@@ -216,9 +216,12 @@ class Entity:
                 ReferenceSystem.delete_links_from_entity(self)
         redirect_link_id = None
         for link_ in links['insert']:
+            if not link_['range']:
+                continue
             ids = self.link(
                 link_['property'],
-                link_['range'],
+                self.string_to_entity_list(link_['range'])
+                if isinstance(link_['range'], str) else link_['range'],
                 link_['description'] if 'description' in link_ else None,
                 type_id=link_['type_id'] if 'type_id' in link_ else None,
                 inverse=('inverse' in link_ and link_['inverse']))
@@ -279,6 +282,13 @@ class Entity:
             if count > 1 and not g.types[id_].multiple:
                 return id_
         return None
+
+    @staticmethod
+    def string_to_entity_list(string: str) -> list[Entity]:
+        ids = ast.literal_eval(string)
+        ids = [int(id_) for id_ in ids] \
+            if isinstance(ids, list) else [int(ids)]
+        return Entity.get_by_ids(ids)
 
     @staticmethod
     def get_invalid_dates() -> list[Entity]:

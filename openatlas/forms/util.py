@@ -130,12 +130,6 @@ def process_form_data(
                 'property': 'P7',
                 'range':
                     Link.get_linked_entity_safe(int(form.place.data), 'P53')})
-        if entity.class_.name == 'acquisition':
-            data['links']['delete'].add('P24')
-            if form.given_place.data:
-                data['links']['insert'].append({
-                    'property': 'P24',
-                    'range': form.given_place.data})
         elif entity.class_.name == 'production':
             data['links']['delete'].add('P108')
             if form.artifact.data:
@@ -200,18 +194,9 @@ def process_form_data(
                 data['links']['insert'].append({
                     'property': code,
                     'range': new_super})
-    for link_ in data['links']['insert']:
-        if isinstance(link_['range'], str):
-            link_['range'] = form_string_to_entity_list(link_['range'])
     if origin and entity.class_.name not in ('administrative_unit', 'type'):
         data = process_origin_data(entity, origin, form, data)
     return data
-
-
-def form_string_to_entity_list(string: str) -> list[Entity]:
-    ids = ast.literal_eval(string)
-    ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-    return Entity.get_by_ids(ids)
 
 
 def process_origin_data(

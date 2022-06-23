@@ -20,6 +20,7 @@ from openatlas.forms.populate import populate_dates, \
     populate_reference_systems, populate_types
 from openatlas.forms.process import process_form_dates
 from openatlas.forms.util import check_if_entity_has_time
+from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
@@ -48,6 +49,7 @@ class BaseFormManager:
         class Form(FlaskForm):
             opened = HiddenField()
             origin_id = HiddenField()
+            validate = validate
 
         self.form_class = Form
         if 'name' in self.fields:
