@@ -15,7 +15,7 @@ from openatlas import app
 from openatlas.forms import base_form_manager, entity_form_manager
 from openatlas.forms.field import (
     TableField, TableMultiField, TreeField)
-from openatlas.forms.populate import pre_populate_form
+from openatlas.forms.populate_org import pre_populate_form
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link

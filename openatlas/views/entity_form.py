@@ -12,7 +12,6 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms import base_form_manager
 from openatlas.forms.form import get_entity_form
-from openatlas.forms.populate import populate_update_form
 from openatlas.forms.util import populate_insert_form, process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -77,7 +76,7 @@ def update(id_: int) -> Union[str, Response]:
                 form=manager.form,
                 entity=entity,
                 modifier=link(logger.get_log_info(entity.id)['modifier']))
-        return redirect(save(manager.form))
+        return redirect(save(manager))
     manager.populate_update()
     if entity.class_.view in ['artifact', 'place']:
         entity.set_image_for_places()
