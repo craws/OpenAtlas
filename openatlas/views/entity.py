@@ -156,7 +156,7 @@ def view(id_: int) -> Union[str, Response]:
     if not gis_data:  # Has to be after get_entity_data()
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
-    problematic_type_id = entity.check_for_too_many_links_for_single_type()
+    problematic_type_id = entity.check_too_many_single_type_links()
     tabs['note'] = add_note_tab(entity)
     tabs['info'].content = render_template(
         'entity/view.html',

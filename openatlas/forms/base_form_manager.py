@@ -1,6 +1,7 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
+import time
 from collections import OrderedDict
 from typing import Any, Optional, Union
 
@@ -15,14 +16,14 @@ from wtforms import (
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator, URL)
 
-from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.forms.field import (
     RemovableListField, TreeField, TreeMultiField, ValueFloatField)
 from openatlas.forms.util import check_if_entity_has_time, form_to_datetime64
 from openatlas.models.entity import Entity
+from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import sanitize, uc_first
+from openatlas.util.util import format_date_part, sanitize, uc_first
 
 
 class BaseFormManager:
@@ -44,6 +45,7 @@ class BaseFormManager:
         self.origin = origin
 
         class Form(FlaskForm):
+            opened = HiddenField()
             origin_id = HiddenField()
 
         self.form_class = Form
@@ -157,7 +159,70 @@ class BaseFormManager:
         pass
 
     def populate_update(self) -> None:
-        pass
+        self.form.opened.data = time.time()
+        if hasattr(self.form, 'begin_year_from'):
+            self.populate_dates()
+
+    def populate_dates(self) -> None:
+        if self.entity.begin_from:
+            self.form.begin_year_from.data = \
+                format_date_part(self.entity.begin_from, 'year')
+            self.form.begin_month_from.data = \
+                format_date_part(self.entity.begin_from, 'month')
+            self.form.begin_day_from.data = \
+                format_date_part(self.entity.begin_from, 'day')
+            if 'begin_hour_from' in self.form:
+                self.form.begin_hour_from.data = \
+                    format_date_part(self.entity.begin_from, 'hour')
+                self.form.begin_minute_from.data = \
+                    format_date_part(self.entity.begin_from, 'minute')
+                self.form.begin_second_from.data = \
+                    format_date_part(self.entity.begin_from, 'second')
+            self.form.begin_comment.data = self.entity.begin_comment
+            if self.entity.begin_to:
+                self.form.begin_year_to.data = \
+                    format_date_part(self.entity.begin_to, 'year')
+                self.form.begin_month_to.data = \
+                    format_date_part(self.entity.begin_to, 'month')
+                self.form.begin_day_to.data = \
+                    format_date_part(self.entity.begin_to, 'day')
+                if 'begin_hour_from' in self.form:
+                    self.form.begin_hour_to.data = \
+                        format_date_part(
+                        self.entity.begin_to, 'hour')
+                    self.form.begin_minute_to.data = \
+                        format_date_part(self.entity.begin_to, 'minute')
+                    self.form.begin_second_to.data = \
+                        format_date_part(self.entity.begin_to, 'second')
+        if self.entity.end_from:
+            self.form.end_year_from.data = \
+                format_date_part(self.entity.end_from, 'year')
+            self.form.end_month_from.data = \
+                format_date_part(self.entity.end_from, 'month')
+            self.form.end_day_from.data = \
+                format_date_part(self.entity.end_from, 'day')
+            if 'begin_hour_from' in self.form:
+                self.form.end_hour_from.data = \
+                    format_date_part(self.entity.end_from, 'hour')
+                self.form.end_minute_from.data = \
+                    format_date_part(self.entity.end_from, 'minute')
+                self.form.end_second_from.data = \
+                    format_date_part(self.entity.end_from, 'second')
+            self.form.end_comment.data = self.entity.end_comment
+            if self.entity.end_to:
+                self.form.end_year_to.data = \
+                    format_date_part(self.entity.end_to, 'year')
+                self.form.end_month_to.data = \
+                    format_date_part(self.entity.end_to, 'month')
+                self.form.end_day_to.data = \
+                    format_date_part(self.entity.end_to, 'day')
+                if 'begin_hour_from' in self.form:
+                    self.form.end_hour_to.data = \
+                        format_date_part(self.entity.end_to, 'hour')
+                    self.form.end_minute_to.data = \
+                        format_date_part(self.entity.end_to, 'minute')
+                    self.form.end_second_to.data = \
+                        format_date_part(self.entity.end_to, 'second')
 
     def process_form_data(self):
         data: dict[str, Any] = {

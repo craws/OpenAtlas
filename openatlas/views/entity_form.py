@@ -11,7 +11,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms import base_form_manager
-from openatlas.forms.form import get_entity_form, get_form
+from openatlas.forms.form import get_entity_form
 from openatlas.forms.populate import populate_update_form
 from openatlas.forms.util import populate_insert_form, process_form_data
 from openatlas.models.entity import Entity
@@ -62,31 +62,28 @@ def insert(
 def update(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True, aliases=True)
     check_update_access(entity)
-    if entity.check_for_too_many_links_for_single_type():
+    if entity.check_too_many_single_type_links():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    form = get_form(
-        entity.class_.name,
-        entity,
-        location=place_info['location'])
-    if form.validate_on_submit():
-        if isinstance(entity, Type) and not check_type(entity, form):
+    manager = get_entity_form(entity)
+    if manager.form.validate_on_submit():
+        if isinstance(entity, Type) and not check_type(entity, manager.form):
             return redirect(url_for('view', id_=entity.id))
-        if was_modified(form, entity):  # pragma: no cover
-            del form.save
+        if was_modified(manager.form, entity):  # pragma: no cover
+            del manager.form.save
             flash(_('error modified'), 'error')
             return render_template(
                 'entity/update.html',
-                form=form,
+                form=manager.form,
                 entity=entity,
                 modifier=link(logger.get_log_info(entity.id)['modifier']))
-        return redirect(save(form))
-    populate_update_form(form, entity)
+        return redirect(save(manager.form))
+    manager.populate_update()
     if entity.class_.view in ['artifact', 'place']:
         entity.set_image_for_places()
     return render_template(
         'entity/update.html',
-        form=form,
+        form=manager.form,
         entity=entity,
         gis_data=place_info['gis_data'],
         overlays=place_info['overlays'],

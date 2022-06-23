@@ -268,7 +268,7 @@ class Entity:
             return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
         return name_parts[0]
 
-    def check_for_too_many_links_for_single_type(self) -> Optional[int]:
+    def check_too_many_single_type_links(self) -> Optional[int]:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
