@@ -119,7 +119,7 @@ class BaseFormManager:
     def process_form_data(self):
         data: dict[str, Any] = {
             'attributes': process_form_dates(self.form),
-            'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
+            'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
         for key, value in self.form.data.items():
             field_type = getattr(self.form, key).type
             if field_type in [
@@ -167,7 +167,6 @@ class BaseFormManager:
                 elif isinstance(self.entity, ReferenceSystem) \
                         and self.entity.system:
                     name = self.entity.name  # Don't change the name
-                    # type
                 data['attributes']['name'] = name
             elif key == 'description':
                 data['attributes'][key] = self.form.data[key]
@@ -180,7 +179,7 @@ class BaseFormManager:
                         data['administrative_units'] = []
                     data['administrative_units'] += value
                 elif self.entity.class_.view != 'type':
-                    data['links']['delete'].add('P2')
+                    data['links']['delete'].append('P2')
                     data['links']['insert'].append({
                         'property': 'P2',
                         'range': [g.types[id_] for id_ in value]})
