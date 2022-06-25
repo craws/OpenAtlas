@@ -113,51 +113,6 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
-    elif entity.class_.view == 'event':
-        data['links']['delete'].update(['P7', 'P9'])
-        data['links']['delete_inverse'].update(['P134'])
-        if form.event.data:  # Super event
-            data['links']['insert'].append({
-                'property': 'P9',
-                'range': form.event.data})
-        if hasattr(form, 'event_preceding') and form.event_preceding.data:
-            data['links']['insert'].append({
-                'property': 'P134',
-                'range': form.event_preceding.data,
-                'inverse': True})
-        if hasattr(form, 'place') and form.place.data:
-            data['links']['insert'].append({
-                'property': 'P7',
-                'range':
-                    Link.get_linked_entity_safe(int(form.place.data), 'P53')})
-        elif entity.class_.name == 'production':
-            data['links']['delete'].add('P108')
-            if form.artifact.data:
-                data['links']['insert'].append({
-                    'property': 'P108',
-                    'range': form.artifact.data})
-        elif entity.class_.name == 'move':
-            data['links']['delete'].update(['P25', 'P26', 'P27'])
-            if form.artifact.data:
-                data['links']['insert'].append({
-                    'property': 'P25',
-                    'range': form.artifact.data})
-            if form.person.data:
-                data['links']['insert'].append({
-                    'property': 'P25',
-                    'range': form.person.data})
-            if form.place_from.data:
-                data['links']['insert'].append({
-                    'property': 'P27',
-                    'range': Link.get_linked_entity_safe(
-                        int(form.place_from.data),
-                        'P53')})
-            if form.place_to.data:
-                data['links']['insert'].append({
-                    'property': 'P26',
-                    'range': Link.get_linked_entity_safe(
-                        int(form.place_to.data),
-                        'P53')})
     elif entity.class_.view in ['artifact', 'place']:
         data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:

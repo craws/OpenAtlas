@@ -25,14 +25,12 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
 FORMS = {
-    'activity': ['name', 'date', 'description', 'continue'],
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'administrative_unit': ['name', 'description', 'continue'],
     'artifact': ['name', 'date', 'description', 'continue', 'map'],
     'bibliography': ['name', 'description', 'continue'],
     'edition': ['name', 'description', 'continue'],
-    'event': ['name', 'date', 'description', 'continue'],
     'external_reference': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
@@ -40,11 +38,9 @@ FORMS = {
     'hierarchy': ['name', 'description'],
     'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
-    'move': ['name', 'date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
-    'production': ['name', 'date', 'description', 'continue'],
     'reference_system': ['name', 'description'],
     'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
@@ -179,11 +175,6 @@ def additional_fields(
             'actor' if code == 'member' else 'group':
                 TableMultiField(_('actor'), [InputRequired()])
                 if not entity else None},
-        'activity': {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'event_preceding': TableField(_('preceding event')),
-            'place': TableField(_('location'))},
         'administrative_unit': {
             'is_type_form': HiddenField(),
             root_id: TreeField(root_id) if root_id else None,
@@ -191,10 +182,6 @@ def additional_fields(
             if directional else None},
         'artifact': {
             'actor': TableField(_('owned by'))},
-        'event': {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'place': TableField(_('location'))},
         'file': {
             'file': MultipleFileField(_('file'), [InputRequired()])
             if not entity else None,
@@ -226,24 +213,10 @@ def additional_fields(
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,
             'activity': SelectField(_('activity'))},
-        'move': {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'event_preceding': TableField(_('preceding event')),
-            'place_from': TableField(_('from')),
-            'place_to': TableField(_('to')),
-            'artifact': TableMultiField(),
-            'person': TableMultiField()},
         'person': {
             'residence': TableField(_('residence')),
             'begins_in': TableField(_('born in')),
             'ends_in': TableField(_('died in'))},
-        'production': {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'event_preceding': TableField(_('preceding event')),
-            'place': TableField(_('location')),
-            'artifact': TableMultiField()},
         'reference_system': {
             'website_url':
                 StringField(_('website URL'), [OptionalValidator(), URL()]),

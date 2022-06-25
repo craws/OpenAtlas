@@ -104,7 +104,7 @@ class BaseFormManager:
             setattr(self.form_class, 'continue_', HiddenField())
 
     def additional_fields(self) -> dict[str, Any]:
-        pass
+        return {}
 
     def populate_insert(self) -> None:
         pass
