@@ -15,20 +15,21 @@ from wtforms.validators import InputRequired, URL
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
-from openatlas.forms.field import RemovableListField
-from openatlas.forms.populate import populate_dates, \
-    populate_reference_systems, populate_types
+from openatlas.forms.field import RemovableListField, TableField
+from openatlas.forms.populate import (
+    populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import process_form_dates
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.util import sanitize, uc_first
 
 
-class BaseFormManager:
+class BaseManager:
     class_: OpenatlasClass
     fields: list[str] = []
     form: FlaskForm = None
@@ -206,6 +207,51 @@ class BaseFormManager:
             else:  # pragma: no cover
                 abort(418, f'Form error: {key}, {field_type}, value={value}')
         self.data = data
+
+
+class EventBaseManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        fields = {
+            'event_id': HiddenField(),
+            'event': TableField(_('sub event of')),
+            'event_preceding': TableField(_('preceding event'))}
+        if self.class_.name != 'move':
+            fields['place'] = TableField(_('location'))
+        return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.event_id.data = self.entity.id
+        if super_event := self.entity.get_linked_entity('P9'):
+            self.form.event.data = super_event.id
+        if preceding_event := self.entity.get_linked_entity('P134', True):
+            self.form.event_preceding.data = preceding_event.id
+        if self.class_.name != 'move':
+            if place := self.entity.get_linked_entity('P7'):
+                self.form.place.data = \
+                    place.get_linked_entity_safe('P53', True).id
+
+    def process_form_data(self):
+        super().process_form_data()
+        self.data['links']['delete'].append('P9')
+        self.data['links']['delete_inverse'].append('P134')
+        self.data['links']['insert'].append({
+            'property': 'P9',
+            'range': self.form.event.data})
+        self.data['links']['insert'].append({
+            'property': 'P134',
+            'range': self.form.event_preceding.data,
+            'inverse': True})
+        if self.class_.name != 'move':
+            self.data['links']['delete'].append('P7')
+            if self.form.place.data:
+                self.data['links']['insert'].append({
+                    'property': 'P7',
+                    'range': Link.get_linked_entity_safe(
+                        int(self.form.place.data),
+                        'P53')})
 
 
 def convert(value: str) -> list[int]:

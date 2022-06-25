@@ -10,7 +10,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms import base_form_manager
+from openatlas.forms import base_manager
 from openatlas.forms.form import get_entity_form
 from openatlas.forms.util import populate_insert_form, process_form_data
 from openatlas.models.entity import Entity
@@ -302,7 +302,7 @@ def insert_entity(form_manager: Any) -> Union[Entity, ReferenceSystem, Type]:
     return entity
 
 
-def get_redirect_url(manager: base_form_manager.BaseFormManager) -> str:
+def get_redirect_url(manager: base_manager.BaseManager) -> str:
     # if redirect_link_id and origin:
     #    return url_for(
     #        'link_update',

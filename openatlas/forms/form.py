@@ -12,7 +12,7 @@ from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
 
 from openatlas import app
-from openatlas.forms import base_form_manager, entity_form_manager
+from openatlas.forms import base_manager, entity_manager
 from openatlas.forms.field import (
     TableField, TableMultiField, TreeField)
 from openatlas.forms.populate_org import pre_populate_form
@@ -50,9 +50,9 @@ FORMS = {
 
 def get_entity_form(
         param: Union[str, Entity],
-        origin: Optional[Entity] = None) -> base_form_manager.BaseFormManager:
+        origin: Optional[Entity] = None) -> base_manager.BaseManager:
     name = param.class_.name if isinstance(param, Entity) else param
-    return getattr(entity_form_manager, f'{name.capitalize()}Form')(
+    return getattr(entity_manager, f'{name.capitalize()}Manager')(
         class_=g.classes[name],
         entity=param if isinstance(param, Entity) else None,
         origin=origin)
