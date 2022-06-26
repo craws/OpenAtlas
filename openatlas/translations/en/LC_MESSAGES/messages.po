@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2022-06-10 14:04+0200\n"
-"PO-Revision-Date: 2022-06-10 14:05+0200\n"
+"PO-Revision-Date: 2022-06-26 16:10+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -219,7 +219,7 @@ msgstr "Link artifacts as the information carrier of the source"
 
 #: openatlas/forms/form.py:376 openatlas/views/link.py:24
 msgid "page"
-msgstr "Page"
+msgstr "page"
 
 #: openatlas/forms/form.py:405 openatlas/templates/admin/check_similar.html:8
 msgid "no entries"
@@ -470,7 +470,7 @@ msgstr ""
 
 #: openatlas/forms/setting.py:117 openatlas/views/user.py:140
 msgid "language"
-msgstr "Language"
+msgstr "language"
 
 #: openatlas/forms/setting.py:120
 msgid "table rows"
@@ -1395,7 +1395,7 @@ msgstr "donor"
 
 #: openatlas/util/util.py:287
 msgid "produced"
-msgstr "produzierte"
+msgstr "produced"
 
 #: openatlas/util/util.py:290
 msgid "size"
@@ -1790,11 +1790,11 @@ msgstr "Suggestion"
 
 #: openatlas/views/index.py:29
 msgid "question"
-msgstr "Question"
+msgstr "question"
 
 #: openatlas/views/index.py:30
 msgid "problem"
-msgstr "Problem"
+msgstr "problem"
 
 #: openatlas/views/index.py:46
 msgid "visibility"
