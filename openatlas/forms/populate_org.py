@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -32,9 +32,6 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
             form.begins_in.data = first.get_linked_entity_safe('P53', True).id
         if last := entity.get_linked_entity('OA9'):
             form.ends_in.data = last.get_linked_entity_safe('P53', True).id
-    elif entity.class_.name in ['artifact', 'human_remains']:
-        owner = entity.get_linked_entity('P52')
-        form.actor.data = owner.id if owner else None
     elif isinstance(entity, Type):
         if hasattr(form, 'name_inverse'):  # Directional, e.g. actor relation
             name_parts = entity.name.split(' (')

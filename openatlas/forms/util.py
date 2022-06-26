@@ -1,6 +1,5 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import ast
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -113,16 +112,10 @@ def process_form_data(
             data['links']['insert'].append({
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
-    elif entity.class_.view in ['artifact', 'place']:
+    elif entity.class_.view in ['place']:
         data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data
-        if entity.class_.name in ['artifact', 'human_remains']:
-            data['links']['delete'].add('P52')
-            if form.actor.data:
-                data['links']['insert'].append({
-                    'property': 'P52',
-                    'range': form.actor.data})
     elif entity.class_.view == 'reference_system':
         data['reference_system'] = {
             'website_url': form.website_url.data,

@@ -28,7 +28,6 @@ FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'administrative_unit': ['name', 'description', 'continue'],
-    'artifact': ['name', 'date', 'description', 'continue', 'map'],
     'bibliography': ['name', 'description', 'continue'],
     'edition': ['name', 'description', 'continue'],
     'external_reference': ['name', 'description', 'continue'],
@@ -36,7 +35,6 @@ FORMS = {
     'file': ['name', 'description'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
     'hierarchy': ['name', 'description'],
-    'human_remains': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
     'note': ['description'],
     'person': ['name', 'alias', 'date', 'description', 'continue'],
@@ -51,9 +49,10 @@ FORMS = {
 def get_entity_form(
         param: Union[str, Entity],
         origin: Optional[Entity] = None) -> base_manager.BaseManager:
-    name = param.class_.name if isinstance(param, Entity) else param
-    return getattr(entity_manager, f'{name.capitalize()}Manager')(
-        class_=g.classes[name],
+    class_name = param.class_.name if isinstance(param, Entity) else param
+    manager_name = ''.join(i.capitalize() for i in class_name.split('_'))
+    return getattr(entity_manager, f'{manager_name}Manager')(
+        class_=g.classes[class_name],
         entity=param if isinstance(param, Entity) else None,
         origin=origin)
 
@@ -180,8 +179,6 @@ def additional_fields(
             root_id: TreeField(root_id) if root_id else None,
             'name_inverse': StringField(_('inverse'))
             if directional else None},
-        'artifact': {
-            'actor': TableField(_('owned by'))},
         'file': {
             'file': MultipleFileField(_('file'), [InputRequired()])
             if not entity else None,
@@ -207,8 +204,6 @@ def additional_fields(
                 choices=[],
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))},
-        'human_remains': {
-            'actor': TableField(_('owned by'))},
         'involvement': {
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,

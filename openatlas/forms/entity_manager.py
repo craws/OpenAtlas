@@ -1,7 +1,7 @@
 from typing import Any
 from flask_babel import lazy_gettext as _
 
-from openatlas.forms.base_manager import EventBaseManager
+from openatlas.forms.base_manager import BaseManager, EventBaseManager
 from openatlas.models.link import Link
 from openatlas.forms.field import TableField, TableMultiField
 
@@ -29,8 +29,54 @@ class ActivityManager(EventBaseManager):
     pass
 
 
+class ArtifactManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'actor': TableField(_('owned by'))}
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if owner := self.entity.get_linked_entity('P52'):
+            self.form.actor.data = owner.id
+
+    def process_form_data(self):
+        super().process_form_data()
+        self.data['gis'] = {}
+        for shape in ['point', 'line', 'polygon']:
+            self.data['gis'][shape] = getattr(self.form, f'gis_{shape}s').data
+        self.data['links']['delete'].append('P52')
+        if self.form.actor.data:
+            self.data['links']['insert'].append({
+                'property': 'P52',
+                'range': self.form.actor.data})
+
+
 class EventManager(EventBaseManager):
     pass
+
+
+class HumanRemainsManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'actor': TableField(_('owned by'))}
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if owner := self.entity.get_linked_entity('P52'):
+            self.form.actor.data = owner.id
+
+    def process_form_data(self):
+        super().process_form_data()
+        self.data['gis'] = {}
+        for shape in ['point', 'line', 'polygon']:
+            self.data['gis'][shape] = getattr(self.form, f'gis_{shape}s').data
+        self.data['links']['delete'].append('P52')
+        if self.form.actor.data:
+            self.data['links']['insert'].append({
+                'property': 'P52',
+                'range': self.form.actor.data})
 
 
 class MoveManager(EventBaseManager):
@@ -41,6 +87,24 @@ class MoveManager(EventBaseManager):
             'place_to': TableField(_('to')),
             'artifact': TableMultiField(),
             'person': TableMultiField()})
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if place_from := self.entity.get_linked_entity('P27'):
+            self.form.place_from.data = \
+                place_from.get_linked_entity_safe('P53', True).id
+        if place_to := self.entity.get_linked_entity('P26'):
+            self.form.place_to.data = \
+                place_to.get_linked_entity_safe('P53', True).id
+        person_data = []
+        object_data = []
+        for linked_entity in self.entity.get_linked_entities('P25'):
+            if linked_entity.class_.name == 'person':
+                person_data.append(linked_entity.id)
+            elif linked_entity.class_.view == 'artifact':
+                object_data.append(linked_entity.id)
+        self.form.person.data = person_data
+        self.form.artifact.data = object_data
 
     def process_form_data(self):
         super().process_form_data()
@@ -66,24 +130,6 @@ class MoveManager(EventBaseManager):
                     int(self.form.place_to.data),
                     'P53')})
 
-    def populate_update(self) -> None:
-        super().populate_update()
-        if place_from := self.entity.get_linked_entity('P27'):
-            self.form.place_from.data = \
-                place_from.get_linked_entity_safe('P53', True).id
-        if place_to := self.entity.get_linked_entity('P26'):
-            self.form.place_to.data = \
-                place_to.get_linked_entity_safe('P53', True).id
-        person_data = []
-        object_data = []
-        for linked_entity in self.entity.get_linked_entities('P25'):
-            if linked_entity.class_.name == 'person':
-                person_data.append(linked_entity.id)
-            elif linked_entity.class_.view == 'artifact':
-                object_data.append(linked_entity.id)
-        self.form.person.data = person_data
-        self.form.artifact.data = object_data
-
 
 class ProductionManager(EventBaseManager):
 
@@ -91,14 +137,14 @@ class ProductionManager(EventBaseManager):
         return dict(super().additional_fields(), **{
             'artifact': TableMultiField()})
 
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.artifact.data = \
+            [entity.id for entity in self.entity.get_linked_entities('P108')]
+
     def process_form_data(self):
         super().process_form_data()
         self.data['links']['delete'].append('P108')
         self.data['links']['insert'].append({
                 'property': 'P108',
                 'range': self.form.artifact.data})
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        self.form.artifact.data = \
-            [entity.id for entity in self.entity.get_linked_entities('P108')]
