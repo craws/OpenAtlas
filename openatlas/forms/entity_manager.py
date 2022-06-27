@@ -52,8 +52,20 @@ class ArtifactManager(BaseManager):
                 'range': self.form.actor.data})
 
 
+class BibliographyManager(BaseManager):
+    fields = ['name', 'description', 'continue']
+
+
+class EditionManager(BaseManager):
+    fields = ['name', 'description', 'continue']
+
+
 class EventManager(EventBaseManager):
     pass
+
+
+class ExternalReferenceManager(BaseManager):
+    fields = ['name', 'description', 'continue']
 
 
 class HumanRemainsManager(BaseManager):

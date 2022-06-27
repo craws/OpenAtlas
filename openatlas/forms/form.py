@@ -28,9 +28,6 @@ FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'administrative_unit': ['name', 'description', 'continue'],
-    'bibliography': ['name', 'description', 'continue'],
-    'edition': ['name', 'description', 'continue'],
-    'external_reference': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
     'group': ['name', 'alias', 'date', 'description', 'continue'],
@@ -158,10 +155,6 @@ def additional_fields(
     if class_ == 'reference_system':
         precision_id = str(Type.get_hierarchy('External reference match').id)
         choices = ReferenceSystem.get_class_choices(entity)  # type: ignore
-
-    # It's not elegant to collect fields for every form at every form call, but
-    # it's much more readable than e.g. using a long if/elif and there are no
-    # database calls at this stage, so it has no high impact on performance.
 
     fields: dict[str, dict[str, Any]] = {
         'actor_actor_relation': {
