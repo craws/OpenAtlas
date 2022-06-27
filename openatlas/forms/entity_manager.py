@@ -158,5 +158,5 @@ class ProductionManager(EventBaseManager):
         super().process_form_data()
         self.data['links']['delete'].append('P108')
         self.data['links']['insert'].append({
-                'property': 'P108',
-                'range': self.form.artifact.data})
+            'property': 'P108',
+            'range': self.form.artifact.data})
