@@ -65,7 +65,7 @@ class EventManager(EventBaseManager):
 
 
 class ExternalReferenceManager(BaseManager):
-    fields = ['name', 'description', 'continue']
+    fields = ['url', 'description', 'continue']
 
 
 class HumanRemainsManager(BaseManager):

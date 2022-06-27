@@ -55,9 +55,13 @@ class BaseManager:
         self.form_class = Form
         if 'name' in self.fields:
             setattr(Form, 'name', StringField(
-                _('URL') if class_.name == 'external_reference' else _('name'),
-                [InputRequired(), URL()] if class_.name == 'external_reference'
-                else [InputRequired()],
+                _('name'),
+                [InputRequired()],
+                render_kw={'autofocus': True}))
+        if 'url' in self.fields:
+            setattr(Form, 'name', StringField(
+                _('URL'),
+                [InputRequired(), URL()],
                 render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(Form, 'alias', FieldList(RemovableListField('')))
@@ -66,10 +70,9 @@ class BaseManager:
             setattr(Form, id_, field)
         add_reference_systems(self.class_, self.form_class)
         if 'date' in self.fields:
-            add_date_fields(self.form_class,
-                            bool(
-                                current_user.settings['module_time']
-                                or check_if_entity_has_time(entity)))
+            add_date_fields(self.form_class, bool(
+                current_user.settings['module_time']
+                or check_if_entity_has_time(entity)))
         if 'description' in self.fields:
             label = _('content') \
                 if class_.name == 'source' else _('description')
@@ -114,7 +117,7 @@ class BaseManager:
         self.form.opened.data = time.time()
         populate_types(self)
         populate_reference_systems(self)
-        if hasattr(self.form, 'begin_year_from'):
+        if 'date' in self.fields:
             populate_dates(self)
 
     def process_form_data(self):
