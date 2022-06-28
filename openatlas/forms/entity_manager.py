@@ -1,9 +1,11 @@
 from typing import Any
+
 from flask_babel import lazy_gettext as _
 
-from openatlas.forms.base_manager import BaseManager, EventBaseManager
-from openatlas.models.link import Link
+from openatlas.forms.base_manager import (
+    ActorBaseManager, BaseManager, EventBaseManager)
 from openatlas.forms.field import TableField, TableMultiField
+from openatlas.models.link import Link
 
 
 class AcquisitionManager(EventBaseManager):
@@ -66,6 +68,15 @@ class EventManager(EventBaseManager):
 
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
+
+
+class GroupManager(ActorBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'residence': TableField(_('residence')),
+            'begins_in': TableField(_('begins in')),
+            'ends_in': TableField(_('ends in'))}
 
 
 class HumanRemainsManager(BaseManager):
@@ -141,6 +152,15 @@ class MoveManager(EventBaseManager):
                 'range': Link.get_linked_entity_safe(
                     int(self.form.place_to.data),
                     'P53')})
+
+
+class PersonManager(ActorBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'residence': TableField(_('residence')),
+            'begins_in': TableField(_('born in')),
+            'ends_in': TableField(_('died in'))}
 
 
 class ProductionManager(EventBaseManager):
