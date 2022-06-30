@@ -33,7 +33,3 @@ def populate_update_form(form: FlaskForm, entity: Union[Entity, Type]) -> None:
                 form,
                 str(root.id)).data = super_.id \
                 if super_.id != root.id else None
-    elif entity.class_.view == 'source':
-        form.artifact.data = [
-            item.id for item in
-            entity.get_linked_entities('P128', inverse=True)]

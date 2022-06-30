@@ -35,7 +35,6 @@ FORMS = {
     'note': ['description'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
     'reference_system': ['name', 'description'],
-    'source': ['name', 'description', 'continue'],
     'source_translation': ['name', 'description', 'continue'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
     'type': ['name', 'date', 'description', 'continue']}
@@ -209,9 +208,6 @@ def additional_fields(
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))
             if choices else None},
-        'source': {
-            'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source'))},
         'type': {
             'is_type_form': HiddenField(),
             root_id: TreeField(root_id) if root_id else None,

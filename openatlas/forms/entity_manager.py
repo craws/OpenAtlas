@@ -19,7 +19,7 @@ class AcquisitionManager(EventBaseManager):
         self.form.given_place.data = [
             entity.id for entity in self.entity.get_linked_entities('P24')]
 
-    def process_form_data(self):
+    def process_form_data(self) -> None:
         super().process_form_data()
         self.data['links']['delete'].append('P24')
         self.data['links']['insert'].append({
@@ -42,7 +42,7 @@ class ArtifactManager(BaseManager):
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
 
-    def process_form_data(self):
+    def process_form_data(self) -> None:
         super().process_form_data()
         self.data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
@@ -90,7 +90,7 @@ class HumanRemainsManager(BaseManager):
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
 
-    def process_form_data(self):
+    def process_form_data(self) -> None:
         super().process_form_data()
         self.data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
@@ -129,7 +129,7 @@ class MoveManager(EventBaseManager):
         self.form.person.data = person_data
         self.form.artifact.data = object_data
 
-    def process_form_data(self):
+    def process_form_data(self) -> None:
         super().process_form_data()
         self.data['links']['delete'] += ['P25', 'P26', 'P27']
         if self.form.artifact.data:
@@ -174,9 +174,33 @@ class ProductionManager(EventBaseManager):
         self.form.artifact.data = \
             [entity.id for entity in self.entity.get_linked_entities('P108')]
 
-    def process_form_data(self):
+    def process_form_data(self) -> None:
         super().process_form_data()
         self.data['links']['delete'].append('P108')
         self.data['links']['insert'].append({
             'property': 'P108',
             'range': self.form.artifact.data})
+
+
+class SourceManager(BaseManager):
+    fields = ['name', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'artifact': TableMultiField(description=_(
+                'Link artifacts as the information carrier of the source'))}
+
+    def populate_update(self) -> None:
+        self.form.artifact.data = [
+            item.id for item in
+            self.entity.get_linked_entities('P128', inverse=True)]
+
+    def process_form_data(self) -> None:
+        super().process_form_data()
+        if not self.origin:
+            self.data['links']['delete_inverse'].append('P128')
+            if self.form.artifact.data:
+                self.data['links']['insert'].append({
+                    'property': 'P128',
+                    'range': self.form.artifact.data,
+                    'inverse': True})

@@ -105,13 +105,6 @@ def process_form_data(
             'resolver_url': form.resolver_url.data,
             'placeholder': form.placeholder.data,
             'classes': form.classes.data if hasattr(form, 'classes') else None}
-    elif entity.class_.view == 'source' and not origin:
-        data['links']['delete_inverse'].add('P128')
-        if form.artifact.data:
-            data['links']['insert'].append({
-                'property': 'P128',
-                'range': form.artifact.data,
-                'inverse': True})
     elif entity.class_.view == 'type' and 'classes' not in form:
         type_ = origin if isinstance(origin, Type) else entity
         if isinstance(type_, Type):
@@ -262,21 +255,9 @@ def form_to_datetime64(
     else:
         day = '01'
 
-    if hour:
-        hour = f'{hour:02}'
-    else:
-        hour = '00'
-
-    if minute:
-        minute = f'{minute:02}'
-    else:
-        minute = '00'
-
-    if second:
-        second = f'{second:02}'
-    else:
-        second = '00'
-
+    hour = f'{hour:02}' if hour else '00'
+    minute = f'{minute:02}' if minute else '00'
+    second = f'{second:02}' if second else '00'
     try:
         date_time = numpy.datetime64(
             f'{year}-{month}-{day}T{hour}:{minute}:{second}')
