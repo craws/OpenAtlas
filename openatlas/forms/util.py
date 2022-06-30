@@ -95,24 +95,7 @@ def process_form_data(
         origin: Optional[Entity] = None) -> dict[str, Any]:
     data: dict[str, Any] = {
         'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
-    if entity.class_.view == 'actor':
-        data['links']['delete'].update(['P74', 'OA8', 'OA9'])
-        if form.residence.data:
-            residence = Entity.get_by_id(int(form.residence.data))
-            data['links']['insert'].append({
-                'property': 'P74',
-                'range': residence.get_linked_entity_safe('P53')})
-        if form.begins_in.data:
-            begin_place = Entity.get_by_id(int(form.begins_in.data))
-            data['links']['insert'].append({
-                'property': 'OA8',
-                'range': begin_place.get_linked_entity_safe('P53')})
-        if form.ends_in.data:
-            end_place = Entity.get_by_id(int(form.ends_in.data))
-            data['links']['insert'].append({
-                'property': 'OA9',
-                'range': end_place.get_linked_entity_safe('P53')})
-    elif entity.class_.view in ['place']:
+    if entity.class_.view in ['place']:
         data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data

@@ -119,6 +119,10 @@ class BaseManager:
         populate_reference_systems(self)
         if 'date' in self.fields:
             populate_dates(self)
+        if hasattr(self.form, 'alias'):
+            for alias in self.entity.aliases.values():
+                self.form.alias.append_entry(alias)
+            self.form.alias.append_entry('')
 
     def process_form_data(self):
         data: dict[str, Any] = {
@@ -210,6 +214,41 @@ class BaseManager:
             else:  # pragma: no cover
                 abort(418, f'Form error: {key}, {field_type}, value={value}')
         self.data = data
+
+
+class ActorBaseManager(BaseManager):
+    fields = ['name', 'alias', 'date', 'description', 'continue']
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if residence := self.entity.get_linked_entity('P74'):
+            self.form.residence.data = \
+                residence.get_linked_entity_safe('P53', True).id
+        if first := self.entity.get_linked_entity('OA8'):
+            self.form.begins_in.data = \
+                first.get_linked_entity_safe('P53', True).id
+        if last := self.entity.get_linked_entity('OA9'):
+            self.form.ends_in.data = \
+                last.get_linked_entity_safe('P53', True).id
+
+    def process_form_data(self):
+        super().process_form_data()
+        self.data['links']['delete'] += ['P74', 'OA8', 'OA9']
+        if self.form.residence.data:
+            residence = Entity.get_by_id(int(self.form.residence.data))
+            self.data['links']['insert'].append({
+                'property': 'P74',
+                'range': residence.get_linked_entity_safe('P53')})
+        if self.form.begins_in.data:
+            begin_place = Entity.get_by_id(int(self.form.begins_in.data))
+            self.data['links']['insert'].append({
+                'property': 'OA8',
+                'range': begin_place.get_linked_entity_safe('P53')})
+        if self.form.ends_in.data:
+            end_place = Entity.get_by_id(int(self.form.ends_in.data))
+            self.data['links']['insert'].append({
+                'property': 'OA9',
+                'range': end_place.get_linked_entity_safe('P53')})
 
 
 class EventBaseManager(BaseManager):

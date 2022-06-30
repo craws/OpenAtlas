@@ -30,11 +30,9 @@ FORMS = {
     'administrative_unit': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
-    'group': ['name', 'alias', 'date', 'description', 'continue'],
     'hierarchy': ['name', 'description'],
     'involvement': ['date', 'description', 'continue'],
     'note': ['description'],
-    'person': ['name', 'alias', 'date', 'description', 'continue'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
     'reference_system': ['name', 'description'],
     'source': ['name', 'description', 'continue'],
@@ -178,10 +176,6 @@ def additional_fields(
             'page': StringField()  # Needed to link file to ref. after insert
             if not entity and origin and origin.class_.view == 'reference'
             else None},
-        'group': {
-            'residence': TableField(_('residence')),
-            'begins_in': TableField(_('begins in')),
-            'ends_in': TableField(_('ends in'))},
         'hierarchy': {
             'multiple': BooleanField(
                 _('multiple'),
@@ -201,10 +195,6 @@ def additional_fields(
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,
             'activity': SelectField(_('activity'))},
-        'person': {
-            'residence': TableField(_('residence')),
-            'begins_in': TableField(_('born in')),
-            'ends_in': TableField(_('died in'))},
         'reference_system': {
             'website_url':
                 StringField(_('website URL'), [OptionalValidator(), URL()]),
