@@ -35,7 +35,9 @@ class Gis:
                 if row['name'] else ''
             geometry['description'] = \
                 row['description'].replace('"', '\"') \
-                if row['description'] else ''
+                    if row['description'] else ''
+            geometry['shapeType'] = row['type'].replace('"', '\"') \
+                if row['type'] else ''
             geometries.append(geometry)
         return geometries
 
