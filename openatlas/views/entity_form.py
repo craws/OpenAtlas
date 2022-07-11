@@ -296,9 +296,6 @@ def insert_entity(form_manager: Any) -> Union[Entity, ReferenceSystem, Type]:
             Entity.insert(
                 'object_location',
                 f'Location of {form_manager.form.name.data}'))
-    if form_manager.class_.name == 'source_translation' \
-            and form_manager.origin:
-        form_manager.origin.link('P73', entity)
     return entity
 
 

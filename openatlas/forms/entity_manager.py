@@ -1,6 +1,7 @@
 from typing import Any
 
 from flask_babel import lazy_gettext as _
+from wtforms import TextAreaField
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager)
@@ -183,12 +184,13 @@ class ProductionManager(EventBaseManager):
 
 
 class SourceManager(BaseManager):
-    fields = ['name', 'description', 'continue']
+    fields = ['name', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
         return {
             'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source'))}
+                'Link artifacts as the information carrier of the source')),
+            'description': TextAreaField(_('content'))}
 
     def populate_update(self) -> None:
         self.form.artifact.data = [
@@ -204,3 +206,18 @@ class SourceManager(BaseManager):
                     'property': 'P128',
                     'range': self.form.artifact.data,
                     'inverse': True})
+
+
+class SourceTranslationManager(BaseManager):
+    fields = ['name', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {'description': TextAreaField(_('content'))}
+
+    def process_form_data(self) -> None:
+        super().process_form_data()
+        if self.origin:
+            self.data['links']['insert'].append({
+                'property': 'P73',
+                'range': self.origin,
+                'inverse': True})

@@ -74,9 +74,7 @@ class BaseManager:
                 current_user.settings['module_time']
                 or check_if_entity_has_time(entity)))
         if 'description' in self.fields:
-            label = _('content') \
-                if class_.name == 'source' else _('description')
-            setattr(Form, 'description', TextAreaField(label))
+            setattr(Form, 'description', TextAreaField())
             if class_.name == 'type':
                 type_ = entity if entity else origin
                 if isinstance(type_, Type):

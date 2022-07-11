@@ -35,7 +35,6 @@ FORMS = {
     'note': ['description'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
     'reference_system': ['name', 'description'],
-    'source_translation': ['name', 'description', 'continue'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
     'type': ['name', 'date', 'description', 'continue']}
 
@@ -76,8 +75,6 @@ def customize_labels(
         form: FlaskForm,
         item: Optional[Union[Entity, Link]] = None,
         origin: Union[Entity, Type, None] = None, ) -> None:
-    if name == 'source_translation':
-        form.description.label.text = _('content')
     if name in ('administrative_unit', 'type'):
         type_ = item if item else origin
         if isinstance(type_, Type):
