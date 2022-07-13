@@ -2,7 +2,7 @@ from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, TextAreaField
+from wtforms import HiddenField, StringField, TextAreaField
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager)
@@ -38,14 +38,10 @@ class AdministrativeUnitManager(BaseManager):
     fields = ['name', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
-        root_id = ''
-        type_ = self.entity if self.entity else self.origin
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-            root_id = str(root.id)
+        root = self.get_root_type()
         return {
             'is_type_form': HiddenField(),
-            root_id: TreeField(root_id) if root_id else None}
+            str(root.id): TreeField(str(root.id))}
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -62,16 +58,40 @@ class AdministrativeUnitManager(BaseManager):
     def process_form_data(self) -> None:
         super().process_form_data()
         type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-            super_id = g.types[type_.root[-1]] if type_.root else type_
-            new_super_id = getattr(self.form, str(root.id)).data
-            new_super = g.types[int(new_super_id)] if new_super_id else root
-            if super_id != new_super.id:
-                self.data['links']['delete'].append('P89')
-                self.data['links']['insert'].append({
-                    'property': 'P89',
-                    'range': new_super})
+        root = self.get_root_type()
+        super_id = g.types[type_.root[-1]] if type_.root else type_
+        new_super_id = getattr(self.form, str(root.id)).data
+        new_super = g.types[int(new_super_id)] if new_super_id else root
+        if super_id != new_super.id:
+            self.data['links']['delete'].append('P89')
+            self.data['links']['insert'].append({
+                'property': 'P89',
+                'range': new_super})
+
+
+class TypeManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        root = self.get_root_type()
+        return {
+            'is_type_form': HiddenField(),
+            str(root.id): TreeField(str(root.id)) if root else None,
+            'name_inverse': StringField(_('inverse'))
+            if root.directional else None}
+
+    def process_form_data(self):
+        super().process_form_data()
+        type_ = self.origin if isinstance(self.origin, Type) else self.entity
+        root = self.get_root_type()
+        super_id = g.types[type_.root[-1]] if type_.root else type_
+        new_super_id = getattr(self.form, str(root.id)).data
+        new_super = g.types[int(new_super_id)] if new_super_id else root
+        if super_id != new_super.id:
+            self.data['links']['delete'].append('P127')
+            self.data['links']['insert'].append({
+                'property': 'P127',
+                'range': new_super})
 
 
 class ArtifactManager(BaseManager):

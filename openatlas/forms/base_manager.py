@@ -116,6 +116,17 @@ class BaseManager:
     def additional_fields(self) -> dict[str, Any]:
         return {}
 
+    def get_root_type(self) -> Type:
+        root = None
+        type_ = self.origin if self.origin else self.entity
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+        else:
+            print(self.entity)
+            print(self.entity.name)
+            print(self.origin)
+        return root
+
     def populate_insert(self) -> None:
         pass
 

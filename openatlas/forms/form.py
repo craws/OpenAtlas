@@ -35,7 +35,7 @@ FORMS = {
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
     'reference_system': ['name', 'description'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
-    'type': ['name', 'date', 'description', 'continue']}
+    }
 
 
 def get_entity_form(
@@ -121,14 +121,7 @@ def additional_fields(
     involved_with = ''
     if class_ == 'involvement' and not entity and origin:
         involved_with = 'actor' if origin.class_.view == 'event' else 'event'
-    root_id = ''
-    directional = False
-    if class_ in ['administrative_unit', 'type']:
-        type_ = entity if entity else origin
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-            root_id = str(root.id)
-            directional = root.directional
+
     precision_id = ''
     choices = None
     if class_ == 'reference_system':
@@ -184,12 +177,7 @@ def additional_fields(
                 choices=choices,
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))
-            if choices else None},
-        'type': {
-            'is_type_form': HiddenField(),
-            root_id: TreeField(root_id) if root_id else None,
-            'name_inverse': StringField(_('inverse'))
-            if directional else None}}
+            if choices else None}}
     if class_ not in fields:
         return {}
     return {k: v for k, v in fields[class_].items() if k and v}
