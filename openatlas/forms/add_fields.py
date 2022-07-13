@@ -5,7 +5,6 @@ from flask_babel import lazy_gettext as _
 from wtforms import IntegerField, SelectField, StringField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
-
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
@@ -218,27 +217,27 @@ def add_value_type_fields(form_class, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_types(class_, form_class):
-    if class_.name in g.classes \
-            and g.classes[class_.name].hierarchies:
+def add_types(manager):
+    if manager.class_.name in g.classes \
+            and g.classes[manager.class_.name].hierarchies:
         types = OrderedDict(
             {id_: g.types[id_] for id_ in
-             g.classes[class_.name].hierarchies})
+             g.classes[manager.class_.name].hierarchies})
         if g.classes[
-                class_.name].standard_type_id in types:
+                manager.class_.name].standard_type_id in types:
             types.move_to_end(  # Standard type to top
-                g.classes[class_.name].standard_type_id,
+                g.classes[manager.class_.name].standard_type_id,
                 last=False)
         for type_ in types.values():
             if type_.multiple:
                 setattr(
-                    form_class,
+                    manager.form_class,
                     str(type_.id),
                     TreeMultiField(str(type_.id)))
             else:
                 setattr(
-                    form_class,
+                    manager.form_class,
                     str(type_.id),
                     TreeField(str(type_.id)))
             if type_.category == 'value':
-                add_value_type_fields(form_class, type_.subs)
+                add_value_type_fields(manager.form_class, type_.subs)

@@ -1,12 +1,14 @@
 from typing import Any
 
+from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import TextAreaField
+from wtforms import HiddenField, TextAreaField
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager)
-from openatlas.forms.field import TableField, TableMultiField
+from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.models.link import Link
+from openatlas.models.type import Type
 
 
 class AcquisitionManager(EventBaseManager):
@@ -30,6 +32,46 @@ class AcquisitionManager(EventBaseManager):
 
 class ActivityManager(EventBaseManager):
     pass
+
+
+class AdministrativeUnitManager(BaseManager):
+    fields = ['name', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        root_id = ''
+        type_ = self.entity if self.entity else self.origin
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            root_id = str(root.id)
+        return {
+            'is_type_form': HiddenField(),
+            root_id: TreeField(root_id) if root_id else None}
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if isinstance(self.entity, Type):
+            root = g.types[self.entity.root[0]] \
+                if self.entity.root else self.entity
+            if root:  # Set super if exists and is not same as root
+                super_ = g.types[self.entity.root[-1]]
+                getattr(
+                    self.form,
+                    str(root.id)).data = super_.id \
+                    if super_.id != root.id else None
+
+    def process_form_data(self) -> None:
+        super().process_form_data()
+        type_ = self.origin if isinstance(self.origin, Type) else self.entity
+        if isinstance(type_, Type):
+            root = g.types[type_.root[0]] if type_.root else type_
+            super_id = g.types[type_.root[-1]] if type_.root else type_
+            new_super_id = getattr(self.form, str(root.id)).data
+            new_super = g.types[int(new_super_id)] if new_super_id else root
+            if super_id != new_super.id:
+                self.data['links']['delete'].append('P89')
+                self.data['links']['insert'].append({
+                    'property': 'P89',
+                    'range': new_super})
 
 
 class ArtifactManager(BaseManager):

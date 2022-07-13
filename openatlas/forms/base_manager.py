@@ -65,7 +65,7 @@ class BaseManager:
                 render_kw={'autofocus': True}))
         if 'alias' in self.fields:
             setattr(Form, 'alias', FieldList(RemovableListField('')))
-        add_types(self.class_, self.form_class)
+        add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
         add_reference_systems(self.class_, self.form_class)
@@ -74,7 +74,7 @@ class BaseManager:
                 current_user.settings['module_time']
                 or check_if_entity_has_time(entity)))
         if 'description' in self.fields:
-            setattr(Form, 'description', TextAreaField())
+            setattr(Form, 'description', TextAreaField(_('description')))
             if class_.name == 'type':
                 type_ = entity if entity else origin
                 if isinstance(type_, Type):
@@ -88,6 +88,14 @@ class BaseManager:
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.add_buttons()
         self.form = Form(obj=self.entity) if self.entity else Form()
+        self.customize_labels()
+
+    def customize_labels(self) -> None:
+        if self.class_.name in ('administrative_unit', 'type'):
+            type_ = self.entity if self.entity else self.origin
+            if isinstance(type_, Type):
+                root = g.types[type_.root[0]] if type_.root else type_
+                getattr(self.form, str(root.id)).label.text = 'super'
 
     def add_buttons(self) -> None:
         setattr(

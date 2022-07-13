@@ -27,7 +27,6 @@ from openatlas.util.util import get_base_table_data, uc_first
 FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
-    'administrative_unit': ['name', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
     'hierarchy': ['name', 'description'],
@@ -53,7 +52,6 @@ def get_entity_form(
 def get_form(
         class_: str,
         entity: Optional[Union[Entity, Link, Type]] = None,
-        origin: Union[Entity, Type, None] = None,
         location: Optional[Entity] = None) -> FlaskForm:
 
     class Form(FlaskForm):
@@ -66,20 +64,7 @@ def get_form(
         form = Form()
     else:
         form = pre_populate_form(Form(obj=entity), entity, location)
-    customize_labels(class_, form, entity, origin)
     return form
-
-
-def customize_labels(
-        name: str,
-        form: FlaskForm,
-        item: Optional[Union[Entity, Link]] = None,
-        origin: Union[Entity, Type, None] = None, ) -> None:
-    if name in ('administrative_unit', 'type'):
-        type_ = item if item else origin
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-            getattr(form, str(root.id)).label.text = 'super'
 
 
 def add_buttons(
@@ -161,11 +146,6 @@ def additional_fields(
             'actor' if code == 'member' else 'group':
                 TableMultiField(_('actor'), [InputRequired()])
                 if not entity else None},
-        'administrative_unit': {
-            'is_type_form': HiddenField(),
-            root_id: TreeField(root_id) if root_id else None,
-            'name_inverse': StringField(_('inverse'))
-            if directional else None},
         'file': {
             'file': MultipleFileField(_('file'), [InputRequired()])
             if not entity else None,
