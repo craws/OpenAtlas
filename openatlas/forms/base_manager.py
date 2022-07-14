@@ -10,7 +10,8 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from wtforms import (
-    FieldList, HiddenField, StringField, SubmitField, TextAreaField)
+    FieldList, HiddenField, SelectMultipleField, StringField, SubmitField,
+    TextAreaField, widgets)
 from wtforms.validators import InputRequired, URL
 
 from openatlas.forms.add_fields import (
@@ -91,7 +92,8 @@ class BaseManager:
         self.customize_labels()
 
     def customize_labels(self) -> None:
-        if self.class_.name in ('administrative_unit', 'type'):
+        if self.class_.name in ('administrative_unit', 'type') \
+                and 'classes' not in self.form:
             type_ = self.entity if self.entity else self.origin
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_
@@ -117,14 +119,8 @@ class BaseManager:
         return {}
 
     def get_root_type(self) -> Type:
-        root = None
-        type_ = self.origin if self.origin else self.entity
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-        else:
-            print(self.entity)
-            print(self.entity.name)
-            print(self.origin)
+        type_ = self.entity if isinstance(self.entity, Type) else self.origin
+        root = g.types[type_.root[0]] if type_.root else type_
         return root
 
     def populate_insert(self) -> None:
@@ -311,6 +307,20 @@ class EventBaseManager(BaseManager):
                     'range': Link.get_linked_entity_safe(
                         int(self.form.place.data),
                         'P53')})
+
+
+class HierarchyBaseManager(BaseManager):
+    fields = ['name', 'description']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'classes': SelectMultipleField(
+                _('classes'),
+                render_kw={'disabled': True},
+                description=_('tooltip hierarchy forms'),
+                choices=Type.get_class_choices(self.entity),
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))}
 
 
 def convert(value: str) -> list[int]:

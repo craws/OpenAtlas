@@ -32,17 +32,16 @@ def insert(
         origin_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form_manager = get_entity_form(class_, origin)
-    form = form_manager.form
-    if form.validate_on_submit():
+    manager = get_entity_form(class_, origin=origin)
+    if manager.form.validate_on_submit():
         if class_ == 'file':
-            return redirect(insert_files(form, origin))
-        return redirect(save(form_manager))
-    populate_insert_form(form, class_, origin)
+            return redirect(insert_files(manager.form, origin))
+        return redirect(save(manager))
+    populate_insert_form(manager.form, class_, origin)
     place_info = get_place_info_for_insert(g.classes[class_].view, origin)
     return render_template(
         'entity/insert.html',
-        form=form,
+        form=manager.form,
         view_name=g.classes[class_].view,
         gis_data=place_info['gis_data'],
         geonames_module=check_geonames_module(class_),
@@ -64,7 +63,7 @@ def update(id_: int) -> Union[str, Response]:
     if entity.check_too_many_single_type_links():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    manager = get_entity_form(entity)
+    manager = get_entity_form(entity=entity)
     if manager.form.validate_on_submit():
         if isinstance(entity, Type) and not check_type(entity, manager.form):
             return redirect(url_for('view', id_=entity.id))

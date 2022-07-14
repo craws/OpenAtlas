@@ -29,23 +29,23 @@ FORMS = {
     'actor_actor_relation': ['date', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
     'file': ['name', 'description'],
-    'hierarchy': ['name', 'description'],
     'involvement': ['date', 'description', 'continue'],
     'note': ['description'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
     'reference_system': ['name', 'description'],
-    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
-    }
+    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
 
 
 def get_entity_form(
-        param: Union[str, Entity],
+        class_name: Optional[str] = None,
+        entity: Optional[Entity] = None,
         origin: Optional[Entity] = None) -> base_manager.BaseManager:
-    class_name = param.class_.name if isinstance(param, Entity) else param
+    class_name = entity.class_.name if not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in class_name.split('_'))
     return getattr(entity_manager, f'{manager_name}Manager')(
-        class_=g.classes[class_name],
-        entity=param if isinstance(param, Entity) else None,
+        class_=g.classes[
+            'type' if class_name.startswith('hierarchy') else class_name],
+        entity=entity,
         origin=origin)
 
 
@@ -145,21 +145,6 @@ def additional_fields(
             'page': StringField()  # Needed to link file to ref. after insert
             if not entity and origin and origin.class_.view == 'reference'
             else None},
-        'hierarchy': {
-            'multiple': BooleanField(
-                _('multiple'),
-                description=_('tooltip hierarchy multiple'))
-            if code == 'custom' or (
-                    entity
-                    and isinstance(entity, Type)
-                    and entity.category != 'value') else None,
-            'classes': SelectMultipleField(
-                _('classes'),
-                render_kw={'disabled': True},
-                description=_('tooltip hierarchy forms'),
-                choices=[],
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))},
         'involvement': {
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,

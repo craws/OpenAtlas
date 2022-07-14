@@ -2,10 +2,10 @@ from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, StringField, TextAreaField
+from wtforms import BooleanField, HiddenField, StringField, TextAreaField
 
 from openatlas.forms.base_manager import (
-    ActorBaseManager, BaseManager, EventBaseManager)
+    ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -92,6 +92,15 @@ class TypeManager(BaseManager):
             self.data['links']['insert'].append({
                 'property': 'P127',
                 'range': new_super})
+
+
+class HierarchyCustomManager(HierarchyBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        return dict(super().additional_fields(), **{
+            'multiple': BooleanField(
+                _('multiple'),
+                description=_('tooltip hierarchy multiple'))})
 
 
 class ArtifactManager(BaseManager):
