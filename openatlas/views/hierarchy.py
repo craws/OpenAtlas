@@ -8,7 +8,6 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_entity_form
-from openatlas.forms.util import process_form_data
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
@@ -27,16 +26,17 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
             return render_template('display_form.html', form=manager.form)
         try:
             Transaction.begin()
-            type_ = Entity.insert('type', sanitize(manager.form.name.data))
+            manager.entity = Entity.insert('type', manager.form.name.data)
             Type.insert_hierarchy(
-                type_,  # type: ignore
+                manager.entity,  # type: ignore
                 category,
                 manager.form.classes.data,
                 bool(
                     category == 'value' or
                     (hasattr(manager.form, 'multiple')
                      and manager.form.multiple.data)))
-            type_.update(process_form_data(manager.form, type_))
+            manager.process_form_data()
+            manager.entity.update(manager.data, new=True)
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -82,14 +82,15 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             try:
                 Type.update_hierarchy(
                     hierarchy,
-                    sanitize(manager.form.name.data),
+                    sanitize(manager.form.name.data, 'text'),
                     manager.form.classes.data,
                     multiple=(
                         hierarchy.category == 'value'
                         or (hasattr(manager.form, 'multiple')
                             and manager.form.multiple.data)
                         or has_multiple_links))
-                hierarchy.update(process_form_data(manager.form, hierarchy))
+                manager.process_form_data()
+                manager.entity.update(manager.data)
                 Transaction.commit()
             except Exception as e:  # pragma: no cover
                 Transaction.rollback()

@@ -103,6 +103,10 @@ class HierarchyCustomManager(HierarchyBaseManager):
                 description=_('tooltip hierarchy multiple'))})
 
 
+class HierarchyValueManager(HierarchyBaseManager):
+    pass
+
+
 class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 

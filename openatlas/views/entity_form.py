@@ -234,17 +234,17 @@ def insert_files(
     return url
 
 
-def save(form_manager: Any) -> Union[str, Response]:
+def save(manager: Any) -> Union[str, Response]:
     Transaction.begin()
-    action = 'update' if form_manager.entity else 'insert'
+    action = 'update' if manager.entity else 'insert'
     try:
-        if not form_manager.entity:
-            form_manager.entity = insert_entity(form_manager)
-        form_manager.process_form_data()
-        form_manager.entity.update(form_manager.data, new=(action == 'insert'))
-        logger.log_user(form_manager.entity.id, action)
+        if not manager.entity:
+            manager.entity = insert_entity(manager)
+        manager.process_form_data()
+        manager.entity.update(manager.data, new=(action == 'insert'))
+        logger.log_user(manager.entity.id, action)
         Transaction.commit()
-        url = get_redirect_url(form_manager)
+        url = get_redirect_url(manager)
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
@@ -252,49 +252,44 @@ def save(form_manager: Any) -> Union[str, Response]:
         Transaction.rollback()
         logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('index', view=g.classes[form_manager.class_.name].view)
-        if action == 'update' and form_manager.entity:
+        url = url_for('index', view=g.classes[manager.class_.name].view)
+        if action == 'update' and manager.entity:
             url = url_for(
                 'update',
-                id_=form_manager.entity.id,
-                origin_id=form_manager.origin.id
-                if form_manager.origin else None)
+                id_=manager.entity.id,
+                origin_id=manager.origin.id if manager.origin else None)
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and form_manager.entity:
+        if action == 'update' and manager.entity:
             url = url_for(
                 'update',
-                id_=form_manager.entity.id,
-                origin_id=form_manager.origin.id
-                if form_manager.origin else None)
+                id_=manager.entity.id,
+                origin_id=manager.origin.id
+                if manager.origin else None)
         else:
-            url = url_for(
-                'index',
-                view=g.classes[form_manager.class_.name].view)
-            if form_manager.class_.name in ['administrative_unit', 'type']:
+            url = url_for('index', view=g.classes[manager.class_.name].view)
+            if manager.class_.name in ['administrative_unit', 'type']:
                 url = url_for('type_index')
     return url
 
 
-def insert_entity(form_manager: Any) -> Union[Entity, ReferenceSystem, Type]:
-    if form_manager.class_.name == 'reference_system':
+def insert_entity(manager: Any) -> Union[Entity, ReferenceSystem, Type]:
+    if manager.class_.name == 'reference_system':
         return ReferenceSystem.insert_system({
-            'name': form_manager.form.name.data,
-            'description': form_manager.form.description.data,
-            'website_url': form_manager.form.website_url.data,
-            'resolver_url': form_manager.form.resolver_url.data})
-    entity = Entity.insert(
-        form_manager.class_.name,
-        form_manager.form.name.data)
-    if form_manager.class_.name == 'artifact' \
-            or g.classes[form_manager.class_.name].view == 'place':
+            'name': manager.form.name.data,
+            'description': manager.form.description.data,
+            'website_url': manager.form.website_url.data,
+            'resolver_url': manager.form.resolver_url.data})
+    entity = Entity.insert(manager.class_.name, manager.form.name.data)
+    if manager.class_.name == 'artifact' \
+            or g.classes[manager.class_.name].view == 'place':
         entity.link(
             'P53',
             Entity.insert(
                 'object_location',
-                f'Location of {form_manager.form.name.data}'))
+                f'Location of {manager.form.name.data}'))
     return entity
 
 

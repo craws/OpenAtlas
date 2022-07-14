@@ -10,7 +10,9 @@ from openatlas.models.type import Type
 from openatlas.util.util import uc_first
 
 
-def add_reference_systems(class_, form_class) -> None:
+def add_reference_systems(class_, form) -> None:
+    if hasattr(form, 'classes'):
+        return  # Skip hierarchies
     precisions = [('', '')] + [
         (str(g.types[id_].id), g.types[id_].name)
         for id_ in Type.get_hierarchy('External reference match').subs]
@@ -20,7 +22,7 @@ def add_reference_systems(class_, form_class) -> None:
         if class_.name not in system.classes:
             continue
         setattr(
-            form_class,
+            form,
             f'reference_system_id_{system.id}',
             StringField(
                 uc_first(system.name),
@@ -30,7 +32,7 @@ def add_reference_systems(class_, form_class) -> None:
                     'autocomplete': 'off',
                     'placeholder': system.placeholder}))
         setattr(
-            form_class,
+            form,
             f'reference_system_precision_{system.id}',
             SelectField(
                 _('precision'),
