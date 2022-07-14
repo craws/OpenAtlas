@@ -74,11 +74,25 @@ class TypeManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         root = self.get_root_type()
-        return {
+        fields = {
             'is_type_form': HiddenField(),
-            str(root.id): TreeField(str(root.id)) if root else None,
-            'name_inverse': StringField(_('inverse'))
-            if root.directional else None}
+            str(root.id): TreeField(str(root.id)) if root else None}
+        if root.directional:
+            fields['name_inverse'] = StringField(_('inverse'))
+        return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
+            name_parts = self.entity.name.split(' (')
+            self.form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
+        if isinstance(self.entity, Type):  # Set super if it isn't the root
+            super_ = g.types[self.entity.root[-1]]
+            root = g.types[self.entity.root[0]]
+            if super_.id != root.id:
+                getattr(self.form, str(root.id)).data = super_.id
 
     def process_form_data(self):
         super().process_form_data()
@@ -92,19 +106,6 @@ class TypeManager(BaseManager):
             self.data['links']['insert'].append({
                 'property': 'P127',
                 'range': new_super})
-
-
-class HierarchyCustomManager(HierarchyBaseManager):
-
-    def additional_fields(self) -> dict[str, Any]:
-        return dict(super().additional_fields(), **{
-            'multiple': BooleanField(
-                _('multiple'),
-                description=_('tooltip hierarchy multiple'))})
-
-
-class HierarchyValueManager(HierarchyBaseManager):
-    pass
 
 
 class ArtifactManager(BaseManager):
@@ -176,6 +177,19 @@ class HumanRemainsManager(BaseManager):
             self.data['links']['insert'].append({
                 'property': 'P52',
                 'range': self.form.actor.data})
+
+
+class HierarchyCustomManager(HierarchyBaseManager):
+
+    def additional_fields(self) -> dict[str, Any]:
+        tooltip = _('tooltip hierarchy multiple')
+        return {
+            **{'multiple': BooleanField(_('multiple'), description=tooltip)},
+            **super().additional_fields()}
+
+
+class HierarchyValueManager(HierarchyBaseManager):
+    pass
 
 
 class MoveManager(EventBaseManager):

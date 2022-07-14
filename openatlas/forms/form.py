@@ -2,7 +2,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 from typing import Any, Optional, Union
 
-from flask import g, render_template, request
+from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -13,9 +13,7 @@ from wtforms.validators import (
 
 from openatlas import app
 from openatlas.forms import base_manager, entity_manager
-from openatlas.forms.field import (
-    TableField, TableMultiField, TreeField)
-from openatlas.forms.populate_org import pre_populate_form
+from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -51,20 +49,18 @@ def get_entity_form(
 
 def get_form(
         class_: str,
-        entity: Optional[Union[Entity, Link, Type]] = None,
-        location: Optional[Entity] = None) -> FlaskForm:
+        entity: Optional[Union[Entity, Link, Type]] = None) -> FlaskForm:
 
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
 
+    # if isinstance(item, ReferenceSystem) and item.system:
+    #    form.name.render_kw['readonly'] = 'readonly'
+
     if class_ == 'note':
         setattr(Form, 'public', BooleanField(_('public'), default=False))
-    if not entity or (request and request.method != 'GET'):
-        form = Form()
-    else:
-        form = pre_populate_form(Form(obj=entity), entity, location)
-    return form
+    return Form()
 
 
 def add_buttons(
