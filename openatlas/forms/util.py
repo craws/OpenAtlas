@@ -99,12 +99,6 @@ def process_form_data(
         data['gis'] = {}
         for shape in ['point', 'line', 'polygon']:
             data['gis'][shape] = getattr(form, f'gis_{shape}s').data
-    elif entity.class_.view == 'reference_system':
-        data['reference_system'] = {
-            'website_url': form.website_url.data,
-            'resolver_url': form.resolver_url.data,
-            'placeholder': form.placeholder.data,
-            'classes': form.classes.data if hasattr(form, 'classes') else None}
     elif entity.class_.view == 'type' and 'classes' not in form:
         type_ = origin if isinstance(origin, Type) else entity
         if isinstance(type_, Type):

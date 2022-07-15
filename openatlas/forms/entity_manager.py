@@ -2,12 +2,16 @@ from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import BooleanField, HiddenField, StringField, TextAreaField
+from wtforms import (
+    BooleanField, HiddenField, SelectMultipleField, StringField, TextAreaField,
+    widgets)
+from wtforms.validators import Optional as OptionalValidator, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.models.link import Link
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
 
@@ -270,6 +274,38 @@ class ProductionManager(EventBaseManager):
         self.data['links']['insert'].append({
             'property': 'P108',
             'range': self.form.artifact.data})
+
+
+class ReferenceSystemManager(BaseManager):
+    fields = ['name', 'description']
+
+    def additional_fields(self) -> dict[str, Any]:
+        precision_id = str(Type.get_hierarchy('External reference match').id)
+        choices = ReferenceSystem.get_class_choices(self.entity)
+        return {
+            'website_url': StringField(
+                _('website URL'),
+                [OptionalValidator(), URL()]),
+            'resolver_url': StringField(
+                _('resolver URL'),
+                [OptionalValidator(), URL()]),
+            'placeholder': StringField(_('example ID')),
+            precision_id: TreeField(precision_id),
+            'classes': SelectMultipleField(
+                _('classes'),
+                render_kw={'disabled': True},
+                choices=choices,
+                option_widget=widgets.CheckboxInput(),
+                widget=widgets.ListWidget(prefix_label=False))
+            if choices else None}
+
+    def process_form_data(self):
+        super().process_form_data()
+        self.data['reference_system'] = {
+            'website_url': self.form.website_url.data,
+            'resolver_url': self.form.resolver_url.data,
+            'placeholder': self.form.placeholder.data,
+            'classes': self.form.classes.data if self.form.classes else None}
 
 
 class SourceManager(BaseManager):

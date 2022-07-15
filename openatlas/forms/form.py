@@ -8,8 +8,7 @@ from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField, HiddenField, MultipleFileField,
     SelectField, SelectMultipleField, StringField, SubmitField, widgets)
-from wtforms.validators import (
-    InputRequired, Optional as OptionalValidator, URL)
+from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.forms import base_manager, entity_manager
@@ -30,7 +29,6 @@ FORMS = {
     'involvement': ['date', 'description', 'continue'],
     'note': ['description'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
-    'reference_system': ['name', 'description'],
     'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
 
 
@@ -54,9 +52,6 @@ def get_form(
     class Form(FlaskForm):
         opened = HiddenField()
         validate = validate
-
-    # if isinstance(item, ReferenceSystem) and item.system:
-    #    form.name.render_kw['readonly'] = 'readonly'
 
     if class_ == 'note':
         setattr(Form, 'public', BooleanField(_('public'), default=False))
@@ -113,17 +108,9 @@ def additional_fields(
         code: Union[str, None],
         entity: Union[Entity, Link, ReferenceSystem, Type, None],
         origin: Union[Entity, Type, None]) -> dict[str, Any]:
-    # Preparations
     involved_with = ''
     if class_ == 'involvement' and not entity and origin:
         involved_with = 'actor' if origin.class_.view == 'event' else 'event'
-
-    precision_id = ''
-    choices = None
-    if class_ == 'reference_system':
-        precision_id = str(Type.get_hierarchy('External reference match').id)
-        choices = ReferenceSystem.get_class_choices(entity)  # type: ignore
-
     fields: dict[str, dict[str, Any]] = {
         'actor_actor_relation': {
             'inverse': BooleanField(_('inverse')),
@@ -144,23 +131,7 @@ def additional_fields(
         'involvement': {
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,
-            'activity': SelectField(_('activity'))},
-        'reference_system': {
-            'website_url':
-                StringField(_('website URL'), [OptionalValidator(), URL()]),
-            'resolver_url':
-                StringField(_('resolver URL'), [OptionalValidator(), URL()]),
-            'placeholder': StringField(_('example ID')),
-            precision_id: TreeField(precision_id),
-            'classes': SelectMultipleField(
-                _('classes'),
-                render_kw={'disabled': True},
-                choices=choices,
-                option_widget=widgets.CheckboxInput(),
-                widget=widgets.ListWidget(prefix_label=False))
-            if choices else None}}
-    if class_ not in fields:
-        return {}
+            'activity': SelectField(_('activity'))}}
     return {k: v for k, v in fields[class_].items() if k and v}
 
 

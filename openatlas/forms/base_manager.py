@@ -55,10 +55,13 @@ class BaseManager:
 
         self.form_class = Form
         if 'name' in self.fields:
+            readonly = bool(
+                isinstance(self.entity, ReferenceSystem)
+                and self.entity.system)
             setattr(Form, 'name', StringField(
                 _('name'),
                 [InputRequired()],
-                render_kw={'autofocus': True}))
+                render_kw={'autofocus': True, 'readonly': readonly}))
         if 'url' in self.fields:
             setattr(Form, 'name', StringField(
                 _('URL'),
