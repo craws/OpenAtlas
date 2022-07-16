@@ -3,10 +3,10 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from wtforms import (
-    BooleanField, HiddenField, SelectMultipleField, StringField, TextAreaField,
-    widgets)
-from wtforms.validators import Optional as OptionalValidator, URL
-
+    BooleanField, HiddenField, MultipleFileField, SelectMultipleField,
+    StringField, TextAreaField, widgets)
+from wtforms.validators import (
+    InputRequired, Optional as OptionalValidator, URL)
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
@@ -73,45 +73,6 @@ class AdministrativeUnitManager(BaseManager):
                 'range': new_super})
 
 
-class TypeManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        root = self.get_root_type()
-        fields = {
-            'is_type_form': HiddenField(),
-            str(root.id): TreeField(str(root.id)) if root else None}
-        if root.directional:
-            fields['name_inverse'] = StringField(_('inverse'))
-        return fields
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
-            name_parts = self.entity.name.split(' (')
-            self.form.name.data = name_parts[0]
-            if len(name_parts) > 1:
-                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
-        if isinstance(self.entity, Type):  # Set super if it isn't the root
-            super_ = g.types[self.entity.root[-1]]
-            root = g.types[self.entity.root[0]]
-            if super_.id != root.id:
-                getattr(self.form, str(root.id)).data = super_.id
-
-    def process_form_data(self):
-        super().process_form_data()
-        type_ = self.origin if isinstance(self.origin, Type) else self.entity
-        root = self.get_root_type()
-        super_id = g.types[type_.root[-1]] if type_.root else type_
-        new_super_id = getattr(self.form, str(root.id)).data
-        new_super = g.types[int(new_super_id)] if new_super_id else root
-        if super_id != new_super.id:
-            self.data['links']['delete'].append('P127')
-            self.data['links']['insert'].append({
-                'property': 'P127',
-                'range': new_super})
-
-
 class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
@@ -149,6 +110,20 @@ class EventManager(EventBaseManager):
 
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
+
+
+class FileManager(BaseManager):
+    fields = ['name', 'description']
+
+    def additional_fields(self) -> dict[str, Any]:
+        fields = {}
+        if not self.entity:
+            fields['file'] = MultipleFileField(_('file'), [InputRequired()])
+        if not self.entity \
+                and self.origin \
+                and self.origin.class_.view == 'reference':
+            fields['page'] = StringField()  # Needed to link file after insert
+        return fields
 
 
 class GroupManager(ActorBaseManager):
@@ -346,3 +321,42 @@ class SourceTranslationManager(BaseManager):
                 'property': 'P73',
                 'range': self.origin,
                 'inverse': True})
+
+
+class TypeManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        root = self.get_root_type()
+        fields = {
+            'is_type_form': HiddenField(),
+            str(root.id): TreeField(str(root.id)) if root else None}
+        if root.directional:
+            fields['name_inverse'] = StringField(_('inverse'))
+        return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if hasattr(self.form, 'name_inverse'):  # e.g. actor relation
+            name_parts = self.entity.name.split(' (')
+            self.form.name.data = name_parts[0]
+            if len(name_parts) > 1:
+                self.form.name_inverse.data = name_parts[1][:-1]  # remove ")"
+        if isinstance(self.entity, Type):  # Set super if it isn't the root
+            super_ = g.types[self.entity.root[-1]]
+            root = g.types[self.entity.root[0]]
+            if super_.id != root.id:
+                getattr(self.form, str(root.id)).data = super_.id
+
+    def process_form_data(self):
+        super().process_form_data()
+        type_ = self.origin if isinstance(self.origin, Type) else self.entity
+        root = self.get_root_type()
+        super_id = g.types[type_.root[-1]] if type_.root else type_
+        new_super_id = getattr(self.form, str(root.id)).data
+        new_super = g.types[int(new_super_id)] if new_super_id else root
+        if super_id != new_super.id:
+            self.data['links']['delete'].append('P127')
+            self.data['links']['insert'].append({
+                'property': 'P127',
+                'range': new_super})

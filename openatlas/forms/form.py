@@ -6,8 +6,8 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    BooleanField, HiddenField, MultipleFileField,
-    SelectField, SelectMultipleField, StringField, SubmitField, widgets)
+    BooleanField, HiddenField, SelectField, SelectMultipleField, StringField,
+    SubmitField, widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -25,7 +25,6 @@ FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
     'feature': ['name', 'date', 'description', 'continue', 'map'],
-    'file': ['name', 'description'],
     'involvement': ['date', 'description', 'continue'],
     'note': ['description'],
     'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
@@ -122,12 +121,6 @@ def additional_fields(
             'actor' if code == 'member' else 'group':
                 TableMultiField(_('actor'), [InputRequired()])
                 if not entity else None},
-        'file': {
-            'file': MultipleFileField(_('file'), [InputRequired()])
-            if not entity else None,
-            'page': StringField()  # Needed to link file to ref. after insert
-            if not entity and origin and origin.class_.view == 'reference'
-            else None},
         'involvement': {
             involved_with: TableMultiField(_(involved_with), [InputRequired()])
             if involved_with else None,
