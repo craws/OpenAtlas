@@ -161,6 +161,11 @@ class HumanRemainsManager(BaseManager):
 
     def process_form_data(self) -> None:
         super().process_form_data()
+        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
+            self.data['links']['insert'].append({
+                'property': 'P46',
+                'range': self.origin,
+                'inverse': True})
         if self.form.actor.data:
             self.data['links']['insert'].append({
                 'property': 'P52',
