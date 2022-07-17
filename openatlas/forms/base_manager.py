@@ -144,6 +144,11 @@ class BaseManager:
         data: dict[str, Any] = {
             'attributes': process_form_dates(self.form),
             'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
+        if 'map' in self.fields:
+            data['links']['delete'].append('P52')
+            data['gis'] = {
+                shape: getattr(self.form, f'gis_{shape}s').data
+                for shape in ['point', 'line', 'polygon']}
         for key, value in self.form.data.items():
             field_type = getattr(self.form, key).type
             if field_type in [

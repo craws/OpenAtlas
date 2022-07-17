@@ -86,10 +86,11 @@ class ArtifactManager(BaseManager):
 
     def process_form_data(self) -> None:
         super().process_form_data()
-        self.data['gis'] = {}
-        for shape in ['point', 'line', 'polygon']:
-            self.data['gis'][shape] = getattr(self.form, f'gis_{shape}s').data
-        self.data['links']['delete'].append('P52')
+        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
+            self.data['links']['insert'].append({
+                'property': 'P46',
+                'range': self.origin,
+                'inverse': True})
         if self.form.actor.data:
             self.data['links']['insert'].append({
                 'property': 'P52',
@@ -110,6 +111,18 @@ class EventManager(EventBaseManager):
 
 class ExternalReferenceManager(BaseManager):
     fields = ['url', 'description', 'continue']
+
+
+class FeatureManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def process_form_data(self):
+        super().process_form_data()
+        if self.origin and self.origin.class_.name == 'place':
+            self.data['links']['insert'].append({
+                'property': 'P46',
+                'range': self.origin,
+                'inverse': True})
 
 
 class FileManager(BaseManager):
@@ -148,10 +161,6 @@ class HumanRemainsManager(BaseManager):
 
     def process_form_data(self) -> None:
         super().process_form_data()
-        self.data['gis'] = {}
-        for shape in ['point', 'line', 'polygon']:
-            self.data['gis'][shape] = getattr(self.form, f'gis_{shape}s').data
-        self.data['links']['delete'].append('P52')
         if self.form.actor.data:
             self.data['links']['insert'].append({
                 'property': 'P52',
@@ -230,6 +239,10 @@ class PersonManager(ActorBaseManager):
             'residence': TableField(_('residence')),
             'begins_in': TableField(_('born in')),
             'ends_in': TableField(_('died in'))}
+
+
+class PlaceManager(BaseManager):
+    fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 
 
 class ProductionManager(EventBaseManager):
@@ -319,6 +332,18 @@ class SourceTranslationManager(BaseManager):
         if self.origin:
             self.data['links']['insert'].append({
                 'property': 'P73',
+                'range': self.origin,
+                'inverse': True})
+
+
+class StratigraphicUnitManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def process_form_data(self):
+        super().process_form_data()
+        if self.origin and self.origin.class_.name == 'feature':
+            self.data['links']['insert'].append({
+                'property': 'P46',
                 'range': self.origin,
                 'inverse': True})
 

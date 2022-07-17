@@ -89,34 +89,6 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         field.data = g.settings[field.name]
 
 
-def process_form_data(
-        form: FlaskForm,
-        entity: Entity,
-        origin: Optional[Entity] = None) -> dict[str, Any]:
-    data: dict[str, Any] = {
-        'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
-    if entity.class_.view in ['place']:
-        data['gis'] = {}
-        for shape in ['point', 'line', 'polygon']:
-            data['gis'][shape] = getattr(form, f'gis_{shape}s').data
-    elif entity.class_.view == 'type' and 'classes' not in form:
-        type_ = origin if isinstance(origin, Type) else entity
-        if isinstance(type_, Type):
-            root = g.types[type_.root[0]] if type_.root else type_
-            super_id = g.types[type_.root[-1]] if type_.root else type_
-            new_super_id = getattr(form, str(root.id)).data
-            new_super = g.types[int(new_super_id)] if new_super_id else root
-            code = 'P127' if entity.class_.name == 'type' else 'P89'
-            if super_id != new_super.id:
-                data['links']['delete'].add(code)
-                data['links']['insert'].append({
-                    'property': code,
-                    'range': new_super})
-    if origin and entity.class_.name not in ('administrative_unit', 'type'):
-        data = process_origin_data(entity, origin, form, data)
-    return data
-
-
 def process_origin_data(
         entity: Entity,
         origin: Entity,
@@ -142,12 +114,6 @@ def process_origin_data(
             'property': 'P67',
             'range': origin,
             'return_link_id': entity.class_.view == 'reference'})
-    elif origin.class_.view in ['place', 'feature', 'stratigraphic_unit']:
-        if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-            data['links']['insert'].append({
-                'property': 'P46',
-                'range': origin,
-                'inverse': True})
     elif origin.class_.view in ['source', 'file'] \
             and entity.class_.name != 'source_translation':
         data['links']['insert'].append({

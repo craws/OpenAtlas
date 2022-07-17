@@ -24,11 +24,8 @@ from openatlas.util.util import get_base_table_data, uc_first
 FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
-    'feature': ['name', 'date', 'description', 'continue', 'map'],
     'involvement': ['date', 'description', 'continue'],
-    'note': ['description'],
-    'place': ['name', 'alias', 'date', 'description', 'continue', 'map'],
-    'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map']}
+    'note': ['description']}
 
 
 def get_entity_form(
