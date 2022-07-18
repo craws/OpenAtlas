@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms import base_manager
 from openatlas.forms.form import get_entity_form
-from openatlas.forms.util import populate_insert_form, process_form_data
+from openatlas.forms.util import populate_insert_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -35,7 +35,7 @@ def insert(
     manager = get_entity_form(class_, origin=origin)
     if manager.form.validate_on_submit():
         if class_ == 'file':
-            return redirect(insert_files(manager.form, origin))
+            return redirect(insert_files(manager))
         return redirect(save(manager))
     populate_insert_form(manager.form, class_, origin)
     place_info = get_place_info_for_insert(g.classes[class_].view, origin)
@@ -197,32 +197,28 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
         'location': entity.get_linked_entity_safe('P53', types=True)}
 
 
-def insert_files(
-        form: FlaskForm,
-        origin: Optional[Entity] = None) -> Union[str, Response]:
-    # Todo: adapt new forms
+def insert_files(manager: Any) -> Union[str, Response]:
     filenames = []
-    url = url_for('index', view=g.classes['file'].view)
     try:
         Transaction.begin()
-        entity_name = form.name.data.strip()
-        for count, file in enumerate(form.file.data):
-            entity = Entity.insert('file', file.filename)
-            url = get_redirect_url(form)
+        entity_name = manager.form.name.data.strip()
+        for count, file in enumerate(manager.form.file.data):
+            manager.entity = Entity.insert('file', file.filename)
             # Add 'a' to prevent emtpy temporary filename, has no side effects
             filename = secure_filename(f'a{file.filename}')
-            new_name = f"{entity.id}.{filename.rsplit('.', 1)[1].lower()}"
-            file.save(str(app.config['UPLOAD_DIR'] / new_name))
-            filenames.append(new_name)
+            name = f"{manager.entity.id}.{filename.rsplit('.', 1)[1].lower()}"
+            file.save(str(app.config['UPLOAD_DIR'] / name))
+            filenames.append(name)
             if g.settings['image_processing']:
-                resize_image(new_name)
-            if len(form.file.data) > 1:
-                form.name.data = f'{entity_name}_{str(count + 1).zfill(2)}'
-                if origin:
-                    url = f"{url_for('view', id_=origin.id)}#tab-file"
-            entity.update(process_form_data(form, entity, origin))
-            logger.log_user(entity.id, 'insert')
+                resize_image(name)
+            if len(manager.form.file.data) > 1:
+                manager.form.name.data = \
+                    f'{entity_name}_{str(count + 1).zfill(2)}'
+            manager.process_form_data()
+            manager.entity.update(manager.data, new=True)
+            logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
+        url = get_redirect_url(manager)
         flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
