@@ -24,8 +24,7 @@ from openatlas.util.util import get_base_table_data, uc_first
 FORMS = {
     'actor_function': ['date', 'description', 'continue'],
     'actor_actor_relation': ['date', 'description', 'continue'],
-    'involvement': ['date', 'description', 'continue'],
-    'note': ['description']}
+    'involvement': ['date', 'description', 'continue']}
 
 
 def get_entity_form(
@@ -49,8 +48,6 @@ def get_form(
         opened = HiddenField()
         validate = validate
 
-    if class_ == 'note':
-        setattr(Form, 'public', BooleanField(_('public'), default=False))
     return Form()
 
 
