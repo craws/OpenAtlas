@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
-from openatlas.forms.form import get_form, get_table_form
+from openatlas.forms.form import get_entity_form, get_form, get_table_form
 from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -88,19 +88,28 @@ def relation_update(
         origin: Entity) -> Union[str, Response]:
     origin = range_ if origin.id == range_.id else domain
     related = range_ if origin.id == domain.id else domain
-    form = get_form('actor_actor_relation', link_)
-    if form.validate_on_submit():
+    manager = get_entity_form(
+        'actor_actor_relation',
+        origin=origin,
+        link_=link_)
+    if manager.form.validate_on_submit():
         Transaction.begin()
         try:
             link_.delete()
-            if form.inverse.data:
+            if manager.form.inverse.data:
                 link_ = Link.get_by_id(
-                    related.link('OA7', origin, form.description.data)[0])
+                    related.link(
+                        'OA7',
+                        origin,
+                        manager.form.description.data)[0])
             else:
                 link_ = Link.get_by_id(
-                    origin.link('OA7', related, form.description.data)[0])
+                    origin.link(
+                        'OA7',
+                        related,
+                        manager.form.description.data)[0])
             # link_.set_dates(process_form_dates(form))
-            link_.type = get_link_type(form)
+            link_.type = get_link_type(manager.form)
             link_.update()
             Transaction.commit()
             flash(_('info update'), 'info')
@@ -110,11 +119,12 @@ def relation_update(
             flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('view', id_=origin.id)}#tab-relation")
+    manager.populate_update()
     if origin.id == range_.id:
-        form.inverse.data = True
+        manager.form.inverse.data = True
     return render_template(
         'display_form.html',
-        form=form,
+        form=manager.form,
         title=_('relation'),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],

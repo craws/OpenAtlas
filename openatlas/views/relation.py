@@ -8,7 +8,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import get_form
+from openatlas.forms.form import get_entity_form
+from openatlas.forms.process import process_form_dates
 from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -19,20 +20,27 @@ from openatlas.util.util import required_group, uc_first
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = get_form('actor_actor_relation')
-    form.relation_origin_id.data = origin.id
-    if form.validate_on_submit():
+    manager = get_entity_form('actor_actor_relation', origin=origin)
+    manager.form.relation_origin_id.data = origin.id
+    if manager.form.validate_on_submit():
         Transaction.begin()
         try:
-            for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
-                if form.inverse.data:
+            for actor in Entity.get_by_ids(
+                    ast.literal_eval(manager.form.actor.data)):
+                if manager.form.inverse.data:
                     link_ = Link.get_by_id(
-                        actor.link('OA7', origin, form.description.data)[0])
+                        actor.link(
+                            'OA7',
+                            origin,
+                            manager.form.description.data)[0])
                 else:
                     link_ = Link.get_by_id(
-                        origin.link('OA7', actor, form.description.data)[0])
-                # link_.set_dates(process_form_dates(form))
-                link_.type = get_link_type(form)
+                        origin.link(
+                            'OA7',
+                            actor,
+                            manager.form.description.data)[0])
+                link_.set_dates(process_form_dates(manager.form))
+                link_.type = get_link_type(manager.form)
                 link_.update()
             Transaction.commit()
             flash(_('entity created'), 'info')
@@ -40,12 +48,13 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
+        if hasattr(manager.form, 'continue_') \
+                and manager.form.continue_.data == 'yes':
             return redirect(url_for('relation_insert', origin_id=origin_id))
         return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     return render_template(
         'display_form.html',
-        form=form,
+        form=manager.form,
         title=_('relation'),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],

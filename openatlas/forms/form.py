@@ -23,21 +23,22 @@ from openatlas.util.util import get_base_table_data, uc_first
 
 FORMS = {
     'actor_function': ['date', 'description', 'continue'],
-    'actor_actor_relation': ['date', 'description', 'continue'],
     'involvement': ['date', 'description', 'continue']}
 
 
 def get_entity_form(
         class_name: Optional[str] = None,
         entity: Optional[Entity] = None,
-        origin: Optional[Entity] = None) -> base_manager.BaseManager:
+        origin: Optional[Entity] = None,
+        link_: Optional[Link] = None) -> base_manager.BaseManager:
     class_name = entity.class_.name if not class_name else class_name
     manager_name = ''.join(i.capitalize() for i in class_name.split('_'))
     return getattr(entity_manager, f'{manager_name}Manager')(
         class_=g.classes[
             'type' if class_name.startswith('hierarchy') else class_name],
         entity=entity,
-        origin=origin)
+        origin=origin,
+        link_=link_)
 
 
 def get_form(
@@ -105,11 +106,6 @@ def additional_fields(
     if class_ == 'involvement' and not entity and origin:
         involved_with = 'actor' if origin.class_.view == 'event' else 'event'
     fields: dict[str, dict[str, Any]] = {
-        'actor_actor_relation': {
-            'inverse': BooleanField(_('inverse')),
-            'actor': TableMultiField(_('actor'), [InputRequired()])
-            if not entity else '',
-            'relation_origin_id': HiddenField() if not entity else ''},
         'actor_function': {
             'member_origin_id': HiddenField() if not entity else None,
             'actor' if code == 'member' else 'group':

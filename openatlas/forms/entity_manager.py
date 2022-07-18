@@ -38,6 +38,17 @@ class ActivityManager(EventBaseManager):
     pass
 
 
+class ActorActorRelationManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'inverse': BooleanField(_('inverse')),
+            'actor': TableMultiField(_('actor'), [InputRequired()])
+            if not self.entity else '',
+            'relation_origin_id': HiddenField() if not self.entity else ''}
+
+
 class AdministrativeUnitManager(BaseManager):
     fields = ['name', 'description', 'continue']
 

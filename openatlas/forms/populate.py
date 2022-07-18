@@ -6,7 +6,8 @@ from openatlas.util.util import format_date_part
 
 
 def populate_types(manager) -> None:
-    types: dict[Any, Any] = manager.entity.types
+    types: dict[Any, Any] = manager.link_.types \
+        if manager.link_ else manager.entity.types
     # if manager.location:
     #    types |= manager.location.types  # Admin. units and historical places
     type_data: dict[int, list[int]] = {}
@@ -23,6 +24,8 @@ def populate_types(manager) -> None:
 
 
 def populate_reference_systems(manager) -> None:
+    if not manager.entity:
+        return  # It's a link update which have no reference systems
     system_links = {
         # Can't use isinstance for class check here
         link_.domain.id: link_ for link_ in manager.entity.get_links('P67', True)
@@ -40,61 +43,49 @@ def populate_reference_systems(manager) -> None:
 
 
 def populate_dates(manager) -> None:
-    if manager.entity.begin_from:
-        manager.form.begin_year_from.data = \
-            format_date_part(manager.entity.begin_from, 'year')
-        manager.form.begin_month_from.data = \
-            format_date_part(manager.entity.begin_from, 'month')
-        manager.form.begin_day_from.data = \
-            format_date_part(manager.entity.begin_from, 'day')
-        if 'begin_hour_from' in manager.form:
-            manager.form.begin_hour_from.data = \
-                format_date_part(manager.entity.begin_from, 'hour')
-            manager.form.begin_minute_from.data = \
-                format_date_part(manager.entity.begin_from, 'minute')
-            manager.form.begin_second_from.data = \
-                format_date_part(manager.entity.begin_from, 'second')
-        manager.form.begin_comment.data = manager.entity.begin_comment
-        if manager.entity.begin_to:
-            manager.form.begin_year_to.data = \
-                format_date_part(manager.entity.begin_to, 'year')
-            manager.form.begin_month_to.data = \
-                format_date_part(manager.entity.begin_to, 'month')
-            manager.form.begin_day_to.data = \
-                format_date_part(manager.entity.begin_to, 'day')
-            if 'begin_hour_from' in manager.form:
-                manager.form.begin_hour_to.data = \
-                    format_date_part(manager.entity.begin_to, 'hour')
-                manager.form.begin_minute_to.data = \
-                    format_date_part(manager.entity.begin_to, 'minute')
-                manager.form.begin_second_to.data = \
-                    format_date_part(manager.entity.begin_to, 'second')
-    if manager.entity.end_from:
-        manager.form.end_year_from.data = \
-            format_date_part(manager.entity.end_from, 'year')
-        manager.form.end_month_from.data = \
-            format_date_part(manager.entity.end_from, 'month')
-        manager.form.end_day_from.data = \
-            format_date_part(manager.entity.end_from, 'day')
-        if 'begin_hour_from' in manager.form:
-            manager.form.end_hour_from.data = \
-                format_date_part(manager.entity.end_from, 'hour')
-            manager.form.end_minute_from.data = \
-                format_date_part(manager.entity.end_from, 'minute')
-            manager.form.end_second_from.data = \
-                format_date_part(manager.entity.end_from, 'second')
-        manager.form.end_comment.data = manager.entity.end_comment
-        if manager.entity.end_to:
-            manager.form.end_year_to.data = \
-                format_date_part(manager.entity.end_to, 'year')
-            manager.form.end_month_to.data = \
-                format_date_part(manager.entity.end_to, 'month')
-            manager.form.end_day_to.data = \
-                format_date_part(manager.entity.end_to, 'day')
-            if 'begin_hour_from' in manager.form:
-                manager.form.end_hour_to.data = \
-                    format_date_part(manager.entity.end_to, 'hour')
-                manager.form.end_minute_to.data = \
-                    format_date_part(manager.entity.end_to, 'minute')
-                manager.form.end_second_to.data = \
-                    format_date_part(manager.entity.end_to, 'second')
+    form = manager.form
+    item = manager.link_ if manager.link_ else manager.entity
+    if item.begin_from:
+        form.begin_year_from.data = format_date_part(item.begin_from, 'year')
+        form.begin_month_from.data = format_date_part(item.begin_from, 'month')
+        form.begin_day_from.data = format_date_part(item.begin_from, 'day')
+        if 'begin_hour_from' in form:
+            form.begin_hour_from.data = \
+                format_date_part(item.begin_from, 'hour')
+            form.begin_minute_from.data = \
+                format_date_part(item.begin_from, 'minute')
+            form.begin_second_from.data = \
+                format_date_part(item.begin_from, 'second')
+        form.begin_comment.data = item.begin_comment
+        if item.begin_to:
+            form.begin_year_to.data = format_date_part(item.begin_to, 'year')
+            form.begin_month_to.data = format_date_part(item.begin_to, 'month')
+            form.begin_day_to.data = format_date_part(item.begin_to, 'day')
+            if 'begin_hour_from' in form:
+                form.begin_hour_to.data = \
+                    format_date_part(item.begin_to, 'hour')
+                form.begin_minute_to.data = \
+                    format_date_part(item.begin_to, 'minute')
+                form.begin_second_to.data = \
+                    format_date_part(item.begin_to, 'second')
+    if item.end_from:
+        form.end_year_from.data = format_date_part(item.end_from, 'year')
+        form.end_month_from.data = format_date_part(item.end_from, 'month')
+        form.end_day_from.data = format_date_part(item.end_from, 'day')
+        if 'begin_hour_from' in form:
+            form.end_hour_from.data = format_date_part(item.end_from, 'hour')
+            form.end_minute_from.data = \
+                format_date_part(item.end_from, 'minute')
+            form.end_second_from.data = \
+                format_date_part(item.end_from, 'second')
+        form.end_comment.data = item.end_comment
+        if item.end_to:
+            form.end_year_to.data = format_date_part(item.end_to, 'year')
+            form.end_month_to.data = format_date_part(item.end_to, 'month')
+            form.end_day_to.data = format_date_part(item.end_to, 'day')
+            if 'begin_hour_from' in form:
+                form.end_hour_to.data = format_date_part(item.end_to, 'hour')
+                form.end_minute_to.data = \
+                    format_date_part(item.end_to, 'minute')
+                form.end_second_to.data = \
+                    format_date_part(item.end_to, 'second')

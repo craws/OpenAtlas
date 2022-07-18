@@ -36,17 +36,20 @@ class BaseManager:
     form: FlaskForm = None
     entity: Optional[Entity] = None
     origin: Optional[Entity] = None
+    link_: Optional[Link] = None
     data: dict[str, Any] = {}
 
     def __init__(
             self,
             class_: OpenatlasClass,
             entity: Union[Entity, None],
-            origin: Union[Entity, None]):
+            origin: Union[Entity, None],
+            link_: Union[Link, None]):
 
         self.class_ = class_
         self.entity = entity
         self.origin = origin
+        self.link_ = link_
 
         class Form(FlaskForm):
             opened = HiddenField()
@@ -109,8 +112,8 @@ class BaseManager:
             SubmitField(_('save') if self.entity else _('insert')))
         if not self.entity and 'continue' in self.fields and (
                 self.class_.name in [
-                    'involvement', 'artifact', 'human_remains',
-                    'source_translation', 'type']
+                    'actor_actor_relation', 'artifact', 'human_remains',
+                    'involvement', 'source_translation', 'type']
                 or not self.origin):
             setattr(
                 self.form_class,
