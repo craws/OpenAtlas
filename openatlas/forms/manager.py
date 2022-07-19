@@ -3,7 +3,8 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from wtforms import (
-    BooleanField, HiddenField, MultipleFileField, SelectMultipleField,
+    BooleanField, HiddenField, MultipleFileField, SelectField,
+    SelectMultipleField,
     StringField, TextAreaField, widgets)
 from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
@@ -42,11 +43,11 @@ class ActorActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
-        return {
-            'inverse': BooleanField(_('inverse')),
-            'actor': TableMultiField(_('actor'), [InputRequired()])
-            if not self.entity else '',
-            'relation_origin_id': HiddenField() if not self.entity else ''}
+        fields = {'inverse': BooleanField(_('inverse'))}
+        if not self.link_:
+            fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
+            fields['relation_origin_id']: HiddenField()
+        return fields
 
 
 class AdministrativeUnitManager(BaseManager):
@@ -194,6 +195,17 @@ class HierarchyCustomManager(HierarchyBaseManager):
 
 class HierarchyValueManager(HierarchyBaseManager):
     pass
+
+
+class InvolvementManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        fields = {'activity': SelectField(_('activity'))}
+        if not self.entity and not self.link_ and self.origin:
+            name = 'actor' if self.origin.class_.view == 'event' else 'event'
+            fields[name] = TableMultiField(_(name), [InputRequired()])
+        return fields
 
 
 class MoveManager(EventBaseManager):

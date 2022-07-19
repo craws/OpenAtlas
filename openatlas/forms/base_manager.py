@@ -94,7 +94,12 @@ class BaseManager:
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.add_buttons()
-        self.form = Form(obj=self.entity) if self.entity else Form()
+        if self.link_:
+            self.form = Form(obj=self.link_)
+        elif self.entity:
+            self.form = Form(obj=self.entity)
+        else:
+            self.form = Form()
         self.customize_labels()
 
     def customize_labels(self) -> None:
@@ -109,11 +114,15 @@ class BaseManager:
         setattr(
             self.form_class,
             'save',
-            SubmitField(_('save') if self.entity else _('insert')))
-        if not self.entity and 'continue' in self.fields and (
-                self.class_.name in [
-                    'actor_actor_relation', 'artifact', 'human_remains',
-                    'involvement', 'source_translation', 'type']
+            SubmitField(
+                _('save') if self.entity or self.link_ else _('insert')))
+        if not self.entity \
+                and not self.link_ \
+                and 'continue' in self.fields \
+                and (
+                    self.class_.name in [
+                        'actor_actor_relation', 'artifact', 'human_remains',
+                        'involvement', 'source_translation', 'type']
                 or not self.origin):
             setattr(
                 self.form_class,

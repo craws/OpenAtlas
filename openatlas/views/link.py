@@ -12,7 +12,8 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
-from openatlas.forms.form import get_entity_form, get_form, get_table_form
+from openatlas.forms.form import get_entity_form, get_table_form
+from openatlas.forms.process import process_form_dates
 from openatlas.forms.util import get_link_type
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -81,6 +82,52 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     abort(403)  # pragma: no cover
 
 
+def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
+    manager = get_entity_form('involvement', origin=origin, link_=link_)
+    manager.form.activity.choices = [('P11', g.properties['P11'].name)]
+    event = Entity.get_by_id(link_.domain.id)
+    actor = Entity.get_by_id(link_.range.id)
+    origin = event if origin.id == event.id else actor
+    if event.class_.name in ['acquisition', 'activity']:
+        manager.form.activity.choices.append(('P14', g.properties['P14'].name))
+        if event.class_.name == 'acquisition':
+            manager.form.activity.choices.append(
+                ('P22', g.properties['P22'].name))
+            manager.form.activity.choices.append(
+                ('P23', g.properties['P23'].name))
+    if manager.form.validate_on_submit():
+        Transaction.begin()
+        try:
+            link_.delete()
+            link_ = Link.get_by_id(
+                event.link(
+                    manager.form.activity.data,
+                    actor,
+                    manager.form.description.data)[0])
+            link_.set_dates(process_form_dates(manager.form))
+            link_.type = get_link_type(manager.form)
+            link_.update()
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
+    manager.populate_update()
+    manager.form.activity.data = link_.property.code
+    return render_template(
+        'display_form.html',
+        origin=origin,
+        form=manager.form,
+        crumbs=[
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            origin,
+            event if origin.id != event.id else actor,
+            _('edit')])
+
+
 def relation_update(
         link_: Link,
         domain: Entity,
@@ -108,7 +155,7 @@ def relation_update(
                         'OA7',
                         related,
                         manager.form.description.data)[0])
-            # link_.set_dates(process_form_dates(form))
+            link_.set_dates(process_form_dates(manager.form))
             link_.type = get_link_type(manager.form)
             link_.update()
             Transaction.commit()
@@ -157,49 +204,4 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
             origin,
             link_.domain if link_.domain.id != origin.id else
             link_.range,
-            _('edit')])
-
-
-def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
-    form = get_form('involvement', link_)
-    form.activity.choices = [('P11', g.properties['P11'].name)]
-    event = Entity.get_by_id(link_.domain.id)
-    actor = Entity.get_by_id(link_.range.id)
-    origin = event if origin.id == event.id else actor
-    if event.class_.name in ['acquisition', 'activity']:
-        form.activity.choices.append(('P14', g.properties['P14'].name))
-        if event.class_.name == 'acquisition':
-            form.activity.choices.append(('P22', g.properties['P22'].name))
-            form.activity.choices.append(('P23', g.properties['P23'].name))
-    if form.validate_on_submit():
-        Transaction.begin()
-        try:
-            link_.delete()
-            link_ = Link.get_by_id(
-                event.link(
-                    form.activity.data,
-                    actor,
-                    form.description.data)[0])
-            # link_.set_dates(process_form_dates(form))
-            link_.type = get_link_type(form)
-            link_.update()
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('view', id_=origin.id)}"
-            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
-    form.save.label.text = _('save')
-    form.activity.data = link_.property.code
-    form.description.data = link_.description
-    return render_template(
-        'display_form.html',
-        origin=origin,
-        form=form,
-        crumbs=[
-            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
-            origin,
-            event if origin.id != event.id else actor,
             _('edit')])
