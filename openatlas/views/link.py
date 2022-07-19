@@ -84,17 +84,9 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 
 def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
     manager = get_entity_form('involvement', origin=origin, link_=link_)
-    manager.form.activity.choices = [('P11', g.properties['P11'].name)]
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)
     origin = event if origin.id == event.id else actor
-    if event.class_.name in ['acquisition', 'activity']:
-        manager.form.activity.choices.append(('P14', g.properties['P14'].name))
-        if event.class_.name == 'acquisition':
-            manager.form.activity.choices.append(
-                ('P22', g.properties['P22'].name))
-            manager.form.activity.choices.append(
-                ('P23', g.properties['P23'].name))
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -116,7 +108,6 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
             f"{url_for('view', id_=origin.id)}"
             f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
     manager.populate_update()
-    manager.form.activity.data = link_.property.code
     return render_template(
         'display_form.html',
         origin=origin,
@@ -164,11 +155,8 @@ def relation_update(
             Transaction.rollback()
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('view', id_=origin.id)}#tab-relation")
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     manager.populate_update()
-    if origin.id == range_.id:
-        manager.form.inverse.data = True
     return render_template(
         'display_form.html',
         form=manager.form,

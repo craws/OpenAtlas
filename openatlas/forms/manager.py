@@ -11,6 +11,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
@@ -46,8 +47,13 @@ class ActorActorRelationManager(BaseManager):
         fields = {'inverse': BooleanField(_('inverse'))}
         if not self.link_:
             fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
-            fields['relation_origin_id']: HiddenField()
+            fields['relation_origin_id'] = HiddenField()
         return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if self.origin.id == self.link_.range.id:
+            self.form.inverse.data = True
 
 
 class AdministrativeUnitManager(BaseManager):
@@ -201,11 +207,22 @@ class InvolvementManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
-        fields = {'activity': SelectField(_('activity'))}
+        choices = [('P11', g.properties['P11'].name)]
+        event = Entity.get_by_id(self.origin.id)
+        if event.class_.name in ['acquisition', 'activity']:
+            choices.append(('P14', g.properties['P14'].name))
+            if event.class_.name == 'acquisition':
+                choices.append(('P22', g.properties['P22'].name))
+                choices.append(('P23', g.properties['P23'].name))
+        fields = {'activity': SelectField(_('activity'), choices=choices)}
         if not self.entity and not self.link_ and self.origin:
             name = 'actor' if self.origin.class_.view == 'event' else 'event'
             fields[name] = TableMultiField(_(name), [InputRequired()])
         return fields
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        self.form.activity.data = self.link_.property.code
 
 
 class MoveManager(EventBaseManager):

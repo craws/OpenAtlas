@@ -1,7 +1,7 @@
 import ast
 from typing import Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -67,17 +67,6 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
 def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     manager = get_entity_form('involvement', origin=origin)
-    manager.form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
-    if origin.class_.name in ['acquisition', 'activity', 'production']:
-        manager.form.activity.choices.append(
-            ('P14', g.properties['P14'].name_inverse))
-        if origin.class_.name == 'acquisition':
-            manager.form.activity.choices.append((
-                'P22',
-                g.properties['P22'].name_inverse))
-            manager.form.activity.choices.append((
-                'P23',
-                g.properties['P23'].name_inverse))
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
