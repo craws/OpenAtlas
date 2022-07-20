@@ -4,8 +4,7 @@ from flask import g
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, MultipleFileField, SelectField,
-    SelectMultipleField,
-    StringField, TextAreaField, widgets)
+    SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
 from openatlas.forms.base_manager import (
@@ -13,6 +12,7 @@ from openatlas.forms.base_manager import (
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 
@@ -153,6 +153,16 @@ class FeatureManager(BaseManager):
                 'property': 'P46',
                 'range': self.origin,
                 'inverse': True})
+
+    def add_buttons(self) -> None:
+        super().add_buttons()
+        if not self.entity:
+            setattr(
+                self.form_class,
+                'insert_continue_sub',
+                SubmitField(
+                    f"{uc_first(_('insert and add'))} "
+                    f"{_('stratigraphic unit')}"))
 
 
 class FileManager(BaseManager):
@@ -301,6 +311,14 @@ class PersonManager(ActorBaseManager):
 class PlaceManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue', 'map']
 
+    def add_buttons(self) -> None:
+        super().add_buttons()
+        if not self.entity:
+            setattr(
+                self.form_class,
+                'insert_continue_sub',
+                SubmitField(f"{uc_first(_('insert and add'))} {_('feature')}"))
+
 
 class ProductionManager(EventBaseManager):
 
@@ -403,6 +421,20 @@ class StratigraphicUnitManager(BaseManager):
                 'property': 'P46',
                 'range': self.origin,
                 'inverse': True})
+
+    def add_buttons(self) -> None:
+        super().add_buttons()
+        if not self.entity:
+            setattr(
+                self.form_class,
+                'insert_continue_sub',
+                SubmitField(
+                    f"{uc_first(_('insert and add'))} {_('artifact')}"))
+            setattr(
+                self.form_class,
+                'insert_continue_human_remains',
+                SubmitField(
+                    f"{uc_first(_('insert and add'))} {_('human remains')}"))
 
 
 class TypeManager(BaseManager):

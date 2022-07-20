@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Optional, Union
+from typing import Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -32,51 +32,6 @@ def get_entity_form(
         entity=entity,
         origin=origin,
         link_=link_)
-
-
-def add_buttons(
-        form: Any,
-        name: str,
-        entity: Union[Entity, Type, Link, None],
-        origin: Optional[Entity] = None) -> FlaskForm:
-    if entity:
-        return form
-    insert_add = uc_first(_('insert and add')) + ' '
-    if name == 'place':
-        setattr(
-            form,
-            'insert_and_continue',
-            SubmitField(uc_first(_('insert and continue'))))
-        setattr(form, 'continue_', HiddenField())
-        setattr(
-            form,
-            'insert_continue_sub',
-            SubmitField(insert_add + _('feature')))
-    elif name == 'feature' and origin and origin.class_.name == 'place':
-        setattr(
-            form,
-            'insert_and_continue',
-            SubmitField(uc_first(_('insert and continue'))))
-        setattr(form, 'continue_', HiddenField())
-        setattr(
-            form,
-            'insert_continue_sub',
-            SubmitField(insert_add + _('stratigraphic unit')))
-    elif name == 'stratigraphic_unit':
-        setattr(
-            form,
-            'insert_and_continue',
-            SubmitField(uc_first(_('insert and continue'))))
-        setattr(form, 'continue_', HiddenField())
-        setattr(
-            form,
-            'insert_continue_sub',
-            SubmitField(insert_add + _('artifact')))
-        setattr(
-            form,
-            'insert_continue_human_remains',
-            SubmitField(insert_add + _('human remains')))
-    return form
 
 
 def get_add_reference_form(class_: str) -> FlaskForm:

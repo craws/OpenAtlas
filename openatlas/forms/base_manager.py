@@ -116,14 +116,7 @@ class BaseManager:
             'save',
             SubmitField(
                 _('save') if self.entity or self.link_ else _('insert')))
-        if not self.entity \
-                and not self.link_ \
-                and 'continue' in self.fields \
-                and (
-                    self.class_.name in [
-                        'actor_actor_relation', 'artifact', 'human_remains',
-                        'involvement', 'source_translation', 'type']
-                or not self.origin):
+        if not self.entity and not self.link_ and 'continue' in self.fields:
             setattr(
                 self.form_class,
                 'insert_and_continue',
