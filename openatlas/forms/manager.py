@@ -36,6 +36,18 @@ class AcquisitionManager(EventBaseManager):
             'range': self.form.given_place.data})
 
 
+class ActorFunctionManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        if self.link_:
+            return {}
+        return {
+            'member_origin_id': HiddenField(),
+            'actor' if self.origin.class_.name == 'member' else 'group':
+                TableMultiField(_('actor'), [InputRequired()])}
+
+
 class ActivityManager(EventBaseManager):
     pass
 

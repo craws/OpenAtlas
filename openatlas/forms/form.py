@@ -6,22 +6,17 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
-    HiddenField, SelectField, SelectMultipleField, StringField, SubmitField,
-    widgets)
+    HiddenField, SelectMultipleField, StringField, SubmitField, widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.forms import base_manager, manager
-from openatlas.forms.field import TableField, TableMultiField, TreeField
-from openatlas.forms.validation import validate
+from openatlas.forms.field import TableField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
-
-FORMS = {'actor_function': ['date', 'description', 'continue']}
 
 
 def get_entity_form(
@@ -37,17 +32,6 @@ def get_entity_form(
         entity=entity,
         origin=origin,
         link_=link_)
-
-
-def get_form(
-        class_: str,
-        entity: Optional[Union[Entity, Link, Type]] = None) -> FlaskForm:
-
-    class Form(FlaskForm):
-        opened = HiddenField()
-        validate = validate
-
-    return Form()
 
 
 def add_buttons(
@@ -93,20 +77,6 @@ def add_buttons(
             'insert_continue_human_remains',
             SubmitField(insert_add + _('human remains')))
     return form
-
-
-def additional_fields(
-        class_: str,
-        code: Union[str, None],
-        entity: Union[Entity, Link, ReferenceSystem, Type, None],
-        origin: Union[Entity, Type, None]) -> dict[str, Any]:
-    fields: dict[str, dict[str, Any]] = {
-        'actor_function': {
-            'member_origin_id': HiddenField() if not entity else None,
-            'actor' if code == 'member' else 'group':
-                TableMultiField(_('actor'), [InputRequired()])
-                if not entity else None}}
-    return {k: v for k, v in fields[class_].items() if k and v}
 
 
 def get_add_reference_form(class_: str) -> FlaskForm:
