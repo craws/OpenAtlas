@@ -215,7 +215,8 @@ def insert_files(manager: Any) -> Union[str, Response]:
                 manager.form.name.data = \
                     f'{entity_name}_{str(count + 1).zfill(2)}'
             manager.process_form_data()
-            manager.entity.update(manager.data, new=True)
+            manager.redirect_link_id = \
+                manager.entity.update(manager.data, new=True)
             logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
         url = get_redirect_url(manager)
@@ -237,7 +238,8 @@ def save(manager: Any) -> Union[str, Response]:
         if not manager.entity:
             manager.entity = insert_entity(manager)
         manager.process_form_data()
-        manager.entity.update(manager.data, new=(action == 'insert'))
+        manager.redirect_link_id = \
+            manager.entity.update(manager.data, new=(action == 'insert'))
         logger.log_user(manager.entity.id, action)
         Transaction.commit()
         url = get_redirect_url(manager)
@@ -290,11 +292,11 @@ def insert_entity(manager: Any) -> Union[Entity, ReferenceSystem, Type]:
 
 
 def get_redirect_url(manager: base_manager.BaseManager) -> str:
-    # if redirect_link_id and origin:
-    #    return url_for(
-    #        'link_update',
-    #        id_=redirect_link_id,
-    #        origin_id=origin.id)
+    if manager.redirect_link_id and manager.origin:
+        return url_for(
+            'link_update',
+            id_=manager.redirect_link_id,
+            origin_id=manager.origin.id)
     url = url_for('view', id_=manager.entity.id)
     if manager.origin and manager.entity.class_.name not in \
             ('administrative_unit', 'source_translation', 'type'):

@@ -37,6 +37,7 @@ class BaseManager:
     entity: Optional[Entity] = None
     origin: Optional[Entity] = None
     link_: Optional[Link] = None
+    redirect_link_id: Optional[int] = None
     data: dict[str, Any] = {}
 
     def __init__(
@@ -154,6 +155,33 @@ class BaseManager:
             data['gis'] = {
                 shape: getattr(self.form, f'gis_{shape}s').data
                 for shape in ['point', 'line', 'polygon']}
+        if self.origin:
+            if self.origin.class_.view == 'reference':
+                if self.entity.class_.name == 'file':
+                    data['links']['insert'].append({
+                        'property': 'P67',
+                        'range': self.origin,
+                        'description': self.form.page.data,
+                        'inverse': True})
+                else:
+                    data['links']['insert'].append({
+                        'property': 'P67',
+                        'range': self.origin,
+                        'return_link_id': True,
+                        'inverse': True})
+            elif self.entity.class_.name == 'file' \
+                    or (self.entity.class_.view in ['reference', 'source']
+                        and self.origin.class_.name != 'file'):
+                data['links']['insert'].append({
+                    'property': 'P67',
+                    'range': self.origin,
+                    'return_link_id': self.entity.class_.view == 'reference'})
+            elif self.origin.class_.view in ['source', 'file'] \
+                    and self.entity.class_.name != 'source_translation':
+                data['links']['insert'].append({
+                    'property': 'P67',
+                    'range': self.origin,
+                    'inverse': True})
         for key, value in self.form.data.items():
             field_type = getattr(self.form, key).type
             if field_type in [
@@ -275,6 +303,19 @@ class ActorBaseManager(BaseManager):
             self.data['links']['insert'].append({
                 'property': 'OA9',
                 'range': end_place.get_linked_entity_safe('P53')})
+        if self.origin:
+            if self.origin.class_.view == 'event':
+                self.data['links']['insert'].append({
+                    'property': 'P11',
+                    'range': self.origin,
+                    'return_link_id': True,
+                    'inverse': True})
+            if self.origin.class_.view == 'actor':
+                self.data['links']['insert'].append({
+                    'property': 'OA7',
+                    'range': self.origin,
+                    'return_link_id': True,
+                    'inverse': True})
 
 
 class EventBaseManager(BaseManager):
@@ -320,6 +361,11 @@ class EventBaseManager(BaseManager):
                     'range': Link.get_linked_entity_safe(
                         int(self.form.place.data),
                         'P53')})
+        if self.origin and self.origin.class_.view == 'actor':
+            self.data['links']['insert'].append({
+                'property': 'P11',
+                'range': self.origin,
+                'return_link_id': True})
 
 
 class HierarchyBaseManager(BaseManager):

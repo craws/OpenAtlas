@@ -89,57 +89,6 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         field.data = g.settings[field.name]
 
 
-def process_origin_data(
-        entity: Entity,
-        origin: Entity,
-        form: FlaskForm,
-        data: dict[str, Any]) -> dict[str, Any]:
-    if origin.class_.view == 'reference':
-        if entity.class_.name == 'file':
-            data['links']['insert'].append({
-                'property': 'P67',
-                'range': origin,
-                'description': form.page.data,
-                'inverse': True})
-        else:
-            data['links']['insert'].append({
-                'property': 'P67',
-                'range': origin,
-                'return_link_id': True,
-                'inverse': True})
-    elif entity.class_.name == 'file' \
-            or (entity.class_.view in ['reference', 'source']
-                and origin.class_.name != 'file'):
-        data['links']['insert'].append({
-            'property': 'P67',
-            'range': origin,
-            'return_link_id': entity.class_.view == 'reference'})
-    elif origin.class_.view in ['source', 'file'] \
-            and entity.class_.name != 'source_translation':
-        data['links']['insert'].append({
-            'property': 'P67',
-            'range': origin,
-            'inverse': True})
-    elif origin.class_.view == 'event':  # Involvement from actor
-        data['links']['insert'].append({
-            'property': 'P11',
-            'range': origin,
-            'return_link_id': True,
-            'inverse': True})
-    elif origin.class_.view == 'actor' and entity.class_.view == 'event':
-        data['links']['insert'].append({  # Involvement from event
-            'property': 'P11',
-            'range': origin,
-            'return_link_id': True})
-    elif origin.class_.view == 'actor' and entity.class_.view == 'actor':
-        data['links']['insert'].append({  # Actor actor relation
-            'property': 'OA7',
-            'range': origin,
-            'return_link_id': True,
-            'inverse': True})
-    return data
-
-
 def populate_insert_form(
         form: FlaskForm,
         class_: str,
