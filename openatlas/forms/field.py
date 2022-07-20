@@ -147,10 +147,7 @@ class TableField(HiddenField):
 class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
-        data: list[int] = []
-        if field.data:
-            data = ast.literal_eval(field.data) \
-                if isinstance(field.data, str) else field.data
+        data = field.data if field.data else []
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_multi_select.html',
             field=field,

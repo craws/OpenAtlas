@@ -67,7 +67,7 @@ class InvolvementTests(TestBaseCase):
                 url_for('link_update', id_=link_id, origin_id=actor.id),
                 data={
                     'description': 'Infinite Space - Infinite Terror',
-                    'activity': 'P23'},
+                    'activity': 'P11'},
                 follow_redirects=True)
             assert b'Infinite Space - Infinite Terror' in rv.data
             rv = self.app.get(url_for('view', id_=actor.id))

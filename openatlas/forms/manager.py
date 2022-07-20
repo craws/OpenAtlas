@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import g
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, MultipleFileField, SelectField,
@@ -44,7 +44,7 @@ class ActorFunctionManager(BaseManager):
             return {}
         return {
             'member_origin_id': HiddenField(),
-            'actor' if self.origin.class_.name == 'member' else 'group':
+            'group' if 'membership' in request.url else 'actor':
                 TableMultiField(_('actor'), [InputRequired()])}
 
 

@@ -383,10 +383,3 @@ class HierarchyBaseManager(BaseManager):
                 choices=Type.get_class_choices(self.entity),
                 option_widget=widgets.CheckboxInput(),
                 widget=widgets.ListWidget(prefix_label=False))}
-
-
-def convert(value: str) -> list[int]:
-    if not value:
-        return []
-    ids = ast.literal_eval(value)
-    return ids if isinstance(ids, list) else [int(ids)]

@@ -105,6 +105,9 @@ class TypeTest(TestBaseCase):
                 data={'name': 'admin unit'},
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
+            rv = self.app.get(
+                url_for('update', id_=g.types[admin_unit_id].subs[0]))
+            assert b'admin unit' in rv.data
 
             # Value type
             rv = self.app.get(
