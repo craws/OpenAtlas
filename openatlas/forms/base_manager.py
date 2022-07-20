@@ -37,7 +37,7 @@ class BaseManager:
     entity: Optional[Entity] = None
     origin: Optional[Entity] = None
     link_: Optional[Link] = None
-    redirect_link_id: Optional[int] = None
+    continue_link_id: Optional[int] = None
     data: dict[str, Any] = {}
 
     def __init__(
@@ -102,6 +102,9 @@ class BaseManager:
         else:
             self.form = Form()
         self.customize_labels()
+
+    def update_entity(self, new: bool = False) -> None:
+        self.continue_link_id = self.entity.update(self.data, new)
 
     def customize_labels(self) -> None:
         if self.class_.name in ('administrative_unit', 'type') \

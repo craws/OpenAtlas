@@ -148,7 +148,7 @@ class Entity:
             self,
             data: dict[str, Any],
             new: bool = False,) -> Optional[int]:
-        redirect_link_id = None
+        continue_link_id = None
         if 'attributes' in data:
             self.update_attributes(data['attributes'])
         if 'aliases' in data:
@@ -157,10 +157,10 @@ class Entity:
                 and self.class_.name != 'administrative_unit':
             self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
-            redirect_link_id = self.update_links(data['links'], new)
+            continue_link_id = self.update_links(data['links'], new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
-        return redirect_link_id
+        return continue_link_id
 
     def update_administrative_units(
             self,
@@ -214,7 +214,7 @@ class Entity:
             if 'delete_reference_system' in links \
                     and links['delete_reference_system']:
                 ReferenceSystem.delete_links_from_entity(self)
-        redirect_link_id = None
+        continue_link_id = None
         for link_ in links['insert']:
             if not link_['range']:
                 continue
@@ -226,8 +226,8 @@ class Entity:
                 type_id=link_['type_id'] if 'type_id' in link_ else None,
                 inverse=('inverse' in link_ and link_['inverse']))
             if 'return_link_id' in link_ and link_['return_link_id']:
-                redirect_link_id = ids[0]
-        return redirect_link_id
+                continue_link_id = ids[0]
+        return continue_link_id
 
     def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
         from openatlas.models.gis import Gis

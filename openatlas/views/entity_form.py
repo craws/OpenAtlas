@@ -11,6 +11,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms import base_manager
+from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_entity_form
 from openatlas.forms.util import populate_insert_form
 from openatlas.models.entity import Entity
@@ -197,7 +198,7 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
         'location': entity.get_linked_entity_safe('P53', types=True)}
 
 
-def insert_files(manager: Any) -> Union[str, Response]:
+def insert_files(manager: BaseManager) -> Union[str, Response]:
     filenames = []
     try:
         Transaction.begin()
@@ -215,8 +216,7 @@ def insert_files(manager: Any) -> Union[str, Response]:
                 manager.form.name.data = \
                     f'{entity_name}_{str(count + 1).zfill(2)}'
             manager.process_form_data()
-            manager.redirect_link_id = \
-                manager.entity.update(manager.data, new=True)
+            manager.update_entity()
             logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
         url = get_redirect_url(manager)
@@ -231,15 +231,14 @@ def insert_files(manager: Any) -> Union[str, Response]:
     return url
 
 
-def save(manager: Any) -> Union[str, Response]:
+def save(manager: BaseManager) -> Union[str, Response]:
     Transaction.begin()
     action = 'update' if manager.entity else 'insert'
     try:
         if not manager.entity:
             manager.entity = insert_entity(manager)
         manager.process_form_data()
-        manager.redirect_link_id = \
-            manager.entity.update(manager.data, new=(action == 'insert'))
+        manager.update_entity(new=(action == 'insert'))
         logger.log_user(manager.entity.id, action)
         Transaction.commit()
         url = get_redirect_url(manager)
@@ -292,10 +291,10 @@ def insert_entity(manager: Any) -> Union[Entity, ReferenceSystem, Type]:
 
 
 def get_redirect_url(manager: base_manager.BaseManager) -> str:
-    if manager.redirect_link_id and manager.origin:
+    if manager.continue_link_id and manager.origin:
         return url_for(
             'link_update',
-            id_=manager.redirect_link_id,
+            id_=manager.continue_link_id,
             origin_id=manager.origin.id)
     url = url_for('view', id_=manager.entity.id)
     if manager.origin and manager.entity.class_.name not in \
