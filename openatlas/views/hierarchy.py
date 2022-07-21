@@ -7,7 +7,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import get_entity_form
+from openatlas.forms.form import get_manager
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
@@ -19,14 +19,14 @@ from openatlas.util.util import (
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> Union[str, Response]:
-    manager = get_entity_form(f'hierarchy_{category}')
+    manager = get_manager(f'hierarchy_{category}')
     if manager.form.validate_on_submit():
         if Type.check_hierarchy_exists(manager.form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('display_form.html', form=manager.form)
         try:
             Transaction.begin()
-            manager.entity = Entity.insert('type', manager.form.name.data)
+            manager.insert_entity()
             Type.insert_hierarchy(
                 manager.entity,  # type: ignore
                 category,
@@ -61,9 +61,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.types[id_]
     if hierarchy.category in ('standard', 'system'):
         abort(403)
-    manager = get_entity_form(
-        f'hierarchy_{hierarchy.category}',
-        entity=hierarchy)
+    manager = get_manager(f'hierarchy_{hierarchy.category}', entity=hierarchy)
     linked_entities = set()
     has_multiple_links = False
     for entity in get_entities_linked_to_type_recursive(id_, []):

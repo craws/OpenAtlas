@@ -47,6 +47,9 @@ class ActorFunctionManager(BaseManager):
             'group' if 'membership' in request.url else 'actor':
                 TableMultiField(_('actor'), [InputRequired()])}
 
+    def populate_insert(self) -> None:
+        self.form.member_origin_id.data = self.origin.id
+
 
 class ActivityManager(EventBaseManager):
     pass
@@ -61,6 +64,9 @@ class ActorActorRelationManager(BaseManager):
             fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
             fields['relation_origin_id'] = HiddenField()
         return fields
+
+    def populate_insert(self) -> None:
+        self.form.relation_origin_id.data = self.origin.id
 
     def populate_update(self) -> None:
         super().populate_update()

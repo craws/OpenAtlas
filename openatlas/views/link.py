@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
-from openatlas.forms.form import get_entity_form, get_table_form
+from openatlas.forms.form import get_manager, get_table_form
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -86,7 +86,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    manager = get_entity_form('involvement', origin=origin)
+    manager = get_manager('involvement', origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -139,8 +139,7 @@ def member_insert(
         origin_id: int,
         code: str = 'member') -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    manager = get_entity_form('actor_function', origin=origin)
-    manager.form.member_origin_id.data = origin.id
+    manager = get_manager('actor_function', origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -189,8 +188,7 @@ def member_insert(
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    manager = get_entity_form('actor_actor_relation', origin=origin)
-    manager.form.relation_origin_id.data = origin.id
+    manager = get_manager('actor_actor_relation', origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -232,7 +230,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
 
 
 def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
-    manager = get_entity_form('involvement', origin=origin, link_=link_)
+    manager = get_manager('involvement', origin=origin, link_=link_)
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)
     origin = event if origin.id == event.id else actor
@@ -275,7 +273,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    manager = get_entity_form('actor_function', origin=origin, link_=link_)
+    manager = get_manager('actor_function', origin=origin, link_=link_)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -311,10 +309,7 @@ def relation_update(
         origin: Entity) -> Union[str, Response]:
     origin = range_ if origin.id == range_.id else domain
     related = range_ if origin.id == domain.id else domain
-    manager = get_entity_form(
-        'actor_actor_relation',
-        origin=origin,
-        link_=link_)
+    manager = get_manager('actor_actor_relation', origin=origin, link_=link_)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:

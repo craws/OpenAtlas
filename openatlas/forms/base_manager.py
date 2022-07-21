@@ -240,8 +240,9 @@ class EventBaseManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         fields = {
             'event_id': HiddenField(),
-            'event': TableField(_('sub event of')),
-            'event_preceding': TableField(_('preceding event'))}
+            'event': TableField(_('sub event of'))}
+        if self.class_.name != 'event':
+            fields['event_preceding'] = TableField(_('preceding event'))
         if self.class_.name != 'move':
             fields['place'] = TableField(_('location'))
         return fields
@@ -261,14 +262,15 @@ class EventBaseManager(BaseManager):
     def process_form(self):
         super().process_form()
         self.data['links']['delete'].append('P9')
-        self.data['links']['delete_inverse'].append('P134')
         self.data['links']['insert'].append({
             'property': 'P9',
             'range': self.form.event.data})
-        self.data['links']['insert'].append({
-            'property': 'P134',
-            'range': self.form.event_preceding.data,
-            'inverse': True})
+        if self.class_.name != 'event':
+            self.data['links']['delete_inverse'].append('P134')
+            self.data['links']['insert'].append({
+                'property': 'P134',
+                'range': self.form.event_preceding.data,
+                'inverse': True})
         if self.class_.name != 'move':
             self.data['links']['delete'].append('P7')
             if self.form.place.data:

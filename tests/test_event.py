@@ -202,6 +202,8 @@ class EventTest(TestBaseCase):
             assert b'Event with preceding' in rv.data
             rv = self.app.get(url_for('view', id_=activity_id))
             assert b'Event with preceding' in rv.data
+            rv = self.app.get(url_for('update', id_=event_id))
+            assert b'Event with preceding' in rv.data
 
             # Delete
             rv = self.app.get(

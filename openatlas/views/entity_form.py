@@ -10,9 +10,8 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms import base_manager
 from openatlas.forms.base_manager import BaseManager
-from openatlas.forms.form import get_entity_form
+from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -33,7 +32,7 @@ def insert(
         origin_id: Optional[int] = None) -> Union[str, Response]:
     check_insert_access(class_)
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    manager = get_entity_form(class_, origin=origin)
+    manager = get_manager(class_, origin=origin)
     if manager.form.validate_on_submit():
         if class_ == 'file':
             return redirect(insert_files(manager))
@@ -64,7 +63,7 @@ def update(id_: int) -> Union[str, Response]:
     if entity.check_too_many_single_type_links():
         abort(422)
     place_info = get_place_info_for_update(entity)
-    manager = get_entity_form(entity=entity)
+    manager = get_manager(entity=entity)
     if manager.form.validate_on_submit():
         if isinstance(entity, Type) and not check_type(entity, manager.form):
             return redirect(url_for('view', id_=entity.id))
@@ -271,7 +270,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
     return url
 
 
-def get_redirect_url(manager: base_manager.BaseManager) -> str:
+def get_redirect_url(manager: BaseManager) -> str:
     if manager.continue_link_id and manager.origin:
         return url_for(
             'link_update',
