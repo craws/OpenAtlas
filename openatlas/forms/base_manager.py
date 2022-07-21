@@ -131,8 +131,7 @@ class BaseManager:
 
     def get_root_type(self) -> Type:
         type_ = self.entity if isinstance(self.entity, Type) else self.origin
-        root = g.types[type_.root[0]] if type_.root else type_
-        return root
+        return g.types[type_.root[0]] if type_.root else type_
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
@@ -155,7 +154,7 @@ class BaseManager:
                 self.form.alias.append_entry(alias)
             self.form.alias.append_entry('')
 
-    def process_form(self):
+    def process_form(self) -> None:
         self.data: dict[str, Any] = {
             'attributes': process_dates(self),
             'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
@@ -203,7 +202,7 @@ class ActorBaseManager(BaseManager):
             self.form.ends_in.data = \
                 last.get_linked_entity_safe('P53', True).id
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'] += ['P74', 'OA8', 'OA9']
         if self.form.residence.data:
@@ -261,7 +260,7 @@ class EventBaseManager(BaseManager):
                 self.form.place.data = \
                     place.get_linked_entity_safe('P53', True).id
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].append('P9')
         self.data['links']['insert'].append({

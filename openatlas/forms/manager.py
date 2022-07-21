@@ -153,7 +153,7 @@ class ExternalReferenceManager(BaseManager):
 class FeatureManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         if self.origin and self.origin.class_.name == 'place':
             self.data['links']['insert'].append({
@@ -374,7 +374,7 @@ class ReferenceSystemManager(BaseManager):
                 widget=widgets.ListWidget(prefix_label=False))
             if choices else None}
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         self.data['reference_system'] = {
             'website_url': self.form.website_url.data,
@@ -426,7 +426,7 @@ class SourceTranslationManager(BaseManager):
 class StratigraphicUnitManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         if self.origin and self.origin.class_.name == 'feature':
             self.data['links']['insert'].append({
@@ -474,7 +474,7 @@ class TypeManager(BaseManager):
             if super_.id != root.id:
                 getattr(self.form, str(root.id)).data = super_.id
 
-    def process_form(self):
+    def process_form(self) -> None:
         super().process_form()
         type_ = self.origin if isinstance(self.origin, Type) else self.entity
         root = self.get_root_type()

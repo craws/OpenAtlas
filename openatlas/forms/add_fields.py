@@ -1,16 +1,20 @@
 from collections import OrderedDict
+from typing import Any
 
 from flask import g
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
+
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
 
 
-def add_reference_systems(class_, form) -> None:
+def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
     if hasattr(form, 'classes'):
         return  # Skip hierarchies
     precisions = [('', '')] + [
@@ -40,7 +44,7 @@ def add_reference_systems(class_, form) -> None:
                 default=system.precision_default_id))
 
 
-def add_date_fields(form_class, has_time: bool) -> None:
+def add_date_fields(form_class: Any, has_time: bool) -> None:
     validator_second = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_minute = [OptionalValidator(), NumberRange(min=0, max=59)]
     validator_hour = [OptionalValidator(), NumberRange(min=0, max=23)]
@@ -209,7 +213,7 @@ def add_date_fields(form_class, has_time: bool) -> None:
         StringField(render_kw={'placeholder': _('comment')}))
 
 
-def add_value_type_fields(form_class, subs: list[int]) -> None:
+def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
     for sub_id in subs:
         sub = g.types[sub_id]
         setattr(
@@ -219,7 +223,7 @@ def add_value_type_fields(form_class, subs: list[int]) -> None:
         add_value_type_fields(form_class, sub.subs)
 
 
-def add_types(manager):
+def add_types(manager: Any) -> None:
     if manager.class_.name in g.classes \
             and g.classes[manager.class_.name].hierarchies:
         types = OrderedDict(

@@ -5,11 +5,13 @@ from flask import g
 from openatlas.util.util import format_date_part
 
 
-def populate_types(manager) -> None:
+def populate_types(manager: Any) -> None:
     types: dict[Any, Any] = manager.link_.types \
         if manager.link_ else manager.entity.types
-    # if manager.location:
-    #    types |= manager.location.types  # Admin. units and historical places
+    if manager.entity and manager.entity.class_.name == 'place':
+        if location := \
+                manager.entity.get_linked_entity_safe('P53', types=True):
+            types |= location.types  # Admin. units and historical places
     type_data: dict[int, list[int]] = {}
     for type_, value in types.items():
         root = g.types[type_.root[0]] if type_.root else type
@@ -23,12 +25,13 @@ def populate_types(manager) -> None:
             getattr(manager.form, str(root_id)).data = types_
 
 
-def populate_reference_systems(manager) -> None:
+def populate_reference_systems(manager: Any) -> None:
     if not manager.entity:
         return  # It's a link update which have no reference systems
     system_links = {
         # Can't use isinstance for class check here
-        link_.domain.id: link_ for link_ in manager.entity.get_links('P67', True)
+        link_.domain.id:
+            link_ for link_ in manager.entity.get_links('P67', True)
         if link_.domain.class_.name == 'reference_system'}
     for key in manager.form.data:
         field = getattr(manager.form, key)
@@ -42,7 +45,7 @@ def populate_reference_systems(manager) -> None:
                 precision_field.data = str(system_links[system_id].type.id)
 
 
-def populate_dates(manager) -> None:
+def populate_dates(manager: Any) -> None:
     form = manager.form
     item = manager.link_ if manager.link_ else manager.entity
     if item.begin_from:
