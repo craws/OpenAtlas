@@ -35,7 +35,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
                     category == 'value' or
                     (hasattr(manager.form, 'multiple')
                      and manager.form.multiple.data)))
-            manager.process_form_data()
+            manager.process_form()
             manager.entity.update(manager.data, new=True)
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -89,7 +89,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                         or (hasattr(manager.form, 'multiple')
                             and manager.form.multiple.data)
                         or has_multiple_links))
-                manager.process_form_data()
+                manager.process_form()
                 manager.entity.update(manager.data)
                 Transaction.commit()
             except Exception as e:  # pragma: no cover

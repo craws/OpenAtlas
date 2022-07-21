@@ -7,10 +7,10 @@ from wtforms import (
     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
+
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
-from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -28,8 +28,8 @@ class AcquisitionManager(EventBaseManager):
         self.form.given_place.data = [
             entity.id for entity in self.entity.get_linked_entities('P24')]
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         self.data['links']['delete'].append('P24')
         self.data['links']['insert'].append({
             'property': 'P24',
@@ -89,8 +89,8 @@ class AdministrativeUnitManager(BaseManager):
                     str(root.id)).data = super_.id \
                     if super_.id != root.id else None
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         type_ = self.origin if isinstance(self.origin, Type) else self.entity
         root = self.get_root_type()
         super_id = g.types[type_.root[-1]] if type_.root else type_
@@ -114,8 +114,8 @@ class ArtifactManager(BaseManager):
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -146,8 +146,8 @@ class ExternalReferenceManager(BaseManager):
 class FeatureManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         if self.origin and self.origin.class_.name == 'place':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -199,8 +199,8 @@ class HumanRemainsManager(BaseManager):
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -278,8 +278,8 @@ class MoveManager(EventBaseManager):
         self.form.person.data = person_data
         self.form.artifact.data = object_data
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         self.data['links']['delete'] += ['P25', 'P26', 'P27']
         if self.form.artifact.data:
             self.data['links']['insert'].append({
@@ -335,8 +335,8 @@ class ProductionManager(EventBaseManager):
         self.form.artifact.data = \
             [entity.id for entity in self.entity.get_linked_entities('P108')]
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         self.data['links']['delete'].append('P108')
         self.data['links']['insert'].append({
             'property': 'P108',
@@ -366,8 +366,8 @@ class ReferenceSystemManager(BaseManager):
                 widget=widgets.ListWidget(prefix_label=False))
             if choices else None}
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         self.data['reference_system'] = {
             'website_url': self.form.website_url.data,
             'resolver_url': self.form.resolver_url.data,
@@ -389,8 +389,8 @@ class SourceManager(BaseManager):
             item.id for item in
             self.entity.get_linked_entities('P128', inverse=True)]
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         if not self.origin:
             self.data['links']['delete_inverse'].append('P128')
             if self.form.artifact.data:
@@ -406,8 +406,8 @@ class SourceTranslationManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         return {'description': TextAreaField(_('content'))}
 
-    def process_form_data(self) -> None:
-        super().process_form_data()
+    def process_form(self) -> None:
+        super().process_form()
         if self.origin:
             self.data['links']['insert'].append({
                 'property': 'P73',
@@ -418,8 +418,8 @@ class SourceTranslationManager(BaseManager):
 class StratigraphicUnitManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         if self.origin and self.origin.class_.name == 'feature':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -466,8 +466,8 @@ class TypeManager(BaseManager):
             if super_.id != root.id:
                 getattr(self.form, str(root.id)).data = super_.id
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         type_ = self.origin if isinstance(self.origin, Type) else self.entity
         root = self.get_root_type()
         super_id = g.types[type_.root[-1]] if type_.root else type_

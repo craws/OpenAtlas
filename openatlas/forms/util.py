@@ -11,20 +11,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
-from openatlas.forms.field import TreeField
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
 from openatlas.util.util import get_file_extension, uc_first
-
-
-def get_link_type(form: Any) -> Optional[Entity]:
-    # Returns base type of link form, e.g. involvement between actor and event
-    for field in form:
-        if isinstance(field, TreeField) and field.data:
-            return g.types[int(field.data)]
-    return None
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:

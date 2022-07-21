@@ -14,8 +14,7 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
 from openatlas.forms.form import get_entity_form, get_table_form
-from openatlas.forms.process import process_form_dates
-from openatlas.forms.util import get_link_type
+from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group, uc_first
@@ -99,8 +98,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                             manager.form.activity.data,
                             actor,
                             manager.form.description.data)[0])
-                    link_.set_dates(process_form_dates(manager.form))
-                    link_.type = get_link_type(manager.form)
+                    link_.set_dates(process_dates(manager))
+                    link_.type = manager.get_link_type()
                     link_.update()
             else:
                 for event in Entity.get_by_ids(
@@ -110,8 +109,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                             manager.form.activity.data,
                             origin,
                             manager.form.description.data)[0])
-                    link_.set_dates(process_form_dates(manager.form))
-                    link_.type = get_link_type(manager.form)
+                    link_.set_dates(process_dates(manager))
+                    link_.type = manager.get_link_type()
                     link_.update()
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -161,8 +160,8 @@ def member_insert(
                             'P107',
                             actor,
                             manager.form.description.data)[0])
-                link_.set_dates(process_form_dates(manager.form))
-                link_.type = get_link_type(manager.form)
+                link_.set_dates(process_dates(manager))
+                link_.type = manager.get_link_type()
                 link_.update()
             Transaction.commit()
             flash(_('entity created'), 'info')
@@ -209,8 +208,8 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
                             'OA7',
                             actor,
                             manager.form.description.data)[0])
-                link_.set_dates(process_form_dates(manager.form))
-                link_.type = get_link_type(manager.form)
+                link_.set_dates(process_dates(manager))
+                link_.type = manager.get_link_type()
                 link_.update()
             Transaction.commit()
             flash(_('entity created'), 'info')
@@ -246,8 +245,8 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
                     manager.form.activity.data,
                     actor,
                     manager.form.description.data)[0])
-            link_.set_dates(process_form_dates(manager.form))
-            link_.type = get_link_type(manager.form)
+            link_.set_dates(process_dates(manager))
+            link_.type = manager.get_link_type()
             link_.update()
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -283,8 +282,8 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
             link_.delete()
             link_ = Link.get_by_id(
                 domain.link('P107', range_, manager.form.description.data)[0])
-            link_.set_dates(process_form_dates(manager.form))
-            link_.type = get_link_type(manager.form)
+            link_.set_dates(process_dates(manager))
+            link_.type = manager.get_link_type()
             link_.update()
             Transaction.commit()
         except Exception as e:  # pragma: no cover
@@ -332,8 +331,8 @@ def relation_update(
                         'OA7',
                         related,
                         manager.form.description.data)[0])
-            link_.set_dates(process_form_dates(manager.form))
-            link_.type = get_link_type(manager.form)
+            link_.set_dates(process_dates(manager))
+            link_.type = manager.get_link_type()
             link_.update()
             Transaction.commit()
             flash(_('info update'), 'info')

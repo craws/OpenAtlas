@@ -1,6 +1,5 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import ast
 import time
 from typing import Any, Optional, Union
 
@@ -8,7 +7,6 @@ from flask import g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from wtforms import (
     FieldList, HiddenField, SelectMultipleField, StringField, SubmitField,
     TextAreaField, widgets)
@@ -16,10 +14,11 @@ from wtforms.validators import InputRequired, URL
 
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
-from openatlas.forms.field import RemovableListField, TableField
+from openatlas.forms.field import RemovableListField, TableField, TreeField
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
-from openatlas.forms.process import process_form_dates
+from openatlas.forms.process import (
+    process_dates, process_map, process_origin, process_standard_fields)
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
@@ -27,7 +26,7 @@ from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import sanitize, uc_first
+from openatlas.util.util import uc_first
 
 
 class BaseManager:
@@ -135,6 +134,13 @@ class BaseManager:
         root = g.types[type_.root[0]] if type_.root else type_
         return root
 
+    def get_link_type(self) -> Optional[Entity]:
+        # Returns base type of link, e.g. involvement between actor and event
+        for field in self.form:  # type: ignore
+            if isinstance(field, TreeField) and field.data:
+                return g.types[int(field.data)]
+        return None
+
     def populate_insert(self) -> None:
         pass
 
@@ -149,128 +155,35 @@ class BaseManager:
                 self.form.alias.append_entry(alias)
             self.form.alias.append_entry('')
 
-    def process_form_data(self):
-        data: dict[str, Any] = {
-            'attributes': process_form_dates(self.form),
+    def process_form(self):
+        self.data: dict[str, Any] = {
+            'attributes': process_dates(self),
             'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
+        process_standard_fields(self)
         if 'map' in self.fields:
-            data['links']['delete'].append('P52')
-            data['gis'] = {
-                shape: getattr(self.form, f'gis_{shape}s').data
-                for shape in ['point', 'line', 'polygon']}
+            process_map(self)
         if self.origin:
-            if self.origin.class_.view == 'reference':
-                if self.entity.class_.name == 'file':
-                    data['links']['insert'].append({
-                        'property': 'P67',
-                        'range': self.origin,
-                        'description': self.form.page.data,
-                        'inverse': True})
-                else:
-                    data['links']['insert'].append({
-                        'property': 'P67',
-                        'range': self.origin,
-                        'return_link_id': True,
-                        'inverse': True})
-            elif self.entity.class_.name == 'file' \
-                    or (self.entity.class_.view in ['reference', 'source']
-                        and self.origin.class_.name != 'file'):
-                data['links']['insert'].append({
-                    'property': 'P67',
-                    'range': self.origin,
-                    'return_link_id': self.entity.class_.view == 'reference'})
-            elif self.origin.class_.view in ['source', 'file'] \
-                    and self.entity.class_.name != 'source_translation':
-                data['links']['insert'].append({
-                    'property': 'P67',
-                    'range': self.origin,
-                    'inverse': True})
-        for key, value in self.form.data.items():
-            field_type = getattr(self.form, key).type
-            if field_type in [
-                    'TreeField',
-                    'TreeMultiField',
-                    'TableField',
-                    'TableMultiField']:
-                if value:
-                    ids = ast.literal_eval(value)
-                    value = ids if isinstance(ids, list) else [int(ids)]
-                else:
-                    value = []
-            if key.startswith((
-                    'begin_',
-                    'end_',
-                    'name_inverse',
-                    'multiple',
-                    'page',
-                    'reference_system_precision_',
-                    'website_url',
-                    'resolver_url',
-                    'placeholder',
-                    'classes')) \
-                    or field_type in [
-                        'CSRFTokenField',
-                        'HiddenField',
-                        'MultipleFileField',
-                        'SelectMultipleField',
-                        'SubmitField',
-                        'TableField',
-                        'TableMultiField']:
-                continue
-            if key == 'name':
-                name = self.form.data['name']
-                if hasattr(self.form, 'name_inverse'):
-                    name = self.form.name.data.replace(
-                        '(', '').replace(')', '').strip()
-                    if self.form.name_inverse.data.strip():
-                        inverse = self.form.name_inverse.data. \
-                            replace('(', ''). \
-                            replace(')', '').strip()
-                        name += ' (' + inverse + ')'
-                if self.entity.class_.name == 'type':
-                    name = sanitize(name, 'text')
-                elif isinstance(self.entity, ReferenceSystem) \
-                        and self.entity.system:
-                    name = self.entity.name  # Don't change the name
-                data['attributes']['name'] = name
-            elif key == 'description':
-                data['attributes'][key] = self.form.data[key]
-            elif key == 'alias':
-                data['aliases'] = value
-            elif field_type in ['TreeField', 'TreeMultiField']:
-                if g.types[int(getattr(self.form, key).id)].class_.name \
-                        == 'administrative_unit':
-                    if 'administrative_units' not in data:
-                        data['administrative_units'] = []
-                    data['administrative_units'] += value
-                elif self.entity.class_.view != 'type':
-                    data['links']['delete'].append('P2')
-                    data['links']['insert'].append({
-                        'property': 'P2',
-                        'range': [g.types[id_] for id_ in value]})
-            elif field_type == 'ValueFloatField':
-                if value is not None:  # Allow the number zero
-                    data['links']['insert'].append({
-                        'property': 'P2',
-                        'description': value,
-                        'range': g.types[int(key)]})
-            elif key.startswith('reference_system_id_'):
-                system = Entity.get_by_id(
-                    int(key.replace('reference_system_id_', '')))
-                precision_field = getattr(
-                    self.form,
-                    key.replace('id_', 'precision_'))
-                data['links']['delete_reference_system'] = True
-                if value:
-                    data['links']['insert'].append({
-                        'property': 'P67',
-                        'range': system,
-                        'description': value,
-                        'type_id': precision_field.data,
-                        'inverse': True})
-            else:  # pragma: no cover
-                abort(418, f'Form error: {key}, {field_type}, value={value}')
-        self.data = data
+            process_origin(self)
+
+    def insert_entity(self) -> None:
+        if self.entity:
+            return
+        if self.class_.name == 'reference_system':
+            self.entity = ReferenceSystem.insert_system({
+                'name': self.form.name.data,
+                'description': self.form.description.data,
+                'website_url': self.form.website_url.data,
+                'resolver_url': self.form.resolver_url.data})
+            return
+        self.entity = Entity.insert(self.class_.name, self.form.name.data)
+        if self.class_.name == 'artifact' \
+                or g.classes[self.class_.name].view == 'place':
+            self.entity.link(
+                'P53',
+                Entity.insert(
+                    'object_location',
+                    f'Location of {self.form.name.data}'))
+        return
 
 
 class ActorBaseManager(BaseManager):
@@ -288,8 +201,8 @@ class ActorBaseManager(BaseManager):
             self.form.ends_in.data = \
                 last.get_linked_entity_safe('P53', True).id
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         self.data['links']['delete'] += ['P74', 'OA8', 'OA9']
         if self.form.residence.data:
             residence = Entity.get_by_id(int(self.form.residence.data))
@@ -345,8 +258,8 @@ class EventBaseManager(BaseManager):
                 self.form.place.data = \
                     place.get_linked_entity_safe('P53', True).id
 
-    def process_form_data(self):
-        super().process_form_data()
+    def process_form(self):
+        super().process_form()
         self.data['links']['delete'].append('P9')
         self.data['links']['delete_inverse'].append('P134')
         self.data['links']['insert'].append({

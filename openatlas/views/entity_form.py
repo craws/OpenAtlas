@@ -215,7 +215,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
             if len(manager.form.file.data) > 1:
                 manager.form.name.data = \
                     f'{entity_name}_{str(count + 1).zfill(2)}'
-            manager.process_form_data()
+            manager.process_form()
             manager.update_entity()
             logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
@@ -235,9 +235,8 @@ def save(manager: BaseManager) -> Union[str, Response]:
     Transaction.begin()
     action = 'update' if manager.entity else 'insert'
     try:
-        if not manager.entity:
-            manager.entity = insert_entity(manager)
-        manager.process_form_data()
+        manager.insert_entity()
+        manager.process_form()
         manager.update_entity(new=(action == 'insert'))
         logger.log_user(manager.entity.id, action)
         Transaction.commit()
@@ -270,24 +269,6 @@ def save(manager: BaseManager) -> Union[str, Response]:
             if manager.class_.name in ['administrative_unit', 'type']:
                 url = url_for('type_index')
     return url
-
-
-def insert_entity(manager: Any) -> Union[Entity, ReferenceSystem, Type]:
-    if manager.class_.name == 'reference_system':
-        return ReferenceSystem.insert_system({
-            'name': manager.form.name.data,
-            'description': manager.form.description.data,
-            'website_url': manager.form.website_url.data,
-            'resolver_url': manager.form.resolver_url.data})
-    entity = Entity.insert(manager.class_.name, manager.form.name.data)
-    if manager.class_.name == 'artifact' \
-            or g.classes[manager.class_.name].view == 'place':
-        entity.link(
-            'P53',
-            Entity.insert(
-                'object_location',
-                f'Location of {manager.form.name.data}'))
-    return entity
 
 
 def get_redirect_url(manager: base_manager.BaseManager) -> str:
