@@ -34,7 +34,8 @@ class TypeTest(TestBaseCase):
             data = {
                 'name': 'My secret type',
                 'name_inverse': 'Do I look inverse?',
-                'description': 'Very important!'}
+                'description': 'Very important!',
+                str(actor_type.id): actor_type.subs[0]}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)

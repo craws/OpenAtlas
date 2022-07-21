@@ -122,6 +122,7 @@ class ArtifactManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
+        self.data['links']['delete'].append('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -207,6 +208,7 @@ class HumanRemainsManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
+        self.data['links']['delete'].append('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',

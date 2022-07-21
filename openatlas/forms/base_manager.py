@@ -18,7 +18,7 @@ from openatlas.forms.field import RemovableListField, TableField, TreeField
 from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
-    process_dates, process_map, process_origin, process_standard_fields)
+    process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import check_if_entity_has_time
 from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
@@ -160,10 +160,12 @@ class BaseManager:
             'attributes': process_dates(self),
             'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
         process_standard_fields(self)
-        if 'map' in self.fields:
-            process_map(self)
         if self.origin:
             process_origin(self)
+        if 'map' in self.fields:
+            self.data['gis'] = {
+                shape: getattr(self.form, f'gis_{shape}s').data
+                for shape in ['point', 'line', 'polygon']}
 
     def insert_entity(self) -> None:
         if self.entity:

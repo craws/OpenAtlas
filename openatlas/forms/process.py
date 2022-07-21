@@ -10,13 +10,6 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.util import sanitize
 
 
-def process_map(manager: Any) -> None:
-    manager.data['links']['delete'].append('P52')
-    manager.data['gis'] = {
-        shape: getattr(manager.form, f'gis_{shape}s').data
-        for shape in ['point', 'line', 'polygon']}
-
-
 def process_standard_fields(manager: Any) -> None:
     for key, value in manager.form.data.items():
         field_type = getattr(manager.form, key).type
@@ -77,7 +70,8 @@ def process_standard_fields(manager: Any) -> None:
                     manager.data['administrative_units'] = []
                 manager.data['administrative_units'] += value
             elif manager.entity.class_.view != 'type':
-                manager.data['links']['delete'].append('P2')
+                if 'P2' not in manager.data['links']['delete']:
+                    manager.data['links']['delete'].append('P2')
                 manager.data['links']['insert'].append({
                     'property': 'P2',
                     'range': [g.types[id_] for id_ in value]})
