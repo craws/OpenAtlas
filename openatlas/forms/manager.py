@@ -229,11 +229,15 @@ class InvolvementManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
+        event_class_name = ''
+        if self.link_:
+            event_class_name = self.link_.domain.class_.name
+        elif self.origin and self.origin.class_.view != 'actor':
+            event_class_name = self.origin.class_.name
         choices = [('P11', g.properties['P11'].name)]
-        event = Entity.get_by_id(self.origin.id)
-        if event.class_.name in ['acquisition', 'activity']:
+        if event_class_name in ['acquisition', 'activity']:
             choices.append(('P14', g.properties['P14'].name))
-            if event.class_.name == 'acquisition':
+            if event_class_name == 'acquisition':
                 choices.append(('P22', g.properties['P22'].name))
                 choices.append(('P23', g.properties['P23'].name))
         fields = {'activity': SelectField(_('activity'), choices=choices)}
