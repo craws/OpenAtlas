@@ -30,7 +30,7 @@ class AcquisitionManager(EventBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].append('P24')
+        self.data['links']['delete'].add('P24')
         self.data['links']['insert'].append({
             'property': 'P24',
             'range': self.form.given_place.data})
@@ -103,7 +103,7 @@ class AdministrativeUnitManager(BaseManager):
         new_super_id = getattr(self.form, str(root.id)).data
         new_super = g.types[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
-            self.data['links']['delete'].append('P89')
+            self.data['links']['delete'].add('P89')
             self.data['links']['insert'].append({
                 'property': 'P89',
                 'range': new_super})
@@ -122,7 +122,7 @@ class ArtifactManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].append('P52')
+        self.data['links']['delete'].add('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -208,7 +208,7 @@ class HumanRemainsManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].append('P52')
+        self.data['links']['delete'].add('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.data['links']['insert'].append({
                 'property': 'P46',
@@ -288,7 +288,7 @@ class MoveManager(EventBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'] += ['P25', 'P26', 'P27']
+        self.data['links']['delete'].update(['P25', 'P26', 'P27'])
         if self.form.artifact.data:
             self.data['links']['insert'].append({
                 'property': 'P25',
@@ -345,7 +345,7 @@ class ProductionManager(EventBaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].append('P108')
+        self.data['links']['delete'].add('P108')
         self.data['links']['insert'].append({
             'property': 'P108',
             'range': self.form.artifact.data})
@@ -400,7 +400,7 @@ class SourceManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if not self.origin:
-            self.data['links']['delete_inverse'].append('P128')
+            self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
                 self.data['links']['insert'].append({
                     'property': 'P128',
@@ -482,7 +482,7 @@ class TypeManager(BaseManager):
         new_super_id = getattr(self.form, str(root.id)).data
         new_super = g.types[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
-            self.data['links']['delete'].append('P127')
+            self.data['links']['delete'].add('P127')
             self.data['links']['insert'].append({
                 'property': 'P127',
                 'range': new_super})

@@ -52,12 +52,12 @@ def process_standard_fields(manager: Any) -> None:
                     inverse = manager.form.name_inverse.data. \
                         replace('(', ''). \
                         replace(')', '').strip()
-                    name += ' (' + inverse + ')'
+                    name += f' ({inverse})'
             if manager.entity.class_.name == 'type':
                 name = sanitize(name, 'text')
             elif isinstance(manager.entity, ReferenceSystem) \
                     and manager.entity.system:
-                name = manager.entity.name  # Don't change the name
+                name = manager.entity.name  # Prevent changing a system name
             manager.data['attributes']['name'] = name
         elif key == 'description':
             manager.data['attributes'][key] = manager.form.data[key]
@@ -70,8 +70,7 @@ def process_standard_fields(manager: Any) -> None:
                     manager.data['administrative_units'] = []
                 manager.data['administrative_units'] += value
             elif manager.entity.class_.view != 'type':
-                if 'P2' not in manager.data['links']['delete']:
-                    manager.data['links']['delete'].append('P2')
+                manager.data['links']['delete'].add('P2')
                 manager.data['links']['insert'].append({
                     'property': 'P2',
                     'range': [g.types[id_] for id_ in value]})

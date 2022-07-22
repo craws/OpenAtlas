@@ -162,7 +162,7 @@ class BaseManager:
     def process_form(self) -> None:
         self.data: dict[str, Any] = {
             'attributes': process_dates(self),
-            'links': {'insert': [], 'delete': [], 'delete_inverse': []}}
+            'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
         process_standard_fields(self)
         if self.origin:
             process_origin(self)
@@ -209,7 +209,7 @@ class ActorBaseManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'] += ['P74', 'OA8', 'OA9']
+        self.data['links']['delete'].update(['P74', 'OA8', 'OA9'])
         if self.form.residence.data:
             residence = Entity.get_by_id(int(self.form.residence.data))
             self.data['links']['insert'].append({
@@ -267,18 +267,18 @@ class EventBaseManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].append('P9')
+        self.data['links']['delete'].add('P9')
         self.data['links']['insert'].append({
             'property': 'P9',
             'range': self.form.event.data})
         if self.class_.name != 'event':
-            self.data['links']['delete_inverse'].append('P134')
+            self.data['links']['delete_inverse'].add('P134')
             self.data['links']['insert'].append({
                 'property': 'P134',
                 'range': self.form.event_preceding.data,
                 'inverse': True})
         if self.class_.name != 'move':
-            self.data['links']['delete'].append('P7')
+            self.data['links']['delete'].add('P7')
             if self.form.place.data:
                 self.data['links']['insert'].append({
                     'property': 'P7',
