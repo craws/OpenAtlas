@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-  <form class="table" id="checkbox-form" method="post">
+  <form id="checkbox-form" method="post">
     {{ form.csrf_token }}
     {{ form.checkbox_values }}
     <p>
