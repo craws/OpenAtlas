@@ -1001,8 +1001,8 @@ class MLStripper(HTMLParser):
         self.convert_charrefs = True
         self.fed: list[str] = []
 
-    def handle_data(self, d: Any) -> None:
-        self.fed.append(d)
+    def handle_data(self, data: Any) -> None:
+        self.fed.append(data)
 
     def get_data(self) -> str:
         return ''.join(self.fed)

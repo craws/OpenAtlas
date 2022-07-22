@@ -8,7 +8,6 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_manager
-from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
