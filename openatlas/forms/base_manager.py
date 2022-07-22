@@ -57,21 +57,7 @@ class BaseManager:
             validate = validate
 
         self.form_class = Form
-        if 'name' in self.fields:
-            readonly = bool(
-                isinstance(self.entity, ReferenceSystem)
-                and self.entity.system)
-            setattr(Form, 'name', StringField(
-                _('name'),
-                [InputRequired()],
-                render_kw={'autofocus': True, 'readonly': readonly}))
-        if 'url' in self.fields:
-            setattr(Form, 'name', StringField(
-                _('URL'),
-                [InputRequired(), URL()],
-                render_kw={'autofocus': True}))
-        if 'alias' in self.fields:
-            setattr(Form, 'alias', FieldList(RemovableListField('')))
+        self.add_name_fields()
         add_types(self)
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
@@ -101,6 +87,25 @@ class BaseManager:
         else:
             self.form = Form()
         self.customize_labels()
+
+    def add_name_fields(self) -> None:
+        if 'name' in self.fields:
+            readonly = bool(
+                isinstance(self.entity, ReferenceSystem)
+                and self.entity.system)
+            setattr(self.form_class, 'name', StringField(
+                _('name'),
+                [InputRequired()],
+                render_kw={'autofocus': True, 'readonly': readonly}))
+        if 'url' in self.fields:
+            setattr(self.form_class, 'name', StringField(
+                _('URL'),
+                [InputRequired(), URL()],
+                render_kw={'autofocus': True}))
+        if 'alias' in self.fields:
+            setattr(
+                self.form_class,
+                'alias', FieldList(RemovableListField('')))
 
     def update_entity(self, new: bool = False) -> None:
         self.continue_link_id = self.entity.update(self.data, new)
