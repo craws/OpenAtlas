@@ -893,6 +893,8 @@ def display_form(
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
             type_ = g.types[hierarchy_id]
+            if not type_.subs:
+                continue  # pragma: no cover
             label = type_.name
             if type_.category == 'standard':
                 label = uc_first(_('type'))
