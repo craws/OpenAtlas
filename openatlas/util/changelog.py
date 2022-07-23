@@ -1,8 +1,9 @@
 versions = {
     '7.5.0': ['TBA', {
         'feature': {
-            '1734': 'Refactor form functions',
+            '1761': "Don't show empty type fields in forms",
             '1737': 'Improved user statistics',
+            '1734': 'Refactor form functions',
             '1710': 'Manual: add CIDOC links for entity classes',
             '1726': 'Manual: add FAQs'},
         'fix': {
