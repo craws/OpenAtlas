@@ -11,6 +11,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
+from openatlas.forms.validation import actor_relation, file, membership
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -42,10 +43,11 @@ class ActorFunctionManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         if self.link_:
             return {}
+        target = 'group' if 'membership' in request.url else 'actor'
+        setattr(self.form_class, f'validate_{target}', membership)
         return {
             'member_origin_id': HiddenField(),
-            'group' if 'membership' in request.url else 'actor':
-                TableMultiField(_('actor'), [InputRequired()])}
+            target: TableMultiField(_('actor'), [InputRequired()])}
 
     def populate_insert(self) -> None:
         self.form.member_origin_id.data = self.origin.id
@@ -63,6 +65,7 @@ class ActorActorRelationManager(BaseManager):
         if not self.link_:
             fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
             fields['relation_origin_id'] = HiddenField()
+        setattr(self.form_class, f'validate_actor', actor_relation)
         return fields
 
     def populate_insert(self) -> None:
@@ -179,6 +182,7 @@ class FileManager(BaseManager):
         fields = {}
         if not self.entity:
             fields['file'] = MultipleFileField(_('file'), [InputRequired()])
+            setattr(self.form_class, 'validate_file', file)
         if not self.entity \
                 and self.origin \
                 and self.origin.class_.view == 'reference':

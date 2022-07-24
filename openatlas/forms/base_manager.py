@@ -20,7 +20,7 @@ from openatlas.forms.populate import (
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import check_if_entity_has_time
-from openatlas.forms.validation import validate
+from openatlas.forms.validation import preceding_event, super_event, validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -247,8 +247,13 @@ class EventBaseManager(BaseManager):
         fields = {
             'event_id': HiddenField(),
             'event': TableField(_('sub event of'))}
+        setattr(self.form_class, 'validate_event', super_event)
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(_('preceding event'))
+            setattr(
+                self.form_class,
+                'validate_event_preceding',
+                preceding_event)
         if self.class_.name != 'move':
             fields['place'] = TableField(_('location'))
         return fields

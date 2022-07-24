@@ -775,6 +775,7 @@ def display_form(
     from openatlas.forms.display import html_form
     return Markup(render_template(
         'forms/form.html',
+        form=form,
         html=html_form(form, form_id, manual_page)))
 
 
