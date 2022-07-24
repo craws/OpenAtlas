@@ -91,7 +91,6 @@ def get_move_form(type_: Type) -> FlaskForm:
 
     root = g.types[type_.root[0]]
     setattr(Form, str(root.id), TreeField(str(root.id)))
-    form = Form(obj=type_)
     choices = []
     if root.class_.name == 'administrative_unit':
         for entity in type_.get_linked_entities('P89', True):
@@ -106,5 +105,6 @@ def get_move_form(type_: Type) -> FlaskForm:
     else:
         for entity in type_.get_linked_entities('P2', True):
             choices.append((entity.id, entity.name))
+    form = Form(obj=type_)
     form.selection.choices = choices
     return form
