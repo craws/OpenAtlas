@@ -62,6 +62,8 @@ class BaseManager:
         for id_, field in self.additional_fields().items():
             setattr(Form, id_, field)
         add_reference_systems(self.class_, self.form_class)
+        if self.entity:
+            setattr(Form, 'entity_id', HiddenField())
         if 'date' in self.fields:
             add_date_fields(self.form_class, bool(
                 current_user.settings['module_time']
@@ -150,6 +152,8 @@ class BaseManager:
 
     def populate_update(self) -> None:
         self.form.opened.data = time.time()
+        if self.entity:
+            self.form.entity_id.data = self.entity.id
         populate_types(self)
         populate_reference_systems(self)
         if 'date' in self.fields:
@@ -261,10 +265,10 @@ class EventBaseManager(BaseManager):
     def populate_update(self) -> None:
         super().populate_update()
         self.form.event_id.data = self.entity.id
-        if super_event := self.entity.get_linked_entity('P9'):
-            self.form.event.data = super_event.id
-        if preceding_event := self.entity.get_linked_entity('P134', True):
-            self.form.event_preceding.data = preceding_event.id
+        if super_ := self.entity.get_linked_entity('P9'):
+            self.form.event.data = super_.id
+        if preceding_ := self.entity.get_linked_entity('P134', True):
+            self.form.event_preceding.data = preceding_.id
         if self.class_.name != 'move':
             if place := self.entity.get_linked_entity('P7'):
                 self.form.place.data = \

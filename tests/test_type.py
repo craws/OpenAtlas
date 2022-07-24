@@ -45,6 +45,7 @@ class TypeTest(TestBaseCase):
             self.app.post(
                 url_for('insert', class_='type', origin_id=sex_type.id),
                 data=data)
+            data['entity_id'] = type_id
             rv = self.app.post(
                 url_for('update', id_=type_id),
                 data=data,

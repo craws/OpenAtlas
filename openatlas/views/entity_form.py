@@ -3,7 +3,6 @@ from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
@@ -65,8 +64,6 @@ def update(id_: int) -> Union[str, Response]:
     place_info = get_place_info_for_update(entity)
     manager = get_manager(entity=entity)
     if manager.form.validate_on_submit():
-        if isinstance(entity, Type) and not check_type(entity, manager.form):
-            return redirect(url_for('view', id_=entity.id))
         if was_modified(manager.form, entity):  # pragma: no cover
             del manager.form.save
             flash(_('error modified'), 'error')
@@ -152,21 +149,6 @@ def check_update_access(entity: Entity) -> None:
             entity.category == 'system'
             or entity.category == 'standard' and not entity.root):
         abort(403)
-
-
-def check_type(entity: Type, form: FlaskForm) -> bool:
-    valid = True
-    root = g.types[entity.root[0]]
-    new_super_id = getattr(form, str(root.id)).data
-    new_super = g.types[int(new_super_id)] if new_super_id else None
-    if new_super:
-        if new_super.id == entity.id:
-            flash(_('error type self as super'), 'error')
-            valid = False
-        if new_super.root and entity.id in new_super.root:
-            flash(_('error type sub as super'), 'error')
-            valid = False
-    return valid
 
 
 def get_place_info_for_insert(

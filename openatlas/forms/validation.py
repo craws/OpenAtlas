@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import MultipleFileField
 
-from openatlas.forms.field import TableField
+from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.util.util import uc_first
 
@@ -39,7 +39,16 @@ def file(_form: FlaskForm, field: MultipleFileField) -> None:
                 '.' in file_.filename
                 and file_.filename.rsplit('.', 1)[1].lower() in
                 g.settings['file_upload_allowed_extension']):
-            field.errors.append(_('file type not allowed'))
+            field.errors.append(uc_first(_('file type not allowed')))
+
+
+def type_super(form: FlaskForm, field: TreeField) -> None:
+    type_ = g.types[int(form.entity_id.data)]
+    new_super = g.types[int(field.data)]
+    if new_super.id == type_.id:
+        field.errors.append(uc_first(_('error type self as super')))
+    if new_super.root and type_.id in new_super.root:
+        field.errors.append(uc_first(_('error type sub as super')))
 
 
 def validate(form: FlaskForm) -> bool:
