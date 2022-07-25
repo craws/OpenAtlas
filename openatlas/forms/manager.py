@@ -33,9 +33,7 @@ class AcquisitionManager(EventBaseManager):
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P24')
-        self.data['links']['insert'].append({
-            'property': 'P24',
-            'range': self.form.given_place.data})
+        self.add_link('P24', self.form.given_place.data)
 
 
 class ActorFunctionManager(BaseManager):
@@ -108,9 +106,7 @@ class AdministrativeUnitManager(BaseManager):
         new_super = g.types[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
             self.data['links']['delete'].add('P89')
-            self.data['links']['insert'].append({
-                'property': 'P89',
-                'range': new_super})
+            self.add_link('P89', new_super)
 
 
 class ArtifactManager(BaseManager):
@@ -128,14 +124,9 @@ class ArtifactManager(BaseManager):
         super().process_form()
         self.data['links']['delete'].add('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            self.data['links']['insert'].append({
-                'property': 'P46',
-                'range': self.origin,
-                'inverse': True})
+            self.add_link('P46', self.origin, inverse=True)
         if self.form.actor.data:
-            self.data['links']['insert'].append({
-                'property': 'P52',
-                'range': self.form.actor.data})
+            self.add_link('P52', self.form.actor.data)
 
 
 class BibliographyManager(BaseManager):
@@ -160,10 +151,7 @@ class FeatureManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if self.origin and self.origin.class_.name == 'place':
-            self.data['links']['insert'].append({
-                'property': 'P46',
-                'range': self.origin,
-                'inverse': True})
+            self.add_link('P46', self.origin, inverse=True)
 
     def add_buttons(self) -> None:
         super().add_buttons()
@@ -215,14 +203,9 @@ class HumanRemainsManager(BaseManager):
         super().process_form()
         self.data['links']['delete'].add('P52')
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            self.data['links']['insert'].append({
-                'property': 'P46',
-                'range': self.origin,
-                'inverse': True})
+            self.add_link('P46', self.origin, inverse=True)
         if self.form.actor.data:
-            self.data['links']['insert'].append({
-                'property': 'P52',
-                'range': self.form.actor.data})
+            self.add_link('P52', self.form.actor.data)
 
 
 class HierarchyCustomManager(HierarchyBaseManager):
@@ -295,25 +278,19 @@ class MoveManager(EventBaseManager):
         super().process_form()
         self.data['links']['delete'].update(['P25', 'P26', 'P27'])
         if self.form.artifact.data:
-            self.data['links']['insert'].append({
-                'property': 'P25',
-                'range': self.form.artifact.data})
+            self.add_link('P25', self.form.artifact.data)
         if self.form.person.data:
-            self.data['links']['insert'].append({
-                'property': 'P25',
-                'range': self.form.person.data})
+            self.add_link('P25', self.form.person.data)
         if self.form.place_from.data:
-            self.data['links']['insert'].append({
-                'property': 'P27',
-                'range': Link.get_linked_entity_safe(
-                    int(self.form.place_from.data),
-                    'P53')})
+            self.add_link(
+                'P27',
+                Link.get_linked_entity_safe(
+                    int(self.form.place_from.data), 'P53'))
         if self.form.place_to.data:
-            self.data['links']['insert'].append({
-                'property': 'P26',
-                'range': Link.get_linked_entity_safe(
-                    int(self.form.place_to.data),
-                    'P53')})
+            self.add_link(
+                'P26',
+                Link.get_linked_entity_safe(
+                    int(self.form.place_to.data), 'P53'))
 
 
 class PersonManager(ActorBaseManager):
@@ -351,9 +328,7 @@ class ProductionManager(EventBaseManager):
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P108')
-        self.data['links']['insert'].append({
-            'property': 'P108',
-            'range': self.form.artifact.data})
+        self.add_link('P108', self.form.artifact.data)
 
 
 class ReferenceSystemManager(BaseManager):
@@ -407,10 +382,7 @@ class SourceManager(BaseManager):
         if not self.origin:
             self.data['links']['delete_inverse'].add('P128')
             if self.form.artifact.data:
-                self.data['links']['insert'].append({
-                    'property': 'P128',
-                    'range': self.form.artifact.data,
-                    'inverse': True})
+                self.add_link('P128', self.form.artifact.data, inverse=True)
 
 
 class SourceTranslationManager(BaseManager):
@@ -422,10 +394,7 @@ class SourceTranslationManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if self.origin:
-            self.data['links']['insert'].append({
-                'property': 'P73',
-                'range': self.origin,
-                'inverse': True})
+            self.add_link('P73', self.origin, inverse=True)
 
 
 class StratigraphicUnitManager(BaseManager):
@@ -434,10 +403,7 @@ class StratigraphicUnitManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if self.origin and self.origin.class_.name == 'feature':
-            self.data['links']['insert'].append({
-                'property': 'P46',
-                'range': self.origin,
-                'inverse': True})
+            self.add_link('P46', self.origin, inverse=True)
 
     def add_buttons(self) -> None:
         super().add_buttons()
@@ -490,6 +456,4 @@ class TypeManager(BaseManager):
         new_super = g.types[int(new_super_id)] if new_super_id else root
         if super_id != new_super.id:
             self.data['links']['delete'].add('P127')
-            self.data['links']['insert'].append({
-                'property': 'P127',
-                'range': new_super})
+            self.add_link('P127', new_super)

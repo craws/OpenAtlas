@@ -1,5 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+import ast
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union
@@ -52,6 +53,12 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
                 'file_upload_allowed_extension']:
             settings[label] = ' '.join(value)
     return settings
+
+
+def string_to_entity_list(string: str) -> list[Entity]:
+    ids = ast.literal_eval(string)
+    ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
+    return Entity.get_by_ids(ids)
 
 
 def set_form_settings(form: Any, profile: bool = False) -> None:
