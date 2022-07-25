@@ -33,6 +33,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy.id))
             assert b'Geronimo' in rv.data
             data['classes'] = ['acquisition']
+            data['entity_id'] = hierarchy.id
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy.id),
                 data=data,
@@ -60,7 +61,9 @@ class HierarchyTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy.id),
-                data={'name': 'Actor actor relation'},
+                data={
+                    'name': 'Actor actor relation',
+                    'entity_id': hierarchy.id},
                 follow_redirects=True)
             assert b'The name is already in use' in rv.data
             rv = self.app.post(

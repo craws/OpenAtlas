@@ -3,6 +3,7 @@ versions = {
         'feature': {
             '1761': "Don't show empty type fields in forms",
             '1737': 'Improved user statistics',
+            '1739': 'Different display of shape and area polygon',
             '1734': 'Refactor form functions',
             '1710': 'Manual: add CIDOC links for entity classes',
             '1726': 'Manual: add FAQs'},

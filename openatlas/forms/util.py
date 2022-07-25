@@ -1,5 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Optional, Union
 
@@ -10,7 +11,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
-from openatlas import app
+from openatlas import app, logger
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -107,6 +108,15 @@ def populate_insert_form(
         root_id = origin.root[0] if origin.root else origin.id
         getattr(form, str(root_id)).data = origin.id \
             if origin.id != root_id else None
+
+
+def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
+    if not entity.modified or not form.opened.data:
+        return False
+    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+        return False
+    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
+    return True
 
 
 def form_to_datetime64(
