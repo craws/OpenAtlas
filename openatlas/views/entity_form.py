@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.database.connect import Transaction
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
-from openatlas.forms.util import populate_insert_form
+from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -19,8 +19,7 @@ from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
-from openatlas.util.util import (
-    is_authorized, link, required_group, was_modified)
+from openatlas.util.util import is_authorized, link, required_group
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])

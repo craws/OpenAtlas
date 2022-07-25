@@ -20,9 +20,6 @@ from openatlas.util.util import (
 def hierarchy_insert(category: str) -> Union[str, Response]:
     manager = get_manager(f'hierarchy_{category}')
     if manager.form.validate_on_submit():
-        if Type.check_hierarchy_exists(manager.form.name.data):
-            flash(_('error name exists'), 'error')
-            return render_template('display_form.html', form=manager.form)
         try:
             Transaction.begin()
             manager.insert_entity()
@@ -68,47 +65,41 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             has_multiple_links = True
             break
         linked_entities.add(entity.id)
-    if hasattr(manager.form, 'multiple') and has_multiple_links:
-        manager.form.multiple.render_kw = {'disabled': 'disabled'}
     if manager.form.validate_on_submit():
-        if manager.form.name.data != hierarchy.name \
-                and Type.get_types(manager.form.name.data):
-            flash(_('error name exists'), 'error')
-        else:
-            Transaction.begin()
-            try:
-                Type.update_hierarchy(
-                    hierarchy,
-                    sanitize(manager.form.name.data, 'text'),
-                    manager.form.classes.data,
-                    multiple=(
-                        hierarchy.category == 'value'
-                        or (hasattr(manager.form, 'multiple')
-                            and manager.form.multiple.data)
-                        or has_multiple_links))
-                manager.process_form()
-                manager.entity.update(manager.data)
-                Transaction.commit()
-            except Exception as e:  # pragma: no cover
-                Transaction.rollback()
-                logger.log('error', 'database', 'transaction failed', e)
-                flash(_('error transaction'), 'error')
-                abort(418)
-            flash(_('info update'), 'info')
+        Transaction.begin()
+        try:
+            Type.update_hierarchy(
+                hierarchy,
+                sanitize(manager.form.name.data, 'text'),
+                manager.form.classes.data,
+                multiple=(
+                    hierarchy.category == 'value'
+                    or (hasattr(manager.form, 'multiple')
+                        and manager.form.multiple.data)
+                    or has_multiple_links))
+            manager.process_form()
+            manager.entity.update(manager.data)
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+            abort(418)
+        flash(_('info update'), 'info')
         tab = 'value' if g.types[id_].category == 'value' else 'custom'
         return redirect(
             f"{url_for('type_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
+    manager.populate_update()
+    if hasattr(manager.form, 'multiple') and has_multiple_links:
+        manager.form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(paging=False)
-    for class_name in hierarchy.classes:
-        count = Type.get_form_count(hierarchy, class_name)
+    for name in hierarchy.classes:
+        count = Type.get_form_count(hierarchy, name)
         table.rows.append([
-            g.classes[class_name].label,
+            g.classes[name].label,
             format_number(count) if count else link(
                 _('remove'),
-                url_for(
-                    'remove_class',
-                    id_=hierarchy.id,
-                    class_name=class_name))])
+                url_for('remove_class', id_=hierarchy.id, class_name=name))])
     return render_template(
         'display_form.html',
         form=manager.form,

@@ -20,7 +20,8 @@ from openatlas.forms.populate import (
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import check_if_entity_has_time
-from openatlas.forms.validation import preceding_event, super_event, validate
+from openatlas.forms.validation import (
+    hierarchy_name_exists, preceding_event, super_event, validate)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -305,6 +306,7 @@ class HierarchyBaseManager(BaseManager):
     fields = ['name', 'description']
 
     def additional_fields(self) -> dict[str, Any]:
+        setattr(self.form_class, 'validate_name', hierarchy_name_exists)
         return {
             'classes': SelectMultipleField(
                 _('classes'),

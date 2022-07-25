@@ -18,7 +18,6 @@ from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
 from jinja2 import contextfilter
 from markupsafe import Markup
 from werkzeug.exceptions import abort
@@ -403,15 +402,6 @@ def tooltip(text: str) -> str:
         <span>
             <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
         </span>""".format(title=text.replace('"', "'"))
-
-
-def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
-        return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
 
 
 def get_appearance(event_links: list[Link]) -> tuple[str, str]:
