@@ -43,7 +43,7 @@ start = time.time()
 for item in config:
     try:
         config[item] = vars(production)[item]
-    except:
+    except Exception:
         pass
 
 db = open_connection(config)

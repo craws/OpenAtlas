@@ -34,7 +34,8 @@ class TypeTest(TestBaseCase):
             data = {
                 'name': 'My secret type',
                 'name_inverse': 'Do I look inverse?',
-                'description': 'Very important!'}
+                'description': 'Very important!',
+                str(actor_type.id): actor_type.subs[0]}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
@@ -44,6 +45,7 @@ class TypeTest(TestBaseCase):
             self.app.post(
                 url_for('insert', class_='type', origin_id=sex_type.id),
                 data=data)
+            data['entity_id'] = type_id
             rv = self.app.post(
                 url_for('update', id_=type_id),
                 data=data,
@@ -105,6 +107,9 @@ class TypeTest(TestBaseCase):
                 data={'name': 'admin unit'},
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
+            rv = self.app.get(
+                url_for('update', id_=g.types[admin_unit_id].subs[0]))
+            assert b'admin unit' in rv.data
 
             # Value type
             rv = self.app.get(

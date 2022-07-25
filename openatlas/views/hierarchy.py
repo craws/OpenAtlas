@@ -7,9 +7,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app, logger
 from openatlas.database.connect import Transaction
-from openatlas.forms.form import get_form
-from openatlas.forms.util import process_form_data
-from openatlas.models.entity import Entity
+from openatlas.forms.form import get_manager
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -20,23 +18,24 @@ from openatlas.util.util import (
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(category: str) -> Union[str, Response]:
-    form = get_form('hierarchy', code=category)
-    form.classes.choices = Type.get_class_choices()
-    if form.validate_on_submit():
-        if Type.check_hierarchy_exists(form.name.data):
+    manager = get_manager(f'hierarchy_{category}')
+    if manager.form.validate_on_submit():
+        if Type.check_hierarchy_exists(manager.form.name.data):
             flash(_('error name exists'), 'error')
-            return render_template('display_form.html', form=form)
+            return render_template('display_form.html', form=manager.form)
         try:
             Transaction.begin()
-            type_ = Entity.insert('type', sanitize(form.name.data))
+            manager.insert_entity()
             Type.insert_hierarchy(
-                type_,  # type: ignore
+                manager.entity,  # type: ignore
                 category,
-                form.classes.data,
+                manager.form.classes.data,
                 bool(
                     category == 'value' or
-                    (hasattr(form, 'multiple') and form.multiple.data)))
-            type_.update(process_form_data(form, type_))
+                    (hasattr(manager.form, 'multiple')
+                     and manager.form.multiple.data)))
+            manager.process_form()
+            manager.entity.update(manager.data, new=True)
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -47,7 +46,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
         return redirect(f"{url_for('type_index')}#menu-tab-{category}")
     return render_template(
         'display_form.html',
-        form=form,
+        form=manager.form,
         manual_page='entity/type',
         title=_('types'),
         crumbs=[
@@ -61,8 +60,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     hierarchy = g.types[id_]
     if hierarchy.category in ('standard', 'system'):
         abort(403)
-    form = get_form('hierarchy', hierarchy)
-    form.classes.choices = Type.get_class_choices(hierarchy)
+    manager = get_manager(f'hierarchy_{hierarchy.category}', entity=hierarchy)
     linked_entities = set()
     has_multiple_links = False
     for entity in get_entities_linked_to_type_recursive(id_, []):
@@ -70,24 +68,26 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             has_multiple_links = True
             break
         linked_entities.add(entity.id)
-    if hasattr(form, 'multiple') and has_multiple_links:
-        form.multiple.render_kw = {'disabled': 'disabled'}
-    if form.validate_on_submit():
-        if form.name.data != hierarchy.name and Type.get_types(form.name.data):
+    if hasattr(manager.form, 'multiple') and has_multiple_links:
+        manager.form.multiple.render_kw = {'disabled': 'disabled'}
+    if manager.form.validate_on_submit():
+        if manager.form.name.data != hierarchy.name \
+                and Type.get_types(manager.form.name.data):
             flash(_('error name exists'), 'error')
         else:
             Transaction.begin()
             try:
                 Type.update_hierarchy(
                     hierarchy,
-                    sanitize(form.name.data),
-                    form.classes.data,
+                    sanitize(manager.form.name.data, 'text'),
+                    manager.form.classes.data,
                     multiple=(
-                            hierarchy.category == 'value'
-                            or (hasattr(form, 'multiple')
-                                and form.multiple.data)
-                            or has_multiple_links))
-                hierarchy.update(process_form_data(form, hierarchy))
+                        hierarchy.category == 'value'
+                        or (hasattr(manager.form, 'multiple')
+                            and manager.form.multiple.data)
+                        or has_multiple_links))
+                manager.process_form()
+                manager.entity.update(manager.data)
                 Transaction.commit()
             except Exception as e:  # pragma: no cover
                 Transaction.rollback()
@@ -98,7 +98,6 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         tab = 'value' if g.types[id_].category == 'value' else 'custom'
         return redirect(
             f"{url_for('type_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
-    form.multiple = hierarchy.multiple
     table = Table(paging=False)
     for class_name in hierarchy.classes:
         count = Type.get_form_count(hierarchy, class_name)
@@ -112,7 +111,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                     class_name=class_name))])
     return render_template(
         'display_form.html',
-        form=form,
+        form=manager.form,
         table=table,
         manual_page='entity/type',
         title=_('types'),

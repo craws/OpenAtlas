@@ -3,17 +3,24 @@ from typing import Union
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
+from wtforms import BooleanField, SubmitField, TextAreaField
 
 from openatlas import app
-from openatlas.forms.form import get_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.util import (
     button, is_authorized, link, manual, required_group, uc_first)
+
+
+class NoteForm(FlaskForm):
+    public = BooleanField(_('public'), default=False)
+    description = TextAreaField(_('description'))
+    save = SubmitField(_('save'))
 
 
 @app.route('/note/view/<int:id_>')
@@ -61,7 +68,7 @@ def note_set_private(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def note_insert(entity_id: int) -> Union[str, Response]:
     entity = Entity.get_by_id(entity_id)
-    form = get_form('note')
+    form = NoteForm()
     if form.validate_on_submit():
         User.insert_note(entity_id, form.description.data, form.public.data)
         flash(_('note added'), 'info')
@@ -83,7 +90,7 @@ def note_update(id_: int) -> Union[str, Response]:
     if not note['user_id'] == current_user.id:
         abort(403)  # pragma: no cover
     entity = Entity.get_by_id(note['entity_id'])
-    form = get_form('note')
+    form = NoteForm()
     if form.validate_on_submit():
         User.update_note(note['id'], form.description.data, form.public.data)
         flash(_('note updated'), 'info')

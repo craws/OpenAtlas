@@ -344,6 +344,7 @@ class PlaceTest(TestBaseCase):
             self.app.get(url_for('update', id_=find_id))
             data = {
                 'name': 'My human remains',
+                'actor': actor.id,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(

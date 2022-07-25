@@ -37,9 +37,8 @@ from openatlas.api import api
 from openatlas.util.util import convert_size
 from openatlas.views import (
     admin, ajax, anthropology, entity, entity_index, entity_form, error,
-    export, file, hierarchy, index, involvement, imports, link, login, member,
-    model, note, overlay, profile, reference, relation, reference_system,
-    search, sql, type as type_, user)
+    export, file, hierarchy, index, imports, link, login, model, note, overlay,
+    profile, reference, reference_system, search, sql, type as type_, user)
 
 
 @babel.localeselector
