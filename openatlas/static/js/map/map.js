@@ -57,6 +57,7 @@ const polygonStyle = (feature) => {
   return {
     color: "#9A9A9A",
     weight: getWeight(feature),
+    fillOpacity: .5
   };
 };
 const siblingStyle = (feature) => {
