@@ -9,6 +9,7 @@ from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
@@ -235,6 +236,13 @@ def add_types(manager: Any) -> None:
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)
         for type_ in types.values():
+            from openatlas.forms.form import get_manager
+
+            origin_id = type_.id
+            print(origin_id)
+            origin = Entity.get_by_id(origin_id) if origin_id else None
+            type_manager = get_manager("type", origin=origin)
+            print(type_manager.form)
             if type_.multiple:
                 setattr(
                     manager.form_class,
@@ -244,6 +252,6 @@ def add_types(manager: Any) -> None:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id)))
+                    TreeField(str(type_.id),form=type_manager.form))
             if type_.category == 'value':
                 add_value_type_fields(manager.form_class, type_.subs)

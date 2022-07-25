@@ -165,6 +165,7 @@ class TreeSelect(HiddenInput):
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         selection = ''
         selected_ids = []
+        id = f'{field.id}-{"form" if field.form else ""}'
         if field.data:
             field.data = field.data[0] \
                 if isinstance(field.data, list) else field.data
@@ -173,9 +174,15 @@ class TreeSelect(HiddenInput):
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
             field=field,
+            id=id,
             selection=selection,
             data=Type.get_tree_data(int(field.id), selected_ids))
 
 
 class TreeField(HiddenField):
+     
+    def __init__(self, label='', validators=None, form=None, **kwargs):
+       super(TreeField, self).__init__(label, validators, **kwargs)
+       self.form = form
+
     widget = TreeSelect()
