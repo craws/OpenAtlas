@@ -270,7 +270,8 @@ class EventBaseManager(BaseManager):
         fields = {
             'event_id': HiddenField(),
             'event': TableField(_('sub event of'))}
-        setattr(self.form_class, 'validate_event', super_event)
+        if self.entity:
+            setattr(self.form_class, 'validate_event', super_event)
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(_('preceding event'))
             setattr(
