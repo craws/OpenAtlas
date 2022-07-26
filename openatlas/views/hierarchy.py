@@ -89,7 +89,8 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         tab = 'value' if g.types[id_].category == 'value' else 'custom'
         return redirect(
             f"{url_for('type_index')}#menu-tab-{tab}_collapse-{hierarchy.id}")
-    manager.populate_update()
+    if not manager.form.errors:
+        manager.populate_update()
     if hasattr(manager.form, 'multiple') and has_multiple_links:
         manager.form.multiple.render_kw = {'disabled': 'disabled'}
     table = Table(paging=False)
