@@ -48,12 +48,8 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
 def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes."""
-    if class_ == 'place':
-        entities = Entity.get_by_class('place', types=True, aliases=True)
-    elif class_ == 'artifact':
-        entities = Entity.get_by_class(
-            ['artifact', 'human_remains'],
-            types=True)
+    if class_ == 'artifact':
+        entities = Entity.get_by_class(['artifact', 'human_remains'], True)
     else:
         entities = Entity.get_by_view(class_, types=True, aliases=True)
     linked_ids = [entity.id for entity in linked_entities]
