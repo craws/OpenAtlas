@@ -561,10 +561,10 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
 
 
 def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
-    tabs = {'source': Tab('source', entity=entity)}
-    if entity.class_.name == 'place':
-        tabs['event'] = Tab('event', entity=entity)
-    tabs['reference'] = Tab('reference', entity=entity)
+    tabs = {
+        'source': Tab('source', entity=entity),
+        'event': Tab('event', entity=entity),
+        'reference': Tab('reference', entity=entity)}
     if entity.class_.name == 'place':
         tabs['actor'] = Tab('actor', entity=entity)
         tabs['feature'] = Tab('feature', entity=entity)
