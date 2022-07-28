@@ -23,6 +23,7 @@ from openatlas.util.util import (
     button, display_delete_link, format_date, get_base_table_data,
     get_entity_data, get_file_path, is_authorized, link, required_group,
     uc_first)
+from openatlas.views.entity_form import get_place_info_for_update
 from openatlas.views.entity_index import file_preview
 from openatlas.views.link import AddReferenceForm
 
@@ -367,6 +368,12 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             data.append(format_number(item.types[entity]))
         data.append(item.class_.label)
         data.append(item.description)
+        if item.class_.view == 'place' and item.class_.name != 'place':
+            if 'place' not in tabs['entities'].table.header:
+                tabs['entities'].table.header.append('place')
+            #super_ = item.get_linked_entity_safe('P89')
+            print(get_place_info_for_update(item))
+            data.append('whatever')
         tabs['entities'].table.rows.append(data)
     if not tabs['entities'].table.rows:
         # If no entities available get links with this type_id
