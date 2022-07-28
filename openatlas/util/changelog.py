@@ -1,6 +1,7 @@
 versions = {
     '7.5.0': ['TBA', {
         'feature': {
+            '1637': 'Linking sub units like places, e.g. with events',
             '1761': "Forms: don't show empty type fields in forms",
             '1768': 'Forms: improved validations',
             '1734': 'Forms: refactor functions',
