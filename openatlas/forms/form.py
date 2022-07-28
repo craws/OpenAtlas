@@ -24,11 +24,10 @@ def get_manager(
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
         link_: Optional[Link] = None) -> base_manager.BaseManager:
-    class_name = entity.class_.name if not class_name else class_name
-    manager_name = ''.join(i.capitalize() for i in class_name.split('_'))
+    name = entity.class_.name if entity and not class_name else class_name
+    manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(
-        class_=g.classes[
-            'type' if class_name.startswith('hierarchy') else class_name],
+        class_=g.classes['type' if name.startswith('hierarchy') else name],
         entity=entity,
         origin=origin,
         link_=link_)

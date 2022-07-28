@@ -34,10 +34,10 @@ from openatlas.util.util import uc_first
 class BaseManager:
     class_: OpenatlasClass
     fields: list[str] = []
-    form: FlaskForm = None
-    entity: Optional[Entity] = None
-    origin: Optional[Entity] = None
-    link_: Optional[Link] = None
+    form: Any = None
+    entity: Any = None
+    origin: Any = None
+    link_: Any = None
     continue_link_id: Optional[int] = None
     data: dict[str, Any] = {}
 
@@ -144,7 +144,7 @@ class BaseManager:
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
-        for field in self.form:  # type: ignore
+        for field in self.form:
             if isinstance(field, TreeField) and field.data:
                 return g.types[int(field.data)]
         return None
@@ -175,11 +175,10 @@ class BaseManager:
             type_id: Optional[int] = None) -> None:
         if not range_:
             return
-        if isinstance(range_, str):
-            range_ = string_to_entity_list(range_)
         self.data['links']['insert'].append({
             'property': property_,
-            'range': range_,
+            'range': string_to_entity_list(range_)
+            if isinstance(range_, str) else range_,
             'description': description,
             'inverse': inverse,
             'return_link_id': return_link_id,

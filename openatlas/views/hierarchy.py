@@ -24,7 +24,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
             Transaction.begin()
             manager.insert_entity()
             Type.insert_hierarchy(
-                manager.entity,  # type: ignore
+                manager.entity,
                 category,
                 manager.form.classes.data,
                 bool(

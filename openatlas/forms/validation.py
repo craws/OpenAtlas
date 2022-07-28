@@ -23,11 +23,14 @@ def super_event(form: FlaskForm, super_: TableField) -> None:
         form.event.errors.append(_('sub of self not allowed as super'))
 
 
-def get_sub_events_recursive(entity, target):  # pragma: no cover
+def get_sub_events_recursive(
+        entity: Entity,
+        target: Entity) -> bool:  # pragma: no cover
     for sub in entity.get_linked_entities('P9', inverse=True):
         if sub.id == target.id:
             return True
         get_sub_events_recursive(sub, target)
+    return False
 
 
 def preceding_event(form: FlaskForm, preceding: TableField) -> None:
