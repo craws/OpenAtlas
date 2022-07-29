@@ -31,10 +31,17 @@ class InvolvementTests(TestBaseCase):
 
             # Add involvement
             rv = self.app.get(
-                url_for('involvement_insert', origin_id=actor.id))
+                url_for(
+                    'insert_relation',
+                    type_='involvement',
+                    origin_id=actor.id))
+
             assert b'Involvement' in rv.data
             rv = self.app.post(
-                url_for('involvement_insert', origin_id=actor.id),
+                url_for(
+                    'insert_relation',
+                    type_='involvement',
+                    origin_id=actor.id),
                 data={
                     'event': str([event_id]),
                     'activity': 'P11',
@@ -44,7 +51,10 @@ class InvolvementTests(TestBaseCase):
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
             rv = self.app.post(
-                url_for('involvement_insert', origin_id=event_id),
+                url_for(
+                    'insert_relation',
+                    type_='involvement',
+                    origin_id=event_id),
                 data={
                     'actor': str([actor.id]),
                     'continue_': 'yes',

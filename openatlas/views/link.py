@@ -82,11 +82,11 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     abort(403)  # pragma: no cover
 
 
-@app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('contributor')
-def involvement_insert(origin_id: int) -> Union[str, Response]:
+@app.route('/insert/relation/<type_>/<int:origin_id>', methods=['POST', 'GET'])
+@required_group('contributer')
+def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    manager = get_manager('involvement', origin=origin)
+    manager = get_manager(type_, origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -119,7 +119,11 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
-            return redirect(url_for('involvement_insert', origin_id=origin_id))
+            return redirect(
+                url_for(
+                    'insert_relation',
+                    type_='involvement',
+                    origin_id=origin_id))
         return redirect(
             f"{url_for('view', id_=origin.id)}"
             f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
@@ -129,7 +133,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         crumbs=[
             [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
-            _('involvement')])
+            _(type_)])
 
 
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])

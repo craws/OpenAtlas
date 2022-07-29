@@ -116,7 +116,10 @@ class Tab:
             elif view == 'event':
                 self.buttons.append(button(
                     'link',
-                    url_for('involvement_insert', origin_id=id_)))
+                    url_for(
+                        'insert_relation',
+                        type_='involvement',
+                        origin_id=id_)))
             for item in g.view_class_mapping['actor']:
                 self.buttons.append(button(
                     g.classes[item].label,
@@ -145,7 +148,10 @@ class Tab:
                 self.buttons.append(
                     button(
                         'link',
-                        url_for('involvement_insert', origin_id=id_)))
+                        url_for(
+                            'insert_relation',
+                            type_='involvement',
+                            origin_id=id_)))
             elif view == 'source':
                 self.buttons.append(
                     button(
