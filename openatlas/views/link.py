@@ -254,7 +254,8 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
         return redirect(
             f"{url_for('view', id_=origin.id)}"
             f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
-    manager.populate_update()
+    if not manager.form.errors:
+        manager.populate_update()
     return render_template(
         'display_form.html',
         origin=origin,
@@ -291,7 +292,8 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
         return redirect(
             f"{url_for('view', id_=origin.id)}"
             f"#tab-member{'-of' if origin.id == range_.id else ''}")
-    manager.populate_update()
+    if not manager.form.errors:
+        manager.populate_update()
     return render_template(
         'display_form.html',
         form=manager.form,
@@ -336,7 +338,8 @@ def relation_update(
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
-    manager.populate_update()
+    if not manager.form.errors:
+        manager.populate_update()
     return render_template(
         'display_form.html',
         form=manager.form,

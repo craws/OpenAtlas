@@ -42,7 +42,7 @@ class TableMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
         aliases = current_user.settings['table_show_aliases']
-        if class_ in ['group', 'person', 'place']:
+        if class_ in ['group', 'person']:
             entities = Entity.get_by_class(class_, types=True, aliases=aliases)
         else:
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
@@ -99,7 +99,7 @@ class TableSelect(HiddenInput):
             if 'place' in field.id \
                     or field.id in ['begins_in', 'ends_in', 'residence']:
                 class_ = 'place'
-                entities = Entity.get_by_class(
+                entities = Entity.get_by_view(
                     'place',
                     types=True,
                     aliases=aliases)

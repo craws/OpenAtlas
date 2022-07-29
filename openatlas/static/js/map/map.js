@@ -47,7 +47,7 @@ const myCircleStyle = {
 };
 
 const getWeight = (feature) =>
-  feature?.properties?.shapeType === "area" ? 0 : 1;
+  feature?.properties?.shapeType === "area" ? 0 : 2;
 const selectedPolygonStyle = (feature) => {
   return {
     weight: getWeight(feature),
