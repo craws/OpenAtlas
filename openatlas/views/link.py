@@ -90,28 +90,8 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
-            if origin.class_.view == 'event':
-                for actor in Entity.get_by_ids(
-                        ast.literal_eval(manager.form.actor.data)):
-                    link_ = Link.get_by_id(
-                        origin.link(
-                            manager.form.activity.data,
-                            actor,
-                            manager.form.description.data)[0])
-                    link_.set_dates(process_dates(manager))
-                    link_.type = manager.get_link_type()
-                    link_.update()
-            else:
-                for event in Entity.get_by_ids(
-                        ast.literal_eval(manager.form.event.data)):
-                    link_ = Link.get_by_id(
-                        event.link(
-                            manager.form.activity.data,
-                            origin,
-                            manager.form.description.data)[0])
-                    link_.set_dates(process_dates(manager))
-                    link_.type = manager.get_link_type()
-                    link_.update()
+            manager.process_form()
+
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
@@ -122,7 +102,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             return redirect(
                 url_for(
                     'insert_relation',
-                    type_='involvement',
+                    type_=type_,
                     origin_id=origin_id))
         return redirect(
             f"{url_for('view', id_=origin.id)}"
@@ -221,7 +201,10 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
-            return redirect(url_for('relation_insert', origin_id=origin_id))
+            return redirect(url_for(
+                        'insert_relation',
+                        type_='actor_actor_relation',
+                        origin_id=origin_id))
         return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     return render_template(
         'display_form.html',

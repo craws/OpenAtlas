@@ -237,7 +237,12 @@ class Tab:
                     url_for('insert', class_=item, origin_id=id_)))
         elif name == 'relation':
             self.buttons.append(
-                button('link', url_for('relation_insert', origin_id=id_)))
+                button(
+                    'link',
+                    url_for(
+                        'insert_relation',
+                        type_='actor_actor_relation',
+                        origin_id=id_)))
             for item in g.view_class_mapping['actor']:
                 self.buttons.append(
                     button(

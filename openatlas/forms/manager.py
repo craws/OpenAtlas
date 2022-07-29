@@ -1,3 +1,4 @@
+import ast
 from typing import Any
 
 from flask import g, request
@@ -13,6 +14,7 @@ from openatlas.forms.base_manager import (
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import \
     (actor_relation, file, membership, type_super)
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -245,6 +247,30 @@ class InvolvementManager(BaseManager):
     def populate_update(self) -> None:
         super().populate_update()
         self.form.activity.data = self.link_.property.code
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.add_link('P25', self.form.artifact.data)
+        if self.origin.class_.view == 'event':
+            for actor in Entity.get_by_ids(
+                    ast.literal_eval(self.form.actor.data)):
+                link_ = Link.get_by_id(
+                    self.origin.link(
+                        self.form.activity.data,
+                        actor,
+                        self.form.description.data)[0])
+                link_.type = self.get_link_type()
+                link_.update()
+        else:
+            for event in Entity.get_by_ids(
+                    ast.literal_eval(self.form.event.data)):
+                link_ = Link.get_by_id(
+                    event.link(
+                        self.form.activity.data,
+                        self.origin,
+                        self.form.description.data)[0])
+                link_.type = self.get_link_type()
+                link_.update()
 
 
 class MoveManager(EventBaseManager):

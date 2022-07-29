@@ -17,7 +17,10 @@ class RelationTests(TestBaseCase):
                 related = Entity.insert('person', 'The Kurgan')
 
             # Add relationship
-            rv = self.app.get(url_for('relation_insert', origin_id=actor.id))
+            rv = self.app.get(url_for(
+                        'insert_relation',
+                        type_='actor_actor_relation',
+                        origin_id=actor.id))
             assert b'Actor actor relation' in rv.data
             relation_id = Type.get_hierarchy('Actor actor relation').id
             relation_sub_id = g.types[relation_id].subs[0]
@@ -33,7 +36,10 @@ class RelationTests(TestBaseCase):
                 'end_year_from': '2049',
                 'end_year_to': '2050'}
             rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id),
+                url_for(
+                    'insert_relation',
+                    type_='actor_actor_relation',
+                    origin_id=actor.id),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
@@ -42,7 +48,10 @@ class RelationTests(TestBaseCase):
             data['continue_'] = 'yes'
             data['inverse'] = True
             rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id),
+                url_for(
+                    'insert_relation',
+                    type_='actor_actor_relation',
+                    origin_id=actor.id),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
@@ -50,7 +59,10 @@ class RelationTests(TestBaseCase):
             assert b'The Kurgan' in rv.data
 
             rv = self.app.post(
-                url_for('relation_insert', origin_id=related.id),
+                url_for(
+                    'insert_relation',
+                    type_='actor_actor_relation',
+                    origin_id=related.id),
                 data=data,
                 follow_redirects=True)
             assert b"link to itself" in rv.data
