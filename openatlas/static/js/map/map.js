@@ -47,7 +47,7 @@ const myCircleStyle = {
 };
 
 const getWeight = (feature) =>
-  feature?.properties?.shapeType === "area" ? 0 : 1;
+  feature?.properties?.shapeType === "area" ? 0 : 2;
 const selectedPolygonStyle = (feature) => {
   return {
     weight: getWeight(feature),
@@ -57,6 +57,7 @@ const polygonStyle = (feature) => {
   return {
     color: "#9A9A9A",
     weight: getWeight(feature),
+    fillOpacity: .5
   };
 };
 const siblingStyle = (feature) => {

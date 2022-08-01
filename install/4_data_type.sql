@@ -3,7 +3,7 @@
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
     ('administrative_unit',  'E53', false, false, false, 'contributor', NULL,      'mdi-map-marker', NULL),
     ('type',                 'E55', false, true,  false, 'editor',      NULL,      NULL,             NULL),
-    ('type_anthropology',    'E55', false, true,  false, 'admin',       NULL,      NULL,             NULL);
+    ('type_anthropology',    'E55', false, false, false, 'admin',       NULL,      NULL,             NULL);
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
     ('E55', 'type', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.'),
@@ -352,7 +352,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM model.entity WHERE name='External reference'), 'External reference', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='External reference match'), 'External reference match', 'system', False, False),
     ((SELECT id FROM model.entity WHERE name='Feature'), 'Feature', 'standard', False, False),
-    ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'anthropology',False , False),
+    ((SELECT id FROM model.entity WHERE name='Features for sexing'), 'Features for sexing', 'anthropology', False, False),
     ((SELECT id FROM model.entity WHERE name='Historical place'), 'Historical place', 'place', True, False),
     ((SELECT id FROM model.entity WHERE name='Human remains' AND cidoc_class_code = 'E55'), 'Human remains', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='Involvement'), 'Involvement', 'standard', False, False),

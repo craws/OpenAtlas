@@ -39,11 +39,13 @@ we use to set up new Debian servers for OpenAtlas installations.
 ### Files
 
 Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub and
-adapt accordingly e.g.
+adapt accordingly e.g. as normal user:
 
     $ git clone https://github.com/craws/OpenAtlas.git
 
 ### Frontend libraries
+
+Execute this lines as normal user too:
 
     $ pip3 install calmjs
     $ cd openatlas/static
@@ -52,7 +54,7 @@ adapt accordingly e.g.
 
 ### Database
 
-The commands below have to be executed as postgres.
+The commands below have to be executed as the postgres user.
 
 Create an openatlas database user
 

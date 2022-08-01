@@ -7,12 +7,30 @@ from wtforms import MultipleFileField
 
 from openatlas.forms.field import TableField, TreeField
 from openatlas.forms.util import form_to_datetime64
+from openatlas.models.entity import Entity
+from openatlas.models.type import Type
 from openatlas.util.util import uc_first
 
 
 def super_event(form: FlaskForm, super_: TableField) -> None:
-    if super_.data and str(super_.data) == str(form.event_id.data):
+    if not super_.data:
+        return
+    if str(super_.data) == str(form.event_id.data):
         form.event.errors.append(_('self as super not allowed'))
+    if get_sub_events_recursive(
+            Entity.get_by_id(form.event_id.data),
+            Entity.get_by_id(super_.data)):  # pragma: no cover
+        form.event.errors.append(_('sub of self not allowed as super'))
+
+
+def get_sub_events_recursive(
+        entity: Entity,
+        target: Entity) -> bool:  # pragma: no cover
+    for sub in entity.get_linked_entities('P9', inverse=True):
+        if sub.id == target.id:
+            return True
+        get_sub_events_recursive(sub, target)
+    return False
 
 
 def preceding_event(form: FlaskForm, preceding: TableField) -> None:
@@ -49,6 +67,13 @@ def type_super(form: FlaskForm, field: TreeField) -> None:
         field.errors.append(uc_first(_('error type self as super')))
     if new_super.root and type_.id in new_super.root:
         field.errors.append(uc_first(_('error type sub as super')))
+
+
+def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
+    if not hasattr(form, 'entity_id') or \
+            Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
+        if Type.check_hierarchy_exists(form.name.data):
+            field.errors.append(uc_first(_('error name exists')))
 
 
 def validate(form: FlaskForm) -> bool:

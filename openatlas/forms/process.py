@@ -71,15 +71,10 @@ def process_standard_fields(manager: Any) -> None:
                 manager.data['administrative_units'] += value
             elif manager.entity.class_.view != 'type':
                 manager.data['links']['delete'].add('P2')
-                manager.data['links']['insert'].append({
-                    'property': 'P2',
-                    'range': [g.types[id_] for id_ in value]})
+                manager.add_link('P2', [g.types[id_] for id_ in value])
         elif field_type == 'ValueFloatField':
             if value is not None:  # Allow the number zero
-                manager.data['links']['insert'].append({
-                    'property': 'P2',
-                    'description': value,
-                    'range': g.types[int(key)]})
+                manager.add_link('P2', g.types[int(key)], value)
         elif key.startswith('reference_system_id_'):
             system = Entity.get_by_id(
                 int(key.replace('reference_system_id_', '')))
@@ -88,12 +83,12 @@ def process_standard_fields(manager: Any) -> None:
                 key.replace('id_', 'precision_'))
             manager.data['links']['delete_reference_system'] = True
             if value:
-                manager.data['links']['insert'].append({
-                    'property': 'P67',
-                    'range': system,
-                    'description': value,
-                    'type_id': precision_field.data,
-                    'inverse': True})
+                manager.add_link(
+                    'P67',
+                    system,
+                    value,
+                    inverse=True,
+                    type_id=precision_field.data)
         else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
@@ -101,30 +96,27 @@ def process_standard_fields(manager: Any) -> None:
 def process_origin(manager: Any) -> None:
     if manager.origin.class_.view == 'reference':
         if manager.entity.class_.name == 'file':
-            manager.data['links']['insert'].append({
-                'property': 'P67',
-                'range': manager.origin,
-                'description': manager.form.page.data,
-                'inverse': True})
+            manager.add_link(
+                'P67',
+                manager.origin,
+                manager.form.page.data,
+                inverse=True)
         else:
-            manager.data['links']['insert'].append({
-                'property': 'P67',
-                'range': manager.origin,
-                'return_link_id': True,
-                'inverse': True})
+            manager.add_link(
+                'P67',
+                manager.origin,
+                inverse=True,
+                return_link_id=True)
     elif manager.entity.class_.name == 'file' \
             or (manager.entity.class_.view in ['reference', 'source']
                 and manager.origin.class_.name != 'file'):
-        manager.data['links']['insert'].append({
-            'property': 'P67',
-            'range': manager.origin,
-            'return_link_id': manager.entity.class_.view == 'reference'})
+        manager.add_link(
+            'P67',
+            manager.origin,
+            return_link_id=bool(manager.entity.class_.view == 'reference'))
     elif manager.origin.class_.view in ['source', 'file'] \
             and manager.entity.class_.name != 'source_translation':
-        manager.data['links']['insert'].append({
-            'property': 'P67',
-            'range': manager.origin,
-            'inverse': True})
+        manager.add_link('P67', manager.origin, inverse=True)
 
 
 def process_dates(manager: Any) -> dict[str, Any]:

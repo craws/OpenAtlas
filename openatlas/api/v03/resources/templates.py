@@ -72,8 +72,14 @@ def linked_places_template(show: str) -> dict[str, Type[String]]:
         'unit': fields.String}
 
     names = {'alias': fields.String}
-    start = {'earliest': fields.String, 'latest': fields.String}
-    end = {'earliest': fields.String, 'latest': fields.String}
+    start = {
+        'earliest': fields.String,
+        'latest': fields.String,
+        'comment': fields.String}
+    end = {
+        'earliest': fields.String,
+        'latest': fields.String,
+        'comment': fields.String}
     description = {'value': fields.String}
     timespans = {'start': fields.Nested(start), 'end': fields.Nested(end)}
     when = {'timespans': fields.List(fields.Nested(timespans))}

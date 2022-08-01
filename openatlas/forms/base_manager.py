@@ -19,8 +19,10 @@ from openatlas.forms.populate import (
     populate_dates, populate_reference_systems, populate_types)
 from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
-from openatlas.forms.util import check_if_entity_has_time
-from openatlas.forms.validation import preceding_event, super_event, validate
+from openatlas.forms.util import (
+    check_if_entity_has_time, string_to_entity_list)
+from openatlas.forms.validation import (
+    hierarchy_name_exists, preceding_event, super_event, validate)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -32,10 +34,10 @@ from openatlas.util.util import uc_first
 class BaseManager:
     class_: OpenatlasClass
     fields: list[str] = []
-    form: FlaskForm = None
-    entity: Optional[Entity] = None
-    origin: Optional[Entity] = None
-    link_: Optional[Link] = None
+    form: Any = None
+    entity: Any = None
+    origin: Any = None
+    link_: Any = None
     continue_link_id: Optional[int] = None
     data: dict[str, Any] = {}
 
@@ -142,7 +144,7 @@ class BaseManager:
 
     def get_link_type(self) -> Optional[Entity]:
         # Returns base type of link, e.g. involvement between actor and event
-        for field in self.form:  # type: ignore
+        for field in self.form:
             if isinstance(field, TreeField) and field.data:
                 return g.types[int(field.data)]
         return None
@@ -163,10 +165,32 @@ class BaseManager:
                 self.form.alias.append_entry(alias)
             self.form.alias.append_entry('')
 
+    def add_link(
+            self,
+            property_: str,
+            range_: Union[str, Entity],
+            description: Optional[str] = None,
+            inverse: bool = False,
+            return_link_id: bool = False,
+            type_id: Optional[int] = None) -> None:
+        if not range_:
+            return
+        self.data['links']['insert'].append({
+            'property': property_,
+            'range': string_to_entity_list(range_)
+            if isinstance(range_, str) else range_,
+            'description': description,
+            'inverse': inverse,
+            'return_link_id': return_link_id,
+            'type_id': type_id})
+
     def process_form(self) -> None:
         self.data: dict[str, Any] = {
             'attributes': process_dates(self),
-            'links': {'insert': [], 'delete': set(), 'delete_inverse': set()}}
+            'links': {
+                'insert': [],
+                'delete': set(),
+                'delete_inverse': set()}}
         process_standard_fields(self)
         if self.origin:
             process_origin(self)
@@ -216,32 +240,26 @@ class ActorBaseManager(BaseManager):
         self.data['links']['delete'].update(['P74', 'OA8', 'OA9'])
         if self.form.residence.data:
             residence = Entity.get_by_id(int(self.form.residence.data))
-            self.data['links']['insert'].append({
-                'property': 'P74',
-                'range': residence.get_linked_entity_safe('P53')})
+            self.add_link('P74', residence.get_linked_entity_safe('P53'))
         if self.form.begins_in.data:
             begin_place = Entity.get_by_id(int(self.form.begins_in.data))
-            self.data['links']['insert'].append({
-                'property': 'OA8',
-                'range': begin_place.get_linked_entity_safe('P53')})
+            self.add_link('OA8', begin_place.get_linked_entity_safe('P53'))
         if self.form.ends_in.data:
             end_place = Entity.get_by_id(int(self.form.ends_in.data))
-            self.data['links']['insert'].append({
-                'property': 'OA9',
-                'range': end_place.get_linked_entity_safe('P53')})
+            self.add_link('OA9', end_place.get_linked_entity_safe('P53'))
         if self.origin:
             if self.origin.class_.view == 'event':
-                self.data['links']['insert'].append({
-                    'property': 'P11',
-                    'range': self.origin,
-                    'return_link_id': True,
-                    'inverse': True})
+                self.add_link(
+                    'P11',
+                    self.origin,
+                    return_link_id=True,
+                    inverse=True)
             if self.origin.class_.view == 'actor':
-                self.data['links']['insert'].append({
-                    'property': 'OA7',
-                    'range': self.origin,
-                    'return_link_id': True,
-                    'inverse': True})
+                self.add_link(
+                    'OA7',
+                    self.origin,
+                    return_link_id=True,
+                    inverse=True)
 
 
 class EventBaseManager(BaseManager):
@@ -251,7 +269,8 @@ class EventBaseManager(BaseManager):
         fields = {
             'event_id': HiddenField(),
             'event': TableField(_('sub event of'))}
-        setattr(self.form_class, 'validate_event', super_event)
+        if self.entity:
+            setattr(self.form_class, 'validate_event', super_event)
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(_('preceding event'))
             setattr(
@@ -277,34 +296,26 @@ class EventBaseManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P9')
-        self.data['links']['insert'].append({
-            'property': 'P9',
-            'range': self.form.event.data})
+        self.add_link('P9', self.form.event.data)
         if self.class_.name != 'event':
             self.data['links']['delete_inverse'].add('P134')
-            self.data['links']['insert'].append({
-                'property': 'P134',
-                'range': self.form.event_preceding.data,
-                'inverse': True})
+            self.add_link('P134', self.form.event_preceding.data, inverse=True)
         if self.class_.name != 'move':
             self.data['links']['delete'].add('P7')
             if self.form.place.data:
-                self.data['links']['insert'].append({
-                    'property': 'P7',
-                    'range': Link.get_linked_entity_safe(
-                        int(self.form.place.data),
-                        'P53')})
+                self.add_link(
+                    'P7',
+                    Link.get_linked_entity_safe(
+                        int(self.form.place.data), 'P53'))
         if self.origin and self.origin.class_.view == 'actor':
-            self.data['links']['insert'].append({
-                'property': 'P11',
-                'range': self.origin,
-                'return_link_id': True})
+            self.add_link('P11', self.origin, return_link_id=True)
 
 
 class HierarchyBaseManager(BaseManager):
     fields = ['name', 'description']
 
     def additional_fields(self) -> dict[str, Any]:
+        setattr(self.form_class, 'validate_name', hierarchy_name_exists)
         return {
             'classes': SelectMultipleField(
                 _('classes'),

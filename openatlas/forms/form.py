@@ -24,11 +24,10 @@ def get_manager(
         entity: Optional[Entity] = None,
         origin: Optional[Entity] = None,
         link_: Optional[Link] = None) -> base_manager.BaseManager:
-    class_name = entity.class_.name if not class_name else class_name
-    manager_name = ''.join(i.capitalize() for i in class_name.split('_'))
+    name = entity.class_.name if entity and not class_name else class_name
+    manager_name = ''.join(i.capitalize() for i in name.split('_'))
     manager_instance = getattr(manager, f'{manager_name}Manager')(
-        class_=g.classes[
-            'type' if class_name.startswith('hierarchy') else class_name],
+        class_=g.classes['type' if name.startswith('hierarchy') else name],
         entity=entity,
         origin=origin,
         link_=link_)
@@ -49,12 +48,8 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
 def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes."""
-    if class_ == 'place':
-        entities = Entity.get_by_class('place', types=True, aliases=True)
-    elif class_ == 'artifact':
-        entities = Entity.get_by_class(
-            ['artifact', 'human_remains'],
-            types=True)
+    if class_ == 'artifact':
+        entities = Entity.get_by_class(['artifact', 'human_remains'], True)
     else:
         entities = Entity.get_by_view(class_, types=True, aliases=True)
     linked_ids = [entity.id for entity in linked_entities]

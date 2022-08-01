@@ -1,9 +1,12 @@
 versions = {
     '7.5.0': ['TBA', {
         'feature': {
-            '1761': "Don't show empty type fields in forms",
+            '1637': 'Linking sub units like places, e.g. with events',
+            '1761': "Forms: don't show empty type fields in forms",
+            '1768': 'Forms: improved validations',
+            '1734': 'Forms: refactor functions',
+            '1739': 'Different display of shape and area polygon',
             '1737': 'Improved user statistics',
-            '1734': 'Refactor form functions',
             '1710': 'Manual: add CIDOC links for entity classes',
             '1726': 'Manual: add FAQs'},
         'fix': {
