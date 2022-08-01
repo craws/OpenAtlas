@@ -242,7 +242,16 @@ def add_types(manager: Any) -> None:
             print(origin_id)
             origin = Entity.get_by_id(origin_id) if origin_id else None
             type_manager = get_manager("type", origin=origin)
-            print(type_manager.form)
+            class AddTypeDynamicalForm(FlaskForm):
+                name = StringField()
+                description = StringField()
+
+            setattr(
+                    AddTypeDynamicalForm,
+                    str(origin_id),
+                    TreeField(str(origin_id)))
+            addDynamForm = AddTypeDynamicalForm()
+            
             if type_.multiple:
                 setattr(
                     manager.form_class,
@@ -252,6 +261,6 @@ def add_types(manager: Any) -> None:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id),form=type_manager.form))
+                    TreeField(str(type_.id),form=addDynamForm))
             if type_.category == 'value':
                 add_value_type_fields(manager.form_class, type_.subs)
