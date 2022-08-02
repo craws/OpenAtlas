@@ -4,7 +4,7 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField
+from wtforms import IntegerField, SelectField, StringField,TextAreaField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
 
@@ -239,17 +239,20 @@ def add_types(manager: Any) -> None:
             from openatlas.forms.form import get_manager
 
             origin_id = type_.id
-            print(origin_id)
             origin = Entity.get_by_id(origin_id) if origin_id else None
             type_manager = get_manager("type", origin=origin)
             class AddTypeDynamicalForm(FlaskForm):
                 name = StringField()
-                description = StringField()
 
             setattr(
                     AddTypeDynamicalForm,
                     str(origin_id),
                     TreeField(str(origin_id)))
+            
+            setattr(
+                    AddTypeDynamicalForm,
+                    'add-dynamical-description',
+                    TextAreaField(_('description')))
             addDynamForm = AddTypeDynamicalForm()
             
             if type_.multiple:
