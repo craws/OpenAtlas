@@ -1,18 +1,20 @@
 versions = {
     '7.5.0': ['TBA', {
         'feature': {
+            '1541': 'Linking references to multiple subunits',
             '1637': 'Linking sub units like places, e.g. with events',
             '1761': "Forms: don't show empty type fields in forms",
             '1768': 'Forms: improved validations',
             '1734': 'Forms: refactor functions',
             '1739': 'Different display of shape and area polygon',
+            '1758': 'Switch between different network visualisations',
             '1737': 'Improved user statistics',
             '1710': 'Manual: add CIDOC links for entity classes',
             '1726': 'Manual: add FAQs'},
         'fix': {
-            '1759': 'Minor table layout issue'
-        }
-    }],
+            '1759': 'Minor table layout issue',
+            '1773': 'Error with type_ids with import',
+            '1767': 'API: Timespans return "None" instead of null'}}],
     '7.4.0': ['2022-06-10', {
         'feature': {
             '1620': 'Natural events',
