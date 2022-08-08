@@ -286,4 +286,6 @@ def model_network(dimensions: Optional[int] = None) -> str:
             bool(form.orphans.data),
             dimensions),
         title=_('model'),
-        crumbs=[_('network visualization')])
+        crumbs=[
+            _('network visualization'),
+            f'{dimensions}D' if dimensions else _('classic')])
