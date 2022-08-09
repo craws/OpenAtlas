@@ -30,6 +30,7 @@ def ajax_add_type() -> str:
     return ""
 
 @app.route('/ajax/get_type_tree/<int:root_id>', methods=['GET'])
+@required_group('readonly')
 def ajax_get_type_tree(root_id: int = None) -> str:
     
     return str(Type.get_tree_data(root_id, []))
