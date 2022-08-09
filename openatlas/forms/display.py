@@ -31,7 +31,7 @@ def html_form(
             continue
 
         if field.type in ['TreeField', 'TreeMultiField']:
-            type_ = g.types[int(field.id)]
+            type_ = g.types[int(field.type_id)]
             if not type_.subs:
                 continue  # pragma: no cover
             label = type_.name

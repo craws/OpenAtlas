@@ -1,23 +1,23 @@
 <input
-        id="{{ id }}-button"
-        name="{{ id }}-button"
+        id="{{ field.id }}-button"
+        name="{{ field.id }}-button"
         type="text"
         class="table-select {% if field.flags.required %}required{% endif %}"
         onfocus="this.blur()"
-        onclick="$('#{{ id }}-modal').modal('show')"
+        onclick="$('#{{ field.id }}-modal').modal('show')"
         readonly="readonly"
         value="{{ selection|safe }}"
         placeholder="{{ _('change')|uc_first }}">
 <a
         href="#"
-        id="{{ id }}-clear"
+        id="{{ field.id }}-clear"
         {% if not selection %}style="display: none;"{% endif %}
         class="{{ config.CSS.button.secondary }}"
-        onclick="clearSelect('{{ id }}');">
+        onclick="clearSelect('{{ field.id }}');">
     {{ _('clear')|uc_first }}
 </a>
 <div
-        id="{{ id }}-modal"
+        id="{{ field.id }}-modal"
         class="modal fade"
         tabindex="-1"
         role="dialog"
@@ -26,7 +26,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">
-                    {{ g.types[field.id|int].name|uc_first }}
+                    {{ root.name|uc_first }}
                 </h5>
                 <button
                         type="button"
@@ -39,76 +39,77 @@
             <div class="modal-body">
                 <input
                         class="tree-filter"
-                        id="{{ id }}-tree-search"
+                        id="{{ field.id }}-tree-search"
                         placeholder="{{ _('type to search')|uc_first }}"
                         type="text">
-                          {% if field.form %}
+                {% if field.form %}
+                    <button type="button" id="add-{{ type }}--{{ field.id }}" class="btn-outline-primary btn-xsm btn"
+                        data-bs-toggle="modal" data-bs-target="#add-type-modal-{{ field.id }}">+
+                    </button>
+                {% endif %}
 
-                <button type="button" id="add-{{ type }}--{{ id }}" class="btn-secondary btn-xsm btn"
-                        data-bs-toggle="modal" data-bs-target="#add-type-modal-{{ id }}">+
-                </button>
-                      {% endif %}
-
-                <div id="{{ id }}-tree" style="text-align: left!important;"></div>
+                <div id="{{ field.id }}-tree" style="text-align: left!important;"></div>
             </div>
             <div class="modal-footer">
                 <button
                         type="button"
                         class="{{ config.CSS.button.primary }}"
                         data-bs-dismiss="modal">
-                    {{ _('close')|uc_first }}
+                    {{ _('Back')|uc_first }}
                 </button>
             </div>
         </div>
     </div>
 </div>
-  {% if field.form %}
-<div class="modal fade" id="add-type-modal-{{ id }}" tabindex="-1" aria-hidden="true">
+{% if field.form %}
+<div class="modal fade" id="add-type-modal-{{ field.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <h5 class="modal-title" >Add Type to {{ root.name|uc_first }}</h5>
+                <button
+                    type="button"
+                    class="{{ config.CSS.button.primary }}"
+                    data-bs-dismiss="modal"
+                    aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
             <div class="modal-body">
-
                     {{ field.form|display_form() }}
-
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" onclick="$('#{{ field.id }}-modal').modal('show')">Close</button>
+                <button id="{{field.id}}-add-type" disabled type="button" class="btn btn-outline-primary btn-sm">Save changes</button>
             </div>
         </div>
     </div>
 </div>
+<script>
+    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function() {
+         if ($(this).val()==='')
+            $('#{{field.id}}-add-type').attr('disabled','')
+         else
+            $('#{{field.id}}-add-type').removeAttr('disabled')
+    });
+
+    $('#{{field.id}}-add-type').on('click',async function (e) {
+        const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
+        const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
+        const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
+        const data = {
+            name, superType, description
+        };
+        ajaxAddType(data, {{field.id}}, {{field.type_id}});
+        e.preventDefault();
+        });
+</script>
 {% endif %}
 <script>
-    variables['{{id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
+    variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
 
-    console.log(variables['{{id}}-isAddDynamicall'])
-    if(variables['{{id}}-isAddDynamicall'])
-        $("#{{ id }}-modal .toolbar").hide()
+    if(variables['{{field.id}}-isAddDynamicall'])
+        $("#{{ field.id }}-modal .toolbar").hide()
 
-
-    $("#{{ id }}-tree").jstree({
-        "plugins": ["search"],
-        "core": {"check_callback": true, "data": {{ data|safe }}},
-        "search": {
-            "case_insensitive": true,
-            "show_only_matches": true,
-            "show_only_matches_children": true
-        },
-    });
-    $("#{{ id }}-tree").on("select_node.jstree", function (e, data) {
-        selectFromTree("{{ id }}", data.node.id, data.node.text);
-    });
-    $("#{{ id }}-tree-search").keyup(function () {
-        if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
-            $("#{{ id }}-tree").jstree("search", $(this).val());
-        } else if (this.value.length == 0) {
-            $("#{{ id }}-tree").jstree("search", $(this).val());
-            $("#{{ id }}-tree").jstree(true).show_all();
-        }
-    });
+    fillTreeSelect('{{field.id}}', {{data |safe}},{{ g.settings.minimum_jstree_search }})   
 </script>

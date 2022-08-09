@@ -151,12 +151,17 @@ class TreeMultiSelect(HiddenInput):
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_multi_select.html',
             field=field,
-            root=g.types[int(field.id)],
+            root=g.types[int(field.type_id)],
             selection=sorted([g.types[id_].name for id_ in data]),
             data=Type.get_tree_data(int(field.id), data))
 
 
 class TreeMultiField(HiddenField):
+    def __init__(self, label='', validators=None, form=None, type_id=None, **kwargs):
+       super(TreeMultiField, self).__init__(label, validators, **kwargs)
+       self.form = form
+       self.type_id = type_id or self.id
+       
     widget = TreeMultiSelect()
 
 
@@ -165,24 +170,24 @@ class TreeSelect(HiddenInput):
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         selection = ''
         selected_ids = []
-        id = f'{field.id}-{"form" if field.form else ""}'
         if field.data:
             field.data = field.data[0] \
                 if isinstance(field.data, list) else field.data
-            selection = g.types[int(field.data)].name
+            selection = g.types[int(field.type_id)].name
             selected_ids.append(g.types[int(field.data)].id)
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
             field=field,
-            id=id,
             selection=selection,
-            data=Type.get_tree_data(int(field.id), selected_ids))
+            root=g.types[int(field.type_id)],
+            data=Type.get_tree_data(int(field.type_id), selected_ids))
 
 
 class TreeField(HiddenField):
      
-    def __init__(self, label='', validators=None, form=None, **kwargs):
+    def __init__(self, label='', validators=None, form=None, type_id=None, **kwargs):
        super(TreeField, self).__init__(label, validators, **kwargs)
        self.form = form
+       self.type_id = type_id or self.id
 
     widget = TreeSelect()

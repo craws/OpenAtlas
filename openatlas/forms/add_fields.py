@@ -236,30 +236,29 @@ def add_types(manager: Any) -> None:
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)
         for type_ in types.values():
-            from openatlas.forms.form import get_manager
-
-            origin_id = type_.id
-            origin = Entity.get_by_id(origin_id) if origin_id else None
-            type_manager = get_manager("type", origin=origin)
-            class AddTypeDynamicalForm(FlaskForm):
-                name = StringField()
-
-            setattr(
-                    AddTypeDynamicalForm,
-                    str(origin_id),
-                    TreeField(str(origin_id)))
             
+            class AddDynamicType(FlaskForm):
+                pass
             setattr(
-                    AddTypeDynamicalForm,
-                    'add-dynamical-description',
+                    AddDynamicType,
+                    f'name-dynamic',
+                    StringField(_('name')))
+            setattr(
+                    AddDynamicType,
+                    f'{type_.id}-dynamic',
+                    TreeField(str(type_.id),type_id=str(type_.id)))
+            setattr(
+                    AddDynamicType,
+                    'description-dynamic',
                     TextAreaField(_('description')))
-            addDynamForm = AddTypeDynamicalForm()
+
+            addDynamForm = AddDynamicType()
             
             if type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeMultiField(str(type_.id)))
+                    TreeMultiField(str(type_.id),form=addDynamForm))
             else:
                 setattr(
                     manager.form_class,
