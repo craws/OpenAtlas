@@ -64,13 +64,7 @@ class Import:
     def check_type_id(type_id: str, class_: str) -> bool:  # pragma: no cover
         if not type_id.isdigit() or int(type_id) not in g.types:
             return False
-        # Check if type is allowed (for corresponding form)
-        valid_type = False
-        root = g.types[g.types[int(type_id)].root[-1]]
-        for form_object in root.forms.values():
-            if form_object['name'] == class_:
-                valid_type = True
-        if not valid_type:
+        if class_ not in g.types[g.types[int(type_id)].root[-1]].classes:
             return False
         return True
 

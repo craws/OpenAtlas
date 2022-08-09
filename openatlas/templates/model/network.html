@@ -7,6 +7,8 @@
         <script src="/static/node_modules/d3/dist/d3.min.js"></script>
         <div class="toolbar">
             {{ 'tools/network'|manual }}
+            {{ '2D'|button(url_for('model_network', dimensions=2)) }}
+            {{ '3D'|button(url_for('model_network', dimensions=3)) }}
             {{ _('download')|button('#', onclick="saveSvgAsPng(d3.select('#network-svg').node(), 'network.png')") }}
         </div>
         <div>

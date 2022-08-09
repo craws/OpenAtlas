@@ -149,7 +149,8 @@ class Link:
                     AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to
             FROM model.link l
             WHERE l.id = %(id)s;
             """,

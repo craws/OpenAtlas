@@ -1,6 +1,8 @@
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.database.entity import Entity as DbEntity
+from openatlas.database.link import Link as DbLink
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -34,8 +36,6 @@ class ContentTests(TestBaseCase):
             assert b'Login' not in rv.data
 
     def test_links(self) -> None:
-        from openatlas.database.entity import Entity as DbEntity
-        from openatlas.database.link import Link as DbLink
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
