@@ -24,6 +24,9 @@ class PlaceTest(TestBaseCase):
                 unit_type = Type.get_hierarchy('Administrative unit')
                 unit_sub1 = g.types[unit_type.subs[0]]
                 unit_sub2 = g.types[unit_type.subs[1]]
+                human_remains_type = Type.get_hierarchy('Human remains')
+                human_remains_type_sub = g.types[human_remains_type.subs[0]]
+
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
@@ -345,6 +348,7 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': 'My human remains',
                 'actor': actor.id,
+                human_remains_type.id: str([human_remains_type_sub.id]),
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
@@ -357,6 +361,8 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=human_remains_id))
             assert b'My human remains' in rv.data
             rv = self.app.get('/')
+            assert b'My human remains' in rv.data
+            rv = self.app.get(url_for('view', id_=human_remains_type_sub.id))
             assert b'My human remains' in rv.data
 
             # Anthropological features

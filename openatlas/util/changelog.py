@@ -10,6 +10,7 @@ versions = {
             '1739': 'Different display of shape and area polygon',
             '1758': 'Switch between different network visualisations',
             '1737': 'Improved user statistics',
+            '1738': 'UI Translations',
             '1710': 'Manual: add CIDOC links for entity classes',
             '1726': 'Manual: add FAQs'},
         'fix': {
