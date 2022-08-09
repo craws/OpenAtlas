@@ -55,7 +55,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" >Add Type to {{ root.name|uc_first }}</h5>
+                <h5 class="modal-title" > {{ _('Add Type to %(hierarchy)s', hierarchy= root.name|safe) }} </h5>
                 <button
                     type="button"
                     class="{{ config.CSS.button.primary }}"
@@ -68,8 +68,8 @@
                     {{ field.form|display_form() }}
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" onclick="$('#{{ field.id }}-modal').modal('show')">Close</button>
-                <button id="{{field.id}}-add-type" disabled type="button" class="btn btn-outline-primary btn-sm">Save changes</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal" onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
+                <button id="{{field.id}}-add-type" disabled type="button" class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
             </div>
         </div>
     </div>
