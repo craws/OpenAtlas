@@ -20,6 +20,8 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
+* :doc:`event` - only for new events. For existing the location at the event
+  itself can be edited.
 * :doc:`reference`
 * :doc:`artifact`
 * :doc:`human_remains`
