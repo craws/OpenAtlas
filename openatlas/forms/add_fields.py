@@ -12,7 +12,7 @@ from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
 from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
+from openatlas.util.util import is_authorized, uc_first
 
 
 def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
@@ -252,7 +252,7 @@ def add_types(manager: Any) -> None:
                     'description-dynamic',
                     TextAreaField(_('description')))
 
-            addDynamForm = AddDynamicType()
+            addDynamForm = AddDynamicType() if is_authorized('editor') else None
             
             if type_.multiple:
                 setattr(

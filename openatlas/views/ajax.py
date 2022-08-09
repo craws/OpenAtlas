@@ -16,6 +16,7 @@ def ajax_bookmark() -> str:
     return jsonify(uc_first(label))
 
 @app.route('/ajax/addtype', methods=['POST'])
+@required_group('editor')
 def ajax_add_type() -> str:
     link = {'E55':'P127', 'E53':'P89'}
     cidoc_name = {'E55':'type', 'E53':'administrative_unit'}
