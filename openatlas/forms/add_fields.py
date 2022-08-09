@@ -253,6 +253,7 @@ def add_types(manager: Any) -> None:
                     TextAreaField(_('description')))
 
             addDynamForm = AddDynamicType() if is_authorized('editor') else None
+            getattr(addDynamForm,f'{type_.id}-dynamic').label.text = 'super'
             
             if type_.multiple:
                 setattr(
