@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-08-09 11:09+0200\n"
-"PO-Revision-Date: 2022-08-09 11:06+0200\n"
+"POT-Creation-Date: 2022-08-09 15:12+0200\n"
+"PO-Revision-Date: 2022-08-09 14:42+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -16,54 +16,48 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.8.0\n"
+"Generated-By: Babel 2.6.0\n"
 
-#: openatlas/forms/add_fields.py:43 openatlas/views/entity.py:387
+#: openatlas/forms/add_fields.py:42 openatlas/views/entity.py:398
 msgid "precision"
 msgstr "precision"
 
-#: openatlas/forms/add_fields.py:63 openatlas/forms/add_fields.py:100
-#: openatlas/forms/add_fields.py:141 openatlas/forms/add_fields.py:178
+#: openatlas/forms/add_fields.py:62 openatlas/forms/add_fields.py:99
+#: openatlas/forms/add_fields.py:140 openatlas/forms/add_fields.py:177
 #: openatlas/views/search.py:40 openatlas/views/search.py:49
 msgid "YYYY"
 msgstr "YYYY"
 
-#: openatlas/forms/add_fields.py:69 openatlas/forms/add_fields.py:106
-#: openatlas/forms/add_fields.py:147 openatlas/forms/add_fields.py:184
+#: openatlas/forms/add_fields.py:68 openatlas/forms/add_fields.py:105
+#: openatlas/forms/add_fields.py:146 openatlas/forms/add_fields.py:183
 msgid "MM"
 msgstr "MM"
 
-#: openatlas/forms/add_fields.py:75 openatlas/forms/add_fields.py:112
-#: openatlas/forms/add_fields.py:153 openatlas/forms/add_fields.py:190
+#: openatlas/forms/add_fields.py:74 openatlas/forms/add_fields.py:111
+#: openatlas/forms/add_fields.py:152 openatlas/forms/add_fields.py:189
 msgid "DD"
 msgstr "DD"
 
-#: openatlas/forms/add_fields.py:82 openatlas/forms/add_fields.py:119
-#: openatlas/forms/add_fields.py:160 openatlas/forms/add_fields.py:197
+#: openatlas/forms/add_fields.py:81 openatlas/forms/add_fields.py:118
+#: openatlas/forms/add_fields.py:159 openatlas/forms/add_fields.py:196
 msgid "hh"
 msgstr "hh"
 
-#: openatlas/forms/add_fields.py:88 openatlas/forms/add_fields.py:125
-#: openatlas/forms/add_fields.py:166 openatlas/forms/add_fields.py:203
+#: openatlas/forms/add_fields.py:87 openatlas/forms/add_fields.py:124
+#: openatlas/forms/add_fields.py:165 openatlas/forms/add_fields.py:202
 msgid "mm"
 msgstr "mm"
 
-#: openatlas/forms/add_fields.py:94 openatlas/forms/add_fields.py:131
-#: openatlas/forms/add_fields.py:172 openatlas/forms/add_fields.py:209
+#: openatlas/forms/add_fields.py:93 openatlas/forms/add_fields.py:130
+#: openatlas/forms/add_fields.py:171 openatlas/forms/add_fields.py:208
 msgid "ss"
 msgstr "ss"
 
-#: openatlas/forms/add_fields.py:136 openatlas/forms/add_fields.py:214
+#: openatlas/forms/add_fields.py:135 openatlas/forms/add_fields.py:213
 msgid "comment"
 msgstr "comment"
 
-#: openatlas/forms/add_fields.py:245 openatlas/forms/base_manager.py:101
-#: openatlas/forms/util.py:26 openatlas/util/tab.py:89
-#: openatlas/views/entity.py:356 openatlas/views/imports.py:29
-msgid "name"
-msgstr "name"
-
-#: openatlas/forms/add_fields.py:253 openatlas/forms/base_manager.py:74
+#: openatlas/forms/base_manager.py:74
 #: openatlas/templates/model/cidoc_class_view.html:8
 #: openatlas/templates/model/property_view.html:8
 #: openatlas/templates/type/index.html:106 openatlas/util/util.py:695
@@ -75,6 +69,12 @@ msgstr "description"
 #: openatlas/forms/base_manager.py:81 openatlas/util/util.py:226
 msgid "unit"
 msgstr "unit"
+
+#: openatlas/forms/base_manager.py:101 openatlas/forms/util.py:26
+#: openatlas/util/tab.py:89 openatlas/views/entity.py:356
+#: openatlas/views/imports.py:29
+msgid "name"
+msgstr "name"
 
 #: openatlas/forms/base_manager.py:106
 msgid "URL"
@@ -93,8 +93,8 @@ msgid "save"
 msgstr "save"
 
 #: openatlas/forms/base_manager.py:130 openatlas/forms/form.py:45
-#: openatlas/templates/forms/tree_select.html:83 openatlas/views/imports.py:33
-#: openatlas/views/link.py:26 openatlas/views/user.py:74
+#: openatlas/views/imports.py:33 openatlas/views/link.py:26
+#: openatlas/views/user.py:74
 msgid "insert"
 msgstr "insert"
 
@@ -211,7 +211,7 @@ msgid "multiple"
 msgstr "multiple"
 
 #: openatlas/forms/manager.py:239 openatlas/templates/user/view.html:14
-#: openatlas/views/admin.py:131 openatlas/views/entity.py:514
+#: openatlas/views/admin.py:131 openatlas/views/entity.py:525
 #: openatlas/views/user.py:124
 msgid "activity"
 msgstr "activity"
@@ -516,7 +516,7 @@ msgstr "self as super not allowed"
 
 #: openatlas/forms/validation.py:23
 msgid "sub of self not allowed as super"
-msgstr ""
+msgstr "sub of self not allowed as super"
 
 #: openatlas/forms/validation.py:38
 msgid "self as preceding not allowed"
@@ -580,22 +580,18 @@ msgid "actor actor relation"
 msgstr "actor actor relation"
 
 #: openatlas/models/openatlas_class.py:32
-msgid "actor appellation"
-msgstr "actor appellation"
-
-#: openatlas/models/openatlas_class.py:33
 msgid "actor function"
 msgstr "actor function"
 
-#: openatlas/models/openatlas_class.py:34
+#: openatlas/models/openatlas_class.py:33
 msgid "appellation"
 msgstr "appellation"
 
-#: openatlas/models/openatlas_class.py:35
+#: openatlas/models/openatlas_class.py:34
 msgid "external reference"
 msgstr "external reference"
 
-#: openatlas/models/openatlas_class.py:36
+#: openatlas/models/openatlas_class.py:35
 msgid "source translation"
 msgstr "source translation"
 
@@ -1229,7 +1225,7 @@ msgstr "network options"
 
 #: openatlas/templates/model/network2.html:8 openatlas/views/model.py:291
 msgid "classic"
-msgstr ""
+msgstr "classic"
 
 #: openatlas/templates/sql/index.html:8
 msgid ""
@@ -1265,12 +1261,12 @@ msgid "untyped entities"
 msgstr "untyped entities"
 
 #: openatlas/templates/type/index.html:99
-msgid "This type has no classes and won't show in forms."
-msgstr ""
+msgid "this type has no classes and won't show in forms"
+msgstr "this type has no classes and won't show in forms"
 
 #: openatlas/templates/type/index.html:102
-msgid "This type has no subs and won't show in forms."
-msgstr ""
+msgid "this type has no subs and won't show in forms"
+msgstr "this type has no subs and won't show in forms"
 
 #: openatlas/templates/user/insert.html:11
 #: openatlas/templates/user/password.html:9
@@ -1362,11 +1358,11 @@ msgstr "note"
 msgid "text"
 msgstr "text"
 
-#: openatlas/util/util.py:42 openatlas/views/ajax.py:15
+#: openatlas/util/util.py:42 openatlas/views/ajax.py:13
 msgid "bookmark remove"
 msgstr "remove bookmark"
 
-#: openatlas/util/util.py:43 openatlas/views/ajax.py:15
+#: openatlas/util/util.py:43 openatlas/views/ajax.py:13
 msgid "bookmark"
 msgstr "bookmark"
 
@@ -1646,7 +1642,7 @@ msgstr "tools"
 msgid "page / link text"
 msgstr "page / link text"
 
-#: openatlas/views/entity.py:338 openatlas/views/entity.py:402
+#: openatlas/views/entity.py:338 openatlas/views/entity.py:413
 #: openatlas/views/hierarchy.py:102 openatlas/views/overlay.py:96
 msgid "remove"
 msgstr "remove"
@@ -1660,28 +1656,28 @@ msgstr "Remove %(name)s?"
 msgid "value"
 msgstr "value"
 
-#: openatlas/views/entity.py:373
+#: openatlas/views/entity.py:384
 msgid "domain"
 msgstr "domain"
 
-#: openatlas/views/entity.py:373
+#: openatlas/views/entity.py:384
 msgid "range"
 msgstr "range"
 
-#: openatlas/views/entity.py:387
+#: openatlas/views/entity.py:398
 msgid "entity"
 msgstr "entity"
 
-#: openatlas/views/entity.py:433
+#: openatlas/views/entity.py:444
 msgid "moved"
 msgstr "moved"
 
-#: openatlas/views/entity.py:663 openatlas/views/index.py:65
+#: openatlas/views/entity.py:674 openatlas/views/index.py:65
 #: openatlas/views/note.py:21
 msgid "public"
 msgstr "public"
 
-#: openatlas/views/entity.py:664 openatlas/views/index.py:65
+#: openatlas/views/entity.py:675 openatlas/views/index.py:65
 msgid "private"
 msgstr "privat"
 
@@ -2103,7 +2099,7 @@ msgstr "action"
 
 #: openatlas/views/user.py:145 openatlas/views/user.py:186
 msgid "created entities"
-msgstr ""
+msgstr "created entities"
 
 #: openatlas/views/user.py:244
 msgid "user created"
@@ -2183,6 +2179,6 @@ msgstr "Failed to send account details to %(email)s."
 #~ msgid "human remains"
 #~ msgstr "human remains"
 
-#~ msgid "Add Type to %(hierarchy)"
-#~ msgstr ""
+#~ msgid "actor appellation"
+#~ msgstr "actor appellation"
 

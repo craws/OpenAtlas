@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_structure
+from openatlas.models.place import get_place, get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -354,6 +354,13 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
     if entity.category == 'value':
         tabs['entities'].table.header = \
             [_('name'), _('value'), _('class'), _('info')]
+    place_classes = [
+            'feature',
+            'stratigraphic_unit',
+            'artifact',
+            'human_remains']
+    if any(item in g.types[entity.root[0]].classes for item in place_classes):
+        tabs['entities'].table.header.append('place')
     for item in entity.get_linked_entities(
             ['P2', 'P89'],
             inverse=True,
@@ -367,6 +374,10 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             data.append(format_number(item.types[entity]))
         data.append(item.class_.label)
         data.append(item.description)
+        if item.class_.name in place_classes:
+            data.append(link(get_place(item)))
+        else:
+            data.append('')
         tabs['entities'].table.rows.append(data)
     if not tabs['entities'].table.rows:
         # If no entities available get links with this type_id

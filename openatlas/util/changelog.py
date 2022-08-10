@@ -3,6 +3,7 @@ versions = {
         'feature': {
             '1541': 'Linking references to multiple subunits',
             '1637': 'Linking sub units like places, e.g. with events',
+            '1752': 'Add a place column for sub units to type view',
             '1761': "Forms: don't show empty type fields in forms",
             '1768': 'Forms: improved validations',
             '1734': 'Forms: refactor functions',
