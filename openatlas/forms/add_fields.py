@@ -236,7 +236,7 @@ def add_types(manager: Any) -> None:
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)
         for type_ in types.values():
-            
+
             class AddDynamicType(FlaskForm):
                 pass
             setattr(
@@ -254,7 +254,7 @@ def add_types(manager: Any) -> None:
 
             addDynamForm = AddDynamicType() if is_authorized('editor') else None
             getattr(addDynamForm,f'{type_.id}-dynamic').label.text = 'super'
-            
+
             if type_.multiple:
                 setattr(
                     manager.form_class,
