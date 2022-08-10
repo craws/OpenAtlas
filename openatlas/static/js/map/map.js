@@ -359,7 +359,7 @@ function buildPopup(feature, action = "view", selected = false) {
               feature.properties.description || ""
             }</div>
             <div id="buttonBar">
-            
+
             ${
               selected &&
               (window.location.href.includes("update") ||
@@ -368,7 +368,11 @@ function buildPopup(feature, action = "view", selected = false) {
                  <button id="deleteButton" onclick="deleteGeometry(${feature.properties.id})">${translate["delete"]}</button>`
                 : `<button  onclick="window.location.href='/entity/${feature.properties.objectId}'">${translate["details"]}</button>`
             }
-            
+
             </div >
         </div > `;
 }
+
+$('.leaflet-geonames-icon').click(function($e) {
+  $e.preventDefault();
+});
