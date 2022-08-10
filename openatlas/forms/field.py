@@ -173,7 +173,7 @@ class TreeSelect(HiddenInput):
         if field.data:
             field.data = field.data[0] \
                 if isinstance(field.data, list) else field.data
-            selection = g.types[int(field.type_id)].name
+            selection = g.types[int(field.data)].name
             selected_ids.append(g.types[int(field.data)].id)
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_select.html',
