@@ -89,7 +89,8 @@
         const data = {
             name, superType, description
         };
-        ajaxAddType(data, {{field.id}}, {{field.type_id}});    
+        const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}},true);
+        $(`#{{field.type_id}}-modal`).modal('show');
         e.preventDefault();
         });
 </script>

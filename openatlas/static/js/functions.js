@@ -175,30 +175,38 @@ function ajaxBookmark(entityId) {
   });
 }
 
-async function ajaxAddType(data, fieldId, typeId) {
-  await $.ajax({
-   type: 'post',
-   url: '/ajax/addtype',
-   data:data,
-   });
-  const typeTree = await getTypeTree(typeId)
-  $(`${fieldId}-tree`).empty();
-  updateTree(`${fieldId}`,JSON.parse(typeTree.replaceAll("'","\"")))
-  updateTree(`${fieldId}-dynamic`,JSON.parse(typeTree.replaceAll("'","\"")))
-  $('.modal').modal('hide')
-  $(`#${ fieldId }-modal`).modal('show')
+async function ajaxAddType(data, fieldId, typeId, multiple=false) {
+  const newTypeId = await $.ajax({
+    type: 'post',
+    url: '/ajax/addtype',
+    data: data,
+  });
+  const typeTree = await getTypeTree(typeId);
+
+  const selectNode = () => {
+    selectFromTree(typeId, newTypeId, data.name);
+  };
+  const selectNodeMultiple = () => {
+    $(`#${typeId}-tree`).jstree('select_node', newTypeId);
+    $(`#${typeId}-tree`).unbind('refresh.jstree');
+  };
+  refreshCallback = multiple ? selectNodeMultiple : selectNode
+
+  updateTree(`${fieldId}`, JSON.parse(typeTree.replaceAll("'", "\"")), refreshCallback);
+  updateTree(`${fieldId}-dynamic`, JSON.parse(typeTree.replaceAll("'", "\"")));
+  $('.modal').modal('hide');
+  return newTypeId;
 }
 
 function getTypeTree(rootId){
   return $.ajax({type: 'get', url: `/ajax/get_type_tree/${rootId}`});
 }
-function updateTree(id,d){
+function updateTree(id, d, refreshCallback) {
   $(`#${id}-tree`).jstree(true).settings.core.data = d;
-$(`#${id}-tree`).jstree(true).refresh();
+  $(`#${id}-tree`).jstree(true).refresh();
+  if (refreshCallback) $(`#${id}-tree`).on('refresh.jstree', refreshCallback);
 }
 function fillTreeSelect(id,d,minimum_jstree_search){
-  console.log(id,'Daten',d)
-  console.log($(`#${id}-tree`))
     $(`#${id}-tree`).jstree({
       "plugins": ["search"],
       "core": {"check_callback": true, "data": d},

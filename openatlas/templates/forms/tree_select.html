@@ -100,7 +100,8 @@
         const data = {
             name, superType, description
         };
-        ajaxAddType(data, {{field.id}}, {{field.type_id}});
+        const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
+        selectFromTree('{{field.type_id}}', typeId, name);
         e.preventDefault();
         });
 </script>
@@ -111,5 +112,5 @@
     if(variables['{{field.id}}-isAddDynamicall'])
         $("#{{ field.id }}-modal .toolbar").hide()
 
-    fillTreeSelect('{{field.id}}', {{data |safe}},{{ g.settings.minimum_jstree_search }})   
+    fillTreeSelect('{{field.id}}', {{data |safe}},{{ g.settings.minimum_jstree_search }})
 </script>

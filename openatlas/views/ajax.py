@@ -20,17 +20,17 @@ def ajax_bookmark() -> str:
 def ajax_add_type() -> str:
     link = {'E55':'P127', 'E53':'P89'}
     cidoc_name = {'E55':'type', 'E53':'administrative_unit'}
-    cidoc_code = g.types[int(request.form['superType'])].cidoc_class.code    
-    entity = Entity.insert(cidoc_name[cidoc_code], request.form['name'], request.form['description'])    
+    cidoc_code = g.types[int(request.form['superType'])].cidoc_class.code
+    entity = Entity.insert(cidoc_name[cidoc_code], request.form['name'], request.form['description'])
     try:
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
     except:
         entity.delete()
         abort(400)
-    return ""
+    return str(entity.id)
 
 @app.route('/ajax/get_type_tree/<int:root_id>', methods=['GET'])
 @required_group('readonly')
 def ajax_get_type_tree(root_id: int = None) -> str:
-    
+
     return str(Type.get_tree_data(root_id, []))
