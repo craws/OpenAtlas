@@ -5,6 +5,19 @@ from typing import Any, Optional
 from openatlas.models.entity import Entity
 
 
+def get_place(entity: Entity) -> Optional[Entity]:
+    if entity := entity.get_linked_entity_safe('P46', inverse=True):
+        if entity.class_.name == 'place':
+            return entity
+        if entity := entity.get_linked_entity_safe('P46', inverse=True):
+            if entity.class_.name == 'place':
+                return entity
+            if entity := entity.get_linked_entity_safe('P46', inverse=True):
+                if entity.class_.name == 'place':
+                    return entity
+    return None
+
+
 def get_structure(
         object_: Optional[Entity] = None,
         super_: Optional[Entity] = None) -> Optional[dict[str, Any]]:
