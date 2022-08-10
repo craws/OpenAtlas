@@ -6,6 +6,10 @@ from flask_restful.fields import Integer, List, Nested, String
 
 
 def geojson_template() -> dict[str, Any]:
+    types = {
+        'typeName': fields.String,
+        'typeId': fields.Integer}
+
     properties = {
         '@id': fields.Integer,
         'systemClass': fields.String,
@@ -17,7 +21,7 @@ def geojson_template() -> dict[str, Any]:
         'end_earliest': fields.String,
         'end_latest': fields.String,
         'end_comment': fields.String,
-        'types': fields.List(fields.String)}
+        'types': fields.List(fields.Nested(types))}
 
     return {
         'type': fields.String,
