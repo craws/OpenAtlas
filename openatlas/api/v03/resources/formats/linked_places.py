@@ -34,7 +34,8 @@ def get_linked_places_entity(
             if 'when' in parser['show'] else None,
             'links': get_reference_systems(links_inverse)
             if 'links' in parser['show'] else None,
-            'descriptions': [{'value': entity.description}],
+            'descriptions': [{'value': entity.description}]
+            if 'description' in parser['show'] else None,
             'names': [{"alias": value} for value in entity.aliases.values()]
             if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
