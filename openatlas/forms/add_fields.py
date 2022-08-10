@@ -4,14 +4,15 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField
+from wtforms import IntegerField, SelectField, StringField,TextAreaField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
+from openatlas.util.util import is_authorized, uc_first
 
 
 def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
@@ -235,15 +236,34 @@ def add_types(manager: Any) -> None:
                 g.classes[manager.class_.name].standard_type_id,
                 last=False)
         for type_ in types.values():
+
+            class AddDynamicType(FlaskForm):
+                pass
+            setattr(
+                    AddDynamicType,
+                    f'name-dynamic',
+                    StringField(_('name')))
+            setattr(
+                    AddDynamicType,
+                    f'{type_.id}-dynamic',
+                    TreeField(str(type_.id),type_id=str(type_.id)))
+            setattr(
+                    AddDynamicType,
+                    'description-dynamic',
+                    TextAreaField(_('description')))
+
+            addDynamForm = AddDynamicType() if is_authorized('editor') else None
+            getattr(addDynamForm,f'{type_.id}-dynamic').label.text = 'super'
+
             if type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeMultiField(str(type_.id)))
+                    TreeMultiField(str(type_.id),form=addDynamForm))
             else:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id)))
+                    TreeField(str(type_.id),form=addDynamForm))
             if type_.category == 'value':
                 add_value_type_fields(manager.form_class, type_.subs)

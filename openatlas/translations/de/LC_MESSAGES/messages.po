@@ -12,7 +12,7 @@ msgstr ""
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -653,8 +653,8 @@ msgstr "Anmelden"
 
 #: openatlas/templates/forms/table_multi_select.html:37
 #: openatlas/templates/forms/table_select.html:42
-#: openatlas/templates/forms/tree_multi_select.html:42
-#: openatlas/templates/forms/tree_select.html:52
+#: openatlas/templates/forms/tree_multi_select.html:47
+#: openatlas/templates/forms/tree_select.html:58
 #: openatlas/templates/layout.html:180
 msgid "close"
 msgstr "schließen"
@@ -662,8 +662,8 @@ msgstr "schließen"
 #: openatlas/templates/layout.html:190
 msgid "warning no js"
 msgstr ""
-"JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite ist "
-"dadurch eingeschränkt."
+"JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite "
+"ist dadurch eingeschränkt."
 
 #: openatlas/templates/admin/data.html:36
 #: openatlas/templates/import/project_view.html:4 openatlas/templates/map.html:32
@@ -828,7 +828,8 @@ msgstr "Link-Duplikat"
 msgid "data transfer"
 msgstr "Daten-Transfer"
 
-#: openatlas/templates/admin/data.html:15 openatlas/templates/admin/data.html:16
+#: openatlas/templates/admin/data.html:15
+#: openatlas/templates/admin/data.html:16
 msgid "export"
 msgstr "Export"
 
@@ -870,8 +871,9 @@ msgstr "Alle Logeinträge löschen"
 msgid "anthropological analyses"
 msgstr "Anthropologische Analysen"
 
-#: openatlas/templates/anthropology/sex.html:4 openatlas/views/anthropology.py:49
-#: openatlas/views/anthropology.py:85 openatlas/views/anthropology.py:139
+#: openatlas/templates/anthropology/sex.html:4
+#: openatlas/views/anthropology.py:49 openatlas/views/anthropology.py:85
+#: openatlas/views/anthropology.py:139
 msgid "sex estimation"
 msgstr "Geschlechtsbestimmung"
 
@@ -892,8 +894,9 @@ msgstr "Erlaubte Erweiterungen"
 #, python-format
 msgid "error modified by %(username)s"
 msgstr ""
-"Der Eintrag wurde von %(username)s inzwischen geändert. Bitte die Änderungen "
-"kopieren oder merken, auf \"Neu laden\" klicken und es noch einmal probieren."
+"Der Eintrag wurde von %(username)s inzwischen geändert. Bitte die "
+"Änderungen kopieren oder merken, auf \"Neu laden\" klicken und es noch "
+"einmal probieren."
 
 #: openatlas/templates/entity/update.html:8
 msgid "reload"
@@ -902,8 +905,8 @@ msgstr "Neu laden"
 #: openatlas/templates/entity/view.html:5
 msgid "Editing is disabled because of multiple links to the single type"
 msgstr ""
-"Bearbeitung ist nicht möglich, da es multiple Links zu einem nur für einfach zu "
-"verlinkenden Typen gibt"
+"Bearbeitung ist nicht möglich, da es multiple Links zu einem nur für "
+"einfach zu verlinkenden Typen gibt"
 
 #: openatlas/templates/entity/view.html:7
 msgid "Please consult the manual about link duplicates"
@@ -916,11 +919,11 @@ msgstr "Fehlende Datei"
 #: openatlas/templates/error/400.html:8 openatlas/templates/error/403.html:7
 #: openatlas/templates/error/404.html:12
 msgid ""
-"Use the back button of your browser or click <a href=\"/\">here</a> to go to "
-"the main page."
+"Use the back button of your browser or click <a href=\"/\">here</a> to go"
+" to the main page."
 msgstr ""
-"Benutze den Zurück Button des  Browser oder klicke <a href=\"/\">hier</a> um "
-"zur Hauptseite zurückzukehren."
+"Benutze den Zurück Button des  Browser oder klicke <a href=\"/\">hier</a>"
+" um zur Hauptseite zurückzukehren."
 
 #: openatlas/templates/error/400.html:11 openatlas/templates/error/403.html:10
 msgid "Please let us know if you think it's a bug"
@@ -942,16 +945,17 @@ msgstr "Es tut uns so leid!"
 
 #: openatlas/templates/error/404.html:9
 msgid ""
-"We searched a long time but this document does not exist. Maybe you mistyped or "
-"followed a broken link."
+"We searched a long time but this document does not exist. Maybe you "
+"mistyped or followed a broken link."
 msgstr ""
-"Wir haben lange gesucht aber das Dokument existiert nicht. Vielleicht hast du "
-"dich verschrieben oder bist einem veralteten Link gefolgt."
+"Wir haben lange gesucht aber das Dokument existiert nicht. Vielleicht "
+"hast du dich verschrieben oder bist einem veralteten Link gefolgt."
 
 #: openatlas/templates/error/418.html:8
 msgid "This entry doesn't exist. Maybe you followed an obsolete link."
 msgstr ""
-"Dieser Eintrag existiert nicht. Vielleicht bist du einem alten Link gefolgt."
+"Dieser Eintrag existiert nicht. Vielleicht bist du einem alten Link "
+"gefolgt."
 
 #: openatlas/templates/forms/form_table.html:10 openatlas/util/tab.py:243
 #: openatlas/util/util.py:589 openatlas/views/entity.py:112
@@ -976,6 +980,18 @@ msgstr "entfernen"
 #: openatlas/templates/type/index.html:50
 msgid "type to search"
 msgstr "Tippe um zu suchen"
+
+#: openatlas/templates/forms/tree_multi_select.html:58
+#: openatlas/templates/forms/tree_select.html:69
+#, python-format
+msgid "Add Type to %(hierarchy)s"
+msgstr "Füge Typ zu %(hierarchy)s hinzu"
+
+#: openatlas/templates/forms/tree_multi_select.html:71
+#: openatlas/templates/forms/tree_multi_select.html:72
+#: openatlas/templates/forms/tree_select.html:82
+msgid "back"
+msgstr "zurück"
 
 #: openatlas/templates/import/import_data.html:5
 #: openatlas/templates/sql/execute.html:5
@@ -1187,7 +1203,8 @@ msgstr "Gültiger Link"
 msgid "wrong domain"
 msgstr "Falsche Domain"
 
-#: openatlas/templates/model/index.html:31 openatlas/templates/model/index.html:37
+#: openatlas/templates/model/index.html:31
+#: openatlas/templates/model/index.html:37
 msgid "for"
 msgstr "für"
 
@@ -1214,10 +1231,14 @@ msgstr "Netzwerk-Optionen"
 msgid "classic"
 msgstr "klassisch"
 
+#: openatlas/templates/model/network2.html:8 openatlas/views/model.py:291
+msgid "classic"
+msgstr ""
+
 #: openatlas/templates/sql/index.html:8
 msgid ""
-"Warning: direct database manipulation is dangerous and can result in data loss "
-"and/or an unusable application!"
+"Warning: direct database manipulation is dangerous and can result in data"
+" loss and/or an unusable application!"
 msgstr ""
 "Achtung: direkte Datenbank Manipulation ist sehr gefährlich und kann zu "
 "Datenverlust und/oder in eine unbrauchbare Applikation führen."
@@ -1808,7 +1829,8 @@ msgstr "Dieser Link ist nicht gültig."
 
 #: openatlas/views/index.py:166
 msgid ""
-"You have successfully unsubscribed. You can subscribe again in your Profile."
+"You have successfully unsubscribed. You can subscribe again in your "
+"Profile."
 msgstr ""
 "Du hast den Newsletter erfolgreich abbestellt. Über deinen Profil kannst du "
 "dich wieder für ihn anmelden."
@@ -1854,8 +1876,8 @@ msgstr "Abschicken"
 #: openatlas/views/login.py:58
 msgid "error login attempts exceeded"
 msgstr ""
-"Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du es "
-"wieder probieren."
+"Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du"
+" es wieder probieren."
 
 #: openatlas/views/login.py:81
 msgid "error inactive"
@@ -2027,8 +2049,8 @@ msgstr "Einträge ohne Datum inkludieren"
 msgid "execute"
 msgstr "ausführen"
 
-#: openatlas/views/sql.py:25 openatlas/views/sql.py:26 openatlas/views/sql.py:57
-#: openatlas/views/sql.py:60
+#: openatlas/views/sql.py:25 openatlas/views/sql.py:26
+#: openatlas/views/sql.py:57 openatlas/views/sql.py:60
 msgid "SQL"
 msgstr "SQL"
 
@@ -2039,8 +2061,8 @@ msgstr "SQL wurde ausgeführt"
 #: openatlas/views/type.py:80
 msgid "I'm sure to delete this type, it's subs and links"
 msgstr ""
-"Ich bin mir sicher diesen Typen zusammen mit allen Untertypen und Links zu "
-"löschen"
+"Ich bin mir sicher diesen Typen zusammen mit allen Untertypen und Links "
+"zu löschen"
 
 #: openatlas/views/type.py:83
 msgid "delete types and remove all links"
@@ -2052,11 +2074,12 @@ msgstr "Typen wurden gelöscht"
 
 #: openatlas/views/type.py:101
 msgid ""
-"Warning: this type has subs and/or links to entities (see tabs). Please check "
-"if you want to delete these subs and links too."
+"Warning: this type has subs and/or links to entities (see tabs). Please "
+"check if you want to delete these subs and links too."
 msgstr ""
-"Achtung: Dieser Typ hat Subtypen und/oder Links zu Einträgen (siehe Tabs). "
-"Bitte prüfe ob du diesen Typ mit allen Subtypen und Links löschen willst."
+"Achtung: Dieser Typ hat Subtypen und/oder Links zu Einträgen (siehe "
+"Tabs). Bitte prüfe ob du diesen Typ mit allen Subtypen und Links löschen "
+"willst."
 
 #: openatlas/views/type.py:142
 msgid "Entities were updated"

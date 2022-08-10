@@ -648,8 +648,8 @@ msgstr ""
 
 #: openatlas/templates/forms/table_multi_select.html:37
 #: openatlas/templates/forms/table_select.html:42
-#: openatlas/templates/forms/tree_multi_select.html:42
-#: openatlas/templates/forms/tree_select.html:52
+#: openatlas/templates/forms/tree_multi_select.html:47
+#: openatlas/templates/forms/tree_select.html:58
 #: openatlas/templates/layout.html:180
 msgid "close"
 msgstr ""
@@ -953,6 +953,18 @@ msgstr ""
 #: openatlas/templates/forms/tree_select.html:43
 #: openatlas/templates/type/index.html:50
 msgid "type to search"
+msgstr ""
+
+#: openatlas/templates/forms/tree_multi_select.html:58
+#: openatlas/templates/forms/tree_select.html:69
+#, python-format
+msgid "Add Type to %(hierarchy)s"
+msgstr ""
+
+#: openatlas/templates/forms/tree_multi_select.html:71
+#: openatlas/templates/forms/tree_multi_select.html:72
+#: openatlas/templates/forms/tree_select.html:82
+msgid "back"
 msgstr ""
 
 #: openatlas/templates/import/import_data.html:5
