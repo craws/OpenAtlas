@@ -95,7 +95,7 @@ class Type(Entity):
 
     @staticmethod
     def get_tree_data(
-            type_id: int,
+            type_id: Optional[int],
             selected_ids: list[int]) -> list[dict[str, Any]]:
         return Type.walk_tree(g.types[type_id].subs, selected_ids)
 

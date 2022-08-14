@@ -1,13 +1,12 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_login import current_user
-from wtforms import FloatField, HiddenField, Field
+from wtforms import Field, FloatField, HiddenField
 from wtforms.widgets import HiddenInput, TextInput
-
 
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -159,11 +158,11 @@ class TreeMultiSelect(HiddenInput):
 class TreeMultiField(HiddenField):
     def __init__(
             self,
-            label='',
-            validators=None,
-            form=None,
-            type_id=None,
-            **kwargs):
+            label: str,
+            validators: Any = None,
+            form: Any = None,
+            type_id: Optional[int] = None,
+            **kwargs: Any) -> None:
         super(TreeMultiField, self).__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id
@@ -193,11 +192,11 @@ class TreeField(HiddenField):
 
     def __init__(
             self,
-            label='',
-            validators=None,
-            form=None,
-            type_id=None,
-            **kwargs):
+            label: str,
+            validators: Any = None,
+            form: Any = None,
+            type_id: str = '',
+            **kwargs: Any) -> None:
         super(TreeField, self).__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id

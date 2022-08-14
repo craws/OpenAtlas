@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
 
@@ -36,5 +38,5 @@ def ajax_add_type() -> str:
 
 @app.route('/ajax/get_type_tree/<int:root_id>', methods=['GET'])
 @required_group('readonly')
-def ajax_get_type_tree(root_id: int = None) -> str:
+def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
     return str(Type.get_tree_data(root_id, []))
