@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
@@ -119,7 +119,7 @@ def sex_update(id_: int) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('sex', id_=entity.id))
 

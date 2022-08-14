@@ -5,7 +5,7 @@ from flask_babel import format_number, lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_manager
 from openatlas.models.type import Type
@@ -36,7 +36,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
             abort(418)
         flash(_('entity created'), 'info')
@@ -82,7 +82,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
             abort(418)
         flash(_('info update'), 'info')
@@ -120,7 +120,7 @@ def remove_class(id_: int, class_name: str) -> Response:
         Type.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log(
+        g.logger.log(
             'error',
             'database',
             'remove class from hierarchy failed', e)

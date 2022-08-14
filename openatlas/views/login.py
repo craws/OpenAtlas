@@ -13,7 +13,7 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.user import User
 from openatlas.util.util import send_mail, uc_first
 
@@ -51,7 +51,7 @@ def login() -> Union[str, Response]:
         user = User.get_by_username(request.form['username'])
         if user and user.username:
             if user.login_attempts_exceeded():
-                logger.log(
+                g.logger.log(
                     'notice',
                     'auth',
                     f'Login attempts exceeded: {user.username}')
@@ -71,16 +71,16 @@ def login() -> Union[str, Response]:
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
-                    logger.log('info', 'auth', f'Login of {user.username}')
+                    g.logger.log('info', 'auth', f'Login of {user.username}')
                     return redirect(
                         request.args.get('next') or url_for('overview'))
-                logger.log(
+                g.logger.log(
                     'notice',
                     'auth',
                     f'Inactive login try {user.username}')
                 flash(_('error inactive'), 'error')
             else:
-                logger.log(
+                g.logger.log(
                     'notice',
                     'auth',
                     f'Wrong password: {user.username}')
@@ -89,7 +89,7 @@ def login() -> Union[str, Response]:
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
-            logger.log(
+            g.logger.log(
                 'notice',
                 'auth',
                 f"Wrong username: {request.form['username']}")
@@ -137,7 +137,7 @@ def reset_password() -> Union[str, Response]:
                       'to %(email)s.', email=email),
                     'error')
             return redirect(url_for('login'))
-        logger.log(
+        g.logger.log(
             'info',
             'password',
             f'Password reset for non existing {form.email.data}')
@@ -152,13 +152,13 @@ def reset_password() -> Union[str, Response]:
 def reset_confirm(code: str) -> Response:  # pragma: no cover
     user = User.get_by_reset_code(code)
     if not user or not user.username or not user.email:
-        logger.log('info', 'auth', 'unknown reset code')
+        g.logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
     hours = g.settings['reset_confirm_hours']
     if datetime.datetime.now() > \
             user.password_reset_date + datetime.timedelta(hours=hours):
-        logger.log('info', 'auth', 'reset code expired')
+        g.logger.log('info', 'auth', 'reset code expired')
         flash(_('This reset confirmation code has expired.'), 'error')
         abort(404)
     password = User.generate_password()

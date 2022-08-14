@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.util.util import get_backup_file_data, required_group
 
@@ -43,10 +43,13 @@ def sql_execute() -> str:
                 pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')
-            logger.log('info', 'database', 'SQL executed', form.statement.data)
+            g.logger.log(
+                'info',
+                'database',
+                'SQL executed', form.statement.data)
         except Exception as e:
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             response = str(e)
             flash(_('error transaction'), 'error')
     return render_template(

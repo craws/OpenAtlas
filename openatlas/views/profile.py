@@ -12,7 +12,7 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
@@ -116,7 +116,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)

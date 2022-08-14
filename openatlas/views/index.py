@@ -9,7 +9,7 @@ from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -93,7 +93,7 @@ def overview() -> str:
                 entity.class_.label,
                 entity.first,
                 entity.last,
-                link(logger.get_log_info(entity.id)['creator'])])
+                link(g.logger.get_log_info(entity.id)['creator'])])
     tabs['info'].content = render_template(
         'index/index.html',
         intro=get_translation('intro'),

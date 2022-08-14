@@ -4,7 +4,6 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
-from openatlas import logger
 from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
@@ -102,7 +101,7 @@ class Link:
                 text = \
                     f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
                     f" > {property_code} > {range_.class_.cidoc_class.code}"
-                logger.log('error', 'model', text)
+                g.logger.log('error', 'model', text)
                 abort(400, text)
             id_ = Db.insert({
                 'property_code': property_code,
@@ -125,7 +124,7 @@ class Link:
             inverse=inverse,
             types=types)
         if len(result) > 1:  # pragma: no cover
-            logger.log(
+            g.logger.log(
                 'error',
                 'model',
                 f'Multiple linked entities found for {code}')
@@ -153,7 +152,7 @@ class Link:
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
         if not entity:  # pragma: no cover
-            logger.log(
+            g.logger.log(
                 'error',
                 'model',
                 'missing linked',

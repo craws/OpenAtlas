@@ -14,7 +14,7 @@ from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
@@ -243,7 +243,7 @@ def admin_check_link_duplicates(
         delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
         count = Link.delete_link_duplicates()
-        logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+        g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table([
@@ -322,12 +322,12 @@ def admin_settings(category: str) -> Union[str, Response]:
         Transaction.begin()
         try:
             Settings.update(data)
-            logger.log('info', 'settings', 'Settings updated')
+            g.logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('admin_index')}"
@@ -542,7 +542,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
             (app.config['UPLOAD_DIR'] / filename).unlink()
             flash(f"{filename} {_('was deleted')}", 'info')
         except Exception as e:
-            logger.log('error', 'file', f'deletion of {filename} failed', e)
+            g.logger.log('error', 'file', f'deletion of {filename} failed', e)
             flash(_('error file delete'), 'error')
         return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
@@ -554,7 +554,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
                 try:
                     (app.config['UPLOAD_DIR'] / file.name).unlink()
                 except Exception as e:
-                    logger.log(
+                    g.logger.log(
                         'error',
                         'file',
                         f'deletion of {file.name} failed',
@@ -607,7 +607,7 @@ def admin_log() -> str:
     table = Table(
         ['date', 'priority', 'type', 'message', 'user', 'info'],
         order=[[0, 'desc']])
-    logs = logger.get_system_logs(
+    logs = g.logger.get_system_logs(
         form.limit.data,
         form.priority.data,
         form.user.data)
@@ -638,7 +638,7 @@ def admin_log() -> str:
 @app.route('/admin/log/delete')
 @required_group('admin')
 def admin_log_delete() -> Response:
-    logger.delete_all_system_logs()
+    g.logger.delete_all_system_logs()
     flash(_('Logs deleted'), 'info')
     return redirect(url_for('admin_log'))
 

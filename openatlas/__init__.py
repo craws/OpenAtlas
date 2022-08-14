@@ -30,9 +30,6 @@ babel = Babel(app)
 
 # pylint: disable=wrong-import-position, import-outside-toplevel
 from openatlas.models.logger import Logger
-
-logger = Logger()
-
 from openatlas.api import api
 from openatlas.util.util import convert_size
 from openatlas.views import (
@@ -61,6 +58,7 @@ def before_request() -> None:
 
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid files overhead if not using Apache with static alias
+    g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)

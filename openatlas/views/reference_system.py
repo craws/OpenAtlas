@@ -3,7 +3,7 @@ from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.util.util import required_group
 
 
@@ -16,6 +16,6 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
         g.reference_systems[system_id].remove_class(class_name)
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'remove form failed', e)
+        g.logger.log('error', 'database', 'remove form failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('view', id_=system_id))

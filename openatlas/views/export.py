@@ -2,14 +2,14 @@ import os
 from pathlib import Path
 from typing import Any, Union
 
-from flask import flash, render_template, send_from_directory, url_for
+from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, SelectField, SubmitField
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.export import csv_export, sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -69,10 +69,10 @@ def export_sql() -> Union[str, Response]:
     form = ExportSqlForm()
     if form.validate_on_submit() and writable:
         if sql_export():
-            logger.log('info', 'database', 'SQL export')
+            g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
         else:  # pragma: no cover
-            logger.log('error', 'database', 'SQL export failed')
+            g.logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
     return render_template(
@@ -94,7 +94,7 @@ def export_csv() -> Union[str, Response]:
     form = ExportCsvForm()
     if form.validate_on_submit() and writable:
         csv_export(form)
-        logger.log('info', 'database', 'CSV export')
+        g.logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
     return render_template(
@@ -133,9 +133,9 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
 def delete_export(type_: str, filename: str) -> Response:
     try:
         (app.config['EXPORT_DIR'] / type_ / filename).unlink()
-        logger.log('info', 'file', f'{type_} file deleted')
+        g.logger.log('info', 'file', f'{type_} file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:
-        logger.log('error', 'file', f'{type_} file deletion failed', e)
+        g.logger.log('error', 'file', f'{type_} file deletion failed', e)
         flash(_('error file delete'), 'error')
     return redirect(url_for(f'export_{type_}'))

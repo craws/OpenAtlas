@@ -12,7 +12,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -122,7 +122,7 @@ def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
         return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
+    g.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True
 
 
