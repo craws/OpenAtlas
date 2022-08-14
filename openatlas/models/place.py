@@ -1,8 +1,9 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
-from openatlas.models.entity import Entity
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
 
 
 def get_place(entity: Entity) -> Optional[Entity]:

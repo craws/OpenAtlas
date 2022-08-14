@@ -3,9 +3,9 @@ from typing import Any, Union
 
 from flask import g
 
-from openatlas.api.v02.resources.error import FilterColumnError, \
-    FilterLogicalOperatorError, FilterOperatorError, InvalidSearchDateError, \
-    InvalidSearchNumberError, NoSearchStringError
+from openatlas.api.v02.resources.error import (
+    FilterColumnError,  FilterLogicalOperatorError, FilterOperatorError,
+    InvalidSearchDateError, InvalidSearchNumberError, NoSearchStringError)
 from openatlas.database.entity import Entity
 
 

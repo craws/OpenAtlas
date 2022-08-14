@@ -1,4 +1,6 @@
-from typing import Any, Optional
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -8,8 +10,10 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.forms.field import ValueFloatField
-from openatlas.models.type import Type
 from openatlas.util.util import manual, tooltip, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 
 def html_form(
