@@ -157,10 +157,16 @@ class TreeMultiSelect(HiddenInput):
 
 
 class TreeMultiField(HiddenField):
-    def __init__(self, label='', validators=None, form=None, type_id=None, **kwargs):
-       super(TreeMultiField, self).__init__(label, validators, **kwargs)
-       self.form = form
-       self.type_id = type_id or self.id
+    def __init__(
+            self,
+            label='',
+            validators=None,
+            form=None,
+            type_id=None,
+            **kwargs):
+        super(TreeMultiField, self).__init__(label, validators, **kwargs)
+        self.form = form
+        self.type_id = type_id or self.id
 
     widget = TreeMultiSelect()
 
@@ -185,9 +191,15 @@ class TreeSelect(HiddenInput):
 
 class TreeField(HiddenField):
 
-    def __init__(self, label='', validators=None, form=None, type_id=None, **kwargs):
-       super(TreeField, self).__init__(label, validators, **kwargs)
-       self.form = form
-       self.type_id = type_id or self.id
+    def __init__(
+            self,
+            label='',
+            validators=None,
+            form=None,
+            type_id=None,
+            **kwargs):
+        super(TreeField, self).__init__(label, validators, **kwargs)
+        self.form = form
+        self.type_id = type_id or self.id
 
     widget = TreeSelect()
