@@ -8,7 +8,7 @@ from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.util.util import (
-    datetime64_to_timestamp, timestamp_to_datetime64)
+    datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -23,7 +23,6 @@ class Link:
             domain: Optional[Entity] = None,
             range_: Optional[Entity] = None) -> None:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import format_date_part
         self.id = row['id']
         self.description = row['description']
         self.property = g.properties[row['property_code']]
