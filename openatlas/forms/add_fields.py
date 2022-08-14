@@ -4,12 +4,11 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField,TextAreaField
+from wtforms import IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import (
     NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
-from openatlas.models.entity import Entity
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import is_authorized, uc_first
@@ -227,9 +226,9 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
 def add_types(manager: Any) -> None:
     if manager.class_.name in g.classes \
             and g.classes[manager.class_.name].hierarchies:
-        types = OrderedDict(
-            {id_: g.types[id_] for id_ in
-             g.classes[manager.class_.name].hierarchies})
+        types = OrderedDict({
+            id_: g.types[id_] for id_ in
+            g.classes[manager.class_.name].hierarchies})
         if g.classes[
                 manager.class_.name].standard_type_id in types:
             types.move_to_end(  # Standard type to top
@@ -239,31 +238,27 @@ def add_types(manager: Any) -> None:
 
             class AddDynamicType(FlaskForm):
                 pass
-            setattr(
-                    AddDynamicType,
-                    f'name-dynamic',
-                    StringField(_('name')))
-            setattr(
-                    AddDynamicType,
-                    f'{type_.id}-dynamic',
-                    TreeField(str(type_.id),type_id=str(type_.id)))
-            setattr(
-                    AddDynamicType,
-                    'description-dynamic',
-                    TextAreaField(_('description')))
 
-            addDynamForm = AddDynamicType() if is_authorized('editor') else None
-            getattr(addDynamForm,f'{type_.id}-dynamic').label.text = 'super'
-
+            setattr(AddDynamicType, f'name-dynamic', StringField(_('name')))
+            setattr(
+                AddDynamicType,
+                f'{type_.id}-dynamic',
+                TreeField(str(type_.id), type_id=str(type_.id)))
+            setattr(
+                AddDynamicType,
+                'description-dynamic',
+                TextAreaField(_('description')))
+            form = AddDynamicType() if is_authorized('editor') else None
+            getattr(form, f'{type_.id}-dynamic').label.text = 'super'
             if type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeMultiField(str(type_.id),form=addDynamForm))
+                    TreeMultiField(str(type_.id), form=form))
             else:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id),form=addDynamForm))
+                    TreeField(str(type_.id), form=form))
             if type_.category == 'value':
                 add_value_type_fields(manager.form_class, type_.subs)

@@ -83,7 +83,7 @@ def get_table(view: str) -> Table:
         for system in g.reference_systems.values():
             table.rows.append([
                 link(system),
-                system.count if system.count else '',
+                system.count or '',
                 external_url(system.website_url),
                 external_url(system.resolver_url),
                 system.placeholder,

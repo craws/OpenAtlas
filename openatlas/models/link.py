@@ -28,8 +28,8 @@ class Link:
         self.id = row['id']
         self.description = row['description']
         self.property = g.properties[row['property_code']]
-        self.domain = domain if domain else Entity.get_by_id(row['domain_id'])
-        self.range = range_ if range_ else Entity.get_by_id(row['range_id'])
+        self.domain = domain or Entity.get_by_id(row['domain_id'])
+        self.range = range_ or Entity.get_by_id(row['range_id'])
         self.type = g.types[row['type_id']] if row['type_id'] else None
         self.types: dict[Entity, None] = {}
         if 'type_id' in row and row['type_id']:

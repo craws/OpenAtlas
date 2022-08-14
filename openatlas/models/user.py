@@ -168,7 +168,7 @@ class User(UserMixin):
     @staticmethod
     def generate_password(
             length: Optional[int] = None) -> str:  # pragma no cover
-        length = length if length else g.settings['random_password_length']
+        length = length or g.settings['random_password_length']
         return ''.join(
             secrets.choice(
                 string.ascii_uppercase + string.digits) for _ in range(length))

@@ -73,7 +73,7 @@ class BaseManager:
         if 'description' in self.fields:
             setattr(Form, 'description', TextAreaField(_('description')))
             if class_.name == 'type':
-                type_ = entity if entity else origin
+                type_ = entity or origin
                 if isinstance(type_, Type):
                     root = g.types[type_.root[0]] if type_.root else type_
                     if root.category == 'value':
@@ -117,7 +117,7 @@ class BaseManager:
     def customize_labels(self) -> None:
         if self.class_.name in ('administrative_unit', 'type') \
                 and 'classes' not in self.form:
-            type_ = self.entity if self.entity else self.origin
+            type_ = self.entity or self.origin
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_
                 getattr(self.form, str(root.id)).label.text = 'super'

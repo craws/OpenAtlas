@@ -14,7 +14,7 @@ class Project:
         self.id = row['id']
         self.name = row['name']
         self.count = row['count']
-        self.description = row['description'] if row['description'] else ''
+        self.description = row['description'] or ''
         self.created = row['created']
         self.modified = row['modified']
 

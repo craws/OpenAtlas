@@ -88,8 +88,6 @@ class ReferenceSystem(Entity):
         Db.insert_system({
             'entity_id': entity.id,
             'name': entity.name,
-            'website_url': data['website_url']
-            if data['website_url'] else None,
-            'resolver_url': data['resolver_url']
-            if data['resolver_url'] else None})
+            'website_url': data['website_url'] or None,
+            'resolver_url': data['resolver_url'] or None})
         return ReferenceSystem.get_all()[entity.id]

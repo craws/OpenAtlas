@@ -132,7 +132,7 @@ def add_value_type(
         root: Optional[Type] = None,
         level: int = 0) -> str:
     html = ''
-    root = root if root else type_
+    root = root or type_
     for sub_id in type_.subs:
         sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
@@ -150,9 +150,7 @@ def add_value_type(
                 </div>
                 {field(class_='value-type')}
               </div>
-              <span class="ms-1">
-                {sub.description if sub.description else ''}
-              </span>
+              <span class="ms-1">{sub.description or ''}</span>
             </div>
             {add_value_type(form, sub, root, level + 1)}
           </div>

@@ -46,7 +46,7 @@ def get_locale() -> str:
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
-    return best_match if best_match else g.settings['default_language']
+    return best_match or g.settings['default_language']
 
 
 @app.before_request
