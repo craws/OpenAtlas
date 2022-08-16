@@ -10,6 +10,8 @@ can be accessed and edited via the **Types** :doc:`/ui/menu` item. With this
 feature the model and user interface can be adapted for specific research
 interests.
 
+* Types can be added dynamically in forms (with at least editor permission)
+  with basic information like name, description and super type
 * The root type description is shown in forms as a mouse over text at
   the **i** icon
 * **Untyped entities** can be checked at the type overview

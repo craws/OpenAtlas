@@ -49,8 +49,13 @@ changing multiple to single choice is not possible.
 
 Add a type to an existing type tree
 -----------------------------------
-To create a new type in an already existing standard, custom, or value type
-tree, find that type tree in the overview and click on it.
+
+Types can be added dynamically in forms (with at least editor permission) with
+basic information like name, description and super type.
+
+A more detailed way to create a new type in an already existing standard,
+custom, or value type tree, is to find that type tree in the overview and
+click on it.
 
 .. image:: type_3.png
     :width: 400px
