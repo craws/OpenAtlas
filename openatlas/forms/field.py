@@ -163,7 +163,7 @@ class TreeMultiField(HiddenField):
             form: Any = None,
             type_id: Optional[int] = None,
             **kwargs: Any) -> None:
-        super(TreeMultiField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id
 
@@ -197,7 +197,7 @@ class TreeField(HiddenField):
             form: Any = None,
             type_id: str = '',
             **kwargs: Any) -> None:
-        super(TreeField, self).__init__(label, validators, **kwargs)
+        super().__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id
 

@@ -239,7 +239,7 @@ def add_types(manager: Any) -> None:
             class AddDynamicType(FlaskForm):
                 pass
 
-            setattr(AddDynamicType, f'name-dynamic', StringField(_('name')))
+            setattr(AddDynamicType, 'name-dynamic', StringField(_('name')))
             setattr(
                 AddDynamicType,
                 f'{type_.id}-dynamic',
