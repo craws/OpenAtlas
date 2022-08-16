@@ -61,6 +61,18 @@ class TypeTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             data['continue_'] = ''
 
+            # Add dynamic types with ajax
+            rv = self.app.post(
+                url_for('ajax_add_type'),
+                data={
+                    'name': 'New dynamic',
+                    'description': 'Hello',
+                    'superType': actor_type.id})
+            assert rv.data.isdigit()
+            rv = self.app.get(
+                url_for('ajax_get_type_tree', root_id=actor_type.id))
+            assert b'New dynamic' in rv.data
+
             # Forbidden system type
             rv = self.app.post(
                 url_for('update', id_=actor_type.id),

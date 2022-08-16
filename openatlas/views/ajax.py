@@ -30,13 +30,13 @@ def ajax_add_type() -> str:
         request.form['description'])
     try:
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
-    except:
+    except Exception as _e:  # pragma: no cover
         entity.delete()
         abort(400)
     return str(entity.id)
 
 
-@app.route('/ajax/get_type_tree/<int:root_id>', methods=['GET'])
+@app.route('/ajax/get_type_tree/<int:root_id>')
 @required_group('readonly')
 def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
     return str(Type.get_tree_data(root_id, []))
