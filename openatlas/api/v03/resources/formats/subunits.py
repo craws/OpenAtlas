@@ -225,9 +225,9 @@ def get_subunits_from_id(
     entities = get_all_subunits_recursive(entity, [])
     ext_reference_links = get_type_links_inverse(entities)
     entities_dict: dict[int, Any] = {}
-    for entity in entities:
-        entities_dict[entity.id] = {
-            'entity': entity,
+    for entity_ in entities:
+        entities_dict[entity_.id] = {
+            'entity': entity_,
             'links': [],
             'links_inverse': [],
             'ext_reference_links': ext_reference_links}

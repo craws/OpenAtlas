@@ -22,9 +22,8 @@ class ImageTest(TestBaseCase):
                 place = insert_entity(
                     'Nostromos',
                     'place',
-                    description='That is the Nostromos')
-                logo = \
-                    pathlib.Path(app.root_path) \
+                    'That is the Nostromos')
+                logo = pathlib.Path(app.root_path) \
                     / 'static' / 'images' / 'layout' / 'logo.png'
 
             # Resizing through UI insert
