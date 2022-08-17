@@ -144,7 +144,6 @@ class TableField(HiddenField):
 
 
 class TreeMultiSelect(HiddenInput):
-
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         data = field.data or []
         data = ast.literal_eval(data) if isinstance(data, str) else data
