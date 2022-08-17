@@ -83,7 +83,7 @@ def get_csv_types(entity: Entity) -> dict[Any, list[Any]]:
                 if link.range.id == type_.id and type_.description:
                     value += f' {type_.description}'
         key = ' > '.join(map(str, hierarchy))
-        types[key].append(type_.name + (': ' + value if value else ''))
+        types[key].append(f"{type_.name}: {value or ''}")
     return types
 
 

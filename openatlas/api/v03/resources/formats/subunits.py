@@ -139,7 +139,7 @@ def get_references(
                 'abbreviation': link_.domain.name,
                 'id': link_.domain.id,
                 'title': link_.domain.description,
-                'pages': link_.description if link_.description else None})
+                'pages': link_.description or None})
     if parser['format'] == 'xml':
         return [{'reference': ref} for ref in references]
     return references
@@ -166,8 +166,7 @@ def get_file(
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
-            'source':
-                link.domain.description if link.domain.description else None})
+            'source': link.domain.description or None})
     if parser['format'] == 'xml':
         return [{'file': file} for file in files]
     return files

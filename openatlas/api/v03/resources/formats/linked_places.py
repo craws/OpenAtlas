@@ -129,8 +129,8 @@ def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
         'start': {
             'earliest': str(entity.begin_from) if entity.begin_from else None,
             'latest': str(entity.begin_to) if entity.begin_to else None,
-            'comment': entity.begin_comment if entity.begin_comment else None},
+            'comment': entity.begin_comment or None},
         'end': {
-            'earliest': str(entity.end_from)if entity.end_from else None,
-            'latest': str(entity.end_to)if entity.end_to else None,
-            'comment': entity.end_comment if entity.end_comment else None}}
+            'earliest': str(entity.end_from) if entity.end_from else None,
+            'latest': str(entity.end_to) if entity.end_to else None,
+            'comment': entity.end_comment or None}}
