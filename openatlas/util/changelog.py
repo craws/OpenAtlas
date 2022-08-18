@@ -1,5 +1,5 @@
 versions = {
-    '7.5.0': ['TBA', {
+    '7.5.0': ['2022-08-18', {
         'feature': {
             '1637': 'Linking sub units like places, e.g. with events',
             '1752': 'Add a place column for sub units to type view',
