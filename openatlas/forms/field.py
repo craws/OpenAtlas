@@ -36,7 +36,10 @@ class RemovableListField(Field):
 
 class TableMultiSelect(HiddenInput):
 
-    def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
+    def __call__(
+            self,
+            field: TableMultiField,
+            **kwargs: Any) -> TableMultiSelect:
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
@@ -45,6 +48,12 @@ class TableMultiSelect(HiddenInput):
             entities = Entity.get_by_class(class_, types=True, aliases=aliases)
         else:
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
+        filtered = []
+        for entity in entities:
+            if entity.id not in field.ignore_ids:
+                filtered.append(entity)
+        entities = filtered
+
         table = Table(
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
@@ -64,6 +73,14 @@ class TableMultiSelect(HiddenInput):
 
 
 class TableMultiField(HiddenField):
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            ignore_ids: Optional[list[int]] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.ignore_ids = ignore_ids or []
     widget = TableMultiSelect()
 
 

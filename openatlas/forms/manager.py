@@ -62,7 +62,10 @@ class ActorActorRelationManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         fields = {'inverse': BooleanField(_('inverse'))}
         if not self.link_:
-            fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
+            fields['actor'] = TableMultiField(
+                _('actor'),
+                [InputRequired()],
+                ignore_ids=[])
             fields['relation_origin_id'] = HiddenField()
         setattr(self.form_class, 'validate_actor', actor_relation)
         return fields
