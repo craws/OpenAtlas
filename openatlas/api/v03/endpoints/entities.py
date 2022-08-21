@@ -13,9 +13,8 @@ from openatlas.api.v03.resources.util import (
     get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
     get_entities_by_view_classes, get_entities_linked_to_special_type,
     get_entities_linked_to_special_type_recursive, get_entity_by_id,
-    get_linked_entities_api)
+    get_linked_entities_api, get_entities_from_links)
 from openatlas.models.entity import Entity
-from openatlas.util.util import get_entities_linked_to_type_recursive
 
 
 class GetByCidocClass(Resource):
@@ -98,7 +97,7 @@ class GetTypeEntitiesAll(Resource):
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if id_ not in g.types:
             raise InvalidSubunitError
-        if not (entities := get_entities_linked_to_type_recursive(id_, [])):
+        if not (entities := get_entities_from_links(id_)):
             entities = get_entities_by_ids(
                 get_entities_linked_to_special_type_recursive(id_, []))
         return resolve_entities(entities, entity_.parse_args(), id_)

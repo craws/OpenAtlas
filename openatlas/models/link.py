@@ -210,6 +210,10 @@ class Link:
         return Db.get_links_by_type(type_.id)
 
     @staticmethod
+    def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
+        return Db.get_entity_ids_by_type_ids(types_)
+
+    @staticmethod
     def delete_(id_: int) -> None:
         Db.delete_(id_)
 
