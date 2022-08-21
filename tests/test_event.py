@@ -182,24 +182,6 @@ class EventTest(TestBaseCase):
             rv = self.app.post(
                 url_for('update', id_=event_id),
                 data={
-                    'name': 'Event',
-                    'event': event_id,
-                    'event_id': event_id},
-                follow_redirects=True)
-            assert b'Self as super not allowed' in rv.data
-
-            rv = self.app.post(
-                url_for('update', id_=event_id),
-                data={
-                    'name': 'Event',
-                    'event_preceding': event_id,
-                    'event_id': event_id},
-                follow_redirects=True)
-            assert b'Self as preceding not allowed' in rv.data
-
-            rv = self.app.post(
-                url_for('update', id_=event_id),
-                data={
                     'name': 'Event with preceding',
                     'event_preceding': activity_id,
                     'event_id': event_id},

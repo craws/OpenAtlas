@@ -3,37 +3,11 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import MultipleFileField
 
-from openatlas.forms.field import TableField, TreeField
+from openatlas.forms.field import TreeField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
-
-
-def super_event(form: FlaskForm, super_: TableField) -> None:
-    if not super_.data:
-        return
-    if str(super_.data) == str(form.event_id.data):
-        form.event.errors.append(_('self as super not allowed'))
-    if get_sub_events_recursive(
-            Entity.get_by_id(form.event_id.data),
-            Entity.get_by_id(super_.data)):  # pragma: no cover
-        form.event.errors.append(_('sub of self not allowed as super'))
-
-
-def get_sub_events_recursive(
-        entity: Entity,
-        target: Entity) -> bool:  # pragma: no cover
-    for sub in entity.get_linked_entities('P9', inverse=True):
-        if sub.id == target.id:
-            return True
-        get_sub_events_recursive(sub, target)
-    return False
-
-
-def preceding_event(form: FlaskForm, preceding: TableField) -> None:
-    if preceding.data and str(preceding.data) == str(form.event_id.data):
-        form.event_preceding.errors.append(_('self as preceding not allowed'))
 
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
@@ -64,7 +38,6 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
 
 
 def validate(form: FlaskForm) -> bool:
-    # Dates and reference systems are validated here because of multiple fields
     valid = FlaskForm.validate(form)
     if hasattr(form, 'begin_year_from'):  # Dates
         if not validate_dates(form):
@@ -114,6 +87,7 @@ def validate_dates(form: FlaskForm) -> bool:
                     valid = False
                 else:
                     dates[prefix + postfix.replace('_', '')] = date
+
     # Check for valid date combination e.g. begin not after end
     if valid:
         for prefix in ['begin', 'end']:

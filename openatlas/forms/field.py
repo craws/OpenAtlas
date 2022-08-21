@@ -126,7 +126,8 @@ class TableSelect(HiddenInput):
                     types=True,
                     aliases=aliases)
             table = Table(g.table_headers[class_])
-            for entity in entities:
+            for entity in list(
+                    filter(lambda x: x.id not in field.filter_ids, entities)):
                 if field.data and entity.id == int(field.data):
                     selection = entity.name
                 data = get_base_table_data(entity, show_links=False)
@@ -151,6 +152,14 @@ class TableSelect(HiddenInput):
 
 
 class TableField(HiddenField):
+    def __init__(
+            self,
+            label: Optional[str] = None,
+            validators: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.filter_ids = filter_ids or []
     widget = TableSelect()
 
 
