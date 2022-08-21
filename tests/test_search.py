@@ -25,13 +25,16 @@ class SearchTest(TestBaseCase):
                     'include_dateless': True,
                     'begin_year': -100, 'end_year': 3000})
             assert b'Waldo' in rv.data
+
             rv = self.app.post(
                 url_for('search_index'),
                 data={'term': 'wal', 'own': True})
             assert b'Waldo' not in rv.data
+
             data = {'term': 'do', 'classes': 'person'}
             rv = self.app.post(url_for('search_index'), data=data)
             assert b'Waldo' in rv.data
+
             rv = self.app.post(
                 url_for('search_index'),
                 follow_redirects=True,

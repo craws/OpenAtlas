@@ -19,6 +19,7 @@ class PlaceTest(TestBaseCase):
         with app.app_context():
             rv: Any = self.app.get(url_for('insert', class_='place'))
             assert b'+ Place' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 unit_type = Type.get_hierarchy('Administrative unit')
@@ -26,7 +27,6 @@ class PlaceTest(TestBaseCase):
                 unit_sub2 = g.types[unit_type.subs[1]]
                 human_remains_type = Type.get_hierarchy('Human remains')
                 human_remains_type_sub = g.types[human_remains_type.subs[0]]
-
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
@@ -47,10 +47,11 @@ class PlaceTest(TestBaseCase):
                 url_for('insert', class_='place', origin_id=reference.id),
                 data=data,
                 follow_redirects=True)
-            assert b'Asgard' in rv.data \
-                   and b'An entry has been created' in rv.data
+            assert b'Asgard' in rv.data and b'An entry has been' in rv.data
+
             rv = self.app.get(url_for('view', id_=precision))
             assert b'Asgard' in rv.data
+
             rv = self.app.get(
                 url_for(
                     'view',
@@ -96,6 +97,7 @@ class PlaceTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Necronomicon' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 places = Entity.get_by_class('place')
@@ -105,10 +107,13 @@ class PlaceTest(TestBaseCase):
                 actor = Entity.insert('person', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
+
             rv = self.app.get(url_for('index', view='place'))
             assert b'Asgard' in rv.data
+
             rv = self.app.get(url_for('update', id_=place.id))
             assert b'Valhalla' in rv.data
+
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
             data['geonames_id'] = '321'
@@ -118,18 +123,15 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Val-hall' in rv.data
 
-            # Test error when viewing the corresponding location
             rv = self.app.get(url_for('view', id_=place.id+1))
             assert b'be viewed directly' in rv.data
 
-            # Test with same GeoNames id
             rv = self.app.post(
                 url_for('update', id_=place.id),
                 data=data,
                 follow_redirects=True)
             assert b'Val-hall' in rv.data
 
-            # Test with same GeoNames id but different precision
             data['geonames_precision'] = ''
             rv = self.app.post(
                 url_for('update', id_=place.id),
@@ -137,7 +139,6 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Val-hall' in rv.data
 
-            # Test update without the previous GeoNames id
             data['geonames_id'] = ''
             rv = self.app.post(
                 url_for('update', id_=place.id),
@@ -152,7 +153,6 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
 
-            # Test invalid geom
             data['gis_polygons'] = """[{
                 "type": "Feature", 
                 "geometry": {
@@ -173,7 +173,6 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
-            # Test Overlays
             path = \
                 pathlib.Path(app.root_path) \
                 / 'static' / 'images' / 'layout' / 'logo.png'
@@ -183,6 +182,7 @@ class PlaceTest(TestBaseCase):
                     data={'name': 'X-Files', 'file': img},
                     follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 file = Entity.get_by_class('file')[0]
@@ -194,6 +194,7 @@ class PlaceTest(TestBaseCase):
                     place_id=place.id,
                     link_id=link_id))
             assert b'X-Files' in rv.data
+
             data = {
                 'top_left_easting': 42,
                 'top_left_northing': 12,
@@ -210,6 +211,7 @@ class PlaceTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Edit' in rv.data
+
             if os.name == "posix":  # Ignore for other OS e.g. Windows
                 with app.test_request_context():
                     app.preprocess_request()  # type: ignore
@@ -222,6 +224,7 @@ class PlaceTest(TestBaseCase):
                         place_id=place.id,
                         link_id=link_id))
                 assert b'42' in rv.data
+
                 rv = self.app.post(
                     url_for(
                         'overlay_update',
@@ -231,6 +234,7 @@ class PlaceTest(TestBaseCase):
                     data=data,
                     follow_redirects=True)
                 assert b'Changes have been saved' in rv.data
+
                 self.app.get(
                     url_for(
                         'overlay_remove',
@@ -238,7 +242,6 @@ class PlaceTest(TestBaseCase):
                         place_id=place.id),
                     follow_redirects=True)
 
-            # Add to place
             rv = self.app.get(url_for('entity_add_file', id_=place.id))
             assert b'Link file' in rv.data
 
@@ -251,15 +254,16 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('reference_add', id_=reference.id, view='place'))
             assert b'Val-hall' in rv.data
+
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
             assert b'Link reference' in rv.data
+
             rv = self.app.post(
                 url_for('entity_add_reference', id_=place.id),
                 data={'reference': reference.id, 'page': '777'},
                 follow_redirects=True)
             assert b'777' in rv.data
 
-            # Place types
             rv = self.app.get(url_for('type_move_entities', id_=unit_sub1.id))
             assert b'Asgard' in rv.data
 
@@ -295,6 +299,7 @@ class PlaceTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Insert and add strati' in rv.data
+
             data['name'] = "It's not a bug, it's a feature!"
             rv = self.app.get(
                 url_for(
@@ -302,6 +307,7 @@ class PlaceTest(TestBaseCase):
                     class_='stratigraphic_unit',
                     origin_id=place.id))
             assert b'Insert and add artifact' in rv.data
+
             rv = self.app.post(
                 url_for('insert', class_='feature', origin_id=place.id),
                 data=data)
@@ -318,11 +324,9 @@ class PlaceTest(TestBaseCase):
                 data=data)
             stratigraphic_id = rv.location.split('/')[-1]
 
-            # Create a stratigraphic unit "sibling"
             self.app.get(
                 url_for('insert', class_='place', origin_id=stratigraphic_id))
             self.app.get(url_for('update', id_=stratigraphic_id))
-
             self.app.post(
                 url_for('update', id_=stratigraphic_id),
                 data={'name': "I'm a stratigraphic unit"})
@@ -344,6 +348,7 @@ class PlaceTest(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'50' in rv.data
+
             self.app.get(url_for('update', id_=find_id))
             data = {
                 'name': 'My human remains',
@@ -360,8 +365,10 @@ class PlaceTest(TestBaseCase):
             human_remains_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('update', id_=human_remains_id))
             assert b'My human remains' in rv.data
+
             rv = self.app.get('/')
             assert b'My human remains' in rv.data
+
             rv = self.app.get(url_for('view', id_=human_remains_type_sub.id))
             assert b'My human remains' in rv.data
 
@@ -369,20 +376,25 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(
                 url_for('anthropology_index', id_=stratigraphic_id))
             assert b'Sex estimation' in rv.data
+
             rv = self.app.get(url_for('sex', id_=stratigraphic_id))
             assert b'Anthropological analyses' in rv.data
+
             rv = self.app.post(
                 url_for('sex_update', id_=stratigraphic_id),
                 follow_redirects=True,
                 data={'Glabella': 'Female'})
             assert b'-2.0' in rv.data
+
             rv = self.app.post(
                 url_for('sex_update', id_=stratigraphic_id),
                 follow_redirects=True,
                 data={'Glabella': 'Female'})
             assert b'-2.0' in rv.data
+
             rv = self.app.get(url_for('sex_update', id_=stratigraphic_id))
             assert b'Glabella' in rv.data
+
             rv = self.app.post(
                 url_for('update', id_=stratigraphic_id),
                 data={'name': 'New name'},
@@ -394,14 +406,17 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.get(url_for('view', id_=find_id))
             assert b'You never' in rv.data
+
             rv = self.app.get(
                 url_for('index', view='place', delete_id=place.id),
                 follow_redirects=True)
             assert b'not possible if subunits' in rv.data
+
             rv = self.app.get(
                 url_for('index', view='place', delete_id=find_id),
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
+
             rv = self.app.get(
                 url_for('index', view='place', delete_id=place2.id))
             assert b'The entry has been deleted.' in rv.data

@@ -40,13 +40,13 @@ class UserTests(TestBaseCase):
                 alice.remove_newsletter()
             rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
+
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
             data['password'] = 'too short'
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
 
-            # Test insert with continue
             rv = self.app.post(
                 url_for('user_insert'),
                 follow_redirects=True, data=data2)
@@ -54,36 +54,41 @@ class UserTests(TestBaseCase):
 
             rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
+
             rv = self.app.get(url_for('user_update', id_=alice.id))
             assert b'Alice' in rv.data
+
             data['description'] = 'The warrant officer'
             rv = self.app.post(
                 url_for('user_update', id_=user_id),
                 data=data,
                 follow_redirects=True)
             assert b'The warrant officer' in rv.data
+
             rv = self.app.get(
                 url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
 
-            # Test activity log
             data = {'name': 'test', 'description': 'test'}
             self.app.post(url_for('insert', class_='bibliography'), data=data)
             rv = self.app.get(url_for('user_activity'))
             assert b'Activity' in rv.data
+
             rv = self.app.get(url_for('user_activity', user_id=user_id))
             assert b'Activity' in rv.data
+
             data = {'limit': 'all', 'action': 'all', 'user': 'all'}
             rv = self.app.post(url_for('user_activity', data=data))
             assert b'Activity' in rv.data
 
-            # Test errors
             rv = self.app.get(
                 url_for('admin_index', action='delete_user', id_=alice.id))
             assert b'403 - Forbidden' in rv.data
+
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
+
             self.app.post(
                 '/login',
                 data={'username': 'Editor', 'password': 'test'})

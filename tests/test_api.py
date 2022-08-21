@@ -158,8 +158,8 @@ class ApiTests(TestBaseCase):
             # ---Content Endpoints---
             # ClassMapping
             for rv in [
-                self.app.get(url_for('api_02.class_mapping')).get_json(),
-                self.app.get(url_for('api_03.class_mapping')).get_json()]:
+                    self.app.get(url_for('api_02.class_mapping')).get_json(),
+                    self.app.get(url_for('api_03.class_mapping')).get_json()]:
                 assert ApiTests.get_class_mapping(rv)
 
             # Content
