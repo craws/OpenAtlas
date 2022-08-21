@@ -130,7 +130,7 @@ def get_entities_linked_to_type_recursive_(
     return data
 
 
-def get_entities_from_links(id_: int) -> list[Entity]:
+def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
     type_ids = get_entities_linked_to_type_recursive_(id_, [id_])
     entity_ids = Link.get_entity_ids_by_type_ids(type_ids)
     return get_entities_by_ids(

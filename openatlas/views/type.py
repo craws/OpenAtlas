@@ -15,8 +15,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (
-    get_entities_linked_to_type_recursive, link, required_group, sanitize)
+from openatlas.util.util import (get_entities_linked_to_type_recursive, link,
+                                 required_group, sanitize)
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:

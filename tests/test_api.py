@@ -89,7 +89,9 @@ class ApiTests(TestBaseCase):
                 strati.modified = str(datetime.now())
 
                 # Adding Administrative Unit Type
-                unit_node = Type.get_hierarchy('Administrative unit')
+                admin_unit = Type.get_hierarchy('Administrative unit')
+                unit_node = g.types[admin_unit.subs[0]]
+                location.link('P89', unit_node)
 
                 # Adding File to place
                 file = insert_entity('Picture with a License', 'file')
@@ -813,7 +815,7 @@ class ApiTests(TestBaseCase):
                 'api_02.node_entities',
                 id_=unit_node.id,
                 count=True))
-            assert bool(rv.get_json() == 6)
+            assert bool(rv.get_json() == 3)
 
             # Test type overview
             for rv in [
