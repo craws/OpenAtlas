@@ -40,47 +40,41 @@ class TableMultiSelect(HiddenInput):
             self,
             field: TableMultiField,
             **kwargs: Any) -> TableMultiSelect:
-        if field.data and isinstance(field.data, str):
-            field.data = ast.literal_eval(field.data)
+        data = field.data or []
+        data = ast.literal_eval(data) if isinstance(data, str) else data
         class_ = field.id if field.id != 'given_place' else 'place'
         aliases = current_user.settings['table_show_aliases']
         if class_ in ['group', 'person']:
             entities = Entity.get_by_class(class_, types=True, aliases=aliases)
         else:
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
-        filtered = []
-        for entity in entities:
-            if entity.id not in field.ignore_ids:
-                filtered.append(entity)
-        entities = filtered
-
         table = Table(
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for e in entities:
-            data = get_base_table_data(e, show_links=False)
-            data.insert(0, f"""
+        for e in list(
+                filter(lambda x: x.id not in field.filter_ids, entities)):
+            row = get_base_table_data(e, show_links=False)
+            row.insert(0, f"""
                 <input type="checkbox" id="{e.id}" value="{e.name}"
-                {'checked' if field.data and e.id in field.data else ''}>""")
-            table.rows.append(data)
+                {'checked' if e.id in data else ''}>""")
+            table.rows.append(row)
         return super().__call__(field, **kwargs) + render_template(
             'forms/table_multi_select.html',
             field=field,
-            selection=[
-                e.name for e in entities if field.data and e.id in field.data],
+            selection=[e.name for e in entities if e.id in data],
             table=table)
 
 
 class TableMultiField(HiddenField):
     def __init__(
             self,
-            label: str,
-            validators: Any = None,
-            ignore_ids: Optional[list[int]] = None,
+            label: Optional[str] = None,
+            validators: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
-        self.ignore_ids = ignore_ids or []
+        self.filter_ids = filter_ids or []
     widget = TableMultiSelect()
 
 

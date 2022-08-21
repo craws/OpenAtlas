@@ -1,5 +1,3 @@
-import ast
-
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -38,17 +36,6 @@ def preceding_event(form: FlaskForm, preceding: TableField) -> None:
         form.event_preceding.errors.append(_('self as preceding not allowed'))
 
 
-def membership(form: FlaskForm, member: TableField) -> None:
-    if form.member_origin_id.data in ast.literal_eval(member.data):
-        member.errors.append(_("Can't link to itself."))
-
-
-def actor_relation(form: FlaskForm, actor: TableField) -> None:
-    if getattr(form, 'relation_origin_id').data \
-            in ast.literal_eval(actor.data):
-        actor.errors.append(_("Can't link to itself."))
-
-
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
     for file_ in request.files.getlist('file'):
         if not file_:  # pragma: no cover
@@ -77,8 +64,7 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
 
 
 def validate(form: FlaskForm) -> bool:
-    # Validation of dates and reference systems are handled here in general
-    # because of multiple fields, Flask doesn't validate empty input, ...
+    # Dates and reference systems are validated here because of multiple fields
     valid = FlaskForm.validate(form)
     if hasattr(form, 'begin_year_from'):  # Dates
         if not validate_dates(form):
