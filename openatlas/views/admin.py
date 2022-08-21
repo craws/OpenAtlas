@@ -28,8 +28,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.image_processing import create_resized_images, \
-    delete_orphaned_resized_images
+from openatlas.util.image_processing import (
+    create_resized_images, delete_orphaned_resized_images)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -118,7 +118,8 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='files'))
                 if is_authorized('manager') else '',
                 button(_('list'), url_for('index', view='file')),
-                button(_('file'), url_for('insert', class_='file'))],
+                button(_('file'), url_for('insert', class_='file'))
+                if is_authorized('contributor') else ''],
             content=render_template(
                 'admin/file.html',
                 info=get_form_settings(FilesForm()),

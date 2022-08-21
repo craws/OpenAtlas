@@ -11,8 +11,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
-from openatlas.forms.validation import (
-    actor_relation, file, membership, type_super)
+from openatlas.forms.validation import file, type_super
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -36,35 +35,17 @@ class AcquisitionManager(EventBaseManager):
         self.add_link('P24', self.form.given_place.data)
 
 
-class ActorFunctionManager(BaseManager):
-    fields = ['date', 'description', 'continue']
-
-    def additional_fields(self) -> dict[str, Any]:
-        if self.link_:
-            return {}
-        target = 'group' if 'membership' in request.url else 'actor'
-        setattr(self.form_class, f'validate_{target}', membership)
-        return {
-            'member_origin_id': HiddenField(),
-            target: TableMultiField(_('actor'), [InputRequired()])}
-
-    def populate_insert(self) -> None:
-        self.form.member_origin_id.data = self.origin.id
-
-
-class ActivityManager(EventBaseManager):
-    pass
-
-
 class ActorActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
         fields = {'inverse': BooleanField(_('inverse'))}
         if not self.link_:
-            fields['actor'] = TableMultiField(_('actor'), [InputRequired()])
+            fields['actor'] = TableMultiField(
+                _('actor'),
+                [InputRequired()],
+                filter_ids=[self.origin.id])
             fields['relation_origin_id'] = HiddenField()
-        setattr(self.form_class, 'validate_actor', actor_relation)
         return fields
 
     def populate_insert(self) -> None:
@@ -74,6 +55,28 @@ class ActorActorRelationManager(BaseManager):
         super().populate_update()
         if self.origin.id == self.link_.range.id:
             self.form.inverse.data = True
+
+
+class ActorFunctionManager(BaseManager):
+    fields = ['date', 'description', 'continue']
+
+    def additional_fields(self) -> dict[str, Any]:
+        if self.link_:
+            return {}
+        return {
+            'member_origin_id': HiddenField(),
+            'group' if 'membership' in request.url else 'actor':
+                TableMultiField(
+                    _('actor'),
+                    [InputRequired()],
+                    filter_ids=[self.origin.id])}
+
+    def populate_insert(self) -> None:
+        self.form.member_origin_id.data = self.origin.id
+
+
+class ActivityManager(EventBaseManager):
+    pass
 
 
 class AdministrativeUnitManager(BaseManager):
