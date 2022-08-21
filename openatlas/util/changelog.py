@@ -1,5 +1,8 @@
 versions = {
-    '7.6.0': ['TBA', {}],
+    '7.6.0': ['TBA',  {
+        'feature': {
+            '1788': 'Forms: filter invalid table options'
+        }}],
     '7.5.0': ['2022-08-18', {
         'feature': {
             '1637': 'Linking sub units like places, e.g. with events',
