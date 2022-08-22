@@ -75,10 +75,10 @@ entity_.add_argument(
     case_sensitive=False,
     default=[
         'when', 'types', 'relations', 'names', 'links', 'geometry',
-        'depictions', 'geonames'],
+        'depictions', 'geonames', 'description'],
     choices=(
         'when', 'types', 'relations', 'names', 'links', 'geometry',
-        'depictions', 'geonames', 'none'))
+        'depictions', 'geonames', 'description', 'none'))
 entity_.add_argument(
     'export',
     type=str,

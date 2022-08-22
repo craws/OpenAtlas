@@ -46,28 +46,39 @@ const myCircleStyle = {
   radius: 10,
 };
 
-const siblingStyle = {
-  color: "rgb(111,111,111)",
-  weight: 1.5,
-  fillOpacity: 0.5,
-  radius: 10,
-  //"opacity": 0.4
+const getWeight = (feature) =>
+  feature?.properties?.shapeType === "area" ? 0 : 2;
+const selectedPolygonStyle = (feature) => {
+  return {
+    weight: getWeight(feature),
+  };
+};
+const polygonStyle = (feature) => {
+  return {
+    color: "#9A9A9A",
+    weight: getWeight(feature),
+    fillOpacity: .5
+  };
+};
+const siblingStyle = (feature) => {
+  return {
+    color: "rgb(111,111,111)",
+    weight: getWeight(feature),
+  };
 };
 
-const superStyle = {
-  color: "rgb(255,231,191)",
-  weight: 1.5,
-  fillOpacity: 0.5,
-  radius: 10,
-  //"opacity": 0.4
+const superStyle = (feature) => {
+  return {
+    color: "rgb(255,231,191)",
+    weight: getWeight(feature),
+  };
 };
 
-const subStyle = {
-  color: "rgb(39,207,59)",
-  weight: 1.5,
-  fillOpacity: 0.5,
-  radius: 10,
-  //"opacity": 0.4
+const subStyle = (feature) => {
+  return {
+    color: "rgb(39,207,59)",
+    weight: getWeight(feature),
+  };
 };
 
 // Define base layers
@@ -133,7 +144,7 @@ const pointLayer = new L.GeoJSON(gisAll, {
 });
 const polygonLayer = new L.GeoJSON(gisAll, {
   onEachFeature: setPopup(false),
-  style: { color: "#9A9A9A" },
+  style: polygonStyle,
   filter: polygonFilter,
 });
 const linestringLayer = new L.GeoJSON(gisAll, {
@@ -143,6 +154,7 @@ const linestringLayer = new L.GeoJSON(gisAll, {
 });
 let selectedLayer = L.geoJson(gisSelected, {
   onEachFeature: setPopup(true),
+  style: selectedPolygonStyle,
 }).addTo(map);
 
 //supers
@@ -347,7 +359,7 @@ function buildPopup(feature, action = "view", selected = false) {
               feature.properties.description || ""
             }</div>
             <div id="buttonBar">
-            
+
             ${
               selected &&
               (window.location.href.includes("update") ||
@@ -356,7 +368,11 @@ function buildPopup(feature, action = "view", selected = false) {
                  <button id="deleteButton" onclick="deleteGeometry(${feature.properties.id})">${translate["delete"]}</button>`
                 : `<button  onclick="window.location.href='/entity/${feature.properties.objectId}'">${translate["details"]}</button>`
             }
-            
+
             </div >
         </div > `;
 }
+
+$('.leaflet-geonames-icon').click(function($e) {
+  $e.preventDefault();
+});

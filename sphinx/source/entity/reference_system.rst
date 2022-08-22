@@ -3,6 +3,9 @@ Reference System
 
 .. toctree::
 
+CIDOC documentation:
+:cidoc_entity:`E32 Authority Document<e32-authority-document>`
+
 For step by step instructions have a look at our
 :doc:`/examples/reference_systems`.
 

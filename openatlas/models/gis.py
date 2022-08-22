@@ -1,13 +1,17 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import ast
-from typing import Any, Optional
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, json
 
 from openatlas.database.gis import Gis as Db
-from openatlas.models.entity import Entity
-from openatlas.models.imports import Project
 from openatlas.models.type import Type
 from openatlas.util.util import sanitize
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
+    from openatlas.models.imports import Project
 
 
 class InvalidGeomException(Exception):

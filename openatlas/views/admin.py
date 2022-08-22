@@ -14,7 +14,7 @@ from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
@@ -28,8 +28,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.image_processing import create_resized_images, \
-    delete_orphaned_resized_images
+from openatlas.util.image_processing import (
+    create_resized_images, delete_orphaned_resized_images)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -70,7 +70,11 @@ def admin_index(
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
     for user in User.get_all():
-        count = User.get_created_entities_count(user.id)
+        user_entities = ''
+        if count := User.get_created_entities_count(user.id):
+            user_entities = \
+                f'<a href="{url_for("user_entities", id_=user.id)}">' \
+                f'{format_number(count)}</a>'
         email = user.email \
             if is_authorized('manager') or user.settings['show_email'] else ''
         tables['user'].rows.append([
@@ -81,7 +85,7 @@ def admin_index(
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
-            format_number(count) if count else ''])
+            user_entities])
     for item, languages in get_content().items():
         content = [uc_first(_(item))]
         for language in app.config['LANGUAGES']:
@@ -114,7 +118,8 @@ def admin_index(
                 button(_('edit'), url_for('admin_settings', category='files'))
                 if is_authorized('manager') else '',
                 button(_('list'), url_for('index', view='file')),
-                button(_('file'), url_for('insert', class_='file'))],
+                button(_('file'), url_for('insert', class_='file'))
+                if is_authorized('contributor') else ''],
             content=render_template(
                 'admin/file.html',
                 info=get_form_settings(FilesForm()),
@@ -239,7 +244,7 @@ def admin_check_link_duplicates(
         delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
         count = Link.delete_link_duplicates()
-        logger.log('info', 'admin', f"Deleted duplicate links: {count}")
+        g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table([
@@ -318,12 +323,12 @@ def admin_settings(category: str) -> Union[str, Response]:
         Transaction.begin()
         try:
             Settings.update(data)
-            logger.log('info', 'settings', 'Settings updated')
+            g.logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('admin_index')}"
@@ -538,7 +543,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
             (app.config['UPLOAD_DIR'] / filename).unlink()
             flash(f"{filename} {_('was deleted')}", 'info')
         except Exception as e:
-            logger.log('error', 'file', f'deletion of {filename} failed', e)
+            g.logger.log('error', 'file', f'deletion of {filename} failed', e)
             flash(_('error file delete'), 'error')
         return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
@@ -550,7 +555,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
                 try:
                     (app.config['UPLOAD_DIR'] / file.name).unlink()
                 except Exception as e:
-                    logger.log(
+                    g.logger.log(
                         'error',
                         'file',
                         f'deletion of {file.name} failed',
@@ -603,7 +608,7 @@ def admin_log() -> str:
     table = Table(
         ['date', 'priority', 'type', 'message', 'user', 'info'],
         order=[[0, 'desc']])
-    logs = logger.get_system_logs(
+    logs = g.logger.get_system_logs(
         form.limit.data,
         form.priority.data,
         form.user.data)
@@ -634,7 +639,7 @@ def admin_log() -> str:
 @app.route('/admin/log/delete')
 @required_group('admin')
 def admin_log_delete() -> Response:
-    logger.delete_all_system_logs()
+    g.logger.delete_all_system_logs()
     flash(_('Logs deleted'), 'info')
     return redirect(url_for('admin_log'))
 

@@ -139,7 +139,7 @@ def get_references(
                 'abbreviation': link_.domain.name,
                 'id': link_.domain.id,
                 'title': link_.domain.description,
-                'pages': link_.description if link_.description else None})
+                'pages': link_.description or None})
     if parser['format'] == 'xml':
         return [{'reference': ref} for ref in references]
     return references
@@ -166,8 +166,7 @@ def get_file(
             'name': link.domain.name,
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
-            'source':
-                link.domain.description if link.domain.description else None})
+            'source': link.domain.description or None})
     if parser['format'] == 'xml':
         return [{'file': file} for file in files]
     return files
@@ -226,9 +225,9 @@ def get_subunits_from_id(
     entities = get_all_subunits_recursive(entity, [])
     ext_reference_links = get_type_links_inverse(entities)
     entities_dict: dict[int, Any] = {}
-    for entity in entities:
-        entities_dict[entity.id] = {
-            'entity': entity,
+    for entity_ in entities:
+        entities_dict[entity_.id] = {
+            'entity': entity_,
             'links': [],
             'links_inverse': [],
             'ext_reference_links': ext_reference_links}

@@ -25,8 +25,7 @@
           <div class="accordion accordion-flush" id="TypeAccordion-{{ category }}">
             {% for type_, tree in types[category].items() %}
               <div class="accordion-item">
-                <div class="accordionheader"
-                     id="heading-{{ type_.id }}">
+                <div class="accordionheader" id="heading-{{ type_.id }}">
                   <button
                   class="accordion-button {{ 'collapsed' if (types[category].items()|length != 1)}}"
                     type="button"
@@ -37,8 +36,10 @@
                     {{ type_.name }}
                   </button>
                 </div>
-                <div id="collapse-{{ type_.id }}" class="accordion-collapse collapse {{ 'show' if (types[category].items()|length == 1)}}"
-                     aria-labelledby="headingOne" data-bs-parent="#TypeAccordion-{{ category }}">
+                <div id="collapse-{{ type_.id }}"
+                     class="accordion-collapse collapse {{ 'show' if (types[category].items()|length == 1)}}"
+                     aria-labelledby="headingOne"
+                     data-bs-parent="#TypeAccordion-{{ category }}">
                   <div class="accordion-body">
                     <div class="row">
                       <div class="col-6 contentbox">
@@ -63,7 +64,6 @@
                                 url_for('hierarchy_delete', id_=type_.id),
                                 onclick="return confirm('" + _('delete')|uc_first + " " + type_.name.replace("'", '').replace('"', '') + "?');") }}
                               {% endif %}
-
                             {% endif %}
                           {% endif %}
                         </div>
@@ -77,24 +77,29 @@
                           </p>
                         {% endif %}
                         {% if type_.classes %}
-                          <p style="margin-top:0;">
+                          <p>
                             <strong>{{ _('classes')|uc_first }}</strong>:
                             {% for class_ in type_.classes %}
                               {{ g.classes[class_].label }}{{ "," if not loop.last }}
                             {% endfor %}
                           </p>
+                          {% if type_.multiple and type_.subs %}
+                            <p>
+                              {{ _('multiple linked entities')|uc_first }}:
+                              <a href="{{ url_for('show_multiple_linked_entities', id_=type_.id) }}">{{ _('show') }}</a>
+                            </p>
+                          {% endif %}
+                          {% if type_.subs and type_.name not in config.PROPERTY_TYPES %}
+                            <p>
+                              {{ _('untyped entities')|uc_first }}:
+                              <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
+                            </p>
+                          {% endif %}
+                        {% elif type_.name not in config.PROPERTY_TYPES %}
+                          <p class="error">{{ _("this type has no classes and won't show in forms")|uc_first }}.</p>
                         {% endif %}
-                        {% if type_.classes and type_.name not in config.PROPERTY_TYPES %}
-                          <p style="margin-top:0;">
-                            {{ _('untyped entities')|uc_first }}:
-                            <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
-                          </p>
-                        {% endif %}
-                        {% if type_.multiple %}
-                          <p style="margin-top:0;">
-                            {{ _('multiple linked entities')|uc_first }}:
-                            <a href="{{ url_for('show_multiple_linked_entities', id_=type_.id) }}">{{ _('show') }}</a>
-                          </p>
+                        {% if not type_.subs %}
+                          <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                         {% endif %}
                         {% if type_.description %}
                           <div class="description">
@@ -112,7 +117,7 @@
             {% endfor %}
             {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
               <div style="padding:0.5rem 1.25rem;">
-              {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
+                {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
               </div>
             {% endif %}
           </div>

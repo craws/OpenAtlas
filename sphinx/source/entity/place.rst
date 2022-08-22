@@ -3,6 +3,10 @@ Place
 
 .. toctree::
 
+CIDOC documentation:
+:cidoc_entity:`E18 Physical Thing<e18-physical-thing>` and
+:cidoc_entity:`E53 Place<e53-place>`
+
 A place can be e.g. a continent, a city or a graveyard.
 For step by step instructions have a look at our :doc:`/examples/places`.
 

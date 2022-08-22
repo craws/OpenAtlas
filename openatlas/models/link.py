@@ -4,12 +4,11 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
-from openatlas import logger
-from openatlas.database.tools import Tools
+from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.util.util import (
-    datetime64_to_timestamp, timestamp_to_datetime64)
+    datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -24,12 +23,11 @@ class Link:
             domain: Optional[Entity] = None,
             range_: Optional[Entity] = None) -> None:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import format_date_part
         self.id = row['id']
         self.description = row['description']
         self.property = g.properties[row['property_code']]
-        self.domain = domain if domain else Entity.get_by_id(row['domain_id'])
-        self.range = range_ if range_ else Entity.get_by_id(row['range_id'])
+        self.domain = domain or Entity.get_by_id(row['domain_id'])
+        self.range = range_ or Entity.get_by_id(row['range_id'])
         self.type = g.types[row['type_id']] if row['type_id'] else None
         self.types: dict[Entity, None] = {}
         if 'type_id' in row and row['type_id']:
@@ -102,7 +100,7 @@ class Link:
                 text = \
                     f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
                     f" > {property_code} > {range_.class_.cidoc_class.code}"
-                logger.log('error', 'model', text)
+                g.logger.log('error', 'model', text)
                 abort(400, text)
             id_ = Db.insert({
                 'property_code': property_code,
@@ -125,7 +123,7 @@ class Link:
             inverse=inverse,
             types=types)
         if len(result) > 1:  # pragma: no cover
-            logger.log(
+            g.logger.log(
                 'error',
                 'model',
                 f'Multiple linked entities found for {code}')
@@ -153,7 +151,7 @@ class Link:
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
         if not entity:  # pragma: no cover
-            logger.log(
+            g.logger.log(
                 'error',
                 'model',
                 'missing linked',
@@ -194,7 +192,7 @@ class Link:
         if entity.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            if anthropological_data := Tools.get_types(entity.id):
+            if anthropological_data := Anthropology.get_types(entity.id):
                 Db.remove_types(
                     entity.id,
                     [row['link_id'] for row in anthropological_data])
@@ -210,6 +208,10 @@ class Link:
     @staticmethod
     def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
         return Db.get_links_by_type(type_.id)
+
+    @staticmethod
+    def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
+        return Db.get_entity_ids_by_type_ids(types_)
 
     @staticmethod
     def delete_(id_: int) -> None:

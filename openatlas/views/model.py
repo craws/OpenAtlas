@@ -257,15 +257,15 @@ class NetworkForm(FlaskForm):
 @app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network(dimensions: Optional[int] = None) -> str:
-    network_classes = [c for c in g.classes.values() if c.network_color]
-    for class_ in network_classes:
+    classes = [c for c in g.classes.values() if c.network_color]
+    for class_ in classes:
         setattr(NetworkForm, class_.name, StringField(
             default=class_.network_color,
             render_kw={'data-huebee': True, 'class': 'data-huebee'}))
     setattr(NetworkForm, 'save', SubmitField(_('apply')))
     form = NetworkForm()
     form.classes.choices = []
-    for class_ in network_classes:
+    for class_ in classes:
         if class_.name == 'object_location':
             continue
         form.classes.choices.append((class_.name, class_.label))
@@ -282,9 +282,10 @@ def model_network(dimensions: Optional[int] = None) -> str:
                 'charge': form.charge.data,
                 'distance': form.distance.data}},
         json_data=Network.get_network_json(
-            {class_.name:
-                getattr(form, class_.name).data for class_ in network_classes},
+            {c.name: getattr(form, c.name).data for c in classes},
             bool(form.orphans.data),
             dimensions),
         title=_('model'),
-        crumbs=[_('network visualization')])
+        crumbs=[
+            _('network visualization'),
+            f'{dimensions}D' if dimensions else _('classic')])

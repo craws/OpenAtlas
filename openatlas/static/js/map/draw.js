@@ -181,10 +181,10 @@ function drawGeometry(shapeType) {
             break;
         case 'area':
             drawLayerIsArea = true;
-            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false, test: 'hoi' });
+            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false, shapeOptions: {weight:0}});
             break;
         case 'shape':
-            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false, test: 'hoi' });
+            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false });
             break;
     }
     currentDrawLayer.enable();

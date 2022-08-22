@@ -36,4 +36,4 @@ class Settings:
 
     @staticmethod
     def set_logo(file_id: Optional[int] = None) -> None:
-        Db.set_logo(file_id if file_id else '')
+        Db.set_logo(file_id or '')

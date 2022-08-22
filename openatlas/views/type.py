@@ -8,15 +8,15 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, SubmitField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (
-    get_entities_linked_to_type_recursive, link, required_group, sanitize)
+from openatlas.util.util import (get_entities_linked_to_type_recursive, link,
+                                 required_group, sanitize)
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:
@@ -92,7 +92,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
             g.types[sub_id].delete()
         type_.delete()
         flash(_('types deleted'), 'info')
-        logger.log_user(id_, 'Recursive type delete')
+        g.logger.log_user(id_, 'Recursive type delete')
         return redirect(
             url_for('view', id_=root.id) if root else url_for('type_index'))
     tabs = {

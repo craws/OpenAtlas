@@ -148,7 +148,7 @@ class Entity:
             self,
             data: dict[str, Any],
             new: bool = False,) -> Optional[int]:
-        redirect_link_id = None
+        continue_link_id = None
         if 'attributes' in data:
             self.update_attributes(data['attributes'])
         if 'aliases' in data:
@@ -157,10 +157,10 @@ class Entity:
                 and self.class_.name != 'administrative_unit':
             self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
-            redirect_link_id = self.update_links(data['links'], new)
+            continue_link_id = self.update_links(data['links'], new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
-        return redirect_link_id
+        return continue_link_id
 
     def update_administrative_units(
             self,
@@ -214,17 +214,17 @@ class Entity:
             if 'delete_reference_system' in links \
                     and links['delete_reference_system']:
                 ReferenceSystem.delete_links_from_entity(self)
-        redirect_link_id = None
+        continue_link_id = None
         for link_ in links['insert']:
             ids = self.link(
                 link_['property'],
                 link_['range'],
-                link_['description'] if 'description' in link_ else None,
-                type_id=link_['type_id'] if 'type_id' in link_ else None,
-                inverse=('inverse' in link_ and link_['inverse']))
-            if 'return_link_id' in link_ and link_['return_link_id']:
-                redirect_link_id = ids[0]
-        return redirect_link_id
+                link_['description'],
+                link_['inverse'],
+                link_['type_id'])
+            if link_['return_link_id']:
+                continue_link_id = ids[0]
+        return continue_link_id
 
     def update_gis(self, gis_data: dict[str, Any], new: bool) -> None:
         from openatlas.models.gis import Gis
@@ -268,7 +268,7 @@ class Entity:
             return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
         return name_parts[0]
 
-    def check_for_too_many_links_for_single_type(self) -> Optional[int]:
+    def check_too_many_single_type_links(self) -> Optional[int]:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -330,8 +330,7 @@ class Entity:
             name: str,
             description: Optional[str] = None) -> Union[Entity, Type]:
         if not name:  # pragma: no cover
-            from openatlas import logger
-            logger.log('error', 'model', 'Insert entity without name')
+            g.logger.log('error', 'model', 'Insert entity without name')
             abort(422)
         id_ = Db.insert({
             'name': str(name).strip(),

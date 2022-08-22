@@ -3,10 +3,13 @@ Actor
 
 .. toctree::
 
-Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
+CIDOC documentation: :cidoc_entity:`E21 Person<e21-person>` and
+:cidoc_entity:`E74 Group<e74-group>`
 
-* **Person**
-* **Group** - e.g. a family, a tribe, Greenpeace or the National Museum of Denmark
+* **Person** (:cidoc_entity:`E21 Person<e21-person>`)
+* **Group** (:cidoc_entity:`E74 Group<e74-group>`) - e
+  .g. a family, a tribe, Greenpeace or the National Museum of
+  Denmark
 
 .. include:: navigation.rst
 

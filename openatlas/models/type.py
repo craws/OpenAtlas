@@ -32,8 +32,7 @@ class Type(Entity):
                 Db.get_types('administrative_unit', 'P89'):
             type_ = Type(row)
             types[type_.id] = type_
-            type_.count = row['count'] if row['count'] \
-                else row['count_property']
+            type_.count = row['count'] or row['count_property']
             type_.count_subs = 0
             type_.subs = []
             type_.root = [row['super_id']] if row['super_id'] else []
@@ -96,7 +95,7 @@ class Type(Entity):
 
     @staticmethod
     def get_tree_data(
-            type_id: int,
+            type_id: Optional[int],
             selected_ids: list[int]) -> list[dict[str, Any]]:
         return Type.walk_tree(g.types[type_id].subs, selected_ids)
 
@@ -196,7 +195,7 @@ class Type(Entity):
     def get_all_sub_ids(
             type_: Type,
             subs: Optional[list[int]] = None) -> list[int]:
-        subs = subs if subs else []
+        subs = subs or []
         for sub_id in type_.subs:
             subs.append(sub_id)
             Type.get_all_sub_ids(g.types[sub_id], subs)

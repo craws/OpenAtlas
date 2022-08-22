@@ -3,6 +3,8 @@ File
 
 .. toctree::
 
+CIDOC documentation: :cidoc_entity:`E31 Document<e31-document>`
+
 A file overview can be seen navigating to :doc:`/ui/menu` item **Admin** at the right top of the site.
 The first tab will be **Files** with a **List** button to show all files.
 

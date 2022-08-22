@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_structure
+from openatlas.models.place import get_place, get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -156,7 +156,7 @@ def view(id_: int) -> Union[str, Response]:
     if not gis_data:  # Has to be after get_entity_data()
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
-    problematic_type_id = entity.check_for_too_many_links_for_single_type()
+    problematic_type_id = entity.check_too_many_single_type_links()
     tabs['note'] = add_note_tab(entity)
     tabs['info'].content = render_template(
         'entity/view.html',
@@ -354,6 +354,13 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
     if entity.category == 'value':
         tabs['entities'].table.header = \
             [_('name'), _('value'), _('class'), _('info')]
+    place_classes = [
+            'feature',
+            'stratigraphic_unit',
+            'artifact',
+            'human_remains']
+    if any(item in g.types[entity.root[0]].classes for item in place_classes):
+        tabs['entities'].table.header.append('place')
     for item in entity.get_linked_entities(
             ['P2', 'P89'],
             inverse=True,
@@ -367,6 +374,10 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             data.append(format_number(item.types[entity]))
         data.append(item.class_.label)
         data.append(item.description)
+        if item.class_.name in place_classes:
+            data.append(link(get_place(item)))
+        else:
+            data.append('')
         tabs['entities'].table.rows.append(data)
     if not tabs['entities'].table.rows:
         # If no entities available get links with this type_id
@@ -561,10 +572,10 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
 
 
 def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
-    tabs = {'source': Tab('source', entity=entity)}
-    if entity.class_.name == 'place':
-        tabs['event'] = Tab('event', entity=entity)
-    tabs['reference'] = Tab('reference', entity=entity)
+    tabs = {
+        'source': Tab('source', entity=entity),
+        'event': Tab('event', entity=entity),
+        'reference': Tab('reference', entity=entity)}
     if entity.class_.name == 'place':
         tabs['actor'] = Tab('actor', entity=entity)
         tabs['feature'] = Tab('feature', entity=entity)

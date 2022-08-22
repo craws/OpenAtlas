@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Iterable, Union
 
 from flask import g
 
@@ -149,7 +149,8 @@ class Link:
                     AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to
             FROM model.link l
             WHERE l.id = %(id)s;
             """,
@@ -166,6 +167,19 @@ class Link:
             """,
             {'type_id': type_id})
         return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_entity_ids_by_type_ids(type_ids: list[int]) -> list[int]:
+        g.cursor.execute(
+            """
+            SELECT domain_id
+            FROM model.link
+            WHERE range_id IN %(type_ids)s 
+            AND property_code in ('P2', 'P89')
+            GROUP BY id ORDER BY id;
+            """,
+            {'type_ids': tuple(type_ids)})
+        return [row[0] for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_(id_: int) -> None:

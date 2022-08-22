@@ -321,16 +321,10 @@
             "type": "array"
           },
           "when": {
-            "items": {
-              "$ref": "#/components/schemas/WhenModel"
-            },
-            "type": "array"
+            "$ref": "#/components/schemas/WhenModel"
           },
           "geometry": {
-            "items": {
-              "$ref": "#/components/schemas/GeometryModel"
-            },
-            "type": "array"
+            "$ref": "#/components/schemas/GeometryModel"
           }
         },
         "required": [
@@ -642,7 +636,7 @@
         },
         "type": "object"
       },
-            "TypesByViewClassModel": {
+      "TypesByViewClassModel": {
         "properties": {
           "actor_actor_relation": {
             "items": {
@@ -959,10 +953,7 @@
             "type": "string"
           },
           "when": {
-            "items": {
-              "$ref": "#/components/schemas/WhenModel"
-            },
-            "type": "array"
+            "$ref": "#/components/schemas/WhenModel"
           }
         },
         "type": "object"
@@ -1143,7 +1134,7 @@
       "WhenModel": {
         "properties": {
           "timespans": {
-              "$ref": "#/components/schemas/TimespansModel"
+            "$ref": "#/components/schemas/TimespansModel"
           }
         },
         "type": "object"
@@ -1188,10 +1179,7 @@
                 "type": "string"
               },
               "geometries": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/GeometryModel"
-                }
+                "$ref": "#/components/schemas/GeometryModel"
               }
             }
           },

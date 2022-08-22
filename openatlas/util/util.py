@@ -18,15 +18,12 @@ from bcrypt import hashpw
 from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
 from jinja2 import contextfilter
-from markupsafe import Markup, escape
+from markupsafe import Markup
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
-from wtforms import Field, IntegerField
-from wtforms.validators import Email
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
@@ -349,16 +346,16 @@ def send_mail(
                 f'Mail from {from_} to {", ".join(recipients)} ' \
                 f'Subject: {subject}'
             log_text += f' Content: {text}' if log_body else ''
-            logger.log('info', 'mail', f'Mail send from {from_}', log_text)
+            g.logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
-        logger.log(
+        g.logger.log(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        logger.log(
+        g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
@@ -405,15 +402,6 @@ def tooltip(text: str) -> str:
         <span>
             <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
         </span>""".format(title=text.replace('"', "'"))
-
-
-def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
-    if not entity.modified or not form.opened.data:
-        return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
-        return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
 
 
 def get_appearance(event_links: list[Link]) -> tuple[str, str]:
@@ -479,64 +467,6 @@ def get_file_path(
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
 
 
-def add_reference_systems_to_form(form: Any) -> str:
-    html = ''
-    switch_class = ''
-    errors = False
-    fields = []
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            fields.append(field)
-            if field.errors:
-                errors = True  # pragma: no cover
-    if len(fields) > 3 and not errors:  # pragma: no cover
-        switch_class = 'reference-system-switch'
-        html = render_template('util/reference_system_switch.html')
-    for field in fields:
-        precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-        class_ = field.label.text \
-            if field.label.text in ['GeoNames', 'Wikidata'] else ''
-        html += add_form_row(
-            field,
-            field.label,
-            f'{field(class_=class_)} {precision_field.label} '
-            f'{precision_field}',
-            row_css=f'external-reference {switch_class}')
-    return html
-
-
-def add_dates_to_form(form: Any) -> str:
-    errors = {}
-    valid_dates = True
-    date_name = [
-        'begin_year_from', 'begin_month_from', 'begin_day_from',
-        'begin_year_to', 'begin_month_to', 'begin_day_to',
-        'end_year_from', 'end_month_from', 'end_day_from',
-        'end_year_to', 'end_month_to', 'end_day_to']
-    if 'begin_hour_from' in form:
-        date_name += [
-            'begin_hour_from', 'begin_minute_from', 'begin_second_from',
-            'begin_hour_to', 'begin_minute_to', 'begin_second_to',
-            'end_hour_from', 'end_minute_from', 'end_second_from',
-            'end_hour_to', 'end_minute_to', 'end_second_to']
-    for field_name in date_name:
-        errors[field_name] = ''
-        if getattr(form, field_name).errors:
-            valid_dates = False
-            errors[field_name] = ''
-            for error in getattr(form, field_name).errors:
-                errors[field_name] += uc_first(error)
-            errors[field_name] = \
-                f'<label class="error">{errors[field_name]}</label>'
-    return render_template(
-        'util/dates.html',
-        form=form,
-        errors=errors,
-        style='' if valid_dates else 'display:table-row',
-        label=_('hide')
-        if form.begin_year_from.data or form.end_year_from.data else _('show'))
-
-
 def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
@@ -557,7 +487,7 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
-    info = logger.get_log_info(entity.id)
+    info = g.logger.get_log_info(entity.id)
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
@@ -598,7 +528,7 @@ def display_delete_link(entity: Union[Entity, Type]) -> str:
             url = url_for('type_delete_recursive', id_=entity.id)
     else:
         if current_user.group == 'contributor':  # pragma: no cover
-            info = logger.get_log_info(entity.id)
+            info = g.logger.get_log_info(entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)
@@ -671,26 +601,6 @@ def button_bar(buttons: list[Any]) -> str:
     return Markup(
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
         if buttons else ''
-
-
-@app.template_filter()
-def button_icon(
-        icon: str,
-        url: Optional[str] = None,
-        css: Optional[str] = 'primary',
-        id_: Optional[str] = None,
-        onclick: Optional[str] = None) -> str:
-    tag = 'a' if url else 'span'
-    css_class = 'btn btn-xsm' if css == '' \
-        else app.config['CSS']['button'][css]
-    return Markup(f"""
-        <{tag}
-            {f'href="{url}"' if url else ''}
-            {f'id="{id_}"' if id_ else ''}
-            class="{css_class}"
-            {f'onclick="{onclick}"' if onclick else ''}>
-                <i class="fa {icon}"></i>
-            </{tag}>""")
 
 
 @app.template_filter()
@@ -847,146 +757,16 @@ def manual(site: str) -> str:
         f'title="{uc_first("manual")}"><i class="fas fa-book"></i></a>')
 
 
-def add_form_row(
-        field: Field,
-        label: Optional[str] = None,
-        value: Optional[str] = None,
-        form_id: Optional[str] = None,
-        row_css: Optional[str] = '') -> str:
-    field.label.text = uc_first(field.label.text)
-    if field.flags.required and field.label.text and form_id != 'login-form':
-        field.label.text += ' *'
-    field_css = 'required' if field.flags.required else ''
-    field_css += ' integer' if isinstance(field, IntegerField) else ''
-    for validator in field.validators:
-        field_css += ' email' if isinstance(validator, Email) else ''
-    return render_template(
-        'forms/form_row.html',
-        field=field,
-        label=label,
-        value=value,
-        field_css=field_css,
-        row_css=row_css)
-
-
 @app.template_filter()
 def display_form(
         form: Any,
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
-    from openatlas.forms.field import ValueFloatField
-
-    reference_systems_added = False
-    html = ''
-    for field in form:
-        if isinstance(field, ValueFloatField) or field.id.startswith(
-                ('insert_', 'reference_system_precision')):
-            continue  # These will be added in combination with other fields
-        if field.type in ['CSRFTokenField', 'HiddenField']:
-            html += str(field)
-            continue
-        if field.id.split('_', 1)[0] in ('begin', 'end'):
-            if field.id == 'begin_year_from':
-                html += add_dates_to_form(form)
-            continue
-
-        if field.type in ['TreeField', 'TreeMultiField']:
-            hierarchy_id = int(field.id)
-            type_ = g.types[hierarchy_id]
-            label = type_.name
-            if type_.category == 'standard':
-                label = uc_first(_('type'))
-            if field.label.text == 'super':
-                label = uc_first(_('super'))
-            if type_.category == 'value' and 'is_type_form' not in form:
-                field.description = type_.description
-                html += add_form_row(
-                    field,
-                    label,
-                    button_icon(
-                        'fa-chevron-right',
-                        onclick=f'switch_value_type({type_.id})',
-                        css='',
-                        id_=f'value-type-switcher-{type_.id}'))
-                html += display_value_type_fields(form, type_)
-                continue
-            tooltip_ = '' \
-                if 'is_type_form' in form else f' {tooltip(type_.description)}'
-            html += add_form_row(field, label + tooltip_)
-            continue
-
-        if field.id == 'save':
-            field.label.text = uc_first(field.label.text)
-            class_ = app.config['CSS']['button']['primary']
-            buttons = []
-            if manual_page:
-                buttons.append(escape(manual(manual_page)))
-            buttons.append(field(class_=class_))
-            if 'insert_and_continue' in form:
-                buttons.append(form.insert_and_continue(class_=class_))
-            if 'insert_continue_sub' in form:
-                buttons.append(form.insert_continue_sub(class_=class_))
-            if 'insert_continue_human_remains' in form:
-                buttons.append(
-                    form.insert_continue_human_remains(class_=class_))
-            html += add_form_row(
-                field,
-                '',  # Setting label to '' keeps the button row label empty
-                f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
-            continue
-
-        if field.id.startswith('reference_system_id_'):
-            if not reference_systems_added:
-                html += add_reference_systems_to_form(form)
-                reference_systems_added = True
-            continue
-        html += add_form_row(field, form_id=form_id)
+    from openatlas.forms.display import html_form
     return Markup(render_template(
         'forms/form.html',
-        form_id=form_id,
         form=form,
-        html=html))
-
-
-def display_value_type_fields(
-        form: Any,
-        type_: Type,
-        root: Optional[Type] = None,
-        level: int = 0) -> str:
-    html = ''
-    root = root if root else type_
-    for sub_id in type_.subs:
-        sub = g.types[sub_id]
-        field = getattr(form, str(sub_id))
-        expand_button = button_icon(
-            'fa-chevron-right',
-            onclick=f'switch_value_type({sub.id})',
-            css='',
-            id_=f'value-type-switcher-{sub.id}') if len(sub.subs) != 0 else ''
-        html += f"""
-        <div class="mt-2 table-row value-type-switch{type_.id}">
-            <div></div>
-            <div class="table-cell">
-                <div class="d-flex">
-                    <div
-                            class="d-flex justify-content-between"
-                            style="width:16.15em;">
-                        <div class="ms-{level} position-relative text-wrap">
-                            <div class="value-type-expander">
-                                {expand_button}
-                            </div>
-                            {sub.name}
-                        </div>
-                        {field(class_='value-type')}
-                    </div>
-                    <span class="ms-1">
-                        {sub.description if sub.description else ''}
-                    </span>
-                </div>
-                {display_value_type_fields(form, sub, root, level + 1)}
-            </div>
-        </div>"""
-    return html
+        html=html_form(form, form_id, manual_page)))
 
 
 class MLStripper(HTMLParser):
@@ -1001,8 +781,8 @@ class MLStripper(HTMLParser):
         self.convert_charrefs = True
         self.fed: list[str] = []
 
-    def handle_data(self, d: Any) -> None:
-        self.fed.append(d)
+    def handle_data(self, data: Any) -> None:
+        self.fed.append(data)
 
     def get_data(self) -> str:
         return ''.join(self.fed)

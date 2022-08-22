@@ -35,10 +35,13 @@ def csv_export(form: FlaskForm) -> None:
             'name',
             'description',
             'cidoc_class_code',
-            "replace(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
-            "replace(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
+            "replace(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), "
+            "' AD', '')",
+            "replace(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), "
+            "' AD', '')",
             'begin_comment',
-            "replace(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
+            "replace(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), "
+            "' AD', '')",
             "replace(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
             'end_comment'],
         'link': [
@@ -48,10 +51,13 @@ def csv_export(form: FlaskForm) -> None:
             'range_id',
             'type_id',
             'description',
-            "replace(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
-            "replace(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
+            "replace(to_char(begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), "
+            "' AD', '')",
+            "replace(to_char(begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), ' "
+            "AD', '')",
             'begin_comment',
-            "replace(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
+            "replace(to_char(end_from, 'yyyy-mm-dd hh24:mi:ss BC'), "
+            "' AD', '')",
             "replace(to_char(end_to, 'yyyy-mm-dd hh24:mi:ss BC'), ' AD', '')",
             'end_comment'],
         'property': [

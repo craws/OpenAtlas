@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -25,7 +25,7 @@ from openatlas.util.util import (
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # Delete before showing index to prevent additional redirect
         if current_user.group == 'contributor':  # pragma: no cover
-            info = logger.get_log_info(delete_id)
+            info = g.logger.get_log_info(delete_id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 abort(403)
         if url := delete_entity(delete_id):
@@ -83,7 +83,7 @@ def get_table(view: str) -> Table:
         for system in g.reference_systems.values():
             table.rows.append([
                 link(system),
-                system.count if system.count else '',
+                system.count or '',
                 external_url(system.website_url),
                 external_url(system.resolver_url),
                 system.placeholder,
@@ -141,11 +141,11 @@ def delete_entity(id_: int) -> Optional[str]:
         try:
             delete_files(id_)
         except Exception as e:  # pragma: no cover
-            logger.log('error', 'file', 'file deletion failed', e)
+            g.logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
             return url_for('view', id_=id_)
     entity.delete()
-    logger.log_user(id_, 'delete')
+    g.logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     return url
 

@@ -19,7 +19,6 @@ from pathlib import Path
 
 from psycopg2 import extras
 
-
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from config.database_versions import DATABASE_VERSIONS
@@ -43,7 +42,7 @@ start = time.time()
 for item in config:
     try:
         config[item] = vars(production)[item]
-    except:
+    except Exception:
         pass
 
 db = open_connection(config)

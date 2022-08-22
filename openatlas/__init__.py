@@ -30,16 +30,12 @@ babel = Babel(app)
 
 # pylint: disable=wrong-import-position, import-outside-toplevel
 from openatlas.models.logger import Logger
-
-logger = Logger()
-
 from openatlas.api import api
 from openatlas.util.util import convert_size
 from openatlas.views import (
-    admin, ajax, entity, entity_index, entity_form, error, export, file,
-    hierarchy, index, involvement, imports, link, login, member, model, note,
-    overlay, profile, reference, relation, reference_system, search, sql,
-    tools, type as type_, user)
+    admin, ajax, anthropology, entity, entity_index, entity_form, error,
+    export, file, hierarchy, index, imports, link, login, model, note, overlay,
+    profile, reference, reference_system, search, sql, type as type_, user)
 
 
 @babel.localeselector
@@ -47,7 +43,7 @@ def get_locale() -> str:
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'])
-    return best_match if best_match else g.settings['default_language']
+    return best_match or g.settings['default_language']
 
 
 @app.before_request
@@ -62,6 +58,7 @@ def before_request() -> None:
 
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Avoid files overhead if not using Apache with static alias
+    g.logger = Logger()
     g.db = open_connection(app.config)
     g.db.autocommit = True
     g.cursor = g.db.cursor(cursor_factory=extras.DictCursor)

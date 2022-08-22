@@ -121,6 +121,22 @@ def get_entities_linked_to_special_type_recursive(
     return data
 
 
+def get_entities_linked_to_type_recursive_(
+        id_: int,
+        data: list[int]) -> list[int]:
+    for sub_id in g.types[id_].subs:
+        data.append(sub_id)
+        get_entities_linked_to_type_recursive_(sub_id, data)
+    return data
+
+
+def get_entities_from_type_with_subs(id_: int) -> list[Entity]:
+    type_ids = get_entities_linked_to_type_recursive_(id_, [id_])
+    entity_ids = Link.get_entity_ids_by_type_ids(type_ids)
+    return get_entities_by_ids(
+        [link_ for link_ in entity_ids if link_ not in type_ids])
+
+
 def get_entities_by_type(
         entities: list[Entity],
         parser: dict[str, Any]) -> list[Entity]:
@@ -204,12 +220,11 @@ def get_reference_systems(
         if not isinstance(link_.domain, ReferenceSystem):
             continue
         system = g.reference_systems[link_.domain.id]
-        identifier = system.resolver_url if system.resolver_url else ''
         ref.append({
             'referenceURL': system.website_url,
             'id': link_.description,
             'resolverURL': system.resolver_url,
-            'identifier': f"{identifier}{link_.description}",
+            'identifier': f"{system.resolver_url or ''}{link_.description}",
             'type': to_camel_case(g.types[link_.type.id].name),
             'referenceSystem': system.name})
     return ref

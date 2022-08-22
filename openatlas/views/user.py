@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 import bcrypt
 from flask import abort, flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -130,6 +130,11 @@ def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
         abort(404)  # pragma: no cover
+    entities_count = ''
+    if count := User.get_created_entities_count(user.id):
+        entities_count = \
+            f'<a href="{url_for("user_entities", id_=user.id)}">' \
+            f'{format_number(count)}</a>'
     info = {
         _('username'): user.username,
         _('group'): user.group,
@@ -137,6 +142,7 @@ def user_view(id_: int) -> str:
         _('email'):
             user.email
             if is_authorized('manager') or user.settings['show_email'] else '',
+        _('created entities'): entities_count,
         _('language'): user.settings['language'],
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):
@@ -149,6 +155,35 @@ def user_view(id_: int) -> str:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user.username])
+
+
+@app.route('/admin/user/entities/<int:id_>')
+@required_group('readonly')
+def user_entities(id_: int) -> str:
+    user = User.get_by_id(id_)
+    table = Table([
+        'name',
+        'class',
+        'type',
+        'begin',
+        'end',
+        'created'])
+    if user:
+        for entity in user.get_entities():
+            table.rows.append([
+                link(entity),
+                entity.class_.label,
+                link(entity.standard_type),
+                entity.first,
+                entity.last,
+                format_date(entity.created)])
+    return render_template(
+        'table.html',
+        table=table,
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
+            user,
+            _('created entities')])
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])

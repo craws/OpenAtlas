@@ -1,11 +1,15 @@
-from typing import Any, Union
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from typing import Any, TYPE_CHECKING, Union
 
 from flask import g
 
-from openatlas.database.tools import Tools as Db
-from openatlas.models.entity import Entity
+from openatlas.database.anthropology import Anthropology as Db
 from openatlas.models.link import Link
 from openatlas.models.type import Type
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
 
 
 def get_types(id_: int) -> list[dict[str, Any]]:

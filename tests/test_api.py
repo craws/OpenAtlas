@@ -4,13 +4,13 @@ from typing import Any, Optional, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.api.v03.resources.error import EntityDoesNotExistError, \
-    FilterColumnError, FilterLogicalOperatorError, FilterOperatorError, \
-    InvalidCidocClassCode, InvalidCodeError, InvalidLimitError, \
-    InvalidSearchSyntax, InvalidSubunitError, InvalidSystemClassError, \
-    LastEntityError, NoEntityAvailable, NoSearchStringError, NotAPlaceError, \
-    QueryEmptyError, \
-    TypeIDError, ValueNotIntegerError
+from openatlas.api.v03.resources.error import (
+    EntityDoesNotExistError, FilterColumnError, FilterLogicalOperatorError,
+    FilterOperatorError, InvalidCidocClassCode, InvalidCodeError,
+    InvalidLimitError, InvalidSearchSyntax, InvalidSubunitError,
+    InvalidSystemClassError, LastEntityError, NoEntityAvailable,
+    NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
+    ValueNotIntegerError)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
@@ -32,7 +32,7 @@ class ApiTests(TestBaseCase):
                 place = insert_entity(
                     'Shire',
                     'place',
-                    description='The Shire was the homeland of the hobbits.')
+                    'The Shire was the homeland of the hobbits.')
 
                 # Adding Created and Modified
                 place.created = str(datetime.now())
@@ -73,17 +73,25 @@ class ApiTests(TestBaseCase):
                     description='Fandom Wiki of lord of the rings')
 
                 # Adding feature to place
-                feature = insert_entity('Home of Baggins', 'feature', place)
+                feature = insert_entity(
+                    'Home of Baggins',
+                    'feature',
+                    origin=place)
                 feature.created = str(datetime.now())
                 feature.modified = str(datetime.now())
 
                 # Adding stratigraphic to place
-                strati = insert_entity('Bar', 'stratigraphic_unit', feature)
+                strati = insert_entity(
+                    'Bar',
+                    'stratigraphic_unit',
+                    origin=feature)
                 strati.created = str(datetime.now())
                 strati.modified = str(datetime.now())
 
                 # Adding Administrative Unit Type
-                unit_node = Type.get_hierarchy('Administrative unit')
+                admin_unit = Type.get_hierarchy('Administrative unit')
+                unit_node = g.types[admin_unit.subs[0]]
+                location.link('P89', unit_node)
 
                 # Adding File to place
                 file = insert_entity('Picture with a License', 'file')
@@ -141,29 +149,17 @@ class ApiTests(TestBaseCase):
                 event.link('P11', actor)
                 event.link('P14', actor2)
                 event.link('P7', location)
-
-                # Creation of an event for subtypes
                 event2 = insert_entity('Exchange of the one ring', 'activity')
-                # exchange = Entity.get_by_id(Type.get_all_sub_ids(
-                #     g.types[Type.get_hierarchy('Event').subs[0]])[0])
                 event2.link('P2', Entity.get_by_id(params["exchange_id"]))
-
-                # Creation of Mordor (place)
-                place2 = insert_entity(
-                    'Mordor', 'place',
-                    description='The heart of evil.')
-
-                # Adding Type Settlement
+                place2 = insert_entity('Mordor', 'place', 'The heart of evil.')
                 place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
-
-                # Creation of Silmarillion (source)
                 insert_entity('Silmarillion', 'source')
 
             # ---Content Endpoints---
             # ClassMapping
             for rv in [
-                self.app.get(url_for('api_02.class_mapping')).get_json(),
-                self.app.get(url_for('api_03.class_mapping')).get_json()]:
+                    self.app.get(url_for('api_02.class_mapping')).get_json(),
+                    self.app.get(url_for('api_03.class_mapping')).get_json()]:
                 assert ApiTests.get_class_mapping(rv)
 
             # Content
@@ -808,20 +804,20 @@ class ApiTests(TestBaseCase):
                 download=True)).get_json()
             assert ApiTests.get_bool(rv['nodes'][0], 'label')
 
-            # Test Type Entities All
+            # Test type entities all
             rv = self.app.get(url_for(
                 'api_02.node_entities_all',
                 id_=unit_node.id)).get_json()
             assert bool([True for i in rv['nodes'] if i['label'] == 'Wien'])
 
-            # Test Type Entities count
+            # Test type entities count
             rv = self.app.get(url_for(
                 'api_02.node_entities',
                 id_=unit_node.id,
                 count=True))
-            assert bool(rv.get_json() == 6)
+            assert bool(rv.get_json() == 3)
 
-            # Test Type Overview
+            # Test type overview
             for rv in [
                 self.app.get(url_for(
                     'api_02.node_overview')),
@@ -852,7 +848,7 @@ class ApiTests(TestBaseCase):
                 rv = rv['place'][0]['children'][0]
                 assert bool(rv['label'] == 'Boundary Mark')
 
-            # Test Type Tree
+            # Test type tree
             for rv in [
                 self.app.get(url_for(
                     'api_02.type_tree')),

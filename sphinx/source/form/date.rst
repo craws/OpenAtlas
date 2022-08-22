@@ -3,11 +3,13 @@ Date
 
 .. toctree::
 
-Date input fields in forms are initially hidden and can be shown with clicking on **Show** beside
-the **Date** label.
+CIDOC based OpenAtlas shortcuts: OA8 (begins in) and OA9 (ends in)
 
-To manage uncertainty in time up to 4 dates can be used: a time span for the beginning and a time
-span for the ending.
+Date input fields in forms are initially hidden and can be shown with
+clicking on **Show** beside the **Date** label.
+
+To manage uncertainty in time up to 4 dates can be used: a time span for the
+beginning and a time span for the ending.
 
 .. image:: date.png
 

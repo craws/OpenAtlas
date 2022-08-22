@@ -3,6 +3,8 @@ Stratigraphic unit
 
 .. toctree::
 
+CIDOC documentation: :cidoc_entity:`E18 Physical Thing<e18-physical-thing>`
+
 Stratigraphic units are used to record archaeological data. They are subunits
 of a :doc:`feature` which itself is a subunit of a :doc:`place`. For an
 archaeological workflow example see :doc:`/examples/archaeological_data`.
@@ -18,6 +20,8 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
+* :doc:`event` - only for new events. For existing the location at the event
+  itself can be edited.
 * :doc:`reference`
 * :doc:`artifact`
 * :doc:`human_remains`

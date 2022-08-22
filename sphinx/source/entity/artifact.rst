@@ -3,6 +3,9 @@ Artifact
 
 .. toctree::
 
+CIDOC documentation:
+:cidoc_entity:`E22 Human-Made Object<e22-human-made-object>`
+
 Artifact can be entered here, e.g. a coin
 
 .. include:: navigation.rst

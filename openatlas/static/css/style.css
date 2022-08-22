@@ -1,4 +1,7 @@
 @charset "UTF-8";
+*{
+  box-sizing: border-box;
+}
 
 html, body, input, select, textarea {
   font-family: helvetica, arial, sans-serif;
@@ -105,6 +108,7 @@ table.dataTable th {
 
 textarea {
   resize: vertical;
+  min-height: 70px;
 }
 
 img#logo {
@@ -498,9 +502,7 @@ label.error {
 input[type=text], input[type=password], textarea, select  {
   border-width: 1px;
   border-style: solid;
-}
 
-input[type=text], input[type=password], select {
   width: 15.6em;
   height: 21px;
   -ms-box-sizing:content-box;

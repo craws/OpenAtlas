@@ -12,7 +12,7 @@ from wtforms import (
     BooleanField, FileField, StringField, SubmitField, TextAreaField)
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
@@ -290,7 +290,7 @@ def import_data(project_id: int, class_: str) -> str:
             if messages['error']:
                 raise Exception()
         except Exception as e:  # pragma: no cover
-            logger.log('error', 'import', 'import check failed', e)
+            g.logger.log('error', 'import', 'import check failed', e)
             flash(_('error at import'), 'error')
             return render_template(
                 'import/import_data.html',
@@ -310,12 +310,12 @@ def import_data(project_id: int, class_: str) -> str:
             try:
                 Import.import_data(project, class_, checked_data)
                 Transaction.commit()
-                logger.log('info', 'import', f'import: {len(checked_data)}')
+                g.logger.log('info', 'import', f'import: {len(checked_data)}')
                 flash(f"{_('import of')}: {len(checked_data)}", 'info')
                 imported = True
             except Exception as e:  # pragma: no cover
                 Transaction.rollback()
-                logger.log('error', 'import', 'import failed', e)
+                g.logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template(
         'import/import_data.html',

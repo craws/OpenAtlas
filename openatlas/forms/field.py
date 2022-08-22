@@ -1,13 +1,12 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
-from typing import Any
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_login import current_user
-from wtforms import FloatField, HiddenField, Field
+from wtforms import Field, FloatField, HiddenField
 from wtforms.widgets import HiddenInput, TextInput
-
 
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -37,12 +36,15 @@ class RemovableListField(Field):
 
 class TableMultiSelect(HiddenInput):
 
-    def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
-        if field.data and isinstance(field.data, str):
-            field.data = ast.literal_eval(field.data)
+    def __call__(
+            self,
+            field: TableMultiField,
+            **kwargs: Any) -> TableMultiSelect:
+        data = field.data or []
+        data = ast.literal_eval(data) if isinstance(data, str) else data
         class_ = field.id if field.id != 'given_place' else 'place'
         aliases = current_user.settings['table_show_aliases']
-        if class_ in ['group', 'person', 'place']:
+        if class_ in ['group', 'person']:
             entities = Entity.get_by_class(class_, types=True, aliases=aliases)
         else:
             entities = Entity.get_by_view(class_, types=True, aliases=aliases)
@@ -50,21 +52,29 @@ class TableMultiSelect(HiddenInput):
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for e in entities:
-            data = get_base_table_data(e, show_links=False)
-            data.insert(0, f"""
+        for e in list(
+                filter(lambda x: x.id not in field.filter_ids, entities)):
+            row = get_base_table_data(e, show_links=False)
+            row.insert(0, f"""
                 <input type="checkbox" id="{e.id}" value="{e.name}"
-                {'checked' if field.data and e.id in field.data else ''}>""")
-            table.rows.append(data)
+                {'checked' if e.id in data else ''}>""")
+            table.rows.append(row)
         return super().__call__(field, **kwargs) + render_template(
             'forms/table_multi_select.html',
             field=field,
-            selection=[
-                e.name for e in entities if field.data and e.id in field.data],
+            selection=[e.name for e in entities if e.id in data],
             table=table)
 
 
 class TableMultiField(HiddenField):
+    def __init__(
+            self,
+            label: Optional[str] = None,
+            validators: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.filter_ids = filter_ids or []
     widget = TableMultiSelect()
 
 
@@ -99,7 +109,7 @@ class TableSelect(HiddenInput):
             if 'place' in field.id \
                     or field.id in ['begins_in', 'ends_in', 'residence']:
                 class_ = 'place'
-                entities = Entity.get_by_class(
+                entities = Entity.get_by_view(
                     'place',
                     types=True,
                     aliases=aliases)
@@ -116,7 +126,8 @@ class TableSelect(HiddenInput):
                     types=True,
                     aliases=aliases)
             table = Table(g.table_headers[class_])
-            for entity in entities:
+            for entity in list(
+                    filter(lambda x: x.id not in field.filter_ids, entities)):
                 if field.data and entity.id == int(field.data):
                     selection = entity.name
                 data = get_base_table_data(entity, show_links=False)
@@ -141,25 +152,41 @@ class TableSelect(HiddenInput):
 
 
 class TableField(HiddenField):
+    def __init__(
+            self,
+            label: Optional[str] = None,
+            validators: Optional[Any] = None,
+            filter_ids: Optional[list[int]] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.filter_ids = filter_ids or []
     widget = TableSelect()
 
 
 class TreeMultiSelect(HiddenInput):
-
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
-        data: list[int] = []
-        if field.data:
-            data = ast.literal_eval(field.data) \
-                if isinstance(field.data, str) else field.data
+        data = field.data or []
+        data = ast.literal_eval(data) if isinstance(data, str) else data
         return super().__call__(field, **kwargs) + render_template(
             'forms/tree_multi_select.html',
             field=field,
-            root=g.types[int(field.id)],
+            root=g.types[int(field.type_id)],
             selection=sorted([g.types[id_].name for id_ in data]),
             data=Type.get_tree_data(int(field.id), data))
 
 
 class TreeMultiField(HiddenField):
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            form: Any = None,
+            type_id: Optional[int] = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.form = form
+        self.type_id = type_id or self.id
+
     widget = TreeMultiSelect()
 
 
@@ -177,8 +204,21 @@ class TreeSelect(HiddenInput):
             'forms/tree_select.html',
             field=field,
             selection=selection,
-            data=Type.get_tree_data(int(field.id), selected_ids))
+            root=g.types[int(field.type_id)],
+            data=Type.get_tree_data(int(field.type_id), selected_ids))
 
 
 class TreeField(HiddenField):
+
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            form: Any = None,
+            type_id: str = '',
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.form = form
+        self.type_id = type_id or self.id
+
     widget = TreeSelect()

@@ -1,13 +1,15 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from flask_login import current_user
 
 from openatlas import app
 from openatlas.database.overlay import Overlay as Db
-from openatlas.models.entity import Entity
 from openatlas.util.util import get_file_path
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.entity import Entity
 
 
 class Overlay:

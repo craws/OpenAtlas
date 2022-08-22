@@ -26,47 +26,62 @@ class TypeTest(TestBaseCase):
             rv: Any = self.app.get(
                 url_for('view', id_=historical_type.subs[0]))
             assert b'Historical place' in rv.data
+
             rv = self.app.get(url_for('type_index'))
             assert b'Actor actor relation' in rv.data
+
             rv = self.app.get(
                 url_for('insert', class_='type', origin_id=actor_type.id))
             assert b'Actor actor relation' in rv.data
+
             data = {
                 'name': 'My secret type',
                 'name_inverse': 'Do I look inverse?',
-                'description': 'Very important!'}
+                'description': 'Very important!',
+                str(actor_type.id): actor_type.subs[0]}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
             type_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('update', id_=type_id))
             assert b'My secret type' in rv.data and b'Super' in rv.data
+
             self.app.post(
                 url_for('insert', class_='type', origin_id=sex_type.id),
                 data=data)
+            data['entity_id'] = type_id
             rv = self.app.post(
                 url_for('update', id_=type_id),
                 data=data,
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            # Insert and continue
             data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data,
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            data['continue_'] = ''
 
-            # Forbidden system type
+            rv = self.app.post(
+                url_for('ajax_add_type'),
+                data={
+                    'name': 'New dynamic',
+                    'description': 'Hello',
+                    'superType': actor_type.id})
+            assert rv.data.isdigit()
+
+            rv = self.app.get(
+                url_for('ajax_get_type_tree', root_id=actor_type.id))
+            assert b'New dynamic' in rv.data
+
+            data['continue_'] = ''
             rv = self.app.post(
                 url_for('update', id_=actor_type.id),
                 data=data,
                 follow_redirects=True)
             assert b'Forbidden' in rv.data
 
-            # Update with self as root
             data[str(actor_type.id)] = type_id
             rv = self.app.post(
                 url_for('update', id_=type_id),
@@ -74,7 +89,6 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Type can&#39;t have itself as super' in rv.data
 
-            # Update with sub as root
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
@@ -86,17 +100,16 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Type can&#39;t have a sub as super' in rv.data
 
-            # Custom type
             rv = self.app.get(
                 url_for('view', id_=sex_type.id),
                 follow_redirects=True)
             assert b'Male' in rv.data
 
-            # Administrative unit
             admin_unit_id = Type.get_hierarchy('Administrative unit').id
             rv = self.app.get(
                 url_for('view', id_=admin_unit_id), follow_redirects=True)
             assert b'Austria' in rv.data
+
             rv = self.app.post(
                 url_for(
                     'insert',
@@ -106,17 +119,21 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            # Value type
+            rv = self.app.get(
+                url_for('update', id_=g.types[admin_unit_id].subs[0]))
+            assert b'admin unit' in rv.data
+
             rv = self.app.get(
                 url_for('view', id_=dimension_type.id),
                 follow_redirects=True)
             assert b'Height' in rv.data
+
             rv = self.app.get(url_for('view', id_=dimension_type.subs[0]))
             assert b'Unit' in rv.data
+
             rv = self.app.get(url_for('update', id_=dimension_type.subs[0]))
             assert b'Dimensions' in rv.data
 
-            # Test parent value type view after creating a sub subtype
             rv = self.app.post(
                 url_for(
                     'insert',
@@ -127,16 +144,17 @@ class TypeTest(TestBaseCase):
                     dimension_type.id: dimension_type.subs[0]},
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
             rv = self.app.get(url_for('view', id_=dimension_type.subs[0]))
             assert b'Sub sub type' in rv.data
 
-            # Untyped entities
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Connor MacLeod')
             rv = self.app.get(
                 url_for('show_untyped_entities', id_=sex_type.id))
             assert b'Connor MacLeod' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor.link('P2', g.types[sex_type.subs[0]])
@@ -144,11 +162,11 @@ class TypeTest(TestBaseCase):
                 url_for('show_untyped_entities', id_=sex_type.id))
             assert b'No entries' in rv.data
 
-            # Delete
             rv = self.app.get(
                 url_for('type_delete', id_=actor_type.id),
                 follow_redirects=True)
             assert b'Forbidden' in rv.data
+
             rv = self.app.get(
                 url_for('type_delete', id_=sub_type_id),
                 follow_redirects=True)
@@ -164,23 +182,19 @@ class TypeTest(TestBaseCase):
                     'P2',
                     Entity.get_by_id(Type.get_hierarchy('Sex').subs[1]))
 
-            # Check invalid multiple type links
             rv = self.app.get(url_for('update', id_=frodo.id))
-            assert b'422' in rv.data
+            assert b'422' in rv.data  # Check invalid multiple type links
 
-            # Multiple linked entities
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))
             assert b'Frodo' in rv.data
 
-            # Multiple disabled
             self.app.post(
                 url_for('hierarchy_update', id_=sex_type.id),
                 data={'multiple': True})
             rv = self.app.get(url_for('hierarchy_update', id_=sex_type.id))
             assert b'disabled="disabled" id="multiple"' in rv.data
 
-            # Delete recursively
             rv = self.app.get(
                 url_for('hierarchy_delete', id_=sex_type.id),
                 follow_redirects=True)

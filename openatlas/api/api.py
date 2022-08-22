@@ -22,14 +22,14 @@ app.config['SWAGGER'] = {
             "name": "Apache 2.0",
             "url": "https://www.apache.org/licenses/LICENSE-2.0.html"},
         "endpoint": '02',
-        "description": 'This is the stable version of the OpenAtlas API',
+        "description": 'This a deprecated version of the OpenAtlas API',
         "route": '/swagger/02',
         "rule_filter": lambda rule: rule.endpoint.startswith('api_02')}, {
         "version": "0.3",
         "title": "OpenAtlas Api",
         "termsOfService":
             "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
-        "description": 'This is the unstable version of the OpenAtlas API',
+        "description": 'This is the stable version of the OpenAtlas API',
         "endpoint": '03',
         "license": {
             "name": "Apache 2.0",
