@@ -4,7 +4,7 @@ from typing import Any, Optional, TYPE_CHECKING, Union
 
 from flask import abort, g
 
-from openatlas.database.anthropology import Anthropology
+from openatlas.database.tools import Tools
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
 from openatlas.util.util import (
@@ -192,7 +192,7 @@ class Link:
         if entity.class_.name == 'stratigraphic_unit' \
                 and 'P2' in codes \
                 and not inverse:
-            if anthropological_data := Anthropology.get_types(entity.id):
+            if anthropological_data := Tools.get_types(entity.id):
                 Db.remove_types(
                     entity.id,
                     [row['link_id'] for row in anthropological_data])

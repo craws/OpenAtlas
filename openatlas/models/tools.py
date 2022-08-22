@@ -4,7 +4,7 @@ from typing import Any, TYPE_CHECKING, Union
 
 from flask import g
 
-from openatlas.database.anthropology import Anthropology as Db
+from openatlas.database.tools import Tools as Db
 from openatlas.models.link import Link
 from openatlas.models.type import Type
 

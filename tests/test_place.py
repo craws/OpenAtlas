@@ -374,11 +374,11 @@ class PlaceTest(TestBaseCase):
 
             # Anthropological features
             rv = self.app.get(
-                url_for('anthropology_index', id_=stratigraphic_id))
+                url_for('tools_index', id_=stratigraphic_id))
             assert b'Sex estimation' in rv.data
 
             rv = self.app.get(url_for('sex', id_=stratigraphic_id))
-            assert b'Anthropological analyses' in rv.data
+            assert b'Sex estimation' in rv.data
 
             rv = self.app.post(
                 url_for('sex_update', id_=stratigraphic_id),
