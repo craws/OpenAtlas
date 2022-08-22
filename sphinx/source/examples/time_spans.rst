@@ -40,7 +40,7 @@ Begin and end each provide two lines for data entry. This can be used for
 entering precise, known data as well as for tracking time spans.
 
 The following values can be put in:
-* Year (YYYY) as four digits: -3713 to 9999, the year 0 is not allowed
+* Year (YYYY) as four digits: -4713 to 9999, the year 0 is not allowed
 * Month (MM) as two digits: 1 to 12
 * Day (DD) as two digits: 1 to 31
 * Hour (hh) as two digits: 0 to 23
@@ -49,7 +49,8 @@ The following values can be put in:
 * Comments as free text for additional information
 
 As PostgreSQL uses the `Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
-the year 0 can not be entered.
+the year 0 can not be entered. Also years that preceeds the year 4713 BC can
+not be entered.
 
 Precise dates
 ^^^^^^^^^^^^^

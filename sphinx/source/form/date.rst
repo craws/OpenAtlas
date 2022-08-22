@@ -32,7 +32,7 @@ Missing days and months are filled out so that the result will be
 
 **Input values**
 
-* **Year**: -3713 to 9999 but not zero
+* **Year**: -4713 to 9999 but not zero
 * **Month**: 1 to 12
 * **Day**: 1 to 31
 * **Comment**: a text field for additional information for begin or end
