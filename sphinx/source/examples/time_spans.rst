@@ -52,7 +52,7 @@ As PostgreSQL uses the `Proleptic Gregorian calendar <https://en.wikipedia.org/w
 the year 0 can not be entered.
 
 Precise dates
-^^^^^^^^^^^^
+^^^^^^^^^^^^^
 
 If precise dates are known, enter the beginning into the first line of
 **Begin** and the end date into the first line of **End**. You can add comments
