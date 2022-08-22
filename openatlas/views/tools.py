@@ -6,7 +6,8 @@ from flask_wtf import FlaskForm
 from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import SelectField, SubmitField
+from wtforms import IntegerField, SelectField, StringField, SubmitField
+from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
@@ -45,7 +46,7 @@ def print_sex_result(entity: Entity) -> str:
 def tools_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
     dating_buttons = [
-        button(_('radiocarbon dating'), url_for('carbon', id_=entity.id)),]
+        button(_('radiocarbon dating'), url_for('carbon', id_=entity.id))]
     sex_buttons = [
         manual('tools/anthropological_analyses'),
         button(_('sex estimation'), url_for('sex', id_=entity.id)),
@@ -62,9 +63,14 @@ def tools_index(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def carbon(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_, types=True)
+    buttons = []
+    if is_authorized('contributor'):
+        buttons.append(
+            button(_('edit'), url_for('carbon_update', id_=entity.id)))
     return render_template(
         'tools/carbon.html',
         entity=entity,
+        buttons=buttons,
         crumbs=[
             entity,
             [_('tools'), url_for('tools_index', id_=entity.id)],
@@ -98,6 +104,42 @@ def sex(id_: int) -> Union[str, Response]:
             entity,
             [_('tools'), url_for('tools_index', id_=entity.id)],
             _('sex estimation')])
+
+
+@app.route('/tools/carbon/update/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def carbon_update(id_: int) -> Union[str, Response]:
+
+    class Form(FlaskForm):
+        lab_id = StringField(
+            f"{_('laboratory')} {_('ID')}",
+            [InputRequired()],
+            render_kw={'placeholder': 'VERA'})
+        spec_id = StringField(
+            f"{_('specimen')} {_('ID')}",
+            [InputRequired()],
+            render_kw={'placeholder': '23432A'})
+        radiocarbon_year = IntegerField(
+            _('radiocarbon year'),
+            [InputRequired()],
+            render_kw={'placeholder': '2040'})
+        range = IntegerField(
+            _('range'),
+            [InputRequired()],
+            render_kw={'placeholder': '30'})
+        save = SubmitField(_('save'))
+
+    entity = Entity.get_by_id(id_)
+    form = Form()
+    return render_template(
+        'display_form.html',
+        entity=entity,
+        form=form,
+        crumbs=[
+            entity,
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            [_('radiocarbon dating'), url_for('carbon', id_=entity.id)],
+            _('edit')])
 
 
 @app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
