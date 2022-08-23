@@ -35,7 +35,7 @@ class TestBaseCase(unittest.TestCase):
                 '/login',
                 data={'username': 'Alice', 'password': 'test'})
 
-
+    @staticmethod
     def setup_database() -> None:
         connection = psycopg2.connect(
             database=app.config['DATABASE_NAME'],

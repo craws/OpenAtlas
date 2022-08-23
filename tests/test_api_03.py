@@ -187,9 +187,8 @@ class Api03(TestBaseCase):
             # /entity
             # Test Entity
             rv = self.app.get(
-                url_for(
-                    'api_03.entity', id_=place.id, download=True)).get_json()
-            rv = rv['features'][0]
+                url_for('api_03.entity', id_=place.id, download=True))
+            rv = rv.get_json()['features'][0]
             assert get_bool(rv, '@id')
             assert get_bool(rv, 'type', 'Feature')
             assert get_bool(rv, 'crmClass', 'crm:E18 Physical Thing')
@@ -254,12 +253,8 @@ class Api03(TestBaseCase):
                     url_for('api_03.entity', id_=place.id, format='xml')),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, export='csv')),
-                # self.app.get(url_for(
-                #     'api_03.entity', id_=place.id, export='csvNetwork')),
                 self.app.get(url_for(
                     'api_03.view_class', view_class='place', format='xml')),
-                # self.app.get(url_for(
-                #     'api_03.view_class', view_class='place', export='csv')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
