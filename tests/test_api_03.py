@@ -29,17 +29,13 @@ class Api03(TestBaseCase):
                 params = {
                     f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
                     (id_, node) in Type.get_all().items()}
-                # Creation of Shire (place)
+
                 place = insert_entity(
                     'Shire',
                     'place',
                     'The Shire was the homeland of the hobbits.')
-
-                # Adding Created and Modified
                 place.created = str(datetime.now())
                 place.modified = str(datetime.now())
-
-                # Adding Dates to place
                 place.update({'attributes': {
                     'begin_from': '2018-01-31',
                     'begin_to': '2018-03-01',
@@ -54,121 +50,78 @@ class Api03(TestBaseCase):
                         '{"type":"Point","coordinates":[9, 17]},'
                         '"properties":{"name":"","description":"",'
                         '"shapeType":"centerpoint"}}]'})
-
-                # Adding Type Place
                 boundary_mark = Entity.get_by_id(
                     Type.get_hierarchy('Place').subs[0])
                 place.link('P2', boundary_mark)
-
-                # Adding Alias
                 alias = insert_entity('Sûza', 'appellation')
                 place.link('P1', alias)
-
-                # Adding External Reference
                 external_reference = insert_entity(
-                    'https://lotr.fandom.com/',
-                    'external_reference')
+                    'https://lotr.fandom.com/', 'external_reference')
                 external_reference.link(
                     'P67',
                     place,
                     description='Fandom Wiki of lord of the rings')
-
-                # Adding feature to place
                 feature = insert_entity(
-                    'Home of Baggins',
-                    'feature',
-                    origin=place)
+                    'Home of Baggins', 'feature', origin=place)
                 feature.created = str(datetime.now())
                 feature.modified = str(datetime.now())
-
-                # Adding stratigraphic to place
                 strati = insert_entity(
-                    'Bar',
-                    'stratigraphic_unit',
-                    origin=feature)
+                    'Bar', 'stratigraphic_unit', origin=feature)
                 strati.created = str(datetime.now())
                 strati.modified = str(datetime.now())
-
-                # Adding Administrative Unit Type
                 admin_unit = Type.get_hierarchy('Administrative unit')
                 unit_node = g.types[admin_unit.subs[0]]
                 location.link('P89', unit_node)
-
-                # Adding File to place
                 file = insert_entity('Picture with a License', 'file')
                 file.link('P67', place)
                 file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
-
-                # Adding Value Type
                 value_type = Type.get_hierarchy('Dimensions')
                 place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
-
-                # Adding Geonames
                 geonames = Entity.get_by_id(
                     ReferenceSystem.get_by_name('GeoNames').id)
                 precision_id = Type.get_hierarchy(
                     'External reference match').subs[0]
                 geonames.link(
-                    'P67',
-                    place,
-                    description='2761369',
-                    type_id=precision_id)
+                    'P67', place, description='2761369', type_id=precision_id)
 
-                # Creation of actor (Frodo)
                 actor = insert_entity(
-                    'Frodo',
-                    'person',
-                    description='That is Frodo')
-
+                    'Frodo', 'person', description='That is Frodo')
                 alias2 = insert_entity('The ring bearer', 'appellation')
                 actor.link('P1', alias2)
-
-                # Adding file to actor
                 file2 = insert_entity('File without license', 'file')
                 file2.link('P67', actor)
-
-                # Adding artefact to actor
                 artifact = insert_entity('The One Ring', 'artifact')
                 artifact.link('P52', actor)
 
-                # Creation of second actor (Sam)
                 actor2 = insert_entity(
-                    'Sam',
-                    'person',
-                    description='That is Sam')
-
-                # Adding residence
+                    'Sam', 'person', description='That is Sam')
                 actor2.link('P74', location)
-
-                # Adding actor relation
                 relation_id = Type.get_hierarchy('Actor actor relation').id
                 relation_sub_id = g.types[relation_id].subs[0]
                 actor.link('OA7', actor2, type_id=relation_sub_id)
 
-                # Creation of event
                 event = insert_entity('Travel to Mordor', 'activity')
                 event.link('P11', actor)
                 event.link('P14', actor2)
                 event.link('P7', location)
+
                 event2 = insert_entity('Exchange of the one ring', 'activity')
                 event2.link('P2', Entity.get_by_id(params["exchange_id"]))
+
                 place2 = insert_entity('Mordor', 'place', 'The heart of evil.')
                 place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
                 insert_entity('Silmarillion', 'source')
 
             # ---Content Endpoints---
-            # ClassMapping
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
             assert get_class_mapping(rv)
 
-            # Content
             rv = self.app.get(
                 url_for('api_03.content', lang='de', download=True)).get_json()
             assert bool(rv['intro'] == 'Das ist Deutsch')
             rv = self.app.get(url_for('api_03.content')).get_json()
             assert bool(rv['intro'] == 'This is English')
 
-            # geometric_entities/
             for rv in [
                 self.app.get(url_for('api_03.geometric_entities')),
                 self.app.get(
@@ -181,12 +134,10 @@ class Api03(TestBaseCase):
                 assert get_geom_properties(rv, 'objectName')
                 assert get_geom_properties(rv, 'shapeType')
 
-            # system_class_count/
             rv = self.app.get(url_for('api_03.system_class_count')).get_json()
             assert bool(rv['person'])
 
             # ---Entity Endpoints---
-            # /entity
             # Test Entity
             rv = self.app.get(
                 url_for('api_03.entity', id_=place.id, download=True))
@@ -204,10 +155,8 @@ class Api03(TestBaseCase):
                 timespan['start'], 'earliest', '2018-01-31T00:00:00')
             assert get_bool(
                 timespan['start'], 'latest', '2018-03-01T00:00:00')
-            assert get_bool(
-                timespan['end'], 'earliest', '2019-01-31T00:00:00')
-            assert get_bool(
-                timespan['end'], 'latest', '2019-03-01T00:00:00')
+            assert get_bool(timespan['end'], 'earliest', '2019-01-31T00:00:00')
+            assert get_bool(timespan['end'], 'latest', '2019-03-01T00:00:00')
             assert get_bool(rv['types'][0], 'identifier')
             assert get_bool(rv['types'][0], 'label', 'Boundary Mark')
             rel = rv['relations']
@@ -337,17 +286,6 @@ class Api03(TestBaseCase):
             assert get_no_key(rv, 'links')
             assert get_no_key(rv, 'types')
 
-            # Test Entities limit
-            # rv = self.app.get(url_for(
-            #     'api_03.query',
-            #     entities=location.id,
-            #     cidoc_classes='E18',
-            #     view_classes='artifact',
-            #     system_classes='person',
-            #     limit=1,
-            #     first=actor2.id)).get_json()
-            # assert bool(len(rv['results']) == 1)
-
             # Test if Query returns enough entities
             rv = self.app.get(url_for(
                 'api_03.query',
@@ -382,7 +320,6 @@ class Api03(TestBaseCase):
                 count=True))
             assert bool(rv.get_json() == 8)
 
-            # Test Entities count
             rv = self.app.get(url_for('api_03.geometric_entities', count=True))
             assert bool(rv.get_json() == 1)
 
@@ -399,7 +336,6 @@ class Api03(TestBaseCase):
             assert get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
-
             for rv in [
                 self.app.get(url_for('api_03.type_overview')),
                 self.app.get(
@@ -414,15 +350,12 @@ class Api03(TestBaseCase):
                 rv = rv.get_json()['place'][0]['children'][0]
                 assert bool(rv['label'] == 'Boundary Mark')
 
-            # Test type tree
-
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
                 self.app.get(
                     url_for('api_03.type_tree', download=True))]:
                 assert bool(rv.get_json()['typeTree'])
 
-            # Test search parameter
             for rv in [
                 self.app.get(url_for(
                     'api_03.query',
@@ -638,7 +571,6 @@ class Api03(TestBaseCase):
                                 "logicalOperator":"or"}]}"""))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 1)
 
-            # Test search parameter
             for rv in [
                 self.app.get(url_for(
                     'api_03.query',
@@ -671,7 +603,6 @@ class Api03(TestBaseCase):
                         "values":["Sûza"],"logicalOperator":"and"}]}"""))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 6)
 
-            # subunits/
             for rv in [
                 self.app.get(url_for('api_03.subunits', id_=place.id)),
                 self.app.get(
@@ -694,7 +625,8 @@ class Api03(TestBaseCase):
                 url_for('api_03.subunits', id_=place.id, count=True))
             assert b'3' in rv.data
 
-            for rv in [self.app.get(
+            for rv in [
+                self.app.get(
                     url_for('api_03.subunits', id_=place.id, format='xml')),
                 self.app.get(url_for(
                     'api_03.subunits',
@@ -703,7 +635,7 @@ class Api03(TestBaseCase):
                     download=True))]:
                 assert b'Shire' in rv.data
 
-            # Test Error Handling
+            # --Test Error Handling--
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for('api_03.entity', id_=233423424))
             with self.assertRaises(NotAPlaceError):
