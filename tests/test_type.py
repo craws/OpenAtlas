@@ -84,21 +84,9 @@ class TypeTest(TestBaseCase):
 
             data[str(actor_type.id)] = type_id
             rv = self.app.post(
-                url_for('update', id_=type_id),
-                data=data,
-                follow_redirects=True)
-            assert b'Type can&#39;t have itself as super' in rv.data
-
-            rv = self.app.post(
                 url_for('insert', class_='type', origin_id=actor_type.id),
                 data=data)
             sub_type_id = rv.location.split('/')[-1].replace('type#tab-', '')
-            data[str(actor_type.id)] = sub_type_id
-            rv = self.app.post(
-                url_for('update', id_=type_id),
-                data=data,
-                follow_redirects=True)
-            assert b'Type can&#39;t have a sub as super' in rv.data
 
             rv = self.app.get(
                 url_for('view', id_=sex_type.id),

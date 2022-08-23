@@ -21,15 +21,6 @@ def file(_form: FlaskForm, field: MultipleFileField) -> None:
             field.errors.append(uc_first(_('file type not allowed')))
 
 
-def type_super(form: FlaskForm, field: TreeField) -> None:
-    type_ = g.types[int(form.entity_id.data)]
-    new_super = g.types[int(field.data)]
-    if new_super.id == type_.id:
-        field.errors.append(uc_first(_('error type self as super')))
-    if new_super.root and type_.id in new_super.root:
-        field.errors.append(uc_first(_('error type sub as super')))
-
-
 def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
     if not hasattr(form, 'entity_id') or \
             Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:

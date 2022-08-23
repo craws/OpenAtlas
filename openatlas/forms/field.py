@@ -205,7 +205,10 @@ class TreeSelect(HiddenInput):
             field=field,
             selection=selection,
             root=g.types[int(field.type_id)],
-            data=Type.get_tree_data(int(field.type_id), selected_ids))
+            data=Type.get_tree_data(
+                int(field.type_id),
+                selected_ids,
+                field.filters_ids))
 
 
 class TreeField(HiddenField):
@@ -216,9 +219,10 @@ class TreeField(HiddenField):
             validators: Any = None,
             form: Any = None,
             type_id: str = '',
+            filter_ids: Optional[list[int]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.form = form
         self.type_id = type_id or self.id
-
+        self.filters_ids = filter_ids
     widget = TreeSelect()
