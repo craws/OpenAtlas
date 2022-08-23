@@ -10,13 +10,14 @@ Where to find the input fields
 ------------------------------
 
 :doc:`Date</form/date>` input fields can be found on the following:
+
 * All forms connected to :doc:`Events</entity/event>`
 * All forms connected to :doc:`Actors</entity/actor>`
-* All forms connected to :doc:`Types</entity/types>`
+* All forms connected to :doc:`Types</entity/type>`
 * :doc:`Places</entity/place>`
-* Archaeological :doc:`Features</entity/feature>` and
-  :doc:`Statigraphic Units</entity/stratigraphic_unit>`
-* :doc:`Artifacts</entity/artifacts>`
+* :doc:`Features</entity/feature>`
+* :doc:`Statigraphic Units</entity/stratigraphic_unit>`
+* :doc:`Artifacts</entity/artifact>`
 
 It is not provided for the input of:
 
@@ -24,7 +25,7 @@ It is not provided for the input of:
 * References
 
 The **Date** field itself can be found at the bottom of the form, its input
-field is intially hidden. It can be used by clicking the **Show** button.
+field is initially hidden. It can be used by clicking the **Show** button.
 
 How to enter dates and time spans
 ---------------------------------
@@ -48,9 +49,12 @@ The following values can be put in:
 * Seconds (ss) as two digits: 0 to 59
 * Comments as free text for additional information
 
-As PostgreSQL uses the `Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
-the year 0 can not be entered. Also years that preceeds the year 4713 BC can
-not be entered.
+Years before the year 0 can be indicated by a preceding minus. Please note that
+years before the year 4713 BC (spelling -4713) cannot be entered at the moment
+due to software restrictions by PostgreSQL.
+Furthermore, as PostgreSQL uses the
+`Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
+the year 0 can not be entered either.
 
 Precise dates
 ^^^^^^^^^^^^^
@@ -76,6 +80,29 @@ and 1648 - 10 - 24 into the first row of **End**.
 
 Time spans
 ^^^^^^^^^^
+
+If dating is uncertain, time spans for the beginning, end or beginning and end
+of the time span can be given.
+This is possible via the four input fields of the date field - 2 for begin
+and to for end:
+
+* The first line represents the **beginning of the begin**
+* The second line represents the **end of the begin**
+* The third line represents the **beginning of the end**
+* The fourth line represents the  **ending of the end**
+
+In the case of unknown start and end dates, the time span must be selected so
+large that the actual time frame lies within the specified span with a 100 %
+certainty.
+
+Example: The exact date of death of King Stephen I of Hungary is known - 15
+August 1038 AD - but for the date of birth only a time span from 01.01.975 AD to
+31.12.975 AD can be given. As first input field corresponds to the earliest
+possible start of the time span, 975 - 01 - 01 should be entered. The second
+line corresponds to the latest possible end of the time span, in this case 975
+- 12 - 31.
+
+.. image:: date_stephen.png
 
 
 Activate hours, minutes, and seconds

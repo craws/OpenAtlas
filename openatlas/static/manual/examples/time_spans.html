@@ -175,16 +175,15 @@
 and how to put in time spans correctly.</p>
 <div class="section" id="where-to-find-the-input-fields">
 <h2>Where to find the input fields<a class="headerlink" href="#where-to-find-the-input-fields" title="Permalink to this headline">¶</a></h2>
-<p><a class="reference internal" href="../form/date.html"><span class="doc">Date</span></a> input fields can be found on the following:
-* All forms connected to <a class="reference internal" href="../entity/event.html"><span class="doc">Events</span></a>
-* All forms connected to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actors</span></a>
-* All forms connected to <span class="xref std std-doc">Types</span>
-* <a class="reference internal" href="../entity/place.html"><span class="doc">Places</span></a>
-* Archaeological <a class="reference internal" href="../entity/feature.html"><span class="doc">Features</span></a> and</p>
-<blockquote>
-<div><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Statigraphic Units</span></a></div></blockquote>
+<p><a class="reference internal" href="../form/date.html"><span class="doc">Date</span></a> input fields can be found on the following:</p>
 <ul class="simple">
-<li><span class="xref std std-doc">Artifacts</span></li>
+<li>All forms connected to <a class="reference internal" href="../entity/event.html"><span class="doc">Events</span></a></li>
+<li>All forms connected to <a class="reference internal" href="../entity/actor.html"><span class="doc">Actors</span></a></li>
+<li>All forms connected to <a class="reference internal" href="../entity/type.html"><span class="doc">Types</span></a></li>
+<li><a class="reference internal" href="../entity/place.html"><span class="doc">Places</span></a></li>
+<li><a class="reference internal" href="../entity/feature.html"><span class="doc">Features</span></a></li>
+<li><a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">Statigraphic Units</span></a></li>
+<li><a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifacts</span></a></li>
 </ul>
 <p>It is not provided for the input of:</p>
 <ul class="simple">
@@ -192,11 +191,11 @@ and how to put in time spans correctly.</p>
 <li>References</li>
 </ul>
 <p>The <strong>Date</strong> field itself can be found at the bottom of the form, its input
-field is intially hidden. It can be used by clicking the <strong>Show</strong> button.</p>
+field is initially hidden. It can be used by clicking the <strong>Show</strong> button.</p>
 </div>
 <div class="section" id="how-to-enter-dates-and-time-spans">
 <h2>How to enter dates and time spans<a class="headerlink" href="#how-to-enter-dates-and-time-spans" title="Permalink to this headline">¶</a></h2>
-<img alt="examples/date.png" src="examples/date.png" />
+<img alt="../_images/date1.png" src="../_images/date1.png" />
 <p>The form consists of two parts:</p>
 <ul class="simple">
 <li><strong>Begin</strong></li>
@@ -205,15 +204,19 @@ field is intially hidden. It can be used by clicking the <strong>Show</strong> b
 <p>Begin and end each provide two lines for data entry. This can be used for
 entering precise, known data as well as for tracking time spans.</p>
 <p>The following values can be put in:
-* Year (YYYY) as four digits: -3713 to 9999, the year 0 is not allowed
+* Year (YYYY) as four digits: -4713 to 9999, the year 0 is not allowed
 * Month (MM) as two digits: 1 to 12
 * Day (DD) as two digits: 1 to 31
 * Hour (hh) as two digits: 0 to 23
 * Minute (mm) as two digits: 0 to 59
 * Seconds (ss) as two digits: 0 to 59
 * Comments as free text for additional information</p>
-<p>As PostgreSQL uses the <a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>,
-the year 0 can not be entered.</p>
+<p>Years before the year 0 can be indicated by a preceding minus. Please note that
+years before the year 4713 BC (spelling -4713) cannot be entered at the moment
+due to software restrictions by PostgreSQL.
+Furthermore, as PostgreSQL uses the
+<a class="reference external" href="https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar">Proleptic Gregorian calendar</a>,
+the year 0 can not be entered either.</p>
 <div class="section" id="precise-dates">
 <h3>Precise dates<a class="headerlink" href="#precise-dates" title="Permalink to this headline">¶</a></h3>
 <p>If precise dates are known, enter the beginning into the first line of
@@ -224,16 +227,36 @@ was fought between William Duke of Normandy with his Norman-French troops and
 King Harold Godwinson and his English army on the 14th of October 1066.
 To track this dates, fill in 1066 as year, 10 as month and 14 as day for
 <strong>Begin</strong> and <strong>End</strong> alike.</p>
-<img alt="examples/date_hastings.png" src="examples/date_hastings.png" />
+<img alt="../_images/date_hastings.png" src="../_images/date_hastings.png" />
 <p>Or think of the Peace of Westphalia as collective name for two peace treaties,
 signed in 1648 in Osnabrück (15th of May 1648) and Münster (24th of October
 1648). The treaties ended the Thirty Years’ War as well as the Eighty Years’
 War. To track those dates add 1648 - 05 - 15 into the first row of <strong>Begin</strong>
 and 1648 - 10 - 24 into the first row of <strong>End</strong>.</p>
-<img alt="examples/date_westphalia.png" src="examples/date_westphalia.png" />
+<img alt="../_images/date_westphalia.png" src="../_images/date_westphalia.png" />
 </div>
 <div class="section" id="id1">
 <h3>Time spans<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>If dating is uncertain, time spans for the beginning, end or beginning and end
+of the time span can be given.
+This is possible via the four input fields of the date field - 2 for begin
+and to for end:</p>
+<ul class="simple">
+<li>The first line represents the <strong>beginning of the begin</strong></li>
+<li>The second line represents the <strong>end of the begin</strong></li>
+<li>The third line represents the <strong>beginning of the end</strong></li>
+<li>The fourth line represents the  <strong>ending of the end</strong></li>
+</ul>
+<p>In the case of unknown start and end dates, the time span must be selected so
+large that the actual time frame lies within the specified span with a 100 %
+certainty.</p>
+<p>Example: The exact date of death of King Stephen I of Hungary is known - 15
+August 1038 AD - but for the date of birth only a time span from 01.01.975 AD to
+31.12.975 AD can be given. As first input field corresponds to the earliest
+possible start of the time span, 975 - 01 - 01 should be entered. The second
+line corresponds to the latest possible end of the time span, in this case 975
+- 12 - 31.</p>
+<img alt="../_images/date_stephen.png" src="../_images/date_stephen.png" />
 </div>
 </div>
 <div class="section" id="activate-hours-minutes-and-seconds">
@@ -245,7 +268,7 @@ Those additional input fields can be activated in your
 <strong>Profile</strong>. Here click <strong>Modules</strong>. Click on the <strong>Edit</strong> button and check
 <strong>“Time”</strong> to turn it on. You might have to refresh your page for it to show in
 the form.</p>
-<img alt="examples/date_hours.png" src="examples/date_hours.png" />
+<img alt="../_images/date_hours.png" src="../_images/date_hours.png" />
 </div>
 </div>
 
