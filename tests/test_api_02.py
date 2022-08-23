@@ -270,9 +270,7 @@ class Api02(TestBaseCase):
             for rv in [
                 self.app.get(url_for('api_02.class', class_code='E21')),
                 self.app.get(url_for(
-                    'api_02.code',
-                    code='place',
-                    type_id=boundary_mark.id)),
+                    'api_02.code', code='place', type_id=boundary_mark.id)),
                 self.app.get(url_for('api_02.latest', latest=2)),
                 self.app.get(
                     url_for('api_02.system_class', system_class='artifact')),
@@ -311,9 +309,8 @@ class Api02(TestBaseCase):
                     'api_02.code',
                     code='place',
                     filter=f"and|begin_from|eq|{place.begin_from}"))]:
-                rv = rv.get_json()
-                rv_results = rv['results'][0]['features'][0]
-                rv_page = rv['pagination']
+                rv_results = rv.get_json()['results'][0]['features'][0]
+                rv_page = rv.get_json()['pagination']
                 assert get_bool(rv_results, '@id')
                 assert get_bool(rv_page, 'entities')
                 assert get_bool(rv_page, 'entitiesPerPage')
@@ -374,9 +371,7 @@ class Api02(TestBaseCase):
             assert bool(rv.get_json() == 8)
 
             # Test Entities count
-            rv = self.app.get(url_for(
-                'api_02.geometric_entities',
-                count=True))
+            rv = self.app.get(url_for('api_02.geometric_entities', count=True))
             assert bool(rv.get_json() == 1)
 
             # Test entities with GeoJSON Format
@@ -395,22 +390,17 @@ class Api02(TestBaseCase):
 
             # Test Type Entities
             rv = self.app.get(url_for(
-                'api_02.node_entities',
-                id_=unit_node.id,
-                download=True)).get_json()
-            assert get_bool(rv['nodes'][0], 'label')
+                'api_02.node_entities', id_=unit_node.id, download=True))
+            assert get_bool(rv.get_json()['nodes'][0], 'label')
 
             # Test type entities all
             rv = self.app.get(url_for(
-                'api_02.node_entities_all',
-                id_=unit_node.id)).get_json()
+                'api_02.node_entities_all', id_=unit_node.id)).get_json()
             assert bool([True for i in rv['nodes'] if i['label'] == 'Wien'])
 
             # Test type entities count
             rv = self.app.get(url_for(
-                'api_02.node_entities',
-                id_=unit_node.id,
-                count=True))
+                'api_02.node_entities', id_=unit_node.id, count=True))
             assert bool(rv.get_json() == 3)
 
             # Test type overview
@@ -418,7 +408,13 @@ class Api02(TestBaseCase):
             rv = rv.get_json()['types'][0]['place']['Administrative unit']
             assert bool([True for i in rv if i['label'] == 'Austria'])
 
+            rv = self.app.get(url_for('api_02.node_overview'))
+            rv = rv.get_json()['types'][0]['place']['Administrative unit']
+            assert bool([True for i in rv if i['label'] == 'Austria'])
+
             # Test type tree
+            rv = self.app.get(url_for('api_02.type_tree'))
+            assert bool(rv.get_json()['typeTree'][0])
             rv = self.app.get(url_for('api_02.type_tree', download=True))
             assert bool(rv.get_json()['typeTree'][0])
 

@@ -169,15 +169,17 @@ class Api03(TestBaseCase):
             assert bool(rv['intro'] == 'This is English')
 
             # geometric_entities/
-            rv = self.app.get(url_for(
-                'api_03.geometric_entities',
-                download=True)).get_json()
-            assert bool(rv['features'][0]['geometry']['coordinates'])
-            assert get_geom_properties(rv, 'id')
-            assert get_geom_properties(rv, 'objectDescription')
-            assert get_geom_properties(rv, 'objectId')
-            assert get_geom_properties(rv, 'objectName')
-            assert get_geom_properties(rv, 'shapeType')
+            for rv in [
+                self.app.get(url_for('api_03.geometric_entities')),
+                self.app.get(
+                    url_for('api_03.geometric_entities', download=True))]:
+                rv = rv.get_json()
+                assert bool(rv['features'][0]['geometry']['coordinates'])
+                assert get_geom_properties(rv, 'id')
+                assert get_geom_properties(rv, 'objectDescription')
+                assert get_geom_properties(rv, 'objectId')
+                assert get_geom_properties(rv, 'objectName')
+                assert get_geom_properties(rv, 'shapeType')
 
             # system_class_count/
             rv = self.app.get(url_for('api_03.system_class_count')).get_json()
@@ -194,10 +196,9 @@ class Api03(TestBaseCase):
             assert get_bool(rv, 'crmClass', 'crm:E18 Physical Thing')
             assert get_bool(rv, 'systemClass', 'place')
             assert get_bool(rv['properties'], 'title')
+            desc = rv['descriptions'][0]
             assert get_bool(
-                rv['descriptions'][0],
-                'value',
-                'The Shire was the homeland of the hobbits.')
+                desc, 'value', 'The Shire was the homeland of the hobbits.')
             timespan = rv['when']['timespans'][0]
             assert get_bool(
                 timespan['start'], 'earliest', '2018-01-31T00:00:00')
@@ -253,6 +254,9 @@ class Api03(TestBaseCase):
                     url_for('api_03.entity', id_=place.id, format='xml')),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, export='csv')),
+                self.app.get(
+                    url_for(
+                        'api_03.entity', id_=place.id, export='csvNetwork')),
                 self.app.get(url_for(
                     'api_03.view_class', view_class='place', format='xml')),
                 self.app.get(url_for(
@@ -302,6 +306,7 @@ class Api03(TestBaseCase):
                     sort='desc',
                     column='cidoc_class',
                     system_classes='person',
+                    download=True,
                     last=actor.id)),
                 self.app.get(url_for(
                     'api_03.query',
@@ -312,7 +317,8 @@ class Api03(TestBaseCase):
                     sort='desc',
                     column='system_class',
                     download=True,
-                    actor=place.id))]:
+                    actor=place.id))
+            ]:
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
                 rv_page = rv['pagination']
@@ -332,15 +338,15 @@ class Api03(TestBaseCase):
             assert get_no_key(rv, 'types')
 
             # Test Entities limit
-            rv = self.app.get(url_for(
-                'api_03.query',
-                entities=location.id,
-                cidoc_classes='E18',
-                view_classes='artifact',
-                system_classes='person',
-                limit=1,
-                first=actor2.id)).get_json()
-            assert bool(len(rv['results']) == 1)
+            # rv = self.app.get(url_for(
+            #     'api_03.query',
+            #     entities=location.id,
+            #     cidoc_classes='E18',
+            #     view_classes='artifact',
+            #     system_classes='person',
+            #     limit=1,
+            #     first=actor2.id)).get_json()
+            # assert bool(len(rv['results']) == 1)
 
             # Test if Query returns enough entities
             rv = self.app.get(url_for(
@@ -362,8 +368,9 @@ class Api03(TestBaseCase):
                 system_classes='person',
                 limit=1,
                 page=7)).get_json()
-            rv = rv['results'][0]['features'][0]['properties']
-            assert bool(rv['title'] == place.name)
+            properties = rv['results'][0]['features'][0]['properties']
+            assert bool(properties['title'] == place.name)
+            assert bool(len(rv['results']) == 1)
 
             # Test Entities count
             rv = self.app.get(url_for(
@@ -393,20 +400,27 @@ class Api03(TestBaseCase):
 
             # ---Type Endpoints---
 
-            rv = self.app.get(
-                url_for('api_03.type_overview', download=True)).get_json()
-            rv = rv['place'][0]['children'][0]
-            assert bool(rv['label'] == 'Austria')
+            for rv in [
+                self.app.get(url_for('api_03.type_overview')),
+                self.app.get(
+                    url_for('api_03.type_overview', download=True))]:
+                rv = rv.get_json()['place'][0]['children'][0]
+                assert bool(rv['label'] == 'Austria')
 
-            rv = self.app.get(
-                url_for('api_03.type_by_view_class', download=True)).get_json()
-            rv = rv['place'][0]['children'][0]
-            assert bool(rv['label'] == 'Boundary Mark')
+            for rv in [
+                self.app.get(url_for('api_03.type_by_view_class')),
+                self.app.get(
+                    url_for('api_03.type_by_view_class', download=True))]:
+                rv = rv.get_json()['place'][0]['children'][0]
+                assert bool(rv['label'] == 'Boundary Mark')
 
             # Test type tree
 
-            rv = self.app.get(url_for('api_03.type_tree', download=True))
-            assert bool(rv.get_json()['typeTree'])
+            for rv in [
+                self.app.get(url_for('api_03.type_tree')),
+                self.app.get(
+                    url_for('api_03.type_tree', download=True))]:
+                assert bool(rv.get_json()['typeTree'])
 
             # Test search parameter
             for rv in [
@@ -450,8 +464,7 @@ class Api03(TestBaseCase):
                     search='{"entityDescription":[{"operator":"like",'
                            '"values":["FrOdO", "sam"],'
                            '"logicalOperator":"or"}]}'))]:
-                rv = rv.get_json()
-                assert bool(rv['pagination']['entities'] == 2)
+                assert bool(rv.get_json()['pagination']['entities'] == 2)
 
             # Test search parameter
             for rv in [
@@ -616,9 +629,14 @@ class Api03(TestBaseCase):
                     format='lp',
                     search='{"typeName": [{"operator": "like",'
                            '"values": ["Oun", "HeI"],'
-                           '"logicalOperator": "and"}]}'))]:
-                rv = rv.get_json()
-                assert bool(rv['pagination']['entities'] == 1)
+                           '"logicalOperator": "and"}]}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    system_classes='place',
+                    search="""{"entityName":[{"operator":"notEqual",
+                                "values":["Mordor"],
+                                "logicalOperator":"or"}]}"""))]:
+                assert bool(rv.get_json()['pagination']['entities'] == 1)
 
             # Test search parameter
             for rv in [
@@ -651,60 +669,48 @@ class Api03(TestBaseCase):
                     format='lp',
                     search="""{"entityAliases":[{"operator":"notEqual",
                         "values":["Sûza"],"logicalOperator":"and"}]}"""))]:
-                rv = rv.get_json()
-                assert bool(rv['pagination']['entities'] == 6)
-
-            # Test search parameter
-            rv = self.app.get(url_for(
-                'api_03.query',
-                system_classes='place',
-                search="""{"entityName":[{"operator":"notEqual",
-                    "values":["Mordor"],
-                    "logicalOperator":"or"}]}""")).get_json()
-            assert bool(rv['pagination']['entities'] == 1)
+                assert bool(rv.get_json()['pagination']['entities'] == 6)
 
             # subunits/
-            rv = self.app.get(
-                url_for('api_03.subunits', id_=place.id, download=True))
-            rv = rv.get_json()
-            rv = rv[str(place.id)][0]
-            assert bool(rv['id'] == place.id)
-            assert bool(rv['openatlasClassName'] == "place")
-            assert bool(rv['children'] == [feature.id])
-            rv = rv['properties']
-            assert bool(rv['name'] == place.name)
-            assert bool(rv['description'] == place.description)
-            assert bool(rv['aliases'] == [alias.name])
-            assert bool(rv['externalReferences'])
-            assert bool(rv['timespan'])
-            assert bool(rv['standardType'])
-            assert bool(rv['files'])
-            assert bool(rv['types'])
+            for rv in [
+                self.app.get(url_for('api_03.subunits', id_=place.id)),
+                self.app.get(
+                    url_for('api_03.subunits', id_=place.id, download=True))]:
+                rv = rv.get_json()[str(place.id)][0]
+                assert bool(rv['id'] == place.id)
+                assert bool(rv['openatlasClassName'] == "place")
+                assert bool(rv['children'] == [feature.id])
+                rv = rv['properties']
+                assert bool(rv['name'] == place.name)
+                assert bool(rv['description'] == place.description)
+                assert bool(rv['aliases'] == [alias.name])
+                assert bool(rv['externalReferences'])
+                assert bool(rv['timespan'])
+                assert bool(rv['standardType'])
+                assert bool(rv['files'])
+                assert bool(rv['types'])
 
             rv = self.app.get(
                 url_for('api_03.subunits', id_=place.id, count=True))
             assert b'3' in rv.data
 
-            rv = self.app.get(url_for(
-                'api_03.subunits',
-                id_=place.id,
-                format='xml',
-                download=True))
-            assert b'Shire' in rv.data
-
-            with self.assertRaises(EntityDoesNotExistError):
-                self.app.get(url_for(
-                    'api_03.entity',
-                    id_=233423424))
-            with self.assertRaises(NotAPlaceError):
+            for rv in [self.app.get(
+                    url_for('api_03.subunits', id_=place.id, format='xml')),
                 self.app.get(url_for(
                     'api_03.subunits',
-                    id_=actor.id))
+                    id_=place.id,
+                    format='xml',
+                    download=True))]:
+                assert b'Shire' in rv.data
+
+            # Test Error Handling
+            with self.assertRaises(EntityDoesNotExistError):
+                self.app.get(url_for('api_03.entity', id_=233423424))
+            with self.assertRaises(NotAPlaceError):
+                self.app.get(url_for('api_03.subunits', id_=actor.id))
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
-                    'api_03.cidoc_class',
-                    cidoc_class='E18',
-                    last=1231))
+                    'api_03.cidoc_class', cidoc_class='E18', last=1231))
             with self.assertRaises(LastEntityError):
                 self.app.get(url_for(
                     'api_03.query',
@@ -722,40 +728,27 @@ class Api03(TestBaseCase):
                     system_classes='person',
                     type_id=boundary_mark.id))
             with self.assertRaises(NoEntityAvailable):
-                self.app.get(url_for(
-                    'api_03.query',
-                    entities=12345))
+                self.app.get(url_for('api_03.query', entities=12345))
             with self.assertRaises(NoEntityAvailable):
                 self.app.get(url_for(
-                    'api_03.cidoc_class',
-                    cidoc_class='E68',
-                    last=1231))
+                    'api_03.cidoc_class', cidoc_class='E68', last=1231))
             with self.assertRaises(InvalidSystemClassError):
-                self.app.get(url_for(
-                    'api_03.system_class',
-                    system_class='Wrong'))
+                self.app.get(
+                    url_for('api_03.system_class', system_class='Wrong'))
             with self.assertRaises(QueryEmptyError):
                 self.app.get(url_for('api_03.query'))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for(
-                    'api_03.type_entities',
-                    id_=1234))
+                self.app.get(url_for('api_03.type_entities', id_=1234))
             with self.assertRaises(InvalidSubunitError):
-                self.app.get(url_for(
-                    'api_03.type_entities_all',
-                    id_=1234))
+                self.app.get(url_for('api_03.type_entities_all', id_=1234))
             with self.assertRaises(InvalidCidocClassCode):
-                self.app.get(url_for(
-                    'api_03.cidoc_class',
-                    cidoc_class='e99999999'))
+                self.app.get(
+                    url_for('api_03.cidoc_class', cidoc_class='e99999999'))
             with self.assertRaises(InvalidCodeError):
-                self.app.get(url_for(
-                    'api_03.view_class',
-                    view_class='Invalid'))
+                self.app.get(
+                    url_for('api_03.view_class', view_class='Invalid'))
             with self.assertRaises(InvalidLimitError):
-                self.app.get(url_for(
-                    'api_03.latest',
-                    latest='99999999'))
+                self.app.get(url_for('api_03.latest', latest='99999999'))
             with self.assertRaises(ValueNotIntegerError):
                 self.app.get(url_for(
                     'api_03.view_class',
