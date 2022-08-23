@@ -31,6 +31,7 @@ class OpenatlasClass:
     _('actor actor relation')
     _('actor function')
     _('appellation')
+    _('bibliography')
     _('external reference')
     _('source translation')
 

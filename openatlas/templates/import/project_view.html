@@ -1,18 +1,20 @@
 {% if 'manager'|is_authorized %}
     <div class="toolbar">
-        {{ 'admin/import'|manual }}
-        {{ _('edit')|button(url_for('import_project_update', id_=project.id)) }}
-        {{ _('delete')|button(
-            url_for('import_project_delete', id_=project.id),
-            onclick="return confirm('" + _('delete %(name)s?', name=project.name)|replace("'", "")|uc_first + "')") }}
+      {{ 'admin/import'|manual }}
+      {{ _('edit')|button(url_for('import_project_update', id_=project.id)) }}
+      {{ _('delete')|button(
+      url_for('import_project_delete', id_=project.id),
+      onclick="return confirm('" + _('delete %(name)s?', name=project.name)|replace("'", "")|uc_first + "')") }}
     </div>
     <p>{{ _('new import')|uc_first }}:</p>
     <div class="toolbar">
-        {{ _('source')|button(url_for('import_data', project_id=project.id, class_='source')) }}
-        {% for class_ in g.view_class_mapping.event + g.view_class_mapping.actor %}
-            {{ class_|button(url_for('import_data', project_id=project.id, class_=class_)) }}
-        {% endfor %}
-        {{ _('place')|button(url_for('import_data', project_id=project.id, class_='place')) }}
+      {{ _('source')|button(url_for('import_data', project_id=project.id, class_='source')) }}
+      {% for class_ in g.view_class_mapping.event + g.view_class_mapping.actor %}
+        {{ _(class_)|button(url_for('import_data', project_id=project.id, class_=class_)) }}
+      {% endfor %}
+      {{ _('place')|button(url_for('import_data', project_id=project.id, class_='place')) }}
+      {{ _('bibliography')|button(url_for('import_data', project_id=project.id, class_='bibliography')) }}
+      {{ _('edition')|button(url_for('import_data', project_id=project.id, class_='edition')) }}
     </div>
 {% endif %}
 {{ project|description }}
