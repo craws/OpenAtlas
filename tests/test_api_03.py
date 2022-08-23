@@ -1,5 +1,4 @@
 from datetime import datetime
-from typing import Any, Optional, Union
 
 from flask import g, url_for
 
@@ -15,7 +14,9 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from tests.base import TestBaseCase, insert_entity
+from tests.base import (
+    TestBaseCase, get_bool, get_bool_inverse, get_class_mapping,
+    get_geom_properties, get_no_key, insert_entity)
 
 
 class Api03(TestBaseCase):
@@ -158,7 +159,7 @@ class Api03(TestBaseCase):
             # ---Content Endpoints---
             # ClassMapping
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
-            assert Api03.get_class_mapping(rv)
+            assert get_class_mapping(rv)
 
             # Content
             rv = self.app.get(
@@ -168,18 +169,15 @@ class Api03(TestBaseCase):
             assert bool(rv['intro'] == 'This is English')
 
             # geometric_entities/
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.geometric_entities')).get_json(),
-                self.app.get(url_for(
-                    'api_03.geometric_entities',
-                    download=True)).get_json()]:
-                assert bool(rv['features'][0]['geometry']['coordinates'])
-                assert Api03.get_geom_properties(rv, 'id')
-                assert Api03.get_geom_properties(rv, 'objectDescription')
-                assert Api03.get_geom_properties(rv, 'objectId')
-                assert Api03.get_geom_properties(rv, 'objectName')
-                assert Api03.get_geom_properties(rv, 'shapeType')
+            rv = self.app.get(url_for(
+                'api_03.geometric_entities',
+                download=True)).get_json()
+            assert bool(rv['features'][0]['geometry']['coordinates'])
+            assert get_geom_properties(rv, 'id')
+            assert get_geom_properties(rv, 'objectDescription')
+            assert get_geom_properties(rv, 'objectId')
+            assert get_geom_properties(rv, 'objectName')
+            assert get_geom_properties(rv, 'shapeType')
 
             # system_class_count/
             rv = self.app.get(url_for('api_03.system_class_count')).get_json()
@@ -188,117 +186,77 @@ class Api03(TestBaseCase):
             # ---Entity Endpoints---
             # /entity
             # Test Entity
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.entity',
-                    id_=place.id)),
-                self.app.get(url_for(
-                    'api_03.entity',
-                    id_=place.id, download=True))]:
-                rv = rv.get_json()
-                rv = rv['features'][0]
-                assert Api03.get_bool(
-                    rv,
-                    '@id')
-                assert Api03.get_bool(
-                    rv,
-                    'type',
-                    'Feature')
-                assert Api03.get_bool(
-                    rv,
-                    'crmClass',
-                    'crm:E18 Physical Thing')
-                assert Api03.get_bool(
-                    rv,
-                    'systemClass',
-                    'place')
-                assert Api03.get_bool(
-                    rv['properties'],
-                    'title')
-                assert Api03.get_bool(
-                    rv['descriptions'][0],
-                    'value',
-                    'The Shire was the homeland of the hobbits.')
-                assert Api03.get_bool(
-                    rv['when']['timespans'][0]['start'],
-                    'earliest',
-                    '2018-01-31T00:00:00')
-                assert Api03.get_bool(
-                    rv['when']['timespans'][0]['start'],
-                    'latest',
-                    '2018-03-01T00:00:00')
-                assert Api03.get_bool(
-                    rv['when']['timespans'][0]['end'],
-                    'earliest',
-                    '2019-01-31T00:00:00')
-                assert Api03.get_bool(
-                    rv['when']['timespans'][0]['end'],
-                    'latest',
-                    '2019-03-01T00:00:00')
-                assert Api03.get_bool(
-                    rv['types'][0],
-                    'identifier')
-                assert Api03.get_bool(
-                    rv['types'][0],
-                    'label',
-                    'Boundary Mark')
-                assert Api03.get_bool(
-                    rv['relations'][1],
-                    'label',
-                    'Height')
-                assert Api03.get_bool(
-                    rv['relations'][0],
-                    'relationTo')
-                assert Api03.get_bool(
-                    rv['relations'][0],
-                    'relationType',
-                    'crm:P2 has type')
-                assert Api03.get_bool(
-                    rv['relations'][0],
-                    'relationSystemClass',
-                    'type')
-                assert Api03.get_bool(
-                    rv['relations'][1],
-                    'relationDescription',
-                    '23.0')
-                assert Api03.get_bool(
-                    rv['names'][0],
-                    'alias',
-                    'Sûza')
-                assert Api03.get_bool(
-                    rv['links'][0],
-                    'type',
-                    'closeMatch')
-                assert Api03.get_bool(
-                    rv['links'][0],
-                    'identifier',
-                    'https://www.geonames.org/2761369')
-                assert Api03.get_bool(
-                    rv['links'][0],
-                    'referenceSystem',
-                    'GeoNames')
-                assert Api03.get_bool(
-                    rv['geometry'],
-                    'type',
-                    'Point')
-                assert Api03.get_bool(
-                    rv['geometry'],
-                    'coordinates',
-                    [9, 17])
-                assert Api03.get_bool(
-                    rv['depictions'][0],
-                    '@id')
-                assert Api03.get_bool(
-                    rv['depictions'][0],
-                    'title',
-                    'Picture with a License')
-                assert Api03.get_bool(
-                    rv['depictions'][0],
-                    'license',
-                    'Open license')
-                assert Api03.get_bool(
-                    rv['depictions'][0],
-                    'url')
+            rv = self.app.get(
+                url_for(
+                    'api_03.entity', id_=place.id, download=True)).get_json()
+            rv = rv['features'][0]
+            assert get_bool(rv, '@id')
+            assert get_bool(rv, 'type', 'Feature')
+            assert get_bool(rv, 'crmClass', 'crm:E18 Physical Thing')
+            assert get_bool(rv, 'systemClass', 'place')
+            assert get_bool(rv['properties'], 'title')
+            assert get_bool(
+                rv['descriptions'][0],
+                'value',
+                'The Shire was the homeland of the hobbits.')
+            assert get_bool(
+                rv['when']['timespans'][0]['start'],
+                'earliest',
+                '2018-01-31T00:00:00')
+            assert get_bool(
+                rv['when']['timespans'][0]['start'],
+                'latest',
+                '2018-03-01T00:00:00')
+            assert get_bool(
+                rv['when']['timespans'][0]['end'],
+                'earliest',
+                '2019-01-31T00:00:00')
+            assert get_bool(
+                rv['when']['timespans'][0]['end'],
+                'latest',
+                '2019-03-01T00:00:00')
+            assert get_bool(rv['types'][0], 'identifier')
+            assert get_bool(rv['types'][0], 'label', 'Boundary Mark')
+            assert get_bool(rv['relations'][1], 'label', 'Height')
+            assert get_bool(rv['relations'][0], 'relationTo')
+            assert get_bool(
+                rv['relations'][0],
+                'relationType',
+                'crm:P2 has type')
+            assert get_bool(rv['relations'][0], 'relationSystemClass', 'type')
+            assert get_bool(rv['relations'][1], 'relationDescription', '23.0')
+            assert get_bool(rv['names'][0], 'alias', 'Sûza')
+            assert get_bool(rv['links'][0], 'type', 'closeMatch')
+            assert get_bool(
+                rv['links'][0],
+                'identifier',
+                'https://www.geonames.org/2761369')
+            assert get_bool(
+                rv['links'][0],
+                'referenceSystem',
+                'GeoNames')
+            assert get_bool(
+                rv['geometry'],
+                'type',
+                'Point')
+            assert get_bool(
+                rv['geometry'],
+                'coordinates',
+                [9, 17])
+            assert get_bool(
+                rv['depictions'][0],
+                '@id')
+            assert get_bool(
+                rv['depictions'][0],
+                'title',
+                'Picture with a License')
+            assert get_bool(
+                rv['depictions'][0],
+                'license',
+                'Open license')
+            assert get_bool(
+                rv['depictions'][0],
+                'url')
 
             # Test entity in GeoJSON format
             rv = self.app.get(url_for(
@@ -306,56 +264,52 @@ class Api03(TestBaseCase):
                 id_=place.id,
                 format='geojson')).get_json()
             rv = rv['features'][0]
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['geometry'],
                 'type')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['geometry'],
                 'coordinates')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 '@id')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'systemClass')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'name')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'description')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'begin_earliest')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'begin_latest')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'begin_comment')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'end_earliest')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'end_latest')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'end_comment')
-            assert Api03.get_bool(
+            assert get_bool(
                 rv['properties'],
                 'types')
 
             # Test Entity export and RDFS
             for rv in [
-                self.app.get(url_for(
-                    'api_03.entity',
-                    id_=place.id,
-                    format='xml')),
-                self.app.get(url_for(
-                    'api_03.entity',
-                    id_=place.id,
-                    export='csv')),
+                self.app.get(
+                    url_for('api_03.entity', id_=place.id, format='xml')),
+                self.app.get(
+                    url_for('api_03.entity', id_=place.id, export='csv')),
                 self.app.get(url_for(
                     'api_03.entity',
                     id_=place.id,
@@ -438,11 +392,11 @@ class Api03(TestBaseCase):
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
                 rv_page = rv['pagination']
-                assert Api03.get_bool(rv_results, '@id')
-                assert Api03.get_bool(rv_page, 'entities')
-                assert Api03.get_bool(rv_page, 'entitiesPerPage')
-                assert Api03.get_bool(rv_page, 'index')
-                assert Api03.get_bool(rv_page, 'totalPages')
+                assert get_bool(rv_results, '@id')
+                assert get_bool(rv_page, 'entities')
+                assert get_bool(rv_page, 'entitiesPerPage')
+                assert get_bool(rv_page, 'index')
+                assert get_bool(rv_page, 'totalPages')
 
             # Test Entities with show=none
             rv = self.app.get(url_for(
@@ -450,10 +404,10 @@ class Api03(TestBaseCase):
                 cidoc_class='E21',
                 show='none')).get_json()
             rv = rv['results'][0]['features'][0]
-            assert Api03.get_bool_inverse(rv, 'geometry')
-            assert Api03.get_no_key(rv, 'depictions')
-            assert Api03.get_no_key(rv, 'links')
-            assert Api03.get_no_key(rv, 'types')
+            assert get_bool_inverse(rv, 'geometry')
+            assert get_no_key(rv, 'depictions')
+            assert get_no_key(rv, 'links')
+            assert get_no_key(rv, 'types')
 
             # Test Entities limit
             rv = self.app.get(url_for(
@@ -514,41 +468,29 @@ class Api03(TestBaseCase):
                 system_classes='person',
                 format='geojson')).get_json()
             rv = rv['results'][0]['features'][0]
-            assert Api03.get_bool(rv['properties'], '@id')
-            assert Api03.get_bool(rv['properties'], 'systemClass')
+            assert get_bool(rv['properties'], '@id')
+            assert get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
 
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.type_overview')),
-                self.app.get(url_for(
+            rv = self.app.get(url_for(
                     'api_03.type_overview',
-                    download=True))]:
-                rv = rv.get_json()
-                rv = rv['place'][0]['children'][0]
-                assert bool(rv['label'] == 'Austria')
+                    download=True)).get_json()
+            rv = rv['place'][0]['children'][0]
+            assert bool(rv['label'] == 'Austria')
 
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.type_by_view_class')),
-                self.app.get(url_for(
+            rv = self.app.get(url_for(
                     'api_03.type_by_view_class',
-                    download=True))]:
-                rv = rv.get_json()
-                rv = rv['place'][0]['children'][0]
-                assert bool(rv['label'] == 'Boundary Mark')
+                    download=True)).get_json()
+            rv = rv['place'][0]['children'][0]
+            assert bool(rv['label'] == 'Boundary Mark')
 
             # Test type tree
 
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.type_tree')),
-                self.app.get(url_for(
+            rv = self.app.get(url_for(
                     'api_03.type_tree',
-                    download=True))]:
-                rv = rv.get_json()
-                assert bool(rv['typeTree'])
+                    download=True)).get_json()
+            assert bool(rv['typeTree'])
 
             # Test search parameter
             for rv in [
@@ -706,9 +648,9 @@ class Api03(TestBaseCase):
                     view_classes='artifact',
                     system_classes='person',
                     format='lp',
-                    search=
-                    '{"endTo":[{"operator":"greaterThanEqual", '
-                    '"values":["2019-03-01"],"logicalOperator":"and"}]}')),
+                    search='{"endTo":[{"operator":"greaterThanEqual", '
+                           '"values":["2019-03-01"],"logicalOperator":"and"}]}'
+                )),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -833,17 +775,12 @@ class Api03(TestBaseCase):
                 'api_03.subunits', id_=place.id, count=True))
             assert b'3' in rv.data
 
-            for rv in [
-                self.app.get(url_for(
-                    'api_03.subunits',
-                    id_=place.id,
-                    format='xml')),
-                self.app.get(url_for(
+            rv = self.app.get(url_for(
                     'api_03.subunits',
                     id_=place.id,
                     format='xml',
-                    download=True))]:
-                assert b'Shire' in rv.data
+                    download=True))
+            assert b'Shire' in rv.data
 
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for(
@@ -976,29 +913,3 @@ class Api03(TestBaseCase):
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
-
-    @staticmethod
-    def get_bool(
-            data: dict[str, Any], key: str,
-            value: Optional[Union[str, list[Any]]] = None) -> bool:
-        return bool(data[key] == value) if value else bool(data[key])
-
-    @staticmethod
-    def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
-        return bool(not data[key])
-
-    @staticmethod
-    def get_no_key(data: dict[str, Any], key: str) -> bool:
-        return bool(key not in data.keys())
-
-    @staticmethod
-    def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
-        return bool(geom['features'][0]['properties'][key])
-
-    @staticmethod
-    def get_class_mapping(data: list[dict[str, Any]]) -> bool:
-        return bool(data[0]['systemClass']
-                    and data[0]['crmClass']
-                    and data[0]['view']
-                    and data[0]['icon']
-                    and data[0]['en'])
