@@ -275,7 +275,6 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event_id': HiddenField(),
             'event': TableField(_('sub event of'), filter_ids=filter_ids)}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
@@ -287,7 +286,6 @@ class EventBaseManager(BaseManager):
 
     def populate_update(self) -> None:
         super().populate_update()
-        self.form.event_id.data = self.entity.id
         if super_ := self.entity.get_linked_entity('P9'):
             self.form.event.data = super_.id
         if preceding_ := self.entity.get_linked_entity('P134', True):
