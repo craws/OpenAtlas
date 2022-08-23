@@ -1,6 +1,6 @@
 import pathlib
 import unittest
-from typing import Optional
+from typing import Any, Optional, Union
 
 import psycopg2
 
@@ -71,3 +71,29 @@ def insert_entity(
         if origin:
             origin.link('P46', entity)
     return entity
+
+
+def get_bool(
+        data: dict[str, Any], key: str,
+        value: Optional[Union[str, list[Any]]] = None) -> bool:
+    return bool(data[key] == value) if value else bool(data[key])
+
+
+def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
+    return bool(not data[key])
+
+
+def get_no_key(data: dict[str, Any], key: str) -> bool:
+    return bool(key not in data.keys())
+
+
+def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
+    return bool(geom['features'][0]['properties'][key])
+
+
+def get_class_mapping(data: list[dict[str, Any]]) -> bool:
+    return bool(data[0]['systemClass']
+                and data[0]['crmClass']
+                and data[0]['view']
+                and data[0]['icon']
+                and data[0]['en'])
