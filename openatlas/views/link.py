@@ -83,7 +83,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 
 
 @app.route('/insert/relation/<type_>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('contributer')
+@required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
     manager = get_manager(type_, origin=origin)

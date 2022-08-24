@@ -1,3 +1,4 @@
+import ast
 from typing import Any
 
 from flask import g, request
@@ -12,6 +13,7 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import file
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
