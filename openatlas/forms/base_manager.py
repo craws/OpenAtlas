@@ -218,6 +218,9 @@ class BaseManager:
                     f'Location of {self.form.name.data}'))
         return
 
+    def update_link(self) -> None:
+        pass
+
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']

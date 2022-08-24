@@ -157,7 +157,7 @@ class Entity:
                 and self.class_.name != 'administrative_unit':
             self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
-            continue_link_id = self.update_links(data['links'], new)
+            continue_link_id = self.update_links(data, new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
         return continue_link_id
@@ -204,18 +204,18 @@ class Entity:
             if alias.strip():
                 self.link('P1', Entity.insert('appellation', alias))
 
-    def update_links(self, links: dict[str, Any], new: bool) -> Optional[int]:
+    def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
         from openatlas.models.reference_system import ReferenceSystem
         if not new:
-            if 'delete' in links and links['delete']:
-                self.delete_links(links['delete'])
-            if 'delete_inverse' in links and links['delete_inverse']:
-                self.delete_links(links['delete_inverse'], True)
-            if 'delete_reference_system' in links \
-                    and links['delete_reference_system']:
+            if 'delete' in data['links'] and data['links']['delete']:
+                self.delete_links(data['links']['delete'])
+            if 'delete_inverse' in data['links'] and data['links']['delete_inverse']:
+                self.delete_links(data['links']['delete_inverse'], True)
+            if 'delete_reference_system' in data['links'] \
+                    and data['links']['delete_reference_system']:
                 ReferenceSystem.delete_links_from_entity(self)
         continue_link_id = None
-        for link_ in links['insert']:
+        for link_ in data['links']['insert']:
             ids = self.link(
                 link_['property'],
                 link_['range'],

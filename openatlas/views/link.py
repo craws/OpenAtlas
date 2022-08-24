@@ -89,14 +89,15 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     manager = get_manager(type_, origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
-        try:
-            manager.process_form()
-
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        #try:
+        manager.process_form()
+        manager.update_link()
+        print(manager.data)
+        Transaction.commit()
+        # except Exception as e:  # pragma: no cover
+        #     Transaction.rollback()
+        #     g.logger.log('error', 'database', 'transaction failed', e)
+        #     flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
             return redirect(

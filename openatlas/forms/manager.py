@@ -12,6 +12,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
+from openatlas.forms.process import process_dates
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -253,27 +254,28 @@ class InvolvementManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.add_link('P25', self.form.artifact.data)
         if self.origin.class_.view == 'event':
             for actor in Entity.get_by_ids(
                     ast.literal_eval(self.form.actor.data)):
-                link_ = Link.get_by_id(
-                    self.origin.link(
-                        self.form.activity.data,
-                        actor,
-                        self.form.description.data)[0])
-                link_.type = self.get_link_type()
-                link_.update()
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    actor,
+                    self.form.description.data,
+                    type_id=link_type.id if link_type else None)
         else:
             for event in Entity.get_by_ids(
                     ast.literal_eval(self.form.event.data)):
-                link_ = Link.get_by_id(
-                    event.link(
-                        self.form.activity.data,
-                        self.origin,
-                        self.form.description.data)[0])
-                link_.type = self.get_link_type()
-                link_.update()
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    event,
+                    self.form.description.data,
+                    inverse=True,
+                    type_id=link_type.id if link_type else None)
+
+    def update_link(self) -> None:
+        self.origin.update_links(self.data, new=True)
 
 
 class MoveManager(EventBaseManager):
