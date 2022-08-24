@@ -12,7 +12,6 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
-from openatlas.forms.process import process_dates
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
