@@ -2,8 +2,9 @@ Model
 =====
 
 .. toctree::
+   :maxdepth: 1
 
-   data model
-   cidoc crm
-   openatlas classes
-   link checker
+   data_model
+   cidoc_crm
+   openatlas_classes
+   link_checker
