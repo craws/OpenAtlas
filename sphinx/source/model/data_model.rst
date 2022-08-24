@@ -1,4 +1,4 @@
-data model
+Data model
 ==========
 
 .. toctree::
