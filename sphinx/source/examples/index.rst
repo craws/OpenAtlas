@@ -16,6 +16,7 @@ General
    move_event
    places
    reference_systems
+   time_spans
    types
 
 

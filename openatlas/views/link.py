@@ -1,7 +1,7 @@
 import ast
 from typing import Union
 
-from flask import flash, render_template, request, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
@@ -10,7 +10,7 @@ from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField
 from wtforms.validators import InputRequired
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.field import TableField
 from openatlas.forms.form import get_manager, get_table_form
@@ -95,7 +95,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
@@ -150,7 +150,7 @@ def member_insert(
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
@@ -197,7 +197,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
@@ -236,7 +236,7 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('view', id_=origin.id)}"
@@ -274,7 +274,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
             Transaction.commit()
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(
             f"{url_for('view', id_=origin.id)}"
@@ -322,7 +322,7 @@ def relation_update(
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             Transaction.rollback()
-            logger.log('error', 'database', 'transaction failed', e)
+            g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     if not manager.form.errors:

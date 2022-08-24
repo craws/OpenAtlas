@@ -21,8 +21,7 @@ from openatlas.forms.process import (
     process_dates, process_origin, process_standard_fields)
 from openatlas.forms.util import (
     check_if_entity_has_time, string_to_entity_list)
-from openatlas.forms.validation import (
-    hierarchy_name_exists, preceding_event, super_event, validate)
+from openatlas.forms.validation import hierarchy_name_exists, validate
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -73,7 +72,7 @@ class BaseManager:
         if 'description' in self.fields:
             setattr(Form, 'description', TextAreaField(_('description')))
             if class_.name == 'type':
-                type_ = entity if entity else origin
+                type_ = entity or origin
                 if isinstance(type_, Type):
                     root = g.types[type_.root[0]] if type_.root else type_
                     if root.category == 'value':
@@ -117,7 +116,7 @@ class BaseManager:
     def customize_labels(self) -> None:
         if self.class_.name in ('administrative_unit', 'type') \
                 and 'classes' not in self.form:
-            type_ = self.entity if self.entity else self.origin
+            type_ = self.entity or self.origin
             if isinstance(type_, Type):
                 root = g.types[type_.root[0]] if type_.root else type_
                 getattr(self.form, str(root.id)).label.text = 'super'
@@ -265,25 +264,28 @@ class ActorBaseManager(BaseManager):
 class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
+    def get_sub_ids(self, entity: Entity, ids: list[int]) -> list[int]:
+        for sub in entity.get_linked_entities('P9', inverse=True):
+            ids.append(sub.id)
+            self.get_sub_ids(sub, ids)
+        return ids
+
     def additional_fields(self) -> dict[str, Any]:
-        fields = {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of'))}
+        filter_ids = []
         if self.entity:
-            setattr(self.form_class, 'validate_event', super_event)
+            filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
+        fields = {
+            'event': TableField(_('sub event of'), filter_ids=filter_ids)}
         if self.class_.name != 'event':
-            fields['event_preceding'] = TableField(_('preceding event'))
-            setattr(
-                self.form_class,
-                'validate_event_preceding',
-                preceding_event)
+            fields['event_preceding'] = TableField(
+                _('preceding event'),
+                filter_ids=filter_ids)
         if self.class_.name != 'move':
             fields['place'] = TableField(_('location'))
         return fields
 
     def populate_update(self) -> None:
         super().populate_update()
-        self.form.event_id.data = self.entity.id
         if super_ := self.entity.get_linked_entity('P9'):
             self.form.event.data = super_.id
         if preceding_ := self.entity.get_linked_entity('P134', True):

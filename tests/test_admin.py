@@ -1,6 +1,8 @@
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.database.entity import Entity as DbEntity
+from openatlas.database.link import Link as DbLink
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
@@ -22,6 +24,7 @@ class ContentTests(TestBaseCase):
                 Entity.insert('file', 'One forsaken file entity')
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
+
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 
@@ -29,13 +32,12 @@ class ContentTests(TestBaseCase):
         with app.app_context():
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
+
             rv = self.app.get(
                 url_for('admin_log_delete', follow_redirects=True))
             assert b'Login' not in rv.data
 
     def test_links(self) -> None:
-        from openatlas.database.entity import Entity as DbEntity
-        from openatlas.database.link import Link as DbLink
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -84,10 +86,12 @@ class ContentTests(TestBaseCase):
                 source.link('P2', g.types[source_type.subs[1]])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
+
             rv = self.app.get(
                 url_for('admin_check_link_duplicates', delete='delete'),
                 follow_redirects=True)
             assert b'Remove' in rv.data
+
             rv = self.app.get(
                 url_for(
                     'admin_delete_single_type_duplicate',
@@ -107,6 +111,7 @@ class ContentTests(TestBaseCase):
                 follow_redirects=True,
                 data={'classes': 'person', 'ratio': 100})
             assert b'I have the same name!' in rv.data
+
             rv = self.app.post(
                 url_for('admin_check_similar'),
                 follow_redirects=True,
@@ -118,9 +123,9 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
 
-            # Mail
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
+
             rv = self.app.post(
                 url_for('admin_settings', category='mail'),
                 follow_redirects=True,
@@ -137,21 +142,24 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data
 
-            # Content
             rv = self.app.post(
                 url_for('admin_content', item='citation_example'),
                 data={'en': 'citation as example', 'de': ''},
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
+
             rv = self.app.get(url_for('insert', class_='edition'))
             assert b'citation as example' in rv.data
+
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
+
             rv = self.app.post(
                 url_for('admin_content', item='legal_notice'),
                 data={'en': 'My legal notice', 'de': 'German notice'},
                 follow_redirects=True)
             assert b'My legal notice' in rv.data
+
             self.app.get('/index/setlocale/de')
             rv = self.app.get(url_for('index_content', item='legal_notice'))
             assert b'German notice' in rv.data

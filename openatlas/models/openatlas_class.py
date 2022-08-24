@@ -29,9 +29,9 @@ class OpenatlasClass:
     # Needed class label translations
     _('acquisition')
     _('actor actor relation')
-    _('actor appellation')
     _('actor function')
     _('appellation')
+    _('bibliography')
     _('external reference')
     _('source translation')
 
@@ -111,7 +111,7 @@ class OpenatlasClass:
             'source': ['name', 'type', 'description'],
             'subs': ['name', 'count', 'info'],
             'text': ['text', 'type', 'content'],
-            'type': ['name', 'description'],}
+            'type': ['name', 'description']}
         for view in ['actor', 'artifact', 'event', 'place']:
             for class_ in view_class_mapping[view]:
                 headers[class_] = headers[view]

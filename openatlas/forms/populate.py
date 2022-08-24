@@ -47,7 +47,7 @@ def populate_reference_systems(manager: Any) -> None:
 
 def populate_dates(manager: Any) -> None:
     form = manager.form
-    item = manager.link_ if manager.link_ else manager.entity
+    item = manager.link_ or manager.entity
     if item.begin_from:
         form.begin_year_from.data = format_date_part(item.begin_from, 'year')
         form.begin_month_from.data = format_date_part(item.begin_from, 'month')

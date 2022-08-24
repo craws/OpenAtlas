@@ -96,10 +96,10 @@
                             </p>
                           {% endif %}
                         {% elif type_.name not in config.PROPERTY_TYPES %}
-                          <p class="error">{{ _("This type has no classes and won't show in forms.")|uc_first }}</p>
+                          <p class="error">{{ _("this type has no classes and won't show in forms")|uc_first }}.</p>
                         {% endif %}
                         {% if not type_.subs %}
-                          <p class="error">{{ _("This type has no subs and won't show in forms.")|uc_first }}</p>
+                          <p class="error">{{ _("this type has no subs and won't show in forms")|uc_first }}.</p>
                         {% endif %}
                         {% if type_.description %}
                           <div class="description">

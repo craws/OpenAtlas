@@ -3,7 +3,7 @@ from pathlib import Path
 from flask import g
 from wand.image import Image
 
-from openatlas import app, logger
+from openatlas import app
 
 
 def resize_image(filename: str) -> None:
@@ -23,7 +23,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
             return image_resizing(name, file_format, size)
         return False  # pragma: no cover
     except OSError as e:
-        logger.log(
+        g.logger.log(
             'info',
             'image processing',
             'failed to save resized image',
@@ -53,7 +53,7 @@ def check_processed_image(filename: str) -> bool:
                 filename.rsplit('.', 1)[0].lower(),
                 file_format)
     except OSError as e:  # pragma: no cover
-        logger.log(
+        g.logger.log(
             'info',
             'image processing',
             'failed to validate file as image',
@@ -82,7 +82,7 @@ def create_folder(folder: Path) -> bool:
         folder.mkdir()
         return True
     except OSError as e:  # pragma: no cover
-        logger.log('info', 'image processing', 'failed to create a folder', e)
+        g.logger.log('info', 'image processing', 'failed to create folder', e)
         return False
 
 

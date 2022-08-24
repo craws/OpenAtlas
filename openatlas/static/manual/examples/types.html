@@ -2,42 +2,42 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Types &mdash; OpenAtlas 7.5.0 documentation</title>
+  <title>Types &mdash; OpenAtlas 7.6.0 documentation</title>
   
-
-  
-  
-  
-  
-
-  
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Archaeological data" href="archaeological_data.html" />
-    <link rel="prev" title="References Systems" href="reference_systems.html" /> 
+    <link rel="prev" title="Time Spans" href="time_spans.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.5.0
+                7.6.0
               </div>
             
           
@@ -81,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -108,6 +109,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -142,11 +144,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Examples</a> &raquo;</li>
         
@@ -155,7 +159,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -176,9 +180,9 @@ They are organized hierarchically into trees and specific for each project.
 There are different kind of types: A distinction is made between different
 groups of types:</p>
 <ul class="simple">
-<li>Standard types</li>
-<li>Custom types</li>
-<li>Value types</li>
+<li><p>Standard types</p></li>
+<li><p>Custom types</p></li>
+<li><p>Value types</p></li>
 </ul>
 <p>Different user groups have different permissions regarding the creation and
 modification of types. Further information can be found in the manual entry
@@ -192,13 +196,13 @@ item. Furthermore, new types can be created here if necessary.</p>
 <p>To create a new custom type or value type tree press the +Type button on the
 bottom of the page. Please fill out the form:</p>
 <ul class="simple">
-<li>Choose a descriptive <strong>name</strong> for the new type</li>
-<li>Decide if the type is single or <strong>multiple choice</strong> (only available for custom
-types)</li>
-<li>Choose to which classes the new type will be added to e.g.
-<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> or <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>.</li>
-<li>You can also enter text into the <strong>description</strong> field which will be displayed
-when you mouse-over the information button next to the type’s name in forms.</li>
+<li><p>Choose a descriptive <strong>name</strong> for the new type</p></li>
+<li><p>Decide if the type is single or <strong>multiple choice</strong> (only available for custom
+types)</p></li>
+<li><p>Choose to which classes the new type will be added to e.g.
+<a class="reference internal" href="../entity/artifact.html"><span class="doc">Artifact</span></a> or <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>.</p></li>
+<li><p>You can also enter text into the <strong>description</strong> field which will be displayed
+when you mouse-over the information button next to the type’s name in forms.</p></li>
 </ul>
 <p>By pressing insert you can create a new type tree.</p>
 <p>To edit an already existing type tree, go to the type you want to edit, click on
@@ -209,17 +213,20 @@ changing multiple to single choice is not possible.</p>
 </div>
 <div class="section" id="add-a-type-to-an-existing-type-tree">
 <h2>Add a type to an existing type tree<a class="headerlink" href="#add-a-type-to-an-existing-type-tree" title="Permalink to this headline">¶</a></h2>
-<p>To create a new type in an already existing standard, custom, or value type
-tree, find that type tree in the overview and click on it.</p>
+<p>Types can be added dynamically in forms (with at least editor permission) with
+basic information like name, description and super type.</p>
+<p>A more detailed way to create a new type in an already existing standard,
+custom, or value type tree, is to find that type tree in the overview and
+click on it.</p>
 <a class="reference internal image-reference" href="../_images/type_3.png"><img alt="../_images/type_3.png" src="../_images/type_3.png" style="width: 400px;" /></a>
 <p>You can then add the following information:</p>
 <ul class="simple">
-<li>Choose a descriptive name</li>
-<li>Choose a super if applicable, e.g. choose “Blue” as super when you are adding
-“Light blue” to the tree</li>
-<li>You can add external references and dates as well as a description; the
+<li><p>Choose a descriptive name</p></li>
+<li><p>Choose a super if applicable, e.g. choose “Blue” as super when you are adding
+“Light blue” to the tree</p></li>
+<li><p>You can add external references and dates as well as a description; the
 description will be displayed when you mouse-over the information button next
-to the type’s name in the data entry form</li>
+to the type’s name in the data entry form</p></li>
 </ul>
 <p>By pressing insert you can create a new type tree.</p>
 <p>To edit an already existing type, click on that type. Find the edit button in
@@ -232,16 +239,10 @@ the overview and change information after clicking that button.</p>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="archaeological_data.html" class="btn btn-neutral float-right" title="Archaeological data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="reference_systems.html" class="btn btn-neutral float-left" title="References Systems" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="archaeological_data.html" class="btn btn-neutral float-right" title="Archaeological data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="time_spans.html" class="btn btn-neutral float-left" title="Time Spans" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
@@ -250,7 +251,14 @@ the overview and change information after clicking that button.</p>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -261,7 +269,6 @@ the overview and change information after clicking that button.</p>
 
 
 </footer>
-
         </div>
       </div>
 
@@ -269,7 +276,6 @@ the overview and change information after clicking that button.</p>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

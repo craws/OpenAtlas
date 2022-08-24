@@ -168,4 +168,4 @@ def value_to_be_searched(entity: Entity, key: str) -> Any:
         value = check_if_date(str(entity.end_from))
     if key == "endTo":
         value = check_if_date(str(entity.end_to))
-    return value if value else []
+    return value or []

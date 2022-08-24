@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Optional, TYPE_CHECKING, Union
 
 import numpy
 from flask import g, url_for
@@ -12,12 +12,14 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.type import Type
 from openatlas.util.util import get_file_extension, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.link import Link
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -122,7 +124,7 @@ def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
         return False
-    logger.log('info', 'multi user', 'Multi user overwrite prevented.')
+    g.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True
 
 

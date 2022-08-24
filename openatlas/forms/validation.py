@@ -1,52 +1,13 @@
-import ast
-
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import MultipleFileField
 
-from openatlas.forms.field import TableField, TreeField
+from openatlas.forms.field import TreeField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.util import uc_first
-
-
-def super_event(form: FlaskForm, super_: TableField) -> None:
-    if not super_.data:
-        return
-    if str(super_.data) == str(form.event_id.data):
-        form.event.errors.append(_('self as super not allowed'))
-    if get_sub_events_recursive(
-            Entity.get_by_id(form.event_id.data),
-            Entity.get_by_id(super_.data)):  # pragma: no cover
-        form.event.errors.append(_('sub of self not allowed as super'))
-
-
-def get_sub_events_recursive(
-        entity: Entity,
-        target: Entity) -> bool:  # pragma: no cover
-    for sub in entity.get_linked_entities('P9', inverse=True):
-        if sub.id == target.id:
-            return True
-        get_sub_events_recursive(sub, target)
-    return False
-
-
-def preceding_event(form: FlaskForm, preceding: TableField) -> None:
-    if preceding.data and str(preceding.data) == str(form.event_id.data):
-        form.event_preceding.errors.append(_('self as preceding not allowed'))
-
-
-def membership(form: FlaskForm, member: TableField) -> None:
-    if form.member_origin_id.data in ast.literal_eval(member.data):
-        member.errors.append(_("Can't link to itself."))
-
-
-def actor_relation(form: FlaskForm, actor: TableField) -> None:
-    if getattr(form, 'relation_origin_id').data \
-            in ast.literal_eval(actor.data):
-        actor.errors.append(_("Can't link to itself."))
 
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
@@ -60,15 +21,6 @@ def file(_form: FlaskForm, field: MultipleFileField) -> None:
             field.errors.append(uc_first(_('file type not allowed')))
 
 
-def type_super(form: FlaskForm, field: TreeField) -> None:
-    type_ = g.types[int(form.entity_id.data)]
-    new_super = g.types[int(field.data)]
-    if new_super.id == type_.id:
-        field.errors.append(uc_first(_('error type self as super')))
-    if new_super.root and type_.id in new_super.root:
-        field.errors.append(uc_first(_('error type sub as super')))
-
-
 def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
     if not hasattr(form, 'entity_id') or \
             Entity.get_by_id(int(form.entity_id.data)).name != form.name.data:
@@ -77,8 +29,6 @@ def hierarchy_name_exists(form: FlaskForm, field: TreeField) -> None:
 
 
 def validate(form: FlaskForm) -> bool:
-    # Validation of dates and reference systems are handled here in general
-    # because of multiple fields, Flask doesn't validate empty input, ...
     valid = FlaskForm.validate(form)
     if hasattr(form, 'begin_year_from'):  # Dates
         if not validate_dates(form):
@@ -128,6 +78,7 @@ def validate_dates(form: FlaskForm) -> bool:
                     valid = False
                 else:
                     dates[prefix + postfix.replace('_', '')] = date
+
     # Check for valid date combination e.g. begin not after end
     if valid:
         for prefix in ['begin', 'end']:

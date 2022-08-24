@@ -40,11 +40,11 @@ class Tab:
         self.content = content
         self.title = uc_first(_(name.replace('_', ' ')))
         self.entity = entity
-        self.table = table if table else Table()
+        self.table = table or Table()
         self.set_table_headers(name, entity)
         self.buttons: list[str] = []
         self.form = form
-        if is_authorized('contributor'):
+        if is_authorized('contributor') or name == 'files':
             self.set_buttons(name, buttons, entity)
 
     def set_table_headers(
@@ -95,12 +95,10 @@ class Tab:
             name: str,
             buttons: Optional[list[str]],
             entity: Optional[Entity] = None) -> None:
-
         view = entity.class_.view if entity else None
         id_ = entity.id if entity else None
         class_ = entity.class_ if entity else None
-
-        self.buttons = buttons if buttons else []
+        self.buttons = buttons or []
         if name == 'actor':
             if view == 'file':
                 self.buttons.append(

@@ -79,7 +79,7 @@ def get_entity_formatted(
         entity: Entity,
         parser: dict[str, Any]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
-        return get_geojson([entity])
+        return get_geojson([entity], parser)
     return get_linked_places_entity(
         entity,
         get_all_links(entity.id),
@@ -161,7 +161,7 @@ def get_entities_formatted(
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     entities = entities_all[:int(parser['limit'])]
     if parser['format'] == 'geojson':
-        return [get_geojson(entities)]
+        return [get_geojson(entities, parser)]
     entities_dict: dict[str, Any] = {}
     for entity in entities:
         entities_dict[entity.id] = {

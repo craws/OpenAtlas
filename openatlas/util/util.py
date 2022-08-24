@@ -23,7 +23,7 @@ from markupsafe import Markup
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
@@ -346,16 +346,16 @@ def send_mail(
                 f'Mail from {from_} to {", ".join(recipients)} ' \
                 f'Subject: {subject}'
             log_text += f' Content: {text}' if log_body else ''
-            logger.log('info', 'mail', f'Mail send from {from_}', log_text)
+            g.logger.log('info', 'mail', f'Mail send from {from_}', log_text)
     except smtplib.SMTPAuthenticationError as e:
-        logger.log(
+        g.logger.log(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        logger.log(
+        g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
@@ -487,7 +487,7 @@ def get_system_data(entity: Entity) -> dict[str, Any]:
     if 'entity_show_class' in current_user.settings \
             and current_user.settings['entity_show_class']:
         data[_('class')] = link(entity.cidoc_class)
-    info = logger.get_log_info(entity.id)
+    info = g.logger.get_log_info(entity.id)
     if 'entity_show_dates' in current_user.settings \
             and current_user.settings['entity_show_dates']:
         data[_('created')] = \
@@ -528,7 +528,7 @@ def display_delete_link(entity: Union[Entity, Type]) -> str:
             url = url_for('type_delete_recursive', id_=entity.id)
     else:
         if current_user.group == 'contributor':  # pragma: no cover
-            info = logger.get_log_info(entity.id)
+            info = g.logger.get_log_info(entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
         url = url_for('index', view=entity.class_.view, delete_id=entity.id)

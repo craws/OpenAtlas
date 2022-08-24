@@ -1,6 +1,6 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -14,9 +14,11 @@ from openatlas.forms import base_manager, manager
 from openatlas.forms.field import TableField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 
 def get_manager(

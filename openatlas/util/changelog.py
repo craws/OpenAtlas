@@ -1,18 +1,31 @@
 versions = {
-    '7.5.0': ['TBA', {
+    '7.6.0': ['TBA',  {
+        'feature': {
+            '1788': 'Forms: filter invalid table options',
+            '1781': 'Import for bibliographies and editions',
+            '1699': 'Manual: time span examples'
+        }}],
+    '7.5.0': ['2022-08-18', {
         'feature': {
             '1637': 'Linking sub units like places, e.g. with events',
+            '1752': 'Add a place column for sub units to type view',
+            '1690': 'Forms: add types dynamically',
             '1761': "Forms: don't show empty type fields in forms",
             '1768': 'Forms: improved validations',
             '1734': 'Forms: refactor functions',
-            '1739': 'Different display of shape and area polygon',
+            '1739': 'Map: different display of shape and area polygon',
+            '1758': 'Switch between different network visualisations',
             '1737': 'Improved user statistics',
+            '1738': 'UI Translations',
             '1710': 'Manual: add CIDOC links for entity classes',
-            '1726': 'Manual: add FAQs'},
+            '1726': 'Manual: add FAQs',
+            '1782': 'API: Added show parameter to geojson format',
+            '1783': 'API: added description to show parameter'},
         'fix': {
-            '1759': 'Minor table layout issue'
-        }
-    }],
+            '1759': 'Minor table layout issue',
+            '1773': 'Error with type_ids with import',
+            '1767': 'API: Timespans return "None" instead of null',
+            '1779': 'View jumps to top if map search is used'}}],
     '7.4.0': ['2022-06-10', {
         'feature': {
             '1620': 'Natural events',

@@ -3,7 +3,7 @@ FAQ
 
 .. toctree::
 
-Here you can find answers to some frquently asked questions.
+Here you can find answers to some frequently asked questions.
 
 **Why is it not possible to add custom types with a free text entry field
 the same way it is possible with numbers for value types?**
@@ -25,7 +25,6 @@ are very case specific, but you could:
 We are more than happy to help you find a solution tailored to your
 project’s specific needs, so please don’t hesitate to reach out to us if you
 have any additional questions on this topic.
-
 
 **How can I enter professions into the OpenAtlas system?**
 

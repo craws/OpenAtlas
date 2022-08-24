@@ -330,8 +330,7 @@ class Entity:
             name: str,
             description: Optional[str] = None) -> Union[Entity, Type]:
         if not name:  # pragma: no cover
-            from openatlas import logger
-            logger.log('error', 'model', 'Insert entity without name')
+            g.logger.log('error', 'model', 'Insert entity without name')
             abort(422)
         id_ = Db.insert({
             'name': str(name).strip(),

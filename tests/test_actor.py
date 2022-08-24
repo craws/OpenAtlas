@@ -14,6 +14,7 @@ class ActorTests(TestBaseCase):
         with app.app_context():
             rv: Any = self.app.get(url_for('index', view='actor'))
             assert b'No entries' in rv.data
+
             rv = self.app.post(url_for('insert', class_='place'), data={
                 'name': 'Captain Miller',
                 self.precision_geonames: '',
@@ -27,9 +28,9 @@ class ActorTests(TestBaseCase):
                 event = Entity.insert('acquisition', 'Event Horizon')
                 source = Entity.insert('source', 'Necronomicon')
 
-            # Actor insert
             rv = self.app.get(url_for('insert', class_='person'))
             assert b'+ Person' in rv.data
+
             self.app.get(
                 url_for('insert', class_='person', origin_id=residence_id))
             data = {
@@ -69,12 +70,13 @@ class ActorTests(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            # Test actor types
             rv = self.app.get(url_for('view', id_=sex_type_sub_1.id))
             assert b'Susan' in rv.data
+
             rv = self.app.get(
                 url_for('type_move_entities', id_=sex_type_sub_1.id))
             assert b'Sigourney' in rv.data
+
             rv = self.app.post(
                 url_for('type_move_entities', id_=sex_type_sub_1.id),
                 follow_redirects=True,
@@ -83,6 +85,7 @@ class ActorTests(TestBaseCase):
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data
+
             rv = self.app.post(
                 url_for('type_move_entities', id_=sex_type_sub_2.id),
                 follow_redirects=True,
@@ -91,6 +94,7 @@ class ActorTests(TestBaseCase):
                     'selection': [actor_id],
                     'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data
+
             self.app.post(
                 url_for('insert', class_='person', origin_id=actor_id),
                 data=data)
@@ -109,18 +113,20 @@ class ActorTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
             data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='person'),
                 data=data,
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
+
             rv = self.app.get(url_for('index', view='actor'))
             assert b'Sigourney Weaver' in rv.data
 
-            # Add to actor
             rv = self.app.get(url_for('entity_add_source', id_=actor_id))
             assert b'Link source' in rv.data
+
             rv = self.app.post(
                 url_for('entity_add_source', id_=actor_id),
                 data={'checkbox_values': str([source.id])},
@@ -129,15 +135,16 @@ class ActorTests(TestBaseCase):
 
             rv = self.app.get(url_for('entity_add_reference', id_=actor_id))
             assert b'Link reference' in rv.data
+
             rv = self.app.post(
                 url_for('entity_add_reference', id_=actor_id),
                 data={'reference': reference_id, 'page': '777'},
                 follow_redirects=True)
             assert b'777' in rv.data
 
-            # Actor update
             rv = self.app.get(url_for('update', id_=actor_id))
             assert b'American actress' in rv.data
+
             data['name'] = 'Susan Alexandra Weaver'
             data['alias-1'] = 'Ripley1'
             data['end_year_from'] = ''
@@ -149,24 +156,27 @@ class ActorTests(TestBaseCase):
                 data=data,
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
+
             rv = self.app.post(
                 url_for('ajax_bookmark'),
                 data={'entity_id': actor_id},
                 follow_redirects=True)
             assert b'Remove bookmark' in rv.data
+
             rv = self.app.get('/')
             assert b'Weaver' in rv.data
+
             rv = self.app.post(
                 url_for('ajax_bookmark'),
                 data={'entity_id': actor_id},
                 follow_redirects=True)
             assert b'Bookmark' in rv.data
+
             rv = self.app.get(
                 url_for('link_delete', origin_id=actor_id, id_=666),
                 follow_redirects=True)
             assert b'removed' in rv.data
 
-            # Actor delete
             rv = self.app.get(
                 url_for('index', view='actor', delete_id=actor_id))
             assert b'The entry has been deleted.' in rv.data

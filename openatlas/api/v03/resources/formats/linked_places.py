@@ -34,7 +34,8 @@ def get_linked_places_entity(
             if 'when' in parser['show'] else None,
             'links': get_reference_systems(links_inverse)
             if 'links' in parser['show'] else None,
-            'descriptions': [{'value': entity.description}],
+            'descriptions': [{'value': entity.description}]
+            if 'description' in parser['show'] else None,
             'names': [{"alias": value} for value in entity.aliases.values()]
             if entity.aliases and 'names' in parser['show'] else None,
             'geometry': get_geometries(entity, links)
@@ -126,10 +127,10 @@ def get_lp_types(entity: Entity, links: list[Link]) -> list[dict[str, Any]]:
 def get_lp_time(entity: Union[Entity, Link]) -> Optional[dict[str, Any]]:
     return {
         'start': {
-            'earliest': str(entity.begin_from),
-            'latest': str(entity.begin_to),
-            'comment': entity.begin_comment},
+            'earliest': str(entity.begin_from) if entity.begin_from else None,
+            'latest': str(entity.begin_to) if entity.begin_to else None,
+            'comment': entity.begin_comment or None},
         'end': {
-            'earliest': str(entity.end_from),
-            'latest': str(entity.end_to),
-            'comment': entity.end_comment}}
+            'earliest': str(entity.end_from) if entity.end_from else None,
+            'latest': str(entity.end_to) if entity.end_to else None,
+            'comment': entity.end_comment or None}}

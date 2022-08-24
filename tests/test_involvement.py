@@ -29,7 +29,6 @@ class InvolvementTests(TestBaseCase):
                 actor = Entity.insert('person', 'Captain Miller')
                 involvement = Type.get_hierarchy('Involvement')
 
-            # Add involvement
             rv = self.app.get(
                 url_for(
                     'insert_relation',
@@ -37,6 +36,7 @@ class InvolvementTests(TestBaseCase):
                     origin_id=actor.id))
 
             assert b'Involvement' in rv.data
+
             rv = self.app.post(
                 url_for(
                     'insert_relation',
@@ -50,6 +50,7 @@ class InvolvementTests(TestBaseCase):
                     involvement.id: involvement.id},
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
+
             rv = self.app.post(
                 url_for(
                     'insert_relation',
@@ -61,18 +62,20 @@ class InvolvementTests(TestBaseCase):
                     'activity': 'P22'},
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
+
             rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
+
             rv = self.app.get(url_for('view', id_=actor.id))
             assert b'Appears first' in rv.data
 
-            # Update involvement
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = Link.get_links(event_id, 'P22')[0].id
             rv = self.app.get(
                 url_for('link_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
+
             rv = self.app.post(
                 url_for('link_update', id_=link_id, origin_id=actor.id),
                 data={
@@ -80,7 +83,9 @@ class InvolvementTests(TestBaseCase):
                     'activity': 'P23'},
                 follow_redirects=True)
             assert b'Infinite Space - Infinite Terror' in rv.data
+
             rv = self.app.get(url_for('view', id_=actor.id))
             assert b'Appears first' in rv.data
+
             rv = self.app.get(url_for('view', id_=event_id))
             assert b'Infinite Space - Infinite Terror' in rv.data

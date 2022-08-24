@@ -1,4 +1,6 @@
-from typing import Any, Optional
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -8,8 +10,10 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.forms.field import ValueFloatField
-from openatlas.models.type import Type
 from openatlas.util.util import manual, tooltip, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover
+    from openatlas.models.type import Type
 
 
 def html_form(
@@ -31,7 +35,7 @@ def html_form(
             continue
 
         if field.type in ['TreeField', 'TreeMultiField']:
-            type_ = g.types[int(field.id)]
+            type_ = g.types[int(field.type_id)]
             if not type_.subs:
                 continue  # pragma: no cover
             label = type_.name
@@ -132,7 +136,7 @@ def add_value_type(
         root: Optional[Type] = None,
         level: int = 0) -> str:
     html = ''
-    root = root if root else type_
+    root = root or type_
     for sub_id in type_.subs:
         sub = g.types[sub_id]
         field = getattr(form, str(sub_id))
@@ -150,9 +154,7 @@ def add_value_type(
                 </div>
                 {field(class_='value-type')}
               </div>
-              <span class="ms-1">
-                {sub.description if sub.description else ''}
-              </span>
+              <span class="ms-1">{sub.description or ''}</span>
             </div>
             {add_value_type(form, sub, root, level + 1)}
           </div>

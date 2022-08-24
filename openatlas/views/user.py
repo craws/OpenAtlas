@@ -183,7 +183,7 @@ def user_entities(id_: int) -> str:
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user,
-            _('entered entities')])
+            _('created entities')])
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])

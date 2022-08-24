@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
@@ -70,7 +70,7 @@ def update(id_: int) -> Union[str, Response]:
                 'entity/update.html',
                 form=manager.form,
                 entity=entity,
-                modifier=link(logger.get_log_info(entity.id)['modifier']))
+                modifier=link(g.logger.get_log_info(entity.id)['modifier']))
         return redirect(save(manager))
     if not manager.form.errors:
         manager.populate_update()
@@ -198,7 +198,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
                     f'{entity_name}_{str(count + 1).zfill(2)}'
             manager.process_form()
             manager.update_entity()
-            logger.log_user(manager.entity.id, 'insert')
+            g.logger.log_user(manager.entity.id, 'insert')
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(_('entity created'), 'info')
@@ -206,7 +206,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
         Transaction.rollback()
         for filename in filenames:
             (app.config['UPLOAD_DIR'] / filename).unlink()
-        logger.log('error', 'database', 'transaction failed', e)
+        g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('index', view=g.classes['file'].view)
     return url
@@ -219,7 +219,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         manager.insert_entity()
         manager.process_form()
         manager.update_entity(new=(action == 'insert'))
-        logger.log_user(manager.entity.id, action)
+        g.logger.log_user(manager.entity.id, action)
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(
@@ -227,7 +227,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
             'info')
     except InvalidGeomException as e:  # pragma: no cover
         Transaction.rollback()
-        logger.log('error', 'database', 'invalid geom', e)
+        g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
         url = url_for('index', view=g.classes[manager.class_.name].view)
         if action == 'update' and manager.entity:
@@ -237,7 +237,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
                 origin_id=manager.origin.id if manager.origin else None)
     except Exception as e:  # pragma: no cover
         Transaction.rollback()
-        logger.log('error', 'database', 'transaction failed', e)
+        g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         if action == 'update' and manager.entity:
             url = url_for(

@@ -17,11 +17,11 @@ class Table:
             order: Optional[list[list[Union[int, str]]]] = None,
             defs: Optional[list[dict[str, Any]]] = None,
             paging: bool = True) -> None:
-        self.header = header if header else []
-        self.rows = rows if rows else []
+        self.header = header or []
+        self.rows = rows or []
         self.paging = paging
-        self.order = order if order else ''
-        self.defs = defs if defs else []
+        self.order = order or ''
+        self.defs = defs or []
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
