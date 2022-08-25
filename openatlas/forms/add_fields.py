@@ -249,7 +249,8 @@ def add_types(manager: Any) -> None:
                 'description-dynamic',
                 TextAreaField(_('description')))
             form = AddDynamicType() if is_authorized('editor') else None
-            getattr(form, f'{type_.id}-dynamic').label.text = 'super'
+            if form:
+                getattr(form, f'{type_.id}-dynamic').label.text = 'super'
             if type_.multiple:
                 setattr(
                     manager.form_class,
