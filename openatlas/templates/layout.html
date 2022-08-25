@@ -186,9 +186,6 @@
   <div id="content">
     <div style="float:left" class="container-fluid">
       {{ ''|system_warnings }}
-      <noscript>
-        <p class="error">{{ _('warning no js') }}</p>
-      </noscript>
       {% block content %}{% endblock %}
     </div>
   </div>
