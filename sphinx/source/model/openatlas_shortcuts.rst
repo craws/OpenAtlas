@@ -1,11 +1,11 @@
-OpenAtlas classes
-=================
+OpenAtlas shortcuts
+===================
 
 .. toctree::
 
 OpenAtlas uses several shortcuts in order to simplify connections between
 entities that are always used the same way. All shortcuts can be resolved
-according to :doc:`CIDOC CRM</cidoc_crm>` specifications and are valid
+according to :doc:`CIDOC CRM<cidoc_crm>` specifications and are valid
 links. These shortcuts are indicated by a preceding OA in combination with a
 number. Currently OpenAtlas uses 3 shortcuts:
 

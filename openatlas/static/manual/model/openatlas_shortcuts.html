@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Model &mdash; OpenAtlas 7.6.0 documentation</title>
+  <title>OpenAtlas shortcuts &mdash; OpenAtlas 7.7.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API" href="api.html" />
-    <link rel="prev" title="Network visualization" href="network.html" /> 
+    <link rel="next" title="Link checker" href="link_checker.html" />
+    <link rel="prev" title="CIDOC CRM" href="cidoc_crm.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.6.0
+                7.7.0
               </div>
             
           
@@ -93,19 +93,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notes.html">Notes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
-<li class="toctree-l2"><a class="reference internal" href="anthropological_analyses.html">Anthropological Analyses</a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Model</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="data_model.html">Data model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cidoc_crm.html">CIDOC CRM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">OpenAtlas shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="link_checker.html">Link checker</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
@@ -157,9 +154,9 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-          <li><a href="index.html">Tools</a> &raquo;</li>
+          <li><a href="index.html">Model</a> &raquo;</li>
         
-      <li>Model</li>
+      <li>OpenAtlas shortcuts</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -176,50 +173,60 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="model">
-<h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="openatlas-shortcuts">
+<h1>OpenAtlas shortcuts<a class="headerlink" href="#openatlas-shortcuts" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The software automatically maps information to the international standard of the
-<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a>. The CIDOC CRM was imported to the
-system, can be browsed and is used to verify link conformity between entities.</p>
-<p>Although it was paid much attention to design a web interface where users don’t
-have to be aware of the underlying data model, interested user can get insights
-how their data is mapped.</p>
-<p>After login there is a <strong>Model</strong> button on the start page which leads to a
-graphical presentation of the model (see below), a link checker and links to
-browse the classes and properties.</p>
-<img alt="../_images/openatlas_schema.png" src="../_images/openatlas_schema.png" />
-<img alt="../_images/openatlas_schema2.png" src="../_images/openatlas_schema2.png" />
-<p>You can also active the <strong>advanced Layout</strong> in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> which
-displays the CIDOC class of an entity at the detail view.</p>
-<div class="section" id="cidoc-classes">
-<h2>CIDOC Classes<a class="headerlink" href="#cidoc-classes" title="Permalink to this headline">¶</a></h2>
-<p>All entities belong to a CIDOC class. E.g. a person has the class
-<strong>Person (E21)</strong>. In the overview table you can browse the classes and see how
-often they were used. A click on the class name will get you to a detail view
-with more information, e.g. a description and their super and sub classes.</p>
+<p>OpenAtlas uses several shortcuts in order to simplify connections between
+entities that are always used the same way. All shortcuts can be resolved
+according to <a class="reference internal" href="cidoc_crm.html"><span class="doc">CIDOC CRM</span></a> specifications and are valid
+links. These shortcuts are indicated by a preceding OA in combination with a
+number. Currently OpenAtlas uses 3 shortcuts:</p>
+<div class="section" id="oa7-has-relationship-to">
+<h2>OA7 - has relationship to<a class="headerlink" href="#oa7-has-relationship-to" title="Permalink to this headline">¶</a></h2>
+<p>OA7 is used to link two instances of “E39 Actor” via a certain relationship; in
+that way an actor can be linked with an actor.
+E39 Actor linked with E39 Actor</p>
+<ul class="simple">
+<li><p>Domain: E39 - Actor</p></li>
+<li><p>Range: E39 - Actor</p></li>
+</ul>
+<img alt="../_images/oa7.png" src="../_images/oa7.png" />
+<p>Example:
+[Stefan (E21)] participated in [Relationship from Stefan to Joachim (E5)] had
+participant [Joachim (E21)]</p>
+<p>The connecting event is defined by an entity of class E55 (Type):
+[Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]</p>
 </div>
-<div class="section" id="cidoc-properties">
-<h2>CIDOC Properties<a class="headerlink" href="#cidoc-properties" title="Permalink to this headline">¶</a></h2>
-<p>Entities are linked with a CIDOC property. E.g. if you select a location
-for an activity, the <strong>Activity (E7)</strong> will be linked with the property
-<strong>took place at (P7)</strong> to a <strong>Place (E53)</strong>.</p>
+<div class="section" id="oa8-appears-for-the-first-time-in">
+<h2>OA8 - appears for the first time in<a class="headerlink" href="#oa8-appears-for-the-first-time-in" title="Permalink to this headline">¶</a></h2>
+<p>OA8 is used to link the beginning of a persistent item’s (E77) life span
+(or time of usage) with a certain place. E.g to document the birthplace of a
+person.
+E77 Persistent Item linked with a E53 Place.</p>
+<ul class="simple">
+<li><p>Domain: E77 - Persistent item</p></li>
+<li><p>Range: E53 - Place</p></li>
+</ul>
+<img alt="../_images/oa8.png" src="../_images/oa8.png" />
+<p>Example:
+[Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein
+(E12)] took place at [Ulm (E53)]</p>
 </div>
-<div class="section" id="openatlas-classes">
-<h2>OpenAtlas Classes<a class="headerlink" href="#openatlas-classes" title="Permalink to this headline">¶</a></h2>
-<p>OpenAtlas uses the CIDOC in the application but because of contextual
-differences we needed a more fine grained model for the user interface.
-E.g. E33 Linguistic Object can be a source or a source translation which have
-different forms in different context.</p>
-<p>Following the <strong>OpenAtlas Classes</strong> link you will see an overview of classes
-used in OpenAtlas with details such as corresponding CIDOC class, used
-standard type, user access and more.</p>
-</div>
-<div class="section" id="link-checker">
-<h2>Link Checker<a class="headerlink" href="#link-checker" title="Permalink to this headline">¶</a></h2>
-<p>With the link checker you can test if certain class and property connections
-are CIDOC CRM conform.</p>
+<div class="section" id="oa9-appears-for-the-last-time-in">
+<h2>OA9 - appears for the last time in<a class="headerlink" href="#oa9-appears-for-the-last-time-in" title="Permalink to this headline">¶</a></h2>
+<p>OA9 is used to link the end of a persistent item’s (E77) life span
+(or time of usage) with a certain place. E.g to document a person’s place of
+death.
+E77 Persistent Item linked with a E53 Place.</p>
+<ul class="simple">
+<li><p>Domain: E77 - Persistent item</p></li>
+<li><p>Range: E53 - Place</p></li>
+</ul>
+<img alt="../_images/oa9.png" src="../_images/oa9.png" />
+<p>Example:
+[Albert Einstein (E21)] was taken out of existence by [Death of Albert Einstein
+(E12)] took place at [Princeton (E53)]</p>
 </div>
 </div>
 
@@ -229,8 +236,8 @@ are CIDOC CRM conform.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="network.html" class="btn btn-neutral float-left" title="Network visualization" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="link_checker.html" class="btn btn-neutral float-right" title="Link checker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cidoc_crm.html" class="btn btn-neutral float-left" title="CIDOC CRM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>

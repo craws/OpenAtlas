@@ -6,5 +6,5 @@ Model
 
    data_model
    cidoc_crm
-   openatlas_classes
+   openatlas_shortcuts
    link_checker

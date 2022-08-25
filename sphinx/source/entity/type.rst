@@ -7,8 +7,7 @@ CIDOC documentation: :cidoc_entity:`E55 Type<e55-type>`
 
 Types are used to add information or group entities. They are hierarchical and
 can be accessed and edited via the **Types** :doc:`/ui/menu` item. With this
-feature the :doc:`model</model>` and user interface can be adapted for specific
-research interests.
+feature the user interface can be adapted for specific research interests.
 
 * Types can be added dynamically in forms (with at least editor permission)
   with basic information like name, description and super type
