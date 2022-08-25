@@ -22,7 +22,7 @@ Where to find the input fields
 It is not provided for the input of:
 
 * :doc:`Sources</entity/source>`
-* References
+* :doc:`References</entity/reference>`
 
 The **Date** field itself can be found at the bottom of the form, its input
 field is initially hidden. It can be used by clicking the **Show** button.
@@ -89,15 +89,15 @@ and to for end:
 * The first line represents the **beginning of the begin**
 * The second line represents the **end of the begin**
 * The third line represents the **beginning of the end**
-* The fourth line represents the  **ending of the end**
+* The fourth line represents the **ending of the end**
 
-In the case of unknown start and end dates, the time span must be selected so
-large that the actual time frame lies within the specified span with a 100 %
-certainty.
+In the case of unknown start and end dates, the time span must be selected
+large enough so that the actual time frame lies within the specified span with
+a 100 % certainty.
 
 Example: The exact date of death of King Stephen I of Hungary is known - 15
-August 1038 AD - but for the date of birth only a time span from 01.01.975 AD to
-31.12.975 AD can be given. As first input field corresponds to the earliest
+August 1038 AD - but for the date of birth only a time span from 01.01.975 AD
+to 31.12.975 AD can be given. As first input field corresponds to the earliest
 possible start of the time span, 975 - 01 - 01 should be entered. The second
 line corresponds to the latest possible end of the time span, in this case 975
 - 12 - 31.
@@ -117,4 +117,3 @@ Those additional input fields can be activated in your
 the form.
 
 .. image:: date_hours.png
-

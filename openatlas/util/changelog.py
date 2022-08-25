@@ -1,7 +1,9 @@
 versions = {
     '7.6.0': ['TBA',  {
         'feature': {
-            '1788': 'Forms: filter invalid table options'
+            '1788': 'Forms: filter invalid table options',
+            '1781': 'Import for bibliographies and editions',
+            '1699': 'Manual: time span examples'
         }}],
     '7.5.0': ['2022-08-18', {
         'feature': {

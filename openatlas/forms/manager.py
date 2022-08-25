@@ -11,7 +11,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
-from openatlas.forms.validation import file, type_super
+from openatlas.forms.validation import file
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -430,11 +430,12 @@ class TypeManager(BaseManager):
         root = self.get_root_type()
         fields = {
             'is_type_form': HiddenField(),
-            str(root.id): TreeField(str(root.id)) if root else None}
+            str(root.id): TreeField(
+                str(root.id),
+                filter_ids=[self.entity.id] if self.entity else []
+            ) if root else None}
         if root.directional:
             fields['name_inverse'] = StringField(_('inverse'))
-        if self.entity:
-            setattr(self.form_class, f'validate_{root.id}', type_super)
         return fields
 
     def populate_update(self) -> None:

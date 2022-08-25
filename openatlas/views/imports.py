@@ -182,12 +182,14 @@ def import_data(project_id: int, class_: str) -> str:
         file_ = request.files['file']
         file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)
         columns: dict[str, list[str]] = {
-            'allowed': [
-                'name', 'id', 'description', 'begin_from', 'begin_to',
-                'begin_comment', 'end_from', 'end_to', 'end_comment',
-                'type_ids'],
+            'allowed': ['name', 'id', 'description'],
             'valid': [],
             'invalid': []}
+        if class_ not in g.view_class_mapping['reference']:
+            columns['allowed'].extend([
+                'begin_from', 'begin_to', 'begin_comment',
+                'end_from', 'end_to', 'end_comment'])
+        columns['allowed'].append('type_ids')
         if class_ == 'place':
             columns['allowed'] += ['easting', 'northing']
         try:
