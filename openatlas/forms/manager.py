@@ -116,7 +116,7 @@ class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
-        return {'actor': TableField(_('owned by'))}
+        return {'actor': TableField(_('owned by'),add_dynamical=['person','group'])}
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -186,9 +186,9 @@ class GroupManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence')),
-            'begins_in': TableField(_('begins in')),
-            'ends_in': TableField(_('ends in'))}
+            'residence': TableField(_('residence'),add_dynamical=['place']),
+            'begins_in': TableField(_('begins in'),add_dynamical=['place']),
+            'ends_in': TableField(_('ends in'),add_dynamical=['place'])}
 
 
 class HumanRemainsManager(BaseManager):
@@ -300,9 +300,9 @@ class PersonManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence')),
-            'begins_in': TableField(_('born in')),
-            'ends_in': TableField(_('died in'))}
+            'residence': TableField(_('residence'),add_dynamical=['place']),
+            'begins_in': TableField(_('born in'),add_dynamical=['place']),
+            'ends_in': TableField(_('died in'),add_dynamical=['place'])}
 
 
 class PlaceManager(BaseManager):
