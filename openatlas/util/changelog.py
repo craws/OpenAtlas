@@ -1,10 +1,13 @@
 versions = {
-    '7.6.0': ['TBA',  {
+    '7.7.0': ['TBA', {}],
+    '7.6.0': ['2022-08-25',  {
         'feature': {
             '1788': 'Forms: filter invalid table options',
             '1781': 'Import for bibliographies and editions',
-            '1699': 'Manual: time span examples'
-        }}],
+            '1699': 'Manual: time span examples',
+            '1792': 'Refactoring and improvements'},
+        'fix': {
+            '1793': 'Cannot create or edit entities as contributor'}}],
     '7.5.0': ['2022-08-18', {
         'feature': {
             '1637': 'Linking sub units like places, e.g. with events',
