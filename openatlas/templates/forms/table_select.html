@@ -38,7 +38,7 @@
                 {% for add_dynamical in field.add_dynamical %}
                     <button type="button"
                             id="add-{{ add_dynamical }}-{{ field.id }}"
-                            class="btn-outline-primary btn btn-sm float-end ms-2"
+                            class="btn-outline-primary btn btn-sm float-end ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
                         + {{ add_dynamical }}
@@ -74,7 +74,7 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    {{ field.form|display_form() }}
+                    {{ field.forms[add_dynamical]|display_form() }}
                 </div>
                 <div class="modal-footer">
                     <button type="button"
@@ -103,14 +103,15 @@
             const name = $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").val();
             const description = $("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
             const entityName = '{{ add_dynamical }}';
+            const standardType =  $("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic").val();
             const data = {
-                name, description, entityName
+                name, description, entityName,standardType
             };
-            console.log(data, 'was')
             e.preventDefault();
+            console.log('data','hioer',data,$("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic"),"#{{field.id}}-{{class_name}}-standard-type-dynamic")
 
             const entityId = await ajaxAddEntity(data);
-            const tableContent = await getTable('{{ field.id }}');
+            const tableContent = await getTable('{{ field.id }}',{{ field.filter_ids }});
             $('.modal').modal('hide');
             //$('#{{ field.id }}-modal').modal('show');
             $("#{{ field.id }}-modal .modal-body-table").empty();

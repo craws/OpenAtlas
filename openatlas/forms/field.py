@@ -89,11 +89,26 @@ class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
 
-        class SimpleEntityForm(FlaskForm):
-            name_dynamic = StringField(_('name'))
-            description_dynamic = TextAreaField(_('description'))
+        def get_form(class_name:str):
+            class SimpleEntityForm(FlaskForm):
+                name_dynamic = StringField(_('name'))
 
-        field.form = SimpleEntityForm()
+            if class_name in g.classes \
+              and g.classes[class_name].hierarchies and g.classes[class_name].standard_type_id:
+                standard_type_id = g.classes[class_name].standard_type_id
+                setattr(
+                    SimpleEntityForm,
+                    f'{field.id}-{class_name}-standard-type-dynamic',
+                    TreeField(str(standard_type_id), type_id=str(standard_type_id)))
+
+            setattr(SimpleEntityForm, "description_dynamic", TextAreaField(_('description')))
+
+            return SimpleEntityForm()
+
+        field.forms = {}
+        for class_name in field.add_dynamical:
+            field.forms[class_name] = get_form(class_name)
+
         table, selection = get_table_content(field.id,field.data,field.filter_ids)
         return super().__call__(field, **kwargs) + render_template(
             'forms/table_select.html',

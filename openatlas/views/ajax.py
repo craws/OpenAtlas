@@ -55,6 +55,9 @@ def ajax_create_entity() -> str:
             entity.link(
                 'P53',
                 Entity.insert('object_location', f'Location of {request.form["name"]}'))
+        if 'standardType' in request.form and request.form['standardType']:
+            entity.link('P2',
+                        g.types[int(request.form['standardType'])])
     except Exception as _e:
         g.logger.log('error', 'ajax',  _e)
         abort(400)
