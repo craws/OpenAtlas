@@ -281,7 +281,7 @@ class EventBaseManager(BaseManager):
                 _('preceding event'),
                 filter_ids=filter_ids)
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'))
+            fields['place'] = TableField(_('location'),add_dynamical=['place'])
         return fields
 
     def populate_update(self) -> None:

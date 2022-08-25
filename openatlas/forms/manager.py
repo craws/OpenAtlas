@@ -254,8 +254,8 @@ class MoveManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return dict(super().additional_fields(), **{
-            'place_from': TableField(_('from')),
-            'place_to': TableField(_('to')),
+            'place_from': TableField(_('from'),add_dynamical=['place']),
+            'place_to': TableField(_('to'),add_dynamical=['place']),
             'artifact': TableMultiField(),
             'person': TableMultiField()})
 
