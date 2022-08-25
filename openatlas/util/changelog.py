@@ -1,4 +1,5 @@
 versions = {
+    '7.7.0': ['TBA', {}],
     '7.6.0': ['2022-08-25',  {
         'feature': {
             '1788': 'Forms: filter invalid table options',
