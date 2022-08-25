@@ -3,7 +3,8 @@ versions = {
         'feature': {
             '1788': 'Forms: filter invalid table options',
             '1781': 'Import for bibliographies and editions',
-            '1699': 'Manual: time span examples'},
+            '1699': 'Manual: time span examples',
+            '1792': 'Refactoring and improvements'},
         'fix': {
             '1793': 'Cannot create or edit entities as contributor'}}],
     '7.5.0': ['2022-08-18', {
