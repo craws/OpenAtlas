@@ -46,6 +46,7 @@ def get_buttons(view: str) -> list[str]:
     for name in [view] if view in ['artifact', 'place'] \
             else g.view_class_mapping[view]:
         if is_authorized(g.classes[name].write_access):
+            print(g.classes[name].label)
             buttons.append(
                 button(g.classes[name].label, url_for('insert', class_=name)))
     return buttons
