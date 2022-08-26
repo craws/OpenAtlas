@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Data model &mdash; OpenAtlas 7.7.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="CIDOC CRM" href="cidoc_crm.html" />
     <link rel="prev" title="Model" href="index.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,7 +110,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -146,13 +144,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Model</a> &raquo;</li>
         
@@ -161,7 +157,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -203,6 +199,16 @@ interface. This will displays the CIDOC class of an entity in the detail view
 of a data base entry.
 To do so click the gear symbol and choose <a class="reference internal" href="../tools/profile.html"><span class="doc">profile</span></a>. Go
 to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <strong>Show CIDOC classes</strong>.</p>
+<p>While we try to only use CIDOC CRM classes and properties where possible
+(instead of introducing own classes or using extensions), some shortcuts are
+used to increase performance and to keep the code base maintainable.
+For more information, see <a class="reference internal" href="openatlas_shortcuts.html"><span class="doc">OpenAtlas shortcuts</span></a>.</p>
+<p>While OpenAtlas uses the CIDOC CRM within the application, a finer grained
+model is needed to deal with any contextual differences needed for the user
+interface. Therefore, e.g. <strong>E33 Linguistic Object</strong> can be a source or a
+source translation with different forms in different context.
+An overview of internal mapping and CIDOC CRM classes can be found here
+<a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a></p>
 </div>
 
 
@@ -210,10 +216,16 @@ to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="cidoc_crm.html" class="btn btn-neutral float-right" title="CIDOC CRM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="index.html" class="btn btn-neutral float-left" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="cidoc_crm.html" class="btn btn-neutral float-right" title="CIDOC CRM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -222,14 +234,7 @@ to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -240,6 +245,7 @@ to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <
 
 
 </footer>
+
         </div>
       </div>
 
@@ -247,6 +253,7 @@ to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

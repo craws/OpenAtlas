@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>OpenAtlas shortcuts &mdash; OpenAtlas 7.7.0 documentation</title>
   
 
   
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
+  
   
   
 
   
-  
-
-  
-
-  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Link checker" href="link_checker.html" />
     <link rel="prev" title="CIDOC CRM" href="cidoc_crm.html" /> 
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -111,7 +110,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -146,13 +144,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Model</a> &raquo;</li>
         
@@ -161,7 +157,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -188,45 +184,133 @@ number. Currently OpenAtlas uses 3 shortcuts:</p>
 that way an actor can be linked with an actor.
 E39 Actor linked with E39 Actor</p>
 <ul class="simple">
-<li><p>Domain: E39 - Actor</p></li>
-<li><p>Range: E39 - Actor</p></li>
+<li>Domain: <strong>E39 - Actor</strong></li>
+<li>Range: <strong>E39 - Actor</strong></li>
 </ul>
 <img alt="../_images/oa7.png" src="../_images/oa7.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E39</span> <span class="pre">(Actor)</span> <span class="pre">-</span> <span class="pre">P11i</span> <span class="pre">(participated</span> <span class="pre">in)</span> <span class="pre">-</span> <span class="pre">E5</span> <span class="pre">(Event)</span> <span class="pre">-</span> <span class="pre">P11</span> <span class="pre">(had</span> <span class="pre">participant)</span> <span class="pre">-</span></code>
+<code class="docutils literal notranslate"><span class="pre">E39</span> <span class="pre">(Actor)</span></code></p>
 <p>Example:
 [Stefan (E21)] participated in [Relationship from Stefan to Joachim (E5)] had
 participant [Joachim (E21)]</p>
-<p>The connecting event is defined by an entity of class E55 (Type):
+<p>The connecting event is defined by an entity of class E55 - Type:
 [Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]</p>
 </div>
 <div class="section" id="oa8-appears-for-the-first-time-in">
 <h2>OA8 - appears for the first time in<a class="headerlink" href="#oa8-appears-for-the-first-time-in" title="Permalink to this headline">¶</a></h2>
-<p>OA8 is used to link the beginning of a persistent item’s (E77) life span
+<p>OA8 is used to link the beginning of a Persistent Item’s (E77) life span
 (or time of usage) with a certain place. E.g to document the birthplace of a
-person.
-E77 Persistent Item linked with a E53 Place.</p>
+person.</p>
+<p>E77 Persistent Item linked with a E53 Place.</p>
 <ul class="simple">
-<li><p>Domain: E77 - Persistent item</p></li>
-<li><p>Range: E53 - Place</p></li>
+<li>Domain: <strong>E77 - Persistent Item</strong></li>
+<li>Range: <strong>E53 - Place</strong></li>
 </ul>
 <img alt="../_images/oa8.png" src="../_images/oa8.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E77</span> <span class="pre">(Persistent</span> <span class="pre">Item)</span> <span class="pre">-</span> <span class="pre">P92i</span> <span class="pre">(was</span> <span class="pre">brought</span> <span class="pre">into</span> <span class="pre">existence</span> <span class="pre">by)</span> <span class="pre">-</span> <span class="pre">E63</span> <span class="pre">(Beginning</span></code>
+<code class="docutils literal notranslate"><span class="pre">of</span> <span class="pre">Existence)</span> <span class="pre">-</span> <span class="pre">P7</span> <span class="pre">(took</span> <span class="pre">place</span> <span class="pre">at)</span> <span class="pre">-</span> <span class="pre">E53</span> <span class="pre">(Place)</span></code></p>
 <p>Example:
 [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein
 (E12)] took place at [Ulm (E53)]</p>
 </div>
 <div class="section" id="oa9-appears-for-the-last-time-in">
 <h2>OA9 - appears for the last time in<a class="headerlink" href="#oa9-appears-for-the-last-time-in" title="Permalink to this headline">¶</a></h2>
-<p>OA9 is used to link the end of a persistent item’s (E77) life span
-(or time of usage) with a certain place. E.g to document a person’s place of
+<p>OA9 is used to link the end of a Persistent Item’s (E77) life span
+(or time of usage) with a certain place (E53). E.g to document a person’s place of
 death.
 E77 Persistent Item linked with a E53 Place.</p>
 <ul class="simple">
-<li><p>Domain: E77 - Persistent item</p></li>
-<li><p>Range: E53 - Place</p></li>
+<li>Domain: <strong>E77 - Persistent Item</strong></li>
+<li>Range: <strong>E53 - Place</strong></li>
 </ul>
 <img alt="../_images/oa9.png" src="../_images/oa9.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E77</span> <span class="pre">(Persistent</span> <span class="pre">Item)</span> <span class="pre">-</span> <span class="pre">P93i</span> <span class="pre">(was</span> <span class="pre">taken</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">existence</span> <span class="pre">by)</span> <span class="pre">-</span> <span class="pre">E64</span> <span class="pre">(End</span> <span class="pre">of</span></code>
+<code class="docutils literal notranslate"><span class="pre">Existence)</span> <span class="pre">-</span> <span class="pre">P7</span> <span class="pre">(took</span> <span class="pre">place</span> <span class="pre">at)</span> <span class="pre">-</span> <span class="pre">E53</span> <span class="pre">(Place)</span></code></p>
 <p>Example:
 [Albert Einstein (E21)] was taken out of existence by [Death of Albert Einstein
 (E12)] took place at [Princeton (E53)]</p>
+</div>
+<div class="section" id="dates">
+<h2>Dates<a class="headerlink" href="#dates" title="Permalink to this headline">¶</a></h2>
+<p>For dates, data is stored in the table model.entity respectively model.link in
+the fields begin_from, begin_to, begin_comment, end_from, end_to, end_comment
+as timestamps.
+Depending on class of the entity respectively the domain and range classes of
+the link, these dates can be mapped as CIDOC CRM <strong>E61 - Time Primitive</strong>
+entities.</p>
+<div class="section" id="e77-persistent-item">
+<h3>E77 - Persistent Item<a class="headerlink" href="#e77-persistent-item" title="Permalink to this headline">¶</a></h3>
+<p>E77 Persistent Item <strong>begin</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E77 - Persistent Item</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e77_begin.png" src="../_images/e77_begin.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E77</span> <span class="pre">(Persistent</span> <span class="pre">Item)</span> <span class="pre">-</span> <span class="pre">P92i</span> <span class="pre">(was</span> <span class="pre">brought</span> <span class="pre">into</span> <span class="pre">existence</span> <span class="pre">by)</span> <span class="pre">-</span> <span class="pre">E63</span></code>
+<code class="docutils literal notranslate"><span class="pre">(Beginning</span> <span class="pre">of</span> <span class="pre">Existence)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span> <span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span></code>
+<code class="docutils literal notranslate"><span class="pre">(ongoing</span> <span class="pre">throughout)</span> <span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [Holy Lance (E22)] was brought into existence by [forging of Holy
+Lance (E12)] has time span [Moment/Duration of Forging of Holy Lance (E52)]
+ongoing throughout [0770-12-24 (E61)]</p>
+<p>E77 Persistent Item <strong>end</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E77 - Persistent Item</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e77_end.png" src="../_images/e77_end.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E77</span> <span class="pre">(Persistent</span> <span class="pre">Item)</span> <span class="pre">-</span> <span class="pre">P93i</span> <span class="pre">(was</span> <span class="pre">taken</span> <span class="pre">out</span> <span class="pre">of</span> <span class="pre">existence</span> <span class="pre">by)</span> <span class="pre">-</span> <span class="pre">E64</span> <span class="pre">(End</span> <span class="pre">of</span></code>
+<code class="docutils literal notranslate"><span class="pre">Existence)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span> <span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span> <span class="pre">(ongoing</span> <span class="pre">throughout)</span></code>
+<code class="docutils literal notranslate"><span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [The one ring (E22)] was destroyed by [Destruction of the one ring
+(E12)] has time span [Moment of throwing it down the lava (E52)] ongoing
+throughout [3019-03-25 (E61)]</p>
+</div>
+<div class="section" id="e21-person">
+<h3>E21 Person<a class="headerlink" href="#e21-person" title="Permalink to this headline">¶</a></h3>
+<p>E21 Person’s <strong>Birth</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E21 - Person</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e21_birth.png" src="../_images/e21_birth.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E21</span> <span class="pre">(Person)</span> <span class="pre">-</span> <span class="pre">P98i</span> <span class="pre">(was</span> <span class="pre">born)</span> <span class="pre">by</span> <span class="pre">-</span> <span class="pre">E67</span> <span class="pre">(Birth)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span></code>
+<code class="docutils literal notranslate"><span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span> <span class="pre">(ongoing</span> <span class="pre">throughout)</span> <span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [Stefan (E21)] was born by [birth of Stefan (E12)] has time span
+[Moment/Duration of Stefan’s birth (E52)] ongoing throughout [1981-11-23 (E61)]</p>
+<p>E21 Person’s <strong>Death</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E21 - Person</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e21_death.png" src="../_images/e21_death.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E21</span> <span class="pre">(Person)</span> <span class="pre">-</span> <span class="pre">P100i</span> <span class="pre">(died</span> <span class="pre">in)</span> <span class="pre">-</span> <span class="pre">E69</span> <span class="pre">(Death)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span></code>
+<code class="docutils literal notranslate"><span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span> <span class="pre">(ongoing</span> <span class="pre">throughout)</span> <span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [Lady Diana (E21)] died in [death of Diana (E69)] has time span
+[Moment/Duration of Diana’s death (E52)] ongoing throughout [1997-08-31 (E61)]</p>
+</div>
+<div class="section" id="e2-temporal-entity">
+<h3>E2 Temporal Entity<a class="headerlink" href="#e2-temporal-entity" title="Permalink to this headline">¶</a></h3>
+<p>E2 Temporal Entity (also property) <strong>begin</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E2 - Temporal Entity</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e2_begin.png" src="../_images/e2_begin.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E2</span> <span class="pre">(Temporal</span> <span class="pre">Entity)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span> <span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span> <span class="pre">(ongoing</span></code>
+<code class="docutils literal notranslate"><span class="pre">throughout)</span> <span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [Thirty Years’ War (E7)] has time span [Moment/Duration of Beginning
+of Thirty Years’ War (E52)] ongoing throughout [1618-05-23 (E61)]</p>
+<p>E2 temporal entity (also property) <strong>end</strong> linked with a E61 Time Primitive:</p>
+<ul class="simple">
+<li>Domain: <strong>E2 - Temporal Entity</strong></li>
+<li>Range: <strong>E61 - Time Primitive</strong></li>
+</ul>
+<img alt="../_images/e2_begin.png" src="../_images/e2_begin.png" />
+<p><code class="docutils literal notranslate"><span class="pre">E2</span> <span class="pre">(temporal</span> <span class="pre">entity)</span> <span class="pre">-</span> <span class="pre">P4</span> <span class="pre">(has</span> <span class="pre">time</span> <span class="pre">span)</span> <span class="pre">-</span> <span class="pre">E52</span> <span class="pre">(Time</span> <span class="pre">Span)</span> <span class="pre">-</span> <span class="pre">P81</span> <span class="pre">(ongoing</span></code>
+<code class="docutils literal notranslate"><span class="pre">throughout)</span> <span class="pre">-</span> <span class="pre">E61</span> <span class="pre">(Time</span> <span class="pre">Primitive)</span></code></p>
+<p>Example: [Thirty Years’ War (E7)] has time span [Moment/Duration of End of
+Thirty Years’ War (E52)] ongoing throughout [1648-10-24 (E61)]</p>
+</div>
 </div>
 </div>
 
@@ -235,10 +319,16 @@ E77 Persistent Item linked with a E53 Place.</p>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="link_checker.html" class="btn btn-neutral float-right" title="Link checker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="cidoc_crm.html" class="btn btn-neutral float-left" title="CIDOC CRM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="link_checker.html" class="btn btn-neutral float-right" title="Link checker" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="cidoc_crm.html" class="btn btn-neutral float-left" title="CIDOC CRM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -247,14 +337,7 @@ E77 Persistent Item linked with a E53 Place.</p>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -265,6 +348,7 @@ E77 Persistent Item linked with a E53 Place.</p>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -272,6 +356,7 @@ E77 Persistent Item linked with a E53 Place.</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

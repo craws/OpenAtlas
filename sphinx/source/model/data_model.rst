@@ -33,3 +33,15 @@ interface. This will displays the CIDOC class of an entity in the detail view
 of a data base entry.
 To do so click the gear symbol and choose :doc:`profile</tools/profile>`. Go
 to **Display**, press the **Edit** button and choose **Show CIDOC classes**.
+
+While we try to only use CIDOC CRM classes and properties where possible
+(instead of introducing own classes or using extensions), some shortcuts are
+used to increase performance and to keep the code base maintainable.
+For more information, see :doc:`OpenAtlas shortcuts<openatlas_shortcuts>`.
+
+While OpenAtlas uses the CIDOC CRM within the application, a finer grained
+model is needed to deal with any contextual differences needed for the user
+interface. Therefore, e.g. **E33 Linguistic Object** can be a source or a
+source translation with different forms in different context.
+An overview of internal mapping and CIDOC CRM classes can be found here
+`here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_
