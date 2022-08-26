@@ -21,8 +21,9 @@ E39 Actor linked with E39 Actor
 
 .. image:: oa7.png
 
-``E39 (Actor) - P11i (participated in) - E5 (Event) - P11 (had participant) -``
-``E39 (Actor)``
+::
+
+   E39(Actor) - P11i(participated in) - E5(Event) - P11(had participant) - E39(Actor)
 
 Example:
 [Stefan (E21)] participated in [Relationship from Stefan to Joachim (E5)] had
@@ -45,8 +46,9 @@ E77 Persistent Item linked with a E53 Place.
 
 .. image:: oa8.png
 
-``E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning``
-``of Existence) - P7 (took place at) - E53 (Place)``
+::
+
+   E77(Persistent Item) - P92i(was brought into existence by) - E63(Beginning of Existence) - P7(took place at) - E53(Place)
 
 Example:
 [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein
@@ -65,8 +67,9 @@ E77 Persistent Item linked with a E53 Place.
 
 .. image:: oa9.png
 
-``E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of``
-``Existence) - P7 (took place at) - E53 (Place)``
+::
+
+   E77(Persistent Item) - P93i(was taken out of existence by) - E64(End of Existence) - P7(took place at) - E53(Place)
 
 Example:
 [Albert Einstein (E21)] was taken out of existence by [Death of Albert Einstein
@@ -83,7 +86,7 @@ the link, these dates can be mapped as CIDOC CRM **E61 - Time Primitive**
 entities.
 
 E77 - Persistent Item
-^^^^^^^^^^^^^^^^^^^^^
++++++++++++++++++++++
 
 E77 Persistent Item **begin** linked with a E61 Time Primitive:
 
@@ -92,9 +95,9 @@ E77 Persistent Item **begin** linked with a E61 Time Primitive:
 
 .. image:: e77_begin.png
 
-``E77 (Persistent Item) - P92i (was brought into existence by) - E63``
-``(Beginning of Existence) - P4 (has time span) - E52 (Time Span) - P81``
-``(ongoing throughout) - E61 (Time Primitive)``
+::
+
+   E77(Persistent Item) - P92i(was brought into existence by) - E63(Beginning of Existence) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [Holy Lance (E22)] was brought into existence by [forging of Holy
 Lance (E12)] has time span [Moment/Duration of Forging of Holy Lance (E52)]
@@ -107,16 +110,16 @@ E77 Persistent Item **end** linked with a E61 Time Primitive:
 
 .. image:: e77_end.png
 
-``E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of``
-``Existence) - P4 (has time span) - E52 (Time Span) - P81 (ongoing throughout)``
-``- E61 (Time Primitive)``
+::
+
+   E77(Persistent Item) - P93i(was taken out of existence by) - E64(End of Existence) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [The one ring (E22)] was destroyed by [Destruction of the one ring
 (E12)] has time span [Moment of throwing it down the lava (E52)] ongoing
 throughout [3019-03-25 (E61)]
 
 E21 Person
-^^^^^^^^^^
+++++++++++
 
 E21 Person's **Birth** linked with a E61 Time Primitive:
 
@@ -125,8 +128,9 @@ E21 Person's **Birth** linked with a E61 Time Primitive:
 
 .. image:: e21_birth.png
 
-``E21 (Person) - P98i (was born) by - E67 (Birth) - P4 (has time span) - E52``
-``(Time Span) - P81 (ongoing throughout) - E61 (Time Primitive)``
+::
+
+   E21(Person) - P98i(was born) by - E67(Birth) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [Stefan (E21)] was born by [birth of Stefan (E12)] has time span
 [Moment/Duration of Stefan's birth (E52)] ongoing throughout [1981-11-23 (E61)]
@@ -138,14 +142,15 @@ E21 Person's **Death** linked with a E61 Time Primitive:
 
 .. image:: e21_death.png
 
-``E21 (Person) - P100i (died in) - E69 (Death) - P4 (has time span) - E52``
-``(Time Span) - P81 (ongoing throughout) - E61 (Time Primitive)``
+::
+
+   E21(Person) - P100i(died in) - E69(Death) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [Lady Diana (E21)] died in [death of Diana (E69)] has time span
 [Moment/Duration of Diana's death (E52)] ongoing throughout [1997-08-31 (E61)]
 
 E2 Temporal Entity
-^^^^^^^^^^^^^^^^^^
+++++++++++++++++++
 
 E2 Temporal Entity (also property) **begin** linked with a E61 Time Primitive:
 
@@ -154,8 +159,9 @@ E2 Temporal Entity (also property) **begin** linked with a E61 Time Primitive:
 
 .. image:: e2_begin.png
 
-``E2 (Temporal Entity) - P4 (has time span) - E52 (Time Span) - P81 (ongoing``
-``throughout) - E61 (Time Primitive)``
+::
+
+   E2(Temporal Entity) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [Thirty Years' War (E7)] has time span [Moment/Duration of Beginning
 of Thirty Years' War (E52)] ongoing throughout [1618-05-23 (E61)]
@@ -167,8 +173,9 @@ E2 temporal entity (also property) **end** linked with a E61 Time Primitive:
 
 .. image:: e2_begin.png
 
-``E2 (temporal entity) - P4 (has time span) - E52 (Time Span) - P81 (ongoing``
-``throughout) - E61 (Time Primitive)``
+::
+
+   E2(temporal entity) - P4(has time span) - E52(Time Span) - P81(ongoing throughout) - E61(Time Primitive)
 
 Example: [Thirty Years' War (E7)] has time span [Moment/Duration of End of
 Thirty Years' War (E52)] ongoing throughout [1648-10-24 (E61)]
