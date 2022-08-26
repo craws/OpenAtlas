@@ -72,7 +72,7 @@ def update(id_: int) -> Union[str, Response]:
                 entity=entity,
                 modifier=link(g.logger.get_log_info(entity.id)['modifier']))
         return redirect(save(manager))
-    if not manager.form.errors:
+    if not manager.form.is_submitted():
         manager.populate_update()
     if entity.class_.view in ['artifact', 'place']:
         entity.set_image_for_places()

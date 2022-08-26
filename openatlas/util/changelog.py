@@ -4,6 +4,9 @@ versions = {
             '1751': 'Manual: add model documentation'
         }
     }],
+    '7.6.1': ['2022-08-25',  {
+        'fix': {
+            '1794': 'Bug when editing types connected to artifacts'}}],
     '7.6.0': ['2022-08-25',  {
         'feature': {
             '1788': 'Forms: filter invalid table options',
