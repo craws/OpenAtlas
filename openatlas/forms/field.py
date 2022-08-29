@@ -91,7 +91,7 @@ class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
 
-        def get_form(class_name_: str):
+        def get_form(class_name_: str) -> FlaskForm:
             class SimpleEntityForm(FlaskForm):
                 name_dynamic = StringField(_('name'))
 

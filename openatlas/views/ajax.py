@@ -66,10 +66,10 @@ def ajax_create_entity() -> str:
 
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
 @required_group('readonly')
-def ajax_get_entity_table(content_domain: Optional[str] = None) -> str:
+def ajax_get_entity_table(content_domain: str) -> str:
     try:
-       filter_ids = json.loads(request.form['filterIds']) or []
-       table,selection = get_table_content(content_domain,None,filter_ids)
+        filter_ids = json.loads(request.form['filterIds']) or []
+        table,selection = get_table_content(content_domain, None, filter_ids)
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)
         abort(400)

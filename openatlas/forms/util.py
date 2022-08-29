@@ -221,10 +221,11 @@ def check_if_entity_has_time(
             return True
     return False
 
+
 def get_table_content(
         class_name: str,
-        selected_data: any,
-        filter_ids: list[int] = None):
+        selected_data: Any,
+        filter_ids: Optional[list[int]] = None) -> tuple[Table, str]:
     filter_ids = filter_ids or []
     selection = ''
     if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
@@ -247,8 +248,8 @@ def get_table_content(
                 entity.name])
     else:
         aliases = current_user.settings['table_show_aliases']
-        if 'place' in class_name \
-          or class_name in ['begins_in', 'ends_in', 'residence']:
+        if 'place' in class_name or class_name in \
+                ['begins_in', 'ends_in', 'residence']:
             class_ = 'place'
             entities = Entity.get_by_view(
                 'place',
@@ -274,7 +275,7 @@ def get_table_content(
             data = get_base_table_data(entity, show_links=False)
             data[0] = format_name_and_aliases(entity, class_name)
             table.rows.append(data)
-    return table,selection
+    return table, selection
 
 
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:
