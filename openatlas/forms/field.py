@@ -143,12 +143,12 @@ class TableField(HiddenField):
             label: Optional[str] = None,
             validators: Optional[Any] = None,
             filter_ids: Optional[list[int]] = None,
-            add_dynamical: Optional[list[str]] = None,
+            add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
         self.add_dynamical = \
-            (add_dynamical or []) if is_authorized('editor') else []
+            (add_dynamic or []) if is_authorized('editor') else []
     widget = TableSelect()
 
 

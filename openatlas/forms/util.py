@@ -221,7 +221,11 @@ def check_if_entity_has_time(
             return True
     return False
 
-def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = []):
+def get_table_content(
+        class_name: str,
+        selected_data: any,
+        filter_ids: list[int] = None):
+    filter_ids = filter_ids or []
     selection = ''
     if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
         table = Table(
