@@ -18,6 +18,7 @@ development specific documentation in our Redmine
    tools/index
    admin/index
    ui/index
+   model/index
    examples/index
    troubleshooting/index
    faq

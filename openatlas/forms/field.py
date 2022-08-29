@@ -55,12 +55,14 @@ class TableMultiSelect(HiddenInput):
             [''] + g.table_headers[class_],
             order=[[0, 'desc'], [1, 'asc']],
             defs=[{'orderDataType': 'dom-checkbox', 'targets': 0}])
-        for e in list(
-                filter(lambda x: x.id not in field.filter_ids, entities)):
-            row = get_base_table_data(e, show_links=False)
+        for entity in list(
+                filter(
+                    lambda x: x.id not in field.filter_ids,
+                    entities)):  # type: Entity
+            row = get_base_table_data(entity, show_links=False)
             row.insert(0, f"""
-                <input type="checkbox" id="{e.id}" value="{e.name}"
-                {'checked' if e.id in data else ''}>""")
+                <input type="checkbox" id="{entity.id}" value="{entity.name}"
+                {'checked' if entity.id in data else ''}>""")
             table.rows.append(row)
         return super().__call__(field, **kwargs) + render_template(
             'forms/table_multi_select.html',
