@@ -1,8 +1,8 @@
+import json
 from typing import Optional
 
 from flask import abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
-import json
 
 from openatlas import app
 from openatlas.forms.util import get_table_content
@@ -51,10 +51,13 @@ def ajax_create_entity() -> str:
             request.form['entityName'],
             request.form['name'],
             request.form['description'])
-        if request.form['entityName'] in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
+        if request.form['entityName'] in \
+                ['artifact', 'feature', 'place', 'stratigraphic_unit']:
             entity.link(
                 'P53',
-                Entity.insert('object_location', f'Location of {request.form["name"]}'))
+                Entity.insert(
+                    'object_location',
+                    f'Location of {request.form["name"]}'))
         if 'standardType' in request.form and request.form['standardType']:
             entity.link('P2',
                         g.types[int(request.form['standardType'])])
@@ -69,7 +72,7 @@ def ajax_create_entity() -> str:
 def ajax_get_entity_table(content_domain: str) -> str:
     try:
         filter_ids = json.loads(request.form['filterIds']) or []
-        table,selection = get_table_content(content_domain, None, filter_ids)
+        table, selection = get_table_content(content_domain, None, filter_ids)
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)
         abort(400)
@@ -77,11 +80,11 @@ def ajax_get_entity_table(content_domain: str) -> str:
 
 
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-   link = f"""<a href='#' onclick="selectFromTable(this,
-       '{field_id}', {entity.id})">{entity.name}</a>"""
-   if not entity.aliases:
-       return link
-   html = f'<p>{link}</p>'
-   for i, alias in enumerate(entity.aliases.values()):
-       html += alias if i else f'<p>{alias}</p>'
-   return html
+    link = f"""<a href='#' onclick="selectFromTable(this,
+        '{field_id}', {entity.id})">{entity.name}</a>"""
+    if not entity.aliases:
+        return link
+    html = f'<p>{link}</p>'
+    for i, alias in enumerate(entity.aliases.values()):
+        html += alias if i else f'<p>{alias}</p>'
+    return html
