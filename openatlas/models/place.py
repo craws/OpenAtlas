@@ -7,13 +7,13 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def get_place(entity: Entity) -> Optional[Entity]:
-    if entity := entity.get_linked_entity_safe('P46', inverse=True):
+    if entity := entity.get_linked_entity('P46', inverse=True):
         if entity.class_.name == 'place':
             return entity  # pragma: no cover
-        if entity := entity.get_linked_entity_safe('P46', inverse=True):
+        if entity := entity.get_linked_entity('P46', inverse=True):
             if entity.class_.name == 'place':
                 return entity  # pragma: no cover
-            if entity := entity.get_linked_entity_safe('P46', inverse=True):
+            if entity := entity.get_linked_entity('P46', inverse=True):
                 if entity.class_.name == 'place':
                     return entity
     return None  # pragma: no cover
