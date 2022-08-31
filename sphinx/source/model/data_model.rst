@@ -41,7 +41,8 @@ For more information, see :doc:`OpenAtlas shortcuts<openatlas_shortcuts>`.
 
 While OpenAtlas uses the CIDOC CRM within the application, a finer grained
 model is needed to deal with any contextual differences needed for the user
-interface. Therefore, e.g. **E33 Linguistic Object** can be a source or a
-source translation with different forms in different context.
+interface. Therefore, e.g.
+:cidoc_entity:`E33 - Lingustic Object<e33-linguistic-object>` can be a source
+or a source translation with different forms in different context.
 An overview of internal mapping and CIDOC CRM classes can be found here
 `here <https://github.com/craws/OpenAtlas/tree/main/install/crm>`_

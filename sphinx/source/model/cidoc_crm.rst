@@ -22,11 +22,12 @@ The ontology consists of classes, linked together by properties.
 
 CIDOC classes
 -------------
-Classes are indicated by a preceding **E** followed by a numeric code-e.g. “E29
-Actor” or “E67 Birth”.
+Classes are indicated by a preceding **E** followed by a numeric code-e.g.
+“:cidoc_entity:`E39 - Actor<e39-actor>`” or
+“:cidoc_entity:`E67 - Birth<e67-birth>`”.
 All entities used within OpenAtlas can be characterised as CIDOC classes.
-An overview of all CIDOC CRM classes can be found
-`at <https://demo.openatlas.eu/overview/model/cidoc_class_index>`_. The count
+An overview of all CIDOC CRM classes can be found on this
+`page <https://demo.openatlas.eu/overview/model/cidoc_class_index>`_. The count
 indicates how many times each class has been used in this database instance.
 A click on the class name will get you to an overview of the class with
 detailed information, such as a short description, sub- and super classes as
@@ -36,7 +37,8 @@ well as possible properties.
 CIDOC Properties
 ----------------
 CIDOC entities are indicated by a combination of “P” and a numerical sequence -
-think “P26 moved to” or “P52 has current owner”. They are used to link classes
+think “:cidoc_property:`P11 - had participant<p11-had-participant>`” or
+":cidoc_property:`P2 - has type<p2-has-type>`“. They are used to link classes
 to other classes. So when an activity to place at a certain location, this can
 be modelled in the following way
 
@@ -58,5 +60,11 @@ suffix. Since we don't use inverse properties in the database
 (direction is determined through domain/range selection)they are linked to
 their counterpart without i.
 
-There are some "special" properties we ignore, e.g. P3, you can look them up in the OpenAtlas CIDOC parser script where they are defined at the top: https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py
-We don't import them because of technical reasons, e.g. they are missing some definitions that "normal" properties have and the import script would have troubles to deal with them. E.g. they have no defined range but this is a foreign key in our database that can't be empty.
+There are some "special" properties we ignore, e.g.
+:cidoc_property:`P3 - has note<P3-has-note>`, you can look them up in the
+OpenAtlas CIDOC parser script where they are defined at the top:
+https://github.com/craws/OpenAtlas/blob/main/install/crm/cidoc_rtfs_parser.py
+We don't import them because of technical reasons, e.g. they are missing some
+definitions that "normal" properties have and the import script would have
+troubles to deal with them. E.g. they have no defined range but this is a
+foreign key in our database that can't be empty.
