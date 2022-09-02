@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>References Systems &mdash; OpenAtlas 7.6.0 documentation</title>
+  <title>References Systems &mdash; OpenAtlas 7.7.0 documentation</title>
   
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script src="../_static/jquery.js"></script>
-        <script src="../_static/underscore.js"></script>
-        <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Time Spans" href="time_spans.html" />
     <link rel="prev" title="Places" href="places.html" /> 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.6.0
+                7.7.0
               </div>
             
           
@@ -81,7 +81,6 @@
           
         </div>
 
-        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -96,6 +95,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
 <li class="toctree-l2 current"><a class="reference internal" href="index.html#general">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="index.html#archaeological">Archaeological</a></li>
@@ -109,7 +109,6 @@
             
           
         </div>
-        
       </div>
     </nav>
 
@@ -144,13 +143,11 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+      <li><a href="../index.html">Docs</a> &raquo;</li>
         
           <li><a href="index.html">Examples</a> &raquo;</li>
         
@@ -159,7 +156,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
         
       </li>
     
@@ -198,42 +195,41 @@ If permissions to create additional external references are available, a
 <strong>+Reference system</strong> button can also be found here. Click it to get into
 the form. Here you can fill in the following fields:</p>
 <ul class="simple">
-<li><p><strong>Name</strong>: Choose a descriptive name; as for other forms, a name is
-required to save data.</p></li>
-<li><p><strong>Website URL</strong>: State the vocabulary’s/gazetteer’s URL, e.g.
-<a class="reference external" href="https://www.wikidata.org">https://www.wikidata.org</a> for Wikidata</p></li>
-<li><p><strong>Resolver URL</strong>: Put in an URL that brings you to the respective entry
+<li><strong>Name</strong>: Choose a descriptive name; as for other forms, a name is
+required to save data.</li>
+<li><strong>Website URL</strong>: State the vocabulary’s/gazetteer’s URL, e.g.
+<a class="reference external" href="https://www.wikidata.org">https://www.wikidata.org</a> for Wikidata</li>
+<li><strong>Resolver URL</strong>: Put in an URL that brings you to the respective entry
 when combined with an ID e.g. <a class="reference external" href="https://www.wikidata.org/wiki/">https://www.wikidata.org/wiki/</a> see for
 example <a class="reference external" href="https://www.wikidata.org/wiki/Q3044">https://www.wikidata.org/wiki/Q3044</a> where Q3044 is an ID (the link
-will bring you directly to Charlemagne’s entry in Wikidata)</p></li>
-<li><p><strong>Example ID</strong>: An example ID can be specified, which is then used as an
+will bring you directly to Charlemagne’s entry in Wikidata)</li>
+<li><strong>Example ID</strong>: An example ID can be specified, which is then used as an
 example in the corresponding input field of the different forms; for
 Wikidata this could be <em>Q3044</em> (for Charlemagne), for Geonames
-for example <em>2761369</em> (for Vienna (AT))</p></li>
-<li><p><strong>External reference match</strong>: Here you can state a default precision (exact
+for example <em>2761369</em> (for Vienna (AT))</li>
+<li><strong>External reference match</strong>: Here you can state a default precision (exact
 match or close match) that will be shown in the respective form; if you
 set a default reference match, the other(s) can be chosen from a drop down
 list if necessary, if no external reference match is set, it will be left
 blank and exact or close match can be chosen from a drop down list.
 Close match and exact match are
-<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of confidence</p>
-<ul>
-<li><p>choose <strong>Close match</strong> if the data base entry and the entity in the
+<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based definitions of confidence<ul>
+<li>choose <strong>Close match</strong> if the data base entry and the entity in the
 vocabulary are sufficiently similar and can be used interchangeably in some
 information retrieval application (think a D-shaped belt buckle is a
 close match to a belt buckle (Wikidata ID Q3180027) or the historic
-Vienna is a close match to today’s Vienna as it is included in Geonames)</p></li>
-<li><p>choose <strong>Exact match</strong> if there is a high degree of confidence that the
+Vienna is a close match to today’s Vienna as it is included in Geonames)</li>
+<li>choose <strong>Exact match</strong> if there is a high degree of confidence that the
 entered data and the vocabulary’s entity are interchangeable (think
 Charlemagne - the King of Franks, King of Lombards and became Holy Roman
 Emperor in 800 AD is an exact match to Q3044 in Wikidata or the Venus of
 Willendorf in the Natural History Museum Vienna is an exact match to the
-entity Q131397 (Venus of Willendorf) in Wikidata)</p></li>
+entity Q131397 (Venus of Willendorf) in Wikidata)</li>
 </ul>
 </li>
-<li><p><strong>Classes</strong>: Select here in which forms the new external reference should
-be displayed. This can appear in one or more forms</p></li>
-<li><p><strong>Description</strong>: you can add a description as free text if desired</p></li>
+<li><strong>Classes</strong>: Select here in which forms the new external reference should
+be displayed. This can appear in one or more forms</li>
+<li><strong>Description</strong>: you can add a description as free text if desired</li>
 </ul>
 <p>Save the information to the database by clicking the <strong>Insert</strong> button.</p>
 <p><strong>Please keep in mind</strong>: When information is entered into a reference system
@@ -247,10 +243,16 @@ external reference match is also specified.</p>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="time_spans.html" class="btn btn-neutral float-right" title="Time Spans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="places.html" class="btn btn-neutral float-left" title="Places" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="time_spans.html" class="btn btn-neutral float-right" title="Time Spans" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="places.html" class="btn btn-neutral float-left" title="Places" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
@@ -259,14 +261,7 @@ external reference match is also specified.</p>
 
     </p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
-    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -277,6 +272,7 @@ external reference match is also specified.</p>
 
 
 </footer>
+
         </div>
       </div>
 
@@ -284,6 +280,7 @@ external reference match is also specified.</p>
 
   </div>
   
+
 
   <script type="text/javascript">
       jQuery(function () {

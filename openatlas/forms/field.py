@@ -4,14 +4,17 @@ import ast
 from typing import Any, Optional
 
 from flask import g, render_template
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from wtforms import Field, FloatField, HiddenField
+from flask_wtf import FlaskForm
+from wtforms import Field, FloatField, HiddenField, StringField, TextAreaField
 from wtforms.widgets import HiddenInput, TextInput
 
+from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data
+from openatlas.util.util import get_base_table_data, is_authorized
 
 
 class RemovableListInput(TextInput):
@@ -87,54 +90,35 @@ class ValueFloatField(FloatField):
 class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
-        selection = ''
-        if field.id in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
-            table = Table(
-                ['code', 'name'],
-                defs=[
-                    {'orderDataType': 'cidoc-model', 'targets': [0]},
-                    {'sType': 'numeric', 'targets': [0]}])
-            for id_, entity in (
-                    g.properties if field.id == 'cidoc_property'
-                    else g.cidoc_classes).items():
-                onclick = f'''
-                    onclick="selectFromTable(
-                        this,
-                        '{field.id}',
-                        '{id_}',
-                        '{entity.code} {entity.name}');"'''
-                table.rows.append([
-                    f'<a href="#" {onclick}>{entity.code}</a>',
-                    entity.name])
-        else:
-            aliases = current_user.settings['table_show_aliases']
-            if 'place' in field.id \
-                    or field.id in ['begins_in', 'ends_in', 'residence']:
-                class_ = 'place'
-                entities = Entity.get_by_view(
-                    'place',
-                    types=True,
-                    aliases=aliases)
-            elif field.id == 'event_preceding':
-                class_ = 'event'
-                entities = Entity.get_by_class(
-                    ['activity', 'acquisition', 'move', 'production'],
-                    types=True,
-                    aliases=aliases)
-            else:
-                class_ = field.id
-                entities = Entity.get_by_view(
-                    class_,
-                    types=True,
-                    aliases=aliases)
-            table = Table(g.table_headers[class_])
-            for entity in list(
-                    filter(lambda x: x.id not in field.filter_ids, entities)):
-                if field.data and entity.id == int(field.data):
-                    selection = entity.name
-                data = get_base_table_data(entity, show_links=False)
-                data[0] = self.format_name_and_aliases(entity, field.id)
-                table.rows.append(data)
+
+        def get_form(class_name_: str):
+            class SimpleEntityForm(FlaskForm):
+                name_dynamic = StringField(_('name'))
+
+            if class_name_ in g.classes \
+                    and g.classes[class_name_].hierarchies \
+                    and g.classes[class_name_].standard_type_id:
+                standard_type_id = g.classes[class_name_].standard_type_id
+                setattr(
+                    SimpleEntityForm,
+                    f'{field.id}-{class_name_}-standard-type-dynamic',
+                    TreeField(
+                        str(standard_type_id),
+                        type_id=str(standard_type_id)))
+            setattr(
+                SimpleEntityForm,
+                "description_dynamic",
+                TextAreaField(_('description')))
+            return SimpleEntityForm()
+
+        field.forms = {}
+        for class_name in field.add_dynamical:
+            field.forms[class_name] = get_form(class_name)
+
+        table, selection = get_table_content(
+            field.id,
+            field.data,
+            field.filter_ids)
         return super().__call__(field, **kwargs) + render_template(
             'forms/table_select.html',
             field=field,
@@ -159,9 +143,12 @@ class TableField(HiddenField):
             label: Optional[str] = None,
             validators: Optional[Any] = None,
             filter_ids: Optional[list[int]] = None,
+            add_dynamical: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
+        self.add_dynamical = \
+            (add_dynamical or []) if is_authorized('editor') else []
     widget = TableSelect()
 
 

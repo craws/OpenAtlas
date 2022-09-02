@@ -1,0 +1,271 @@
+
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data model &mdash; OpenAtlas 7.7.0 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="CIDOC CRM" href="cidoc_crm.html" />
+    <link rel="prev" title="Model" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.7.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Model</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cidoc_crm.html">CIDOC CRM</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openatlas_shortcuts.html">OpenAtlas shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="link_checker.html">Link checker</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="index.html">Model</a> &raquo;</li>
+        
+      <li>Data model</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-model">
+<h1>Data model<a class="headerlink" href="#data-model" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>While the model uses <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> as
+ontology, it can be used without prior knowledge of data models, ontologies,
+etc. The software automatically maps information to the model. As the
+definitions of the CIDOC Conceptual Refernece Model was imported into the
+system, its
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/cidoc_class_index">classes</a>
+and <a class="reference external" href="https://demo.openatlas.eu/overview/model/property">properties</a> can be
+browsed directly in OpenAtlas (see also <a class="reference internal" href="cidoc_crm.html"><span class="doc">here</span></a>).
+Furthermore, it is possible to verify link-conformity between entities via the
+<a class="reference external" href="https://demo.openatlas.eu/overview/model">link-checker</a> (for more
+information click here <a class="reference internal" href="link_checker.html"><span class="doc">here</span></a>).</p>
+<p>During the development much emphasis was put on the fact that users do not have
+to concern themselves with the model or its ontology. Nevertheless, it is
+possible to display the CIDOC classes used in the user interface and thus gain
+insight into how the data is mapped.</p>
+<p>Pressing the <strong>Model</strong> button on the start page leads to a
+graphical presentation of the model (see below), a
+<a class="reference internal" href="link_checker.html"><span class="doc">link checking tool</span></a> and links to the classes and
+properties.</p>
+<img alt="../_images/openatlas_schema.png" src="../_images/openatlas_schema.png" />
+<img alt="../_images/openatlas_schema2.png" src="../_images/openatlas_schema2.png" />
+<p>Furthermore, it is possible to active <strong>Show CIDOC classes</strong> in the user
+interface. This will displays the CIDOC class of an entity in the detail view
+of a data base entry.
+To do so click the gear symbol and choose <a class="reference internal" href="../tools/profile.html"><span class="doc">profile</span></a>. Go
+to <strong>Display</strong>, press the <strong>Edit</strong> button and choose <strong>Show CIDOC classes</strong>.</p>
+<p>While we try to only use CIDOC CRM classes and properties where possible
+(instead of introducing own classes or using extensions), some shortcuts are
+used to increase performance and to keep the code base maintainable.
+For more information, see <a class="reference internal" href="openatlas_shortcuts.html"><span class="doc">OpenAtlas shortcuts</span></a>.</p>
+<p>While OpenAtlas uses the CIDOC CRM within the application, a finer grained
+model is needed to deal with any contextual differences needed for the user
+interface. Therefore, e.g.
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e33-linguistic-object/version-7.1.1">E33 - Lingustic Object</a> can be a source
+or a source translation with different forms in different context.
+An overview of internal mapping and CIDOC CRM classes can be found here
+<a class="reference external" href="https://github.com/craws/OpenAtlas/tree/main/install/crm">here</a></p>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="cidoc_crm.html" class="btn btn-neutral float-right" title="CIDOC CRM" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

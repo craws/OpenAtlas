@@ -13,7 +13,7 @@
               role="tab"
               aria-selected="{% if loop.index == 1 %}true{% else %}false{% endif %}"
               href="#menu-tab-{{ category }}">
-            {{ _(category + ' types')|uc_first }}
+            {{ category|uc_first + ' ' + _('types') }}
           </a>
         </li>
       {% endfor %}
@@ -23,6 +23,11 @@
         <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ category }}"
              style="padding: 0;">
           <div class="accordion accordion-flush" id="TypeAccordion-{{ category }}">
+            {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
+              <div style="padding:0.5rem 1.25rem;">
+                {{ (_('type') + ' ' + _('hierarchy'))|button(url_for('hierarchy_insert', category=category)) }}
+              </div>
+            {% endif %}
             {% for type_, tree in types[category].items() %}
               <div class="accordion-item">
                 <div class="accordionheader" id="heading-{{ type_.id }}">
@@ -52,7 +57,11 @@
                             style="width:8em;"
                             type="text">
                           {% if 'editor'|is_authorized and type_.category != 'system' %}
-                            {{ ''|button(url_for('insert', class_='type' if category != 'place' else 'administrative_unit', origin_id=type_.id)) }}
+                            {% if category == 'place' %}
+                              {{ _('place')|button(url_for('insert', class_='administrative_unit', origin_id=type_.id)) }}
+                            {% else %}
+                              {{ _('type')|button(url_for('insert', class_='type', origin_id=type_.id)) }}
+                            {% endif %}
                           {% endif %}
                           {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
                             {{ _('edit')|button(url_for('hierarchy_update', id_=type_.id)) }}
@@ -95,7 +104,7 @@
                               <a href="{{ url_for('show_untyped_entities', id_=type_.id) }}">{{ _('show') }}</a>
                             </p>
                           {% endif %}
-                        {% elif type_.name not in config.PROPERTY_TYPES %}
+                        {% elif category != 'system' and type_.name not in config.PROPERTY_TYPES %}
                           <p class="error">{{ _("this type has no classes and won't show in forms")|uc_first }}.</p>
                         {% endif %}
                         {% if not type_.subs %}
@@ -115,11 +124,6 @@
                 {{ tree|safe }}
               </div>
             {% endfor %}
-            {% if category in ['custom', 'value'] and 'manager'|is_authorized %}
-              <div style="padding:0.5rem 1.25rem;">
-                {{ _('type')|button(url_for('hierarchy_insert', category=category)) }}
-              </div>
-            {% endif %}
           </div>
         </div>
       {% endfor %}
