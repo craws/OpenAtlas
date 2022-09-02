@@ -246,7 +246,7 @@ function saveCurrentEditLayer() {
 
         }
         currentEditLayer.editing.disable();
-        currentEditLayer.bindPopup(buildPopup(currentEditLayer.feature, 'view', true));
+        setPopup(true)(currentEditLayer.feature,currentEditLayer);
 
         drawnItems.addLayer(currentEditLayer);
         currentEditLayer = undefined;

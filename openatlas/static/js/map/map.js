@@ -295,7 +295,7 @@ const groupedOverlays = {
       SubPoints: pointLayerSubs,
     }),
     ...(polygonLayerSubs?.getLayers().length > 0 && {
-      SubPolys: polygonLayerSubs,
+      SubPolygons: polygonLayerSubs,
     }),
     ...(linestringLayerSubs?.getLayers().length > 0 && {
       SubLines: linestringLayerSubs,
@@ -307,8 +307,16 @@ const GroupOptions = {
   exclusiveGroups: ["Places"],
   groupCheckboxes: true,
 };
-L.control.groupedLayers(baseMaps, groupedOverlays, GroupOptions).addTo(map);
-
+L.Control.GroupedLayers.include({
+    getActiveOverlays: function () {
+        const active = this._layers
+            .filter(x => x.name.includes("Polygons"))
+            .flatMap(x => map.hasLayer(x.layer) ? Object.values(x.layer._layers) : [])
+        return L.layerGroup(active);
+    }
+});
+const control = L.control.groupedLayers(baseMaps, groupedOverlays, GroupOptions).addTo(map);
+console.log(control.getActiveOverlays())
 const geoSearchControl = L.control.geonames({
   username: geoNamesUsername, // Geonames account username.  Must be provided.
   maxresults: 8, // Maximum number of results to display per search.
@@ -346,8 +354,40 @@ geoSearchControl.on("select", function (e) {
 map.addControl(geoSearchControl);
 
 function setPopup(selected) {
-  return (feature, layer) =>
-    layer.bindPopup(buildPopup(feature, "view", selected));
+    return (feature, layer) => {
+        layer.bindPopup(buildPopup(feature, "view", selected));
+
+        // Handle overlay of multiple polygons
+        layer.on('click', function (e) {
+            const active = control.getActiveOverlays();
+            console.log(active,drawnItems)
+            const match = [...leafletPip.pointInLayer(e.latlng, selectedLayer, false),
+                ...leafletPip.pointInLayer(e.latlng, drawnItems, false),
+                ...leafletPip.pointInLayer(e.latlng, active, false)]
+            if (match.length > 1) {
+                const content = `<div id="popup" class="d-flex flex-column"> 
+                                  <strong class="mb-2">There are Multiple Places overlapping</strong>
+                                  ${match.map(x => `<a 
+                                                      role='button' 
+                                                      class="mb-1" 
+                                                      onclick="dispatchPopup(${x._leaflet_id},[${e.latlng.lat},${e.latlng.lng}])">
+                                                          ${x.feature?.properties?.name || x.feature?.properties?.objectName}
+                                                    </a>`).join("")}
+                                 </div>`
+                L.popup()
+                    .setLatLng(e.latlng)
+                    .setContent(content)
+                    .openOn(map);
+            }
+        });
+    }
+}
+
+function dispatchPopup(id, latlng){
+    const layer = selectedLayer._layers[id]
+                    ||control.getActiveOverlays()._layers[id]
+                    ||drawnItems._layers[id];
+    layer?.openPopup(latlng);
 }
 
 function buildPopup(feature, action = "view", selected = false) {
