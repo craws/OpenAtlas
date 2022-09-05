@@ -108,8 +108,6 @@
                 name, description, entityName,standardType
             };
             e.preventDefault();
-            console.log('data','hioer',data,$("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic"),"#{{field.id}}-{{class_name}}-standard-type-dynamic")
-
             const entityId = await ajaxAddEntity(data);
             const tableContent = await getTable('{{ field.id }}',{{ field.filter_ids }});
             $('.modal').modal('hide');
