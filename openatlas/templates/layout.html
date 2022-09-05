@@ -186,12 +186,18 @@
   <div id="content">
     <div style="float:left" class="container-fluid">
       {{ ''|system_warnings }}
-      <noscript>
-        <p class="error">{{ _('warning no js') }}</p>
-      </noscript>
       {% block content %}{% endblock %}
     </div>
   </div>
 </main>
+
+<noscript>
+    <style>nav,main,.navbar{display:none;!important;}</style>
+    <div class="vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
+        <img src="/static/images/layout/logo.png" alt="OpenAtlas Logo">
+        <p class="error">{{ _('warning no js') }}</p>
+    </div>
+</noscript>
 </body>
 </html>
+
