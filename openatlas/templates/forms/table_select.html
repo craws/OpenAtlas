@@ -41,7 +41,7 @@
                             class="btn-outline-primary btn btn-sm float-end ms-1"
                             data-bs-toggle="modal"
                             data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
-                        + {{ add_dynamical }}
+                        + {{ _(add_dynamical)|uc_first }}
                     </button>
                 {% endfor %}
                 <div class="modal-body-table">{{ table }}</div>
@@ -64,7 +64,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title">Add {{ add_dynamical }}</h5>
+                    <h5 class="modal-title">+ {{ _(add_dynamical)|uc_first  }}</h5>
                     <button
                             type="button"
                             class="{{ config.CSS.button.primary }}"
