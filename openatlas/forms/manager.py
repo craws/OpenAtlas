@@ -116,7 +116,10 @@ class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
-        return {'actor': TableField(_('owned by'),add_dynamical=['person','group'])}
+        return {
+            'actor': TableField(
+                _('owned by'),
+                add_dynamical=['person', 'group'])}
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -186,9 +189,9 @@ class GroupManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence'),add_dynamical=['place']),
-            'begins_in': TableField(_('begins in'),add_dynamical=['place']),
-            'ends_in': TableField(_('ends in'),add_dynamical=['place'])}
+            'residence': TableField(_('residence'), add_dynamical=['place']),
+            'begins_in': TableField(_('begins in'), add_dynamical=['place']),
+            'ends_in': TableField(_('ends in'), add_dynamical=['place'])}
 
 
 class HumanRemainsManager(BaseManager):
@@ -254,8 +257,8 @@ class MoveManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return dict(super().additional_fields(), **{
-            'place_from': TableField(_('from'),add_dynamical=['place']),
-            'place_to': TableField(_('to'),add_dynamical=['place']),
+            'place_from': TableField(_('from'), add_dynamical=['place']),
+            'place_to': TableField(_('to'), add_dynamical=['place']),
             'artifact': TableMultiField(),
             'person': TableMultiField()})
 
@@ -300,9 +303,9 @@ class PersonManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence'),add_dynamical=['place']),
-            'begins_in': TableField(_('born in'),add_dynamical=['place']),
-            'ends_in': TableField(_('died in'),add_dynamical=['place'])}
+            'residence': TableField(_('residence'), add_dynamical=['place']),
+            'begins_in': TableField(_('born in'), add_dynamical=['place']),
+            'ends_in': TableField(_('died in'), add_dynamical=['place'])}
 
 
 class PlaceManager(BaseManager):
