@@ -1,6 +1,7 @@
 versions = {
     '7.7.0': ['TBA', {
         'feature': {
+            '1641': 'Acquisition in combination with artifacts',
             '1789': 'Disable site if JavaScript is disabled',
             '1751': 'Manual: add model documentation'
         }
