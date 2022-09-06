@@ -22,17 +22,23 @@ class AcquisitionManager(EventBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return dict(super().additional_fields(), **{
-            'given_place': TableMultiField(_('given place'))})
+            'given_place': TableMultiField(_('given place')),
+            'artifact': TableMultiField(_('given artifact'))})
 
     def populate_update(self) -> None:
         super().populate_update()
-        self.form.given_place.data = [
-            entity.id for entity in self.entity.get_linked_entities('P24')]
+        data = {'place': [], 'artifact': []}
+        for entity in self.entity.get_linked_entities('P24'):
+            var = 'artifact' if entity.class_.name == 'artifact' else 'place'
+            data[var].append(entity.id)
+        self.form.given_place.data = data['place']
+        self.form.artifact.data = data['artifact']
 
     def process_form(self) -> None:
         super().process_form()
         self.data['links']['delete'].add('P24')
         self.add_link('P24', self.form.given_place.data)
+        self.add_link('P24', self.form.artifact.data)
 
 
 class ActorActorRelationManager(BaseManager):
