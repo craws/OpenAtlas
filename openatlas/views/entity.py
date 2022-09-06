@@ -578,7 +578,6 @@ def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
         'reference': Tab('reference', entity=entity)}
     if entity.class_.name == 'place':
         tabs['actor'] = Tab('actor', entity=entity)
-        tabs['artifact'] = Tab('artifact', entity=entity)
         tabs['feature'] = Tab('feature', entity=entity)
     elif entity.class_.name == 'feature':
         tabs['stratigraphic_unit'] = Tab(
@@ -602,20 +601,16 @@ def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
             events.append(event)
     if entity.class_.name == 'place':
         for link_ in entity.location.get_links(
-                ['P53', 'P74', 'OA8', 'OA9'],
+                ['P74', 'OA8', 'OA9'],
                 inverse=True):
-            if link_.property.code == 'P53':
-                artifact = Entity.get_by_id(link_.range.id)
-                tabs['artifact'].table.rows.append(get_base_table_data(artifact))
-            else:
-                actor = Entity.get_by_id(link_.domain.id)
-                tabs['actor'].table.rows.append([
-                    link(actor),
-                    g.properties[link_.property.code].name,
-                    actor.class_.name,
-                    actor.first,
-                    actor.last,
-                    actor.description])
+            actor = Entity.get_by_id(link_.domain.id)
+            tabs['actor'].table.rows.append([
+                link(actor),
+                g.properties[link_.property.code].name,
+                actor.class_.name,
+                actor.first,
+                actor.last,
+                actor.description])
         actor_ids = []
         for event in events:
             for actor in event.get_linked_entities(
