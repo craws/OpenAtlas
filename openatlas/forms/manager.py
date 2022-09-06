@@ -12,6 +12,7 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import file
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -116,10 +117,13 @@ class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
-        return {
+        fields = {
             'actor': TableField(
                 _('owned by'),
                 add_dynamical=['person', 'group'])}
+        if not self.in_sub_units():
+            fields['place'] = TableField(add_dynamical=['place'])
+        return fields
 
     def populate_update(self) -> None:
         super().populate_update()
@@ -128,11 +132,21 @@ class ArtifactManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].add('P52')
+        self.data['links']['delete'].update(['P52', 'P53'])
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
             self.add_link('P46', self.origin, inverse=True)
         if self.form.actor.data:
             self.add_link('P52', self.form.actor.data)
+        if hasattr(self.form, 'place') and self.form.place.data:
+            location = Entity.get_by_id(int(self.form.place.data))
+            self.add_link('P53', location.get_linked_entity_safe('P53'))
+
+    def in_sub_units(self):
+        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
+            return True
+        if self.entity and self.entity.get_linked_entity('P46', inverse=True):
+            return True
+        return False
 
 
 class BibliographyManager(BaseManager):
