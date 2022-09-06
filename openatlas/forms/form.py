@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.forms import base_manager, manager
-from openatlas.forms.field import TableField, TreeField
+from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.table import Table
@@ -42,7 +42,7 @@ def get_add_reference_form(class_: str) -> FlaskForm:
     class Form(FlaskForm):
         pass
 
-    setattr(Form, class_, TableField(_(class_), [InputRequired()]))
+    setattr(Form, class_, TableMultiField(_(class_), [InputRequired()]))
     setattr(Form, 'page', StringField(_('page')))
     setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
     return Form()
