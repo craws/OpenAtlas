@@ -465,6 +465,15 @@ def admin_orphans() -> str:
         'orphaned_files': Tab(
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_subunits': Tab(
+            'orphaned_sub_units',
+            table=Table([
+                'id',
+                'name',
+                'class',
+                'created',
+                'modified',
+                'description'])),
         'circular': Tab('circular_dependencies', table=Table(
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
@@ -515,10 +524,21 @@ def admin_orphans() -> str:
                     file.name,
                     url_for('admin_file_delete', filename=file.name))])
 
+    # Orphaned subunits (without connection to a P46 super)
+    for entity in Entity.get_orphaned_subunits():
+        tabs['orphaned_subunits'].table.rows.append([
+            entity.id,
+            entity.name,
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
+
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
+
     if tabs['orphaned_files'].table.rows and is_authorized('admin'):
         text = uc_first(_('delete all files without corresponding entities?'))
         tabs['orphaned_files'].buttons.append(
