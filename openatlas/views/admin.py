@@ -247,12 +247,15 @@ def admin_check_link_duplicates(
         g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
-    table = Table([
+    tab = Tab(
+        'check_link_duplicates',
+        buttons=[manual('admin/data_integrity_checks')])
+    tab.table = Table([
         'domain', 'range', 'property_code', 'description', 'type_id',
         'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
         'end_comment', 'count'])
     for row in Link.check_link_duplicates():
-        table.rows.append([
+        tab.table.rows.append([
             link(Entity.get_by_id(row['domain_id'])),
             link(Entity.get_by_id(row['range_id'])),
             link(g.properties[row['property_code']]),
@@ -265,8 +268,13 @@ def admin_check_link_duplicates(
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    if not table.rows:  # Check single types for multiple use
-        table = Table(
+    if tab.table.rows:
+        tab.buttons.append(
+            button(
+                _('delete link duplicates'),
+                url_for('admin_check_link_duplicates', delete='delete')))
+    else:  # Check single types for multiple use
+        tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
         for row in Link.check_single_type_duplicates():
             remove_links = []
@@ -276,16 +284,18 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a>'
+                    f'<a href="{url}">{uc_first(_("remove"))}</a> '
                     f'{type_.name}')
-            table.rows.append([
+            tab.table.rows.append([
                 link(row['entity']),
-                row['entity'].class_.name,
+                row['entity'].class_.label,
                 link(g.types[row['type'].id]),
-                '<br><br><br><br><br>'.join(remove_links)])
+                '<br><br>'.join(remove_links)])
+    if not tab.table.rows:
+        tab.content = _('Congratulations, everything looks fine!')
     return render_template(
-        'admin/check_link_duplicates.html',
-        table=table,
+        'tabs.html',
+        tabs={'tab': tab},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
