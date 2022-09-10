@@ -4,6 +4,7 @@ versions = {
             '1541': 'Linking references to multiple subunits',
             '1641': 'Acquisition in combination with artifacts',
             '1789': 'Disable site if JavaScript is disabled',
+            '1811': 'Checks for orphaned subunits',
             '1751': 'Manual: add model documentation'
         }
     }],
