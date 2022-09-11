@@ -376,14 +376,15 @@ def admin_check_similar() -> str:
         for sample in Entity.get_similar_named(
                 form.classes.data,
                 form.ratio.data).values():
-            html = link(sample['entity'])
-            for entity in sample['entities']:  # Table linebreaks workaround
-                html += f'<br><br><br><br><br>{link(entity)}'
-            table.rows.append([html, len(sample['entities']) + 1])
+            similar = [link(entity) for entity in sample['entities']]
+            table.rows.append([
+                f"{link(sample['entity'])}<br><br>{'<br><br>'.join(similar)}",
+                len(sample['entities']) + 1])
+    content = display_form(form, manual_page='admin/data_integrity_checks')
+    content += uc_first(_('no entries')) if table and not table.rows else ''
     return render_template(
-        'admin/check_similar.html',
-        table=table,
-        form=form,
+        'tabs.html',
+        tabs={'similar': Tab('similar', table=table, content=content)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
