@@ -217,20 +217,26 @@ def admin_content(item: str) -> Union[str, Response]:
         item=item,
         form=form,
         title=_('content'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)]
-    )
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-content"],
+            _(item)])
 
 
 @app.route('/admin/check_links')
 @required_group('contributor')
 def admin_check_links() -> str:
-    return render_template(
-        'admin/check_links.html',
+    tab = Tab(
+        'check_links',
         table=Table(
             ['domain', 'property', 'range'],
-            rows=[
-                [x['domain'], x['property'], x['range']]
-                for x in Link.get_invalid_cidoc_links()]),
+            [[x['domain'], x['property'], x['range']]
+             for x in Link.get_invalid_cidoc_links()]),
+        buttons=[manual('admin/data_integrity_checks')])
+    tab.content = _('Congratulations, everything looks fine!') \
+        if not tab.table.rows else None
+    return render_template(
+        'tabs.html',
+        tabs={'check_links': tab},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
