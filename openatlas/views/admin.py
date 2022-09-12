@@ -198,7 +198,9 @@ def admin_content(item: str) -> Union[str, Response]:
             ContentForm,
             language,
             StringField()
-            if item == 'site_name_for_frontend' else TextAreaField())
+            if item == 'site_name_for_frontend'
+            else TextAreaField(render_kw={'class': 'tinymce'}))
+    setattr(ContentForm, 'save', SubmitField(uc_first(_('save'))))
     form = ContentForm()
     if form.validate_on_submit():
         data = []
@@ -213,9 +215,8 @@ def admin_content(item: str) -> Union[str, Response]:
     for language in app.config['LANGUAGES']:
         form.__getattribute__(language).data = get_content()[item][language]
     return render_template(
-        'admin/content.html',
-        item=item,
-        form=form,
+        'tabs.html',
+        tabs={'content': Tab('content', form=form)},
         title=_('content'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-content"],
