@@ -91,6 +91,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
         Transaction.begin()
         #try:
         manager.process_form()
+
         manager.update_link()
         print(manager.data)
         Transaction.commit()

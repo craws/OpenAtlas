@@ -282,9 +282,6 @@ class InvolvementManager(BaseManager):
                     inverse=True,
                     type_id=link_type.id if link_type else None)
 
-    def update_link(self) -> None:
-        self.origin.update_links(self.data, new=True)
-
 
 class MoveManager(EventBaseManager):
 

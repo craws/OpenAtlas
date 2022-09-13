@@ -222,6 +222,18 @@ class Entity:
                 link_['description'],
                 link_['inverse'],
                 link_['type_id'])
+            if 'attributes_link' in data:
+                for id_ in ids:
+                    item = Link.get_by_id(id_)
+                    item.begin_from = data['attributes_link']['begin_from']
+                    item.begin_to = data['attributes_link']['begin_to']
+                    item.begin_comment = \
+                        data['attributes_link']['begin_comment']
+                    item.end_from = data['attributes_link']['end_from']
+                    item.end_to = data['attributes_link']['end_to']
+                    item.end_comment = \
+                        data['attributes_link']['end_comment']
+                    item.update()
             if link_['return_link_id']:
                 continue_link_id = ids[0]
         return continue_link_id

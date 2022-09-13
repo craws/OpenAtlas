@@ -219,7 +219,8 @@ class BaseManager:
         return
 
     def update_link(self) -> None:
-        pass
+        self.data['attributes_link'] = self.data['attributes']
+        self.origin.update_links(self.data, new=True)
 
 
 class ActorBaseManager(BaseManager):
@@ -278,13 +279,15 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event': TableField(_('sub event of'), filter_ids=filter_ids,add_dynamical=['event'])}
+            'event': TableField(_('sub event of'), filter_ids=filter_ids,
+                                add_dynamical=['event'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
                 filter_ids=filter_ids)
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'),add_dynamical=['place'])
+            fields['place'] = TableField(_('location'),
+                                         add_dynamical=['place'])
         return fields
 
     def populate_update(self) -> None:
