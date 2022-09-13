@@ -73,13 +73,11 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-    if 'reference' in [domain.class_.view, range_.class_.view]:
-        return reference_link_update(link_, origin)
-    if 'event' in [domain.class_.view, range_.class_.view]:
-        return involvement_update(link_, origin)
-    if domain.class_.view == 'actor' and range_.class_.view == 'actor':
-        return relation_update(link_, domain, range_, origin)
-    abort(403)  # pragma: no cover
+    return update_relation(link_, origin)
+    # if 'reference' in [domain.class_.view, range_.class_.view]:
+    #     return reference_link_update(link_, origin)
+    # if domain.class_.view == 'actor' and range_.class_.view == 'actor':
+    #     return relation_update(link_, domain, range_, origin)
 
 
 @app.route('/insert/relation/<type_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -89,9 +87,8 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     manager = get_manager(type_, origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
-        #try:
+        # try:
         manager.process_form()
-
         manager.update_link()
         print(manager.data)
         Transaction.commit()
@@ -106,9 +103,14 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
                     'insert_relation',
                     type_=type_,
                     origin_id=origin_id))
-        return redirect(
-            f"{url_for('view', id_=origin.id)}"
-            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
+        tab = 'event'
+        if type_ == 'involvement':
+            tab = 'actor' if origin.class_.view == 'event' else 'event'
+        elif type_ == 'actor_actor_relation':
+            tab = 'relation'
+        elif type_ == 'member':
+            tab = 'member' if True else 'member-of'
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
     return render_template(
         'display_form.html',
         form=manager.form,
@@ -170,55 +172,7 @@ def member_insert(
             _('member')])
 
 
-@app.route('/relation/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('contributor')
-def relation_insert(origin_id: int) -> Union[str, Response]:
-    origin = Entity.get_by_id(origin_id)
-    manager = get_manager('actor_actor_relation', origin=origin)
-    if manager.form.validate_on_submit():
-        Transaction.begin()
-        try:
-            for actor in Entity.get_by_ids(
-                    ast.literal_eval(manager.form.actor.data)):
-                if manager.form.inverse.data:
-                    link_ = Link.get_by_id(
-                        actor.link(
-                            'OA7',
-                            origin,
-                            manager.form.description.data)[0])
-                else:
-                    link_ = Link.get_by_id(
-                        origin.link(
-                            'OA7',
-                            actor,
-                            manager.form.description.data)[0])
-                link_.set_dates(process_dates(manager))
-                link_.type = manager.get_link_type()
-                link_.update()
-            Transaction.commit()
-            flash(_('entity created'), 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        if hasattr(manager.form, 'continue_') \
-                and manager.form.continue_.data == 'yes':
-            return redirect(url_for(
-                        'insert_relation',
-                        type_='actor_actor_relation',
-                        origin_id=origin_id))
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
-    return render_template(
-        'display_form.html',
-        form=manager.form,
-        title=_('relation'),
-        crumbs=[
-            [_('actor'), url_for('index', view='actor')],
-            origin,
-            f"+ {uc_first(_('relation'))}"])
-
-
-def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
+def update_relation(link_: Link, origin: Entity) -> Union[str, Response]:
     manager = get_manager('involvement', origin=origin, link_=link_)
     event = Entity.get_by_id(link_.domain.id)
     actor = Entity.get_by_id(link_.range.id)

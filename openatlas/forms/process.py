@@ -33,7 +33,8 @@ def process_standard_fields(manager: Any) -> None:
                 'website_url',
                 'resolver_url',
                 'placeholder',
-                'classes')) \
+                'classes',
+                'inverse')) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',

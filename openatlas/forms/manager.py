@@ -64,6 +64,18 @@ class ActorActorRelationManager(BaseManager):
         if self.origin.id == self.link_.range.id:
             self.form.inverse.data = True
 
+    def process_form(self) -> None:
+        super().process_form()
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(self.form.actor.data)):
+            link_type = self.get_link_type()
+            self.add_link(
+                'OA7',
+                actor,
+                self.form.description.data,
+                inverse=True if self.form.inverse.data else False,
+                type_id=link_type.id if link_type else None)
+
 
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
