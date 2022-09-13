@@ -84,13 +84,15 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    manager = get_manager(type_, origin=origin)
+    if type_.startswith('member'):
+        manager = get_manager('actor_function', origin=origin)
+    else:
+        manager = get_manager(type_, origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         # try:
         manager.process_form()
         manager.update_link()
-        print(manager.data)
         Transaction.commit()
         # except Exception as e:  # pragma: no cover
         #     Transaction.rollback()
@@ -109,7 +111,9 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
         elif type_ == 'actor_actor_relation':
             tab = 'relation'
         elif type_ == 'member':
-            tab = 'member' if True else 'member-of'
+            tab = 'member'
+        elif type_ == 'membership':
+            tab = 'member-of'
         return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
     return render_template(
         'display_form.html',
@@ -118,58 +122,6 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
             _(type_)])
-
-
-@app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
-@app.route('/member/insert/<int:origin_id>/<code>', methods=['POST', 'GET'])
-@required_group('contributor')
-def member_insert(
-        origin_id: int,
-        code: str = 'member') -> Union[str, Response]:
-    origin = Entity.get_by_id(origin_id)
-    manager = get_manager('actor_function', origin=origin)
-    if manager.form.validate_on_submit():
-        Transaction.begin()
-        try:
-            member_field = getattr(manager.form, 'actor') \
-                if code == 'member' else getattr(manager.form, 'group')
-            for actor in Entity.get_by_ids(
-                    ast.literal_eval(member_field.data)):
-                if code == 'membership':
-                    link_ = Link.get_by_id(
-                        actor.link(
-                            'P107',
-                            origin,
-                            manager.form.description.data)[0])
-                else:
-                    link_ = Link.get_by_id(
-                        origin.link(
-                            'P107',
-                            actor,
-                            manager.form.description.data)[0])
-                link_.set_dates(process_dates(manager))
-                link_.type = manager.get_link_type()
-                link_.update()
-            Transaction.commit()
-            flash(_('entity created'), 'info')
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        if hasattr(manager.form, 'continue_') \
-                and manager.form.continue_.data == 'yes':
-            return redirect(
-                url_for('member_insert', origin_id=origin_id, code=code))
-        return redirect(
-            f"{url_for('view', id_=origin.id)}"
-            f"#tab-member{'' if code == 'member' else '-of'}")
-    return render_template(
-        'display_form.html',
-        form=manager.form,
-        crumbs=[
-            [_('actor'), url_for('index', view='actor')],
-            origin,
-            _('member')])
 
 
 def update_relation(link_: Link, origin: Entity) -> Union[str, Response]:

@@ -203,11 +203,13 @@ class Tab:
                         url_for('insert', origin_id=id_, class_=name)))
         elif name == 'member':
             self.buttons.append(
-                button('link', url_for('member_insert', origin_id=id_)))
+                button(
+                    'link',
+                    url_for('insert_relation', type_='member', origin_id=id_)))
         elif name == 'member_of':
             self.buttons.append(button(
                 'link',
-                url_for('member_insert', origin_id=id_, code='membership')))
+                url_for('insert_relation', type_='membership', origin_id=id_)))
         elif name == 'note' and is_authorized('contributor'):
             self.buttons.append(
                 button(_('note'), url_for('note_insert', entity_id=id_)))
