@@ -16,7 +16,9 @@ from openatlas import app
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.util import get_file_extension, uc_first
+from openatlas.util.table import Table
+from openatlas.util.util import get_base_table_data, get_file_extension, \
+    uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.link import Link
@@ -218,3 +220,65 @@ def check_if_entity_has_time(
         if '00:00:00' not in str(item) and item:
             return True
     return False
+
+def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = []):
+    selection = ''
+    if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
+        table = Table(
+            ['code', 'name'],
+            defs=[
+                {'orderDataType': 'cidoc-model', 'targets': [0]},
+                {'sType': 'numeric', 'targets': [0]}])
+        for id_, entity in (
+          g.properties if class_name == 'cidoc_property'
+          else g.cidoc_classes).items():
+            onclick = f'''
+                onclick="selectFromTable(
+                    this,
+                    '{class_name}',
+                    '{id_}',
+                    '{entity.code} {entity.name}');"'''
+            table.rows.append([
+                f'<a href="#" {onclick}>{entity.code}</a>',
+                entity.name])
+    else:
+        aliases = current_user.settings['table_show_aliases']
+        if 'place' in class_name \
+          or class_name in ['begins_in', 'ends_in', 'residence']:
+            class_ = 'place'
+            entities = Entity.get_by_view(
+                'place',
+                types=True,
+                aliases=aliases)
+        elif class_name == 'event_preceding':
+            class_ = 'event'
+            entities = Entity.get_by_class(
+                ['activity', 'acquisition', 'move', 'production'],
+                types=True,
+                aliases=aliases)
+        else:
+            class_ = class_name
+            entities = Entity.get_by_view(
+                class_,
+                types=True,
+                aliases=aliases)
+        table = Table(g.table_headers[class_])
+        for entity in list(
+          filter(lambda x: x.id not in filter_ids, entities)):
+            if selected_data and entity.id == int(selected_data):
+                selection = entity.name
+            data = get_base_table_data(entity, show_links=False)
+            data[0] = format_name_and_aliases(entity, class_name)
+            table.rows.append(data)
+    return table,selection
+
+
+def format_name_and_aliases(entity: Entity, field_id: str) -> str:
+    link = f"""<a href='#' onclick="selectFromTable(this,
+        '{field_id}', {entity.id})">{entity.name}</a>"""
+    if not entity.aliases:
+        return link
+    html = f'<p>{link}</p>'
+    for i, alias in enumerate(entity.aliases.values()):
+        html += alias if i else f'<p>{alias}</p>'
+    return html
