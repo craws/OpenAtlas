@@ -219,6 +219,8 @@ class BaseManager:
         return
 
     def update_link(self) -> None:
+        if self.link_:
+            self.link_.delete()
         self.data['attributes_link'] = self.data['attributes']
         self.origin.update_links(self.data, new=True)
 

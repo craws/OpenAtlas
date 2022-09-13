@@ -296,8 +296,12 @@ class InvolvementManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if self.origin.class_.view == 'event':
-            for actor in Entity.get_by_ids(
-                    ast.literal_eval(self.form.actor.data)):
+            if self.link_:
+                actors = [self.link_.range_]
+            else:
+                actors = Entity.get_by_ids(
+                    ast.literal_eval(self.form.actor.data))
+            for actor in actors:
                 link_type = self.get_link_type()
                 self.add_link(
                     self.form.activity.data,
@@ -305,8 +309,12 @@ class InvolvementManager(BaseManager):
                     self.form.description.data,
                     type_id=link_type.id if link_type else None)
         else:
-            for event in Entity.get_by_ids(
-                    ast.literal_eval(self.form.event.data)):
+            if self.link_:
+                events = [self.link_.domain]
+            else:
+                events = Entity.get_by_ids(
+                    ast.literal_eval(self.form.event.data))
+            for event in events:
                 link_type = self.get_link_type()
                 self.add_link(
                     self.form.activity.data,

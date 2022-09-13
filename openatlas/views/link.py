@@ -1,10 +1,8 @@
-import ast
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import StringField, SubmitField
@@ -73,11 +71,39 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-    return update_relation(link_, origin)
-    # if 'reference' in [domain.class_.view, range_.class_.view]:
-    #     return reference_link_update(link_, origin)
-    # if domain.class_.view == 'actor' and range_.class_.view == 'actor':
-    #     return relation_update(link_, domain, range_, origin)
+
+    manager_name = 'involvement'
+    if link_.property.code == 'OA7':
+        manager_name = 'actor_actor_relation'
+    elif link_.property.code == 'P107':
+        manager_name = 'actor_function'
+    manager = get_manager(manager_name, origin=origin, link_=link_)
+
+    if manager.form.validate_on_submit():
+        Transaction.begin()
+        # try:
+        manager.process_form()
+        manager.update_link()
+
+        Transaction.commit()
+        # except Exception as e:  # pragma: no cover
+        #     Transaction.rollback()
+        #     g.logger.log('error', 'database', 'transaction failed', e)
+        #     flash(_('error transaction'), 'error')
+        return redirect(
+            f"{url_for('view', id_=origin.id)}"
+            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
+    if not manager.form.errors:
+        manager.populate_update()
+    return render_template(
+        'display_form.html',
+        origin=origin,
+        form=manager.form,
+        crumbs=[
+            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
+            origin,
+            domain if origin.id != domain.id else range_,
+            _('edit')])
 
 
 @app.route('/insert/relation/<type_>/<int:origin_id>', methods=['POST', 'GET'])
@@ -90,14 +116,14 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
         manager = get_manager(type_, origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
-        # try:
-        manager.process_form()
-        manager.update_link()
-        Transaction.commit()
-        # except Exception as e:  # pragma: no cover
-        #     Transaction.rollback()
-        #     g.logger.log('error', 'database', 'transaction failed', e)
-        #     flash(_('error transaction'), 'error')
+        try:
+            manager.process_form()
+            manager.update_link()
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
             return redirect(
@@ -123,43 +149,6 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             origin,
             _(type_)])
 
-
-def update_relation(link_: Link, origin: Entity) -> Union[str, Response]:
-    manager = get_manager('involvement', origin=origin, link_=link_)
-    event = Entity.get_by_id(link_.domain.id)
-    actor = Entity.get_by_id(link_.range.id)
-    origin = event if origin.id == event.id else actor
-    if manager.form.validate_on_submit():
-        Transaction.begin()
-        try:
-            link_.delete()
-            link_ = Link.get_by_id(
-                event.link(
-                    manager.form.activity.data,
-                    actor,
-                    manager.form.description.data)[0])
-            link_.set_dates(process_dates(manager))
-            link_.type = manager.get_link_type()
-            link_.update()
-            Transaction.commit()
-        except Exception as e:  # pragma: no cover
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(
-            f"{url_for('view', id_=origin.id)}"
-            f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
-    if not manager.form.errors:
-        manager.populate_update()
-    return render_template(
-        'display_form.html',
-        origin=origin,
-        form=manager.form,
-        crumbs=[
-            [_(origin.class_.view), url_for('index', view=origin.class_.view)],
-            origin,
-            event if origin.id != event.id else actor,
-            _('edit')])
 
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
