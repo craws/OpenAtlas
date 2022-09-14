@@ -664,10 +664,14 @@ def admin_log() -> str:
             row['message'],
             user,
             row['info']])
+    buttons = [button(
+        _('delete all logs'),
+        url_for('admin_log_delete'),
+        onclick=f"return confirm('{uc_first(_('delete all logs'))}?')")]
+
     return render_template(
-        'admin/log.html',
-        table=table,
-        form=form,
+        'tabs.html',
+        tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-general"],
