@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
 from openatlas.api.v03.resources.util import (
-    get_geoms_by_entity, replace_empty_list_values_in_dict_with_none)
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -41,11 +41,22 @@ def get_geojson_v2(
 
 def get_geoms_as_collection(entity: Entity) -> Optional[dict[str, Any]]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
-        if location_id := Link.get_linked_entity_safe(entity.id, 'P53').id:
-            return get_geoms_by_entity(location_id)
+        if geom := get_geoms_by_entity_for_geojson(
+                Link.get_linked_entity_safe(entity.id, 'P53').id):
+            return geom
     if entity.class_.name == 'object_location':
-        return get_geoms_by_entity(entity.id)
+        return get_geoms_by_entity_for_geojson(entity.id)
     return None
+
+
+def get_geoms_by_entity_for_geojson(
+        location_id: int) -> Optional[dict[str, Any]]:
+    geoms = Gis.get_by_id(location_id)
+    if len(geoms) == 0:
+        return None
+    if len(geoms) == 1:
+        return geoms[0]
+    return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
 def get_geojson_dict(
