@@ -221,7 +221,11 @@ def check_if_entity_has_time(
             return True
     return False
 
-def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = []):
+
+def get_table_content(
+        class_name: str,
+        selected_data: any,
+        filter_ids: list[int] = []):
     selection = ''
     if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
         table = Table(
@@ -276,9 +280,9 @@ def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = [
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:
     link = f"""<a href='#' onclick="selectFromTable(this,
         '{field_id}', {entity.id})">{entity.name}</a>"""
-    if not entity.aliases:
-        return link
-    html = f'<p>{link}</p>'
-    for i, alias in enumerate(entity.aliases.values()):
-        html += alias if i else f'<p>{alias}</p>'
-    return html
+    if entity.aliases:  # pragma: no cover
+        html = f'<p>{link}</p>'
+        for i, alias in enumerate(entity.aliases.values()):
+            html += alias if i else f'<p>{alias}</p>'
+        return html
+    return link

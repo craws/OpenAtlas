@@ -125,17 +125,6 @@ class TableSelect(HiddenInput):
             table=table.display(field.id),
             selection=selection)
 
-    @staticmethod
-    def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-        link = f"""<a href='#' onclick="selectFromTable(this,
-            '{field_id}', {entity.id})">{entity.name}</a>"""
-        if not entity.aliases:
-            return link
-        html = f'<p>{link}</p>'
-        for i, alias in enumerate(entity.aliases.values()):
-            html += alias if i else f'<p>{alias}</p>'
-        return html
-
 
 class TableField(HiddenField):
     def __init__(
