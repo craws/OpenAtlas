@@ -46,6 +46,7 @@ def ajax_add_type() -> str:
 def ajax_get_type_tree(root_id: Optional[int] = None) -> str:
     return str(Type.get_tree_data(root_id, []))
 
+
 @app.route('/ajax/add_entity', methods=['POST'])
 @required_group('editor')
 def ajax_create_entity() -> str:
@@ -81,4 +82,3 @@ def ajax_get_entity_table(content_domain: Optional[str] = None) -> str:
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)
         abort(400)
-
