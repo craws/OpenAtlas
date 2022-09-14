@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
 from openatlas.api.v03.resources.util import (
-    replace_empty_list_values_in_dict_with_none)
+    get_geoms_by_entity, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -21,12 +21,31 @@ def get_geojson(
 
 
 def get_geom(entity: Entity) -> Union[list[dict[str, Any]], list[Any]]:
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
+    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
         return Gis.get_by_id(
             Link.get_linked_entity_safe(entity.id, 'P53').id)
     if entity.class_.name == 'object_location':
         return Gis.get_by_id(entity.id)
     return []
+
+
+def get_geojson_v2(
+        entities: list[Entity],
+        parser: dict[str, Any]) -> dict[str, Any]:
+    out = []
+    for entity in entities:
+        if geom := get_geoms_as_collection(entity):
+            out.append(get_geojson_dict(entity, parser, geom))
+    return {'type': 'FeatureCollection', 'features': out}
+
+
+def get_geoms_as_collection(entity: Entity) -> Optional[dict[str, Any]]:
+    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
+        if location_id := Link.get_linked_entity_safe(entity.id, 'P53').id:
+            return get_geoms_by_entity(location_id)
+    if entity.class_.name == 'object_location':
+        return get_geoms_by_entity(entity.id)
+    return None
 
 
 def get_geojson_dict(

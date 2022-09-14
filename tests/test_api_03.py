@@ -180,9 +180,12 @@ class Api03(TestBaseCase):
             assert get_bool(rv['depictions'][0], 'url')
 
             # Test entity in GeoJSON format
-            rv = self.app.get(url_for(
-                'api_03.entity', id_=place.id, format='geojson')).get_json()
-            rv = rv['features'][0]
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.entity', id_=place.id, format='geojson')),
+                self.app.get(url_for(
+                    'api_03.entity', id_=place.id, format='geojson-v2'))]:
+                rv = rv.get_json()['features'][0]
             assert get_bool(rv['geometry'], 'type')
             assert get_bool(rv['geometry'], 'coordinates')
             assert get_bool(rv['properties'], '@id')
@@ -203,9 +206,8 @@ class Api03(TestBaseCase):
                     url_for('api_03.entity', id_=place.id, format='xml')),
                 self.app.get(
                     url_for('api_03.entity', id_=place.id, export='csv')),
-                self.app.get(
-                    url_for(
-                        'api_03.entity', id_=place.id, export='csvNetwork')),
+                self.app.get(url_for(
+                    'api_03.entity', id_=place.id, export='csvNetwork')),
                 self.app.get(url_for(
                     'api_03.view_class', view_class='place', format='xml')),
                 self.app.get(url_for(
@@ -324,31 +326,39 @@ class Api03(TestBaseCase):
             assert bool(rv.get_json() == 1)
 
             # Test entities with GeoJSON Format
-            rv = self.app.get(url_for(
-                'api_03.query',
-                entities=location.id,
-                cidoc_classes='E18',
-                view_classes='artifact',
-                system_classes='person',
-                format='geojson')).get_json()
-            rv = rv['results'][0]['features'][0]
-            assert get_bool(rv['properties'], '@id')
-            assert get_bool(rv['properties'], 'systemClass')
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='geojson')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=location.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='geojson-v2'))]:
+                rv = rv.get_json()['results'][0]['features'][0]
+                assert get_bool(rv['properties'], '@id')
+                assert get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
-            for rv in [
-                self.app.get(url_for('api_03.type_overview')),
-                self.app.get(
-                    url_for('api_03.type_overview', download=True))]:
+            for rv in[
+            self.app.get(url_for('api_03.type_overview')),
+            self.app.get(
+            url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()['place'][0]['children'][0]
-                assert bool(rv['label'] == 'Austria')
+            assert bool(rv['label'] == 'Austria')
 
             for rv in [
                 self.app.get(url_for('api_03.type_by_view_class')),
                 self.app.get(
                     url_for('api_03.type_by_view_class', download=True))]:
                 rv = rv.get_json()['place'][0]['children'][0]
-                assert bool(rv['label'] == 'Boundary Mark')
+            assert bool(rv['label'] == 'Boundary Mark')
 
             for rv in [
                 self.app.get(url_for('api_03.type_tree')),
@@ -608,18 +618,18 @@ class Api03(TestBaseCase):
                 self.app.get(
                     url_for('api_03.subunits', id_=place.id, download=True))]:
                 rv = rv.get_json()[str(place.id)][0]
-                assert bool(rv['id'] == place.id)
-                assert bool(rv['openatlasClassName'] == "place")
-                assert bool(rv['children'] == [feature.id])
-                rv = rv['properties']
-                assert bool(rv['name'] == place.name)
-                assert bool(rv['description'] == place.description)
-                assert bool(rv['aliases'] == [alias.name])
-                assert bool(rv['externalReferences'])
-                assert bool(rv['timespan'])
-                assert bool(rv['standardType'])
-                assert bool(rv['files'])
-                assert bool(rv['types'])
+            assert bool(rv['id'] == place.id)
+            assert bool(rv['openatlasClassName'] == "place")
+            assert bool(rv['children'] == [feature.id])
+            rv = rv['properties']
+            assert bool(rv['name'] == place.name)
+            assert bool(rv['description'] == place.description)
+            assert bool(rv['aliases'] == [alias.name])
+            assert bool(rv['externalReferences'])
+            assert bool(rv['timespan'])
+            assert bool(rv['standardType'])
+            assert bool(rv['files'])
+            assert bool(rv['types'])
 
             rv = self.app.get(
                 url_for('api_03.subunits', id_=place.id, count=True))
