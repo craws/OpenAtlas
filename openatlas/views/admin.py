@@ -629,8 +629,8 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.description,
             date])
     return render_template(
-        'admin/logo.html',
-        table=table,
+        'tabs.html',
+        tabs={'logo': Tab('files', table=table)},
         title=_('logo'),
         crumbs=[[
             _('admin'),
@@ -699,7 +699,9 @@ def admin_newsletter() -> Union[str, Response]:
         body = TextAreaField(
             '',
             [InputRequired()],
-            render_kw={'placeholder': uc_first(_('content'))})
+            render_kw={
+                'class': 'description',
+                'placeholder': uc_first(_('content'))})
         save = SubmitField(_('send'))
 
     form = NewsLetterForm()
@@ -737,9 +739,8 @@ def admin_newsletter() -> Union[str, Response]:
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'admin/newsletter.html',
-        form=form,
-        table=table,
+        'tabs.html',
+        tabs={'tab': Tab('newsletter', form=form, table=table)},
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
