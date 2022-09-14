@@ -275,12 +275,21 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event': TableField(_('sub event of'), filter_ids=filter_ids,
-                                add_dynamic=['event'])}
+            'event': TableField(
+                _('sub event of'),
+                filter_ids=filter_ids,
+                add_dynamic=['activity', 'acquisition', 'event', 'move',
+                             'production'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
-                filter_ids=filter_ids)
+                filter_ids=filter_ids,
+                add_dynamic=[
+                    'activity',
+                    'acquisition',
+                    'move',
+                    'production']
+            )
         if self.class_.name != 'move':
             fields['place'] = TableField(_('location'), add_dynamic=['place'])
         return fields
