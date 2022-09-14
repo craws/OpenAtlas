@@ -22,8 +22,11 @@ class ContentTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 Entity.insert('file', 'One forsaken file entity')
+                Entity.insert('feature', 'One forsaken subunit')
             rv = self.app.get(url_for('admin_orphans'))
-            assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
+            assert b'Oliver Twist' in rv.data
+            assert b'One forsaken file entity' in rv.data
+            assert b'One forsaken subunit' in rv.data
 
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data

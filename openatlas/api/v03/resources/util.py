@@ -243,6 +243,12 @@ def get_geometries(
         return {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
+    if entity.class_.view == 'event':
+        geoms = [Gis.get_by_id(link_.range.id) for link_ in links
+                 if link_.property.code in ['P7', 'P26', 'P27']]
+        return {
+            'type': 'GeometryCollection',
+            'geometries': [geom for sublist in geoms for geom in sublist]}
     return None
 
 
@@ -250,8 +256,8 @@ def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
 
 
-def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
-    geoms = Gis.get_by_id(entity_id)
+def get_geoms_by_entity(location_id: int) -> dict[str, Any]:
+    geoms = Gis.get_by_id(location_id)
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}

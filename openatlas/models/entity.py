@@ -287,6 +287,10 @@ class Entity:
             for row in Date.get_invalid_dates()]
 
     @staticmethod
+    def get_orphaned_subunits() -> list[Entity]:
+        return [Entity.get_by_id(x['id']) for x in Db.get_orphaned_subunits()]
+
+    @staticmethod
     def delete_(id_: Union[int, list[int]]) -> None:
         if not id_:
             return
