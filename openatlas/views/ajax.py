@@ -1,10 +1,11 @@
-import json
 from typing import Optional
 
 from flask import abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
+import json
 
 from openatlas import app
+from openatlas.database.connect import Transaction
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -26,16 +27,18 @@ def ajax_add_type() -> str:
     link = {'E55': 'P127', 'E53': 'P89'}
     cidoc_name = {'E55': 'type', 'E53': 'administrative_unit'}
     cidoc_code = g.types[int(request.form['superType'])].cidoc_class.code
-    entity = Entity.insert(
-        cidoc_name[cidoc_code],
-        request.form['name'],
-        request.form['description'])
+    Transaction.begin()
     try:
+        entity = Entity.insert(
+            cidoc_name[cidoc_code],
+            request.form['name'],
+            request.form['description'])
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
+        Transaction.commit()
+        return str(entity.id)
     except Exception as _e:  # pragma: no cover
-        entity.delete()
+        Transaction.rollback()
         abort(400)
-    return str(entity.id)
 
 
 @app.route('/ajax/get_type_tree/<int:root_id>')
@@ -59,32 +62,23 @@ def ajax_create_entity() -> str:
                     'object_location',
                     f'Location of {request.form["name"]}'))
         if 'standardType' in request.form and request.form['standardType']:
-            entity.link('P2',
-                        g.types[int(request.form['standardType'])])
-    except Exception as _e:
-        g.logger.log('error', 'ajax',  _e)
+            entity.link(
+                'P2',
+                g.types[int(request.form['standardType'])])
+        return str(entity.id)
+    except Exception as _e:  # pragma: no cover
+        g.logger.log('error', 'ajax', _e)
         abort(400)
-    return str(entity.id)
 
 
 @app.route('/ajax/get_entity_table/<string:content_domain>', methods=['POST'])
 @required_group('readonly')
-def ajax_get_entity_table(content_domain: str) -> str:
+def ajax_get_entity_table(content_domain: Optional[str] = None) -> str:
     try:
         filter_ids = json.loads(request.form['filterIds']) or []
         table, selection = get_table_content(content_domain, None, filter_ids)
+        return table.display(content_domain)
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)
         abort(400)
-    return table.display(content_domain)
 
-
-def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-    link = f"""<a href='#' onclick="selectFromTable(this,
-        '{field_id}', {entity.id})">{entity.name}</a>"""
-    if not entity.aliases:
-        return link
-    html = f'<p>{link}</p>'
-    for i, alias in enumerate(entity.aliases.values()):
-        html += alias if i else f'<p>{alias}</p>'
-    return html
