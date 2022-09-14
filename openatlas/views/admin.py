@@ -699,9 +699,7 @@ def admin_newsletter() -> Union[str, Response]:
         body = TextAreaField(
             '',
             [InputRequired()],
-            render_kw={
-                'class': 'description',
-                'placeholder': uc_first(_('content'))})
+            render_kw={'placeholder': uc_first(_('content'))})
         save = SubmitField(_('send'))
 
     form = NewsLetterForm()
