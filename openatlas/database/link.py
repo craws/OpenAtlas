@@ -223,6 +223,28 @@ class Link:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_all_links() -> list[dict[str, Any]]:
+        g.cursor.execute(f"""
+            SELECT
+                l.id, 
+                l.property_code,
+                l.domain_id,
+                l.range_id,
+                l.description,
+                l.created,
+                l.modified,
+                l.type_id,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
+            FROM model.link l 
+            GROUP BY l.id""")
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def check_link_duplicates() -> list[dict[str, int]]:
         g.cursor.execute(
             """
