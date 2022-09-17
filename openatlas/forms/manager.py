@@ -27,7 +27,7 @@ class AcquisitionManager(EventBaseManager):
 
     def populate_update(self) -> None:
         super().populate_update()
-        data = {'place': [], 'artifact': []}
+        data: dict[str, list[int]] = {'place': [], 'artifact': []}
         for entity in self.entity.get_linked_entities('P24'):
             var = 'artifact' if entity.class_.name == 'artifact' else 'place'
             data[var].append(entity.id)
