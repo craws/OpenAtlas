@@ -66,8 +66,8 @@ def class_entities(code: str) -> str:
         ['name'],
         rows=[[link(entity)] for entity in Entity.get_by_cidoc_class(code)])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         title=_('model'),
         crumbs=[
             [_('model'), url_for('model_index')],
@@ -111,8 +111,8 @@ def openatlas_class_index() -> str:
             format_number(class_count[class_.name])
             if class_count[class_.name] else ''])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         title=_('model'),
         crumbs=[
             [_('model'), url_for('model_index')],
@@ -138,8 +138,8 @@ def cidoc_class_index() -> str:
                     url_for('class_entities', code=class_.code))
         table.rows.append([link(class_), class_.name, count])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         title=_('model'),
         crumbs=[[_('model'), url_for('model_index')], _('classes')])
 
@@ -168,8 +168,8 @@ def property_index() -> str:
             classes[property_.range_class_code].name,
             format_number(property_.count) if property_.count else ''])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         title=_('model'),
         crumbs=[[_('model'), url_for('model_index')], _('properties')])
 

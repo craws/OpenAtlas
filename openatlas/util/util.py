@@ -601,8 +601,8 @@ def button(
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    return Markup(
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
+    return \
+        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
         if buttons else ''
 
 

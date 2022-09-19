@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-  {{ buttons|button_bar }}
-  {{ table.display() }}
+  {{ buttons|button_bar|safe }}
+  {{ content|safe }}
 {% endblock %}

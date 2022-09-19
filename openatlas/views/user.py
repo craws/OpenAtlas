@@ -178,8 +178,8 @@ def user_entities(id_: int) -> str:
                 entity.last,
                 format_date(entity.created)])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user,

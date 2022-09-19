@@ -172,12 +172,11 @@ def show_untyped_entities(id_: int) -> str:
             entity.last,
             entity.description])
     return render_template(
-        'table.html',
+        'content.html',
+        content=table.display(),
         entity=hierarchy,
-        table=table,
         crumbs=[
-            [_('types'),
-             url_for('type_index')],
+            [_('types'), url_for('type_index')],
             link(hierarchy),
             _('untyped entities')])
 
@@ -200,11 +199,10 @@ def show_multiple_linked_entities(id_: int) -> str:
             entity.last,
             entity.description])
     return render_template(
-        'table.html',
+        'content.html',
+        content=table.display(),
         entity=g.types[id_],
-        table=table,
         crumbs=[
-            [_('types'),
-             url_for('type_index')],
+            [_('types'), url_for('type_index')],
             link(g.types[id_]),
             _('untyped entities')])

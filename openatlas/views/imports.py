@@ -58,8 +58,8 @@ def import_index() -> str:
     if is_authorized('admin'):
         buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         buttons=buttons,
         title=_('import'),
         crumbs=[
