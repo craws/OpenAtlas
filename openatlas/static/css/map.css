@@ -80,3 +80,7 @@ a.manual svg.svg-inline--fa {
 .leaflet-lines-pane {
     z-index: 410 !important;
 }
+
+.leaflet-shadow-pane {
+    z-index: 400 !important;
+}
