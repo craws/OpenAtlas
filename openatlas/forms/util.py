@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import ast
 from datetime import datetime
@@ -221,7 +221,12 @@ def check_if_entity_has_time(
             return True
     return False
 
-def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = []):
+
+def get_table_content(
+        class_name: str,
+        selected_data: Any,
+        filter_ids: Optional[list[int]] = None) -> tuple[Table, str]:
+    filter_ids = filter_ids or []
     selection = ''
     if class_name in ('cidoc_domain', 'cidoc_property', 'cidoc_range'):
         table = Table(
@@ -243,8 +248,8 @@ def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = [
                 entity.name])
     else:
         aliases = current_user.settings['table_show_aliases']
-        if 'place' in class_name \
-          or class_name in ['begins_in', 'ends_in', 'residence']:
+        if 'place' in class_name or class_name in \
+                ['begins_in', 'ends_in', 'residence']:
             class_ = 'place'
             entities = Entity.get_by_view(
                 'place',
@@ -264,21 +269,21 @@ def get_table_content(class_name:str,selected_data:any, filter_ids:list[int] = [
                 aliases=aliases)
         table = Table(g.table_headers[class_])
         for entity in list(
-          filter(lambda x: x.id not in filter_ids, entities)):
+          filter(lambda x: x.id not in filter_ids, entities)):  # type: ignore
             if selected_data and entity.id == int(selected_data):
                 selection = entity.name
             data = get_base_table_data(entity, show_links=False)
             data[0] = format_name_and_aliases(entity, class_name)
             table.rows.append(data)
-    return table,selection
+    return table, selection
 
 
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:
     link = f"""<a href='#' onclick="selectFromTable(this,
         '{field_id}', {entity.id})">{entity.name}</a>"""
-    if not entity.aliases:
-        return link
-    html = f'<p>{link}</p>'
-    for i, alias in enumerate(entity.aliases.values()):
-        html += alias if i else f'<p>{alias}</p>'
-    return html
+    if entity.aliases:  # pragma: no cover
+        html = f'<p>{link}</p>'
+        for i, alias in enumerate(entity.aliases.values()):
+            html += alias if i else f'<p>{alias}</p>'
+        return html
+    return link

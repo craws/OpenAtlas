@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Union
+from typing import Any, Union
 
 from flask import g
 
@@ -174,7 +174,7 @@ class Link:
             """
             SELECT domain_id
             FROM model.link
-            WHERE range_id IN %(type_ids)s 
+            WHERE range_id IN %(type_ids)s
             AND property_code in ('P2', 'P89')
             GROUP BY id ORDER BY id;
             """,

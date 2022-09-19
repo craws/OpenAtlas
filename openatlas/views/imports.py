@@ -19,8 +19,10 @@ from openatlas.models.imports import Import, is_float
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    datetime64_to_timestamp, format_date, get_backup_file_data, link,
-    required_group, uc_first)
+    button, datetime64_to_timestamp, format_date, get_backup_file_data,
+    is_authorized,
+    link,
+    manual, required_group, uc_first)
 
 
 class ProjectForm(FlaskForm):
@@ -52,9 +54,13 @@ def import_index() -> str:
             link(project),
             format_number(project.count),
             project.description])
+    buttons = [manual('admin/import')]
+    if is_authorized('admin'):
+        buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
-        'import/index.html',
+        'table.html',
         table=table,
+        buttons=buttons,
         title=_('import'),
         crumbs=[
             [_('admin'),

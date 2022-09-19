@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import ast
 from typing import Any, Iterable, Optional, TYPE_CHECKING, Union
@@ -287,6 +287,10 @@ class Entity:
             for row in Date.get_invalid_dates()]
 
     @staticmethod
+    def get_orphaned_subunits() -> list[Entity]:
+        return [Entity.get_by_id(x['id']) for x in Db.get_orphaned_subunits()]
+
+    @staticmethod
     def delete_(id_: Union[int, list[int]]) -> None:
         if not id_:
             return
@@ -399,7 +403,7 @@ class Entity:
         entities = Entity.get_by_class(class_)
         for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in filter(lambda x: x.id != sample.id, entities):
+            for entity in filter(lambda y: y.id != sample.id, entities):
                 if fuzz.ratio(sample.name, entity.name) >= ratio:
                     already_added.add(sample.id)
                     already_added.add(entity.id)
