@@ -184,12 +184,15 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
-function getTable(id,filterIds = []){
-  return $.ajax({
+async function refillTable(id, filterIds = []) {
+  const tableContent = await $.ajax({
     type: 'post',
     url: `/ajax/get_entity_table/${id}`,
-    data: {filterIds:JSON.stringify(filterIds)},
+    data: {filterIds: JSON.stringify(filterIds)},
   });
+  $(`#${id}-modal .modal-body-table`)
+      .empty()
+      .append($(`${tableContent}`));
 }
 
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
