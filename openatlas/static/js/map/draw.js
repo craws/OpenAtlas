@@ -61,24 +61,31 @@ let mapInputForm = L.control();
 mapInputForm.onAdd = () => {
     let div = L.DomUtil.create('div');
     div.innerHTML = `
-    <div class="mapFormDiv" onmouseover="interactionOff()" onmouseout="interactionOn()">
-            <span id="closeButton" title="${translate["map_info_close"]}" onclick="closeForm()" class="fad">X</span>
+    <div class="mapFormDiv" onmouseover="interactionOff()" 
+      onmouseout="interactionOn()">
+            <span id="closeButton" title="${translate["map_info_close"]}" 
+              onclick="closeForm()" class="fad">X</span>
             <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
-            <input type="text" id="nameField" placeholder="Enter a name if desired">
-            <textarea rows="3" cols="70" id="descriptionField" placeholder="${translate["map_info_description"]}"/></textarea>
+            <input type="text" id="nameField" 
+              placeholder="Enter a name if desired">
+            <textarea rows="3" cols="70" id="descriptionField" 
+              placeholder="${translate["map_info_description"]}"/></textarea>
             <div id="coordinatesDiv">
             <div class="markerInput">
                 <label for='easting'>Easting</label>
-                <input type="text" oninput="check_coordinates_input_marker()" id="easting" placeholder="decimal degrees">
+                <input type="text" oninput="check_coordinates_input_marker()" 
+                 id="easting" placeholder="decimal degrees">
             </div>
             <div class="markerInput">
                 <label for='northing'>Northing</label>
-                <input type="text" oninput="check_coordinates_input_marker()" id="northing" placeholder="decimal degrees">
+                <input type="text" oninput="check_coordinates_input_marker()" 
+                  id="northing" placeholder="decimal degrees">
             </div>
             <div class="polygonInput">
                 <label for='polyInput'>Points</label>
-                <input type="text" oninput="check_coordinates_input_polygon()" id="polyInput"  placeholder="[[lon1,lat1],[lon2,lat2],...]">
+                <input type="text" oninput="check_coordinates_input_polygon()" 
+                  id="polyInput"  placeholder="[[lon1,lat1],[lon2,lat2],...]">
             </div>
         </div>
         </div>
@@ -94,23 +101,35 @@ map.on(L.Draw.Event.CREATED, function (e) {
     currentEditLayer = e.layer;
     switch (e.layerType.toLowerCase()) {
         case 'marker':
-            geometry = { type: 'Point', coordinates: [currentEditLayer.getLatLng().lng, currentEditLayer.getLatLng().lat] };
+            geometry = {
+                type: 'Point',
+                coordinates: [currentEditLayer.getLatLng().lng,
+                    currentEditLayer.getLatLng().lat]
+            };
             shapeType = 'centerpoint';
             $('#easting').val(currentEditLayer.getLatLng().lng)
             $('#northing').val(currentEditLayer.getLatLng().lat)
             $("#coordinatesDiv input").removeClass('error');
             break;
         case 'polyline':
-            geometry = { type: 'Linestring', coordinates: currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]) };
+            geometry = {
+                type: 'Linestring',
+                coordinates:
+                    currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
+            };
             shapeType = 'polyline';
             $('#polyInput').val(JSON.stringify(geometry.coordinates));
             break;
         case 'polygon':
-            geometry = { type: 'Polygon', coordinates: [currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat])] };
+            geometry = {
+                type: 'Polygon',
+                coordinates:
+                    [currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat])]
+            };
             // Add first xy again as last xy to close polygon
-            geometry.coordinates = [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
+            geometry.coordinates =
+                [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
             $('#polyInput').val(JSON.stringify(geometry.coordinates[0]));
-
 
             shapeType = drawLayerIsArea ? 'area' : 'shape';
             break;
@@ -119,43 +138,59 @@ map.on(L.Draw.Event.CREATED, function (e) {
     currentEditLayer.feature = {
         type: "Feature",
         geometry: geometry,
-        properties: { name: name, description: description, id: Date.now() * -1, shapeType: shapeType }
+        properties: {
+            name: name,
+            description: description,
+            id: Date.now() * -1,
+            shapeType: shapeType
+        }
     }
-    currentEditLayer.bindPopup(buildPopup(currentEditLayer.feature, 'view', true));
+    setPopup(true)(currentEditLayer.feature, currentEditLayer);
     currentDrawLayer = undefined;
     drawnItems.addLayer(currentEditLayer);
 });
 
 function editGeometry(featureId) {
     saveCurrentEditLayer();
-    let tempLayer = Object.values(selectedLayer._layers).find(x => x.feature.properties.id === featureId) ||
-        Object.values(drawnItems._layers).find(x => x?.feature?.properties?.id === featureId);
+    let tempLayer = Object.values(selectedLayer._layers)
+            .find(x => x.feature.properties.id === featureId) ||
+        Object.values(drawnItems._layers)
+            .find(x => x?.feature?.properties?.id === featureId);
 
     openForm(tempLayer.feature.properties.shapeType, tempLayer.feature);
 
     switch (tempLayer.feature.properties.shapeType.toLowerCase()) {
-        case "centerpoint": case "point":
-            currentEditLayer = L.marker(tempLayer.getLatLng(), { draggable: true, icon: editIcon }).addTo(map);
+        case "centerpoint":
+        case "point":
+            currentEditLayer = L.marker(tempLayer.getLatLng(), {
+                draggable: true,
+                icon: editIcon
+            }).addTo(map);
             $('#easting').val(tempLayer.getLatLng().lng)
             $('#northing').val(tempLayer.getLatLng().lat)
 
             break;
-        case "polyline": case "linestring":
+        case "polyline":
+        case "linestring":
             currentEditLayer = L.polyline(tempLayer.getLatLngs()).addTo(map);
-            currentEditLayer.options.editing || (currentEditLayer.options.editing = {});
-            $('#polyInput').val(JSON.stringify(tempLayer.feature.geometry.coordinates));
+            currentEditLayer.options.editing
+            || (currentEditLayer.options.editing = {});
+            $('#polyInput')
+                .val(JSON.stringify(tempLayer.feature.geometry.coordinates));
             break;
         default:
             currentEditLayer = L.polygon(tempLayer.getLatLngs()).addTo(map);
-            $('#polyInput').val(JSON.stringify(tempLayer.feature.geometry.coordinates[0]));
+            $('#polyInput').val(
+                JSON.stringify(tempLayer.feature.geometry.coordinates[0]));
 
     }
     $("#coordinatesDiv input").removeClass('error');
-    currentEditLayer.options.editing || (currentEditLayer.options.editing = {});
+    currentEditLayer.options.editing
+    || (currentEditLayer.options.editing = {});
     currentEditLayer.editing.enable();
     currentEditLayer.feature = tempLayer.feature;
     map.closePopup();
-    currentEditLayer.bindPopup(buildPopup(tempLayer.feature, 'view', true));
+    setPopup(true)(currentEditLayer.feature, currentEditLayer);
     drawnItems.removeLayer(tempLayer);
     selectedLayer.removeLayer(tempLayer);
 }
@@ -163,8 +198,10 @@ function editGeometry(featureId) {
 function deleteGeometry(featureId) {
     closeForm();
     saveCurrentEditLayer();
-    let tempLayer = Object.values(selectedLayer._layers).find(x => x.feature.properties.id === featureId) ||
-        Object.values(drawnItems._layers).find(x => x?.feature?.properties?.id === featureId);
+    let tempLayer = Object.values(selectedLayer._layers)
+            .find(x => x.feature.properties.id === featureId) ||
+        Object.values(drawnItems._layers)
+            .find(x => x?.feature?.properties?.id === featureId);
     tempLayer.remove();
     deleteIdList.push(featureId);
 }
@@ -181,14 +218,19 @@ function drawGeometry(shapeType) {
             break;
         case 'area':
             drawLayerIsArea = true;
-            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false, shapeOptions: {weight:0}});
+            currentDrawLayer = new L.Draw.Polygon(map, {
+                allowIntersection: false,
+                shapeOptions: {weight: 0}
+            });
             break;
         case 'shape':
-            currentDrawLayer = new L.Draw.Polygon(map, { allowIntersection: false });
+            currentDrawLayer =
+                new L.Draw.Polygon(map, {allowIntersection: false});
             break;
     }
     currentDrawLayer.enable();
 }
+
 function openForm(shapeType, feature = undefined) {
     if (shapeType === 'polyline') shapeType = 'linestring'
     if (shapeType === 'point') shapeType = 'centerpoint'
@@ -196,8 +238,13 @@ function openForm(shapeType, feature = undefined) {
     map.addControl(mapInputForm);
     $('.leaflet-right .leaflet-bar').hide();
 
-    if (shapeType == 'centerpoint') { $('.markerInput').show(); $('.polygonInput').hide(); }
-    else { $('.markerInput').hide(); $('.polygonInput').show(); }
+    if (shapeType == 'centerpoint') {
+        $('.markerInput').show();
+        $('.polygonInput').hide();
+    } else {
+        $('.markerInput').hide();
+        $('.polygonInput').show();
+    }
 
     $('#inputFormTitle').text(shapeType);
     $('#inputFormInfo').text(translate[`map_info_${shapeType}`]);
@@ -206,6 +253,7 @@ function openForm(shapeType, feature = undefined) {
 
 
 }
+
 function closeForm(withoutSave = true) {
     interactionOn();
     currentDrawLayer?.disable();
@@ -221,19 +269,38 @@ function saveCurrentEditLayer() {
     let geometry = [];
     let shapeType = "";
     if (currentEditLayer) {
-        switch (currentEditLayer?.feature?.properties?.shapeType.toLowerCase()) {
-            case 'marker': case 'point': case 'centerpoint':
-                geometry = { type: 'Point', coordinates: [currentEditLayer.getLatLng().lng, currentEditLayer.getLatLng().lat] };
+        switch (currentEditLayer?.feature
+            ?.properties?.shapeType.toLowerCase()) {
+            case 'marker':
+            case 'point':
+            case 'centerpoint':
+                geometry = {
+                    type: 'Point',
+                    coordinates: [currentEditLayer.getLatLng().lng,
+                        currentEditLayer.getLatLng().lat]
+                };
                 shapeType = "centerpoint";
                 break;
-            case 'polyline': case 'linestring':
-                geometry = { type: 'Linestring', coordinates: currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]) };
+            case 'polyline':
+            case 'linestring':
+                geometry = {
+                    type: 'Linestring',
+                    coordinates:
+                        currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
+                };
                 shapeType = "polyline";
                 break;
-            case 'polygon': case 'area': case 'shape':
-                geometry = { type: 'Polygon', coordinates: [currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat])] };
+            case 'polygon':
+            case 'area':
+            case 'shape':
+                geometry = {
+                    type: 'Polygon',
+                    coordinates: [currentEditLayer.getLatLngs()[0]
+                        .map(x => [x.lng, x.lat])]
+                };
                 // Add first xy again as last xy to close polygon
-                geometry.coordinates = [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
+                geometry.coordinates =
+                    [[...geometry.coordinates[0], geometry.coordinates[0][0]]]
 
                 shapeType = currentEditLayer?.feature?.properties?.shapeType;
                 break;
@@ -242,11 +309,16 @@ function saveCurrentEditLayer() {
         currentEditLayer.feature = {
             ...currentEditLayer.feature,
             geometry: geometry,
-            properties: { ...currentEditLayer.feature.properties, name: name, description: description, shapeType: shapeType },
+            properties: {
+                ...currentEditLayer.feature.properties,
+                name: name,
+                description: description,
+                shapeType: shapeType
+            },
 
         }
         currentEditLayer.editing.disable();
-        setPopup(true)(currentEditLayer.feature,currentEditLayer);
+        setPopup(true)(currentEditLayer.feature, currentEditLayer);
 
         drawnItems.addLayer(currentEditLayer);
         currentEditLayer = undefined;
@@ -256,15 +328,21 @@ function saveCurrentEditLayer() {
 
 function updateHiddenInputFields() {
     saveCurrentEditLayer();
-    const drawnItemsFeatures = Object.values(drawnItems?._layers).map(x => x.feature);
+    const drawnItemsFeatures =
+        Object.values(drawnItems?._layers).map(x => x.feature);
     const drawnItemsFeaturesIds = drawnItemsFeatures.map(x => x.properties.id);
     const removeIdList = [...drawnItemsFeaturesIds, ...deleteIdList];
-    const allGisElements = [...gisSelected.filter(x => !removeIdList.includes(x.properties.id)),
-    ...drawnItemsFeatures.filter(x => !deleteIdList.includes(x.properties.id))];
+    const allGisElements =
+        [...gisSelected.filter(x => !removeIdList.includes(x.properties.id)),
+            ...drawnItemsFeatures
+                .filter(x => !deleteIdList.includes(x.properties.id))];
 
-    $('#gis_points').val(JSON.stringify(allGisElements.filter(x => x.geometry.type.toLowerCase() === 'point')));
-    $('#gis_lines').val(JSON.stringify(allGisElements.filter(x => x.geometry.type.toLowerCase() === 'linestring')));
-    $('#gis_polygons').val(JSON.stringify(allGisElements.filter(x => x.geometry.type.toLowerCase() === 'polygon')));
+    $('#gis_points').val(JSON.stringify(allGisElements
+        .filter(x => x.geometry.type.toLowerCase() === 'point')));
+    $('#gis_lines').val(JSON.stringify(allGisElements
+        .filter(x => x.geometry.type.toLowerCase() === 'linestring')));
+    $('#gis_polygons').val(JSON.stringify(allGisElements
+        .filter(x => x.geometry.type.toLowerCase() === 'polygon')));
 }
 
 function importGeonamesID(geo, popup) {
@@ -276,26 +354,36 @@ function importNewPoint(geo, popup) {
     saveCurrentEditLayer();
     popup._close();
     point =
-    {
-        type: "Feature",
-        geometry: { type: "Point", coordinates: [geo.lng, geo.lat] },
-        properties: { name: geo.name, description: `${geo.name} (${geo.geonameId}), imported from GeoNames`, shapeType: "centerpoint" }
-    };
+        {
+            type: "Feature",
+            geometry: {type: "Point", coordinates: [geo.lng, geo.lat]},
+            properties: {
+                name: geo.name,
+                description:
+                    `${geo.name} (${geo.geonameId}), imported from GeoNames`,
+                shapeType: "centerpoint"
+            }
+        };
     openForm("centerpoint", point);
-    currentEditLayer = L.marker([geo.lat, geo.lng], { draggable: true, icon: editIcon }).addTo(map);
+    currentEditLayer = L.marker([geo.lat, geo.lng], {
+        draggable: true,
+        icon: editIcon
+    }).addTo(map);
     currentEditLayer.editing.enable();
     currentEditLayer.feature = point;
-    currentEditLayer.bindPopup(buildPopup(point, 'view', true));
+    setPopup(true)(currentEditLayer.feature, currentEditLayer);
 }
 
 function importAll(geo, popup) {
     importGeonamesID(geo, popup);
     importNewPoint(geo, popup);
 }
+
 $(document).ready(function () {
-    $('#save,#insert_and_continue,#insert_continue_sub').on('click', function () { // I think this should be click event because you're not submitting your page you're just clearing it based on "CLEAR"
-        updateHiddenInputFields();
-    });
+    $('#save,#insert_and_continue,#insert_continue_sub')
+        .on('click', function () {
+            updateHiddenInputFields();
+        });
 });
 
 function check_coordinates_input_marker() {
@@ -308,7 +396,8 @@ function check_coordinates_input_marker() {
     if (!floatRegex.test(lat)) $("#northing").addClass('error');
     else $("#northing").removeClass('error');
     if (!floatRegex.test(lng) || !floatRegex.test(lat)) return false;
-    currentEditLayer.feature.geometry.coordinates = [parseFloat(lng), parseFloat(lat)]
+    currentEditLayer.feature.geometry.coordinates =
+        [parseFloat(lng), parseFloat(lat)]
     var newLatLng = new L.LatLng(parseFloat(lat), parseFloat(lng));
     currentEditLayer.setLatLng(newLatLng);
     if (!map.getBounds().contains(newLatLng)) map.panTo(newLatLng);
@@ -323,10 +412,13 @@ function check_coordinates_input_polygon() {
         let points = [];
         try {
             points = JSON.parse(input)
-        } catch { return false }
+        } catch {
+            return false
+        }
 
         if (!Array.isArray(points)) return false;
-        if (points.some(x => !Array.isArray(x) || x.length !== 2)) return false;
+        if (points.some(x => !Array.isArray(x) || x.length !== 2))
+            return false;
         if (points.some(x => x.some(y => !floatRegex.test(y)))) return false;
         return true
     }
@@ -342,9 +434,10 @@ function check_coordinates_input_polygon() {
 }
 
 map.on('draw:editvertex', function () {
-    const newCoordinates = currentEditLayer.feature.geometry.type === 'Polygon' ?
-        currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat]) :
-        currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]);
+    const newCoordinates =
+        currentEditLayer.feature.geometry.type === 'Polygon' ?
+            currentEditLayer.getLatLngs()[0].map(x => [x.lng, x.lat]) :
+            currentEditLayer.getLatLngs().map(x => [x.lng, x.lat]);
     $('#polyInput').val(JSON.stringify(newCoordinates))
     $("#coordinatesDiv input").removeClass('error');
 
@@ -356,12 +449,13 @@ map.on('draw:editmove', function () {
 });
 
 map.on('keyup', (event) => {
-    if (event.originalEvent.key === 'Escape' )
+    if (event.originalEvent.key === 'Escape')
         closeForm();
 });
+
 function interactionOn() {
     // Enable interaction with map e.g. if cursor leaves form
-    if(currentDrawLayer?.type === 'marker')
+    if (currentDrawLayer?.type === 'marker')
         currentDrawLayer.enable();
     captureCoordinates = true;
     map.dragging.enable();
@@ -376,7 +470,7 @@ function interactionOn() {
 }
 
 function interactionOff() {
-    if(currentDrawLayer?.type === 'marker')
+    if (currentDrawLayer?.type === 'marker')
         currentDrawLayer.disable();
     // Disable interaction with map e.g. if cursor is over a form
     captureCoordinates = false;
