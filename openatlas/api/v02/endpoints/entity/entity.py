@@ -5,7 +5,7 @@ from flask import Response
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.csv_export import export_entities_csv
+from openatlas.api.v03.resources.formats.csv import export_entities_csv
 from openatlas.api.v02.resources.formats.geojson import Geojson
 from openatlas.api.v02.resources.formats.linked_places import LinkedPlaces
 from openatlas.api.v02.resources.formats.rdf import rdf_output

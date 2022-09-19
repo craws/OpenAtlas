@@ -126,31 +126,6 @@ class ExportDatabase(Resource):
                         file.write(bytes(
                             pd.DataFrame(data=entries).to_csv(),
                             encoding='utf8'))
-
-            #
-            # for key, frame in ExportDatabase.get_grouped_entities(
-            #         entities).items():
-            #     with zipped_file.open(f'{key}.csv', 'w') as file:
-            #         file.write(bytes(
-            #             pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
-            # with zipped_file.open('links.csv', 'w') as file:
-            #     file.write(bytes(
-            #         pd.DataFrame(data=links).to_csv(), encoding='utf8'))
-            # with zipped_file.open('geometries.csv', 'w') as file:
-            #     file.write(bytes(
-            #         pd.DataFrame(data=geometries).to_csv(), encoding='utf8'))
-            # with zipped_file.open('properties.csv', 'w') as file:
-            #     file.write(bytes(
-            #         pd.DataFrame(data=properties).to_csv(), encoding='utf8'))
-            # with zipped_file.open('property_hierarchy.csv', 'w') as file:
-            #     file.write(bytes(pd.DataFrame(
-            #         data=property_hierarchy).to_csv(), encoding='utf8'))
-            # with zipped_file.open('classes.csv', 'w') as file:
-            #     file.write(bytes(pd.DataFrame(
-            #         data=classes).to_csv(), encoding='utf8'))
-            # with zipped_file.open('class_hierarchy.csv', 'w') as file:
-            #     file.write(bytes(pd.DataFrame(
-            #         data=class_hierarchy).to_csv(), encoding='utf8'))
         return Response(
             archive.getvalue(),
             mimetype='application/zip',

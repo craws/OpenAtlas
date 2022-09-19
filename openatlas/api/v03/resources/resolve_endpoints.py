@@ -6,7 +6,7 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.csv_export import (
+from openatlas.api.v03.resources.formats.csv import (
     export_csv_for_network_analysis, export_entities_csv)
 from openatlas.api.v03.resources.error import (
     EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
