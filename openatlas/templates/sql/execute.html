@@ -11,7 +11,7 @@
             {{ _('There seems to be no recent backup, please make one') }} <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
         </p>
     {% else %}
-        {{ form|display_form(manual_page='admin/execute_sql') }}
+        {{ form|display_form(manual_page='admin/execute_sql')|safe }}
         <p>
             {{ response|safe }}
         </p>

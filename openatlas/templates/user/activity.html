@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
     {{ form|display_form }}
-    {{ table.display() }}
+    {{ table.display()|safe }}
 {% endblock %}

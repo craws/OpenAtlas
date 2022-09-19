@@ -36,15 +36,16 @@
       </div>
       <div class="modal-body">
         {% for add_dynamical in field.add_dynamical %}
-          <button type="button"
-                  id="add-{{ add_dynamical }}-{{ field.id }}"
-                  class="btn-outline-primary btn btn-sm float-end ms-1"
-                  data-bs-toggle="modal"
-                  data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
-            + {{ _(add_dynamical)|uc_first }}
+          <button
+            type="button"
+            id="add-{{ add_dynamical }}-{{ field.id }}"
+            class="btn-outline-primary btn btn-sm float-end ms-1"
+            data-bs-toggle="modal"
+            data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
+              + {{ _(add_dynamical)|uc_first }}
           </button>
         {% endfor %}
-        <div class="modal-body-table">{{ table }}</div>
+        <div class="modal-body-table">{{ table|safe }}</div>
       </div>
       <div class="modal-footer">
         <button
@@ -58,9 +59,7 @@
   </div>
 </div>
 {% for add_dynamical in field.add_dynamical %}
-  <div class="modal fade" id="add-{{ add_dynamical }}-modal-{{ field.id }}"
-       tabindex="-1"
-       aria-hidden="true">
+  <div class="modal fade" id="add-{{ add_dynamical }}-modal-{{ field.id }}" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
@@ -70,26 +69,27 @@
             class="{{ config.CSS.button.primary }}"
             data-bs-dismiss="modal"
             aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+              <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          {{ field.forms[add_dynamical]|display_form() }}
+          {{ field.forms[add_dynamical]|display_form()|safe }}
         </div>
         <div class="modal-footer">
-          <button type="button"
-                  class="btn btn-outline-secondary btn-sm"
-                  data-bs-dismiss="modal"
-                  onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
-          <button id="{{ field.id }}-add-{{ add_dynamical }}"
-                  disabled
-                  type="button"
-                  class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal"
+            onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
+          <button
+            id="{{ field.id }}-add-{{ add_dynamical }}"
+            disabled
+            type="button"
+            class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
         </div>
       </div>
     </div>
   </div>
-
 
   <script>
       $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").on('keyup change', function () {

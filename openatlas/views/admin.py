@@ -352,9 +352,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page=f"admin/{category}",
+        'content.html',
+        content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
         crumbs=[
             [

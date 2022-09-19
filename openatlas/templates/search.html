@@ -37,7 +37,7 @@
     </form>
   </div>
   <div class="col-10">
-    {{ table.display() }}
+    {{ table.display()|safe }}
   </div>
 </div>
 {% endblock %}

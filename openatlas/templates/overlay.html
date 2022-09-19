@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block content %}
-    {{ buttons|button_bar }}
+    {{ buttons|button_bar|safe }}
     <form method="post">
         {{ form.csrf_token }}
         <div class="data-table">

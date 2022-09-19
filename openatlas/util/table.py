@@ -3,7 +3,6 @@ from typing import Any, Optional, Union
 from flask import json, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from markupsafe import Markup
 
 from openatlas.util.util import uc_first
 

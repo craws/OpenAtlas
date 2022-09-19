@@ -15,7 +15,7 @@
       <p style="font-weight: bold;">
         {{ _('check for valid links')|uc_first }} (CIDOC CRM 7.1.1)
       </p>
-      {{ form|display_form() }}
+      {{ form|display_form()|safe }}
       {% if result %}
         <p style="margin-top:1em;">
           {{ _('result for')|uc_first }}

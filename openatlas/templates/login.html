@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-  {{ form|display_form('login-form') }}
+  {{ form|display_form('login-form')|safe }}
   {% if config.DEMO_MODE %}
     <p>User: Demolina, Pass: Demolina</p>
   {% elif g.settings.mail %}

@@ -70,7 +70,7 @@
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
       {% if current_user.is_authenticated %}
-        {{ entity|display_menu(origin=origin) }}
+        {{ entity|display_menu(origin=origin)|safe }}
       {% endif %}
     </div>
   </div>
@@ -165,7 +165,7 @@
 </nav>
 <nav aria-label="breadcrumb">
   <div class="breadcrumb">
-    {{ crumbs|breadcrumb }}
+    {{ crumbs|breadcrumb|safe }}
     <div id="site-name-and-version">
       {{ g.settings.site_name }}
       <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>

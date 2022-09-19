@@ -13,16 +13,16 @@
         {% if view_name == 'file' and not writable %}
             <span class="error">{{ _('directory not writable')|uc_first }}</span>
         {% else %}
-            {{ form|display_form(manual_page='entity/' + view_name) }}
+            {{ form|display_form(manual_page='entity/' + view_name)|safe }}
         {% endif %}
     {% else %}
         <div class="row">
             <div class="col-xl-4">
                 <div class="row">
                     <div id='map-info-display' style="float:left;">
-                        {{ form|display_form(manual_page='entity/' + view_name) }}
+                        {{ form|display_form(manual_page='entity/' + view_name)|safe }}
                     </div>
-                    
+
                 </div>
             </div>
             <div class="col-xl-8 d-flex align-items-center">

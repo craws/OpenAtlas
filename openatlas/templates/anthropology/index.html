@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
   <h1>{{ _('anthropological analyses')|uc_first }} - {{ entity.name }}</h1>
-  {{ buttons|button_bar }}
+  {{ buttons|button_bar|safe }}
 {% endblock %}

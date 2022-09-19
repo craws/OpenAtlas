@@ -21,7 +21,7 @@
       {% if g.settings.mail and g.settings.mail_recipients_feedback %}
       <li>
         <p>{{ _('feedback_form') }}:</p>
-        {{ form|display_form('feedback-form') }}
+        {{ form|display_form('feedback-form')|safe }}
       </li>
     {% endif %}
   </ul>

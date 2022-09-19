@@ -82,7 +82,7 @@
           </button>
         </div>
         <div class="modal-body">
-          {{ field.form|display_form() }}
+          {{ field.form|display_form()|safe }}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary btn-sm"

@@ -3,7 +3,7 @@
         <label>{{ _('date')|uc_first }}</label> {{ _('tooltip date')|tooltip|safe }}
     </div>
     <div class="table-cell date-switcher">
-        {{ label|button(id_='date-switcher', css='secondary') }}
+        {{ label|button(id_='date-switcher', css='secondary')|safe }}
     </div>
 </div>
 
