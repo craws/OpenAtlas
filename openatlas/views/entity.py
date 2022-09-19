@@ -261,13 +261,12 @@ def entity_add_file(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'], inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    form = get_table_form(
-        'file',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
         entity=entity,
-        form=form,
+        form=get_table_form(
+            'file',
+            entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -286,12 +285,11 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 request.form['checkbox_values'],
                 inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    form = get_table_form(
-        'source',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
-        form=form,
+        form=get_table_form(
+            'source',
+            entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

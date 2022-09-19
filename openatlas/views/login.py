@@ -15,7 +15,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.models.user import User
-from openatlas.util.util import send_mail, uc_first
+from openatlas.util.util import display_form, send_mail, uc_first
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -56,7 +56,7 @@ def login() -> Union[str, Response]:
                     'auth',
                     f'Login attempts exceeded: {user.username}')
                 flash(_('error login attempts exceeded'), 'error')
-                return render_template('login/index.html', form=form)
+                return render_template('login.html', form=form)
             hash_ = hashpw(
                 request.form['password'].encode('utf-8'),
                 user.password.encode('utf-8'))
@@ -95,7 +95,7 @@ def login() -> Union[str, Response]:
                 f"Wrong username: {request.form['username']}")
             flash(_('error username'), 'error')
     return render_template(
-        'login/index.html',
+        'login.html',
         title=_('login'),
         crumbs=[_('login')], form=form)
 
@@ -143,8 +143,9 @@ def reset_password() -> Union[str, Response]:
             f'Password reset for non existing {form.email.data}')
         flash(_('error non existing email'), 'error')
     return render_template(
-        'login/reset_password.html',
-        form=form,
+        'form.html',
+        form=display_form(form),
+        content=f"<p>{_('info password reset')}</p>",
         crumbs=[[_('login'), url_for('login')], _('Forgot your password?')])
 
 
