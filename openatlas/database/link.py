@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Union
+from typing import Any, Union
 
 from flask import g
 
@@ -97,10 +97,12 @@ class Link:
                 l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from, l.begin_comment,
-                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') 
+                    AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') 
+                    AS end_to
             FROM model.link l
             JOIN model.entity e
                 ON l.{'domain' if inverse else 'range'}_id = e.id """
@@ -236,12 +238,13 @@ class Link:
                 l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from, l.begin_comment,
-                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') 
+                    AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
-            FROM model.link l 
-            GROUP BY l.id""")
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') 
+                    AS end_to
+            FROM model.link l""")
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

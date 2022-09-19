@@ -16,6 +16,8 @@ from openatlas.api.v03.resources.templates import (
     content_template,
     geometries_template,
     overview_template)
+from openatlas.database.cidoc_class import CidocClass as Db_cidoc_class
+from openatlas.database.cidoc_property import CidocProperty as db_cidoc_property
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -98,23 +100,57 @@ class ExportDatabase(Resource):
         "../swagger/system_class_count.yml",
         endpoint="api_03.export_database")
     def get(format_: str) -> Union[tuple[Resource, int], Response]:
-        entities = Db_entity.get_all_entities()
-        links = Db_link.get_all_links()
-        geometries = GetGeometricEntities.get_geometries(
-            {'geometry': 'gisAll'})
+        tables = {
+            'entities': Db_entity.get_all_entities(),
+            'links': Db_link.get_all_links(),
+            'properties': db_cidoc_property.get_properties(),
+            'property_hierarchy': db_cidoc_property.get_hierarchy(),
+            'classes': Db_cidoc_class.get_classes(),
+            'class_hierarchy': Db_cidoc_class.get_hierarchy(),
+            'geometries': GetGeometricEntities.get_geometries(
+                {'geometry': 'gisAll'})}
+
         archive = BytesIO()
         with zipfile.ZipFile(archive, 'w') as zipped_file:
-            for key, frame in ExportDatabase.get_grouped_entities(
-                    entities).items():
-                with zipped_file.open(f'{key}.csv', 'w') as file:
-                    file.write(bytes(
-                        pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
-            with zipped_file.open('links.csv', 'w') as file:
-                file.write(bytes(
-                    pd.DataFrame(data=links).to_csv(), encoding='utf8'))
-            with zipped_file.open('geometries.csv', 'w') as file:
-                file.write(bytes(
-                    pd.DataFrame(data=geometries).to_csv(), encoding='utf8'))
+            for name, entries in tables.items():
+                if name == 'entities':
+                    grouped = ExportDatabase.get_grouped_entities(entries)
+                    for system_class, frame in grouped.items():
+                        with zipped_file.open(
+                                f'{system_class}.csv', 'w') as file:
+                            file.write(bytes(
+                                pd.DataFrame(data=frame).to_csv(),
+                                encoding='utf8'))
+                else:
+                    with zipped_file.open(f'{name}.csv', 'w') as file:
+                        file.write(bytes(
+                            pd.DataFrame(data=entries).to_csv(),
+                            encoding='utf8'))
+
+            #
+            # for key, frame in ExportDatabase.get_grouped_entities(
+            #         entities).items():
+            #     with zipped_file.open(f'{key}.csv', 'w') as file:
+            #         file.write(bytes(
+            #             pd.DataFrame(data=frame).to_csv(), encoding='utf8'))
+            # with zipped_file.open('links.csv', 'w') as file:
+            #     file.write(bytes(
+            #         pd.DataFrame(data=links).to_csv(), encoding='utf8'))
+            # with zipped_file.open('geometries.csv', 'w') as file:
+            #     file.write(bytes(
+            #         pd.DataFrame(data=geometries).to_csv(), encoding='utf8'))
+            # with zipped_file.open('properties.csv', 'w') as file:
+            #     file.write(bytes(
+            #         pd.DataFrame(data=properties).to_csv(), encoding='utf8'))
+            # with zipped_file.open('property_hierarchy.csv', 'w') as file:
+            #     file.write(bytes(pd.DataFrame(
+            #         data=property_hierarchy).to_csv(), encoding='utf8'))
+            # with zipped_file.open('classes.csv', 'w') as file:
+            #     file.write(bytes(pd.DataFrame(
+            #         data=classes).to_csv(), encoding='utf8'))
+            # with zipped_file.open('class_hierarchy.csv', 'w') as file:
+            #     file.write(bytes(pd.DataFrame(
+            #         data=class_hierarchy).to_csv(), encoding='utf8'))
         return Response(
             archive.getvalue(),
             mimetype='application/zip',
@@ -124,7 +160,8 @@ class ExportDatabase(Resource):
     def get_grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:
         grouped_entities = {}
         for class_, entities_ in groupby(
-                sorted(entities, key=lambda entity: entity['openatlas_class_name']),
+                sorted(entities,
+                       key=lambda entity: entity['openatlas_class_name']),
                 key=lambda entity: entity['openatlas_class_name']):
             grouped_entities[class_] = \
                 [entity for entity in entities_]
@@ -144,4 +181,3 @@ class ExportDatabase(Resource):
             'end_from': entity.end_from,
             'end_to': entity.end_to,
             'end_comment': entity.end_comment}
-
