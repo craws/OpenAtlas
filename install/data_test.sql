@@ -39,8 +39,19 @@ INSERT INTO model.entity (cidoc_class_code, openatlas_class_name,
 VALUES ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.',
         '2018-01-31', '2018-03-01', 'Begin of the shire',  '2019-01-31',
         '2019-03-01','Descent of Shire'),
-VALUES ('E53', 'location', 'Location of Shire', NONE, NONE, NONE, NONE, NONE,
-    NONE, NONE,);
+VALUES ('E53', 'location', 'Location of Shire', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E53', 'feature', 'Home of Baggins', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E53', 'stratigraphic_unit', 'Bar', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E31', 'file', 'Picture with a License', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E31', 'file', 'File without license', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E21', 'person', 'Frodo', 'That is Frodo', NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E21', 'person', 'Sam', 'That is Sam', NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E32', 'external_reference', 'https://lotr.fandom.com/', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E41', 'appellation', 'Sûza', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E41', 'appellation', 'The ring bearer', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E22', 'artifact', 'The One Ring', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+VALUES ('E7', 'activity', 'Travel to Mordor', NONE, NONE, NONE, NONE, NONE, NONE, NONE),
+    ;
 
 
 INSERT INTO model.gis (
@@ -56,3 +67,30 @@ INSERT INTO model.gis (
                 'centerpoint',
                 public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"type":"Point","coordinates":[9, 17]}'),4326)
             );
+
+
+INSERT INTO model.link (property_code, range_id, domain_id, description) VALUES
+    ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Shire'), NULL),
+    ('P1', (SELECT id FROM model.entity WHERE name='Sûza'), (SELECT id FROM model.entity WHERE name='Shire'), NULL),
+    ('P1', (SELECT id FROM model.entity WHERE name='The ring bearer'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL),
+    ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='https://lotr.fandom.com/'), 'Fandom Wiki of lord of the rings'),
+   ('P46', (SELECT id FROM model.entity WHERE name='Home of Baggins'), (SELECT id FROM model.entity WHERE name='Shire'), NULL),
+   ('P46', (SELECT id FROM model.entity WHERE name='Bar'), (SELECT id FROM model.entity WHERE name='Home of Baggins'), NULL),
+   ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL ),
+   ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL ),
+   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License'), NULL ),
+   ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='File without license'), NULL ),
+   ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring'), NULL ),
+   ('P2', (SELECT id FROM model.entity WHERE name='Open license'), (SELECT id FROM model.entity WHERE name='Picture with a License'), NULL ),
+   ('P2', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Shire'), '23.0' ),
+   ('P74', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Sam'), NULL ),
+   ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL ),
+   ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL ),
+   ('P7', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL ),
+   ;
+
+INSERT INTO model.link (property_code, range_id, domain_id, description, type_id) VALUES
+   ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='closeMatch') ),
+    ('OA7', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Sam'), NULL, (SELECT id FROM model.entity WHERE name='Friend of') ),
+
+   ;
