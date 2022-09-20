@@ -13,7 +13,7 @@ class ContentForm(FlaskForm):
 
 class ModulesForm(FlaskForm):
     module_map_overlay = BooleanField(_('map overlay'))
-    module_sub_units = BooleanField(_('sub units'))
+    module_sub_units = BooleanField(_('subunits'))
     module_time = BooleanField(_('time'))
     save = SubmitField(_('save'))
 
