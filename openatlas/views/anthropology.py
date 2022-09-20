@@ -48,7 +48,7 @@ def anthropology_index(id_: int) -> Union[str, Response]:
         button(_('sex estimation'), url_for('sex', id_=entity.id)),
         print_result(entity)]
     return render_template(
-        'anthropology/index.html',
+        'content.html',
         entity=entity,
         buttons=buttons,
         crumbs=[entity, _('anthropological analyses')])
@@ -72,7 +72,7 @@ def sex(id_: int) -> Union[str, Response]:
             'option_value': SexEstimation.options[item['description']],
             'value': item['description']})
     return render_template(
-        'anthropology/sex.html',
+        'anthropology_sex.html',
         entity=entity,
         buttons=buttons,
         data=data,

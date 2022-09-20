@@ -1,46 +1,45 @@
 {% extends 'layout.html' %}
 {% block content %}
-    {% if view_name not in ['artifact', 'place'] %}
-        {% if view_name == 'file' %}
-            <p>
-                {{ _('max size')|uc_first }}:
-                <span style="font-weight: bold;">{{ g.settings.file_upload_max_size }} MB</span>.
-                {{ _('if exceeded you will receive a connection error')|uc_first }}.
-                {{ _('allowed extensions')|uc_first }}:
-                <span style="font-weight: bold;">{{ ', '.join(g.settings.file_upload_allowed_extension) }}</span>
-            </p>
-        {% endif %}
-        {% if view_name == 'file' and not writable %}
-            <span class="error">{{ _('directory not writable')|uc_first }}</span>
-        {% else %}
-            {{ form|display_form(manual_page='entity/' + view_name)|safe }}
-        {% endif %}
-    {% else %}
-        <div class="row">
-            <div class="col-xl-4">
-                <div class="row">
-                    <div id='map-info-display' style="float:left;">
-                        {{ form|display_form(manual_page='entity/' + view_name)|safe }}
-                    </div>
-
-                </div>
-            </div>
-            <div class="col-xl-8 d-flex align-items-center">
-                <div class="pe-4 d-none d-lg-inline">
-                    <span class="extend-icon" id="extend-form-icon">
-                        <i class="fas fa-arrow-right" title="Enlarge Form"></i>
-                    </span>
-                    <span class="extend-icon" id="extend-map-icon" style="display: none;">
-                        <i class="fas fa-arrow-left " title="Enlarge Map"></i>
-                    </span>
-                </div>
-                <div id="map" class="map"></div>
-            </div>
-            <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
-            <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
-            <script src="/static/js/map/map.js"></script>
-            <script src="/static/js/map/draw.js"></script>
-        </div>
+  {% if view_name not in ['artifact', 'place'] %}
+    {% if view_name == 'file' %}
+      <p>
+        {{ _('max size')|uc_first }}:
+        <span style="font-weight: bold;">{{ g.settings.file_upload_max_size }} MB</span>.
+        {{ _('if exceeded you will receive a connection error')|uc_first }}.
+        {{ _('allowed extensions')|uc_first }}:
+        <span style="font-weight: bold;">{{ ', '.join(g.settings.file_upload_allowed_extension) }}</span>
+      </p>
     {% endif %}
-    {{ view_name|display_citation_example }}
+    {% if view_name == 'file' and not writable %}
+      <span class="error">{{ _('directory not writable')|uc_first }}</span>
+    {% else %}
+      {{ form|display_form(manual_page='entity/' + view_name)|safe }}
+    {% endif %}
+  {% else %}
+    <div class="row">
+      <div class="col-xl-4">
+        <div class="row">
+          <div id='map-info-display' style="float:left;">
+            {{ form|display_form(manual_page='entity/' + view_name)|safe }}
+          </div>
+        </div>
+      </div>
+      <div class="col-xl-8 d-flex align-items-center">
+        <div class="pe-4 d-none d-lg-inline">
+          <span class="extend-icon" id="extend-form-icon">
+            <i class="fas fa-arrow-right" title="Enlarge Form"></i>
+          </span>
+          <span class="extend-icon" id="extend-map-icon" style="display: none;">
+            <i class="fas fa-arrow-left " title="Enlarge Map"></i>
+          </span>
+        </div>
+        <div id="map" class="map"></div>
+      </div>
+    </div>
+    <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css">
+    <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="/static/js/map/map.js"></script>
+    <script src="/static/js/map/draw.js"></script>
+  {% endif %}
+  {{ view_name|display_citation_example }}
 {% endblock %}

@@ -8,12 +8,13 @@
   readonly="readonly"
   value="{{ selection }}"
   onclick="$('#{{ field.id }}-modal').modal('show');">
-<a href="#"
-   id="{{ field.id }}-clear"
-   class="{{ config.CSS.button.secondary }}"
-   {% if not selection %}style="display: none;"{% endif %}
-   onclick="clearSelect('{{ field.id }}');">
-  {{ _('clear')|uc_first }}
+<a
+  href="#"
+  id="{{ field.id }}-clear"
+  class="{{ config.CSS.button.secondary }}"
+  {% if not selection %}style="display: none;"{% endif %}
+  onclick="clearSelect('{{ field.id }}');">
+    {{ _('clear')|uc_first }}
 </a>
 <div
   id="{{ field.id }}-modal"

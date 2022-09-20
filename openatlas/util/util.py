@@ -761,10 +761,12 @@ def display_form(
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
     from openatlas.forms.display import html_form
-    return render_template(
-        'forms/form.html',
-        form=form,
-        html=html_form(form, form_id, manual_page))
+    form_id = f'id="{form_id}"' if form_id else ''
+    multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
+    return \
+        f'<form method="post" {form_id} {multipart}>' \
+        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
+        f'</div></form>'
 
 
 class MLStripper(HTMLParser):

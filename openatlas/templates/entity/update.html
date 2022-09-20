@@ -1,43 +1,43 @@
 {% extends 'layout.html' %}
 {% block content %}
-    {% if modifier %}
-        <p class="error">
-            {{ _('error modified by %(username)s', username=modifier|safe) }}
-        </p>
-        <p>
-            {{ _('reload')|button(url_for('update', id_=entity.id)) }}
-        </p>
-    {% endif %}
-    {% if entity.class_.view not in ['artifact', 'place'] %}
-        {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-        {{ entity.class_.view|display_citation_example }}
-    {% else %}
+  {% if modifier %}
+    <p class="error">
+      {{ _('error modified by %(username)s', username=modifier|safe) }}
+    </p>
+    <p>
+      {{ _('reload')|button(url_for('update', id_=entity.id)) }}
+    </p>
+  {% endif %}
+  {% if entity.class_.view not in ['artifact', 'place'] %}
+    {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
+    {{ entity.class_.view|display_citation_example }}
+  {% else %}
+    <div class="row">
+      <div class="col-xl-4">
         <div class="row">
-            <div class="col-xl-4">
-                <div class="row">
-                    <div id='map-info-display'>
-                        {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-                        {% if entity.image_id %}
-                            <div>{{ entity|display_profile_image }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-            <div class="col-xl-8 d-flex align-items-center">
-                <div class="pe-4 d-none d-lg-inline">
-                    <span class="extend-icon" id="extend-form-icon">
-                        <i class="fas fa-arrow-right" title="Enlarge Form"></i>
-                    </span>
-                    <span class="extend-icon" id="extend-map-icon" style="display: none;">
-                        <i class="fas fa-arrow-left " title="Enlarge Map"></i>
-                    </span>
-                </div>
-                <div id="map" class="map"></div>
-            </div>
-            <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css"/>
-            <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
-            <script src="/static/js/map/map.js"></script>
-            <script src="/static/js/map/draw.js"></script>
+          <div id='map-info-display'>
+            {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
+            {% if entity.image_id %}
+              <div>{{ entity|display_profile_image }}</div>
+            {% endif %}
+          </div>
         </div>
-    {% endif %}
+      </div>
+      <div class="col-xl-8 d-flex align-items-center">
+        <div class="pe-4 d-none d-lg-inline">
+          <span class="extend-icon" id="extend-form-icon">
+            <i class="fas fa-arrow-right" title="Enlarge Form"></i>
+          </span>
+          <span class="extend-icon" id="extend-map-icon" style="display: none;">
+            <i class="fas fa-arrow-left " title="Enlarge Map"></i>
+          </span>
+        </div>
+        <div id="map" class="map"></div>
+      </div>
+    </div>
+    <link rel="stylesheet" href="/static/node_modules/leaflet-draw/dist/leaflet.draw.css"/>
+    <script src="/static/node_modules/leaflet-draw/dist/leaflet.draw.js"></script>
+    <script src="/static/js/map/map.js"></script>
+    <script src="/static/js/map/draw.js"></script>
+  {% endif %}
 {% endblock %}
