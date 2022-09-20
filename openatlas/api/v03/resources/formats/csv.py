@@ -154,3 +154,36 @@ def get_entities_grouped_by_class(entities: list[Entity]) -> dict[str, Any]:
         grouped_entities[class_] = \
             [build_entity_dataframe(entity) for entity in entities_]
     return grouped_entities
+
+
+def grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:
+    grouped_entities = {}
+    for class_, entities_ in groupby(
+            sorted(entities,
+                   key=lambda entity: entity['openatlas_class_name']),
+            key=lambda entity: entity['openatlas_class_name']):
+        grouped_entities[class_] = \
+            [entity for entity in entities_]
+    return grouped_entities
+
+
+def export_database_csv(tables: dict[str, Any]) -> Response:
+    archive = BytesIO()
+    with zipfile.ZipFile(archive, 'w') as zipped_file:
+        for name, entries in tables.items():
+            if name == 'entities':
+                for system_class, frame in grouped_entities(entries).items():
+                    with zipped_file.open(
+                            f'{system_class}.csv', 'w') as file:
+                        file.write(bytes(
+                            pd.DataFrame(data=frame).to_csv(),
+                            encoding='utf8'))
+            else:
+                with zipped_file.open(f'{name}.csv', 'w') as file:
+                    file.write(bytes(
+                        pd.DataFrame(data=entries).to_csv(),
+                        encoding='utf8'))
+    return Response(
+        archive.getvalue(),
+        mimetype='application/zip',
+        headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})

@@ -4,7 +4,7 @@ from flask import g
 
 from openatlas.api.v03.resources.util import (
     get_all_links, get_all_links_inverse, get_all_subunits_recursive,
-    get_geometries, get_license, get_reference_systems,
+    get_geometric_collection, get_license, get_reference_systems,
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -23,7 +23,7 @@ def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
         'latestModRec': data['latest_modified'],
         'geometry':
             get_geometries_thanados(
-                get_geometries(data['entity'], data['links']),
+                get_geometric_collection(data['entity'], data['links']),
                 data['parser']),
         'children': get_children(data),
         'properties': get_properties(data)})
