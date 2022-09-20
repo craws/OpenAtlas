@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import math
 import os
@@ -278,8 +278,11 @@ def get_entity_data(
                 [link(actor) for actor in entity.get_linked_entities('P22')]
             data[_('donor')] = \
                 [link(donor) for donor in entity.get_linked_entities('P23')]
-            data[_('given place')] = \
-                [link(place) for place in entity.get_linked_entities('P24')]
+            data[_('given place')] = []
+            data[_('given artifact')] = []
+            for item in entity.get_linked_entities('P24'):
+                var = 'artifact' if item.class_.name == 'artifact' else 'place'
+                data[_(f'given {var}')].append(link(item))
         if entity.class_.name == 'production':
             data[_('produced')] = \
                 [link(item) for item in entity.get_linked_entities('P108')]

@@ -6,7 +6,7 @@ information is mapped as a network using classes and properties of the
 [CIDOC CRM](https://www.cidoc-crm.org).
 
 Documentation:
-[Manual](https://demo.openatlas.eu/static/manual),
+[Manual](https://manual.openatlas.eu),
 [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),
 [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
@@ -41,6 +41,9 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 **Andreas Olschnögger** - Frontend Development
 ([andreas.olschnoegger@oeaw.ac.at](mailto:andreas.olschnoegger@oeaw.ac.at)
+
+**Veronika Gründhammer** - Project Administration
+([veronika.gruendhammer@oeaw.ac.at](mailto:veronika.gruendhammer@oeaw.ac.at))
 
 **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))

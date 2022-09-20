@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import ast
 from typing import Any, Optional, TYPE_CHECKING

@@ -180,32 +180,41 @@ links. These shortcuts are indicated by a preceding OA in combination with a
 number. Currently OpenAtlas uses 3 shortcuts:</p>
 <div class="section" id="oa7-has-relationship-to">
 <h2>OA7 - has relationship to<a class="headerlink" href="#oa7-has-relationship-to" title="Permalink to this headline">¶</a></h2>
-<p>OA7 is used to link two instances of “E39 Actor” via a certain relationship; in
-that way an actor can be linked with an actor.
-E39 Actor linked with E39 Actor</p>
+<p>OA7 is used to link two instances of <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a> via
+a certain relationship; in that way an actor can be linked with an actor.
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a> linked with
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a></p>
 <ul class="simple">
-<li>Domain: <strong>E39 - Actor</strong></li>
-<li>Range: <strong>E39 - Actor</strong></li>
+<li>Domain:<a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e39-actor/version-7.1.1">E39 - Actor</a></li>
 </ul>
 <img alt="../_images/oa7.png" src="../_images/oa7.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E39</span><span class="p">(</span><span class="n">Actor</span><span class="p">)</span> <span class="o">-</span> <span class="n">P11i</span><span class="p">(</span><span class="n">participated</span> <span class="ow">in</span><span class="p">)</span> <span class="o">-</span> <span class="n">E5</span><span class="p">(</span><span class="n">Event</span><span class="p">)</span> <span class="o">-</span> <span class="n">P11</span><span class="p">(</span><span class="n">had</span> <span class="n">participant</span><span class="p">)</span> <span class="o">-</span> <span class="n">E39</span><span class="p">(</span><span class="n">Actor</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Example:
-[Stefan (E21)] participated in [Relationship from Stefan to Joachim (E5)] had
-participant [Joachim (E21)]</p>
-<p>The connecting event is defined by an entity of class E55 - Type:
-[Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]</p>
+[Stefan (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21</a>)] participated in
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11i</a>) [Relationship from Stefan to
+Joachim (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5</a>)] had participant
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p11-had-participant/version-7.1.1">P11</a> [Joachim
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21</a>)]</p>
+<p>The connecting event is defined by an entity of class
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1.1">E55</a>: [Relationship from Stefan to Joachim
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e5-event/version-7.1.1">E5</a>)] has type
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/P2-has-type/version-7.1.1">P2</a>) [Son to Father
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e55-type/version-7.1.1">E55</a>)]</p>
 </div>
 <div class="section" id="oa8-appears-for-the-first-time-in">
 <h2>OA8 - appears for the first time in<a class="headerlink" href="#oa8-appears-for-the-first-time-in" title="Permalink to this headline">¶</a></h2>
-<p>OA8 is used to link the beginning of a Persistent Item’s (E77) life span
-(or time of usage) with a certain place. E.g to document the birthplace of a
-person.</p>
-<p>E77 Persistent Item linked with a E53 Place.</p>
+<p>OA8 is used to link the beginning of a Persistent Item’s
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77</a>) life
+span (or time of usage) with a certain place. E.g to document the birthplace of
+a person.</p>
+<p><a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a> linked with a
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 - Place</a>.</p>
 <ul class="simple">
-<li>Domain: <strong>E77 - Persistent Item</strong></li>
-<li>Range: <strong>E53 - Place</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 - Place</a></li>
 </ul>
 <img alt="../_images/oa8.png" src="../_images/oa8.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E77</span><span class="p">(</span><span class="n">Persistent</span> <span class="n">Item</span><span class="p">)</span> <span class="o">-</span> <span class="n">P92i</span><span class="p">(</span><span class="n">was</span> <span class="n">brought</span> <span class="n">into</span> <span class="n">existence</span> <span class="n">by</span><span class="p">)</span> <span class="o">-</span> <span class="n">E63</span><span class="p">(</span><span class="n">Beginning</span> <span class="n">of</span> <span class="n">Existence</span><span class="p">)</span> <span class="o">-</span>
@@ -213,18 +222,23 @@ person.</p>
 </pre></div>
 </div>
 <p>Example:
-[Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein
-(E12)] took place at [Ulm (E53)]</p>
+[Albert Einstein (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E521</a> was brought into existence
+by
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1.1">P92</a>) [Birth of Albert Einstein
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E512</a>)] took place at
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p7-took-place-at/version-7.1.1">P7</a>) [Ulm (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53</a>)]</p>
 </div>
 <div class="section" id="oa9-appears-for-the-last-time-in">
 <h2>OA9 - appears for the last time in<a class="headerlink" href="#oa9-appears-for-the-last-time-in" title="Permalink to this headline">¶</a></h2>
-<p>OA9 is used to link the end of a Persistent Item’s (E77) life span
-(or time of usage) with a certain place (E53). E.g to document a person’s place of
-death.
-E77 Persistent Item linked with a E53 Place.</p>
+<p>OA9 is used to link the end of a Persistent Item’s
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77</a>) life
+span (or time of usage) with a certain place (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53</a>).
+E.g to document a person’s place of death.
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a> linked with a
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 - Place</a>.</p>
 <ul class="simple">
-<li>Domain: <strong>E77 - Persistent Item</strong></li>
-<li>Range: <strong>E53 - Place</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 - Place</a></li>
 </ul>
 <img alt="../_images/oa9.png" src="../_images/oa9.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E77</span><span class="p">(</span><span class="n">Persistent</span> <span class="n">Item</span><span class="p">)</span> <span class="o">-</span> <span class="n">P93i</span><span class="p">(</span><span class="n">was</span> <span class="n">taken</span> <span class="n">out</span> <span class="n">of</span> <span class="n">existence</span> <span class="n">by</span><span class="p">)</span> <span class="o">-</span> <span class="n">E64</span><span class="p">(</span><span class="n">End</span> <span class="n">of</span> <span class="n">Existence</span><span class="p">)</span> <span class="o">-</span>
@@ -232,8 +246,11 @@ E77 Persistent Item linked with a E53 Place.</p>
 </pre></div>
 </div>
 <p>Example:
-[Albert Einstein (E21)] was taken out of existence by [Death of Albert Einstein
-(E12)] took place at [Princeton (E53)]</p>
+[Albert Einstein (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21</a>)] was taken out of existence
+by (<a class="reference external" href="https://www.cidoc-crm.org/Property/P93-took-out-of-existence/version-7.1.1">P93i</a>)
+[Death of Albert Einstein (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12</a>)] took place at
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p7-took-place-at/version-7.1.1">P7</a>) [Princeton
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e53-place/version-7.1.1">E53 - Place</a>)]</p>
 </div>
 <div class="section" id="dates">
 <h2>Dates<a class="headerlink" href="#dates" title="Permalink to this headline">¶</a></h2>
@@ -241,90 +258,119 @@ E77 Persistent Item linked with a E53 Place.</p>
 the fields begin_from, begin_to, begin_comment, end_from, end_to, end_comment
 as timestamps.
 Depending on class of the entity respectively the domain and range classes of
-the link, these dates can be mapped as CIDOC CRM <strong>E61 - Time Primitive</strong>
-entities.</p>
+the link, these dates can be mapped as CIDOC CRM
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a> entities.</p>
 <div class="section" id="e77-persistent-item">
 <h3>E77 - Persistent Item<a class="headerlink" href="#e77-persistent-item" title="Permalink to this headline">¶</a></h3>
 <p>E77 Persistent Item <strong>begin</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E77 - Persistent Item</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a></li>
 </ul>
 <img alt="../_images/e77_begin.png" src="../_images/e77_begin.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E77</span><span class="p">(</span><span class="n">Persistent</span> <span class="n">Item</span><span class="p">)</span> <span class="o">-</span> <span class="n">P92i</span><span class="p">(</span><span class="n">was</span> <span class="n">brought</span> <span class="n">into</span> <span class="n">existence</span> <span class="n">by</span><span class="p">)</span> <span class="o">-</span> <span class="n">E63</span><span class="p">(</span><span class="n">Beginning</span> <span class="n">of</span> <span class="n">Existence</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span> <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span> <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [Holy Lance (E22)] was brought into existence by [forging of Holy
-Lance (E12)] has time span [Moment/Duration of Forging of Holy Lance (E52)]
-ongoing throughout [0770-12-24 (E61)]</p>
+<p>Example: [Holy Lance (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-human-made-object/version-7.1.1">E22</a>)] was
+brought into existence by <a class="reference external" href="https://www.cidoc-crm.org/Property/p92-brought-into-existence/version-7.1.1">P92i</a>
+[forging of Holy Lance
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12</a>)] has time span
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/P4-has-time-span/version-7.1.1">P4</a>) [Moment/Duration of Forging of Holy
+Lance (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e52-Time-Span/version-7.1.1">E52</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [0770-12-24
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/61-Time-Primitive/version-7.1.1">E61</a>)]</p>
 <p>E77 Persistent Item <strong>end</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E77 - Persistent Item</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e77-persistent-item/version-7.1.1">E77 - Persistent Item</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a></li>
 </ul>
 <img alt="../_images/e77_end.png" src="../_images/e77_end.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E77</span><span class="p">(</span><span class="n">Persistent</span> <span class="n">Item</span><span class="p">)</span> <span class="o">-</span> <span class="n">P93i</span><span class="p">(</span><span class="n">was</span> <span class="n">taken</span> <span class="n">out</span> <span class="n">of</span> <span class="n">existence</span> <span class="n">by</span><span class="p">)</span> <span class="o">-</span> <span class="n">E64</span><span class="p">(</span><span class="n">End</span> <span class="n">of</span> <span class="n">Existence</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span> <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span> <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [The one ring (E22)] was destroyed by [Destruction of the one ring
-(E12)] has time span [Moment of throwing it down the lava (E52)] ongoing
-throughout [3019-03-25 (E61)]</p>
+<p>Example: [The one ring
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e22-human-made-object/version-7.1.1">E22</a>)] was destroyed by
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p13-destroyed/version-7.1.1">P13</a>) [Destruction of the one ring
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12</a>)] has time span
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/P4-has-time-span/version-7.1.1">P4</a>) [Moment of throwing it into the lava
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e52-Time-Span/version-7.1.1">E52</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [3019-03-25
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/61-Time-Primitive/version-7.1.1">E61</a>)]</p>
 </div>
 <div class="section" id="e21-person">
 <h3>E21 Person<a class="headerlink" href="#e21-person" title="Permalink to this headline">¶</a></h3>
 <p>E21 Person’s <strong>Birth</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E21 - Person</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 - Person</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a></li>
 </ul>
 <img alt="../_images/e21_birth.png" src="../_images/e21_birth.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E21</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span> <span class="o">-</span> <span class="n">P98i</span><span class="p">(</span><span class="n">was</span> <span class="n">born</span><span class="p">)</span> <span class="n">by</span> <span class="o">-</span> <span class="n">E67</span><span class="p">(</span><span class="n">Birth</span><span class="p">)</span> <span class="o">-</span> <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span> <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [Stefan (E21)] was born by [birth of Stefan (E12)] has time span
-[Moment/Duration of Stefan’s birth (E52)] ongoing throughout [1981-11-23 (E61)]</p>
+<p>Example: [Stefan(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21</a>)] was born
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p98-brought-into-life/version-7.1.1">P98i</a>) [birth of Stefan
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e12-production/version-7.1.1">E12</a>)] has time span
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p4-has-time-span/version-7.1.1">P4</a>) [Moment/Duration of Stefan’s birth
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e52-time-span/version-7.1.1">E52</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [1981-11-23
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61</a>)]</p>
 <p>E21 Person’s <strong>Death</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E21 - Person</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21 - Person</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a></li>
 </ul>
 <img alt="../_images/e21_death.png" src="../_images/e21_death.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E21</span><span class="p">(</span><span class="n">Person</span><span class="p">)</span> <span class="o">-</span> <span class="n">P100i</span><span class="p">(</span><span class="n">died</span> <span class="ow">in</span><span class="p">)</span> <span class="o">-</span> <span class="n">E69</span><span class="p">(</span><span class="n">Death</span><span class="p">)</span> <span class="o">-</span> <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span> <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [Lady Diana (E21)] died in [death of Diana (E69)] has time span
-[Moment/Duration of Diana’s death (E52)] ongoing throughout [1997-08-31 (E61)]</p>
+<p>Example: [Lady Diana
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e21-person/version-7.1.1">E21</a>)] died in
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p100-was-death-of/version-7.1.1">P100i</a>) [death of Diana
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e69-death/version-7.1.1">E69</a>)] has time span
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p4-has-time-span/version-7.1.1">P4</a>) [Moment/Duration of Diana’s death
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e52-time-span/version-7.1.1">E52</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [1997-08-31
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61</a>)]</p>
 </div>
 <div class="section" id="e2-temporal-entity">
 <h3>E2 Temporal Entity<a class="headerlink" href="#e2-temporal-entity" title="Permalink to this headline">¶</a></h3>
 <p>E2 Temporal Entity (also property) <strong>begin</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E2 - Temporal Entity</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e2-temporal-entity/version-7.1.1">E2 - Temporal Entity</a></li>
+<li>Range: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61 - Time Primitive</a></li>
 </ul>
 <img alt="../_images/e2_begin.png" src="../_images/e2_begin.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E2</span><span class="p">(</span><span class="n">Temporal</span> <span class="n">Entity</span><span class="p">)</span> <span class="o">-</span> <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span> <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [Thirty Years’ War (E7)] has time span [Moment/Duration of Beginning
-of Thirty Years’ War (E52)] ongoing throughout [1618-05-23 (E61)]</p>
+<p>Example: [Thirty Years’ War
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7</a>)] has time span
+<a class="reference external" href="https://www.cidoc-crm.org/Property/p4-has-time-span/version-7.1.1">P4</a> [Moment/Duration of Beginning of Thirty
+Years’ War (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e61-time-primitive/version-7.1.1">E61</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [1618-05-23
+(<cite>E61&lt;e61-time-primitive&gt;</cite>)]</p>
 <p>E2 temporal entity (also property) <strong>end</strong> linked with a E61 Time Primitive:</p>
 <ul class="simple">
-<li>Domain: <strong>E2 - Temporal Entity</strong></li>
-<li>Range: <strong>E61 - Time Primitive</strong></li>
+<li>Domain: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e2-temporal-entity/version-7.1.1">E2 - Temporal Entity</a></li>
+<li>Range: <cite>E61 - Time Primitive&lt;e61-time-primitive&gt;</cite></li>
 </ul>
 <img alt="../_images/e2_begin.png" src="../_images/e2_begin.png" />
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">E2</span><span class="p">(</span><span class="n">temporal</span> <span class="n">entity</span><span class="p">)</span> <span class="o">-</span> <span class="n">P4</span><span class="p">(</span><span class="n">has</span> <span class="n">time</span> <span class="n">span</span><span class="p">)</span> <span class="o">-</span> <span class="n">E52</span><span class="p">(</span><span class="n">Time</span> <span class="n">Span</span><span class="p">)</span> <span class="o">-</span> <span class="n">P81</span><span class="p">(</span><span class="n">ongoing</span> <span class="n">throughout</span><span class="p">)</span> <span class="o">-</span>
 <span class="n">E61</span><span class="p">(</span><span class="n">Time</span> <span class="n">Primitive</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Example: [Thirty Years’ War (E7)] has time span [Moment/Duration of End of
-Thirty Years’ War (E52)] ongoing throughout [1648-10-24 (E61)]</p>
+<p>Example: [Thirty Years’ War
+(<a class="reference external" href="https://www.cidoc-crm.org/Entity/e7-activity/version-7.1.1">E7</a>)] has time span
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p4-has-time-span/version-7.1.1">P4</a>) [Moment/Duration of End of Thirty
+Years’ War (<a class="reference external" href="https://www.cidoc-crm.org/Entity/e52-time-span/version-7.1.1">E52</a>)] ongoing throughout
+(<a class="reference external" href="https://www.cidoc-crm.org/Property/p81-ongoing-throughout/version-7.1.1">P81</a>) [1648-10-24
+(<cite>E61&lt;e61-time-primitive&gt;</cite>)]</p>
 </div>
 </div>
 </div>

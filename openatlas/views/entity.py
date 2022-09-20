@@ -75,7 +75,7 @@ def view(id_: int) -> Union[str, Response]:
             tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.view == 'artifact':
             tabs['event'] = Tab('event', entity=entity)
-            for link_ in entity.get_links(['P25', 'P108'], True):
+            for link_ in entity.get_links(['P24', 'P25', 'P108'], True):
                 data = get_base_table_data(link_.domain)
                 tabs['event'].table.rows.append(data)
         tabs['file'] = Tab('file', entity=entity)
@@ -261,13 +261,12 @@ def entity_add_file(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'], inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    form = get_table_form(
-        'file',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
         entity=entity,
-        form=form,
+        form=get_table_form(
+            'file',
+            entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -286,12 +285,11 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 request.form['checkbox_values'],
                 inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    form = get_table_form(
-        'source',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
         'form.html',
-        form=form,
+        form=get_table_form(
+            'source',
+            entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -590,7 +588,7 @@ def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
     events = []  # Collect events to display actors
     event_ids = []  # Keep track of event ids to prevent event doubles
     for event in entity.location.get_linked_entities(
-            ['P7', 'P26', 'P27'],
+            ['P7', 'P24', 'P26', 'P27'],
             inverse=True):
         events.append(event)
         tabs['event'].table.rows.append(get_base_table_data(event))

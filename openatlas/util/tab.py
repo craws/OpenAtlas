@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
 
@@ -155,7 +155,7 @@ class Tab:
                         'link',
                         url_for('reference_add', id_=id_, view='event')))
             if view == 'artifact':
-                for item in ['move', 'production']:
+                for item in ['acquisition', 'move', 'production']:
                     self.buttons.append(
                         button(
                             g.classes[item].label,

@@ -1,6 +1,10 @@
 versions = {
     '7.7.0': ['TBA', {
         'feature': {
+            '1541': 'Linking references to multiple subunits',
+            '1641': 'Acquisition in combination with artifacts',
+            '1789': 'Disable site if JavaScript is disabled',
+            '1811': 'Checks for orphaned subunits',
             '1751': 'Manual: add model documentation'
         }
     }],
@@ -17,8 +21,8 @@ versions = {
             '1793': 'Cannot create or edit entities as contributor'}}],
     '7.5.0': ['2022-08-18', {
         'feature': {
-            '1637': 'Linking sub units like places, e.g. with events',
-            '1752': 'Add a place column for sub units to type view',
+            '1637': 'Linking subunits like places, e.g. with events',
+            '1752': 'Add a place column for subunits to type view',
             '1690': 'Forms: add types dynamically',
             '1761': "Forms: don't show empty type fields in forms",
             '1768': 'Forms: improved validations',
@@ -298,7 +302,7 @@ versions = {
             '1272': 'Tabs redesign',
             '1279': 'Change "Add" button label to "Link"',
             '1229': 'Show descriptions in all tables',
-            '1282': 'Additional submit buttons for sub units',
+            '1282': 'Additional submit buttons for subunits',
             '1283': 'More detailed type display',
             '1286': 'Notifications for date field',
             '1287': 'Map tiles max zoom',

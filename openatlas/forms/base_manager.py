@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import time
 from typing import Any, Optional, Union
@@ -275,13 +275,14 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event': TableField(_('sub event of'), filter_ids=filter_ids)}
+            'event': TableField(_('sub event of'), filter_ids=filter_ids,
+                                add_dynamic=['event'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
                 filter_ids=filter_ids)
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'))
+            fields['place'] = TableField(_('location'), add_dynamic=['place'])
         return fields
 
     def populate_update(self) -> None:
