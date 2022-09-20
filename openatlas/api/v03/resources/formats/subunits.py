@@ -1,4 +1,3 @@
-from datetime import datetime
 from typing import Any, Optional, Union
 
 from flask import g
@@ -9,35 +8,25 @@ from openatlas.api.v03.resources.util import (
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.util.util import get_file_path
 
 
-def get_subunit(
-        entity: Entity,
-        links: list[Link],
-        links_inverse: list[Link],
-        ext_reference_links: list[Link],
-        root_id: int,
-        latest_mod_rec: datetime,
-        parser: dict[str, Any]) -> dict[str, Any]:
+def get_subunit(data: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
-        'id': entity.id,
-        'rootId': root_id,
-        'parentId': get_parent(links_inverse),
-        'openatlasClassName': entity.class_.name,
-        'crmClass': entity.cidoc_class.code,
-        'created': str(entity.created),
-        'modified': str(entity.modified),
-        'latestModRec': latest_mod_rec,
-        'geometry': get_geometries_thanados(entity, links, parser),
-        'children': get_children(links, parser),
-        'properties': get_properties(
-            entity,
-            links,
-            links_inverse,
-            ext_reference_links,
-            parser)})
+        'id': data['entity'].id,
+        'rootId': data['root_id'],
+        'parentId': get_parent(data['links_inverse']),
+        'openatlasClassName': data['entity'].class_.name,
+        'crmClass': data['entity'].cidoc_class.code,
+        'created': str(data['entity'].created),
+        'modified': str(data['entity'].modified),
+        'latestModRec': data['latest_modified'],
+        'geometry':
+            get_geometries_thanados(
+                get_geometries(data['entity'], data['links']),
+                data['parser']),
+        'children': get_children(data),
+        'properties': get_properties(data)})
 
 
 def get_parent(links: list[Link]) -> Optional[int]:
@@ -48,10 +37,8 @@ def get_parent(links: list[Link]) -> Optional[int]:
 
 
 def get_geometries_thanados(
-        entity: Entity,
-        links: list[Link],
+        geom: Union[dict[str, Any], None],
         parser: dict[str, Any]) -> Union[list[Any], None, dict[str, Any]]:
-    geom = get_geometries(entity, links)
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
@@ -80,41 +67,31 @@ def transform_coords(coords: list[float]) -> list[dict[str, Any]]:
     return [{'coordinate': {'longitude': coords[0], 'latitude': coords[1]}}]
 
 
-def get_children(
-        links: list[Link],
-        parser: dict[str, Any]) -> Union[list[int], list[dict[str, Any]]]:
-    children = [link_.range.id for link_ in links if
+def get_children(data: dict[str, Any]) -> list[Union[int, dict[str, Any]]]:
+    children = [link_.range.id for link_ in data['links'] if
                 link_.property.code == 'P46']
     return [{'child': child} for child in children] \
-        if parser['format'] == 'xml' else children
+        if data['parser']['format'] == 'xml' else children
 
 
-def get_properties(
-        entity: Entity,
-        links: list[Link],
-        links_inverse: list[Link],
-        ext_reference_links: list[Link],
-        parser: dict[str, Any]) -> dict[str, Any]:
+def get_properties(data: dict[str, Any]) -> dict[str, Any]:
     return replace_empty_list_values_in_dict_with_none({
-        'name': entity.name,
-        'aliases': get_aliases(entity, parser),
-        'description': entity.description,
+        'name': data['entity'].name,
+        'aliases': get_aliases(data),
+        'description': data['entity'].description,
         'standardType':
-            get_standard_type(
-                entity.standard_type,
-                ext_reference_links,
-                parser)
-            if entity.standard_type else None,
-        'timespan': get_timespans(entity),
-        'externalReferences': get_ref_system(links_inverse, parser),
-        'references': get_references(links_inverse, parser),
-        'files': get_file(links_inverse, parser),
-        'types': get_types(entity, links, ext_reference_links, parser)})
+            get_standard_type(data) if data['entity'].standard_type else None,
+        'timespan': get_timespans(data['entity']),
+        'externalReferences':
+            get_ref_system(data['links_inverse'], data['parser']),
+        'references': get_references(data['links_inverse'], data['parser']),
+        'files': get_file(data),
+        'types': get_types(data)})
 
 
-def get_aliases(entity: Entity, parser: dict[str, Any]) -> list[Any]:
-    aliases = list(entity.aliases.values())
-    if parser['format'] == 'xml':
+def get_aliases(data: dict[str, Any]) -> list[Any]:
+    aliases = list(data['entity'].aliases.values())
+    if data['parser']['format'] == 'xml':
         return [{'alias': alias} for alias in aliases]
     return aliases
 
@@ -153,11 +130,9 @@ def get_timespans(entity: Entity) -> dict[str, Any]:
         'latestEnd': str(entity.end_to) if entity.end_to else None}
 
 
-def get_file(
-        links_inverse: list[Link],
-        parser: dict[str, Any]) -> list[dict[str, Any]]:
+def get_file(data: dict[str, Any]) -> list[dict[str, Any]]:
     files = []
-    for link in links_inverse:
+    for link in data['links_inverse']:
         if link.domain.class_.name != 'file':
             continue
         path = get_file_path(link.domain.id)
@@ -167,21 +142,20 @@ def get_file(
             'fileName': path.name if path else None,
             'license': get_license(link.domain),
             'source': link.domain.description or None})
-    if parser['format'] == 'xml':
+    if data['parser']['format'] == 'xml':
         return [{'file': file} for file in files]
     return files
 
 
-def get_standard_type(
-        type_: Type,
-        ext_reference_links: list[Link],
-        parser: dict[str, Any]) -> dict[str, Any]:
+def get_standard_type(data: dict[str, Any]) -> dict[str, Any]:
+    type_ = data['entity'].standard_type
     type_ref_link = \
-        [link for link in ext_reference_links if link.range.id == type_.id]
+        [link for link in data['ext_reference_links'] if
+         link.range.id == type_.id]
     types_dict = {
         'id': type_.id,
         'name': type_.name,
-        'externalReferences': get_ref_system(type_ref_link, parser)}
+        'externalReferences': get_ref_system(type_ref_link, data['parser'])}
     hierarchy = [g.types[root].name for root in type_.root]
     hierarchy.reverse()
     types_dict['path'] = ' > '.join(map(str, hierarchy))
@@ -189,22 +163,19 @@ def get_standard_type(
     return types_dict
 
 
-def get_types(
-        entity: Entity,
-        links: list[Link],
-        ext_reference_links: list[Link],
-        parser: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
+def get_types(data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
     types = []
-    for type_ in entity.types:
+    for type_ in data['entity'].types:
         if type_.category == 'standard':
             continue
-        type_ref_link = [link for link in ext_reference_links if
+        type_ref_link = [link for link in data['ext_reference_links'] if
                          link.range.id == type_.id]
         types_dict = {
             'id': type_.id,
             'name': type_.name,
-            'externalReferences': get_ref_system(type_ref_link, parser)}
-        for link in links:
+            'externalReferences':
+                get_ref_system(type_ref_link, data['parser'])}
+        for link in data['links']:
             if link.range.id == type_.id and link.description:
                 types_dict['value'] = link.description
                 if link.range.id == type_.id and type_.description:
@@ -213,7 +184,7 @@ def get_types(
         types_dict['path'] = ' > '.join(map(str, hierarchy))
         types_dict['rootId'] = type_.root[0]
         types.append(types_dict)
-    if parser['format'] == 'xml':
+    if data['parser']['format'] == 'xml':
         return [{'type': type_} for type_ in types]
     return types
 
@@ -221,34 +192,21 @@ def get_types(
 def get_subunits_from_id(
         entity: Entity,
         parser: dict[str, Any]) -> list[dict[str, Any]]:
-    root_id = entity.id
     entities = get_all_subunits_recursive(entity, [])
     ext_reference_links = get_type_links_inverse(entities)
+    latest_modified = max(
+        entity.modified for entity in entities if entity.modified)
     entities_dict: dict[int, Any] = {}
     for entity_ in entities:
         entities_dict[entity_.id] = {
             'entity': entity_,
-            'links': [],
-            'links_inverse': [],
-            'ext_reference_links': ext_reference_links}
-    for link_ in get_all_links(list(entities_dict.keys())):
-        entities_dict[link_.domain.id]['links'].append(link_)
-    for link_ in get_all_links_inverse(list(entities_dict.keys())):
-        entities_dict[link_.range.id]['links_inverse'].append(link_)
-    latest_modified = max(
-        entity.modified for entity in entities if entity.modified)
-    result = []
-    for item in entities_dict.values():
-        result.append(
-            get_subunit(
-                item['entity'],
-                item['links'],
-                item['links_inverse'],
-                item['ext_reference_links'],
-                root_id,
-                latest_modified,
-                parser))
-    return result
+            'links': get_all_links(entity_.id),
+            'links_inverse': get_all_links_inverse(entity_.id),
+            'ext_reference_links': ext_reference_links,
+            'root_id': entity.id,
+            'latest_modified': latest_modified,
+            'parser': parser}
+    return [get_subunit(item) for item in entities_dict.values()]
 
 
 def get_type_links_inverse(entities: list[Entity]) -> list[Link]:

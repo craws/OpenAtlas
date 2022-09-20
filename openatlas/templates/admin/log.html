@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block content %}
-    <div class="toolbar">
-        {{ _('delete all logs')|button(url_for('admin_log_delete'), onclick="return confirm('" + _('delete all logs')|uc_first + "?')") }}
-    </div>
-    {{ form|display_form }}
-    {{ table.display() }}
-{% endblock %}
