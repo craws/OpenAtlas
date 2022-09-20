@@ -31,8 +31,8 @@
       {{ form.classes }}
 
       <div class="toolbar">
-        {{ 'tools/search'|manual }}
-        {{ form.search(class_=config.CSS.button.primary) }}
+        {{ 'tools/search'|manual|safe }}
+        {{ form.search(class_=config.CSS.button.primary)|safe }}
       </div>
     </form>
   </div>

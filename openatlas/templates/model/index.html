@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block content %}
-<div class="toolbar">
-  {{ 'tools/model'|manual }}
-</div>
+{{ buttons|button_bar|safe }}
 <div class="container-fluid">
   <div class="row">
     <div class="col">

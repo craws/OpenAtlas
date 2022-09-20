@@ -1,9 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - SQL{% endblock %}
 {% block content %}
-  <div class="toolbar">
-    {{ 'admin/execute_sql'|manual }}
-  </div>
+  {{ buttons|button_bar|safe }}
   <h2 class="error">
     {{ _('Warning: direct database manipulation is dangerous and can result in data loss and/or an unusable application!') }}
   </h2>
@@ -12,7 +10,7 @@
     {{ _("I'm aware of the risk and have read the documentation.") }}
   </p>
   <div class="toolbar">
-    {{ _('proceed')|button(id_='proceed_button', url='#') }}
+    {{ _('proceed')|button(id_='proceed_button', url='#')|safe }}
   </div>
 {% endblock %}
 

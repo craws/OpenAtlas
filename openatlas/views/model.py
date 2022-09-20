@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, uc_first
+from openatlas.util.util import link, manual, required_group, uc_first
 
 
 class LinkCheckForm(FlaskForm):
@@ -56,6 +56,7 @@ def model_index() -> str:
         form=form,
         result=result,
         title=_('model'),
+        buttons=[manual('model/index')],
         crumbs=[_('model')])
 
 
