@@ -35,15 +35,24 @@ VALUES ('intro_for_frontend', 'de', 'Das ist Deutsch');
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name,
                 name, description, begin_from, begin_to, begin_comment,
-                end_from, end_to, end_comment)
+                end_from, end_to, end_comment, created, modified)
 VALUES ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.',
         '2018-01-31', '2018-03-01', 'Begin of the shire',  '2019-01-31',
-        '2019-03-01','Descent of Shire'),
-('E18', 'place', 'Mordor', 'The heart of evil.', NULL, NULL, NULL, NULL, NULL, NULL),
+        '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431', '2022-09-21 16:38:05.923431');
+
+INSERT INTO model.entity (cidoc_class_code, openatlas_class_name,
+                name, description, begin_from, begin_to, begin_comment,
+                end_from, end_to, end_comment)
+VALUES
 ('E53', 'object_location', 'Location of Shire', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E18', 'place', 'Mordor', 'The heart of evil.', NULL, NULL, NULL, NULL, NULL, NULL),
 ('E53', 'object_location', 'Location of Mordor', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('E53', 'feature', 'Home of Baggins', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('E53', 'stratigraphic_unit', 'Bar', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E22', 'artifact', 'The One Ring', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E53', 'object_location', 'Location of The One Ring', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E18', 'feature', 'Home of Baggins', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E53', 'object_location', 'Location of Home of Baggins', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E18', 'stratigraphic_unit', 'Bar', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
+('E53', 'object_location', 'Location of Bar', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E31', 'file', 'Picture with a License', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E31', 'file', 'File without license', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E33', 'source', 'Silmarillion', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
@@ -52,10 +61,8 @@ VALUES ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.',
 ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E41', 'appellation', 'Sûza', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E41', 'appellation', 'The ring bearer', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('E22', 'artifact', 'The One Ring', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
 ('E7', 'activity', 'Travel to Mordor', NULL, NULL, NULL, NULL, NULL, NULL, NULL),
-('E7', 'activity', 'Exchange of the one ring', NULL, NULL, NULL, NULL, NULL, NULL, NULL)
-;
+('E7', 'activity', 'Exchange of the one ring', NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 
 INSERT INTO model.gis (
@@ -75,7 +82,7 @@ INSERT INTO model.gis (
 
 INSERT INTO model.link (property_code, range_id, domain_id, description) VALUES
     ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Shire'), NULL),
-    ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Mordor'), NULL),
+   ('P2', (SELECT id FROM model.entity WHERE name='Boundary Mark'), (SELECT id FROM model.entity WHERE name='Mordor'), NULL),
     ('P2', (SELECT id FROM model.entity WHERE name='Exchange'), (SELECT id FROM model.entity WHERE name='Exchange of the one ring'), NULL),
     ('P1', (SELECT id FROM model.entity WHERE name='Sûza'), (SELECT id FROM model.entity WHERE name='Shire'), NULL),
     ('P1', (SELECT id FROM model.entity WHERE name='The ring bearer'), (SELECT id FROM model.entity WHERE name='Frodo'), NULL),
@@ -85,6 +92,9 @@ INSERT INTO model.link (property_code, range_id, domain_id, description) VALUES
    ('P89', (SELECT id FROM model.entity WHERE name='Austria'), (SELECT id FROM model.entity WHERE name='Location of Shire'), NULL ),
    ('P53', (SELECT id FROM model.entity WHERE name='Location of Shire'), (SELECT id FROM model.entity WHERE name='Shire'), NULL ),
    ('P53', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Mordor'), NULL ),
+   ('P53', (SELECT id FROM model.entity WHERE name='Location of The One Ring'), (SELECT id FROM model.entity WHERE name='The One Ring'), NULL ),
+   ('P53', (SELECT id FROM model.entity WHERE name='Location of Home of Baggins'), (SELECT id FROM model.entity WHERE name='Home of Baggins'), NULL ),
+   ('P53', (SELECT id FROM model.entity WHERE name='Location of Bar'), (SELECT id FROM model.entity WHERE name='Bar'), NULL ),
    ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='Picture with a License'), NULL ),
    ('P67', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='File without license'), NULL ),
    ('P52', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='The One Ring'), NULL ),
@@ -94,6 +104,7 @@ INSERT INTO model.link (property_code, range_id, domain_id, description) VALUES
    ('P11', (SELECT id FROM model.entity WHERE name='Frodo'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL ),
    ('P14', (SELECT id FROM model.entity WHERE name='Sam'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL ),
    ('P7', (SELECT id FROM model.entity WHERE name='Location of Mordor'), (SELECT id FROM model.entity WHERE name='Travel to Mordor'), NULL );
+
 
 INSERT INTO model.link (property_code, range_id, domain_id, description, type_id) VALUES
    ('P67', (SELECT id FROM model.entity WHERE name='Shire'), (SELECT id FROM model.entity WHERE name='GeoNames'), '2761369', (SELECT id FROM model.entity WHERE name='close match') ),
