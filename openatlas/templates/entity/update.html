@@ -5,7 +5,7 @@
       {{ _('error modified by %(username)s', username=modifier|safe) }}
     </p>
     <p>
-      {{ _('reload')|button(url_for('update', id_=entity.id)) }}
+      {{ _('reload')|button(url_for('update', id_=entity.id))|safe }}
     </p>
   {% endif %}
   {% if entity.class_.view not in ['artifact', 'place'] %}

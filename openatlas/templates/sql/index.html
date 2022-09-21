@@ -18,11 +18,11 @@
   <script>
     $(document).ready(function () {
       $('#sql_risk_aware').change(function() {
-          if (this.checked) {
-              $("#proceed_button").attr("href", "{{ url_for('sql_execute') }}")
-          } else {
-              $("#proceed_button").attr("href", "")
-          }
+        if (this.checked) {
+          $("#proceed_button").attr("href", "{{ url_for('sql_execute') }}")
+        } else {
+          $("#proceed_button").attr("href", "")
+        }
       });
     })
   </script>

@@ -18,11 +18,7 @@ from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, description, display_form, display_info, format_date,
-    is_authorized, link,
-    manual,
-    required_group,
-    send_mail,
-    uc_first)
+    is_authorized, link, manual, required_group, send_mail, uc_first)
 
 
 class UserForm(FlaskForm):
@@ -122,9 +118,8 @@ def user_activity(user_id: int = 0) -> str:
             _(row['action']),
             entity])
     return render_template(
-        'user/activity.html',
-        table=table,
-        form=form,
+        'content.html',
+        content=display_form(form) + table.display(),
         title=_('user'),
         crumbs=[[_('admin'), url_for('admin_index')], _('activity')])
 
@@ -292,8 +287,7 @@ def user_insert() -> Union[str, Response]:
         form=form,
         title=_('user'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
             f"+ {uc_first(_('user'))}"])
 
 
