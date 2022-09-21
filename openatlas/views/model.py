@@ -205,8 +205,7 @@ def cidoc_class_view(code: str) -> str:
         info={'code': class_.code, 'name': class_.name},
         title=_('model'),
         crumbs=[
-            [_('model'),
-             url_for('model_index')],
+            [_('model'), url_for('model_index')],
             [_('classes'), url_for('cidoc_class_index')],
             class_.code])
 

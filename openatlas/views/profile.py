@@ -125,8 +125,7 @@ def profile_settings(category: str) -> Union[str, Response]:
         content=display_form(form, manual_page='profile'),
         title=_('profile'),
         crumbs=[
-            [_('profile'),
-             f"{url_for('profile_index')}#tab-{category}"],
+            [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
             _(category)])
 
 
@@ -146,6 +145,5 @@ def profile_password() -> Union[str, Response]:
         form=form,
         title=_('profile'),
         crumbs=[
-            [_('profile'),
-             url_for('profile_index')],
+            [_('profile'), url_for('profile_index')],
             _('change password')])

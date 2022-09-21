@@ -18,7 +18,7 @@
           <div id='map-info-display'>
             {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
             {% if entity.image_id %}
-              <div>{{ entity|display_profile_image }}</div>
+              <div>{{ entity|display_profile_image|safe }}</div>
             {% endif %}
           </div>
         </div>

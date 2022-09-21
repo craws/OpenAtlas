@@ -97,7 +97,8 @@ def login() -> Union[str, Response]:
     return render_template(
         'login.html',
         title=_('login'),
-        crumbs=[_('login')], form=form)
+        form=form,
+        crumbs=[_('login')])
 
 
 @app.route('/password_reset', methods=["GET", "POST"])

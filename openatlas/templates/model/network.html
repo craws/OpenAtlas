@@ -25,7 +25,7 @@
     <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
   {% else %}
     <div class="toolbar">
-      {{ 'tools/network'|manual }}
+      {{ 'tools/network'|manual|safe }}
     </div>
     <h2>{{ _('no data to display')|uc_first }}</h2>
   {% endif %}

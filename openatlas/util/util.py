@@ -612,7 +612,6 @@ def display_citation_example(code: str) -> str:
     return ''  # pragma: no cover
 
 
-@app.template_filter()
 def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:
         return ''
@@ -703,7 +702,6 @@ def description(entity: Union[Entity, Project]) -> str:
         </div>"""
 
 
-@app.template_filter()
 def download_button(entity: Entity) -> str:
     if entity.image_id:
         if path := get_file_path(entity.image_id):
