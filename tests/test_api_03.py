@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
 from openatlas.api.v03.resources.error import (
@@ -10,18 +8,13 @@ from openatlas.api.v03.resources.error import (
     InvalidSystemClassError, LastEntityError, NoEntityAvailable,
     NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
     ValueNotIntegerError)
-from openatlas.api.v03.resources.util import get_by_cidoc_classes, \
-    get_entities_by_view_classes
-from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
+from openatlas.api.v03.resources.util import get_by_cidoc_classes
 from tests.base import (
-    TestBaseCase, get_bool, get_bool_inverse, get_class_mapping,
-    get_geom_properties, get_no_key, insert_entity)
+    ApiTestCase, get_bool, get_bool_inverse, get_class_mapping,
+    get_geom_properties, get_no_key)
 
 
-class Api03(TestBaseCase):
+class Api03(ApiTestCase):
 
     def test_api_03(self) -> None:
 
