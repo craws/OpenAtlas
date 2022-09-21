@@ -22,9 +22,7 @@ class Api03(ApiTestCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
 
-                entities = get_by_cidoc_classes(['all'])
-
-                for entity in entities:
+                for entity in get_by_cidoc_classes(['all']):
                     if entity.name == 'Location of Shire':
                         location = entity
                     if entity.name == 'Shire':
@@ -35,7 +33,7 @@ class Api03(ApiTestCase):
                         event = entity
                     if entity.name == 'Travel to Mordor':
                         event = entity
-                    if entity.name == 'Friend of':
+                    if entity.name == 'Actor actor relation':
                         relation_sub = entity
                     if entity.name == 'Austria':
                         unit_node = entity
