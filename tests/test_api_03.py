@@ -33,7 +33,7 @@ class Api03(ApiTestCase):
                         event = entity
                     if entity.name == 'Travel to Mordor':
                         event = entity
-                    if entity.name == 'Actor actor relation':
+                    if entity.name == 'Economical':
                         relation_sub = entity
                     if entity.name == 'Austria':
                         unit_node = entity
