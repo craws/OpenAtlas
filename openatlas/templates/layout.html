@@ -176,7 +176,7 @@
   {% if messages %}
     {% for category, message in messages %}
       <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-        {{ message|uc_first }}
+        {{ message|uc_first|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}"></button>
       </div>
     {% endfor %}
@@ -185,7 +185,7 @@
 <main>
   <div id="content">
     <div style="float:left" class="container-fluid">
-      {{ ''|system_warnings }}
+      {{ ''|system_warnings|safe }}
       {% block content %}{% endblock %}
     </div>
   </div>
