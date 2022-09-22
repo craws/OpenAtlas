@@ -13,7 +13,7 @@ References can be:
 * Documents (:cidoc_entity:`E31<E31-Document>`) such as files, bibliographic
   entities or references like URLs, DOIs, etc.
 * Linguistic Objects (:cidoc_entity:`E33<E33-Linguistic-Object>`) such as the
-  content of a medieval charter)
+  content of a medieval charter
 
 In order to record which part of the document contains the respective reference
 a delimiter respectively a certain value to determine the position in the
@@ -38,7 +38,7 @@ a whole refers to the entity, no delimiter is necessary.
 Reference Systems
 -----------------
 
-Referencers systems include sources such as vocabularies, gazetteers, etc.
+Reference systems include sources such as vocabularies, gazetteers, etc.
 They are considered authority documents
 (:cidoc_entity:`E32<EE32-Authority-Document>`).
 
@@ -47,7 +47,7 @@ a name, class, and description.
 
 Example:
 
-* Name: `GeoNames<https://geonames.org/>`
+* Name: `GeoNames <http://geonames.org/>`_
 * Class: :cidoc_entity:`E32<E32-Authority-Document>`
 * Description: GeoNames - a geographical database - contains geographical
   information on all countries and the dataset includes over eleven million
@@ -76,14 +76,15 @@ container for all possible references from this authority document.
 
 ::
 
-   E21(Person) - P67i(is referred to by) - E31(Document) - P71(is listed in) E32(Authority Document)
+   E21(Person) - P67i(is referred to by) - E31(Document) - P71(is listed in) -
+   E32(Authority Document)
 
 Example:
 [Terry Prattchet (:cidoc_entity:`21 Person<E21-Person>`)] is referred to by
 (:cidoc_property:`P67i<P67-refers-to>`)
-[`Q46248<https://www.wikidata.org/wiki/Q46248>`
+[`Q46248 <https://www.wikidata.org/wiki/Q46248>`_
 (:cidoc_entity:`E31 Document<E31-Document>`)] is listed in
-(:cidoc_property:`P71i<P71-lists>`)[`WikiData<https://www.wikidata.org/wiki/>`
+(:cidoc_property:`P71i<P71-lists>`)[`WikiData <https://www.wikidata.org/wiki/>`_
 (:cidoc_entity:`E32<EE32-Authority-Document>`)]
 
 
@@ -108,4 +109,4 @@ link between a document :cidoc_entity:`E31<E31-Document>` with a type
 another document :cidoc_entity:`E31<E31-Document>` with a system type "file".
 In this case the file is not the depiction of the reference but the reference
 is the origin of the file. This is mostly needed to document the copyright
-resp. right holder or source of the file.
+respectively right holder or source of the file.
