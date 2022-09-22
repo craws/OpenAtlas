@@ -7,4 +7,5 @@ Model
    data_model
    cidoc_crm
    openatlas_shortcuts
+   references
    link_checker
