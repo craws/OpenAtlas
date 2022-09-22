@@ -48,7 +48,7 @@ a name, class, and description.
 Example:
 
 * Name: `GeoNames<https://geonames.org/>`
-* Class: :cidoc_entity:`E32<EE32-Authority-Document>`
+* Class: :cidoc_entity:`E32<E32-Authority-Document>`
 * Description: GeoNames - a geographical database - contains geographical
   information on all countries and the dataset includes over eleven million
   place names that are available for download free of charge.
@@ -93,7 +93,7 @@ References and Files
 Various entities can be connected to files. This is mapped as:
 
 :cidoc_entity:`E31<E31-Document>` (Document = file) - refers to
-(:cidoc_property:`P67i<P67-refers-to>`) - :cidoc_entity:`E1<E1-CRM-Entity>`
+(:cidoc_property:`P67<P67-refers-to>`) - :cidoc_entity:`E1<E1-CRM-Entity>`
 
 Files can refer to any of the "top level" entities and can
 (but need not necessarily) be images. Files are stored with a certain
@@ -104,7 +104,7 @@ A file can also have a further reference - e.g. the source where the file comes
 from. This can be a bibliographical reference to the publication
 where a file (e.g. a scanned image) is extracted from. In this case there is a
 link between a document :cidoc_entity:`E31<E31-Document>` with a type
-"Bibliography" (or sub type) via :cidoc_property:`P67i<P67-refers-to>` to
+"Bibliography" (or sub type) via :cidoc_property:`P67<P67-refers-to>` to
 another document :cidoc_entity:`E31<E31-Document>` with a system type "file".
 In this case the file is not the depiction of the reference but the reference
 is the origin of the file. This is mostly needed to document the copyright
