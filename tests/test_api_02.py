@@ -34,14 +34,6 @@ class Api02(ApiTestCase):
                         actor = entity
                     if entity.name == 'Sam':
                         actor2 = entity
-                    if entity.name == 'Home of Baggins':
-                        feature = entity
-                    if entity.name == 'Sûza':
-                        alias = entity
-                    if entity.name == 'Height':
-                        height = entity
-                    if entity.name == 'Exchange':
-                        exchange = entity
 
             # ---Content Endpoints---
             # ClassMapping

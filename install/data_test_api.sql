@@ -2,37 +2,39 @@
 INSERT INTO model.entity (
         cidoc_class_code, openatlas_class_name, name, description, begin_from, begin_to, begin_comment,
         end_from, end_to, end_comment, created, modified)
-VALUES (
-    'E18', 'place', 'Shire','The Shire was the homeland of the hobbits.', '2018-01-31', '2018-03-01', 'Begin of the shire',
-    '2019-01-31', '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431', '2022-09-21 16:38:05.923431');
+VALUES
+    ('E18', 'place', 'Shire','The Shire was the homeland of the hobbits.',
+    '2018-01-31', '2018-03-01', 'Begin of the shire', '2019-01-31',
+    '2019-03-01','Descent of Shire', '2022-09-21 16:38:01.923431',
+     '2022-09-21 16:38:05.923431');
 
 INSERT INTO model.entity (
     cidoc_class_code, openatlas_class_name, name, description)
 VALUES
-('E53', 'object_location', 'Location of Shire', NULL),
-('E18', 'place', 'Mordor', 'The heart of evil.'),
-('E53', 'object_location', 'Location of Mordor', NULL),
-('E22', 'artifact', 'The One Ring', NULL),
-('E53', 'object_location', 'Location of The One Ring', NULL),
-('E18', 'feature', 'Home of Baggins', NULL),
-('E53', 'object_location', 'Location of Home of Baggins', NULL),
-('E18', 'stratigraphic_unit', 'Bar', NULL),
-('E53', 'object_location', 'Location of Bar', NULL),
-('E31', 'file', 'Picture with a License', NULL),
-('E31', 'file', 'File without license', NULL),
-('E33', 'source', 'Silmarillion', NULL),
-('E21', 'person', 'Frodo', 'That is Frodo'),
-('E21', 'person', 'Sam', 'That is Sam'),
-('E32', 'external_reference', 'https://lotr.fandom.com/', NULL),
-('E41', 'appellation', 'Sûza', NULL),
-('E41', 'appellation', 'The ring bearer', NULL),
-('E7', 'activity', 'Travel to Mordor', NULL),
-('E7', 'activity', 'Exchange of the one ring', NULL);
+    ('E53', 'object_location', 'Location of Shire', NULL),
+    ('E18', 'place', 'Mordor', 'The heart of evil.'),
+    ('E53', 'object_location', 'Location of Mordor', NULL),
+    ('E22', 'artifact', 'The One Ring', NULL),
+    ('E53', 'object_location', 'Location of The One Ring', NULL),
+    ('E18', 'feature', 'Home of Baggins', NULL),
+    ('E53', 'object_location', 'Location of Home of Baggins', NULL),
+    ('E18', 'stratigraphic_unit', 'Bar', NULL),
+    ('E53', 'object_location', 'Location of Bar', NULL),
+    ('E31', 'file', 'Picture with a License', NULL),
+    ('E31', 'file', 'File without license', NULL),
+    ('E33', 'source', 'Silmarillion', NULL),
+    ('E21', 'person', 'Frodo', 'That is Frodo'),
+    ('E21', 'person', 'Sam', 'That is Sam'),
+    ('E32', 'external_reference', 'https://lotr.fandom.com/', NULL),
+    ('E41', 'appellation', 'Sûza', NULL),
+    ('E41', 'appellation', 'The ring bearer', NULL),
+    ('E7', 'activity', 'Travel to Mordor', NULL),
+    ('E7', 'activity', 'Exchange of the one ring', NULL);
 
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point)
-VALUES (
-    (SELECT id from model.entity WHERE name='Location of Shire'),
+VALUES
+    ((SELECT id from model.entity WHERE name='Location of Shire'),
     'Shire',
     'Nice place',
     'centerpoint',

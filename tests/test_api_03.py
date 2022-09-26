@@ -47,8 +47,6 @@ class Api03(ApiTestCase):
                         alias = entity
                     if entity.name == 'Height':
                         height = entity
-                    if entity.name == 'Exchange':
-                        exchange = entity
                     if entity.name == 'Change of Property':
                         change_of_property = entity
 
@@ -207,8 +205,7 @@ class Api03(ApiTestCase):
                     sort='desc',
                     column='system_class',
                     download=True,
-                    actor=place.id))
-            ]:
+                    actor=place.id))]:
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
                 rv_page = rv['pagination']
