@@ -59,11 +59,11 @@ class TestBaseCase(unittest.TestCase):
 
 class ApiTestCase(TestBaseCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         super().setUp()
         with open(
                 pathlib.Path(app.root_path).parent / 'install' /
-                f'data_test_api.sql',
+                'data_test_api.sql',
                 encoding='utf8') as sql_file:
             self.cursor.execute(sql_file.read())
 
@@ -71,8 +71,7 @@ class ApiTestCase(TestBaseCase):
 def insert_entity(
         name: str,
         class_: str,
-        description: Optional[str] = None,
-        origin: Optional[Entity] = None) -> Entity:
+        description: Optional[str] = None) -> Entity:
     entity = Entity.insert(class_, name, description)
     if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
         entity.link(
