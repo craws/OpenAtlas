@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 from typing import Any, Optional, TYPE_CHECKING
 
@@ -7,13 +7,17 @@ if TYPE_CHECKING:  # pragma: no cover
 
 
 def get_place(entity: Entity) -> Optional[Entity]:
-    if entity := entity.get_linked_entity('P46', inverse=True):
+    if entity := entity.get_linked_entity('P46', inverse=True):  # type: ignore
         if entity.class_.name == 'place':
             return entity  # pragma: no cover
-        if entity := entity.get_linked_entity('P46', inverse=True):
+        if entity := entity.get_linked_entity(
+                'P46',
+                inverse=True):  # type: ignore
             if entity.class_.name == 'place':
                 return entity  # pragma: no cover
-            if entity := entity.get_linked_entity('P46', inverse=True):
+            if entity := entity.get_linked_entity(
+                    'P46',
+                    inverse=True):  # type: ignore
                 if entity.class_.name == 'place':
                     return entity
     return None  # pragma: no cover

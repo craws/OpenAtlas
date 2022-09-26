@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
 {% block content %}
-  {{ form|safe }}
+  {{ buttons|button_bar|safe }}
+  {{ content|safe }}
 {% endblock %}

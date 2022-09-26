@@ -57,8 +57,8 @@ def file_add(id_: int, view: str) -> Union[str, Response]:
             entity.link_string('P67', request.form['checkbox_values'])
         return redirect(f"{url_for('view', id_=entity.id)}#tab-{view}")
     return render_template(
-        'form.html',
-        form=get_table_form(view, entity.get_linked_entities('P67')),
+        'content.html',
+        content=get_table_form(view, entity.get_linked_entities('P67')),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

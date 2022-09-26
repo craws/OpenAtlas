@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import ast
 from typing import Any, Optional
@@ -91,7 +91,7 @@ class TableSelect(HiddenInput):
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
 
-        def get_form(class_name_: str):
+        def get_form(class_name_: str) -> FlaskForm:
             class SimpleEntityForm(FlaskForm):
                 name_dynamic = StringField(_('name'))
 
@@ -125,17 +125,6 @@ class TableSelect(HiddenInput):
             table=table.display(field.id),
             selection=selection)
 
-    @staticmethod
-    def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-        link = f"""<a href='#' onclick="selectFromTable(this,
-            '{field_id}', {entity.id})">{entity.name}</a>"""
-        if not entity.aliases:
-            return link
-        html = f'<p>{link}</p>'
-        for i, alias in enumerate(entity.aliases.values()):
-            html += alias if i else f'<p>{alias}</p>'
-        return html
-
 
 class TableField(HiddenField):
     def __init__(
@@ -143,12 +132,12 @@ class TableField(HiddenField):
             label: Optional[str] = None,
             validators: Optional[Any] = None,
             filter_ids: Optional[list[int]] = None,
-            add_dynamical: Optional[list[str]] = None,
+            add_dynamic: Optional[list[str]] = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
         self.add_dynamical = \
-            (add_dynamical or []) if is_authorized('editor') else []
+            (add_dynamic or []) if is_authorized('editor') else []
     widget = TableSelect()
 
 

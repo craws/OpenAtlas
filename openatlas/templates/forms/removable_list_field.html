@@ -1,50 +1,49 @@
 {% if id == '0' %}
-    <button type="button" id="add-{{ name }}-{{ id }}" class="add-{{ name }} btn-secondary btn-xsm">+</button>
+  <button type="button" id="add-{{ name }}-{{ id }}" class="add-{{ name }} btn-secondary btn-xsm">+</button>
 {% else %}
-    <button type="button" id="remove-{{ name }}-{{ id }}" class="remove-{{ name }} btn-secondary btn-xsm">-</button>
+  <button type="button" id="remove-{{ name }}-{{ id }}" class="remove-{{ name }} btn-secondary btn-xsm">-</button>
 {% endif %}
 
 {% if id == '0' %}
-    <script>
-        let rlf_name = '{{name}}';
-        let rlf_length = 0;
-        let rlf_lastIndex = 0;
+  <script>
+    let rlf_name = '{{name}}';
+    let rlf_length = 0;
+    let rlf_lastIndex = 0;
 
-        const rlf_initializeValues = () => {
-            let rlf_elements = $(`ul[id='${rlf_name}'] li`);
-            rlf_length = rlf_elements.length;
-            rlf_lastIndex = rlf_length
-        }
+    const rlf_initializeValues = () => {
+      let rlf_elements = $(`ul[id='${rlf_name}'] li`);
+      rlf_length = rlf_elements.length;
+      rlf_lastIndex = rlf_length
+    }
 
-        $(`.add-${rlf_name}`).click(function () {
-            if (rlf_length === 0)
-                rlf_initializeValues();
+    $(`.add-${rlf_name}`).click(function () {
+      if (rlf_length === 0)
+        rlf_initializeValues();
 
-            const rlf_label = `<label for="${rlf_name}-${rlf_lastIndex}"></label>`
-            const rlf_input = `<input id="${rlf_name}-${rlf_lastIndex}" name="${rlf_name}-${rlf_lastIndex}" type="text"/>`;
-            const rlf_button = `<button type="button" id="remove-${rlf_name}-${rlf_lastIndex}" class="remove-${rlf_name} btn-secondary btn-xsm">-</button>`;
+      const rlf_label = `<label for="${rlf_name}-${rlf_lastIndex}"></label>`
+      const rlf_input = `<input id="${rlf_name}-${rlf_lastIndex}" name="${rlf_name}-${rlf_lastIndex}" type="text"/>`;
+      const rlf_button = `<button type="button" id="remove-${rlf_name}-${rlf_lastIndex}" class="remove-${rlf_name} btn-secondary btn-xsm">-</button>`;
 
-            $(`#add-${rlf_name}-0`).parent().parent().children().eq(rlf_length - 1).after(`<li>${rlf_label}${rlf_input} ${rlf_button}</li>`)
-            rlf_length++;
-            rlf_lastIndex++;
-        })
+      $(`#add-${rlf_name}-0`).parent().parent().children().eq(rlf_length - 1).after(`<li>${rlf_label}${rlf_input} ${rlf_button}</li>`)
+        rlf_length++;
+        rlf_lastIndex++;
+      })
 
-        $(`ul[id='${rlf_name}']`).on('click', `.remove-${rlf_name}`, function (e) {
-            if (rlf_length === 0)
-                rlf_initializeValues();
-            const rlf_id = e.target.id;
-            $(`#${rlf_id}`).parent().remove();
-            rlf_length--;
-        })
-    </script>
-    <style>
-        input[id^={{ name }}] {
-            width: calc(15.6em - 24px - 4px);
-            margin-bottom: 4px;
-
-        }
-        button.add-{{ name }}, button.remove-{{ name }} {
-            width: 24px;
-        }
-    </style>
+      $(`ul[id='${rlf_name}']`).on('click', `.remove-${rlf_name}`, function (e) {
+        if (rlf_length === 0)
+          rlf_initializeValues();
+        const rlf_id = e.target.id;
+        $(`#${rlf_id}`).parent().remove();
+        rlf_length--;
+    })
+  </script>
+  <style>
+    input[id^={{ name }}] {
+      width: calc(15.6em - 24px - 4px);
+      margin-bottom: 4px;
+    }
+    button.add-{{ name }}, button.remove-{{ name }} {
+      width: 24px;
+    }
+  </style>
 {% endif %}

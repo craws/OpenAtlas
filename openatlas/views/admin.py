@@ -352,9 +352,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page=f"admin/{category}",
+        'content.html',
+        content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
         crumbs=[
             [
@@ -629,8 +628,8 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.description,
             date])
     return render_template(
-        'admin/logo.html',
-        table=table,
+        'tabs.html',
+        tabs={'logo': Tab('files', table=table)},
         title=_('logo'),
         crumbs=[[
             _('admin'),
@@ -664,10 +663,14 @@ def admin_log() -> str:
             row['message'],
             user,
             row['info']])
+    buttons = [button(
+        _('delete all logs'),
+        url_for('admin_log_delete'),
+        onclick=f"return confirm('{uc_first(_('delete all logs'))}?')")]
+
     return render_template(
-        'admin/log.html',
-        table=table,
-        form=form,
+        'tabs.html',
+        tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-general"],
@@ -733,9 +736,8 @@ def admin_newsletter() -> Union[str, Response]:
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'admin/newsletter.html',
-        form=form,
-        table=table,
+        'tabs.html',
+        tabs={'tab': Tab('newsletter', form=form, table=table)},
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

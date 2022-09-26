@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.util.util import get_backup_file_data, required_group
+from openatlas.util.util import get_backup_file_data, manual, required_group
 
 
 class SqlForm(FlaskForm):
@@ -23,6 +23,7 @@ def sql_index() -> str:
     return render_template(
         'sql/index.html',
         title=_('SQL'),
+        buttons=[manual('admin/execute_sql')],
         crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-data"], _('SQL')])
 
 

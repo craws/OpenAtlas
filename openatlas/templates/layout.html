@@ -70,7 +70,7 @@
   <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
     <div class="navbar-nav">
       {% if current_user.is_authenticated %}
-        {{ entity|display_menu(origin=origin) }}
+        {{ entity|display_menu(origin=origin)|safe }}
       {% endif %}
     </div>
   </div>
@@ -165,7 +165,7 @@
 </nav>
 <nav aria-label="breadcrumb">
   <div class="breadcrumb">
-    {{ crumbs|breadcrumb }}
+    {{ crumbs|breadcrumb|safe }}
     <div id="site-name-and-version">
       {{ g.settings.site_name }}
       <a href="{{ url_for('index_changelog') }}">{{ config.VERSION }}</a>
@@ -176,7 +176,7 @@
   {% if messages %}
     {% for category, message in messages %}
       <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
-        {{ message|uc_first }}
+        {{ message|uc_first|safe }}
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="{{ _('close')|uc_first }}"></button>
       </div>
     {% endfor %}
@@ -185,19 +185,18 @@
 <main>
   <div id="content">
     <div style="float:left" class="container-fluid">
-      {{ ''|system_warnings }}
+      {{ ''|system_warnings|safe }}
       {% block content %}{% endblock %}
     </div>
   </div>
 </main>
 
 <noscript>
-    <style>nav,main,.navbar{display:none;!important;}</style>
-    <div class="vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
-        <img src="/static/images/layout/logo.png" alt="OpenAtlas Logo">
-        <p class="error">{{ _('warning no js') }}</p>
-    </div>
+  <style>nav,main,.navbar{display:none;!important;}</style>
+  <div class="vw-100 vh-100 d-flex flex-column justify-content-center align-items-center">
+    <img src="/static/images/layout/logo.png" alt="OpenAtlas Logo">
+    <p class="error">{{ _('warning no js') }}</p>
+  </div>
 </noscript>
 </body>
 </html>
-

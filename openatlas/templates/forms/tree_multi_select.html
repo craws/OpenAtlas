@@ -2,7 +2,7 @@
   id="{{ field.id }}-button"
   class="{{ config.CSS.button.secondary }}"
   onclick="$('#{{ field.id }}-modal').modal('show')">
-        {{ _('change')|uc_first }}
+    {{ _('change')|uc_first }}
 </span>
 <div id="{{ field.id }}-selection" style="text-align:left;">
   {{ '<br>'.join(selection)|safe }}
@@ -39,8 +39,7 @@
             + {{ root.name }}
           </button>
         {% endif %}
-        <div id="{{ field.id }}-tree"
-             style="text-align: left!important;"></div>
+        <div id="{{ field.id }}-tree" style="text-align: left!important;"></div>
       </div>
       <div class="modal-footer">
         <button
@@ -55,72 +54,75 @@
   </div>
 </div>
 {% if field.form %}
-  <div class="modal fade" id="add-type-modal-{{ field.id }}" tabindex="-1"
-       aria-hidden="true">
+  <div
+      class="modal fade"
+      id="add-type-modal-{{ field.id }}"
+      tabindex="-1"
+      aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5
-            class="modal-title"> {{ _('Add Type to %(hierarchy)s', hierarchy= root.name|safe) }} </h5>
+          <h5 class="modal-title"> {{ _('Add Type to %(hierarchy)s', hierarchy= root.name|safe) }} </h5>
           <button
             type="button"
             class="{{ config.CSS.button.primary }}"
             data-bs-dismiss="modal"
-            aria-label="Close">
-            <span aria-hidden="true">&times;</span>
+            aria-label="Close"><span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          {{ field.form|display_form() }}
+          {{ field.form|display_form()|safe }}
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-outline-secondary btn-sm"
-                  data-bs-dismiss="modal"
-                  onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
-          <button id="{{ field.id }}-add-type" disabled type="button"
-                  class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal"
+            onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
+          <button
+            id="{{ field.id }}-add-type"
+            disabled type="button"
+            class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
         </div>
       </div>
     </div>
   </div>
   <script>
-      $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
-          if ($(this).val() === '')
-              $('#{{field.id}}-add-type').attr('disabled', '')
-          else
-              $('#{{field.id}}-add-type').removeAttr('disabled')
+    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
+      if ($(this).val() === '')
+        $('#{{field.id}}-add-type').attr('disabled', '')
+      else
+        $('#{{field.id}}-add-type').removeAttr('disabled')
       });
 
-      $('#{{field.id}}-add-type').on('click', async function (e) {
-          const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
-          const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
-          const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
-          const data = {
-              name, superType, description
-          };
-          const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}}, true);
-          $(`#{{field.type_id}}-modal`).modal('show');
-          e.preventDefault();
-      });
+    $('#{{field.id}}-add-type').on('click', async function (e) {
+      const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
+      const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
+      const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
+      const data = {name, superType, description};
+      const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}}, true);
+      $(`#{{field.type_id}}-modal`).modal('show');
+      e.preventDefault();
+    });
   </script>
 {% endif %}
-<script>
+  <script>
     $("#{{ field.id }}-tree").jstree({
-        "core": {"check_callback": true, "data": {{ data|safe }}},
-        "plugins": ["search", "checkbox"],
-        "checkbox": {"three_state": false},
-        "search": {
-            "case_insensitive": true,
-            "show_only_matches": true,
-            "show_only_matches_children": true
-        }
+      "core": {"check_callback": true, "data": {{ data|safe }}},
+      "plugins": ["search", "checkbox"],
+      "checkbox": {"three_state": false},
+      "search": {
+        "case_insensitive": true,
+        "show_only_matches": true,
+        "show_only_matches_children": true
+      }
     });
     $("#{{ field.id }}-tree-search").keyup(function () {
-        if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
-            $("#{{ field.id }}-tree").jstree("search", $(this).val());
-        } else if (this.value.length == 0) {
-            $("#{{ field.id }}-tree").jstree("search", $(this).val());
-            $("#{{ field.id }}-tree").jstree(true).show_all();
-        }
+      if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
+        $("#{{ field.id }}-tree").jstree("search", $(this).val());
+      } else if (this.value.length == 0) {
+        $("#{{ field.id }}-tree").jstree("search", $(this).val());
+        $("#{{ field.id }}-tree").jstree(true).show_all();
+      }
     });
-</script>
+  </script>

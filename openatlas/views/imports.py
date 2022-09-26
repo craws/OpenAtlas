@@ -19,8 +19,11 @@ from openatlas.models.imports import Import, is_float
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    datetime64_to_timestamp, format_date, get_backup_file_data, link,
-    required_group, uc_first)
+    button, datetime64_to_timestamp, display_form, format_date,
+    get_backup_file_data,
+    is_authorized,
+    link,
+    manual, required_group, uc_first)
 
 
 class ProjectForm(FlaskForm):
@@ -52,9 +55,13 @@ def import_index() -> str:
             link(project),
             format_number(project.count),
             project.description])
+    buttons = [manual('admin/import')]
+    if is_authorized('admin'):
+        buttons.append(button(_('project'), url_for('import_project_insert')))
     return render_template(
-        'import/index.html',
-        table=table,
+        'content.html',
+        content=table.display(),
+        buttons=buttons,
         title=_('import'),
         crumbs=[
             [_('admin'),
@@ -71,9 +78,8 @@ def import_project_insert() -> Union[str, Response]:
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page='admin/import',
+        'content.html',
+        content=display_form(form, manual_page='admin/import'),
         title=_('import'),
         crumbs=[
             [_('admin'), url_for('admin_index') + '#tab-data'],
@@ -129,9 +135,8 @@ def import_project_update(id_: int) -> Union[str, Response]:
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page='admin/import',
+        'content.html',
+        content=display_form(form, manual_page='admin/import'),
         title=_('import'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
