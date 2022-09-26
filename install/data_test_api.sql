@@ -34,6 +34,16 @@ VALUES
 
 INSERT INTO model.gis (entity_id, name, description, type, geom_point)
 VALUES
+    ((SELECT id from model.entity WHERE name='Location of Mordor'),
+    'Mordor',
+    'Nicer place',
+    'centerpoint',
+    public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [18.370696110389183, 28.20857123273274], "type": "Point"}'),4326)),
+    ((SELECT id from model.entity WHERE name='Location of Mordor'),
+    'Mordor',
+    'best place',
+    'centerpoint',
+    public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [8.370696110389183, 22.20857123273274], "type": "Point"}'),4326)),
     ((SELECT id from model.entity WHERE name='Location of Shire'),
     'Shire',
     'Nice place',

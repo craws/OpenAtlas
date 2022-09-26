@@ -261,7 +261,7 @@ class Api03(ApiTestCase):
             assert bool(rv.get_json() == 8)
 
             rv = self.app.get(url_for('api_03.geometric_entities', count=True))
-            assert bool(rv.get_json() == 1)
+            assert bool(rv.get_json() == 3)
 
             # Test entities with GeoJSON Format
             for rv in [
