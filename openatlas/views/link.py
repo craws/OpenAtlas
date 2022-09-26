@@ -17,7 +17,7 @@ from openatlas.forms.form import get_manager, get_table_form
 from openatlas.forms.process import process_dates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import required_group, uc_first
+from openatlas.util.util import display_form, required_group, uc_first
 
 
 class AddReferenceForm(FlaskForm):
@@ -57,8 +57,8 @@ def link_insert(id_: int, view: str) -> Union[str, Response]:
     else:
         excluded = entity.get_linked_entities(property_code, inverse=inverse)
     return render_template(
-        'form.html',
-        form=get_table_form(view, excluded),
+        'content.html',
+        content=get_table_form(view, excluded),
         title=_(entity.class_.view),
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -124,8 +124,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             f"{url_for('view', id_=origin.id)}"
             f"#tab-{'actor' if origin.class_.view == 'event' else 'event'}")
     return render_template(
-        'display_form.html',
-        form=manager.form,
+        'content.html',
+        content=display_form(manager.form),
         crumbs=[
             [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
@@ -176,8 +176,8 @@ def member_insert(
             f"{url_for('view', id_=origin.id)}"
             f"#tab-member{'' if code == 'member' else '-of'}")
     return render_template(
-        'display_form.html',
-        form=manager.form,
+        'content.html',
+        content=display_form(manager.form),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],
             origin,
@@ -220,8 +220,8 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             return redirect(url_for('relation_insert', origin_id=origin_id))
         return redirect(f"{url_for('view', id_=origin.id)}#tab-relation")
     return render_template(
-        'display_form.html',
-        form=manager.form,
+        'content.html',
+        content=display_form(manager.form),
         title=_('relation'),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],
@@ -257,9 +257,9 @@ def involvement_update(link_: Link, origin: Entity) -> Union[str, Response]:
     if not manager.form.errors:
         manager.populate_update()
     return render_template(
-        'display_form.html',
+        'content.html',
+        content=display_form(manager.form),
         origin=origin,
-        form=manager.form,
         crumbs=[
             [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
@@ -295,8 +295,8 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     if not manager.form.errors:
         manager.populate_update()
     return render_template(
-        'display_form.html',
-        form=manager.form,
+        'content.html',
+        content=display_form(manager.form),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],
             origin,
@@ -341,8 +341,8 @@ def relation_update(
     if not manager.form.errors:
         manager.populate_update()
     return render_template(
-        'display_form.html',
-        form=manager.form,
+        'content.html',
+        content=display_form(manager.form),
         title=_('relation'),
         crumbs=[
             [_('actor'), url_for('index', view='actor')],
@@ -367,8 +367,8 @@ def reference_link_update(link_: Link, origin: Entity) -> Union[str, Response]:
     if link_.domain.class_.name == 'external_reference':
         form.page.label.text = uc_first(_('link text'))
     return render_template(
-        'display_form.html',
-        form=form,
+        'content.html',
+        content=display_form(form),
         crumbs=[
             [_(origin.class_.view),
              url_for('index', view=origin.class_.view)],

@@ -35,8 +35,7 @@ class TestBaseCase(unittest.TestCase):
                 '/login',
                 data={'username': 'Alice', 'password': 'test'})
 
-    @staticmethod
-    def setup_database() -> None:
+    def setup_database(self) -> None:
         connection = psycopg2.connect(
             database=app.config['DATABASE_NAME'],
             host=app.config['DATABASE_HOST'],
@@ -44,7 +43,7 @@ class TestBaseCase(unittest.TestCase):
             password=app.config['DATABASE_PASS'],
             port=app.config['DATABASE_PORT'])
         connection.autocommit = True
-        cursor = connection.cursor()
+        self.cursor = connection.cursor()
         for file_name in [
                 '1_structure',
                 '2_data_model',
@@ -55,7 +54,18 @@ class TestBaseCase(unittest.TestCase):
                     pathlib.Path(app.root_path).parent / 'install' /
                     f'{file_name}.sql',
                     encoding='utf8') as sql_file:
-                cursor.execute(sql_file.read())
+                self.cursor.execute(sql_file.read())
+
+
+class ApiTestCase(TestBaseCase):
+
+    def setUp(self):
+        super().setUp()
+        with open(
+                pathlib.Path(app.root_path).parent / 'install' /
+                f'data_test_api.sql',
+                encoding='utf8') as sql_file:
+            self.cursor.execute(sql_file.read())
 
 
 def insert_entity(
