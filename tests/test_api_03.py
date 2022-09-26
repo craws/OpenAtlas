@@ -49,6 +49,8 @@ class Api03(ApiTestCase):
                         height = entity
                     if entity.name == 'Exchange':
                         exchange = entity
+                    if entity.name == 'Change of Property':
+                        change_of_property = entity
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
@@ -324,7 +326,7 @@ class Api03(ApiTestCase):
                     search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
                            f'"values":[{boundary_mark.id},'
                            f'{height.id},'
-                           f'{exchange.id}],'
+                           f'{change_of_property.id}],'
                            f'"logicalOperator":"or"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
