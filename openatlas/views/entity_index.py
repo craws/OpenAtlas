@@ -16,7 +16,7 @@ from openatlas.util.image_processing import check_processed_image
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, external_url, format_date, get_base_table_data, get_file_path,
-    is_authorized, link, required_group)
+    is_authorized, link, manual, required_group)
 
 
 @app.route('/index/<view>')
@@ -34,7 +34,7 @@ def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
         'entity/index.html',
         class_=view,
         table=get_table(view),
-        buttons=get_buttons(view),
+        buttons=[manual(f'entity/{view}')] + get_buttons(view),
         gis_data=Gis.get_all() if view == 'place' else None,
         title=_(view.replace('_', ' ')),
         crumbs=[[_('admin'), url_for('admin_index')], _('file')]

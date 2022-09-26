@@ -1,25 +1,25 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <p><strong>{{ _('info')|uc_first }}</strong></p>
-            {{ info|display_info }}
-            <p><strong>{{ _('description')|uc_first }}</strong></p>
-            <p>{{ property_.comment }}</p>
-        </div>
-        {% if tables.super.rows %}
-            <div class="col">
-                <p><strong>{{ _('super')|uc_first }}</strong></p>
-                {{ tables.super.display('super')|safe }}
-            </div>
-        {% endif %}
-        {% if tables.sub.rows %}
-            <div class="col">
-                <p><strong>{{ _('subs')|uc_first }}</strong></p>
-                {{ tables.sub.display('sub')|safe }}
-            </div>
-        {% endif %}
+  <div class="row">
+    <div class="col">
+      <p><strong>{{ _('info')|uc_first }}</strong></p>
+      {{ info|display_info }}
+      <p><strong>{{ _('description')|uc_first }}</strong></p>
+      <p>{{ property_.comment }}</p>
     </div>
+    {% if tables.super.rows %}
+      <div class="col">
+        <p><strong>{{ _('super')|uc_first }}</strong></p>
+        {{ tables.super.display('super')|safe }}
+      </div>
+    {% endif %}
+    {% if tables.sub.rows %}
+      <div class="col">
+        <p><strong>{{ _('subs')|uc_first }}</strong></p>
+        {{ tables.sub.display('sub')|safe }}
+      </div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

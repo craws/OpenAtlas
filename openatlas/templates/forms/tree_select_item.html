@@ -11,7 +11,7 @@
     });
     $("#{{ name }}-tree-search").keyup(function() {
       if (this.value.length >= {{ g.settings.minimum_jstree_search }}) {
-          $("#{{ name }}-tree").jstree("search", $(this).val());
+        $("#{{ name }}-tree").jstree("search", $(this).val());
       }
     });
   });

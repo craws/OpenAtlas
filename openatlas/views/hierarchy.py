@@ -11,7 +11,8 @@ from openatlas.forms.form import get_manager
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    get_entities_linked_to_type_recursive, link, required_group, sanitize,
+    display_form, get_entities_linked_to_type_recursive, link, required_group,
+    sanitize,
     uc_first)
 
 
@@ -42,9 +43,8 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
         flash(_('entity created'), 'info')
         return redirect(f"{url_for('type_index')}#menu-tab-{category}")
     return render_template(
-        'display_form.html',
-        form=manager.form,
-        manual_page='entity/type',
+        'content.html',
+        content=display_form(manager.form, manual_page='entity/type'),
         title=_('types'),
         crumbs=[
             [_('types'), url_for('type_index')],
@@ -102,10 +102,9 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
                 _('remove'),
                 url_for('remove_class', id_=hierarchy.id, class_name=name))])
     return render_template(
-        'display_form.html',
-        form=manager.form,
-        table=table,
-        manual_page='entity/type',
+        'content.html',
+        content=display_form(manager.form, manual_page='entity/type')
+        + table.display(),
         title=_('types'),
         crumbs=[[_('types'), url_for('type_index')], hierarchy, _('edit')])
 
