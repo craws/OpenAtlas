@@ -1,6 +1,4 @@
-from datetime import datetime
-
-from flask import g, url_for
+from flask import url_for
 
 from openatlas import app
 from openatlas.api.v03.resources.error import (
@@ -10,107 +8,47 @@ from openatlas.api.v03.resources.error import (
     InvalidSystemClassError, LastEntityError, NoEntityAvailable,
     NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
     ValueNotIntegerError)
-from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
+from openatlas.api.v03.resources.util import get_by_cidoc_classes
 from tests.base import (
-    TestBaseCase, get_bool, get_bool_inverse, get_class_mapping,
-    get_geom_properties, get_no_key, insert_entity)
+    ApiTestCase, get_bool, get_bool_inverse, get_class_mapping,
+    get_geom_properties, get_no_key)
 
 
-class Api03(TestBaseCase):
+class Api03(ApiTestCase):
 
     def test_api_03(self) -> None:
 
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                params = {
-                    f'{(node.name.lower()).replace(" ", "_")}_id': id_ for
-                    (id_, node) in Type.get_all().items()}
 
-                place = insert_entity(
-                    'Shire',
-                    'place',
-                    'The Shire was the homeland of the hobbits.')
-                place.created = str(datetime.now())
-                place.modified = str(datetime.now())
-                place.update({'attributes': {
-                    'begin_from': '2018-01-31',
-                    'begin_to': '2018-03-01',
-                    'begin_comment': 'Begin of the shire',
-                    'end_from': '2019-01-31',
-                    'end_to': '2019-03-01',
-                    'end_comment': 'Descent of Shire'}})
-                location = place.get_linked_entity_safe('P53')
-                Gis.insert(location, {
-                    'point':
-                        '[{"type":"Feature","geometry":'
-                        '{"type":"Point","coordinates":[9, 17]},'
-                        '"properties":{"name":"","description":"",'
-                        '"shapeType":"centerpoint"}}]'})
-                boundary_mark = Entity.get_by_id(
-                    Type.get_hierarchy('Place').subs[0])
-                place.link('P2', boundary_mark)
-                alias = insert_entity('Sûza', 'appellation')
-                place.link('P1', alias)
-                external_reference = insert_entity(
-                    'https://lotr.fandom.com/', 'external_reference')
-                external_reference.link(
-                    'P67',
-                    place,
-                    description='Fandom Wiki of lord of the rings')
-                feature = insert_entity(
-                    'Home of Baggins', 'feature', origin=place)
-                feature.created = str(datetime.now())
-                feature.modified = str(datetime.now())
-                strati = insert_entity(
-                    'Bar', 'stratigraphic_unit', origin=feature)
-                strati.created = str(datetime.now())
-                strati.modified = str(datetime.now())
-                admin_unit = Type.get_hierarchy('Administrative unit')
-                unit_node = g.types[admin_unit.subs[0]]
-                location.link('P89', unit_node)
-                file = insert_entity('Picture with a License', 'file')
-                file.link('P67', place)
-                file.link('P2', g.types[Type.get_hierarchy('License').subs[0]])
-                value_type = Type.get_hierarchy('Dimensions')
-                place.link('P2', Entity.get_by_id(value_type.subs[0]), '23.0')
-                geonames = Entity.get_by_id(
-                    ReferenceSystem.get_by_name('GeoNames').id)
-                precision_id = Type.get_hierarchy(
-                    'External reference match').subs[0]
-                geonames.link(
-                    'P67', place, description='2761369', type_id=precision_id)
-
-                actor = insert_entity(
-                    'Frodo', 'person', description='That is Frodo')
-                alias2 = insert_entity('The ring bearer', 'appellation')
-                actor.link('P1', alias2)
-                file2 = insert_entity('File without license', 'file')
-                file2.link('P67', actor)
-                artifact = insert_entity('The One Ring', 'artifact')
-                artifact.link('P52', actor)
-
-                actor2 = insert_entity(
-                    'Sam', 'person', description='That is Sam')
-                actor2.link('P74', location)
-                relation_id = Type.get_hierarchy('Actor actor relation').id
-                relation_sub_id = g.types[relation_id].subs[0]
-                actor.link('OA7', actor2, type_id=relation_sub_id)
-
-                event = insert_entity('Travel to Mordor', 'activity')
-                event.link('P11', actor)
-                event.link('P14', actor2)
-                event.link('P7', location)
-
-                event2 = insert_entity('Exchange of the one ring', 'activity')
-                event2.link('P2', Entity.get_by_id(params["exchange_id"]))
-
-                place2 = insert_entity('Mordor', 'place', 'The heart of evil.')
-                place2.link('P2', Entity.get_by_id(Type.get_types('Place')[1]))
-                insert_entity('Silmarillion', 'source')
+                for entity in get_by_cidoc_classes(['all']):
+                    if entity.name == 'Location of Shire':
+                        location = entity
+                    if entity.name == 'Shire':
+                        place = entity
+                    if entity.name == 'Boundary Mark':
+                        boundary_mark = entity
+                    if entity.name == 'Travel to Mordor':
+                        event = entity
+                    if entity.name == 'Travel to Mordor':
+                        event = entity
+                    if entity.name == 'Economical':
+                        relation_sub = entity
+                    if entity.name == 'Austria':
+                        unit_node = entity
+                    if entity.name == 'Frodo':
+                        actor = entity
+                    if entity.name == 'Sam':
+                        actor2 = entity
+                    if entity.name == 'Home of Baggins':
+                        feature = entity
+                    if entity.name == 'Sûza':
+                        alias = entity
+                    if entity.name == 'Height':
+                        height = entity
+                    if entity.name == 'Change of Property':
+                        change_of_property = entity
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()
@@ -121,6 +59,9 @@ class Api03(TestBaseCase):
             assert bool(rv['intro'] == 'Das ist Deutsch')
             rv = self.app.get(url_for('api_03.content')).get_json()
             assert bool(rv['intro'] == 'This is English')
+
+            rv = self.app.get(url_for('api_03.system_class_count')).get_json()
+            assert bool(rv['person'])
 
             for rv in [
                 self.app.get(url_for('api_03.geometric_entities')),
@@ -133,9 +74,6 @@ class Api03(TestBaseCase):
                 assert get_geom_properties(rv, 'objectId')
                 assert get_geom_properties(rv, 'objectName')
                 assert get_geom_properties(rv, 'shapeType')
-
-            rv = self.app.get(url_for('api_03.system_class_count')).get_json()
-            assert bool(rv['person'])
 
             # ---Entity Endpoints---
             # Test Entity
@@ -161,18 +99,19 @@ class Api03(TestBaseCase):
             assert get_bool(rv['types'][0], 'label', 'Boundary Mark')
             rel = rv['relations']
             assert get_bool(rel[1], 'label', 'Height')
+            assert get_bool(rel[1], 'relationDescription', '23.0')
             assert get_bool(rel[0], 'relationTo')
             assert get_bool(rel[0], 'relationType', 'crm:P2 has type')
             assert get_bool(rel[0], 'relationSystemClass', 'type')
-            assert get_bool(rel[1], 'relationDescription', '23.0')
             assert get_bool(rv['names'][0], 'alias', 'Sûza')
-            assert get_bool(rv['links'][0], 'type', 'closeMatch')
             links = rv['links'][0]
+            assert get_bool(links, 'type', 'closeMatch')
             assert get_bool(
                 links, 'identifier', 'https://www.geonames.org/2761369')
             assert get_bool(links, 'referenceSystem', 'GeoNames')
             assert get_bool(rv['geometry'], 'type', 'Point')
-            assert get_bool(rv['geometry'], 'coordinates', [9, 17])
+            assert get_bool(
+                rv['geometry'], 'coordinates', [16.37069611, 48.208571233])
             assert get_bool(rv['depictions'][0], '@id')
             assert get_bool(
                 rv['depictions'][0], 'title', 'Picture with a License')
@@ -244,11 +183,11 @@ class Api03(TestBaseCase):
                 self.app.get(
                     url_for('api_03.type_entities', id_=boundary_mark.id)),
                 self.app.get(
-                    url_for('api_03.type_entities', id_=relation_sub_id)),
+                    url_for('api_03.type_entities', id_=relation_sub.id)),
                 self.app.get(
                     url_for('api_03.type_entities_all', id_=unit_node.id)),
                 self.app.get(
-                    url_for('api_03.type_entities_all', id_=relation_sub_id)),
+                    url_for('api_03.type_entities_all', id_=relation_sub.id)),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=location.id,
@@ -268,8 +207,7 @@ class Api03(TestBaseCase):
                     sort='desc',
                     column='system_class',
                     download=True,
-                    actor=place.id))
-            ]:
+                    actor=place.id))]:
                 rv = rv.get_json()
                 rv_results = rv['results'][0]['features'][0]
                 rv_page = rv['pagination']
@@ -393,9 +331,9 @@ class Api03(TestBaseCase):
                     system_classes='activity',
                     format='lp',
                     search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
-                           f'"values":[{params["boundary_mark_id"]},'
-                           f'{params["height_id"]},'
-                           f'{params["change_of_property_id"]}],'
+                           f'"values":[{boundary_mark.id},'
+                           f'{height.id},'
+                           f'{change_of_property.id}],'
                            f'"logicalOperator":"or"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
@@ -419,29 +357,7 @@ class Api03(TestBaseCase):
                     system_classes='person',
                     format='lp',
                     search=f'{{"valueTypeID":[{{"operator":"equal",'
-                           f'"values":[({params["height_id"]},23.0)],'
-                           f'"logicalOperator":"or"}}]}}')),
-                self.app.get(url_for(
-                    'api_03.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search=f'{{"typeID":[{{"operator":"equal",'
-                           f'"values":[{params["boundary_mark_id"]},'
-                           f'{params["height_id"]}],'
-                           f'"logicalOperator":"or"}}]}}')),
-                self.app.get(url_for(
-                    'api_03.query',
-                    entities=place.id,
-                    cidoc_classes='E18',
-                    view_classes='artifact',
-                    system_classes='person',
-                    format='lp',
-                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
-                           f'"values":[{params["boundary_mark_id"]},'
-                           f'{params["height_id"]}],'
+                           f'"values":[({height.id},23.0)],'
                            f'"logicalOperator":"or"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
@@ -580,6 +496,31 @@ class Api03(TestBaseCase):
                                 "values":["Mordor"],
                                 "logicalOperator":"or"}]}"""))]:
                 assert bool(rv.get_json()['pagination']['entities'] == 1)
+
+            for rv in [
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeID":[{{"operator":"equal",'
+                           f'"values":[{boundary_mark.id},'
+                           f'{height.id}],'
+                           f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    entities=place.id,
+                    cidoc_classes='E18',
+                    view_classes='artifact',
+                    system_classes='person',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{boundary_mark.id},'
+                           f'{height.id}],'
+                           f'"logicalOperator":"or"}}]}}'))]:
+                assert bool(rv.get_json()['pagination']['entities'] == 2)
 
             for rv in [
                 self.app.get(url_for(

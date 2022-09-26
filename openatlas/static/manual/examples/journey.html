@@ -2,39 +2,39 @@
 
 
 <!DOCTYPE html>
-<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Journey &mdash; OpenAtlas 7.7.0 documentation</title>
   
 
   
-  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
   
   
 
   
-  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+
+  
+
+  
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
     
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Letters" href="letters.html" />
     <link rel="prev" title="Archaeological data" href="archaeological_data.html" /> 
@@ -81,6 +81,7 @@
           
         </div>
 
+        
         <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
           
             
@@ -109,6 +110,7 @@
             
           
         </div>
+        
       </div>
     </nav>
 
@@ -143,11 +145,13 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
     
-      <li><a href="../index.html">Docs</a> &raquo;</li>
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
           <li><a href="index.html">Examples</a> &raquo;</li>
         
@@ -156,7 +160,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
         
       </li>
     
@@ -180,10 +184,10 @@ On move events concerning artifacts, have a look at the
 event</strong>. To create a new move event following elements are involved in the
 procedure:</p>
 <ul class="simple">
-<li><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a>: the person/persons that went on a journey</li>
-<li><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a>: the <strong>Move</strong> of the letter from one place to another</li>
-<li><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: start or end point of the journey</li>
-<li><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</li>
+<li><p><a class="reference internal" href="../entity/actor.html"><span class="doc">Actor</span></a>: the person/persons that went on a journey</p></li>
+<li><p><a class="reference internal" href="../entity/event.html"><span class="doc">Event</span></a>: the <strong>Move</strong> of the letter from one place to another</p></li>
+<li><p><a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a>: start or end point of the journey</p></li>
+<li><p><a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a>: used for classification, can be extended by users</p></li>
 </ul>
 <div class="section" id="adding-actors">
 <h2>Adding actors<a class="headerlink" href="#adding-actors" title="Permalink to this headline">¶</a></h2>
@@ -206,18 +210,18 @@ the form. As for all other forms, a name is required to save the data.</p>
 <h2>Creating the move event<a class="headerlink" href="#creating-the-move-event" title="Permalink to this headline">¶</a></h2>
 <p>The following steps will create a move event:</p>
 <ul class="simple">
-<li>Click on the <strong>Event</strong> tab in the menu then use the <strong>+ Move</strong> button</li>
-<li>Fill out the form, for more information see the <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>.</li>
-<li><strong>Please note</strong>: do not link a person in this form if the journey was taken willingly.
+<li><p>Click on the <strong>Event</strong> tab in the menu then use the <strong>+ Move</strong> button</p></li>
+<li><p>Fill out the form, for more information see the <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>.</p></li>
+<li><p><strong>Please note</strong>: do not link a person in this form if the journey was taken willingly.
 Link here only people who have not traveled of their own free will - think,
 for example, of a prisoner transport or the translation of relics. To see
-how to link (voluntary) travelers correctly, see below.</li>
-<li><strong>Please also note</strong>: Use <strong>preceding event</strong> to document multiple
+how to link (voluntary) travelers correctly, see below.</p></li>
+<li><p><strong>Please also note</strong>: Use <strong>preceding event</strong> to document multiple
 parts of a trip. Unlike <strong>sub events</strong>, these can be put in chronological
 order. Sub events are there to capture events that happen at the same time
-(for more information see <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>).</li>
-<li>Click the <strong>Insert</strong> button to save the data or <strong>Insert and continue</strong>
-button to save and start to enter another move event</li>
+(for more information see <a class="reference internal" href="move_event.html"><span class="doc">move event tutorial</span></a>).</p></li>
+<li><p>Click the <strong>Insert</strong> button to save the data or <strong>Insert and continue</strong>
+button to save and start to enter another move event</p></li>
 </ul>
 </div>
 <div class="section" id="link-actors-to-the-journey">
@@ -226,22 +230,21 @@ button to save and start to enter another move event</li>
 entry click on the blue <strong>Actor</strong> tab on the landing page of the respective
 move event.</p>
 <ul>
-<li><p class="first">Here, the Link button can be used to link people already entered into the
+<li><p>Here, the Link button can be used to link people already entered into the
 database. The following information can be entered via the form:</p>
 <blockquote>
 <div><ul class="simple">
-<li>at type you can define the role of the actor in the journey; if
+<li><p>at type you can define the role of the actor in the journey; if
 there is no suitable entry in the list, a new type can be created
 depending on the user’s authorization, see the <a class="reference internal" href="types.html"><span class="doc">types
-tutorial</span></a>.</li>
-<li>the actor can be changed afterwards via the <strong>Change</strong> button</li>
-<li>the form of participation can be determined</li>
-<li>in addition, dates and a free text description are possible</li>
+tutorial</span></a>.</p></li>
+<li><p>the actor can be changed afterwards via the <strong>Change</strong> button</p></li>
+<li><p>the form of participation can be determined</p></li>
+<li><p>in addition, dates and a free text description are possible</p></li>
 </ul>
 </div></blockquote>
 </li>
-<li><p class="first">via <strong>+person</strong> or <strong>+group</strong> new actors can be created and then linked to the move event</p>
-</li>
+<li><p>via <strong>+person</strong> or <strong>+group</strong> new actors can be created and then linked to the move event</p></li>
 </ul>
 </div>
 </div>
@@ -251,16 +254,10 @@ tutorial</span></a>.</li>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="letters.html" class="btn btn-neutral float-right" title="Letters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="archaeological_data.html" class="btn btn-neutral float-left" title="Archaeological data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="letters.html" class="btn btn-neutral float-right" title="Letters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="archaeological_data.html" class="btn btn-neutral float-left" title="Archaeological data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
@@ -269,7 +266,14 @@ tutorial</span></a>.</li>
 
     </p>
   </div>
-  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -280,7 +284,6 @@ tutorial</span></a>.</li>
 
 
 </footer>
-
         </div>
       </div>
 
@@ -288,7 +291,6 @@ tutorial</span></a>.</li>
 
   </div>
   
-
 
   <script type="text/javascript">
       jQuery(function () {

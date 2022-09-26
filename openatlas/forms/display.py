@@ -4,7 +4,6 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
-from markupsafe import Markup, escape
 from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
@@ -58,7 +57,7 @@ def html_form(
             class_ = app.config['CSS']['button']['primary']
             buttons = []
             if manual_page:
-                buttons.append(escape(manual(manual_page)))
+                buttons.append(manual(manual_page))
             buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:
                 buttons.append(form.insert_and_continue(class_=class_))
@@ -166,9 +165,9 @@ def button_icon(type_: Type) -> str:
     if not type_.subs:
         return ''
     onclick = f'switch_value_type({type_.id})' if len(type_.subs) != 0 else ''
-    return Markup(f"""
-        <span id="value-type-switcher-{type_.id}" class="btn btn-xsm"
-            onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>""")
+    return \
+        f'<span id="value-type-switcher-{type_.id}" class="btn btn-xsm" ' \
+        f'onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>'
 
 
 def add_dates(form: Any) -> str:

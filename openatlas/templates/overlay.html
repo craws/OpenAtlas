@@ -1,30 +1,30 @@
 {% extends 'layout.html' %}
 {% block content %}
-    {{ buttons|button_bar }}
+    {{ buttons|button_bar|safe }}
     <form method="post">
-        {{ form.csrf_token }}
-        <div class="data-table">
-            <div class="table-row">
-                <div></div>
-                <div>{{ _('easting')|uc_first }}</div>
-                <div>{{ _('northing')|uc_first }}</div>
-            </div>
-            <div class="table-row">
-                <div>{{ _('top left')|uc_first }}</div>
-                <div>{{ form.top_left_easting(class_='number') }}</div>
-                <div>{{ form.top_left_northing(class_='number') }}</div>
-            </div>
-            <div class="table-row">
-                <div>{{ _('top right')|uc_first }}</div>
-                <div>{{ form.top_right_easting(class_='number') }}</div>
-                <div>{{ form.top_right_northing(class_='number') }}</div>
-            </div>
-            <div class="table-row">
-                <div>{{ _('bottom left')|uc_first }}</div>
-                <div>{{ form.bottom_left_easting(class_='number') }}</div>
-                <div>{{ form.bottom_left_northing(class_='number') }}</div>
-            </div>
+      {{ form.csrf_token }}
+      <div class="data-table">
+        <div class="table-row">
+          <div></div>
+          <div>{{ _('easting')|uc_first }}</div>
+          <div>{{ _('northing')|uc_first }}</div>
         </div>
-        {{ form.save(class=config.CSS.button.primary) }}
+        <div class="table-row">
+          <div>{{ _('top left')|uc_first }}</div>
+          <div>{{ form.top_left_easting(class_='number') }}</div>
+          <div>{{ form.top_left_northing(class_='number') }}</div>
+        </div>
+        <div class="table-row">
+          <div>{{ _('top right')|uc_first }}</div>
+          <div>{{ form.top_right_easting(class_='number') }}</div>
+          <div>{{ form.top_right_northing(class_='number') }}</div>
+        </div>
+        <div class="table-row">
+          <div>{{ _('bottom left')|uc_first }}</div>
+          <div>{{ form.bottom_left_easting(class_='number') }}</div>
+          <div>{{ form.bottom_left_northing(class_='number') }}</div>
+        </div>
+      </div>
+      {{ form.save(class=config.CSS.button.primary) }}
     </form>
 {% endblock %}

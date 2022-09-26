@@ -3,7 +3,6 @@ from typing import Union
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from markupsafe import Markup
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField
@@ -13,7 +12,7 @@ from openatlas.database.connect import Transaction
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
 from openatlas.util.util import (
-    button, is_authorized, manual, required_group, uc_first)
+    button, display_form, is_authorized, manual, required_group, uc_first)
 
 
 def name_result(result: float) -> str:
@@ -34,10 +33,10 @@ def print_result(entity: Entity) -> str:
     calculation = SexEstimation.calculate(entity)
     if calculation is None:
         return ''
-    return Markup(
-        'Ferembach et al. 1979: '
-        f'<span class="anthro-result">{calculation}</span>'
-        f' - {_("corresponds to")} "{name_result(calculation)}"')
+    return \
+        'Ferembach et al. 1979: ' \
+        f'<span class="anthro-result">{calculation}</span>' \
+        f' - {_("corresponds to")} "{name_result(calculation)}"'
 
 
 @app.route('/anthropology/index/<int:id_>')
@@ -49,7 +48,7 @@ def anthropology_index(id_: int) -> Union[str, Response]:
         button(_('sex estimation'), url_for('sex', id_=entity.id)),
         print_result(entity)]
     return render_template(
-        'anthropology/index.html',
+        'content.html',
         entity=entity,
         buttons=buttons,
         crumbs=[entity, _('anthropological analyses')])
@@ -73,7 +72,7 @@ def sex(id_: int) -> Union[str, Response]:
             'option_value': SexEstimation.options[item['description']],
             'value': item['description']})
     return render_template(
-        'anthropology/sex.html',
+        'anthropology_sex.html',
         entity=entity,
         buttons=buttons,
         data=data,
@@ -126,12 +125,12 @@ def sex_update(id_: int) -> Union[str, Response]:
     # Fill in data
     for dict_ in types:
         getattr(form, g.types[dict_['id']].name).data = dict_['description']
-
     return render_template(
-        'display_form.html',
+        'content.html',
+        content=display_form(
+            form,
+            manual_page='tools/anthropological_analyses'),
         entity=entity,
-        manual_page='tools/anthropological_analyses',
-        form=form,
         crumbs=[
             entity,
             [_('anthropological analyses'),

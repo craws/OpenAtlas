@@ -82,7 +82,7 @@
           </button>
         </div>
         <div class="modal-body">
-          {{ field.form|display_form() }}
+          {{ field.form|display_form()|safe }}
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-outline-secondary btn-sm"
@@ -95,31 +95,27 @@
     </div>
   </div>
   <script>
-      $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
-          if ($(this).val() === '')
-              $('#{{field.id}}-add-type').attr('disabled', '')
-          else
-              $('#{{field.id}}-add-type').removeAttr('disabled')
-      });
+    $("#add-type-modal-{{field.id}} #name-dynamic").on('keyup change', function () {
+      if ($(this).val() === '')
+        $('#{{field.id}}-add-type').attr('disabled', '')
+      else
+        $('#{{field.id}}-add-type').removeAttr('disabled')
+    });
 
-      $('#{{field.id}}-add-type').on('click', async function (e) {
-          const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
-          const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
-          const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
-          const data = {
-              name, superType, description
-          };
-          const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
-          selectFromTree('{{field.type_id}}', typeId, name);
-          e.preventDefault();
-      });
+    $('#{{field.id}}-add-type').on('click', async function (e) {
+      const name = $("#add-type-modal-{{field.id}} #name-dynamic").val();
+      const superType = $("#{{field.id}}-dynamic").val() ||{{field.type_id}};
+      const description = $("#add-type-modal-{{field.id}} #description-dynamic").val();
+      const data = {name, superType, description};
+      const typeId = await ajaxAddType(data, {{field.id}}, {{field.type_id}});
+      selectFromTree('{{field.type_id}}', typeId, name);
+      e.preventDefault();
+    });
   </script>
 {% endif %}
 <script>
-    variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
-
-    if (variables['{{field.id}}-isAddDynamicall'])
-        $("#{{ field.id }}-modal .toolbar").hide()
-
-    fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
+  variables['{{field.id}}-isAddDynamicall'] = '{{field.form}}' !== 'None';
+  if (variables['{{field.id}}-isAddDynamicall'])
+    $("#{{ field.id }}-modal .toolbar").hide()
+  fillTreeSelect('{{field.id}}', {{data |safe}}, {{ g.settings.minimum_jstree_search }})
 </script>
