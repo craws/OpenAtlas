@@ -1,0 +1,6 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div {style="float:left;margin-right:1em;">
+      {{ form|display_form(manual_page='admin/export')|safe }}
+    </div>
+{% endblock %}

@@ -7,10 +7,10 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SelectField, SubmitField
+from wtforms import RadioField, SubmitField
 
 from openatlas import app
-from openatlas.models.export import csv_export, sql_export
+from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
     convert_size, delete_link, is_authorized, link, required_group, uc_first)
@@ -21,25 +21,11 @@ class ExportSqlForm(FlaskForm):
 
 
 class ExportCsvForm(FlaskForm):
-    zip = BooleanField(_('export as ZIP and add info file'), default=True)
-    timestamps = BooleanField('created and modified dates', default=False)
-    gis_format = SelectField(
-        _('GIS format'),
-        choices=[
-            ('coordinates', _('coordinates')),
-            ('wkt', 'WKT'),
-            ('postgis', 'PostGIS Geometry')])
-    cidoc_class = BooleanField('cidoc class', default=True)
-    cidoc_class_inheritance = BooleanField(
-        'cidoc class inheritance',
-        default=True)
-    entity = BooleanField('entity', default=True)
-    link = BooleanField('link', default=True)
-    property = BooleanField('property', default=True)
-    property_inheritance = BooleanField(
-        'property inheritance',
-        default=True)
-    gis = BooleanField('gis', default=True)
+    select_export_format = RadioField(
+        'export format',
+        choices=[('csv', 'CSV'),
+                 ('json', 'JSON'),
+                 ('xml', 'XML')])
     save = SubmitField(uc_first(_('export CSV')))
 
 
@@ -88,24 +74,20 @@ def export_sql() -> Union[str, Response]:
 
 @app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
-def export_csv() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'csv'
-    writable = os.access(path, os.W_OK)
+def export() -> Union[str, Response]:
     form = ExportCsvForm()
-    if form.validate_on_submit() and writable:
-        csv_export(form)
-        g.logger.log('info', 'database', 'CSV export')
-        flash(_('data was exported as CSV'), 'info')
-        return redirect(url_for('export_csv'))
+    if form.validate_on_submit():
+        format_ = form.data["select_export_format"]
+        g.logger.log('info', 'database', f'export {format_}')
+        flash(_(f'data was exported as {format_}'), 'info')
+        return redirect(url_for('api_03.export_database', format_=format_))
     return render_template(
-        'export.html',
+        'export_api.html',
         form=form,
-        table=get_table('csv', path, writable),
-        writable=writable,
         title=_('export CSV'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export CSV')])
+            _('export')])
 
 
 def get_table(type_: str, path: Path, writable: bool) -> Table:

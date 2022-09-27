@@ -167,7 +167,7 @@ def grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:
     return grouped_entities
 
 
-def export_database_csv(tables: dict[str, Any]) -> Response:
+def export_database_csv(tables: dict[str, Any], filename: str) -> Response:
     archive = BytesIO()
     with zipfile.ZipFile(archive, 'w') as zipped_file:
         for name, entries in tables.items():
@@ -186,4 +186,5 @@ def export_database_csv(tables: dict[str, Any]) -> Response:
     return Response(
         archive.getvalue(),
         mimetype='application/zip',
-        headers={'Content-Disposition': 'attachment;filename=oa_csv.zip'})
+        headers={
+            'Content-Disposition': f'attachment;filename={filename}.zip'})

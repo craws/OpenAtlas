@@ -17,9 +17,9 @@ def subunit_xml(result: dict[str, Any]) -> bytes:
     return xml
 
 
-def export_database_xml(tables: dict[str, Any]) -> Response:
+def export_database_xml(tables: dict[str, Any], filename: str) -> Response:
     return Response(
         dicttoxml(tables, root=False, attr_type=False),
         mimetype='application/xml',
         headers={
-            'Content-Disposition': f'attachment;filename=database.xml'})
+            'Content-Disposition': f'attachment;filename={filename}.xml'})

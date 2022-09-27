@@ -23,6 +23,7 @@ from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.database.link import Link as DbLink
 from openatlas.database.entity import Entity as DbEntity
+from openatlas.models.export import current_date_for_filename
 
 
 class GetContent(Resource):
@@ -98,14 +99,16 @@ class ExportDatabase(Resource):
             'classes': DbCidocClass.get_classes(),
             'class_hierarchy': DbCidocClass.get_hierarchy(),
             'geometries': geoms}
+        filename = f'{current_date_for_filename()}-export'
         if format_ == 'csv':
-            return export_database_csv(tables)
+            return export_database_csv(tables, filename)
         if format_ == 'xml':
-            return export_database_xml(tables)
+            return export_database_xml(tables, filename)
         return Response(
             json.dumps({key: str(value) for key, value in tables.items()}),
             mimetype='application/json',
-            headers={'Content-Disposition': 'attachment;filename=oa_csv.json'})
+            headers={
+                'Content-Disposition': f'attachment;filename={filename}.json'})
 
     @staticmethod
     def get_geometries_dict(
