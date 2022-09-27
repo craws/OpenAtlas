@@ -195,7 +195,7 @@ class Api02(ApiTestCase):
                 self.app.get(url_for(
                     'api_02.code',
                     code='place',
-                    filter=f"and|begin_from|eq|2018-01-31"))]:
+                    filter="and|begin_from|eq|2018-01-31"))]:
                 rv_results = rv.get_json()['results'][0]['features'][0]
                 rv_page = rv.get_json()['pagination']
                 assert get_bool(rv_results, '@id')
