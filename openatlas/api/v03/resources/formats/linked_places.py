@@ -72,8 +72,7 @@ def get_lp_links(
         links: list[Link],
         links_inverse: list[Link],
         parser: dict[str, Any]) -> list[dict[str, str]]:
-    properties = parser['relation_type'] \
-        if parser['relation_type'] else list(g.properties)
+    properties = parser['relation_type'] or list(g.properties)
     out = []
     for link_ in links:
         if link_.property.code in properties:

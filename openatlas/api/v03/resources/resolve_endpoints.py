@@ -10,7 +10,8 @@ from openatlas.api.v03.resources.formats.csv import (
     export_csv_for_network_analysis, export_entities_csv)
 from openatlas.api.v03.resources.error import (
     EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
-from openatlas.api.v03.resources.formats.geojson import get_geojson
+from openatlas.api.v03.resources.formats.geojson import get_geojson, \
+    get_geojson_v2
 from openatlas.api.v03.resources.formats.linked_places import \
     get_linked_places_entity
 from openatlas.api.v03.resources.formats.rdf import rdf_output
@@ -60,7 +61,7 @@ def resolve_entities(
 
 
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
-    if parser['format'] == 'geojson':
+    if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_pagination()
     return linked_place_pagination(parser)
 
@@ -80,6 +81,8 @@ def get_entity_formatted(
         parser: dict[str, Any]) -> dict[str, Any]:
     if parser['format'] == 'geojson':
         return get_geojson([entity], parser)
+    if parser['format'] == 'geojson-v2':
+        return get_geojson_v2([entity], parser)
     return get_linked_places_entity(
         entity,
         get_all_links(entity.id),
@@ -106,7 +109,7 @@ def resolve_entity(
 
 
 def get_entity_template(parser: dict[str, Any]) -> dict[str, Any]:
-    if parser['format'] == 'geojson':
+    if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_collection_template()
     return linked_places_template(parser['show'])
 
@@ -162,6 +165,8 @@ def get_entities_formatted(
     entities = entities_all[:int(parser['limit'])]
     if parser['format'] == 'geojson':
         return [get_geojson(entities, parser)]
+    if parser['format'] == 'geojson-v2':
+        return [get_geojson_v2(entities, parser)]
     entities_dict: dict[str, Any] = {}
     for entity in entities:
         entities_dict[entity.id] = {

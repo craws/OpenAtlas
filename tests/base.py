@@ -78,8 +78,6 @@ def insert_entity(
         entity.link(
             'P53',
             Entity.insert('object_location', f'Location of {name}'))
-        if origin:
-            origin.link('P46', entity)
     return entity
 
 

@@ -259,7 +259,7 @@ class Api02(ApiTestCase):
 
             # Test Entities count
             rv = self.app.get(url_for('api_02.geometric_entities', count=True))
-            assert bool(rv.get_json() == 1)
+            assert bool(rv.get_json() == 3)
 
             # Test entities with GeoJSON Format
             rv = self.app.get(url_for(
