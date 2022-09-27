@@ -12,7 +12,7 @@
   <div class="toolbar">
     {{ _('import')|button(url_for('import_index'))|safe }}
     {% if 'manager'|is_authorized %}
-      {{ ('CSV ' + _('export'))|button(url_for('export_csv'))|safe }}
+      {{ ('CSV ' + _('export'))|button(url_for('export'))|safe }}
       {{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}
     {% endif %}
     {% if 'admin'|is_authorized %}

@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 from wtforms import RadioField, SubmitField
 
 from openatlas import app
+from openatlas.api.v03.endpoints.content import ExportDatabase
 from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -75,19 +76,12 @@ def export_sql() -> Union[str, Response]:
 @app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
 def export() -> Union[str, Response]:
-    form = ExportCsvForm()
-    if form.validate_on_submit():
-        format_ = form.data["select_export_format"]
-        g.logger.log('info', 'database', f'export {format_}')
-        flash(_(f'data was exported as {format_}'), 'info')
-        return redirect(url_for('api_03.export_database', format_=format_))
     return render_template(
         'export_api.html',
-        form=form,
         title=_('export CSV'),
         crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export')])
+            [_('admin'), f"{url_for('admin_index')}#tab-data"], _('export')],
+        format_options=['csv', 'json', 'xml'])
 
 
 def get_table(type_: str, path: Path, writable: bool) -> Table:

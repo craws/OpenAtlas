@@ -1,6 +1,16 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div {style="float:left;margin-right:1em;">
+    <div style="float:left;margin-right:1em;">
       {{ form|display_form(manual_page='admin/export')|safe }}
     </div>
+<div class="btn-toolbar">
+  <div class="btn-group me-2">
+    {% for option in format_options %}
+      <a class="{{ config.CSS.button.primary }}"
+         href=" {{ url_for('api_03.export_database', format_='{{ option }}') }}">
+        {{ option }}
+      </a>
+    {% endfor %}
+  </div>
+</div>
 {% endblock %}
