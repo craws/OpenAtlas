@@ -7,9 +7,15 @@ RUN export DEBIAN_FRONTEND=noninteractive &&\
     apt install -y --no-install-recommends python3-pandas python3-jinja2 python3-flask-cors python3-flask-restful p7zip-full &&\
     apt install -y --no-install-recommends python3-wand python3-rdflib python3-dicttoxml python3-rdflib-jsonld python3-flasgger &&\
     apt install -y --no-install-recommends apache2 libapache2-mod-wsgi-py3 &&\
-    apt install -y --no-install-recommends gettext npm python3-pip git &&\
+    apt install -y --no-install-recommends gettext npm python3-pip git postgresql-client-13 &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
-    chown www-data:www-data /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm
+    chown -R www-data:www-data /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
+COPY entrypoint.sh /entrypoint.sh
+COPY example_apache.conf /etc/apache2/sites-available/000-default.conf
+RUN chmod a+x /entrypoint.sh &&\
+    sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
+    sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
+    sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
 USER www-data
 RUN cd /var/www &&\
     git clone https://github.com/craws/OpenAtlas.git openatlas &&\
@@ -19,13 +25,8 @@ RUN cd /var/www &&\
     pip3 install -e ./ &&\
     ~/.local/bin/calmjs npm --install openatlas
 
-# RUN
+EXPOSE 8080
+ENV APACHE_CONFDIR /etc/apache2
 
-# USER postgres
-
-# RUN 
-
-# USER root
-
-# USER www-data
-# CMD 
+ENTRYPOINT [ "/entrypoint.sh" ]
+CMD [ "/usr/sbin/apache2", "-D", "FOREGROUND" ]
