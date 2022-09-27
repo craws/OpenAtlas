@@ -103,7 +103,7 @@ class ExportDatabase(Resource):
         if format_ == 'xml':
             return export_database_xml(tables)
         return Response(
-            json.dumps(tables),
+            json.dumps({key: str(value) for key, value in tables.items()}),
             mimetype='application/json',
             headers={'Content-Disposition': 'attachment;filename=oa_csv.json'})
 
