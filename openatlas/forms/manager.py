@@ -76,6 +76,19 @@ class ActorActorRelationManager(BaseManager):
                 inverse=True if self.form.inverse.data else False,
                 type_id=link_type.id if link_type else None)
 
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_actor_relation'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        inverse = self.form.inverse.data
+        if (self.origin.id == self.link_.domain.id and inverse) or \
+                (self.origin.id == self.link_.range.id and not inverse):
+            new_range = self.link_.domain
+            self.link_.domain = self.link_.range
+            self.link_.range = new_range
+
 
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
@@ -114,6 +127,13 @@ class ActorFunctionManager(BaseManager):
                     actor,
                     self.form.description.data,
                     type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_function'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
 
 
 class ActivityManager(EventBaseManager):
@@ -296,11 +316,7 @@ class InvolvementManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         if self.origin.class_.view == 'event':
-            if self.link_:
-                actors = [self.link_.range_]
-            else:
-                actors = Entity.get_by_ids(
-                    ast.literal_eval(self.form.actor.data))
+            actors = Entity.get_by_ids(ast.literal_eval(self.form.actor.data))
             for actor in actors:
                 link_type = self.get_link_type()
                 self.add_link(
@@ -309,11 +325,7 @@ class InvolvementManager(BaseManager):
                     self.form.description.data,
                     type_id=link_type.id if link_type else None)
         else:
-            if self.link_:
-                events = [self.link_.domain]
-            else:
-                events = Entity.get_by_ids(
-                    ast.literal_eval(self.form.event.data))
+            events = Entity.get_by_ids(ast.literal_eval(self.form.event.data))
             for event in events:
                 link_type = self.get_link_type()
                 self.add_link(

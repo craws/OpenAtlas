@@ -5,7 +5,6 @@ from flask import url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
 
@@ -27,14 +26,12 @@ class InvolvementTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('person', 'Captain Miller')
-                involvement = Type.get_hierarchy('Involvement')
 
             rv = self.app.get(
                 url_for(
                     'insert_relation',
-                    type_='involvement',
-                    origin_id=actor.id))
-
+                    origin_id=actor.id,
+                    type_='involvement'))
             assert b'Involvement' in rv.data
 
             rv = self.app.post(
@@ -46,8 +43,7 @@ class InvolvementTests(TestBaseCase):
                     'event': str([event_id]),
                     'activity': 'P11',
                     'begin_year_from': '950',
-                    'end_year_from': '1950',
-                    involvement.id: involvement.id},
+                    'end_year_from': '1950'},
                 follow_redirects=True)
             assert b'Event Horizon' in rv.data
 

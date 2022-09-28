@@ -61,9 +61,6 @@ class Link:
             'end_to': datetime64_to_timestamp(self.end_to),
             'end_comment': self.end_comment})
 
-    def delete(self) -> None:
-        Link.delete_(self.id)
-
     def set_dates(self, data: dict[str, Any]) -> None:
         self.begin_from = data['begin_from']
         self.begin_to = data['begin_to']

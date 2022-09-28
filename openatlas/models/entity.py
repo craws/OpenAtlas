@@ -147,7 +147,7 @@ class Entity:
     def update(
             self,
             data: dict[str, Any],
-            new: bool = False,) -> Optional[int]:
+            new: bool = False) -> Optional[int]:
         continue_link_id = None
         if 'attributes' in data:
             self.update_attributes(data['attributes'])
@@ -209,7 +209,8 @@ class Entity:
         if not new:
             if 'delete' in data['links'] and data['links']['delete']:
                 self.delete_links(data['links']['delete'])
-            if 'delete_inverse' in data['links'] and data['links']['delete_inverse']:
+            if 'delete_inverse' in data['links'] \
+                    and data['links']['delete_inverse']:
                 self.delete_links(data['links']['delete_inverse'], True)
             if 'delete_reference_system' in data['links'] \
                     and data['links']['delete_reference_system']:

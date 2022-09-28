@@ -492,7 +492,7 @@ def add_tabs_for_actor(
             link_.last,
             link_.description,
             edit_link(
-                url_for('member_update', id_=link_.id, origin_id=entity.id)),
+                url_for('link_update', id_=link_.id, origin_id=entity.id)),
             remove_link(link_.domain.name, link_, entity, 'member-of')]
         tabs['member_of'].table.rows.append(data)
     if entity.class_.name != 'group':
@@ -506,8 +506,7 @@ def add_tabs_for_actor(
                 link_.last,
                 link_.description,
                 edit_link(
-                    url_for('member_update', id_=link_.id, origin_id=entity.id)
-                ),
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.range.name, link_, entity, 'member')])
     for link_ in entity.get_links('P52', True):
         data = [
