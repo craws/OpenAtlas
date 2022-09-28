@@ -84,10 +84,9 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     return html
 
 
-@contextfilter
+@contextfilter  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
-    # Using context filter above to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
