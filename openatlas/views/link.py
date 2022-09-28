@@ -82,9 +82,8 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     if manager.form.validate_on_submit():
         Transaction.begin()
         # try:
-        manager.process_form()
-        manager.update_link()
-
+        manager.process_link_form()
+        manager.link_.update()
         Transaction.commit()
         # except Exception as e:  # pragma: no cover
         #     Transaction.rollback()
@@ -148,7 +147,6 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             [_(origin.class_.view), url_for('index', view=origin.class_.view)],
             origin,
             _(type_)])
-
 
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])

@@ -323,6 +323,14 @@ class InvolvementManager(BaseManager):
                     inverse=True,
                     type_id=link_type.id if link_type else None)
 
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['involvement'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        self.link_.property = g.properties[self.form.activity.data]
+
 
 class MoveManager(EventBaseManager):
 
