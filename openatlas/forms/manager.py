@@ -403,15 +403,15 @@ class PersonManager(ActorBaseManager):
             'residence': TableField(
                 _('residence'),
                 add_dynamic=['place'],
-                related_tables=['born_in', 'died_in']),
+                related_tables=['begins_in', 'ends_in']),
             'begins_in': TableField(
                 _('born in'),
                 add_dynamic=['place'],
-                related_tables=['residence', 'died_in']),
+                related_tables=['residence', 'ends_in']),
             'ends_in': TableField(_(
                 'died in'),
                 add_dynamic=['place'],
-                related_tables=['born_in', 'residence'])}
+                related_tables=['begins_in', 'residence'])}
 
 
 class PlaceManager(BaseManager):
