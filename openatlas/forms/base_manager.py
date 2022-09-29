@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import time
 from typing import Any, Optional, Union
@@ -218,6 +218,14 @@ class BaseManager:
                     f'Location of {self.form.name.data}'))
         return
 
+    def update_link(self) -> None:
+        self.data['attributes_link'] = self.data['attributes']
+        self.origin.update_links(self.data, new=True)
+
+    def process_link_form(self) -> None:
+        self.link_.description = self.form.description.data
+        self.link_.set_dates(process_dates(self))
+
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']
@@ -275,19 +283,19 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event_id': HiddenField(),
-            'event': TableField(_('sub event of'), filter_ids=filter_ids)}
+            'event': TableField(_('sub event of'), filter_ids=filter_ids,
+                                add_dynamic=['event'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
                 filter_ids=filter_ids)
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'))
+            fields['place'] = TableField(_('location'),
+                                         add_dynamic=['place'])
         return fields
 
     def populate_update(self) -> None:
         super().populate_update()
-        self.form.event_id.data = self.entity.id
         if super_ := self.entity.get_linked_entity('P9'):
             self.form.event.data = super_.id
         if preceding_ := self.entity.get_linked_entity('P134', True):

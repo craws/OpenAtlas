@@ -9,6 +9,5 @@ Tools
    notes
    map
    network
-   model
    api
    anthropological_analyses

@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-  {{ form|display_form(manual_page='admin/user') }}
+  {{ form|display_form(manual_page='admin/user')|safe }}
 {% endblock %}
 
 {% block script %}

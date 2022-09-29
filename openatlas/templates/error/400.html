@@ -1,21 +1,20 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container" style="text-align:center;">
-        <h1 class="error">
-            {{ e }}
-        </h1>
-        <p>
-            {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
-        </p>
-        <p>
-            {{ _("Please let us know if you think it's a bug") }}:
-            <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
-        </p>
-        <p>
-            <img src="/static/images/layout/400.jpg" alt="400 - Bad Request"><br>
-            From commons.wikimedia.org<br>
-            Oseberg ship excavation 1904. Photo Olaf Væring,
-            Kulturhistorisk museum UiO Oslo, Norway. License CC BY-SA 4.0
-        </p>
-    </div>
+<div class="container" style="text-align:center;">
+  <h1 class="error">
+    {{ e }}
+  </h1>
+  <p>
+    {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
+  </p>
+  <p>
+    {{ _("Please let us know if you think it's a bug") }}:
+    <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
+  </p>
+  <p>
+    <img src="/static/images/layout/400.jpg" alt="400 - Bad Request"><br>
+    From commons.wikimedia.org<br>
+    Oseberg ship excavation 1904. Photo Olaf Væring, Kulturhistorisk museum UiO Oslo, Norway. License CC BY-SA 4.0
+  </p>
+</div>
 {% endblock %}

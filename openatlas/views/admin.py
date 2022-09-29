@@ -198,7 +198,9 @@ def admin_content(item: str) -> Union[str, Response]:
             ContentForm,
             language,
             StringField()
-            if item == 'site_name_for_frontend' else TextAreaField())
+            if item == 'site_name_for_frontend'
+            else TextAreaField(render_kw={'class': 'tinymce'}))
+    setattr(ContentForm, 'save', SubmitField(uc_first(_('save'))))
     form = ContentForm()
     if form.validate_on_submit():
         data = []
@@ -213,24 +215,29 @@ def admin_content(item: str) -> Union[str, Response]:
     for language in app.config['LANGUAGES']:
         form.__getattribute__(language).data = get_content()[item][language]
     return render_template(
-        'admin/content.html',
-        item=item,
-        form=form,
+        'tabs.html',
+        tabs={'content': Tab('content', form=form)},
         title=_('content'),
-        crumbs=[[_('admin'), f"{url_for('admin_index')}#tab-content"], _(item)]
-    )
+        crumbs=[
+            [_('admin'), f"{url_for('admin_index')}#tab-content"],
+            _(item)])
 
 
 @app.route('/admin/check_links')
 @required_group('contributor')
 def admin_check_links() -> str:
-    return render_template(
-        'admin/check_links.html',
+    tab = Tab(
+        'check_links',
         table=Table(
             ['domain', 'property', 'range'],
-            rows=[
-                [x['domain'], x['property'], x['range']]
-                for x in Link.get_invalid_cidoc_links()]),
+            [[x['domain'], x['property'], x['range']]
+             for x in Link.get_invalid_cidoc_links()]),
+        buttons=[manual('admin/data_integrity_checks')])
+    tab.content = _('Congratulations, everything looks fine!') \
+        if not tab.table.rows else None
+    return render_template(
+        'tabs.html',
+        tabs={'check_links': tab},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -247,12 +254,15 @@ def admin_check_link_duplicates(
         g.logger.log('info', 'admin', f"Deleted duplicate links: {count}")
         flash(f"{_('deleted links')}: {count}", 'info')
         return redirect(url_for('admin_check_link_duplicates'))
-    table = Table([
+    tab = Tab(
+        'check_link_duplicates',
+        buttons=[manual('admin/data_integrity_checks')])
+    tab.table = Table([
         'domain', 'range', 'property_code', 'description', 'type_id',
         'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
         'end_comment', 'count'])
     for row in Link.check_link_duplicates():
-        table.rows.append([
+        tab.table.rows.append([
             link(Entity.get_by_id(row['domain_id'])),
             link(Entity.get_by_id(row['range_id'])),
             link(g.properties[row['property_code']]),
@@ -265,8 +275,13 @@ def admin_check_link_duplicates(
             format_date(row['end_to']),
             row['end_comment'],
             row['count']])
-    if not table.rows:  # Check single types for multiple use
-        table = Table(
+    if tab.table.rows:
+        tab.buttons.append(
+            button(
+                _('delete link duplicates'),
+                url_for('admin_check_link_duplicates', delete='delete')))
+    else:  # Check single types for multiple use
+        tab.table = Table(
             ['entity', 'class', 'base type', 'incorrect multiple types'])
         for row in Link.check_single_type_duplicates():
             remove_links = []
@@ -276,16 +291,18 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a>'
+                    f'<a href="{url}">{uc_first(_("remove"))}</a> '
                     f'{type_.name}')
-            table.rows.append([
+            tab.table.rows.append([
                 link(row['entity']),
-                row['entity'].class_.name,
+                row['entity'].class_.label,
                 link(g.types[row['type'].id]),
-                '<br><br><br><br><br>'.join(remove_links)])
+                '<br><br>'.join(remove_links)])
+    if not tab.table.rows:
+        tab.content = _('Congratulations, everything looks fine!')
     return render_template(
-        'admin/check_link_duplicates.html',
-        table=table,
+        'tabs.html',
+        tabs={'tab': tab},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -335,9 +352,8 @@ def admin_settings(category: str) -> Union[str, Response]:
             f"#tab-{category.replace('api', 'data').replace('mail', 'email')}")
     set_form_settings(form)
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page=f"admin/{category}",
+        'content.html',
+        content=display_form(form, manual_page=f"admin/{category}"),
         title=_('admin'),
         crumbs=[
             [
@@ -360,14 +376,15 @@ def admin_check_similar() -> str:
         for sample in Entity.get_similar_named(
                 form.classes.data,
                 form.ratio.data).values():
-            html = link(sample['entity'])
-            for entity in sample['entities']:  # Table linebreaks workaround
-                html += f'<br><br><br><br><br>{link(entity)}'
-            table.rows.append([html, len(sample['entities']) + 1])
+            similar = [link(entity) for entity in sample['entities']]
+            table.rows.append([
+                f"{link(sample['entity'])}<br><br>{'<br><br>'.join(similar)}",
+                len(sample['entities']) + 1])
+    content = display_form(form, manual_page='admin/data_integrity_checks')
+    content += uc_first(_('no entries')) if table and not table.rows else ''
     return render_template(
-        'admin/check_similar.html',
-        table=table,
-        form=form,
+        'tabs.html',
+        tabs={'similar': Tab('similar', table=table, content=content)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-data"],
@@ -465,6 +482,15 @@ def admin_orphans() -> str:
         'orphaned_files': Tab(
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
+        'orphaned_subunits': Tab(
+            'orphaned_sub_units',
+            table=Table([
+                'id',
+                'name',
+                'class',
+                'created',
+                'modified',
+                'description'])),
         'circular': Tab('circular_dependencies', table=Table(
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
@@ -515,10 +541,21 @@ def admin_orphans() -> str:
                     file.name,
                     url_for('admin_file_delete', filename=file.name))])
 
+    # Orphaned subunits (without connection to a P46 super)
+    for entity in Entity.get_orphaned_subunits():
+        tabs['orphaned_subunits'].table.rows.append([
+            entity.id,
+            entity.name,
+            entity.class_.label,
+            format_date(entity.created),
+            format_date(entity.modified),
+            entity.description])
+
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
         if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
+
     if tabs['orphaned_files'].table.rows and is_authorized('admin'):
         text = uc_first(_('delete all files without corresponding entities?'))
         tabs['orphaned_files'].buttons.append(
@@ -591,8 +628,8 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.description,
             date])
     return render_template(
-        'admin/logo.html',
-        table=table,
+        'tabs.html',
+        tabs={'logo': Tab('files', table=table)},
         title=_('logo'),
         crumbs=[[
             _('admin'),
@@ -626,10 +663,14 @@ def admin_log() -> str:
             row['message'],
             user,
             row['info']])
+    buttons = [button(
+        _('delete all logs'),
+        url_for('admin_log_delete'),
+        onclick=f"return confirm('{uc_first(_('delete all logs'))}?')")]
+
     return render_template(
-        'admin/log.html',
-        table=table,
-        form=form,
+        'tabs.html',
+        tabs={'log': Tab('log', form=form, table=table, buttons=buttons)},
         title=_('admin'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-general"],
@@ -695,9 +736,8 @@ def admin_newsletter() -> Union[str, Response]:
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'admin/newsletter.html',
-        form=form,
-        table=table,
+        'tabs.html',
+        tabs={'tab': Tab('newsletter', form=form, table=table)},
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

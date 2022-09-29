@@ -3,8 +3,8 @@
 from typing import List
 
 # pylint: disable=invalid-name
-version = '7.6.0'
-release = '7.6.0'
+version = '7.7.0'
+release = '7.7.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
@@ -14,7 +14,9 @@ language = 'en'
 pygments_style = 'sphinx'
 extensions: List[str] = ['sphinx.ext.extlinks']
 extlinks = {
-    'cidoc_entity': ('https://www.cidoc-crm.org/Entity/%s/version-7.1.1', '')}
+    'cidoc_entity': ('https://www.cidoc-crm.org/Entity/%s/version-7.1.1', ''),
+    'cidoc_property':
+        ('https://www.cidoc-crm.org/Property/%s/version-7.1.1', '')}
 
 html_logo = 'logo.png'
 html_theme = 'sphinx_rtd_theme'

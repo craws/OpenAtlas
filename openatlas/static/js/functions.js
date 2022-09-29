@@ -175,6 +175,23 @@ function ajaxBookmark(entityId) {
   });
 }
 
+async function ajaxAddEntity(data) {
+  const newEntityId = await $.ajax({
+    type: 'post',
+    url: '/ajax/add_entity',
+    data: data,
+  });
+  return newEntityId;
+}
+
+function getTable(id,filterIds = []){
+  return $.ajax({
+    type: 'post',
+    url: `/ajax/get_entity_table/${id}`,
+    data: {filterIds:JSON.stringify(filterIds)},
+  });
+}
+
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
   const newTypeId = await $.ajax({
     type: 'post',
@@ -266,9 +283,9 @@ function selectFromTreeMulti(name, value_type = false) {
   $("#" + name).trigger('change');
 }
 
-function selectFromTable(element, table, id) {
+function selectFromTable(element, table, id,label= undefined) {
   $("#" + table).attr('value', id);
-  $("#" + table + "-button").val(element.innerText);
+  $("#" + table + "-button").val(label || element?.innerText );
   $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
   $("#" + table + "-clear").show();
   $('#' + table + '-modal').modal('hide');

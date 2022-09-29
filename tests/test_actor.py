@@ -27,6 +27,7 @@ class ActorTests(TestBaseCase):
                 sex_type_sub_2 = g.types[sex_type.subs[1]]
                 event = Entity.insert('acquisition', 'Event Horizon')
                 source = Entity.insert('source', 'Necronomicon')
+                artifact_type_id = Type.get_hierarchy('Artifact').id
 
             rv = self.app.get(url_for('insert', class_='person'))
             assert b'+ Person' in rv.data
@@ -159,17 +160,29 @@ class ActorTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('ajax_bookmark'),
-                data={'entity_id': actor_id},
-                follow_redirects=True)
+                data={'entity_id': actor_id})
             assert b'Remove bookmark' in rv.data
+
+            rv = self.app.post(
+                url_for('ajax_create_entity'),
+                data={
+                    'entityName': 'artifact',
+                    'name': 'Bishop',
+                    'standardType': artifact_type_id,
+                    'description': 'AI'})
+            assert rv.data.isdigit()
+
+            rv = self.app.post(
+                url_for('ajax_get_entity_table', content_domain='artifact'),
+                data={'filterIds': str([])})
+            assert b'Bishop' in rv.data
 
             rv = self.app.get('/')
             assert b'Weaver' in rv.data
 
             rv = self.app.post(
                 url_for('ajax_bookmark'),
-                data={'entity_id': actor_id},
-                follow_redirects=True)
+                data={'entity_id': actor_id})
             assert b'Bookmark' in rv.data
 
             rv = self.app.get(

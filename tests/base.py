@@ -1,6 +1,6 @@
 import pathlib
 import unittest
-from typing import Optional
+from typing import Any, Optional, Union
 
 import psycopg2
 
@@ -35,8 +35,7 @@ class TestBaseCase(unittest.TestCase):
                 '/login',
                 data={'username': 'Alice', 'password': 'test'})
 
-    @staticmethod
-    def setup_database() -> None:
+    def setup_database(self) -> None:
         connection = psycopg2.connect(
             database=app.config['DATABASE_NAME'],
             host=app.config['DATABASE_HOST'],
@@ -44,7 +43,7 @@ class TestBaseCase(unittest.TestCase):
             password=app.config['DATABASE_PASS'],
             port=app.config['DATABASE_PORT'])
         connection.autocommit = True
-        cursor = connection.cursor()
+        self.cursor = connection.cursor()
         for file_name in [
                 '1_structure',
                 '2_data_model',
@@ -55,19 +54,53 @@ class TestBaseCase(unittest.TestCase):
                     pathlib.Path(app.root_path).parent / 'install' /
                     f'{file_name}.sql',
                     encoding='utf8') as sql_file:
-                cursor.execute(sql_file.read())
+                self.cursor.execute(sql_file.read())
+
+
+class ApiTestCase(TestBaseCase):
+
+    def setUp(self) -> None:
+        super().setUp()
+        with open(
+                pathlib.Path(app.root_path).parent / 'install' /
+                'data_test_api.sql',
+                encoding='utf8') as sql_file:
+            self.cursor.execute(sql_file.read())
 
 
 def insert_entity(
         name: str,
         class_: str,
-        description: Optional[str] = None,
-        origin: Optional[Entity] = None) -> Entity:
+        description: Optional[str] = None) -> Entity:
     entity = Entity.insert(class_, name, description)
     if class_ in ['artifact', 'feature', 'place', 'stratigraphic_unit']:
         entity.link(
             'P53',
             Entity.insert('object_location', f'Location of {name}'))
-        if origin:
-            origin.link('P46', entity)
     return entity
+
+
+def get_bool(
+        data: dict[str, Any], key: str,
+        value: Optional[Union[str, list[Any]]] = None) -> bool:
+    return bool(data[key] == value) if value else bool(data[key])
+
+
+def get_bool_inverse(data: dict[str, Any], key: str) -> bool:
+    return bool(not data[key])
+
+
+def get_no_key(data: dict[str, Any], key: str) -> bool:
+    return bool(key not in data.keys())
+
+
+def get_geom_properties(geom: dict[str, Any], key: str) -> bool:
+    return bool(geom['features'][0]['properties'][key])
+
+
+def get_class_mapping(data: list[dict[str, Any]]) -> bool:
+    return bool(data[0]['systemClass']
+                and data[0]['crmClass']
+                and data[0]['view']
+                and data[0]['icon']
+                and data[0]['en'])

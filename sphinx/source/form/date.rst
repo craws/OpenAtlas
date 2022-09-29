@@ -9,7 +9,8 @@ Date input fields in forms are initially hidden and can be shown with
 clicking on **Show** beside the **Date** label.
 
 To manage uncertainty in time up to 4 dates can be used: a time span for the
-beginning and a time span for the ending.
+beginning and a time span for the ending. You find detailed examples here:
+:doc:`/examples/time_spans`
 
 .. image:: date.png
 
@@ -32,7 +33,7 @@ Missing days and months are filled out so that the result will be
 
 **Input values**
 
-* **Year**: -3713 to 9999 but not zero
+* **Year**: -4713 to 9999 but not zero
 * **Month**: 1 to 12
 * **Day**: 1 to 31
 * **Comment**: a text field for additional information for begin or end

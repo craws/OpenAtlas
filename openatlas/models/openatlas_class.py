@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 from typing import Optional
 
@@ -31,6 +31,7 @@ class OpenatlasClass:
     _('actor actor relation')
     _('actor function')
     _('appellation')
+    _('bibliography')
     _('external reference')
     _('source translation')
 

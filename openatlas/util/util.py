@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import math
 import os
@@ -19,7 +19,6 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import LazyString, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import contextfilter
-from markupsafe import Markup
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
@@ -36,7 +35,6 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
 
 
-@app.template_filter()
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(
         _('bookmark remove')
@@ -51,8 +49,7 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 @app.template_filter()
 def display_external_references(entity: Entity) -> str:
-    return Markup(
-        render_template('util/external_references.html', entity=entity))
+    return render_template('util/external_references.html', entity=entity)
 
 
 @app.template_filter()
@@ -84,13 +81,12 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
                 f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
-    return Markup(html)
+    return html
 
 
-@contextfilter
+@contextfilter  # Prevent Jinja2 context caching
 @app.template_filter()
 def is_authorized(context: str, group: Optional[str] = None) -> bool:
-    # Using context filter above to prevent Jinja2 context caching
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
@@ -278,8 +274,11 @@ def get_entity_data(
                 [link(actor) for actor in entity.get_linked_entities('P22')]
             data[_('donor')] = \
                 [link(donor) for donor in entity.get_linked_entities('P23')]
-            data[_('given place')] = \
-                [link(place) for place in entity.get_linked_entities('P24')]
+            data[_('given place')] = []
+            data[_('given artifact')] = []
+            for item in entity.get_linked_entities('P24'):
+                var = 'artifact' if item.class_.name == 'artifact' else 'place'
+                data[_(f'given {var}')].append(link(item))
         if entity.class_.name == 'production':
             data[_('produced')] = \
                 [link(item) for item in entity.get_linked_entities('P108')]
@@ -390,7 +389,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
     if warnings:
-        return Markup(f'<p class="error">{"<br>".join(warnings)}<p>')
+        return f'<p class="error">{"<br>".join(warnings)}<p>'
     return ''  # pragma: no cover
 
 
@@ -588,18 +587,18 @@ def button(
     label = uc_first(label)
     if url and '/insert' in url and label != uc_first(_('link')):
         label = f'+ {label}'
-    return Markup(f"""
+    return f"""
         <{tag}
             {f'href="{url}"' if url else ''}
             {f'id="{id_}"' if id_ else ''}
             class="{app.config['CSS']['button'][css]}"
-            {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>""")
+            {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
 
 
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
-    return Markup(
-        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>') \
+    return \
+        f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
         if buttons else ''
 
 
@@ -608,11 +607,10 @@ def display_citation_example(code: str) -> str:
     if code != 'reference':
         return ''
     if text := get_translation('citation_example'):
-        return Markup(f'<h1>{uc_first(_("citation_example"))}</h1>{text}')
+        return f'<h1>{uc_first(_("citation_example"))}</h1>{text}'
     return ''  # pragma: no cover
 
 
-@app.template_filter()
 def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
     if not structure or len(structure['siblings']) < 2:
         return ''
@@ -633,7 +631,7 @@ def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
     if next_id:
         parts.append(button('>', url_for('view', id_=next_id)))
     parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
-    return Markup(' '.join(parts))
+    return ' '.join(parts)
 
 
 @app.template_filter()
@@ -650,7 +648,7 @@ def breadcrumb(crumbs: list[Any]) -> str:
             items.append(f'<a href="{item[1]}">{uc_first(str(item[0]))}</a>')
         else:
             items.append(uc_first(item))
-    return Markup('&nbsp;>&nbsp; '.join(items))
+    return '&nbsp;>&nbsp; '.join(items)
 
 
 @app.template_filter()
@@ -660,7 +658,7 @@ def uc_first(string: str) -> str:
 
 @app.template_filter()
 def display_info(data: dict[str, Union[str, list[str]]]) -> str:
-    return Markup(render_template('util/info_data.html', data=data))
+    return render_template('util/info_data.html', data=data)
 
 
 def get_type_data(entity: Entity) -> dict[str, Any]:
@@ -691,26 +689,24 @@ def description(entity: Union[Entity, Project]) -> str:
                 f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
                 f"<p>{result}</p>"
     if not entity.description:
-        return Markup(html)
+        return html
     label = _('description')
     if isinstance(entity, Entity) and entity.class_.name == 'source':
         label = _('content')
-    return Markup(f"""
+    return f"""
         {html}
         <h2>{uc_first(label)}</h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
-        </div>""")
+        </div>"""
 
 
-@app.template_filter()
 def download_button(entity: Entity) -> str:
     if entity.image_id:
         if path := get_file_path(entity.image_id):
-            return Markup(
-                button(
-                    _('download'),
-                    url_for('download_file', filename=path.name)))
+            return button(
+                _('download'),
+                url_for('download_file', filename=path.name))
     return ''  # pragma: no cover
 
 
@@ -726,12 +722,11 @@ def display_profile_image(entity: Entity) -> str:
     if g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(entity.image_id, size):
             resized = url_for('display_file', filename=path_.name, size=size)
-    return Markup(
-        render_template(
-            'util/profile_image.html',
-            entity=entity,
-            path=path,
-            resized=resized))
+    return render_template(
+        'util/profile_image.html',
+        entity=entity,
+        path=path,
+        resized=resized)
 
 
 @contextfilter
@@ -752,9 +747,9 @@ def manual(site: str) -> str:
     if not path.exists():
         # print(f'Missing manual link: {path}')
         return ''
-    return Markup(
-        f'<a class="manual" href="/static/manual/{site}.html" target="_blank" '
-        f'title="{uc_first("manual")}"><i class="fas fa-book"></i></a>')
+    return \
+        f'<a title="{uc_first("manual")}" href="/static/manual/{site}.html" ' \
+        f'class="manual" target="_blank" ><i class="fas fa-book"></i></a>'
 
 
 @app.template_filter()
@@ -763,10 +758,12 @@ def display_form(
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
     from openatlas.forms.display import html_form
-    return Markup(render_template(
-        'forms/form.html',
-        form=form,
-        html=html_form(form, form_id, manual_page)))
+    form_id = f'id="{form_id}"' if form_id else ''
+    multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
+    return \
+        f'<form method="post" {form_id} {multipart}>' \
+        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
+        f'</div></form>'
 
 
 class MLStripper(HTMLParser):
