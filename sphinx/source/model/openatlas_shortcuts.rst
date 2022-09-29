@@ -64,7 +64,7 @@ Example:
 [Albert Einstein (:cidoc_entity:`E521<e21-person>` was brought into existence
 by
 (:cidoc_property:`P92<p92-brought-into-existence>`) [Birth of Albert Einstein
-(:cidoc_entity:`E512<e12-production>`)] took place at
+(:cidoc_entity:`E567<e67-birth>`)] took place at
 (:cidoc_property:`P7<p7-took-place-at>`) [Ulm (:cidoc_entity:`E53<e53-place>`)]
 
 OA9 - appears for the last time in
@@ -90,7 +90,7 @@ E.g to document a person's place of death.
 Example:
 [Albert Einstein (:cidoc_entity:`E21<e21-person>`)] was taken out of existence
 by (:cidoc_property:`P93i<P93-took-out-of-existence>`)
-[Death of Albert Einstein (:cidoc_entity:`E12<e12-production>`)] took place at
+[Death of Albert Einstein (:cidoc_entity:`E69<e69-death>`)] took place at
 (:cidoc_property:`P7<p7-took-place-at>`) [Princeton
 (:cidoc_entity:`E53 - Place<e53-place>`)]
 
@@ -143,7 +143,7 @@ E77 Persistent Item **end** linked with a E61 Time Primitive:
 Example: [The one ring
 (:cidoc_entity:`E22<e22-human-made-object>`)] was destroyed by
 (:cidoc_property:`P13<p13-destroyed>`) [Destruction of the one ring
-(:cidoc_entity:`E12<e12-production>`)] has time span
+(:cidoc_entity:`E6<e6-destruction>`)] has time span
 (:cidoc_property:`P4<P4-has-time-span>`) [Moment of throwing it into the lava
 (:cidoc_entity:`E52<e52-Time-Span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [3019-03-25
@@ -166,7 +166,7 @@ E21 Person's **Birth** linked with a E61 Time Primitive:
 
 Example: [Stefan(:cidoc_entity:`E21<e21-person>`)] was born
 (:cidoc_property:`P98i<p98-brought-into-life>`) [birth of Stefan
-(:cidoc_entity:`E12<e12-production>`)] has time span
+(:cidoc_entity:`E67<e67-birth>`)] has time span
 (:cidoc_property:`P4<p4-has-time-span>`) [Moment/Duration of Stefan's birth
 (:cidoc_entity:`E52<e52-time-span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [1981-11-23
@@ -232,4 +232,4 @@ Example: [Thirty Years' War
 (:cidoc_property:`P4<p4-has-time-span>`) [Moment/Duration of End of Thirty
 Years' War (:cidoc_entity:`E52<e52-time-span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [1648-10-24
-(`E61<e61-time-primitive>`)]
+(:cidoc_property:`E61<e61-time-primitive>`)]

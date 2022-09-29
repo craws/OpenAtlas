@@ -15,29 +15,36 @@ class MemberTests(TestBaseCase):
                 newt = Entity.insert('person', 'Newt')
                 group = Entity.insert('group', 'LV-426 colony')
 
-            rv = self.app.get(url_for('member_insert', origin_id=group.id))
+            rv = self.app.get(
+                url_for('insert_relation', origin_id=group.id, type_='member'))
             assert b'Actor function' in rv.data
 
             rv = self.app.post(
-                url_for('member_insert', origin_id=newt.id, code='membership'),
+                url_for(
+                    'insert_relation',
+                    origin_id=newt.id,
+                    type_='membership'),
                 data={'group': str([group.id])},
                 follow_redirects=True)
             assert b'LV-426 colony' in rv.data
 
             rv = self.app.post(
-                url_for('member_insert', origin_id=newt.id, code='membership'),
+                url_for(
+                    'insert_relation',
+                    origin_id=newt.id,
+                    type_='membership'),
                 data={'group': str([group.id]), 'continue_': 'yes'},
                 follow_redirects=True)
             assert b'LV-426 colony' in rv.data
 
             rv = self.app.post(
-                url_for('member_insert', origin_id=group.id),
+                url_for('insert_relation', origin_id=group.id, type_='member'),
                 data={'actor': str([newt.id])},
                 follow_redirects=True)
             assert b'Newt' in rv.data
 
             rv = self.app.post(
-                url_for('member_insert', origin_id=group.id),
+                url_for('insert_relation', origin_id=group.id, type_='member'),
                 data={'actor': str([newt.id]), 'continue_': 'yes'},
                 follow_redirects=True)
             assert b'Newt' in rv.data
@@ -46,11 +53,11 @@ class MemberTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 link_id = Link.get_links(group.id, 'P107')[0].id
             rv = self.app.get(
-                url_for('member_update', id_=link_id, origin_id=group.id))
+                url_for('link_update', id_=link_id, origin_id=group.id))
             assert b'Newt' in rv.data
 
             rv = self.app.post(
-                url_for('member_update', id_=link_id, origin_id=group.id),
+                url_for('link_update', id_=link_id, origin_id=group.id),
                 data={'description': 'We are here to help you.'},
                 follow_redirects=True)
             assert b'here to help' in rv.data

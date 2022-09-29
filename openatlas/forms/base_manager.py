@@ -218,6 +218,14 @@ class BaseManager:
                     f'Location of {self.form.name.data}'))
         return
 
+    def update_link(self) -> None:
+        self.data['attributes_link'] = self.data['attributes']
+        self.origin.update_links(self.data, new=True)
+
+    def process_link_form(self) -> None:
+        self.link_.description = self.form.description.data
+        self.link_.set_dates(process_dates(self))
+
 
 class ActorBaseManager(BaseManager):
     fields = ['name', 'alias', 'date', 'description', 'continue']
@@ -291,7 +299,8 @@ class EventBaseManager(BaseManager):
                     'production']
             )
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'), add_dynamic=['place'])
+            fields['place'] = TableField(_('location'),
+                                         add_dynamic=['place'])
         return fields
 
     def populate_update(self) -> None:

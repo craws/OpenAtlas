@@ -1,8 +1,8 @@
+import json
 from typing import Optional
 
 from flask import abort, g, jsonify, request
 from flask_babel import lazy_gettext as _
-import json
 
 from openatlas import app
 from openatlas.database.connect import Transaction
@@ -77,7 +77,7 @@ def ajax_create_entity() -> str:
 def ajax_get_entity_table(content_domain: str) -> str:
     try:
         filter_ids = json.loads(request.form['filterIds']) or []
-        table, selection = get_table_content(content_domain, None, filter_ids)
+        table, _selection = get_table_content(content_domain, None, filter_ids)
         return table.display(content_domain)
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)

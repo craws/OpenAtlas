@@ -1,3 +1,4 @@
+import ast
 from typing import Any
 
 from flask import g, request
@@ -12,6 +13,7 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import file
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.openatlas_class import uc_first
 from openatlas.models.reference_system import ReferenceSystem
@@ -62,6 +64,31 @@ class ActorActorRelationManager(BaseManager):
         if self.origin.id == self.link_.range.id:
             self.form.inverse.data = True
 
+    def process_form(self) -> None:
+        super().process_form()
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(self.form.actor.data)):
+            link_type = self.get_link_type()
+            self.add_link(
+                'OA7',
+                actor,
+                self.form.description.data,
+                inverse=True if self.form.inverse.data else False,
+                type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_actor_relation'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        inverse = self.form.inverse.data
+        if (self.origin.id == self.link_.domain.id and inverse) or \
+                (self.origin.id == self.link_.range.id and not inverse):
+            new_range = self.link_.domain
+            self.link_.domain = self.link_.range
+            self.link_.range = new_range
+
 
 class ActorFunctionManager(BaseManager):
     fields = ['date', 'description', 'continue']
@@ -79,6 +106,34 @@ class ActorFunctionManager(BaseManager):
 
     def populate_insert(self) -> None:
         self.form.member_origin_id.data = self.origin.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        link_type = self.get_link_type()
+        if hasattr(self.form, 'group'):
+            for actor in Entity.get_by_ids(
+                    ast.literal_eval(getattr(self.form, 'group').data)):
+                self.add_link(
+                    'P107',
+                    actor,
+                    self.form.description.data,
+                    inverse=True,
+                    type_id=link_type.id if link_type else None)
+        else:
+            for actor in Entity.get_by_ids(
+                    ast.literal_eval(getattr(self.form, 'actor').data)):
+                self.add_link(
+                    'P107',
+                    actor,
+                    self.form.description.data,
+                    type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['actor_function'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
 
 
 class ActivityManager(EventBaseManager):
@@ -263,6 +318,36 @@ class InvolvementManager(BaseManager):
     def populate_update(self) -> None:
         super().populate_update()
         self.form.activity.data = self.link_.property.code
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.origin.class_.view == 'event':
+            actors = Entity.get_by_ids(ast.literal_eval(self.form.actor.data))
+            for actor in actors:
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    actor,
+                    self.form.description.data,
+                    type_id=link_type.id if link_type else None)
+        else:
+            events = Entity.get_by_ids(ast.literal_eval(self.form.event.data))
+            for event in events:
+                link_type = self.get_link_type()
+                self.add_link(
+                    self.form.activity.data,
+                    event,
+                    self.form.description.data,
+                    inverse=True,
+                    type_id=link_type.id if link_type else None)
+
+    def process_link_form(self) -> None:
+        super().process_link_form()
+        type_id = getattr(
+            self.form,
+            str(g.classes['involvement'].standard_type_id)).data
+        self.link_.type = g.types[int(type_id)] if type_id else None
+        self.link_.property = g.properties[self.form.activity.data]
 
 
 class MoveManager(EventBaseManager):

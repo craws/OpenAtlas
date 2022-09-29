@@ -7,10 +7,10 @@
       {{ root.name }} {{ form[root.id|string] }}
     </p>
     <div class="toolbar">
-      {{ _('select all')|button(id_='select-all') }}
-      {{ _('deselect all')|button(id_='select-none') }}
+      {{ _('select all')|button(id_='select-all')|safe }}
+      {{ _('deselect all')|button(id_='select-none')|safe }}
     </div>
-    {{ table.display('move') }}
+    {{ table.display('move')|safe }}
     {{ form.save(class_=config.CSS.button.primary) }}
   </form>
 {% endblock %}

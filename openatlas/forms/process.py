@@ -33,11 +33,13 @@ def process_standard_fields(manager: Any) -> None:
                 'website_url',
                 'resolver_url',
                 'placeholder',
-                'classes')) \
+                'classes',
+                'inverse')) \
                 or field_type in [
                     'CSRFTokenField',
                     'HiddenField',
                     'MultipleFileField',
+                    'SelectField',
                     'SelectMultipleField',
                     'SubmitField',
                     'TableField',
@@ -69,7 +71,7 @@ def process_standard_fields(manager: Any) -> None:
                 if 'administrative_units' not in manager.data:
                     manager.data['administrative_units'] = []
                 manager.data['administrative_units'] += value
-            elif manager.entity.class_.view != 'type':
+            elif not manager.entity or manager.entity.class_.view != 'type':
                 manager.data['links']['delete'].add('P2')
                 manager.add_link('P2', [g.types[id_] for id_ in value])
         elif field_type == 'ValueFloatField':
@@ -94,6 +96,8 @@ def process_standard_fields(manager: Any) -> None:
 
 
 def process_origin(manager: Any) -> None:
+    if not manager.entity:
+        return None
     if manager.origin.class_.view == 'reference':
         if manager.entity.class_.name == 'file':
             manager.add_link(
