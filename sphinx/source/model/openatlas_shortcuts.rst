@@ -232,4 +232,4 @@ Example: [Thirty Years' War
 (:cidoc_property:`P4<p4-has-time-span>`) [Moment/Duration of End of Thirty
 Years' War (:cidoc_entity:`E52<e52-time-span>`)] ongoing throughout
 (:cidoc_property:`P81<p81-ongoing-throughout>`) [1648-10-24
-(`E61<e61-time-primitive>`)]
+(:cidoc_property:`E61<e61-time-primitive>`)]
