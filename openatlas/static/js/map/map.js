@@ -385,7 +385,7 @@ function setPopup(selected) {
                 const content =
                     `<div id="popup" class="d-flex flex-column"> 
                        <strong class="mb-2">
-                         There are Multiple Places overlapping
+                         ${translate["There are Multiple Places overlapping"]}
                        </strong>
                        ${match
                         .map(x => `<a      
