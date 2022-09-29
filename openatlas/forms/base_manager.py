@@ -287,7 +287,8 @@ class EventBaseManager(BaseManager):
                 _('sub event of'),
                 filter_ids=filter_ids,
                 add_dynamic=['activity', 'acquisition', 'event', 'move',
-                             'production'])}
+                             'production'],
+                related_tables=['event_preceding'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
@@ -296,7 +297,8 @@ class EventBaseManager(BaseManager):
                     'activity',
                     'acquisition',
                     'move',
-                    'production']
+                    'production'],
+                related_tables=['event']
             )
         if self.class_.name != 'move':
             fields['place'] = TableField(_('location'),
