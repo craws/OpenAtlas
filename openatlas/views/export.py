@@ -7,10 +7,9 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import RadioField, SubmitField
+from wtforms import SubmitField
 
 from openatlas import app
-from openatlas.api.v03.endpoints.content import ExportDatabase
 from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -21,29 +20,11 @@ class ExportSqlForm(FlaskForm):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(FlaskForm):
-    select_export_format = RadioField(
-        'export format',
-        choices=[('csv', 'CSV'),
-                 ('json', 'JSON'),
-                 ('xml', 'XML')])
-    save = SubmitField(uc_first(_('export CSV')))
-
-
 @app.route('/download/sql/<filename>')
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
         app.config['EXPORT_DIR'] / 'sql',
-        filename,
-        as_attachment=True)
-
-
-@app.route('/download/csv/<filename>')
-@required_group('manager')
-def download_csv(filename: str) -> Any:
-    return send_from_directory(
-        app.config['EXPORT_DIR'] / 'csv',
         filename,
         as_attachment=True)
 
@@ -71,17 +52,6 @@ def export_sql() -> Union[str, Response]:
         crumbs=[
             [_('admin'),
              f"{url_for('admin_index')}#tab-data"], _('export SQL')])
-
-
-@app.route('/export/csv', methods=['POST', 'GET'])
-@required_group('manager')
-def export() -> Union[str, Response]:
-    return render_template(
-        'export_api.html',
-        title=_('export CSV'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"], _('export')],
-        format_options=['csv', 'json', 'xml'])
 
 
 def get_table(type_: str, path: Path, writable: bool) -> Table:

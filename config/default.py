@@ -46,7 +46,6 @@ PROCESSED_EXT = '.jpeg'
 WRITABLE_DIRS = [
     UPLOAD_DIR,
     EXPORT_DIR / 'sql',
-    EXPORT_DIR / 'csv',
     RESIZED_IMAGES]
 
 # Security
