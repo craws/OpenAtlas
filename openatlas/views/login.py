@@ -97,7 +97,8 @@ def login() -> Union[str, Response]:
     return render_template(
         'login.html',
         title=_('login'),
-        crumbs=[_('login')], form=form)
+        form=form,
+        crumbs=[_('login')])
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
@@ -143,9 +144,8 @@ def reset_password() -> Union[str, Response]:
             f'Password reset for non existing {form.email.data}')
         flash(_('error non existing email'), 'error')
     return render_template(
-        'form.html',
-        form=display_form(form),
-        content=f"<p>{_('info password reset')}</p>",
+        'content.html',
+        content=f"<p>{_('info password reset')}</p>{display_form(form)}",
         crumbs=[[_('login'), url_for('login')], _('Forgot your password?')])
 
 

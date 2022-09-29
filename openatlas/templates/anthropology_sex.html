@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block content %}
-  {{ buttons|button_bar }}
+  {{ buttons|button_bar|safe }}
   <h1>{{ _('sex estimation')|uc_first }} - {{ entity.name }}</h1>
   <p>
-    {{ result }}
+    {{ result|safe }}
   </p>
   <div class="data-table">
     {% set ns = namespace(category='') %}

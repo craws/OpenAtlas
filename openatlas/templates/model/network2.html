@@ -4,12 +4,12 @@
 <link rel="stylesheet" href="/static/css/network.css">
 <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
 <div class="toolbar">
-  {{ 'tools/network'|manual }}
-  {{ _('classic')|button(url_for('model_network')) }}
+  {{ 'tools/network'|manual|safe }}
+  {{ _('classic')|button(url_for('model_network'))|safe }}
   {% if dimensions == 3 %}
-    {{ '2D'|button(url_for('model_network', dimensions=2)) }}
+    {{ '2D'|button(url_for('model_network', dimensions=2))|safe }}
   {% else %}
-    {{ '3D'|button(url_for('model_network', dimensions=3)) }}
+    {{ '3D'|button(url_for('model_network', dimensions=3))|safe }}
   {% endif %}
 </div>
 {% if json_data %}
