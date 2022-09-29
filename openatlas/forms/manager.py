@@ -376,6 +376,7 @@ class SourceManager(BaseManager):
             'description': TextAreaField(_('content'))}
 
     def populate_update(self) -> None:
+        super().populate_update()
         self.form.artifact.data = [
             item.id for item in
             self.entity.get_linked_entities('P128', inverse=True)]
