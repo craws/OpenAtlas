@@ -1,9 +1,7 @@
 versions = {
-    '7.7.0': ['TBA', {
-        'feature': {
-            '1751': 'Manual: add model documentation'
-        }
-    }],
+    '7.6.2': ['2022-09-29', {
+        'fix': {
+            '1822': 'Missing types at edit'}}],
     '7.6.1': ['2022-08-25',  {
         'fix': {
             '1794': 'Bug when editing types connected to artifacts'}}],
