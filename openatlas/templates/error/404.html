@@ -1,22 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container" style="text-align:center;">
-        <h1>404 - File not found</h1>
-        <p>
-            {{ _('We are so sorry!') }}
-        </p>
-        <p>
-            {{ _('We searched a long time but this document does not exist. Maybe you mistyped or followed a broken link.') }}
-        </p>
-        <p>
-            {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
-        </p>
-        <div class="toolbar">
-            {{ 'troubleshooting/error_codes'|manual }}
-        </div>
-        <p>
-            <img src="/static/images/layout/404.jpg" alt="404 - File not found"><br>
-            Excavation of the Oseberg ship (from commons.wikimedia.org)
-        </p>
-    </div>
+<div class="container" style="text-align:center;">
+  <h1>404 - File not found</h1>
+  <p>
+    {{ _('We are so sorry!') }}
+  </p>
+  <p>
+    {{ _('We searched a long time but this document does not exist. Maybe you mistyped or followed a broken link.') }}
+  </p>
+  <p>
+    {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
+  </p>
+  <div class="toolbar">
+    {{ 'troubleshooting/error_codes'|manual|safe }}
+  </div>
+  <p>
+    <img src="/static/images/layout/404.jpg" alt="404 - File not found"><br>
+    Excavation of the Oseberg ship (from commons.wikimedia.org)
+  </p>
+</div>
 {% endblock %}

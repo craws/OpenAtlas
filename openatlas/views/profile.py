@@ -18,7 +18,7 @@ from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.util.tab import Tab
 from openatlas.util.util import (
-    button, display_info, is_authorized, manual, uc_first)
+    button, display_form, display_info, is_authorized, manual, uc_first)
 
 
 class PasswordForm(FlaskForm):
@@ -121,13 +121,11 @@ def profile_settings(category: str) -> Union[str, Response]:
         return redirect(f"{url_for('profile_index')}#tab-{category}")
     set_form_settings(form, True)
     return render_template(
-        'display_form.html',
-        form=form,
-        manual_page='profile',
+        'content.html',
+        content=display_form(form, manual_page='profile'),
         title=_('profile'),
         crumbs=[
-            [_('profile'),
-             f"{url_for('profile_index')}#tab-{category}"],
+            [_('profile'), f"{url_for('profile_index')}#tab-{category}"],
             _(category)])
 
 
@@ -147,6 +145,5 @@ def profile_password() -> Union[str, Response]:
         form=form,
         title=_('profile'),
         crumbs=[
-            [_('profile'),
-             url_for('profile_index')],
+            [_('profile'), url_for('profile_index')],
             _('change password')])

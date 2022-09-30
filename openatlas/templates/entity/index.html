@@ -2,13 +2,8 @@
 {% block content %}
   <div class="row">
     <div class="col">
-      <div class="toolbar">
-        {{ ('entity/' + class_)|manual }}
-        {% for button in buttons %}
-          {{ button }}
-        {% endfor %}
-      </div>
-      {{ table.display() }}
+      {{ buttons|button_bar|safe }}
+      {{ table.display()|safe }}
     </div>
     {% if gis_data %}
       <div class="col">

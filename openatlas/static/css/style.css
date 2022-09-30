@@ -344,7 +344,6 @@ input.table-select {
 noscript div {
   font-size: 0.8em;
   font-weight: normal;
-  margin-top: 1em;
 }
 
 #content {
@@ -467,15 +466,15 @@ input[type="text"].value_input {
   text-align: right;
 }
 
-#newsletter-form textarea {
+#tab-newsletter textarea {
   font-size: 1em;
-  width: 30em;
-  height: 10em;
+  width: 50em;
+  height: 8em;
 }
 
-#newsletter-form input[type='text'] {
+#tab-newsletter input[type='text'] {
   font-size: 1em;
-  width: 30em;
+  width: 50em;
 }
 
 form input[type="text"].month,

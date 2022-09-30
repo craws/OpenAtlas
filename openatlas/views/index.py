@@ -139,8 +139,8 @@ def index_feedback() -> Union[str, Response]:
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
     return render_template(
-        'index/content.html',
-        text=get_translation(item),
+        'content.html',
+        content=get_translation(item),
         title=_(_(item)),
         crumbs=[_(item)])
 
@@ -157,16 +157,16 @@ def index_changelog() -> str:
 @app.route('/unsubscribe/<code>')
 def index_unsubscribe(code: str) -> str:
     user = User.get_by_unsubscribe_code(code)
-    text = _('unsubscribe link not valid')
+    content = _('unsubscribe link not valid')
     if user:  # pragma: no cover
         user.settings['newsletter'] = ''
         user.unsubscribe_code = ''
         user.update()
         user.remove_newsletter()
-        text = _(
+        content = _(
             'You have successfully unsubscribed. '
             'You can subscribe again in your Profile.')
     return render_template(
-        'index/unsubscribe.html',
-        text=text,
+        'content.html',
+        content=content,
         crumbs=[_('unsubscribe newsletter')])
