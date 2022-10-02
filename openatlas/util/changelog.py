@@ -5,9 +5,14 @@ versions = {
             '1641': 'Acquisition in combination with artifacts',
             '1789': 'Disable site if JavaScript is disabled',
             '1811': 'Checks for orphaned subunits',
-            '1751': 'Manual: add model documentation'
+            '1823': 'Show class at activity view',
+            '1751': 'Manual: add model documentation',
+            '1807': 'API: New geojson format'
         }
     }],
+    '7.6.2': ['2022-09-29', {
+        'fix': {
+            '1822': 'Missing types at edit'}}],
     '7.6.1': ['2022-08-25',  {
         'fix': {
             '1794': 'Bug when editing types connected to artifacts'}}],

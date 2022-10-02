@@ -105,18 +105,23 @@ def user_activity(user_id: int = 0) -> str:
         activity = User.get_activities(100, user_id, 'all')
     else:
         activity = User.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'], order=[[0, 'desc']])
+    table = Table(
+        ['date', 'user', 'action', 'class', 'entity'],
+        order=[[0, 'desc']])
     for row in activity:
         try:
-            entity = link(Entity.get_by_id(row['entity_id']))
+            entity = Entity.get_by_id(row['entity_id'])
+            entity_name = link(entity)
         except AttributeError:  # pragma: no cover - entity already deleted
-            entity = f"id {row['entity_id']}"
+            entity = None
+            entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([
             format_date(row['created']),
             link(user) if user else f"id {row['user_id']}",
             _(row['action']),
-            entity])
+            _(entity.class_.label) if entity else '',
+            entity_name])
     return render_template(
         'content.html',
         content=display_form(form) + table.display(),
