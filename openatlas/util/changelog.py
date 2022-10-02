@@ -3,6 +3,7 @@ versions = {
         'feature': {
             '1541': 'Linking references to multiple subunits',
             '1641': 'Acquisition in combination with artifacts',
+            '1785': 'Forms: add places dynamically',
             '1789': 'Disable site if JavaScript is disabled',
             '1811': 'Checks for orphaned subunits',
             '1823': 'Show class at activity view',
