@@ -286,8 +286,12 @@ class EventBaseManager(BaseManager):
             'event': TableField(
                 _('sub event of'),
                 filter_ids=filter_ids,
-                add_dynamic=['activity', 'acquisition', 'event', 'move',
-                             'production'],
+                add_dynamic=[
+                    'activity',
+                    'acquisition',
+                    'event',
+                    'move',
+                    'production'],
                 related_tables=['event_preceding'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
@@ -298,11 +302,10 @@ class EventBaseManager(BaseManager):
                     'acquisition',
                     'move',
                     'production'],
-                related_tables=['event']
-            )
+                related_tables=['event'])
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'),
-                                         add_dynamic=['place'])
+            fields['place'] = \
+                TableField(_('location'), add_dynamic=['place'])
         return fields
 
     def populate_update(self) -> None:
@@ -329,7 +332,8 @@ class EventBaseManager(BaseManager):
                 self.add_link(
                     'P7',
                     Link.get_linked_entity_safe(
-                        int(self.form.place.data), 'P53'))
+                        int(self.form.place.data),
+                        'P53'))
         if self.origin and self.origin.class_.view == 'actor':
             self.add_link('P11', self.origin, return_link_id=True)
 

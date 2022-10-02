@@ -93,36 +93,29 @@
   </div>
 
   <script>
-      $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
-          .on('keyup change', function () {
-              if ($(this).val() === '')
-                  $('#{{field.id}}-add-{{ add_dynamical }}')
-                      .attr('disabled', '')
-              else
-                  $('#{{field.id}}-add-{{ add_dynamical }}')
-                      .removeAttr('disabled')
-          });
+    $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
+      .on('keyup change', function () {
+          if ($(this).val() === '')
+            $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
+          else
+            $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
+      });
 
-      $('#{{field.id}}-add-{{ add_dynamical }}')
-          .on('click', async function (e) {
-              const name =
-                  $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
-                      .val();
-              const description =
-                  $("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
-              const entityName = '{{ add_dynamical }}';
-              const standardType =
-                  $("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic")
-                      .val();
-              const data = {name, description, entityName, standardType};
-              e.preventDefault();
-              const entityId = await ajaxAddEntity(data);
-              const relatedTables = {{ field.related_tables | safe }};
-              relatedTables
-                  ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
-              await refillTable('{{ field.id }}', {{ field.filter_ids }});
-              $('.modal').modal('hide');
-              selectFromTable(undefined, '{{ field.id }}', entityId, name)
-          });
+    $('#{{field.id}}-add-{{ add_dynamical }}')
+      .on('click', async function (e) {
+        const name = $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").val();
+        const description =$("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
+        const entityName = '{{ add_dynamical }}';
+        const standardType = $("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic").val();
+        const data = {name, description, entityName, standardType};
+        e.preventDefault();
+        const entityId = await ajaxAddEntity(data);
+        const relatedTables = {{ field.related_tables | safe }};
+        relatedTables
+            ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
+        await refillTable('{{ field.id }}', {{ field.filter_ids }});
+        $('.modal').modal('hide');
+        selectFromTable(undefined, '{{ field.id }}', entityId, name)
+      });
   </script>
 {% endfor %}
