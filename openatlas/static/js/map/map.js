@@ -383,14 +383,14 @@ function setPopup(selected) {
                 ...leafletPip.pointInLayer(e.latlng, active, false)];
             if (match.length > 1) {
                 const content =
-                    `<div id="popup" class="d-flex flex-column"> 
+                    `<div id="popup" class="d-flex flex-column">
                        <strong class="mb-2">
-                         ${translate["There are Multiple Places overlapping"]}
+                         ${translate["map_overlapping_places"]}
                        </strong>
                        ${match
-                        .map(x => `<a      
-                                      role='button' 
-                                      class="mb-1" 
+                        .map(x => `<a
+                                      role='button'
+                                      class="mb-1"
                                       onclick="dispatchPopup(${x._leaflet_id},[${e.latlng.lat},${e.latlng.lng}])">
                                                ${x.feature?.properties?.name || x.feature?.properties?.objectName}
                                    </a>`).join("")}
@@ -428,17 +428,17 @@ function buildPopup(feature, action = "view", selected = false) {
         selected &&
         (window.location.href.includes("update") ||
             window.location.href.includes("insert"))
-            ? `<button 
-               id="editButton" 
+            ? `<button
+               id="editButton"
                onclick="editGeometry(${feature.properties.id})">
                  ${translate["edit"]}
                </button>
-               <button 
-               id="deleteButton" 
+               <button
+               id="deleteButton"
                onclick="deleteGeometry(${feature.properties.id})">
                  ${translate["delete"]}
                </button>`
-            : `<button  
+            : `<button
                onclick="window.location.href='/entity/${feature.properties.objectId}'">
                  ${translate["details"]}
                </button>`
