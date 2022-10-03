@@ -5,13 +5,12 @@ versions = {
             '1641': 'Acquisition in combination with artifacts',
             '1785': 'Forms: add places dynamically',
             '1789': 'Disable site if JavaScript is disabled',
+            '1790': 'Map: make intersecting polygons selectable',
             '1811': 'Checks for orphaned subunits',
             '1823': 'Show class at activity view',
             '1802': 'Move CSV export functions to API',
             '1751': 'Manual: add model documentation',
-            '1807': 'API: New geojson format'
-        }
-    }],
+            '1807': 'API: New geojson format'}}],
     '7.6.2': ['2022-09-29', {
         'fix': {
             '1822': 'Missing types at edit'}}],
