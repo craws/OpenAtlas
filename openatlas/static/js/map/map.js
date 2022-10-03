@@ -371,7 +371,8 @@ function setPopup(selected) {
 
         // Handle overlay of multiple polygons
         layer.on('click', function (e) {
-
+            if (e.sourceTarget.feature.geometry.type === 'Point'
+            || e.sourceTarget.feature.geometry.type === 'LineString') return;
             const active = control.getActiveOverlays();
             const match = [
                 ...leafletPip.pointInLayer(e.latlng, selectedLayer, false),
