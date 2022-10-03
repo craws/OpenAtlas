@@ -75,6 +75,15 @@ class Api03(ApiTestCase):
                 assert get_geom_properties(rv, 'objectName')
                 assert get_geom_properties(rv, 'shapeType')
 
+            for rv in [
+                self.app.get(
+                    url_for('api_03.export_database', format_='xml')),
+                self.app.get(
+                    url_for('api_03.export_database', format_='json')),
+                self.app.get(
+                    url_for('api_03.export_database', format_='csv'))]:
+                assert b'Shire' in rv.data
+
             # ---Entity Endpoints---
             # Test Entity
             rv = self.app.get(
@@ -284,10 +293,10 @@ class Api03(ApiTestCase):
                 assert get_bool(rv['properties'], 'systemClass')
 
             # ---Type Endpoints---
-            for rv in[
-            self.app.get(url_for('api_03.type_overview')),
-            self.app.get(
-            url_for('api_03.type_overview', download=True))]:
+            for rv in [
+                self.app.get(url_for('api_03.type_overview')),
+                self.app.get(
+                    url_for('api_03.type_overview', download=True))]:
                 rv = rv.get_json()['place'][0]['children'][0]
             assert bool(rv['label'] == 'Austria')
 

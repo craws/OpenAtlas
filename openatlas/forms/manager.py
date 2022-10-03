@@ -250,9 +250,18 @@ class GroupManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence'), add_dynamic=['place']),
-            'begins_in': TableField(_('begins in'), add_dynamic=['place']),
-            'ends_in': TableField(_('ends in'), add_dynamic=['place'])}
+            'residence': TableField(
+                _('residence'),
+                add_dynamic=['place'],
+                related_tables=['begins_in', 'ends_in']),
+            'begins_in': TableField(
+                _('begins in'),
+                add_dynamic=['place'],
+                related_tables=['residence', 'ends_in']),
+            'ends_in': TableField(
+                _('ends in'),
+                add_dynamic=['place'],
+                related_tables=['begins_in', 'residence'])}
 
 
 class HumanRemainsManager(BaseManager):
@@ -394,9 +403,18 @@ class PersonManager(ActorBaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'residence': TableField(_('residence'), add_dynamic=['place']),
-            'begins_in': TableField(_('born in'), add_dynamic=['place']),
-            'ends_in': TableField(_('died in'), add_dynamic=['place'])}
+            'residence': TableField(
+                _('residence'),
+                add_dynamic=['place'],
+                related_tables=['begins_in', 'ends_in']),
+            'begins_in': TableField(
+                _('born in'),
+                add_dynamic=['place'],
+                related_tables=['residence', 'ends_in']),
+            'ends_in': TableField(_(
+                'died in'),
+                add_dynamic=['place'],
+                related_tables=['begins_in', 'residence'])}
 
 
 class PlaceManager(BaseManager):
@@ -470,6 +488,7 @@ class SourceManager(BaseManager):
             'description': TextAreaField(_('content'))}
 
     def populate_update(self) -> None:
+        super().populate_update()
         self.form.artifact.data = [
             item.id for item in
             self.entity.get_linked_entities('P128', inverse=True)]

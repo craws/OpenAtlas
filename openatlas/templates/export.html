@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block content %}
   {% if writable %}
-    <div {% if 'CSV' in title %}style="float:left;margin-right:1em;"{% endif %}>
+    <div>
       {{ form|display_form(manual_page='admin/export')|safe }}
     </div>
   {% else %}

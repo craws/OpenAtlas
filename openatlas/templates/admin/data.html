@@ -11,8 +11,10 @@
   <h1>{{ _('data transfer')|uc_first }}</h1>
   <div class="toolbar">
     {{ _('import')|button(url_for('import_index'))|safe }}
+    {{ ('CSV ' + _('export'))|button(url_for('api_03.export_database', format_='csv'))|safe }}
+    {{ ('JSON ' + _('export'))|button(url_for('api_03.export_database', format_='json'))|safe }}
+    {{ ('XML ' + _('export'))|button(url_for('api_03.export_database', format_='xml'))|safe }}
     {% if 'manager'|is_authorized %}
-      {{ ('CSV ' + _('export'))|button(url_for('export_csv'))|safe }}
       {{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}
     {% endif %}
     {% if 'admin'|is_authorized %}

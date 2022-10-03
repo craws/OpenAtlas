@@ -1,7 +1,7 @@
 import ast
 from typing import Any, Optional, Union
 
-from flask import g
+from flask import g, json
 
 from openatlas.api.v03.resources.error import (
     EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
@@ -230,7 +230,7 @@ def get_reference_systems(
     return ref
 
 
-def get_geometries(
+def get_geometric_collection(
         entity: Entity,
         links: list[Link]) -> Union[dict[str, Any], None]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
@@ -261,3 +261,16 @@ def get_geoms_by_entity(location_id: int) -> dict[str, Any]:
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
+
+def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
+    choices = [
+        'gisPointAll', 'gisPointSupers', 'gisPointSubs',
+        'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
+    all_geoms = Gis.get_all()
+    out = []
+    for item in choices \
+            if parser['geometry'] == 'gisAll' else parser['geometry']:
+        for geom in json.loads(all_geoms[item]):
+            out.append(geom)
+    return out
