@@ -192,14 +192,14 @@ class ArtifactManager(BaseManager):
 
     def process_form(self) -> None:
         super().process_form()
-        self.data['links']['delete'].update(['P52', 'P53'])
-        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            self.add_link('P46', self.origin, inverse=True)
+        self.data['links']['delete'].add('P52')
+        self.data['links']['delete_inverse'].add('P46')
         if self.form.actor.data:
             self.add_link('P52', self.form.actor.data)
-        if hasattr(self.form, 'place') and self.form.place.data:
-            location = Entity.get_by_id(int(self.form.place.data))
-            self.add_link('P53', location.get_linked_entity_safe('P53'))
+        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
+            self.add_link('P46', self.origin, inverse=True)
+        elif hasattr(self.form, 'place') and self.form.place.data:
+            self.add_link('P46', self.form.place.data, inverse=True)
 
     def in_sub_units(self):
         if self.origin and self.origin.class_.name == 'stratigraphic_unit':
