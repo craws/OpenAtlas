@@ -1,21 +1,22 @@
 {% extends "layout.html" %}
 {% block content %}
-    <div class="container" style="text-align:center;">
-        <h1>403 - Forbidden</h1>
-        <p>{{ _('This page is restricted.') }}</p>
-        <p>
-            {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
-        </p>
-        <p>
-            {{ _("Please let us know if you think it's a bug") }}: <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
-        </p>
-        <div class="toolbar">
-            {{ 'troubleshooting/error_codes'|manual }}
-        </div>
-        <p>
-            <img src="/static/images/layout/403.jpg" alt="403 - Forbidden"><br>
-            The northwest corner of the Forbidden City, Beijing, China<br>
-            commons.wikimedia.org, author: Charlie fong
-        </p>
-    </div>
+<div class="container" style="text-align:center;">
+  <h1>403 - Forbidden</h1>
+  <p>{{ _('This page is restricted.') }}</p>
+  <p>
+    {{ _('Use the back button of your browser or click <a href="/">here</a> to go to the main page.') }}
+  </p>
+  <p>
+    {{ _("Please let us know if you think it's a bug") }}: <a href="{{ url_for('index_feedback') }}">{{
+    _('feedback')|uc_first }}</a>
+  </p>
+  <div class="toolbar">
+    {{ 'troubleshooting/error_codes'|manual|safe }}
+  </div>
+  <p>
+    <img src="/static/images/layout/403.jpg" alt="403 - Forbidden"><br>
+    The northwest corner of the Forbidden City, Beijing, China<br>
+    commons.wikimedia.org, author: Charlie fong
+  </p>
+</div>
 {% endblock %}

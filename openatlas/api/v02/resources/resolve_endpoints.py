@@ -10,7 +10,7 @@ from openatlas.api.v02.resources.pagination import Pagination
 from openatlas.api.v02.templates.geojson import GeojsonTemplate
 from openatlas.api.v02.templates.linked_places import LinkedPlacesTemplate
 from openatlas.api.v02.templates.nodes import NodeTemplate
-from openatlas.api.csv_export import export_entities_csv
+from openatlas.api.v03.resources.formats.csv import export_entities_csv
 from openatlas.models.entity import Entity
 
 

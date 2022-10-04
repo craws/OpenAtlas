@@ -1,7 +1,7 @@
 import ast
 from typing import Any, Optional, Union
 
-from flask import g
+from flask import g, json
 
 from openatlas.api.v03.resources.error import (
     EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
@@ -230,7 +230,7 @@ def get_reference_systems(
     return ref
 
 
-def get_geometries(
+def get_geometric_collection(
         entity: Entity,
         links: list[Link]) -> Union[dict[str, Any], None]:
     if entity.class_.view == 'place' or entity.class_.name == 'artifact':
@@ -243,6 +243,12 @@ def get_geometries(
         return {
             'type': 'GeometryCollection',
             'geometries': [geom for sublist in geoms for geom in sublist]}
+    if entity.class_.view == 'event':
+        geoms = [Gis.get_by_id(link_.range.id) for link_ in links
+                 if link_.property.code in ['P7', 'P26', 'P27']]
+        return {
+            'type': 'GeometryCollection',
+            'geometries': [geom for sublist in geoms for geom in sublist]}
     return None
 
 
@@ -250,8 +256,21 @@ def get_location_id(links: list[Link]) -> int:
     return [l_.range.id for l_ in links if l_.property.code == 'P53'][0]
 
 
-def get_geoms_by_entity(entity_id: int) -> dict[str, Any]:
-    geoms = Gis.get_by_id(entity_id)
+def get_geoms_by_entity(location_id: int) -> dict[str, Any]:
+    geoms = Gis.get_by_id(location_id)
     if len(geoms) == 1:
         return geoms[0]
     return {'type': 'GeometryCollection', 'geometries': geoms}
+
+
+def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
+    choices = [
+        'gisPointAll', 'gisPointSupers', 'gisPointSubs',
+        'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
+    all_geoms = Gis.get_all()
+    out = []
+    for item in choices \
+            if parser['geometry'] == 'gisAll' else parser['geometry']:
+        for geom in json.loads(all_geoms[item]):
+            out.append(geom)
+    return out

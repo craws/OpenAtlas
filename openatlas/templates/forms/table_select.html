@@ -1,123 +1,121 @@
 <input
-        id="{{ field.id }}-button"
-        name="{{ field.id }}-button"
-        class="table-select {% if field.flags.required %}required{% endif %}"
-        type="text"
-        placeholder="{{ _('change')|uc_first }}"
-        onfocus="this.blur()"
-        readonly="readonly"
-        value="{{ selection }}"
-        onclick="$('#{{ field.id }}-modal').modal('show');">
-<a href="#"
-   id="{{ field.id }}-clear"
-   class="{{ config.CSS.button.secondary }}"
-   {% if not selection %}style="display: none;"{% endif %}
-   onclick="clearSelect('{{ field.id }}');">
+  id="{{ field.id }}-button"
+  name="{{ field.id }}-button"
+  class="table-select {% if field.flags.required %}required{% endif %}"
+  type="text"
+  placeholder="{{ _('change')|uc_first }}"
+  onfocus="this.blur()"
+  readonly="readonly"
+  value="{{ selection }}"
+  onclick="$('#{{ field.id }}-modal').modal('show');">
+<a
+  href="#"
+  id="{{ field.id }}-clear"
+  class="{{ config.CSS.button.secondary }}"
+  {% if not selection %}style="display: none;"{% endif %}
+  onclick="clearSelect('{{ field.id }}');">
     {{ _('clear')|uc_first }}
 </a>
 <div
-        id="{{ field.id }}-modal"
-        class="modal fade"
-        tabindex="-1"
-        role="dialog"
-        aria-hidden="true">
-    <div class="modal-dialog" role="document"
-         style="max-width: 100%!important;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">{{ _(field.id.replace('_', ' '))|uc_first }}</h5>
-                <button
-                        type="button"
-                        class="{{ config.CSS.button.primary }}"
-                        data-bs-dismiss="modal"
-                        aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                {% for add_dynamical in field.add_dynamical %}
-                    <button type="button"
-                            id="add-{{ add_dynamical }}-{{ field.id }}"
-                            class="btn-outline-primary btn btn-sm float-end ms-1"
-                            data-bs-toggle="modal"
-                            data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
-                        + {{ add_dynamical }}
-                    </button>
-                {% endfor %}
-                <div class="modal-body-table">{{ table }}</div>
-            </div>
-            <div class="modal-footer">
-                <button
-                        type="button"
-                        class="{{ config.CSS.button.primary }}"
-                        data-bs-dismiss="modal">
-                    {{ _('close')|uc_first }}
-                </button>
-            </div>
-        </div>
+  id="{{ field.id }}-modal"
+  class="modal fade"
+  tabindex="-1"
+  role="dialog"
+  aria-hidden="true">
+  <div class="modal-dialog" role="document" style="max-width: 100%!important;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5
+          class="modal-title">{{ _(field.id.replace('_', ' '))|uc_first }}</h5>
+        <button
+          type="button"
+          class="{{ config.CSS.button.primary }}"
+          data-bs-dismiss="modal"
+          aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        {% for add_dynamical in field.add_dynamical %}
+          <button
+            type="button"
+            id="add-{{ add_dynamical }}-{{ field.id }}"
+            class="btn-outline-primary btn btn-sm float-end ms-1"
+            data-bs-toggle="modal"
+            data-bs-target="#add-{{ add_dynamical }}-modal-{{ field.id }}">
+              + {{ _(add_dynamical)|uc_first }}
+          </button>
+        {% endfor %}
+        <div class="modal-body-table">{{ table|safe }}</div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="{{ config.CSS.button.primary }}"
+          data-bs-dismiss="modal">
+          {{ _('close')|uc_first }}
+        </button>
+      </div>
     </div>
+  </div>
 </div>
 {% for add_dynamical in field.add_dynamical %}
-    <div class="modal fade" id="add-{{ add_dynamical }}-modal-{{ field.id }}"
-         tabindex="-1"
-         aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add {{ add_dynamical }}</h5>
-                    <button
-                            type="button"
-                            class="{{ config.CSS.button.primary }}"
-                            data-bs-dismiss="modal"
-                            aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    {{ field.forms[add_dynamical]|display_form() }}
-                </div>
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-outline-secondary btn-sm"
-                            data-bs-dismiss="modal"
-                            onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
-                    <button id="{{ field.id }}-add-{{ add_dynamical }}"
-                            disabled
-                            type="button"
-                            class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
-                </div>
-            </div>
+  <div class="modal fade" id="add-{{ add_dynamical }}-modal-{{ field.id }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">+ {{ _(add_dynamical)|uc_first }}</h5>
+          <button
+            type="button"
+            class="{{ config.CSS.button.primary }}"
+            data-bs-dismiss="modal"
+            aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          {{ field.forms[add_dynamical]|display_form()|safe }}
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-outline-secondary btn-sm"
+            data-bs-dismiss="modal"
+            onclick="$('#{{ field.id }}-modal').modal('show')">{{ _('back')|uc_first }}</button>
+          <button
+            id="{{ field.id }}-add-{{ add_dynamical }}"
+            disabled
+            type="button"
+            class="btn btn-outline-primary btn-sm">{{ _('insert')|uc_first }}</button>
+        </div>
+      </div>
     </div>
+  </div>
 
+  <script>
+    $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic")
+      .on('keyup change', function () {
+          if ($(this).val() === '')
+            $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
+          else
+            $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
+      });
 
-    <script>
-        $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").on('keyup change', function () {
-            if ($(this).val() === '')
-                $('#{{field.id}}-add-{{ add_dynamical }}').attr('disabled', '')
-            else
-                $('#{{field.id}}-add-{{ add_dynamical }}').removeAttr('disabled')
-        });
-
-        $('#{{field.id}}-add-{{ add_dynamical }}').on('click', async function (e) {
-            const name = $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").val();
-            const description = $("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
-            const entityName = '{{ add_dynamical }}';
-            const standardType =  $("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic").val();
-            const data = {
-                name, description, entityName,standardType
-            };
-            e.preventDefault();
-            console.log('data','hioer',data,$("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic"),"#{{field.id}}-{{class_name}}-standard-type-dynamic")
-
-            const entityId = await ajaxAddEntity(data);
-            const tableContent = await getTable('{{ field.id }}',{{ field.filter_ids }});
-            $('.modal').modal('hide');
-            //$('#{{ field.id }}-modal').modal('show');
-            $("#{{ field.id }}-modal .modal-body-table").empty();
-            $("#{{ field.id }}-modal .modal-body-table").append($(`${tableContent}`));
-            selectFromTable(undefined, '{{ field.id }}', entityId, name)
-
-        });
-    </script>
+    $('#{{field.id}}-add-{{ add_dynamical }}')
+      .on('click', async function (e) {
+        const name = $("#add-{{ add_dynamical }}-modal-{{field.id}} #name_dynamic").val();
+        const description =$("#add-{{ add_dynamical }}-modal-{{field.id}} #description_dynamic").val();
+        const entityName = '{{ add_dynamical }}';
+        const standardType = $("#add-{{ add_dynamical }}-modal-{{field.id}} #{{field.id}}-{{add_dynamical}}-standard-type-dynamic").val();
+        const data = {name, description, entityName, standardType};
+        e.preventDefault();
+        const entityId = await ajaxAddEntity(data);
+        const relatedTables = {{ field.related_tables | safe }};
+        relatedTables
+            ?.forEach(x => refillTable(x, {{ field.filter_ids }}));
+        await refillTable('{{ field.id }}', {{ field.filter_ids }});
+        $('.modal').modal('hide');
+        selectFromTable(undefined, '{{ field.id }}', entityId, name)
+      });
+  </script>
 {% endfor %}

@@ -4,7 +4,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.api.v03.resources.util import (
-    get_geometries, get_license, get_reference_systems,
+    get_geometric_collection, get_license, get_reference_systems,
     replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -38,7 +38,7 @@ def get_linked_places_entity(
             if 'description' in parser['show'] else None,
             'names': [{"alias": value} for value in entity.aliases.values()]
             if entity.aliases and 'names' in parser['show'] else None,
-            'geometry': get_geometries(entity, links)
+            'geometry': get_geometric_collection(entity, links)
             if 'geometry' in parser['show'] else None,
             'relations': get_lp_links(links, links_inverse, parser)
             if 'relations' in parser['show'] else None})]}
@@ -72,8 +72,7 @@ def get_lp_links(
         links: list[Link],
         links_inverse: list[Link],
         parser: dict[str, Any]) -> list[dict[str, str]]:
-    properties = parser['relation_type'] \
-        if parser['relation_type'] else list(g.properties)
+    properties = parser['relation_type'] or list(g.properties)
     out = []
     for link_ in links:
         if link_.property.code in properties:

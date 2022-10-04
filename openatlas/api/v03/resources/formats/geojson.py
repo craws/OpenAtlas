@@ -1,6 +1,7 @@
 from typing import Any, Optional, Union
 
 from openatlas.api.v03.resources.util import (
+    flatten_list_and_remove_duplicates, link_parser_check,
     replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -21,12 +22,48 @@ def get_geojson(
 
 
 def get_geom(entity: Entity) -> Union[list[dict[str, Any]], list[Any]]:
-    if entity.class_.view == 'place' or entity.class_.name in ['artifact']:
+    if entity.class_.view == 'place' or entity.class_.name == 'artifact':
         return Gis.get_by_id(
             Link.get_linked_entity_safe(entity.id, 'P53').id)
     if entity.class_.name == 'object_location':
         return Gis.get_by_id(entity.id)
     return []
+
+
+def get_geojson_v2(
+        entities: list[Entity],
+        parser: dict[str, Any]) -> dict[str, Any]:
+    out = []
+    links = [link_ for link_ in link_parser_check(entities, parser)
+             if link_.property.code
+             in ['P53', 'P74', 'OA8', 'OA9', 'P7', 'P26', 'P27']]
+    for entity in entities:
+        if geom := get_geoms_as_collection(
+                entity,
+                [link_.range.id for link_ in links
+                 if link_.domain.id == entity.id]):
+            out.append(get_geojson_dict(entity, parser, geom))
+    return {'type': 'FeatureCollection', 'features': out}
+
+
+def get_geoms_as_collection(
+        entity: Entity,
+        links: list[int]) -> Optional[dict[str, Any]]:
+    if entity.class_.name == 'object_location':
+        return get_geoms_dict(Gis.get_by_id(entity.id))
+    if links:
+        return get_geoms_dict(flatten_list_and_remove_duplicates(
+            [Gis.get_by_id(location) for location in links]))
+    return None
+
+
+def get_geoms_dict(
+        geoms: list[dict[str, any]]) -> Optional[dict[str, Any]]:
+    if len(geoms) == 0:
+        return None
+    if len(geoms) == 1:
+        return geoms[0]
+    return {'type': 'GeometryCollection', 'geometries': geoms}
 
 
 def get_geojson_dict(

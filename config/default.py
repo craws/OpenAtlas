@@ -46,7 +46,6 @@ PROCESSED_EXT = '.jpeg'
 WRITABLE_DIRS = [
     UPLOAD_DIR,
     EXPORT_DIR / 'sql',
-    EXPORT_DIR / 'csv',
     RESIZED_IMAGES]
 
 # Security
@@ -68,7 +67,8 @@ RDF_FORMATS = {
     'xml': 'application/xml'}
 JSON_FORMATS = {
     'lp': 'application/json',
-    'geojson': 'application/json'}
+    'geojson': 'application/json',
+    'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 
 # Table options

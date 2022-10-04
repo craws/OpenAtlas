@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 import ast
 from typing import Any, Iterable, Optional, TYPE_CHECKING, Union
@@ -147,7 +147,7 @@ class Entity:
     def update(
             self,
             data: dict[str, Any],
-            new: bool = False,) -> Optional[int]:
+            new: bool = False) -> Optional[int]:
         continue_link_id = None
         if 'attributes' in data:
             self.update_attributes(data['attributes'])
@@ -157,7 +157,7 @@ class Entity:
                 and self.class_.name != 'administrative_unit':
             self.update_administrative_units(data['administrative_units'], new)
         if 'links' in data:
-            continue_link_id = self.update_links(data['links'], new)
+            continue_link_id = self.update_links(data, new)
         if 'gis' in data:
             self.update_gis(data['gis'], new)
         return continue_link_id
@@ -204,24 +204,37 @@ class Entity:
             if alias.strip():
                 self.link('P1', Entity.insert('appellation', alias))
 
-    def update_links(self, links: dict[str, Any], new: bool) -> Optional[int]:
+    def update_links(self, data: dict[str, Any], new: bool) -> Optional[int]:
         from openatlas.models.reference_system import ReferenceSystem
         if not new:
-            if 'delete' in links and links['delete']:
-                self.delete_links(links['delete'])
-            if 'delete_inverse' in links and links['delete_inverse']:
-                self.delete_links(links['delete_inverse'], True)
-            if 'delete_reference_system' in links \
-                    and links['delete_reference_system']:
+            if 'delete' in data['links'] and data['links']['delete']:
+                self.delete_links(data['links']['delete'])
+            if 'delete_inverse' in data['links'] \
+                    and data['links']['delete_inverse']:
+                self.delete_links(data['links']['delete_inverse'], True)
+            if 'delete_reference_system' in data['links'] \
+                    and data['links']['delete_reference_system']:
                 ReferenceSystem.delete_links_from_entity(self)
         continue_link_id = None
-        for link_ in links['insert']:
+        for link_ in data['links']['insert']:
             ids = self.link(
                 link_['property'],
                 link_['range'],
                 link_['description'],
                 link_['inverse'],
                 link_['type_id'])
+            if 'attributes_link' in data:
+                for id_ in ids:
+                    item = Link.get_by_id(id_)
+                    item.begin_from = data['attributes_link']['begin_from']
+                    item.begin_to = data['attributes_link']['begin_to']
+                    item.begin_comment = \
+                        data['attributes_link']['begin_comment']
+                    item.end_from = data['attributes_link']['end_from']
+                    item.end_to = data['attributes_link']['end_to']
+                    item.end_comment = \
+                        data['attributes_link']['end_comment']
+                    item.update()
             if link_['return_link_id']:
                 continue_link_id = ids[0]
         return continue_link_id
@@ -285,6 +298,10 @@ class Entity:
         return [
             Entity.get_by_id(row['id'], types=True)
             for row in Date.get_invalid_dates()]
+
+    @staticmethod
+    def get_orphaned_subunits() -> list[Entity]:
+        return [Entity.get_by_id(x['id']) for x in Db.get_orphaned_subunits()]
 
     @staticmethod
     def delete_(id_: Union[int, list[int]]) -> None:
@@ -399,7 +416,7 @@ class Entity:
         entities = Entity.get_by_class(class_)
         for sample in filter(lambda x: x.id not in already_added, entities):
             similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in filter(lambda x: x.id != sample.id, entities):
+            for entity in filter(lambda y: y.id != sample.id, entities):
                 if fuzz.ratio(sample.name, entity.name) >= ratio:
                     already_added.add(sample.id)
                     already_added.add(entity.id)

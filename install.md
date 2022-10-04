@@ -2,12 +2,12 @@
 Some knowledge about package installation, web server and database configuration
 will be needed.
 
-This software was developed and tested on Linux/Debian 10 (codename "bullseye")
-and the easiest way to install would be on a Debian 10 system following these
-instructions. It may work on other Linux distributions or even on non Linux
-systems and we provided a [requirements.txt](requirements.txt). But it 
-is experimental and would need substantially more knowledge about server 
-administration.
+This software was developed and tested on Linux/Debian 11.5
+(codename "bullseye") and the easiest way to install would be on a Debian 11.5
+system following these instructions. It may work on other Linux distributions
+or even on non Linux systems and we provided a
+[requirements.txt](requirements.txt). But it is experimental and would need
+substantially more knowledge about server administration.
 
 Feel free to also consult our own
 [documentation](https://redmine.openatlas.eu/projects/uni/wiki/Debian_server_installation)
@@ -105,14 +105,13 @@ Test Apache configuration and restart
 Make these directories writable for the Apache user:
 
     openatlas/uploads
-    openatlas/export/csv
     openatlas/export/sql
     openatlas/processed_images/resized
 
 e.g.
 
     # chown www-data openatlas/uploads
-    # chown www-data openatlas/export/*
+    # chown www-data openatlas/export/sql
     # chown www-data openatlas/processed_images/resized
 
 ### Finishing

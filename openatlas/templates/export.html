@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-    {% if writable %}
-        <div {% if 'CSV' in title %}style="float:left;margin-right:1em;"{% endif %}>
-            {{ form|display_form(manual_page='admin/export') }}
-        </div>
-    {% else %}
-        <p><span class="error">{{ _('directory not writable')|uc_first }}</span></p>
-    {% endif %}
-    {{ table.display() }}
+  {% if writable %}
+    <div>
+      {{ form|display_form(manual_page='admin/export')|safe }}
+    </div>
+  {% else %}
+    <p><span class="error">{{ _('directory not writable')|uc_first }}</span></p>
+  {% endif %}
+  {{ table.display()|safe }}
 {% endblock %}

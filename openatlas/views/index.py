@@ -20,18 +20,6 @@ from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 
 
-class FeedbackForm(FlaskForm):
-    subject = SelectField(
-        _('subject'),
-        render_kw={'autofocus': True},
-        choices=(
-            ('suggestion', _('suggestion')),
-            ('question', _('question')),
-            ('problem', _('problem'))))
-    description = TextAreaField(_('description'), [InputRequired()])
-    save = SubmitField(_('send'))
-
-
 @app.route('/')
 @app.route('/overview')
 def overview() -> str:
@@ -113,6 +101,18 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
+
+    class FeedbackForm(FlaskForm):
+        subject = SelectField(
+            _('subject'),
+            render_kw={'autofocus': True},
+            choices=(
+                ('suggestion', uc_first(_('suggestion'))),
+                ('question', uc_first(_('question'))),
+                ('problem', uc_first(_('problem')))))
+        description = TextAreaField(_('description'), [InputRequired()])
+        save = SubmitField(_('send'))
+
     form = FeedbackForm()
     if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
         body = \
@@ -139,8 +139,8 @@ def index_feedback() -> Union[str, Response]:
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
     return render_template(
-        'index/content.html',
-        text=get_translation(item),
+        'content.html',
+        content=get_translation(item),
         title=_(_(item)),
         crumbs=[_(item)])
 
@@ -157,16 +157,16 @@ def index_changelog() -> str:
 @app.route('/unsubscribe/<code>')
 def index_unsubscribe(code: str) -> str:
     user = User.get_by_unsubscribe_code(code)
-    text = _('unsubscribe link not valid')
+    content = _('unsubscribe link not valid')
     if user:  # pragma: no cover
         user.settings['newsletter'] = ''
         user.unsubscribe_code = ''
         user.update()
         user.remove_newsletter()
-        text = _(
+        content = _(
             'You have successfully unsubscribed. '
             'You can subscribe again in your Profile.')
     return render_template(
-        'index/unsubscribe.html',
-        text=text,
+        'content.html',
+        content=content,
         crumbs=[_('unsubscribe newsletter')])

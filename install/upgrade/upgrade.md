@@ -19,6 +19,14 @@ base, then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 7.6.x to 7.7.0
+NPM packages need to be upgraded:
+
+    $ cd openatlas/static
+    $ rm package.json
+    $ pip3 install -e ./
+    $ ~/.local/bin/calmjs npm --install openatlas
+
 ### 7.5.0 to 7.6.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
@@ -33,13 +41,10 @@ The new stable API version is now 0.3 (instead 0.2). Systems using the API
 
 NPM packages need to be upgraded for the Bootstrap upgrade:
 
-    $ pip3 install calmjs
     $ cd openatlas/static
+    $ rm package.json
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
-
-In case you get a warning in the last step about not overwriting existing
-'../package.json', delete this file manually and try again.
 
 ### 7.2.0 to 7.3.0
 7.3.0.sql is needed (wil be taken care of by the database upgrade script).
@@ -59,13 +64,10 @@ version **0.3** will be the new default. Version 0.2. will still be available
 
 For the new map system NPM packages have to be upgraded:
 
-    $ pip3 install calmjs
     $ cd openatlas/static
+    $ rm package.json
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
-
-In case you get a warning in the last step about not overwriting existing
-'../package.json', delete this file manually and try again.
 
 ### 7.1.0 to 7.1.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.

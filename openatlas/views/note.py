@@ -14,7 +14,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.util import (
-    button, is_authorized, link, manual, required_group, uc_first)
+    button, display_form, is_authorized, link, manual, required_group,
+    uc_first)
 
 
 class NoteForm(FlaskForm):
@@ -74,8 +75,8 @@ def note_insert(entity_id: int) -> Union[str, Response]:
         flash(_('note added'), 'info')
         return redirect(f"{url_for('view', id_=entity.id)}#tab-note")
     return render_template(
-        'display_form.html',
-        form=form,
+        'content.html',
+        content=display_form(form),
         entity=entity,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -99,8 +100,8 @@ def note_update(id_: int) -> Union[str, Response]:
     form.description.data = note['text']
     form.public.data = note['public']
     return render_template(
-        'display_form.html',
-        form=form,
+        'content.html',
+        content=display_form(form),
         entity=entity,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],

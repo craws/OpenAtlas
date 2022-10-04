@@ -20,9 +20,10 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, display_delete_link, format_date, get_base_table_data,
-    get_entity_data, get_file_path, is_authorized, link, required_group,
-    uc_first)
+    bookmark_toggle, button, display_delete_link, display_form,
+    download_button, format_date, get_base_table_data, get_entity_data,
+    get_file_path, is_authorized, link, manual, required_group,
+    siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 from openatlas.views.link import AddReferenceForm
 
@@ -158,12 +159,21 @@ def view(id_: int) -> Union[str, Response]:
             if entity.linked_places else None
     problematic_type_id = entity.check_too_many_single_type_links()
     tabs['note'] = add_note_tab(entity)
+    buttons = [manual(f'entity/{entity.class_.view}')]
+    buttons += add_buttons(entity, bool(problematic_type_id))
+    buttons.append(bookmark_toggle(entity.id))
+    if entity.class_.view == 'file':
+        if entity.image_id:
+            buttons.append(download_button(entity))
+        else:
+            buttons.append(
+                f'<span class="error">{uc_first(_("missing file"))}</span>')
+    buttons.append(siblings_pager(entity, place_structure))
     tabs['info'].content = render_template(
         'entity/view.html',
-        buttons=add_buttons(entity, bool(problematic_type_id)),
+        buttons=buttons,
         entity=entity,
         gis_data=gis_data,
-        structure=place_structure,
         overlays=overlays,
         title=entity.name,
         problematic_type_id=problematic_type_id)
@@ -261,13 +271,12 @@ def entity_add_file(id_: int) -> Union[str, Response]:
                 'P67',
                 request.form['checkbox_values'], inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-file")
-    form = get_table_form(
-        'file',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
-        'form.html',
+        'content.html',
+        content=get_table_form(
+            'file',
+            entity.get_linked_entities('P67', inverse=True)),
         entity=entity,
-        form=form,
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -286,12 +295,11 @@ def entity_add_source(id_: int) -> Union[str, Response]:
                 request.form['checkbox_values'],
                 inverse=True)
         return redirect(f"{url_for('view', id_=id_)}#tab-source")
-    form = get_table_form(
-        'source',
-        entity.get_linked_entities('P67', inverse=True))
     return render_template(
-        'form.html',
-        form=form,
+        'content.html',
+        content=get_table_form(
+            'source',
+            entity.get_linked_entities('P67', inverse=True)),
         title=entity.name,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
@@ -313,9 +321,9 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
         return redirect(f"{url_for('view', id_=id_)}#tab-reference")
     form.page.label.text = uc_first(_('page / link text'))
     return render_template(
-        'display_form.html',
+        'content.html',
+        content=display_form(form),
         entity=entity,
-        form=form,
         crumbs=[
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
@@ -484,7 +492,7 @@ def add_tabs_for_actor(
             link_.last,
             link_.description,
             edit_link(
-                url_for('member_update', id_=link_.id, origin_id=entity.id)),
+                url_for('link_update', id_=link_.id, origin_id=entity.id)),
             remove_link(link_.domain.name, link_, entity, 'member-of')]
         tabs['member_of'].table.rows.append(data)
     if entity.class_.name != 'group':
@@ -498,8 +506,7 @@ def add_tabs_for_actor(
                 link_.last,
                 link_.description,
                 edit_link(
-                    url_for('member_update', id_=link_.id, origin_id=entity.id)
-                ),
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.range.name, link_, entity, 'member')])
     for link_ in entity.get_links('P52', True):
         data = [

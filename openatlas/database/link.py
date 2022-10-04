@@ -1,4 +1,4 @@
-from typing import Any, Iterable, Union
+from typing import Any, Union
 
 from flask import g
 
@@ -12,7 +12,8 @@ class Link:
             DELETE FROM model.link
             WHERE property_code = 'P2'
                 AND domain_id = %(id)s
-                AND id NOT IN %(exclude_ids)s;""",
+                AND id NOT IN %(exclude_ids)s;
+            """,
             {'id': id_, 'exclude_ids': tuple(exclude_ids)})
 
     @staticmethod
@@ -97,10 +98,12 @@ class Link:
                 l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS begin_from, l.begin_comment,
-                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS begin_to,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
                     AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '') AS end_to
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to
             FROM model.link l
             JOIN model.entity e
                 ON l.{'domain' if inverse else 'range'}_id = e.id """
@@ -174,7 +177,7 @@ class Link:
             """
             SELECT domain_id
             FROM model.link
-            WHERE range_id IN %(type_ids)s 
+            WHERE range_id IN %(type_ids)s
             AND property_code in ('P2', 'P89')
             GROUP BY id ORDER BY id;
             """,
@@ -220,6 +223,30 @@ class Link:
                 AND r.cidoc_class_code = %(range_code)s;
             """,
             data)
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_all_links() -> list[dict[str, Any]]:
+        g.cursor.execute(f"""
+            SELECT
+                l.id,
+                l.property_code,
+                l.domain_id,
+                l.range_id,
+                l.description,
+                l.created,
+                l.modified,
+                l.type_id,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd hh24:mi:ss BC'), '')
+                    AS end_to
+            FROM model.link l
+            """)
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -275,5 +302,6 @@ class Link:
             FROM model.link
             WHERE property_code = 'P2' AND range_id IN %(ids)s
             GROUP BY domain_id
-            HAVING COUNT(*) > 1;""", {'ids': tuple(ids)})
+            HAVING COUNT(*) > 1;
+            """, {'ids': tuple(ids)})
         return [row['domain_id'] for row in g.cursor.fetchall()]

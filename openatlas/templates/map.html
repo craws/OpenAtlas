@@ -8,54 +8,55 @@
 <link rel="stylesheet" href="/static/node_modules/leaflet.fullscreen/Control.FullScreen.css">
 
 <script>
-    const geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
-    const geoNamesUsername =  '{{ g.settings.geonames_username }}';
-    const gisPointAll =        {{ gis_data.gisPointAll|safe }};
-    const gisPointSupers =     {{ gis_data.gisPointSupers|safe }};
-    const gisPointSubs =       {{ gis_data.gisPointSubs|safe }};
-    const gisPointSibling =    {{ gis_data.gisPointSibling|safe }};
-    const gisPointSelected =   {{ gis_data.gisPointSelected|safe }};
-    const gisLineAll =         {{ gis_data.gisLineAll|safe }};
-    const gisLineSelected =    {{ gis_data.gisLineSelected|safe }};
-    const gisPolygonAll =      {{ gis_data.gisPolygonAll|safe }};
-    const gisPolygonSelected = {{ gis_data.gisPolygonSelected|safe }};
-    const gisPolygonPointSelected = {{ gis_data.gisPolygonPointSelected|safe }};
-    const gisAllSelected =     {{ gis_data.gisAllSelected|safe }};
-    const jsonSearch = [];
-    const translate = [];
-    const mapMaxZoom             =  {{ current_user.settings.map_zoom_max }}
-    const mapDefaultZoom         =  {{ current_user.settings.map_zoom_default }}
-    const map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
-    const maxClusterRadius        = {{ g.settings.map_cluster_max_radius }};
-    const disableClusteringAtZoom = {{ g.settings.map_cluster_disable_at_zoom }};
-    translate.save    = '{{ _('save')|uc_first|safe }}';
-    translate.edit    = '{{ _('edit')|uc_first|safe }}';
-    translate.delete  = '{{ _('delete')|uc_first|safe }}';
-    translate.details = '{{ _('details')|uc_first|safe }}';
-    translate.import  = '{{ _('import')|uc_first|safe }}';
-    translate.map_clear =                '{{ _('map_clear')|uc_first|safe }}';
-    translate.map_info_reedit =          '{{ _('map_info_reedit')|uc_first|safe }}';
-    translate.map_info_shape =           '{{ _('map_info_shape')|uc_first|safe }}';
-    translate.map_info_area =            '{{ _('map_info_area')|uc_first|safe }}';
-    translate.map_info_centerpoint =     '{{ _('map_info_point')|uc_first|safe }}';
-    translate.map_info_linestring =      '{{ _('map_info_linestring')|uc_first|safe }}';
-    translate.map_info_close =           '{{ _('map_info_close')|uc_first|safe }}';
-    translate.map_info_description =     '{{ _('map_info_description')|safe }}';
-    translate.map_geonames_title =       '{{ _('Search by location name or postcode')|safe }}';
-    translate.map_geonames_placeholder = '{{ _('Enter a location name')|safe }}';
+  const geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
+  const geoNamesUsername =  '{{ g.settings.geonames_username }}';
+  const gisPointAll =        {{ gis_data.gisPointAll|safe }};
+  const gisPointSupers =     {{ gis_data.gisPointSupers|safe }};
+  const gisPointSubs =       {{ gis_data.gisPointSubs|safe }};
+  const gisPointSibling =    {{ gis_data.gisPointSibling|safe }};
+  const gisPointSelected =   {{ gis_data.gisPointSelected|safe }};
+  const gisLineAll =         {{ gis_data.gisLineAll|safe }};
+  const gisLineSelected =    {{ gis_data.gisLineSelected|safe }};
+  const gisPolygonAll =      {{ gis_data.gisPolygonAll|safe }};
+  const gisPolygonSelected = {{ gis_data.gisPolygonSelected|safe }};
+  const gisPolygonPointSelected = {{ gis_data.gisPolygonPointSelected|safe }};
+  const gisAllSelected =     {{ gis_data.gisAllSelected|safe }};
+  const jsonSearch = [];
+  const translate = [];
+  const mapMaxZoom             =  {{ current_user.settings.map_zoom_max }}
+  const mapDefaultZoom         =  {{ current_user.settings.map_zoom_default }}
+  const map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
+  const maxClusterRadius        = {{ g.settings.map_cluster_max_radius }};
+  const disableClusteringAtZoom = {{ g.settings.map_cluster_disable_at_zoom }};
+  translate.save    = '{{ _('save')|uc_first|safe }}';
+  translate.edit    = '{{ _('edit')|uc_first|safe }}';
+  translate.delete  = '{{ _('delete')|uc_first|safe }}';
+  translate.details = '{{ _('details')|uc_first|safe }}';
+  translate.import  = '{{ _('import')|uc_first|safe }}';
+  translate.map_clear =                '{{ _('map_clear')|uc_first|safe }}';
+  translate.map_info_reedit =          '{{ _('map_info_reedit')|uc_first|safe }}';
+  translate.map_info_shape =           '{{ _('map_info_shape')|uc_first|safe }}';
+  translate.map_info_area =            '{{ _('map_info_area')|uc_first|safe }}';
+  translate.map_info_centerpoint =     '{{ _('map_info_point')|uc_first|safe }}';
+  translate.map_info_linestring =      '{{ _('map_info_linestring')|uc_first|safe }}';
+  translate.map_info_close =           '{{ _('map_info_close')|uc_first|safe }}';
+  translate.map_info_description =     '{{ _('map_info_description')|safe }}';
+  translate.map_geonames_title =       '{{ _('Search by location name or postcode')|safe }}';
+  translate.map_geonames_placeholder = '{{ _('Enter a location name')|safe }}';
+  translate.map_overlapping_places =   '{{ _('There are multiple places overlapping')|safe }}';
 
-    overlays = [];
-    {% if current_user.settings.module_map_overlay and overlays is defined and overlays and overlays|length %}
-        overlays = [
-            {% for image_id, overlay in overlays.items() %}
-                {
-                    name: '{{ overlay.name }}',
-                    image: '{{ overlay.image_name }}',
-                    boundingBox: {{ overlay.bounding_box }}
-                },
-            {% endfor %}
-        ];
-    {% endif %}
+  overlays = [];
+  {% if current_user.settings.module_map_overlay and overlays is defined and overlays and overlays|length %}
+    overlays = [
+      {% for image_id, overlay in overlays.items() %}
+      {
+        name: '{{ overlay.name }}',
+        image: '{{ overlay.image_name }}',
+        boundingBox: {{ overlay.bounding_box }}
+      },
+      {% endfor %}
+    ];
+  {% endif %}
 </script>
 <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
 <script src="/static/node_modules/leaflet/dist/leaflet.js"></script>
@@ -64,3 +65,4 @@
 <script src="/static/vendor/Geonames-0.4.7/L.Control.Geonames.js"></script>
 <script src="/static/node_modules/leaflet.fullscreen/Control.FullScreen.js"></script>
 <script src="/static/node_modules/leaflet-imageoverlay-rotated/Leaflet.ImageOverlay.Rotated.js"></script>
+<script src="/static/node_modules/@mapbox/leaflet-pip/leaflet-pip.js"></script>

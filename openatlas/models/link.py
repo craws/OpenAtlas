@@ -1,4 +1,4 @@
-from __future__ import annotations  # Needed for Python 4.0 type annotations
+from __future__ import annotations
 
 from typing import Any, Optional, TYPE_CHECKING, Union
 
@@ -60,9 +60,6 @@ class Link:
             'end_from': datetime64_to_timestamp(self.end_from),
             'end_to': datetime64_to_timestamp(self.end_to),
             'end_comment': self.end_comment})
-
-    def delete(self) -> None:
-        Link.delete_(self.id)
 
     def set_dates(self, data: dict[str, Any]) -> None:
         self.begin_from = data['begin_from']

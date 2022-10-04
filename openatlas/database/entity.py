@@ -99,11 +99,24 @@ class Entity:
             row['name']: row['count'] for row in g.cursor.fetchall()}
 
     @staticmethod
+    def get_orphaned_subunits() -> list[dict[str, Any]]:
+        g.cursor.execute(
+            """
+            SELECT e.id FROM model.entity e
+            LEFT JOIN model.link l
+                ON e.id = l.range_id
+                AND l.property_code = 'P46'
+            WHERE l.domain_id IS NULL
+                AND e.openatlas_class_name
+                    IN ('feature', 'stratigraphic_unit');""")
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_orphans() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
             SELECT e.id FROM model.entity e
-            LEFT JOIN model.link l1 on e.id = l1.domain_id
+            LEFT JOIN model.link l1 ON e.id = l1.domain_id
                 AND l1.range_id NOT IN
                 (SELECT id FROM model.entity WHERE cidoc_class_code = 'E55')
             LEFT JOIN model.link l2 on e.id = l2.range_id
@@ -121,6 +134,11 @@ class Entity:
             ORDER BY e.created DESC LIMIT %(limit)s;
             """,
             {'codes': tuple(classes), 'limit': limit})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_all_entities() -> list[dict[str, Any]]:
+        g.cursor.execute(Entity.select_sql())
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

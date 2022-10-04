@@ -3,7 +3,6 @@ from typing import Any, Optional, Union
 from flask import json, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from markupsafe import Markup
 
 from openatlas.util.util import uc_first
 
@@ -25,7 +24,7 @@ class Table:
 
     def display(self, name: str = 'default') -> str:
         if not self.rows:
-            return Markup(f"<p>{uc_first(_('no entries'))}</p>")
+            return f"<p>{uc_first(_('no entries'))}</p>"
         self.defs.append({
             'className': 'dt-body-right',
             'targets': [
@@ -46,8 +45,8 @@ class Table:
             data_table['order'] = self.order
         if self.defs:
             data_table['columnDefs'] = self.defs
-        return Markup(render_template(
+        return render_template(
             'util/table.html',
             table=self,
             name=name,
-            data=json.dumps(data_table)))
+            data=json.dumps(data_table))

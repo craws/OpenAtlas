@@ -17,7 +17,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    format_date, is_authorized, link, required_group, send_mail, uc_first)
+    button, description, display_form, display_info, format_date,
+    is_authorized, link, manual, required_group, send_mail, uc_first)
 
 
 class UserForm(FlaskForm):
@@ -104,22 +105,26 @@ def user_activity(user_id: int = 0) -> str:
         activity = User.get_activities(100, user_id, 'all')
     else:
         activity = User.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'], order=[[0, 'desc']])
+    table = Table(
+        ['date', 'user', 'action', 'class', 'entity'],
+        order=[[0, 'desc']])
     for row in activity:
         try:
-            entity = link(Entity.get_by_id(row['entity_id']))
+            entity = Entity.get_by_id(row['entity_id'])
+            entity_name = link(entity)
         except AttributeError:  # pragma: no cover - entity already deleted
-            entity = f"id {row['entity_id']}"
+            entity = None
+            entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([
             format_date(row['created']),
             link(user) if user else f"id {row['user_id']}",
             _(row['action']),
-            entity])
+            _(entity.class_.label) if entity else '',
+            entity_name])
     return render_template(
-        'user/activity.html',
-        table=table,
-        form=form,
+        'content.html',
+        content=display_form(form) + table.display(),
         title=_('user'),
         crumbs=[[_('admin'), url_for('admin_index')], _('activity')])
 
@@ -147,10 +152,27 @@ def user_view(id_: int) -> str:
         _('last login'): format_date(user.login_last_success),
         _('failed logins'):
             user.login_failed_count if is_authorized('manager') else ''}
+    buttons = [manual('admin/user')]
+    if is_authorized('manager'):
+        if user.group != 'admin' or current_user.group == 'admin':
+            buttons.append(
+                button(_('edit'), url_for('user_update', id_=user.id)))
+        if user.id != current_user.id and (
+                    user.group != 'admin' or current_user.group == 'admin'):
+            name = user.username.replace('"', '').replace("'", '')
+            buttons.append(
+                button(
+                    _('delete'),
+                    url_for('admin_index', action='delete_user', id_=user.id)
+                    + '#tab-user',
+                    onclick=
+                    f"return confirm('{_('Delete %(name)s?', name=name)}')"))
+        buttons.append(
+            button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
-        'user/view.html',
-        user=user,
-        info=info,
+        'content.html',
+        content=display_info(info) + description(user),
+        buttons=buttons,
         title=user.username,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
@@ -178,8 +200,8 @@ def user_entities(id_: int) -> str:
                 entity.last,
                 format_date(entity.created)])
     return render_template(
-        'table.html',
-        table=table,
+        'content.html',
+        content=table.display(),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user,
@@ -213,10 +235,9 @@ def user_update(id_: int) -> Union[str, Response]:
     if user.id == current_user.id:
         del form.active
     return render_template(
-        'display_form.html',
-        form=form,
+        'content.html',
+        content=display_form(form, manual_page='admin/user'),
         title=user.username,
-        manual_page='admin/user',
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
             user,
@@ -271,8 +292,7 @@ def user_insert() -> Union[str, Response]:
         form=form,
         title=_('user'),
         crumbs=[
-            [_('admin'),
-             f"{url_for('admin_index')}#tab-user"],
+            [_('admin'), f"{url_for('admin_index')}#tab-user"],
             f"+ {uc_first(_('user'))}"])
 
 

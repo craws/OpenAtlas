@@ -1,40 +1,42 @@
 <h1>{{ _('data integrity checks')|uc_first }}</h1>
 <div class="toolbar">
-    {{ 'admin/data_integrity_checks'|manual }}
-    {{ _('orphans')|button(url_for('admin_orphans')) }}
-    {{ _('dates')|button(url_for('admin_check_dates')) }}
-    {{ _('similar names')|button(url_for('admin_check_similar')) }}
-    {{ _('links')|button(url_for('admin_check_links')) }}
-    {{ _('link duplicates')|button(url_for('admin_check_link_duplicates')) }}
+  {{ 'admin/data_integrity_checks'|manual|safe }}
+  {{ _('orphans')|button(url_for('admin_orphans'))|safe }}
+  {{ _('dates')|button(url_for('admin_check_dates'))|safe }}
+  {{ _('similar names')|button(url_for('admin_check_similar'))|safe }}
+  {{ _('links')|button(url_for('admin_check_links'))|safe }}
+  {{ _('link duplicates')|button(url_for('admin_check_link_duplicates'))|safe }}
 </div>
 {% if 'manager'|is_authorized or imports %}
-    <h1>{{ _('data transfer')|uc_first }}</h1>
-    <div class="toolbar">
-        {{ _('import')|button(url_for('import_index')) }}
-        {% if 'manager'|is_authorized %}
-            {{ ('CSV ' + _('export'))|button(url_for('export_csv')) }}
-            {{ ('SQL ' + _('export'))|button(url_for('export_sql')) }}
-        {% endif %}
-        {% if 'admin'|is_authorized %}
-            {{ _('execute SQL')|button(url_for('sql_index')) }}
-        {% endif %}
-    </div>
+  <h1>{{ _('data transfer')|uc_first }}</h1>
+  <div class="toolbar">
+    {{ _('import')|button(url_for('import_index'))|safe }}
+    {{ ('CSV ' + _('export'))|button(url_for('api_03.export_database', format_='csv'))|safe }}
+    {{ ('JSON ' + _('export'))|button(url_for('api_03.export_database', format_='json'))|safe }}
+    {{ ('XML ' + _('export'))|button(url_for('api_03.export_database', format_='xml'))|safe }}
+    {% if 'manager'|is_authorized %}
+      {{ ('SQL ' + _('export'))|button(url_for('export_sql'))|safe }}
+    {% endif %}
+    {% if 'admin'|is_authorized %}
+      {{ _('execute SQL')|button(url_for('sql_index'))|safe }}
+    {% endif %}
+  </div>
 {% endif %}
 {% if 'admin'|is_authorized and g.settings.image_processing %}
-    <div class="toolbar">
-        <h1>{{ _('image processing')|uc_first }}</h1>
-        {{ 'admin/file'|manual }}
-        {{ _('create resized images')|button(url_for('admin_resize_images')) }}
-        {{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images')) }}
-    </div>
+  <div class="toolbar">
+    <h1>{{ _('image processing')|uc_first }}</h1>
+    {{ 'admin/file'|manual|safe }}
+    {{ _('create resized images')|button(url_for('admin_resize_images'))|safe }}
+    {{ _('delete orphaned resized images')|button(url_for('admin_delete_orphaned_resized_images'))|safe }}
+  </div>
 {% endif %}
 {% if 'manager'|is_authorized %}
-    <div class="toolbar">
-        <h1>{{ 'API'|uc_first }}</h1>
-        {{ 'admin/api'|manual }}
-        {% if 'manager'|is_authorized %}
-            {{ _('edit')|button(url_for('admin_settings', category='api')) }}
-        {% endif %}
-    </div>
-    {{ info|display_info }}
+  <div class="toolbar">
+    <h1>{{ 'API'|uc_first }}</h1>
+      {{ 'admin/api'|manual|safe }}
+      {% if 'manager'|is_authorized %}
+        {{ _('edit')|button(url_for('admin_settings', category='api'))|safe }}
+      {% endif %}
+  </div>
+  {{ info|display_info|safe }}
 {% endif %}
