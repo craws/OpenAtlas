@@ -43,6 +43,7 @@
   translate.map_info_description =     '{{ _('map_info_description')|safe }}';
   translate.map_geonames_title =       '{{ _('Search by location name or postcode')|safe }}';
   translate.map_geonames_placeholder = '{{ _('Enter a location name')|safe }}';
+  translate.map_overlapping_places =   '{{ _('There are multiple places overlapping')|safe }}';
 
   overlays = [];
   {% if current_user.settings.module_map_overlay and overlays is defined and overlays and overlays|length %}
@@ -64,3 +65,4 @@
 <script src="/static/vendor/Geonames-0.4.7/L.Control.Geonames.js"></script>
 <script src="/static/node_modules/leaflet.fullscreen/Control.FullScreen.js"></script>
 <script src="/static/node_modules/leaflet-imageoverlay-rotated/Leaflet.ImageOverlay.Rotated.js"></script>
+<script src="/static/node_modules/@mapbox/leaflet-pip/leaflet-pip.js"></script>
