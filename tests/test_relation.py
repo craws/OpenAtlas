@@ -16,7 +16,11 @@ class RelationTests(TestBaseCase):
                 actor = Entity.insert('person', 'Connor MacLeod')
                 related = Entity.insert('person', 'The Kurgan')
 
-            rv = self.app.get(url_for('relation_insert', origin_id=actor.id))
+            rv = self.app.get(
+                url_for(
+                    'insert_relation',
+                    origin_id=actor.id,
+                    type_='actor_actor_relation'))
             assert b'Actor actor relation' in rv.data
 
             relation_id = Type.get_hierarchy('Actor actor relation').id
@@ -33,7 +37,10 @@ class RelationTests(TestBaseCase):
                 'end_year_from': '2049',
                 'end_year_to': '2050'}
             rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id),
+                url_for(
+                    'insert_relation',
+                    origin_id=actor.id,
+                    type_='actor_actor_relation'),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
@@ -44,7 +51,10 @@ class RelationTests(TestBaseCase):
             data['continue_'] = 'yes'
             data['inverse'] = True
             rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id),
+                url_for(
+                    'insert_relation',
+                    origin_id=actor.id,
+                    type_='actor_actor_relation'),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
@@ -55,6 +65,7 @@ class RelationTests(TestBaseCase):
             rv = self.app.get(url_for('type_move_entities', id_=sub_id))
             assert b'The Kurgan' in rv.data
 
+            # Update relationship
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = Link.get_links(actor.id, 'OA7')[0].id

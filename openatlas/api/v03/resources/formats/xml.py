@@ -1,6 +1,7 @@
 from typing import Any
 
 from dicttoxml import dicttoxml
+from flask import Response
 
 
 def subunit_xml(result: dict[str, Any]) -> bytes:
@@ -14,3 +15,11 @@ def subunit_xml(result: dict[str, Any]) -> bytes:
     xml = xml.replace(b'<item>', b'')
     xml = xml.replace(b'</item>', b'')
     return xml
+
+
+def export_database_xml(tables: dict[str, Any], filename: str) -> Response:
+    return Response(
+        dicttoxml(tables, root=False, attr_type=False),
+        mimetype='application/xml',
+        headers={
+            'Content-Disposition': f'attachment;filename={filename}.xml'})

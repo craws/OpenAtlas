@@ -20,18 +20,6 @@ from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 
 
-class FeedbackForm(FlaskForm):
-    subject = SelectField(
-        _('subject'),
-        render_kw={'autofocus': True},
-        choices=(
-            ('suggestion', _('suggestion')),
-            ('question', _('question')),
-            ('problem', _('problem'))))
-    description = TextAreaField(_('description'), [InputRequired()])
-    save = SubmitField(_('send'))
-
-
 @app.route('/')
 @app.route('/overview')
 def overview() -> str:
@@ -113,6 +101,18 @@ def set_locale(language: str) -> Response:
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
 def index_feedback() -> Union[str, Response]:
+
+    class FeedbackForm(FlaskForm):
+        subject = SelectField(
+            _('subject'),
+            render_kw={'autofocus': True},
+            choices=(
+                ('suggestion', uc_first(_('suggestion'))),
+                ('question', uc_first(_('question'))),
+                ('problem', uc_first(_('problem')))))
+        description = TextAreaField(_('description'), [InputRequired()])
+        save = SubmitField(_('send'))
+
     form = FeedbackForm()
     if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
         body = \

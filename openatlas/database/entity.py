@@ -137,6 +137,11 @@ class Entity:
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_all_entities() -> list[dict[str, Any]]:
+        g.cursor.execute(Entity.select_sql())
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_circular() -> list[dict[str, Any]]:
         g.cursor.execute(
             'SELECT domain_id FROM model.link WHERE domain_id = range_id;')

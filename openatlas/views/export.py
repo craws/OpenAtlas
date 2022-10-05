@@ -7,10 +7,10 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SelectField, SubmitField
+from wtforms import SubmitField
 
 from openatlas import app
-from openatlas.models.export import csv_export, sql_export
+from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
     convert_size, delete_link, is_authorized, link, required_group, uc_first)
@@ -20,43 +20,11 @@ class ExportSqlForm(FlaskForm):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(FlaskForm):
-    zip = BooleanField(_('export as ZIP and add info file'), default=True)
-    timestamps = BooleanField('created and modified dates', default=False)
-    gis_format = SelectField(
-        _('GIS format'),
-        choices=[
-            ('coordinates', _('coordinates')),
-            ('wkt', 'WKT'),
-            ('postgis', 'PostGIS Geometry')])
-    cidoc_class = BooleanField('cidoc class', default=True)
-    cidoc_class_inheritance = BooleanField(
-        'cidoc class inheritance',
-        default=True)
-    entity = BooleanField('entity', default=True)
-    link = BooleanField('link', default=True)
-    property = BooleanField('property', default=True)
-    property_inheritance = BooleanField(
-        'property inheritance',
-        default=True)
-    gis = BooleanField('gis', default=True)
-    save = SubmitField(uc_first(_('export CSV')))
-
-
 @app.route('/download/sql/<filename>')
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
         app.config['EXPORT_DIR'] / 'sql',
-        filename,
-        as_attachment=True)
-
-
-@app.route('/download/csv/<filename>')
-@required_group('manager')
-def download_csv(filename: str) -> Any:
-    return send_from_directory(
-        app.config['EXPORT_DIR'] / 'csv',
         filename,
         as_attachment=True)
 
@@ -84,28 +52,6 @@ def export_sql() -> Union[str, Response]:
         crumbs=[
             [_('admin'),
              f"{url_for('admin_index')}#tab-data"], _('export SQL')])
-
-
-@app.route('/export/csv', methods=['POST', 'GET'])
-@required_group('manager')
-def export_csv() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'csv'
-    writable = os.access(path, os.W_OK)
-    form = ExportCsvForm()
-    if form.validate_on_submit() and writable:
-        csv_export(form)
-        g.logger.log('info', 'database', 'CSV export')
-        flash(_('data was exported as CSV'), 'info')
-        return redirect(url_for('export_csv'))
-    return render_template(
-        'export.html',
-        form=form,
-        table=get_table('csv', path, writable),
-        writable=writable,
-        title=_('export CSV'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export CSV')])
 
 
 def get_table(type_: str, path: Path, writable: bool) -> Table:

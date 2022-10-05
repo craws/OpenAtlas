@@ -1,7 +1,7 @@
 from flask_restful import Api
 
 from openatlas.api.v03.endpoints.content import ClassMapping, \
-    GetContent, GetGeometricEntities, SystemClassCount
+    ExportDatabase, GetContent, GetGeometricEntities, SystemClassCount
 from openatlas.api.v03.endpoints.display_image import DisplayImage
 from openatlas.api.v03.endpoints.entities import GetByCidocClass, \
     GetBySystemClass, GetByViewClass, GetEntitiesLinkedToEntity, GetEntity, \
@@ -82,6 +82,10 @@ def add_routes_v03(api: Api) -> None:
         GetGeometricEntities,
         '/geometric_entities/',
         endpoint="geometric_entities")
+    api.add_resource(
+        ExportDatabase,
+        '/export_database/<string:format_>',
+        endpoint="export_database")
 
     api.add_resource(
         DisplayImage,

@@ -1,10 +1,13 @@
+import json
 from typing import Any, Union
 
 from flasgger import swag_from
-from flask import Response, g, json, jsonify
+from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.v03.resources.formats.csv import export_database_csv
+from openatlas.api.v03.resources.formats.xml import export_database_xml
 from openatlas.api.v03.resources.parser import gis, language
 from openatlas.api.v03.resources.resolve_endpoints import download
 from openatlas.api.v03.resources.templates import (
@@ -12,9 +15,15 @@ from openatlas.api.v03.resources.templates import (
     content_template,
     geometries_template,
     overview_template)
+from openatlas.api.v03.resources.util import get_geometries
+from openatlas.database.cidoc_class import CidocClass as DbCidocClass
+from openatlas.database.cidoc_property import \
+    CidocProperty as DbCidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
+from openatlas.database.link import Link as DbLink
+from openatlas.database.entity import Entity as DbEntity
+from openatlas.models.export import current_date_for_filename
 
 
 class GetContent(Resource):
@@ -57,24 +66,12 @@ class GetGeometricEntities(Resource):
         parser = gis.parse_args()
         output: dict[str, Any] = {
             'type': 'FeatureCollection',
-            'features': GetGeometricEntities.get_geometries(parser)}
+            'features': get_geometries(parser)}
         if parser['count'] == 'true':
             return jsonify(len(output['features']))
         if parser['download'] == 'true':
             return download(output, geometries_template(), 'geometries')
         return marshal(output, geometries_template()), 200
-
-    @staticmethod
-    def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
-        choices = [
-            'gisPointAll', 'gisPointSupers', 'gisPointSubs',
-            'gisPointSibling', 'gisLineAll', 'gisPolygonAll']
-        out = []
-        for item in choices \
-                if parser['geometry'] == 'gisAll' else parser['geometry']:
-            for geom in json.loads(Gis.get_all()[item]):
-                out.append(geom)
-        return out
 
 
 class SystemClassCount(Resource):
@@ -84,3 +81,44 @@ class SystemClassCount(Resource):
         endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal(Entity.get_overview_counts(), overview_template()), 200
+
+
+class ExportDatabase(Resource):
+    @staticmethod
+    @swag_from(
+        "../swagger/system_class_count.yml",
+        endpoint="api_03.export_database")
+    def get(format_: str) -> Union[tuple[Resource, int], Response]:
+        geoms = [ExportDatabase.get_geometries_dict(geom) for geom in
+                 get_geometries({'geometry': 'gisAll'})]
+        tables = {
+            'entities': DbEntity.get_all_entities(),
+            'links': DbLink.get_all_links(),
+            'properties': DbCidocProperty.get_properties(),
+            'property_hierarchy': DbCidocProperty.get_hierarchy(),
+            'classes': DbCidocClass.get_classes(),
+            'class_hierarchy': DbCidocClass.get_hierarchy(),
+            'geometries': geoms}
+        filename = f'{current_date_for_filename()}-export'
+        if format_ == 'csv':
+            return export_database_csv(tables, filename)
+        if format_ == 'xml':
+            return export_database_xml(tables, filename)
+        return Response(
+            json.dumps({key: str(value) for key, value in tables.items()}),
+            mimetype='application/json',
+            headers={
+                'Content-Disposition': f'attachment;filename={filename}.json'})
+
+    @staticmethod
+    def get_geometries_dict(
+            geom: dict[str, Any]) -> dict[str, Any]:
+        return {
+            'id': geom['properties']['id'],
+            'locationId': geom['properties']['locationId'],
+            'objectId': geom['properties']['objectId'],
+            'name': geom['properties']['name'],
+            'objectName': geom['properties']['objectName'],
+            'objectDescription': geom['properties']['objectDescription'],
+            'coordinates': geom['geometry']['coordinates'],
+            'type': geom['geometry']['type']}

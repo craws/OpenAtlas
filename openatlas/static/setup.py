@@ -3,6 +3,7 @@ from setuptools import setup
 package_json = {
     "dependencies": {
         "@fortawesome/fontawesome-free": "^5.15.4",
+        "@mapbox/leaflet-pip": "^1.1.0",
         "@popperjs/core": "^2.11.5",
         "bootstrap-autocomplete": "2.3.7",
         "bootstrap": "^5.1.3",
