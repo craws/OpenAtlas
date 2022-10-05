@@ -4,9 +4,9 @@
   <div class="row">
     <div class="col">
       <p><strong>{{ _('info')|uc_first }}</strong></p>
-      {{ info|display_info }}
+      {{ info|display_info|safe }}
       <p><strong>{{ _('description')|uc_first }}</strong></p>
-      <p>{{ property_.comment }}</p>
+      <p>{{ property_.comment|safe }}</p>
     </div>
     {% if tables.super.rows %}
       <div class="col">
