@@ -111,10 +111,9 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    if type_.startswith('member'):
-        manager = get_manager('actor_function', origin=origin)
-    else:
-        manager = get_manager(type_, origin=origin)
+    manager = get_manager(
+        'actor_function' if type_.startswith('member') else type_,
+        origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
@@ -128,20 +127,15 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
             return redirect(
-                url_for(
-                    'insert_relation',
-                    type_=type_,
-                    origin_id=origin_id))
-        tab = 'event'
-        if type_ == 'involvement':
-            tab = 'actor' if origin.class_.view == 'event' else 'event'
-        elif type_ == 'actor_actor_relation':
-            tab = 'relation'
-        elif type_ == 'member':
-            tab = 'member'
-        elif type_ == 'membership':
-            tab = 'member-of'
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+                url_for('insert_relation', type_=type_, origin_id=origin_id))
+        tabs = {
+            'actor_actor_relation': 'relation',
+            'event': 'event',
+            'involvement':
+                'actor' if origin.class_.view == 'event' else 'event',
+            'member': 'member',
+            'membership': 'member-of'}
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tabs[type_]}")
     return render_template(
         'content.html',
         content=display_form(manager.form),
