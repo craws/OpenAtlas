@@ -689,7 +689,7 @@ def description(entity: Union[Entity, Project]) -> str:
         from openatlas.views.anthropology import print_result
         if result := print_result(entity):
             html += \
-                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
                 f"<p>{result}</p>"
     if not entity.description:
         return html

@@ -479,13 +479,12 @@ class ReferenceSystemManager(BaseManager):
 
 
 class SourceManager(BaseManager):
-    fields = ['name', 'continue']
+    fields = ['name', 'continue', 'description']
 
     def additional_fields(self) -> dict[str, Any]:
         return {
             'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source')),
-            'description': TextAreaField(_('content'))}
+                'Link artifacts as the information carrier of the source'))}
 
     def populate_update(self) -> None:
         super().populate_update()
