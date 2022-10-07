@@ -70,10 +70,8 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-
     if 'reference' in [domain.class_.view, range_.class_.view]:
         return reference_link_update(link_, origin)
-
     manager_name = 'involvement'
     tab = 'actor' if origin.class_.view == 'event' else 'event'
     if link_.property.code == 'OA7':
@@ -83,7 +81,6 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
         manager_name = 'actor_function'
         tab = f"member{'-of' if origin.id == range_.id else ''}"
     manager = get_manager(manager_name, origin=origin, link_=link_)
-
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
