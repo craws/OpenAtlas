@@ -610,7 +610,7 @@ def display_citation_example(code: str) -> str:
     if code != 'reference':
         return ''
     if text := get_translation('citation_example'):
-        return f'<h1>{uc_first(_("citation_example"))}</h1>{text}'
+        return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
     return ''  # pragma: no cover
 
 

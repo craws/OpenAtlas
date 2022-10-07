@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-10-07 14:33+0200\n"
+"POT-Creation-Date: 2022-10-07 14:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -133,7 +133,8 @@ msgstr ""
 msgid "tooltip hierarchy forms"
 msgstr ""
 
-#: openatlas/forms/display.py:42 openatlas/templates/type/index.html:24
+#: openatlas/forms/display.py:42 openatlas/templates/forms/tree_select.html:50
+#: openatlas/templates/type/index.html:24
 #: openatlas/templates/type/index.html:59 openatlas/util/util.py:212
 msgid "type"
 msgstr ""
@@ -1396,6 +1397,10 @@ msgstr ""
 #: openatlas/util/util.py:520 openatlas/util/util.py:537
 #, python-format
 msgid "Delete %(name)s?"
+msgstr ""
+
+#: openatlas/util/util.py:613
+msgid "citation_example"
 msgstr ""
 
 #: openatlas/views/admin.py:56
