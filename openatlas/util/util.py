@@ -277,8 +277,11 @@ def get_entity_data(
             data[_('given place')] = []
             data[_('given artifact')] = []
             for item in entity.get_linked_entities('P24'):
-                var = 'artifact' if item.class_.name == 'artifact' else 'place'
-                data[_(f'given {var}')].append(link(item))
+                # Don't shorten below because translation errors otherwise
+                label = _('given place')
+                if item.class_.name == 'artifact':
+                    label = _('given artifact')
+                data[label].append(link(item))
         if entity.class_.name == 'production':
             data[_('produced')] = \
                 [link(item) for item in entity.get_linked_entities('P108')]
