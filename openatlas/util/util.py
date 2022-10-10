@@ -277,8 +277,9 @@ def get_entity_data(
             data[_('given place')] = []
             data[_('given artifact')] = []
             for item in entity.get_linked_entities('P24'):
-                var = 'artifact' if item.class_.name == 'artifact' else 'place'
-                data[_(f'given {var}')].append(link(item))
+                label = _('given artifact') \
+                    if item.class_.name == 'artifact' else _('given place')
+                data[label].append(link(item))
         if entity.class_.name == 'production':
             data[_('produced')] = \
                 [link(item) for item in entity.get_linked_entities('P108')]
@@ -607,7 +608,7 @@ def display_citation_example(code: str) -> str:
     if code != 'reference':
         return ''
     if text := get_translation('citation_example'):
-        return f'<h1>{uc_first(_("citation_example"))}</h1>{text}'
+        return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
     return ''  # pragma: no cover
 
 
@@ -686,7 +687,7 @@ def description(entity: Union[Entity, Project]) -> str:
         from openatlas.views.anthropology import print_result
         if result := print_result(entity):
             html += \
-                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
                 f"<p>{result}</p>"
     if not entity.description:
         return html
