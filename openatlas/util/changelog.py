@@ -8,6 +8,7 @@ versions = {
             '1790': 'Map: make intersecting polygons selectable',
             '1811': 'Checks for orphaned subunits',
             '1823': 'Show class at activity view',
+            '1736': 'Keep form map data after failed backend validation',
             '1802': 'Move CSV export functions to API',
             '1751': 'Manual: add model documentation',
             '1807': 'API: New geojson format'}}],
