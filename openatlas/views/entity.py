@@ -210,7 +210,14 @@ def add_crumbs(
     crumbs = [
         [label, url_for('index', view=entity.class_.view)],
         entity.name]
-    if structure:
+    if entity.class_.name == 'artifact':
+        crumbs = [[
+            g.classes['artifact'].label,
+            url_for('index', view='artifact')]]
+        for super_ in entity.get_linked_entities_recursive('P46'):
+            crumbs.append(link(super_))
+        crumbs.append(entity.name)
+    elif structure:
         crumbs = [[g.classes['place'].label, url_for('index', view='place')]]
         if entity.class_.name == 'artifact':
             crumbs = [[
