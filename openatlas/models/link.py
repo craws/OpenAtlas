@@ -141,6 +141,18 @@ class Link:
             types=types)
 
     @staticmethod
+    def get_linked_entities_recursive(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        from openatlas.models.entity import Entity
+        result = Db.get_linked_entities_recursive_inverse(id_, code) \
+            if inverse else Db.get_linked_entities_recursive(id_, code)
+        result.pop(0)  # remove caller id from list
+        return Entity.get_by_ids(result, types=types)
+
+    @staticmethod
     def get_linked_entity_safe(
             id_: int,
             code: str,

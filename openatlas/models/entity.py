@@ -109,6 +109,17 @@ class Entity:
             inverse=inverse,
             types=types)
 
+    def get_linked_entities_recursive(
+            self,
+            code: str,
+            inverse: bool = False,
+            types: bool = False):
+        return Link.get_linked_entities_recursive(
+            self.id,
+            code,
+            inverse=inverse,
+            types=types)
+
     def link(self,
              code: str,
              range_: Union[Entity, list[Entity]],
