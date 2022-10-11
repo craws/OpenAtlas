@@ -106,13 +106,10 @@ def add_crumbs(
             origin.get_linked_entity('P73', True),
             origin]
     if structure:
-        crumbs = [
-            [_('place'), url_for('index', view='place')],
-            structure['place']
-            if origin and origin.class_.name != 'place' else '',
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            origin]
+        crumbs = [_('place'), url_for('index', view='place')]
+        for super_ in structure['supers']:
+            crumbs.append(super_)
+        crumbs.append(origin)
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
