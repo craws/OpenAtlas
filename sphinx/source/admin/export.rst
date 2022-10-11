@@ -18,19 +18,48 @@ When clicking the **Export SQL** button a new SQL dump will be created with pg_d
 
 Export CSV
 ----------
-When clicking the **Export CSV** button a new CSV export file for all marked tables will be created.
+When the **Export CSV** button is clicked, a **ZIP** file containing several **CSV** files is downloaded. The CSV files are:
 
-* Existing files are shown in a list and can be downloaded or deleted (only admins can delete)
-* If the directory isn't writable, a warning will be shown
-* CSV exports are saved in the **export/csv** folder
-* File names are constructed from the date, database schema and table name e.g. 2018-08-23_1533_model_class.csv
+* All entities divided by their OpenAtlas class
+* Links
+* Properties
+* Hierarchy of properties
+* Classes
+* Hierarchy of classes
+* Geometries
 
-Options
-*******
-* **Export as ZIP and add info file** - files are compressed with an info file (date, username, domain)
-* **Created and modified dates** - additional columns for creation and last modified dates
-* **GIS format**
+The file name of the **ZIP** file starts with the current date and time, for example 2022-10-04_1610-export.zip.
+This process can take some time.
 
-  * **Coordinates** - eg. "15.4498 47.0659", for polygons a `ST_PointOnSurface <https://postgis.net/docs/ST_PointOnSurface.html>`_ will be calculated
-  * **WKT** - `Well known text <https://en.wikipedia.org/wiki/Well-known_text>`_ e.g. POINT (15.4498 47.0659)
-  * **PostGIS geometry** - `PostGIS <https://en.wikipedia.org/wiki/PostGIS#Features>`_ geometry format
+
+Export JSON
+-----------
+When the **Export JSON** button is clicked, the download of a **JSON** file begins. This file contains following keys:
+
+* Entities
+* Links
+* Properties
+* Hierarchy of properties
+* Classes
+* Hierarchy of classes
+* Geometries
+
+The file name starts with the current date and time, for example 2022-10-04_1610-export.json.
+This process can take some time.
+
+
+Export XML
+----------
+When the **Export XML** button is clicked, the download of an **XML** file begins. This file contains following tags:
+
+* Entities
+* Links
+* Properties
+* Hierarchy of properties
+* Classes
+* Hierarchy of classes
+* Geometries
+
+The file name starts with the current date and time, for example 2022-10-04_1610-export.xml.
+This process can take some time.
+

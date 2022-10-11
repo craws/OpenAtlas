@@ -10,7 +10,7 @@
   {% endif %}
   {% if entity.class_.view not in ['artifact', 'place'] %}
     {{ form|display_form(manual_page='entity/' + entity.class_.view)|safe }}
-    {{ entity.class_.view|display_citation_example }}
+    {{ entity.class_.view|display_citation_example|safe }}
   {% else %}
     <div class="row">
       <div class="col-xl-4">

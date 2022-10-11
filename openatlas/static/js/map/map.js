@@ -130,11 +130,17 @@ const pointFilter = (feature) => feature?.geometry?.type === "Point";
 const polygonFilter = (feature) => feature?.geometry?.type === "Polygon";
 const lineFilter = (feature) => feature?.geometry?.type === "LineString";
 
+
 const gisAll = [...gisPointAll, ...gisPolygonAll, ...gisLineAll];
+
+//take selected from hidden fields if exist
+const hiddenFieldPoints = $("#gis_points")?.val(),
+    hiddenFieldsLines = $("#gis_lines")?.val(),
+    hiddenFieldsPolygons = $("#gis_polygons")?.val();
 const gisSelected = [
-    ...gisPointSelected,
-    ...gisLineSelected,
-    ...gisPolygonSelected,
+    ...(!hiddenFieldPoints || hiddenFieldPoints === "[]" ? gisPointSelected : JSON.parse(hiddenFieldPoints)),
+    ...(!hiddenFieldsLines || hiddenFieldsLines === "[]" ? gisLineSelected : JSON.parse(hiddenFieldsLines)),
+    ...(!hiddenFieldsPolygons || hiddenFieldsPolygons === "[]" ? gisPolygonSelected : JSON.parse(hiddenFieldsPolygons)),
 ];
 
 const pointLayer = new L.GeoJSON(gisAll, {

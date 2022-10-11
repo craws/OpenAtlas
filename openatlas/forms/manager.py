@@ -110,23 +110,15 @@ class ActorFunctionManager(BaseManager):
     def process_form(self) -> None:
         super().process_form()
         link_type = self.get_link_type()
-        if hasattr(self.form, 'group'):
-            for actor in Entity.get_by_ids(
-                    ast.literal_eval(getattr(self.form, 'group').data)):
-                self.add_link(
-                    'P107',
-                    actor,
-                    self.form.description.data,
-                    inverse=True,
-                    type_id=link_type.id if link_type else None)
-        else:
-            for actor in Entity.get_by_ids(
-                    ast.literal_eval(getattr(self.form, 'actor').data)):
-                self.add_link(
-                    'P107',
-                    actor,
-                    self.form.description.data,
-                    type_id=link_type.id if link_type else None)
+        class_ = 'group' if hasattr(self.form, 'group') else 'actor'
+        for actor in Entity.get_by_ids(
+                ast.literal_eval(getattr(self.form, class_).data)):
+            self.add_link(
+                'P107',
+                actor,
+                self.form.description.data,
+                inverse=(class_ == 'group'),
+                type_id=link_type.id if link_type else None)
 
     def process_link_form(self) -> None:
         super().process_link_form()
@@ -492,13 +484,12 @@ class ReferenceSystemManager(BaseManager):
 
 
 class SourceManager(BaseManager):
-    fields = ['name', 'continue']
+    fields = ['name', 'continue', 'description']
 
     def additional_fields(self) -> dict[str, Any]:
         return {
             'artifact': TableMultiField(description=_(
-                'Link artifacts as the information carrier of the source')),
-            'description': TextAreaField(_('content'))}
+                'Link artifacts as the information carrier of the source'))}
 
     def populate_update(self) -> None:
         super().populate_update()

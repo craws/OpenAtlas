@@ -113,7 +113,7 @@ map.on(L.Draw.Event.CREATED, function (e) {
             break;
         case 'polyline':
             geometry = {
-                type: 'Linestring',
+                type: 'LineString',
                 coordinates:
                     currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
             };
@@ -232,7 +232,7 @@ function drawGeometry(shapeType) {
 }
 
 function openForm(shapeType, feature = undefined) {
-    if (shapeType === 'polyline') shapeType = 'linestring'
+    if (shapeType === 'polyline') shapeType = 'LineString'
     if (shapeType === 'point') shapeType = 'centerpoint'
 
     map.addControl(mapInputForm);
@@ -284,7 +284,7 @@ function saveCurrentEditLayer() {
             case 'polyline':
             case 'linestring':
                 geometry = {
-                    type: 'Linestring',
+                    type: 'LineString',
                     coordinates:
                         currentEditLayer.getLatLngs().map(x => [x.lng, x.lat])
                 };

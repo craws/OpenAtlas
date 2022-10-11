@@ -47,7 +47,7 @@
                   class="btn-outline-primary btn-xsm btn"
                   data-bs-toggle="modal"
                   data-bs-target="#add-type-modal-{{ field.id }}">
-            + {{ _(root.name|uc_first) }}
+            + {{  _('type')|uc_first if root.category == 'standard' else root.name }}
           </button>
         {% endif %}
 
