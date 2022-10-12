@@ -98,23 +98,19 @@ def add_crumbs(
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
     crumbs: list[Any] = [
-        [label, url_for('index', view=origin.class_.view if origin else view)],
-        origin]
+        [label, url_for('index', view=origin.class_.view if origin else view)]]
     if class_ == 'source_translation' and origin and not insert_:
         crumbs = [
             [_('source'), url_for('index', view='source')],
-            origin.get_linked_entity('P73', True),
-            origin]
+            origin.get_linked_entity('P73', True)]
     if structure:
-        crumbs = [_('place'), url_for('index', view='place')]
         for super_ in structure['supers']:
             crumbs.append(super_)
-        crumbs.append(origin)
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
             crumbs += [g.types[type_id] for type_id in origin.root]
-        crumbs.append(origin)
+    crumbs.append(origin)
     sibling_count = 0
     if origin \
             and origin.class_.name == 'stratigraphic_unit' \

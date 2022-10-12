@@ -206,29 +206,21 @@ def get_profile_image_table_link(
 def add_crumbs(
         entity: Union[Entity, Type],
         structure: Optional[dict[str, Any]]) -> list[str]:
-    label = _(entity.class_.view.replace('_', ' '))
-    crumbs = [
-        [label, url_for('index', view=entity.class_.view)],
-        entity.name]
+    crumbs = [[
+        _(entity.class_.view.replace('_', ' ')),
+        url_for('index', view=entity.class_.view)]]
     if structure:
-        crumbs = [[g.classes['place'].label, url_for('index', view='place')]]
-        if entity.class_.name == 'artifact':
-            crumbs = [[
-                g.classes['artifact'].label,
-                url_for('index', view='artifact')]]
         for super_ in entity.get_linked_entities_recursive('P46'):
             crumbs.append(link(super_))
-        crumbs.append(entity.name)
     elif isinstance(entity, Type):
         crumbs = [[_('types'), url_for('type_index')]]
         if entity.root:
             crumbs += [g.types[type_id] for type_id in entity.root]
-        crumbs.append(entity.name)
     elif entity.class_.view == 'source_translation':
         crumbs = [
             [_('source'), url_for('index', view='source')],
-            entity.get_linked_entity('P73', True),
-            entity.name]
+            entity.get_linked_entity('P73', True)]
+    crumbs.append(entity.name)
     return crumbs
 
 
