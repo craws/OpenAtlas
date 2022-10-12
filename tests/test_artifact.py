@@ -3,7 +3,7 @@ from flask import url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class ArtifactTest(TestBaseCase):
@@ -15,13 +15,17 @@ class ArtifactTest(TestBaseCase):
                 source = Entity.insert('source', 'Necronomicon')
                 actor = Entity.insert('person', 'Conan')
                 alice = User.get_by_username('Alice')
+                place = insert_entity('Home', 'place')
 
             rv = self.app.get(url_for('insert', class_='artifact'))
             assert b'+ Artifact' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
-                data={'name': 'Love-letter', 'actor': actor.id},
+                data={
+                    'name': 'Love-letter',
+                    'actor': actor.id,
+                    'place': place.id},
                 follow_redirects=True)
             assert b'Love-letter' in rv.data
 

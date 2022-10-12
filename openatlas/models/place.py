@@ -29,7 +29,7 @@ def get_structure(
     siblings: list[Entity] = []
     subunits: list[Entity] = []
     if super_:
-        supers = [super_.get_linked_entities_recursive('P46')] + [super_]
+        supers = super_.get_linked_entities_recursive('P46') + [super_]
         siblings = super_.get_linked_entities('P46')
     elif not object_:
         return None

@@ -56,21 +56,8 @@ class Overlay:
                 and not current_user.settings['module_map_overlay']:
             return {}  # pragma: no cover - tests can't access user settings
 
-        ids = [object_.id]
-        # Get overlays of parents
-        if object_.class_.name == 'artifact' \
-                and object_.get_linked_entity('P46', True):
-            stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
-            ids.append(stratigraphic_unit.id)
-            feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
-            ids.append(feature.id)
-            ids.append(feature.get_linked_entity_safe('P46', True).id)
-        elif object_.class_.name == 'stratigraphic_unit':
-            feature = object_.get_linked_entity_safe('P46', True)
-            ids.append(feature.id)
-            ids.append(feature.get_linked_entity_safe('P46', True).id)
-        elif object_.class_.name == 'feature':
-            ids.append(object_.get_linked_entity_safe('P46', True).id)
+        ids = [object_.id] +\
+              [e.id for e in object_.get_linked_entities_recursive('P46')]
         return {row['image_id']: Overlay(row) for row in Db.get_by_object(ids)}
 
     @staticmethod
