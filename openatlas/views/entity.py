@@ -151,7 +151,7 @@ def view(id_: int) -> Union[str, Response]:
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
-                and (not place_structure or not place_structure['super_id']):
+                and (not place_structure or not place_structure['supers']):
             gis_data = {}
     entity.info_data = get_entity_data(entity, event_links=event_links)
     if not gis_data:  # Has to be after get_entity_data()
@@ -210,24 +210,15 @@ def add_crumbs(
     crumbs = [
         [label, url_for('index', view=entity.class_.view)],
         entity.name]
-    if entity.class_.name == 'artifact':
-        crumbs = [[
-            g.classes['artifact'].label,
-            url_for('index', view='artifact')]]
-        for super_ in entity.get_linked_entities_recursive('P46'):
-            crumbs.append(link(super_))
-        crumbs.append(entity.name)
-    elif structure:
+    if structure:
         crumbs = [[g.classes['place'].label, url_for('index', view='place')]]
         if entity.class_.name == 'artifact':
             crumbs = [[
                 g.classes['artifact'].label,
                 url_for('index', view='artifact')]]
-        crumbs += [
-            structure['place'],
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            entity.name]
+        for super_ in entity.get_linked_entities_recursive('P46'):
+            crumbs.append(link(super_))
+        crumbs.append(entity.name)
     elif isinstance(entity, Type):
         crumbs = [[_('types'), url_for('type_index')]]
         if entity.root:

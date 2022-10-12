@@ -114,7 +114,7 @@ def add_crumbs(
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
             crumbs += [g.types[type_id] for type_id in origin.root]
-        crumbs += [origin]
+        crumbs.append(origin)
     sibling_count = 0
     if origin \
             and origin.class_.name == 'stratigraphic_unit' \

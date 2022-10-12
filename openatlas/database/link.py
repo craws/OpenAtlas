@@ -73,7 +73,6 @@ class Link:
 
     @staticmethod
     def get_linked_entities_recursive(id_: int, code: str) -> list[int]:
-        print('here')
         g.cursor.execute(
             """
             WITH RECURSIVE supers AS (
