@@ -139,19 +139,18 @@ def view(id_: int) -> Union[str, Response]:
                     int(row[0].replace('<a href="/entity/', '').split('"')[0]))
             )
 
-    place_structure = None
+    structure = None
     gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        place_structure = get_structure(entity)
-        if place_structure:
-            for item in place_structure['subunits']:
+        if structure := get_structure(entity):
+            for item in structure['subunits']:
                 tabs[item.class_.name].table.rows.append(
                     get_base_table_data(item))
-        gis_data = Gis.get_all([entity], place_structure)
+        gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
-                and (not place_structure or not place_structure['supers']):
+                and (not structure or not structure['supers']):
             gis_data = {}
     entity.info_data = get_entity_data(entity, event_links=event_links)
     if not gis_data:  # Has to be after get_entity_data()
@@ -168,7 +167,7 @@ def view(id_: int) -> Union[str, Response]:
         else:
             buttons.append(
                 f'<span class="error">{uc_first(_("missing file"))}</span>')
-    buttons.append(siblings_pager(entity, place_structure))
+    buttons.append(siblings_pager(entity, structure))
     tabs['info'].content = render_template(
         'entity/view.html',
         buttons=buttons,
@@ -181,7 +180,7 @@ def view(id_: int) -> Union[str, Response]:
         'tabs.html',
         tabs=tabs,
         gis_data=gis_data,
-        crumbs=add_crumbs(entity, place_structure),
+        crumbs=add_crumbs(entity, structure),
         entity=entity)
 
 
@@ -210,7 +209,7 @@ def add_crumbs(
         _(entity.class_.view.replace('_', ' ')),
         url_for('index', view=entity.class_.view)]]
     if structure:
-        for super_ in entity.get_linked_entities_recursive('P46'):
+        for super_ in structure['supers']:
             crumbs.append(link(super_))
     elif isinstance(entity, Type):
         crumbs = [[_('types'), url_for('type_index')]]

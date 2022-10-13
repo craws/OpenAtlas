@@ -396,9 +396,10 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False) -> list[Entity]:
+            aliases: bool = False,
+            sort_by_name: bool = True) -> list[Entity]:
         entities = []
-        for row in Db.get_by_ids(ids, types, aliases):
+        for row in Db.get_by_ids(ids, types, aliases, sort_by_name):
             if row['id'] in g.types:
                 entities.append(g.types[row['id']])
             elif row['id'] in g.reference_systems:

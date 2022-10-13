@@ -83,10 +83,10 @@ class Link:
                 UNION
                     SELECT e.id FROM model.entity e
                     JOIN model.link l ON
-                        e.id = l.{'range' if inverse else 'domain'}_id
+                        e.id = l.{'domain' if inverse else 'range'}_id
                         AND l.property_code = %(code)s
                     INNER JOIN items i
-                        ON l.{'domain' if inverse else 'range'}_id = i.id
+                        ON l.{'range' if inverse else 'domain'}_id = i.id
             ) SELECT id FROM items;
             """,
             {'id_': id_, 'code': code})
