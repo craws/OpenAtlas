@@ -147,9 +147,8 @@ class Link:
             inverse: bool = False,
             types: bool = False) -> list[Entity]:
         from openatlas.models.entity import Entity
-        result = Db.get_linked_entities_recursive_inverse(id_, code) \
-            if inverse else Db.get_linked_entities_recursive(id_, code)
-        result.pop(0)  # remove caller id from list
+        result = Db.get_linked_entities_recursive(id_, code, inverse)
+        result.pop(0)  # Remove caller id from list
         return Entity.get_by_ids(result, types=types)
 
     @staticmethod

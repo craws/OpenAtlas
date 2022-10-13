@@ -72,37 +72,22 @@ class Link:
         return [row['result_id'] for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_linked_entities_recursive(id_: int, code: str) -> list[int]:
-        g.cursor.execute(
-            """
-            WITH RECURSIVE supers AS (
-                SELECT id FROM model.entity
-                WHERE id = %(id_)s
-                UNION
-                    SELECT e.id FROM model.entity e
-                    JOIN model.link l ON e.id = l.domain_id
-                        AND l.property_code = %(code)s
-                    INNER JOIN supers s ON l.range_id = s.id
-            ) SELECT id FROM supers;
-            """,
-            {'id_': id_, 'code': code})
-        return [row['id'] for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def get_linked_entities_recursive_inverse(
+    def get_linked_entities_recursive(
             id_: int,
-            code: str) -> list[int]:
+            code: str,
+            inverse: bool) -> list[int]:
         g.cursor.execute(
-            """
-            WITH RECURSIVE subs AS (
-                SELECT id FROM model.entity
-                WHERE id = %(id_)s
+            f"""
+            WITH RECURSIVE items AS (
+                SELECT id FROM model.entity WHERE id = %(id_)s
                 UNION
                     SELECT e.id FROM model.entity e
-                    JOIN model.link l ON e.id = l.range_id
-                        AND l.property_code = (code)s
-                    INNER JOIN subs s ON l.domain_id = s.id
-            ) SELECT id FROM subs;
+                    JOIN model.link l ON
+                        e.id = l.{'range' if inverse else 'domain'}_id
+                        AND l.property_code = %(code)s
+                    INNER JOIN items i
+                        ON l.{'domain' if inverse else 'range'}_id = i.id
+            ) SELECT id FROM items;
             """,
             {'id_': id_, 'code': code})
         return [row['id'] for row in g.cursor.fetchall()]
