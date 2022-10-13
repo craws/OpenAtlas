@@ -173,9 +173,7 @@ class Tab:
                             g.classes[item].label,
                             url_for('insert', class_=item, origin_id=id_)))
         elif name == 'feature':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'place':
+            if class_ and class_.name == 'place':
                 self.buttons.append(
                     button(
                         g.classes[name].label,
@@ -194,9 +192,7 @@ class Tab:
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_)))
         elif name == 'human_remains':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'stratigraphic_unit':
+            if class_ and class_.name == 'stratigraphic_unit':
                 self.buttons.append(
                     button(
                         g.classes[name].label,
@@ -265,9 +261,7 @@ class Tab:
                     g.classes['source'].label,
                     url_for('insert', class_=name, origin_id=id_)))
         elif name == 'stratigraphic_unit':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'feature':
+            if class_ and class_.name == 'feature':
                 self.buttons.append(
                     button(
                         g.classes['stratigraphic_unit'].label,

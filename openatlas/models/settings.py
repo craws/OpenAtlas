@@ -4,7 +4,7 @@ from openatlas.database.settings import Settings as Db
 
 
 class Settings:
-    MODULES = ['map_overlay', 'sub_units']
+    MODULES = ['map_overlay', 'time']
 
     @staticmethod
     def get_settings() -> dict[str, Any]:
