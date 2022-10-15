@@ -15,7 +15,6 @@ from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
@@ -149,7 +148,7 @@ def get_place_info_for_insert(
         origin: Optional[Entity]) -> dict[str, Any]:
     if class_view not in ['artifact', 'place']:
         return {'structure': None, 'gis_data': None, 'overlays': None}
-    structure = get_structure(super_=origin)
+    structure = Entity.get_structure(super_=origin)
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
@@ -164,7 +163,7 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
             'gis_data': None,
             'overlays': None,
             'location': None}
-    structure = get_structure(entity)
+    structure = Entity.get_structure(entity)
     return {
         'structure': structure,
         'gis_data': Gis.get_all([entity], structure),

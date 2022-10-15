@@ -11,7 +11,6 @@ from openatlas.api.v02.resources.resolve_endpoints import (
     get_node_dict, resolve_node_parser)
 from openatlas.api.v02.resources.util import get_entity_by_id
 from openatlas.models.entity import Entity
-from openatlas.models.place import get_structure
 
 
 class GetSubunitHierarchy(Resource):
@@ -40,11 +39,11 @@ class GetSubunitHierarchy(Resource):
     def get_subunits_recursive(
             entity: Optional[Entity],
             data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        structure = get_structure(entity)
+        structure = Entity.get_structure(entity)
         if structure and structure['subunits']:
             for subunit in structure['subunits']:
                 data.append(get_node_dict(subunit))
-        node = get_structure(entity)
+        node = Entity.get_structure(entity)
         if node:
             for sub_id in node['subunits']:
                 GetSubunitHierarchy.get_subunits_recursive(sub_id, data)

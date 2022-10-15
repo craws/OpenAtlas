@@ -76,21 +76,23 @@ class Link:
             id_: int,
             code: str,
             inverse: bool) -> list[int]:
+        first = 'domain_id' if inverse else 'range_id'
+        second = 'range_id' if inverse else 'domain_id'
         g.cursor.execute(
             f"""
             WITH RECURSIVE items AS (
-                SELECT id FROM model.entity WHERE id = %(id_)s
+                SELECT {first}
+                FROM model.link
+                WHERE {second} = %(id_)s AND property_code = %(code)s
                 UNION
-                    SELECT e.id FROM model.entity e
-                    JOIN model.link l ON
-                        e.id = l.{'domain' if inverse else 'range'}_id
+                    SELECT l.{first} FROM model.link l
+                    INNER JOIN items i ON
+                        l.{second} = i.{first}
                         AND l.property_code = %(code)s
-                    INNER JOIN items i
-                        ON l.{'range' if inverse else 'domain'}_id = i.id
-            ) SELECT id FROM items;
+                ) SELECT {first} FROM items;
             """,
             {'id_': id_, 'code': code})
-        return [row['id'] for row in g.cursor.fetchall()]
+        return [row[first] for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_linked_entities_inverse(id_: int, codes: list[str]) -> list[int]:

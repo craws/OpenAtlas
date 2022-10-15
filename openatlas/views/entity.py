@@ -13,7 +13,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_place, get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -142,7 +141,7 @@ def view(id_: int) -> Union[str, Response]:
     structure = None
     gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        if structure := get_structure(entity):
+        if structure := Entity.get_structure(entity):
             for item in structure['subunits']:
                 tabs[item.class_.name].table.rows.append(
                     get_base_table_data(item))
@@ -371,10 +370,11 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             data.append(format_number(item.types[entity]))
         data.append(item.class_.label)
         data.append(item.description)
+        root_place = ''
         if item.class_.name in place_classes:
-            data.append(link(get_place(item)))
-        else:
-            data.append('')
+            if roots := item.get_linked_entities_recursive('P46', True):
+                root_place = link(roots[0])
+        data.append(root_place)
         tabs['entities'].table.rows.append(data)
     if not tabs['entities'].table.rows:
         # If no entities available get links with this type_id
