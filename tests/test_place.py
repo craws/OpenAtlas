@@ -293,7 +293,6 @@ class PlaceTest(TestBaseCase):
                 'continue_': 'sub',
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
-            self.app.get(url_for('insert', class_='place'))
             rv = self.app.post(
                 url_for('insert', class_='place'),
                 data=data,
@@ -301,6 +300,7 @@ class PlaceTest(TestBaseCase):
             assert b'Insert and add strati' in rv.data
 
             data['name'] = "It's not a bug, it's a feature!"
+            data['place'] = place.id
             rv = self.app.get(
                 url_for(
                     'insert',
@@ -316,6 +316,7 @@ class PlaceTest(TestBaseCase):
             self.app.get(url_for('update', id_=feat_id))
             self.app.post(url_for('update', id_=feat_id), data=data)
             data['name'] = "I'm a stratigraphic unit"
+            data['place'] = feat_id
             rv = self.app.post(
                 url_for(
                     'insert',
@@ -324,16 +325,20 @@ class PlaceTest(TestBaseCase):
                 data=data)
             stratigraphic_id = rv.location.split('/')[-1]
 
-            self.app.get(
-                url_for('insert', class_='place', origin_id=stratigraphic_id))
             self.app.get(url_for('update', id_=stratigraphic_id))
             self.app.post(
                 url_for('update', id_=stratigraphic_id),
-                data={'name': "I'm a stratigraphic unit"})
-            dimension_type_id = Type.get_hierarchy('Dimensions').subs[0]
+                data={'name': "I'm a stratigraphic unit", 'place': feat_id})
+            rv = self.app.get(
+                url_for(
+                    'insert',
+                    class_='human_remains',
+                    origin_id=stratigraphic_id))
+            assert b"I'm a stratigraphic unit" in rv.data
             data = {
                 'name': 'You never find me',
-                dimension_type_id: 50,
+                'place': stratigraphic_id,
+                Type.get_hierarchy('Dimensions').subs[0]: 50,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
@@ -349,10 +354,19 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'50' in rv.data
 
+            # Create a second artifact to test siblings pager
+            self.app.post(
+                url_for(
+                    'insert',
+                    class_='artifact',
+                    origin_id=stratigraphic_id),
+                data=data)
+
             self.app.get(url_for('update', id_=find_id))
             data = {
                 'name': 'My human remains',
                 'actor': actor.id,
+                'place': stratigraphic_id,
                 human_remains_type.id: str([human_remains_type_sub.id]),
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
@@ -371,6 +385,11 @@ class PlaceTest(TestBaseCase):
 
             rv = self.app.get(url_for('view', id_=human_remains_type_sub.id))
             assert b'My human remains' in rv.data
+
+            rv = self.app.get(
+                url_for('index', view='artifact', delete_id=human_remains_id),
+                follow_redirects=True)
+            assert b'The entry has been deleted.' in rv.data
 
             # Anthropological features
             rv = self.app.get(
