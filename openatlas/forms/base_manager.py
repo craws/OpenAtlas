@@ -210,8 +210,7 @@ class BaseManager:
                 'resolver_url': self.form.resolver_url.data})
             return
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
-        if self.class_.name == 'artifact' \
-                or g.classes[self.class_.name].view == 'place':
+        if self.class_.view in ['artifact', 'place']:
             self.entity.link(
                 'P53',
                 Entity.insert(
@@ -268,6 +267,37 @@ class ActorBaseManager(BaseManager):
                     self.origin,
                     return_link_id=True,
                     inverse=True)
+
+
+class ArtifactBaseManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'actor': TableField(
+                _('owned by'),
+                add_dynamic=['person', 'group']),
+            'place': TableField()}
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.view == 'place':
+            self.form.place.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if owner := self.entity.get_linked_entity('P52'):
+            self.form.actor.data = owner.id
+        if super_ := self.entity.get_linked_entity('P46', inverse=True):
+            self.form.place.data = super_.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P52')
+        self.data['links']['delete_inverse'].add('P46')
+        if self.form.actor.data:
+            self.add_link('P52', self.form.actor.data)
+        if self.form.place.data:
+            self.add_link('P46', self.form.place.data, inverse=True)
 
 
 class EventBaseManager(BaseManager):

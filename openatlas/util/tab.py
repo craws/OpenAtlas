@@ -128,10 +128,11 @@ class Tab:
                     button(
                         'link',
                         url_for('link_insert', id_=id_, view='artifact')))
-            self.buttons.append(
-                button(
-                    g.classes[name].label,
-                    url_for('insert', class_=name, origin_id=id_)))
+            for name in ['artifact', 'human_remains']:
+                self.buttons.append(
+                    button(
+                        g.classes[name].label,
+                        url_for('insert', class_=name, origin_id=id_)))
         elif name == 'entities':
             if id_:
                 self.buttons.append(
@@ -191,12 +192,6 @@ class Tab:
                 button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_)))
-        elif name == 'human_remains':
-            if class_ and class_.name == 'stratigraphic_unit':
-                self.buttons.append(
-                    button(
-                        g.classes[name].label,
-                        url_for('insert', origin_id=id_, class_=name)))
         elif name == 'member':
             self.buttons.append(
                 button(

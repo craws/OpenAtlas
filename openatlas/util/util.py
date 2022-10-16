@@ -180,8 +180,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(
             g.file_stats[entity.id]['ext']
             if entity.id in g.file_stats else 'N/A')
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place'] \
-            or entity.class_.name == 'human_remains':
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
@@ -245,7 +244,7 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-    elif entity.class_.name in ['artifact', 'human_remains']:
+    elif entity.class_.view == 'artifact':
         data[_('source')] = \
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))

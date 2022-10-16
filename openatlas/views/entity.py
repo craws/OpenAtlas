@@ -143,8 +143,9 @@ def view(id_: int) -> Union[str, Response]:
     if entity.class_.view in ['artifact', 'place']:
         if structure := entity.get_structure():
             for item in structure['subunits']:
-                tabs[item.class_.name].table.rows.append(
-                    get_base_table_data(item))
+                name = 'artifact' if item.class_.view == 'artifact' \
+                    else item.class_.name
+                tabs[name].table.rows.append(get_base_table_data(item))
         gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
@@ -547,8 +548,7 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
             'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'human_remains', 'reference',
-            'type']:
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
         tabs[name] = Tab(name, entity=entity)
     entity.image_id = entity.id if get_file_path(entity.id) else None
     for link_ in entity.get_links('P67'):
@@ -571,17 +571,13 @@ def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
     tabs = {
         'source': Tab('source', entity=entity),
         'event': Tab('event', entity=entity),
-        'reference': Tab('reference', entity=entity)}
+        'reference': Tab('reference', entity=entity),
+        'artifact': Tab('artifact', entity=entity)}
     if entity.class_.name == 'place':
         tabs['actor'] = Tab('actor', entity=entity)
         tabs['feature'] = Tab('feature', entity=entity)
     elif entity.class_.name == 'feature':
-        tabs['stratigraphic_unit'] = Tab(
-            'stratigraphic_unit',
-            entity=entity)
-    elif entity.class_.name == 'stratigraphic_unit':
-        tabs['artifact'] = Tab('artifact', entity=entity)
-        tabs['human_remains'] = Tab('human_remains', entity=entity)
+        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', entity=entity)
     entity.location = entity.get_linked_entity_safe('P53', types=True)
     events = []  # Collect events to display actors
     event_ids = []  # Keep track of event ids to prevent event doubles
@@ -625,7 +621,7 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
             'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'human_remains', 'artifact', 'file']:
+            'stratigraphic_unit', 'artifact', 'file']:
         tabs[name] = Tab(name, entity=entity)
     for link_ in entity.get_links('P67'):
         range_ = link_.range
@@ -642,7 +638,7 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
 def add_tabs_for_source(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
-            'actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
+            'actor', 'artifact', 'feature', 'event', 'place',
             'stratigraphic_unit', 'text']:
         tabs[name] = Tab(name, entity=entity)
     for text in entity.get_linked_entities('P73', types=True):

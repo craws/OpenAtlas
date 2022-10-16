@@ -10,7 +10,8 @@ from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
 
 from openatlas.forms.base_manager import (
-    ActorBaseManager, BaseManager, EventBaseManager, HierarchyBaseManager)
+    ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
+    HierarchyBaseManager)
 from openatlas.forms.field import TableField, TableMultiField, TreeField
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
@@ -165,42 +166,8 @@ class AdministrativeUnitManager(BaseManager):
             self.add_link('P89', new_super)
 
 
-class ArtifactManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue', 'map']
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {
-            'actor': TableField(
-                _('owned by'),
-                add_dynamic=['person', 'group']),
-            'place': TableField()}
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.view == 'place':
-            self.form.place.data = str(self.origin.id)
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if owner := self.entity.get_linked_entity('P52'):
-            self.form.actor.data = owner.id
-        if super_ := self.entity.get_linked_entity('P46', inverse=True):
-            self.form.place.data = super_.id
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P52')
-        self.data['links']['delete_inverse'].add('P46')
-        if self.form.actor.data:
-            self.add_link('P52', self.form.actor.data)
-        if self.form.place.data:
-            self.add_link('P46', self.form.place.data, inverse=True)
-
-    def in_sub_units(self):
-        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            return True
-        if self.entity and self.entity.get_linked_entity('P46', inverse=True):
-            return True
-        return False
+class ArtifactManager(ArtifactBaseManager):
+    pass
 
 
 class BibliographyManager(BaseManager):
@@ -271,24 +238,8 @@ class GroupManager(ActorBaseManager):
                 related_tables=['begins_in', 'residence'])}
 
 
-class HumanRemainsManager(BaseManager):
-    fields = ['name', 'date', 'description', 'continue', 'map']
-
-    def additional_fields(self) -> dict[str, Any]:
-        return {'actor': TableField(_('owned by'))}
-
-    def populate_update(self) -> None:
-        super().populate_update()
-        if owner := self.entity.get_linked_entity('P52'):
-            self.form.actor.data = owner.id
-
-    def process_form(self) -> None:
-        super().process_form()
-        self.data['links']['delete'].add('P52')
-        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            self.add_link('P46', self.origin, inverse=True)
-        if self.form.actor.data:
-            self.add_link('P52', self.form.actor.data)
+class HumanRemainsManager(ArtifactBaseManager):
+    pass
 
 
 class HierarchyCustomManager(HierarchyBaseManager):
