@@ -20,6 +20,7 @@ base, then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.6.x to 7.7.0
+7.7.0.sql is needed but wil be taken care of by the database upgrade script.
 NPM packages need to be upgraded:
 
     $ cd openatlas/static
