@@ -304,6 +304,24 @@ class Entity:
                 return id_
         return None
 
+    def get_structure(self) -> dict[str, list[Entity]]:
+        structure: dict[str, list[Entity]] = {
+            'siblings': [],
+            'supers': self.get_linked_entities_recursive('P46', inverse=True),
+            'subunits': self.get_linked_entities('P46', types=True)}
+        if structure['supers']:
+            structure['siblings'] = \
+                structure['supers'][-1].get_linked_entities('P46')
+        return structure
+
+    def get_structure_for_insert(self) -> dict[str, list[Entity]]:
+        return {
+            'siblings': self.get_linked_entities('P46'),
+            'subunits': [],
+            'supers':
+                self.get_linked_entities_recursive('P46', inverse=True) +
+                [self]}
+
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
         return [
@@ -457,27 +475,3 @@ class Entity:
     def get_entities_linked_to_itself() -> list[Entity]:
         return [
             Entity.get_by_id(row['domain_id']) for row in Db.get_circular()]
-
-    @staticmethod
-    def get_structure(
-            object_: Optional[Entity] = None,
-            super_: Optional[Entity] = None
-    ) -> Optional[dict[str, list[Entity]]]:
-        siblings: list[Entity] = []
-        subunits: list[Entity] = []
-        if super_:
-            supers = \
-                super_.get_linked_entities_recursive('P46', inverse=True) \
-                + [super_]
-            siblings = super_.get_linked_entities('P46')
-        elif not object_:
-            return None
-        else:
-            supers = object_.get_linked_entities_recursive('P46', inverse=True)
-            subunits = object_.get_linked_entities('P46', types=True)
-            if supers:
-                siblings = supers[-1].get_linked_entities('P46')
-        return {
-            'supers': supers,
-            'subunits': subunits,
-            'siblings': siblings}

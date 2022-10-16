@@ -141,7 +141,7 @@ def view(id_: int) -> Union[str, Response]:
     structure = None
     gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        if structure := Entity.get_structure(entity):
+        if structure := entity.get_structure():
             for item in structure['subunits']:
                 tabs[item.class_.name].table.rows.append(
                     get_base_table_data(item))

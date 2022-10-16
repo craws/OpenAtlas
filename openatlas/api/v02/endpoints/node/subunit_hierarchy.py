@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 from flasgger import swag_from
 from flask import Response
@@ -15,8 +15,9 @@ from openatlas.models.entity import Entity
 
 class GetSubunitHierarchy(Resource):
     @staticmethod
-    @swag_from("../swagger/subunit_hierarchy.yml",
-               endpoint="api_02.subunit_hierarchy")
+    @swag_from(
+        "../swagger/subunit_hierarchy.yml",
+        endpoint="api_02.subunit_hierarchy")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_node_parser(
             {"nodes": GetSubunitHierarchy.get_subunit_hierarchy(id_)},
@@ -37,14 +38,11 @@ class GetSubunitHierarchy(Resource):
 
     @staticmethod
     def get_subunits_recursive(
-            entity: Optional[Entity],
+            entity: Entity,
             data: list[dict[str, Any]]) -> list[dict[str, Any]]:
-        structure = Entity.get_structure(entity)
+        structure = entity.get_structure()
         if structure and structure['subunits']:
-            for subunit in structure['subunits']:
-                data.append(get_node_dict(subunit))
-        node = Entity.get_structure(entity)
-        if node:
-            for sub_id in node['subunits']:
+            for sub_id in structure['subunits']:
+                data.append(get_node_dict(sub_id))
                 GetSubunitHierarchy.get_subunits_recursive(sub_id, data)
         return data
