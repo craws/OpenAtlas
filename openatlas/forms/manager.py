@@ -169,18 +169,22 @@ class ArtifactManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue', 'map']
 
     def additional_fields(self) -> dict[str, Any]:
-        fields = {
+        return {
             'actor': TableField(
                 _('owned by'),
-                add_dynamic=['person', 'group'])}
-        if not self.in_sub_units():
-            fields['place'] = TableField(add_dynamic=['place'])
-        return fields
+                add_dynamic=['person', 'group']),
+            'place': TableField()}
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.view == 'place':
+            self.form.place.data = str(self.origin.id)
 
     def populate_update(self) -> None:
         super().populate_update()
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
+        if super_ := self.entity.get_linked_entity('P46', inverse=True):
+            self.form.place.data = super_.id
 
     def process_form(self) -> None:
         super().process_form()
@@ -188,9 +192,7 @@ class ArtifactManager(BaseManager):
         self.data['links']['delete_inverse'].add('P46')
         if self.form.actor.data:
             self.add_link('P52', self.form.actor.data)
-        if self.origin and self.origin.class_.name == 'stratigraphic_unit':
-            self.add_link('P46', self.origin, inverse=True)
-        elif hasattr(self.form, 'place') and self.form.place.data:
+        if self.form.place.data:
             self.add_link('P46', self.form.place.data, inverse=True)
 
     def in_sub_units(self):

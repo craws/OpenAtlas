@@ -102,14 +102,14 @@ def add_crumbs(
         crumbs = [
             [_('source'), url_for('index', view='source')],
             origin.get_linked_entity('P73', True)]
-    if structure:
-        for super_ in structure['supers']:
-            crumbs.append(super_)
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
             crumbs += [g.types[type_id] for type_id in origin.root]
-    crumbs.append(origin)
+    if structure:
+        crumbs += structure['supers']
+    else:
+        crumbs.append(origin)
     sibling_count = 0
     if origin \
             and origin.class_.name == 'stratigraphic_unit' \

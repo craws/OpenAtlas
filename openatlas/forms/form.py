@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional, TYPE_CHECKING
 
-from flask import g, render_template
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -33,7 +33,7 @@ def get_manager(
         entity=entity,
         origin=origin,
         link_=link_)
-    if not entity and not link_:
+    if request.method != 'POST' and not entity and not link_:
         manager_instance.populate_insert()
     return manager_instance
 
