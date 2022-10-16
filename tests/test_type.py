@@ -14,7 +14,7 @@ class TypeTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor_type = Type.get_hierarchy('Actor actor relation')
+                actor_type = Type.get_hierarchy('Actor relation')
                 dimension_type = Type.get_hierarchy('Dimensions')
                 historical_type = Type.get_hierarchy('Historical place')
                 sex_type = Type.get_hierarchy('Sex')
@@ -28,11 +28,11 @@ class TypeTest(TestBaseCase):
             assert b'Historical place' in rv.data
 
             rv = self.app.get(url_for('type_index'))
-            assert b'Actor actor relation' in rv.data
+            assert b'Actor relation' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='type', origin_id=actor_type.id))
-            assert b'Actor actor relation' in rv.data
+            assert b'Actor relation' in rv.data
 
             data = {
                 'name': 'My secret type',

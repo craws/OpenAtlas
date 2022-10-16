@@ -28,7 +28,7 @@ class OpenatlasClass:
 
     # Needed class label translations
     _('acquisition')
-    _('actor actor relation')
+    _('actor relation')
     _('actor function')
     _('appellation')
     _('bibliography')

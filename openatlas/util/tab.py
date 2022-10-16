@@ -232,7 +232,7 @@ class Tab:
                     'link',
                     url_for(
                         'insert_relation',
-                        type_='actor_actor_relation',
+                        type_='actor_relation',
                         origin_id=id_)))
             for item in g.view_class_mapping['actor']:
                 self.buttons.append(

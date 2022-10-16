@@ -75,7 +75,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     manager_name = 'involvement'
     tab = 'actor' if origin.class_.view == 'event' else 'event'
     if link_.property.code == 'OA7':
-        manager_name = 'actor_actor_relation'
+        manager_name = 'actor_relation'
         tab = 'relation'
     elif link_.property.code == 'P107':
         manager_name = 'actor_function'
@@ -126,7 +126,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             return redirect(
                 url_for('insert_relation', type_=type_, origin_id=origin_id))
         tabs = {
-            'actor_actor_relation': 'relation',
+            'actor_relation': 'relation',
             'event': 'event',
             'involvement':
                 'actor' if origin.class_.view == 'event' else 'event',

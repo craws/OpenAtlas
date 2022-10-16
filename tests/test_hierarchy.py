@@ -65,9 +65,7 @@ class HierarchyTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy.id),
-                data={
-                    'name': 'Actor actor relation',
-                    'entity_id': hierarchy.id},
+                data={'name': 'Actor relation', 'entity_id': hierarchy.id},
                 follow_redirects=True)
             assert b'The name is already in use' in rv.data
 
@@ -93,7 +91,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_update', id_=value_type.id))
             assert b'valued' in rv.data
 
-            relation_type = Type.get_hierarchy('Actor actor relation')
+            relation_type = Type.get_hierarchy('Actor relation')
             rv = self.app.get(
                 url_for('hierarchy_update', id_=relation_type.id),
                 follow_redirects=True)

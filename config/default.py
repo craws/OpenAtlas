@@ -93,4 +93,4 @@ CSS = {
         'secondary': 'btn btn-secondary btn-xsm'}}
 
 # Property types work differently, e.g. no move functionality
-PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']
+PROPERTY_TYPES = ['Actor relation', 'Actor function', 'Involvement']

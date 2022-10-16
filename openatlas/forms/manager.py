@@ -44,7 +44,7 @@ class AcquisitionManager(EventBaseManager):
         self.add_link('P24', self.form.artifact.data)
 
 
-class ActorActorRelationManager(BaseManager):
+class ActorRelationManager(BaseManager):
     fields = ['date', 'description', 'continue']
 
     def additional_fields(self) -> dict[str, Any]:
@@ -81,7 +81,7 @@ class ActorActorRelationManager(BaseManager):
         super().process_link_form()
         type_id = getattr(
             self.form,
-            str(g.classes['actor_actor_relation'].standard_type_id)).data
+            str(g.classes['actor_relation'].standard_type_id)).data
         self.link_.type = g.types[int(type_id)] if type_id else None
         inverse = self.form.inverse.data
         if (self.origin.id == self.link_.domain.id and inverse) or \
