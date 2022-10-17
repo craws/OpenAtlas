@@ -43,8 +43,7 @@ def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
 
 def get_buttons(view: str) -> list[str]:
     buttons = []
-    for name in [view] if view in ['artifact', 'place'] \
-            else g.view_class_mapping[view]:
+    for name in g.view_class_mapping[view]:
         if is_authorized(g.classes[name].write_access):
             buttons.append(
                 button(g.classes[name].label, url_for('insert', class_=name)))

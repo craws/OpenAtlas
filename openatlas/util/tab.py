@@ -119,19 +119,15 @@ class Tab:
                         type_='involvement',
                         origin_id=id_)))
             for item in g.view_class_mapping['actor']:
-                self.buttons.append(button(
-                    g.classes[item].label,
-                    url_for('insert', class_=item, origin_id=id_)))
+                self.buttons.append(
+                    button(
+                        g.classes[item].label,
+                        url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            if class_ and class_.name != 'stratigraphic_unit':
+            for item in g.view_class_mapping['artifact']:
                 self.buttons.append(
                     button(
-                        'link',
-                        url_for('link_insert', id_=id_, view='artifact')))
-            for name in ['artifact', 'human_remains']:
-                self.buttons.append(
-                    button(
-                        g.classes[name].label,
+                        g.classes[item].label,
                         url_for('insert', class_=name, origin_id=id_)))
         elif name == 'entities':
             if id_:
