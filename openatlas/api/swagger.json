@@ -638,7 +638,7 @@
       },
       "TypesByViewClassModel": {
         "properties": {
-          "actor_actor_relation": {
+          "actor_relation": {
             "items": {
               "$ref": "#/components/schemas/TypesByViewClassEntry"
             },

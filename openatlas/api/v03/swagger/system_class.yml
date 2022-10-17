@@ -16,7 +16,7 @@ parameters:
         - type
         - acquisition
         - activity
-        - actor_actor_relation
+        - actor_relation
         - actor_function
         - appellation
         - artifact
