@@ -166,7 +166,8 @@ def view(id_: int) -> Union[str, Response]:
             buttons.append(download_button(entity))
         else:
             buttons.append(
-                f'<span class="error">{uc_first(_("missing file"))}</span>')
+                '<span class="error">' + uc_first(_("missing file")) +
+                '</span>')
     buttons.append(siblings_pager(entity, structure))
     tabs['info'].content = render_template(
         'entity/view.html',
@@ -668,7 +669,7 @@ def add_note_tab(entity: Entity) -> Tab:
             if note['public'] else uc_first(_('private')),
             link(User.get_by_id(note['user_id'])),
             note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">'
-            f'{uc_first(_("view"))}</a>']
+            f'<a href="{url_for("note_view", id_=note["id"])}">' +
+            uc_first(_("view")) + '</a>']
         tab.table.rows.append(data)
     return tab

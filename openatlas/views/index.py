@@ -61,8 +61,8 @@ def overview() -> str:
             link(entity),
             entity.class_.label,
             note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">'
-            f'{uc_first(_("view"))}</a>'])
+            f'<a href="{url_for("note_view", id_=note["id"])}">' +
+            uc_first(_("view")) + '</a>'])
     for name, count in Entity.get_overview_counts().items():
         if not count:
             continue  # pragma: no cover

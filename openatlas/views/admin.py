@@ -291,7 +291,7 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a> '
+                    f'<a href="{url}">' + uc_first(_("remove")) + '</a> '
                     f'{type_.name}')
             tab.table.rows.append([
                 link(row['entity']),

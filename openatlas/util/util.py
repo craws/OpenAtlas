@@ -75,12 +75,13 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">' \
-                f'{uc_first(_("types"))}</a>'
+                f'class="nav-item nav-link {active}">' + \
+                uc_first(_("types")) + '</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
+                f'class="nav-item nav-link {active}">' + uc_first(_(item)) + \
+                '</a>'
     return html
 
 
@@ -748,7 +749,8 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-        f'<a title="{uc_first("manual")}" href="/static/manual/{site}.html" ' \
+        '<a title="' + uc_first("manual") + \
+        f'" href="/static/manual/{site}.html" ' \
         f'class="manual" target="_blank" ><i class="fas fa-book"></i></a>'
 
 
