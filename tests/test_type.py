@@ -193,6 +193,18 @@ class TypeTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Warning' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                actor.link(
+                    'P74',
+                    location,
+                    type_id=g.types[actor_type.subs[0]].id)
+            rv = self.app.get(
+                url_for(
+                    'type_delete_recursive',
+                    id_=g.types[actor_type.subs[0]].id))
+            assert b'Warning' in rv.data
+
             rv = self.app.post(
                 url_for('type_delete_recursive', id_=sex_type.id))
             assert b'This field is required.' in rv.data
