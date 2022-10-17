@@ -4,7 +4,6 @@ from typing import Optional, TYPE_CHECKING
 
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas.util.table import Table
