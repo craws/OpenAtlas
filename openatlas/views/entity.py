@@ -358,32 +358,33 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             'human_remains']
     if any(item in g.types[entity.root[0]].classes for item in place_classes):
         tabs['entities'].table.header.append('place')
-    for item in entity.get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
-        if item.class_.name in ['location', 'reference_system']:
-            continue  # pragma: no cover
-        if item.class_.name == 'object_location':
-            item = item.get_linked_entity_safe('P53', inverse=True)
-        data = [link(item)]
-        if entity.category == 'value':
-            data.append(format_number(item.types[entity]))
-        data.append(item.class_.label)
-        data.append(item.description)
-        root_place = ''
-        if item.class_.name in place_classes:
-            if roots := item.get_linked_entities_recursive('P46', True):
-                root_place = link(roots[0])
-        data.append(root_place)
-        tabs['entities'].table.rows.append(data)
-    if not tabs['entities'].table.rows:
-        # If no entities available get links with this type_id
+    root = g.types[entity.root[0]] if entity.root else entity
+    if root.name in app.config['PROPERTY_TYPES']:
         tabs['entities'].table.header = [_('domain'), _('range')]
         for row in Link.get_links_by_type(entity):
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
                 link(Entity.get_by_id(row['range_id']))])
+    else:
+        for item in entity.get_linked_entities(
+                ['P2', 'P89'],
+                inverse=True,
+                types=True):
+            if item.class_.name in ['location', 'reference_system']:
+                continue  # pragma: no cover
+            if item.class_.name == 'object_location':
+                item = item.get_linked_entity_safe('P53', inverse=True)
+            data = [link(item)]
+            if entity.category == 'value':
+                data.append(format_number(item.types[entity]))
+            data.append(item.class_.label)
+            data.append(item.description)
+            root_place = ''
+            if item.class_.name in place_classes:
+                if roots := item.get_linked_entities_recursive('P46', True):
+                    root_place = link(roots[0])
+            data.append(root_place)
+            tabs['entities'].table.rows.append(data)
     return tabs
 
 

@@ -12,6 +12,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.type import Type
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
@@ -86,7 +87,9 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
 
     type_ = g.types[id_]
     root = g.types[type_.root[0]] if type_.root else None
-    if type_.category in ('standard', 'system', 'place') and not root:
+    root_name = root.name if root else type_.name
+    if type_.category == 'system' or \
+            type_.category in ('standard', 'place') and not root:
         abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
@@ -113,9 +116,16 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
             link(sub),
             sub.count,
             sub.description])
-    for item in get_entities_linked_to_type_recursive(type_.id, []):
-        data = [link(item), item.class_.label, item.description]
-        tabs['entities'].table.rows.append(data)
+    if root_name in app.config['PROPERTY_TYPES']:
+        for row in Link.get_links_by_type(type_):
+            tabs['entities'].table.header = [_('domain'), _('range')]
+            tabs['entities'].table.rows.append([
+                link(Entity.get_by_id(row['domain_id'])),
+                link(Entity.get_by_id(row['range_id']))])
+    else:
+        for item in get_entities_linked_to_type_recursive(type_.id, []):
+            data = [link(item), item.class_.label, item.description]
+            tabs['entities'].table.rows.append(data)
     crumbs = [[_('types'), url_for('type_index')]]
     if root:
         crumbs += [g.types[type_id] for type_id in type_.root]
@@ -131,7 +141,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
 def type_move_entities(id_: int) -> Union[str, Response]:
     type_ = g.types[id_]
     root = g.types[type_.root[0]]
-    if root.category == 'value':
+    if root.category in ['system', 'value']:
         abort(403)  # pragma: no cover
     form = get_move_form(type_)
     if form.validate_on_submit():
