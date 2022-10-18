@@ -736,8 +736,9 @@ def admin_newsletter() -> Union[str, Response]:
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'tabs.html',
-        tabs={'tab': Tab('newsletter', form=form, table=table)},
+        'admin/newsletter.html',
+        form=form,
+        table=table,
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
