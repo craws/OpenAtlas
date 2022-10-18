@@ -483,7 +483,7 @@ def admin_orphans() -> str:
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_subunits': Tab(
-            'orphaned_sub_units',
+            'orphaned_subunits',
             table=Table([
                 'id',
                 'name',

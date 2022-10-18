@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-10-18 13:49+0200\n"
-"PO-Revision-Date: 2022-10-18 13:53+0200\n"
+"POT-Creation-Date: 2022-10-18 14:38+0200\n"
+"PO-Revision-Date: 2022-10-18 14:40+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -59,7 +59,7 @@ msgid "comment"
 msgstr "Beschreibung"
 
 #: openatlas/forms/add_fields.py:242 openatlas/forms/base_manager.py:101
-#: openatlas/forms/field.py:96 openatlas/forms/util.py:30 openatlas/util/tab.py:88
+#: openatlas/forms/field.py:96 openatlas/forms/util.py:30 openatlas/util/tab.py:89
 #: openatlas/views/entity.py:354 openatlas/views/imports.py:32
 msgid "name"
 msgstr "Name"
@@ -170,7 +170,7 @@ msgstr "Seite"
 msgid "no entries"
 msgstr "Keine Einträge"
 
-#: openatlas/forms/form.py:84 openatlas/util/tab.py:138 openatlas/views/type.py:171
+#: openatlas/forms/form.py:84 openatlas/util/tab.py:139 openatlas/views/type.py:171
 msgid "move entities"
 msgstr "Entitäten verschieben"
 
@@ -916,7 +916,7 @@ msgid "This entry doesn't exist. Maybe you followed an obsolete link."
 msgstr ""
 "Dieser Eintrag existiert nicht. Vielleicht bist du einem alten Link gefolgt."
 
-#: openatlas/templates/forms/form_table.html:5 openatlas/util/tab.py:243
+#: openatlas/templates/forms/form_table.html:5 openatlas/util/tab.py:244
 #: openatlas/util/util.py:590 openatlas/views/entity.py:112
 #: openatlas/views/link.py:63 openatlas/views/reference.py:34
 msgid "link"
@@ -1105,7 +1105,7 @@ msgstr ""
 "archäologische und geospatiale Daten zu verwalten."
 
 #: openatlas/templates/model/cidoc_class_view.html:6
-#: openatlas/templates/model/property_view.html:6 openatlas/util/tab.py:88
+#: openatlas/templates/model/property_view.html:6 openatlas/util/tab.py:89
 #: openatlas/views/entity.py:354 openatlas/views/user.py:37
 msgid "info"
 msgstr "Info"
@@ -1294,22 +1294,26 @@ msgid "orphaned files"
 msgstr "Verwaiste Dateien"
 
 #: openatlas/util/tab.py:24
+msgid "orphaned subunits"
+msgstr "verwaiste Subunits"
+
+#: openatlas/util/tab.py:25
 msgid "circular dependencies"
 msgstr "zirkuläre Abhängigkeiten"
 
-#: openatlas/util/tab.py:86
+#: openatlas/util/tab.py:87
 msgid "main image"
 msgstr "Angezeigtes Bild"
 
-#: openatlas/util/tab.py:88 openatlas/views/admin.py:375
+#: openatlas/util/tab.py:89 openatlas/views/admin.py:375
 msgid "count"
 msgstr "Anzahl"
 
-#: openatlas/util/tab.py:204 openatlas/views/index.py:42 openatlas/views/note.py:54
+#: openatlas/util/tab.py:205 openatlas/views/index.py:42 openatlas/views/note.py:54
 msgid "note"
 msgstr "Notiz"
 
-#: openatlas/util/tab.py:264
+#: openatlas/util/tab.py:265
 msgid "text"
 msgstr "Text"
 
