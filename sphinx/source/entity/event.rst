@@ -54,7 +54,9 @@ For step by step instructions have a look at our :doc:`/examples/index`.
 
 Acquisition
 ***********
-* **Given Place** - to select which :doc:`places <place>` changed ownership.
+* **Given place** - to select which :doc:`places <place>` changed ownership.
+* **Given artifact** - to select which :doc:`artifacts <artifact>`
+  changed ownership.
 
 To add **recipients** and **donors** go to the **Actor** tab, add actors and
 select as activity:
