@@ -1,5 +1,5 @@
 versions = {
-    '7.7.0': ['TBA', {
+    '7.7.0': ['2022-10-18', {
         'feature': {
             '1587': 'Link artifacts and human remains to places directly',
             '1541': 'Linking references to multiple subunits',
