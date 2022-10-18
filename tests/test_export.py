@@ -49,4 +49,3 @@ class ExportTest(TestBaseCase):
                 url_for('delete_export', type_='sql', filename='non_existing'),
                 follow_redirects=True)
             assert b'An error occurred when trying to delete the f' in rv.data
-

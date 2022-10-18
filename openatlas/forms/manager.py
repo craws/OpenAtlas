@@ -74,7 +74,7 @@ class ActorRelationManager(BaseManager):
                 'OA7',
                 actor,
                 self.form.description.data,
-                inverse=True if self.form.inverse.data else False,
+                inverse=bool(self.form.inverse.data),
                 type_id=link_type.id if link_type else None)
 
     def process_link_form(self) -> None:

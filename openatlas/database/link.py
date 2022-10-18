@@ -250,7 +250,7 @@ class Link:
 
     @staticmethod
     def get_all_links() -> list[dict[str, Any]]:
-        g.cursor.execute(f"""
+        g.cursor.execute("""
             SELECT
                 l.id,
                 l.property_code,
