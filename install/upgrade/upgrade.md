@@ -21,12 +21,23 @@ base, then run the database upgrade script, then restart Apache:
 
 ### 7.6.x to 7.7.0
 7.7.0.sql is needed but wil be taken care of by the database upgrade script.
+
 NPM packages need to be upgraded:
 
     $ cd openatlas/static
     $ rm package.json
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
+
+The new CSV export function now provides files to download directly. So
+the CSV folder isn't needed anymore and can be deleted (or moved elsewhere in
+case you like to keep it). To remove it execute:
+
+    $ rm -R openatlas/export/csv
+
+This is the last version that will support the deprecated API version 0.2.
+In case other systems are still depend on it, they should be updated to use
+the 0.3 version before the next release.
 
 ### 7.5.0 to 7.6.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
