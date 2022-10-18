@@ -58,7 +58,7 @@ def get_geoms_as_collection(
 
 
 def get_geoms_dict(
-        geoms: list[dict[str, any]]) -> Optional[dict[str, Any]]:
+        geoms: list[dict[str, Any]]) -> Optional[dict[str, Any]]:
     if len(geoms) == 0:
         return None
     if len(geoms) == 1:

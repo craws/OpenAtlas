@@ -33,6 +33,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.link import Link
     from openatlas.models.type import Type
+    from openatlas.models.user import User
 
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
@@ -679,7 +680,7 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
 
 
 @app.template_filter()
-def description(entity: Union[Entity, Project]) -> str:
+def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
     html = ''
     if isinstance(entity, Entity) \

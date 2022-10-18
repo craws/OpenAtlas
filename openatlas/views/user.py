@@ -113,7 +113,7 @@ def user_activity(user_id: int = 0) -> str:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
         except AttributeError:  # pragma: no cover - entity already deleted
-            entity = None
+            entity = None  # type: ignore
             entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([

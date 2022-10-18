@@ -113,7 +113,7 @@ class Entity:
             self,
             code: str,
             inverse: bool = False,
-            types: bool = False):
+            types: bool = False) -> list[Entity]:
         return Link.get_linked_entities_recursive(
             self.id,
             code,

@@ -205,8 +205,8 @@ def get_profile_image_table_link(
 
 def add_crumbs(
         entity: Union[Entity, Type],
-        structure: Optional[dict[str, Any]]) -> list[str]:
-    crumbs = [[
+        structure: Optional[dict[str, Any]]) -> list[Any]:
+    crumbs: list[Any] = [[
         _(entity.class_.view.replace('_', ' ')),
         url_for('index', view=entity.class_.view)]]
     if structure:
