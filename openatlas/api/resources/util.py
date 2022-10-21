@@ -4,24 +4,13 @@ from typing import Any, Optional, Union
 from flask import g, json
 
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, InvalidCidocClassCode, InvalidCodeError,
-    InvalidSearchSyntax, InvalidSystemClassError)
+    InvalidSearchSyntax)
+from openatlas.api.resources.model_mapper import get_entities_by_ids, \
+    get_all_links, get_all_links_inverse
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.reference_system import ReferenceSystem
-
-
-def get_entity_by_id(id_: int) -> Entity:
-    try:
-        entity = Entity.get_by_id(id_, types=True, aliases=True)
-    except Exception as e:
-        raise EntityDoesNotExistError from e
-    return entity
-
-
-def get_entities_by_ids(ids: list[int]) -> list[Entity]:
-    return Entity.get_by_ids(ids, types=True, aliases=True)
 
 
 def get_license(entity: Entity) -> Optional[str]:
@@ -59,31 +48,6 @@ def replace_empty_list_values_in_dict_with_none(
         if isinstance(value, list) and not data[key]:
             data[key] = None
     return data
-
-
-def get_by_cidoc_classes(class_codes: list[str]) -> list[Entity]:
-    class_codes = list(g.cidoc_classes) \
-        if 'all' in class_codes else class_codes
-    if not all(cc in g.cidoc_classes for cc in class_codes):
-        raise InvalidCidocClassCode
-    return Entity.get_by_cidoc_class(class_codes, types=True, aliases=True)
-
-
-def get_entities_by_view_classes(codes: list[str]) -> list[Entity]:
-    codes = list(g.view_class_mapping) if 'all' in codes else codes
-    if not all(c in g.view_class_mapping for c in codes):
-        raise InvalidCodeError
-    view_classes = flatten_list_and_remove_duplicates(
-        [g.view_class_mapping[view] for view in codes])
-    return Entity.get_by_class(view_classes, types=True, aliases=True)
-
-
-def get_entities_by_system_classes(system_classes: list[str]) -> list[Entity]:
-    system_classes = list(g.classes) \
-        if 'all' in system_classes else system_classes
-    if not all(sc in g.classes for sc in system_classes):
-        raise InvalidSystemClassError
-    return Entity.get_by_class(system_classes, types=True, aliases=True)
 
 
 def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
@@ -162,20 +126,6 @@ def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
     return [
         entity for entity in entities
         if not (entity.id in seen or seen_add(entity.id))]
-
-
-def get_all_links(
-        entities: Union[int, list[int]],
-        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
-    codes = list(g.properties) if not codes else codes
-    return Link.get_links(entities, codes)
-
-
-def get_all_links_inverse(
-        entities: Union[int, list[int]],
-        codes: Optional[Union[str, list[str]]] = None) -> list[Link]:
-    codes = list(g.properties) if not codes else codes
-    return Link.get_links(entities, codes, inverse=True)
 
 
 def link_parser_check(

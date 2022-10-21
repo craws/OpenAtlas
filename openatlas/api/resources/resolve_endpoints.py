@@ -23,10 +23,12 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, subunit_template)
 from openatlas.api.resources.util import (
-    get_all_links, get_all_links_inverse, get_entities_by_type,
+    get_entities_by_type,
     get_key,
     link_parser_check, link_parser_check_inverse, parser_str_to_dict,
     remove_duplicate_entities)
+from openatlas.api.resources.model_mapper import get_all_links, \
+    get_all_links_inverse
 from openatlas.models.entity import Entity
 
 

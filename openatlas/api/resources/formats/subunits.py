@@ -3,9 +3,11 @@ from typing import Any, Optional, Union
 from flask import g
 
 from openatlas.api.resources.util import (
-    get_all_links, get_all_links_inverse, get_all_subunits_recursive,
+    get_all_subunits_recursive,
     get_geometric_collection, get_license, get_reference_systems,
     remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
+from openatlas.api.resources.model_mapper import get_all_links, \
+    get_all_links_inverse
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_path

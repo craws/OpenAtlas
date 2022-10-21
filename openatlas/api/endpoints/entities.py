@@ -10,11 +10,11 @@ from openatlas.api.resources.parser import entity_, query
 from openatlas.api.resources.resolve_endpoints import (
     resolve_entities, resolve_entity)
 from openatlas.api.resources.util import (
-    get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
-    get_entities_by_view_classes, get_entities_linked_to_special_type,
-    get_entities_linked_to_special_type_recursive, get_entity_by_id,
-    get_linked_entities_api, get_entities_from_type_with_subs)
-from openatlas.models.entity import Entity
+    get_entities_linked_to_special_type,
+    get_entities_linked_to_special_type_recursive, get_linked_entities_api, get_entities_from_type_with_subs)
+from openatlas.api.resources.model_mapper import get_entity_by_id, \
+    get_entities_by_ids, get_latest_entities, get_by_cidoc_classes, \
+    get_entities_by_view_classes, get_entities_by_system_classes
 
 
 class GetByCidocClass(Resource):
@@ -65,14 +65,14 @@ class GetEntitiesLinkedToEntity(Resource):
 class GetLatest(Resource):
     @staticmethod
     @swag_from("../swagger/latest.yml", endpoint="api_03.latest")
-    def get(latest: int) \
+    def get(limit: int) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        if not 0 < latest < 101:
+        if not 0 < limit < 101:
             raise InvalidLimitError
         return resolve_entities(
-            Entity.get_latest(latest),
+            get_latest_entities(limit),
             entity_.parse_args(),
-            latest)
+            limit)
 
 
 class GetTypeEntities(Resource):

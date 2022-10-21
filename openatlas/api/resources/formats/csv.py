@@ -8,8 +8,10 @@ import pandas as pd
 from flask import Response, g
 
 from openatlas.api.resources.util import (
-    get_all_links, get_all_links_inverse, get_linked_entities_api,
+    get_linked_entities_api,
     link_parser_check, link_parser_check_inverse, remove_duplicate_entities)
+from openatlas.api.resources.model_mapper import get_all_links, \
+    get_all_links_inverse
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link

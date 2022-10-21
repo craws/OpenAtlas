@@ -7,14 +7,14 @@ from openatlas import app
 from openatlas.api.resources.error import AccessDeniedError
 from openatlas.api.resources.parser import image
 from openatlas.api.resources.util import get_license
-from openatlas.models.entity import Entity
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.util.image_processing import check_processed_image
 
 
 class DisplayImage(Resource):
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
-        entity = Entity.get_by_id(int(Pathlib_path(filename).stem), types=True)
+        entity = get_entity_by_id(int(Pathlib_path(filename).stem))
         license_ = get_license(entity)
         if not license_:
             raise AccessDeniedError

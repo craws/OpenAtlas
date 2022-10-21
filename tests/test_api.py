@@ -8,7 +8,7 @@ from openatlas.api.resources.error import (
     InvalidSystemClassError, LastEntityError, NoEntityAvailable,
     NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
     ValueNotIntegerError)
-from openatlas.api.resources.util import get_by_cidoc_classes
+from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from tests.base import (
     ApiTestCase, get_bool, get_bool_inverse, get_class_mapping,
     get_geom_properties, get_no_key)

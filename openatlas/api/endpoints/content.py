@@ -1,12 +1,14 @@
 import json
 from typing import Any, Union
 
-from flask import request
 from flasgger import swag_from
 from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.resources.database_mapper import get_all_entities, \
+    get_all_links, get_properties, get_property_hierarchy, get_classes, \
+    get_cidoc_hierarchy
 from openatlas.api.resources.formats.csv import export_database_csv
 from openatlas.api.resources.formats.xml import export_database_xml
 from openatlas.api.resources.parser import gis, language
@@ -15,13 +17,8 @@ from openatlas.api.resources.templates import (
     class_overview_template, content_template, geometries_template,
     overview_template)
 from openatlas.api.resources.util import get_geometries
-from openatlas.database.cidoc_class import CidocClass as DbCidocClass
-from openatlas.database.cidoc_property import \
-    CidocProperty as DbCidocProperty
+from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.models.content import get_translation
-from openatlas.models.entity import Entity
-from openatlas.database.link import Link as DbLink
-from openatlas.database.entity import Entity as DbEntity
 from openatlas.models.export import current_date_for_filename
 
 
@@ -79,7 +76,7 @@ class SystemClassCount(Resource):
         "../swagger/system_class_count.yml",
         endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
-        return marshal(Entity.get_overview_counts(), overview_template()), 200
+        return marshal(get_overview_counts(), overview_template()), 200
 
 
 class ExportDatabase(Resource):
@@ -91,12 +88,12 @@ class ExportDatabase(Resource):
         geoms = [ExportDatabase.get_geometries_dict(geom) for geom in
                  get_geometries({'geometry': 'gisAll'})]
         tables = {
-            'entities': DbEntity.get_all_entities(),
-            'links': DbLink.get_all_links(),
-            'properties': DbCidocProperty.get_properties(),
-            'property_hierarchy': DbCidocProperty.get_hierarchy(),
-            'classes': DbCidocClass.get_classes(),
-            'class_hierarchy': DbCidocClass.get_hierarchy(),
+            'entities': get_all_entities(),
+            'links': get_all_links(),
+            'properties': get_properties(),
+            'property_hierarchy': get_property_hierarchy(),
+            'classes': get_classes(),
+            'class_hierarchy': get_cidoc_hierarchy(),
             'geometries': geoms}
         filename = f'{current_date_for_filename()}-export'
         if format_ == 'csv':

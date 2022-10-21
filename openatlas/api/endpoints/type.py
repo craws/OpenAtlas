@@ -12,8 +12,7 @@ from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)
 from openatlas.api.resources.templates import (
     type_by_view_class_template, type_overview_template, type_tree_template)
-from openatlas.api.resources.util import (
-    get_entity_by_id)
+from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
