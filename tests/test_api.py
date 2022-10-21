@@ -184,7 +184,7 @@ class Api03(ApiTestCase):
                     column='id',
                     relation_type='P2',
                     type_id=boundary_mark.id)),
-                self.app.get(url_for('api_03.latest', latest=2)),
+                self.app.get(url_for('api_03.latest', limit=2)),
                 self.app.get(
                     url_for('api_03.system_class', system_class='artifact')),
                 self.app.get(
@@ -640,7 +640,7 @@ class Api03(ApiTestCase):
                 self.app.get(
                     url_for('api_03.view_class', view_class='Invalid'))
             with self.assertRaises(InvalidLimitError):
-                self.app.get(url_for('api_03.latest', latest='99999999'))
+                self.app.get(url_for('api_03.latest', limit='99999999'))
             with self.assertRaises(ValueNotIntegerError):
                 self.app.get(url_for(
                     'api_03.view_class',

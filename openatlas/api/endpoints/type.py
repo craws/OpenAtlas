@@ -5,8 +5,8 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
+from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.resources.error import NotAPlaceError
-from openatlas.api.resources.formats.subunits import get_subunits_from_id
 from openatlas.api.resources.parser import default, entity_
 from openatlas.api.resources.resolve_endpoints import (
     download, resolve_subunits)

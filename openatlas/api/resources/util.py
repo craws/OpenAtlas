@@ -50,10 +50,6 @@ def replace_empty_list_values_in_dict_with_none(
     return data
 
 
-def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
-    return [item for sublist in list_ for item in sublist if item not in list_]
-
-
 def get_linked_entities_api(id_: Union[int, list[int]]) -> list[Entity]:
     domain_entity = [link_.range for link_ in get_all_links(id_)]
     range_entity = [link_.domain for link_ in get_all_links_inverse(id_)]

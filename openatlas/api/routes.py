@@ -26,7 +26,7 @@ def add_routes_v03(api: Api) -> None:
         endpoint='entity')
     api.add_resource(
         GetLatest,
-        '/latest/<int:latest>',
+        '/latest/<int:limit>',
         endpoint="latest")
     api.add_resource(
         GetQuery,

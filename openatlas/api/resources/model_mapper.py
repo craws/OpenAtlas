@@ -1,10 +1,9 @@
-from typing import Union, Optional
+from typing import Union, Optional, Any
 
 from flask import g
 
 from openatlas.api.resources.error import EntityDoesNotExistError, \
     InvalidCidocClassCode, InvalidCodeError, InvalidSystemClassError
-from openatlas.api.resources.util import flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
@@ -67,3 +66,6 @@ def get_all_links_inverse(
     codes = list(g.properties) if not codes else codes
     return Link.get_links(entities, codes, inverse=True)
 
+
+def flatten_list_and_remove_duplicates(list_: list[Any]) -> list[Any]:
+    return [item for sublist in list_ for item in sublist if item not in list_]

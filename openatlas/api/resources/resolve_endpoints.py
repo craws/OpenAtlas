@@ -6,16 +6,15 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.resources.formats.csv import (
-    export_csv_for_network_analysis, export_entities_csv)
+from openatlas.api.formats.csv import export_entities_csv, \
+    export_csv_for_network_analysis
+from openatlas.api.formats.geojson import get_geojson_v2, get_geojson
+from openatlas.api.formats.linked_places import get_linked_places_entity
+from openatlas.api.formats.rdf import rdf_output
+from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
-from openatlas.api.resources.formats.geojson import get_geojson, \
-    get_geojson_v2
-from openatlas.api.resources.formats.linked_places import \
-    get_linked_places_entity
-from openatlas.api.resources.formats.rdf import rdf_output
-from openatlas.api.resources.formats.xml import subunit_xml
+
 from openatlas.api.resources.search import search
 from openatlas.api.resources.search_validation import (
     iterate_validation)

@@ -6,11 +6,11 @@ from flask import Response, g, jsonify
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.formats.csv import export_database_csv
+from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.database_mapper import get_all_entities, \
     get_all_links, get_properties, get_property_hierarchy, get_classes, \
     get_cidoc_hierarchy
-from openatlas.api.resources.formats.csv import export_database_csv
-from openatlas.api.resources.formats.xml import export_database_xml
 from openatlas.api.resources.parser import gis, language
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (

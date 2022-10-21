@@ -1,8 +1,10 @@
 from typing import Any, Optional, Union
 
 from openatlas.api.resources.util import (
-    flatten_list_and_remove_duplicates, link_parser_check,
+    link_parser_check,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.api.resources.model_mapper import \
+    flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
