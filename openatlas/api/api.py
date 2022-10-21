@@ -10,7 +10,7 @@ from openatlas.api.v03.resources.error import errors
 from openatlas.api.routes_3 import add_routes_v03
 
 app.config['SWAGGER'] = {
-    'openapi': '3.1.0',
+    'openapi': '3.0.2',
     'uiversion': 3,
     "swagger_version": "2.0",
     "specs": [{

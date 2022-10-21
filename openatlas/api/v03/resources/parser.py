@@ -96,11 +96,6 @@ entity_.add_argument(
     help='{error_msg}',
     action='append')
 entity_.add_argument(
-    'type_id',
-    type=int,
-    help='{error_msg}',
-    action='append')
-entity_.add_argument(
     'relation_type',
     type=str,
     help='{error_msg}',
