@@ -6,7 +6,7 @@ from flask import g, json
 from openatlas.api.resources.error import (
     InvalidSearchSyntax)
 from openatlas.api.resources.model_mapper import get_entities_by_ids, \
-    get_all_links, get_all_links_inverse
+    get_all_links_of_entities, get_all_links_of_entities_inverse
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -51,14 +51,14 @@ def replace_empty_list_values_in_dict_with_none(
 
 
 def get_linked_entities_api(id_: Union[int, list[int]]) -> list[Entity]:
-    domain_entity = [link_.range for link_ in get_all_links(id_)]
-    range_entity = [link_.domain for link_ in get_all_links_inverse(id_)]
+    domain_entity = [link_.range for link_ in get_all_links_of_entities(id_)]
+    range_entity = [link_.domain for link_ in get_all_links_of_entities_inverse(id_)]
     return [*range_entity, *domain_entity]
 
 
 def get_linked_entities_id_api(id_: int) -> list[Entity]:
-    domain_ids = [link_.range.id for link_ in get_all_links(id_)]
-    range_ids = [link_.domain.id for link_ in get_all_links_inverse(id_)]
+    domain_ids = [link_.range.id for link_ in get_all_links_of_entities(id_)]
+    range_ids = [link_.domain.id for link_ in get_all_links_of_entities_inverse(id_)]
     return [*range_ids, *domain_ids]
 
 
@@ -129,7 +129,7 @@ def link_parser_check(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return get_all_links(
+        return get_all_links_of_entities(
             [entity.id for entity in entities],
             get_properties_for_links(parser))
     return []
@@ -140,7 +140,7 @@ def link_parser_check_inverse(
         parser: dict[str, Any]) -> list[Link]:
     if any(i in ['relations', 'types', 'depictions', 'links', 'geometry']
            for i in parser['show']):
-        return get_all_links_inverse(
+        return get_all_links_of_entities_inverse(
             [entity.id for entity in entities],
             get_properties_for_links(parser))
     return []
@@ -220,3 +220,15 @@ def get_geometries(parser: dict[str, Any]) -> list[dict[str, Any]]:
         for geom in json.loads(all_geoms[item]):
             out.append(geom)
     return out
+
+
+def filter_link_list_by_property_codes(
+        links: list[dict[str, Any]],
+        codes: list[str]) -> list[dict[str, str]]:
+    data = []
+    for link_ in links:
+        if link_['property_code'] in codes:
+            data.append({
+                'domain_id': link_['domain_id'],
+                'range_id': link_['range_id']})
+    return data

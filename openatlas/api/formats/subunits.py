@@ -1,13 +1,15 @@
+
 from typing import Any, Optional, Union
 
 from flask import g
 
+from openatlas.api.resources.database_mapper import get_all_links_as_dict
 from openatlas.api.resources.util import (
-    get_all_subunits_recursive,
     get_geometric_collection, get_license, get_reference_systems,
-    remove_duplicate_entities, replace_empty_list_values_in_dict_with_none)
-from openatlas.api.resources.model_mapper import get_all_links, \
-    get_all_links_inverse
+    remove_duplicate_entities, replace_empty_list_values_in_dict_with_none,
+    filter_link_list_by_property_codes)
+from openatlas.api.resources.model_mapper import \
+    get_all_links_of_entities_inverse, get_entities_by_ids
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_path
@@ -194,7 +196,11 @@ def get_types(data: dict[str, Any]) -> Optional[list[dict[str, Any]]]:
 def get_subunits_from_id(
         entity: Entity,
         parser: dict[str, Any]) -> list[dict[str, Any]]:
-    entities = get_all_subunits_recursive(entity, [])
+    all_links = get_all_links_as_dict()
+    subunits = get_all_subs_linked_to_place(entity, all_links)
+    entities = get_entities_by_ids(subunits)
+    links = get_links_from_list_of_links(entities, all_links)
+    links_inverse = get_links_from_list_of_links_inverse(entities, all_links)
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
@@ -202,8 +208,11 @@ def get_subunits_from_id(
     for entity_ in entities:
         entities_dict[entity_.id] = {
             'entity': entity_,
-            'links': get_all_links(entity_.id),
-            'links_inverse': get_all_links_inverse(entity_.id),
+            'links':
+                [link_ for link_ in links if link_.domain.id == entity.id],
+            'links_inverse':
+                [link_ for link_ in links_inverse
+                 if link_.range.id == entity.id],
             'ext_reference_links': ext_reference_links,
             'root_id': entity.id,
             'latest_modified': latest_modified,
@@ -211,9 +220,51 @@ def get_subunits_from_id(
     return [get_subunit(item) for item in entities_dict.values()]
 
 
+def get_links_from_list_of_links(
+        entities: list[Entity],
+        links: list[dict[str, Any]]) -> list[Link]:
+    data = []
+    for entity in entities:
+        for link_ in links:
+            if link_['domain_id'] == entity.id:
+                data.append(Link(link_))
+    return data
+
+
+def get_links_from_list_of_links_inverse(
+        entities: list[Entity],
+        links: list[dict[str, Any]]) -> list[Link]:
+    data = []
+    for entity in entities:
+        for link_ in links:
+            if link_['range_id'] == entity.id:
+                data.append(Link(link_))
+    return data
+
+
+def get_all_subs_linked_to_place(
+        entity: Entity,
+        links: list[dict[str, Any]]) -> list[int]:
+    links_ = filter_link_list_by_property_codes(links, ['P46'])
+    return get_all_subs_linked_to_place_recursive(entity.id, links_, [])
+
+
+def get_all_subs_linked_to_place_recursive(
+        id_: int,
+        links: list[dict[str, Any]],
+        data: list[int]) -> list[int]:
+    data.append(id_)
+    for link_ in links:
+        if link_['domain_id'] == id_:
+            get_all_subs_linked_to_place_recursive(
+                link_['range_id'], links, data)
+    return data
+
+
 def get_type_links_inverse(entities: list[Entity]) -> list[Link]:
     types = remove_duplicate_entities(
         [type_ for entity in entities for type_ in entity.types])
-    links = get_all_links_inverse([type_.id for type_ in types], 'P67')
+    links = get_all_links_of_entities_inverse(
+        [type_.id for type_ in types], 'P67')
     return [link_ for link_ in links if
             link_.domain.class_.name == 'reference_system']

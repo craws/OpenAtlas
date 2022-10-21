@@ -10,8 +10,8 @@ from flask import Response, g
 from openatlas.api.resources.util import (
     get_linked_entities_api,
     link_parser_check, link_parser_check_inverse, remove_duplicate_entities)
-from openatlas.api.resources.model_mapper import get_all_links, \
-    get_all_links_inverse
+from openatlas.api.resources.model_mapper import get_all_links_of_entities, \
+    get_all_links_of_entities_inverse
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -79,7 +79,7 @@ def get_csv_types(entity: Entity) -> dict[Any, list[Any]]:
     for type_ in entity.types:
         hierarchy = [g.types[root].name for root in type_.root]
         value = ''
-        for link in get_all_links(entity.id):
+        for link in get_all_links_of_entities(entity.id):
             if link.range.id == type_.id and link.description:
                 value += link.description
                 if link.range.id == type_.id and type_.description:
@@ -91,11 +91,11 @@ def get_csv_types(entity: Entity) -> dict[Any, list[Any]]:
 
 def get_csv_links(entity: Entity) -> dict[str, Any]:
     links: dict[str, Any] = defaultdict(list)
-    for link in get_all_links(entity.id):
+    for link in get_all_links_of_entities(entity.id):
         key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
               f"{link.range.class_.name}"
         links[key].append(link.range.name)
-    for link in get_all_links_inverse(entity.id):
+    for link in get_all_links_of_entities_inverse(entity.id):
         key = f"{link.property.i18n['en'].replace(' ', '_')}_" \
               f"{link.range.class_.name}"
         if link.property.i18n_inverse['en']:
