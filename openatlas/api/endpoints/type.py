@@ -5,14 +5,11 @@ from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
-from openatlas.api.formats.subunits import get_subunits_from_id
-from openatlas.api.resources.error import NotAPlaceError
 from openatlas.api.resources.parser import default, entity_
 from openatlas.api.resources.resolve_endpoints import (
-    download, resolve_subunits)
+    download)
 from openatlas.api.resources.templates import (
     type_by_view_class_template, type_overview_template, type_tree_template)
-from openatlas.api.resources.model_mapper import get_entity_by_id
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 
@@ -113,13 +110,3 @@ class GetTypeTree(Resource):
             'category': type_.category}
 
 
-class GetSubunits(Resource):
-    @staticmethod
-    @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
-    def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
-        parser = entity_.parse_args()
-        entity = get_entity_by_id(id_)
-        if not entity.class_.name == 'place':
-            raise NotAPlaceError
-        subunits = get_subunits_from_id(entity, parser)
-        return resolve_subunits(subunits, parser, str(id_))
