@@ -84,12 +84,7 @@ class BaseManager:
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.add_buttons()
-        if self.link_:
-            self.form = Form(obj=self.link_)
-        elif self.entity:
-            self.form = Form(obj=self.entity)
-        else:
-            self.form = Form()
+        self.form = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
     def add_name_fields(self) -> None:
