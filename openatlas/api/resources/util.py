@@ -31,17 +31,6 @@ def parser_str_to_dict(parser: list[str]) -> list[dict[str, Any]]:
         raise InvalidSearchSyntax from e
 
 
-def get_all_subunits_recursive(
-        entity: Entity,
-        data: list[Entity]) -> list[Entity]:
-    data.append(entity)
-    if entity.class_.name not in ['artifact', 'human_remains']:
-        if sub_entities := entity.get_linked_entities('P46', types=True):
-            for e in sub_entities:
-                get_all_subunits_recursive(e, data)
-    return data
-
-
 def replace_empty_list_values_in_dict_with_none(
         data: dict[str, Any]) -> dict[str, Any]:
     for key, value in data.items():
