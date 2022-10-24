@@ -1,3 +1,4 @@
+from operator import attrgetter
 from typing import Any, Optional, Union
 
 from flask import g
@@ -198,6 +199,7 @@ def get_subunits_from_id(
     all_links = get_all_links_as_dict()
     entity_ids = get_all_subs_linked_to_place(entity, all_links)
     entities = get_entities_by_ids(entity_ids)
+    entities.sort(key=attrgetter('id'))
     links = get_links_from_list_of_links(entity_ids, all_links)
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
