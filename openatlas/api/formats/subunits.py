@@ -1,4 +1,3 @@
-
 from typing import Any, Optional, Union
 
 from flask import g
@@ -40,6 +39,13 @@ def get_parent(links: list[Link]) -> Optional[int]:
     return None
 
 
+def get_children(data: dict[str, Any]) -> list[Union[int, dict[str, Any]]]:
+    children = [link_.range.id for link_ in data['links'] if
+                link_.property.code == 'P46']
+    return [{'child': child} for child in children] \
+        if data['parser']['format'] == 'xml' else children
+
+
 def get_geometries_thanados(
         geom: Union[dict[str, Any], None],
         parser: dict[str, Any]) -> Union[list[Any], None, dict[str, Any]]:
@@ -59,23 +65,16 @@ def get_geometries_thanados(
 def check_geometries(geom: dict[str, Any]) \
         -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
-        return [transform_coords(k) for i in geom['coordinates'] for k in i]
+        return [transform_coordinates(k) for i in geom['coordinates'] for k in i]
     if geom['type'] == 'LineString':  # pragma: no cover
-        return [transform_coords(k) for k in geom['coordinates']]
+        return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
-        return transform_coords(geom['coordinates'])
+        return transform_coordinates(geom['coordinates'])
     return None  # pragma: no cover
 
 
-def transform_coords(coords: list[float]) -> list[dict[str, Any]]:
-    return [{'coordinate': {'longitude': coords[0], 'latitude': coords[1]}}]
-
-
-def get_children(data: dict[str, Any]) -> list[Union[int, dict[str, Any]]]:
-    children = [link_.range.id for link_ in data['links'] if
-                link_.property.code == 'P46']
-    return [{'child': child} for child in children] \
-        if data['parser']['format'] == 'xml' else children
+def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:
+    return [{'coordinate': {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
@@ -197,10 +196,9 @@ def get_subunits_from_id(
         entity: Entity,
         parser: dict[str, Any]) -> list[dict[str, Any]]:
     all_links = get_all_links_as_dict()
-    subunits = get_all_subs_linked_to_place(entity, all_links)
-    entities = get_entities_by_ids(subunits)
-    links = get_links_from_list_of_links(entities, all_links)
-    links_inverse = get_links_from_list_of_links_inverse(entities, all_links)
+    entity_ids = get_all_subs_linked_to_place(entity, all_links)
+    entities = get_entities_by_ids(entity_ids)
+    links = get_links_from_list_of_links(entity_ids, all_links)
     ext_reference_links = get_type_links_inverse(entities)
     latest_modified = max(
         entity.modified for entity in entities if entity.modified)
@@ -209,10 +207,9 @@ def get_subunits_from_id(
         entities_dict[entity_.id] = {
             'entity': entity_,
             'links':
-                [link_ for link_ in links if link_.domain.id == entity.id],
+                [Link(link_) for link_ in links['links'] if link_['domain_id'] == entity_.id],
             'links_inverse':
-                [link_ for link_ in links_inverse
-                 if link_.range.id == entity.id],
+                [Link(link_) for link_ in links['links_inverse'] if link_['range_id'] == entity_.id],
             'ext_reference_links': ext_reference_links,
             'root_id': entity.id,
             'latest_modified': latest_modified,
@@ -221,24 +218,16 @@ def get_subunits_from_id(
 
 
 def get_links_from_list_of_links(
-        entities: list[Entity],
-        links: list[dict[str, Any]]) -> list[Link]:
-    data = []
-    for entity in entities:
-        for link_ in links:
-            if link_['domain_id'] == entity.id:
-                data.append(Link(link_))
-    return data
-
-
-def get_links_from_list_of_links_inverse(
-        entities: list[Entity],
-        links: list[dict[str, Any]]) -> list[Link]:
-    data = []
-    for entity in entities:
-        for link_ in links:
-            if link_['range_id'] == entity.id:
-                data.append(Link(link_))
+        entities: list[int],
+        links: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
+    data = {
+        'links': [],
+        'links_inverse': []}
+    for link_ in links:
+        if link_['domain_id'] in entities:
+            data['links'].append(link_)
+        if link_['range_id'] in entities:
+            data['links_inverse'].append(link_)
     return data
 
 
