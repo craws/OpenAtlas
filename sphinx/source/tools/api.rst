@@ -3,18 +3,11 @@ API
 
 .. toctree::
 
-The OpenAtlas API
-(`Application programming interface <https://en.wikipedia.org/wiki/Application_programming_interface>`_)
-output is based on `JSON-LD syntax <https://json-ld.org/spec/latest/json-ld/>`_
-and `GeoJSON <https://tools.ietf.org/html/rfc7946>`_, and therefore could be rendered in many web
-mapping applications. In addition, `Linked Places <https://github.com/LinkedPasts/linked-places>`_
-was used as standard.
+This page provides an overview of the OpenAtlas Application Programming
+Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API provided is
+`RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
+to provide easy access to the data included.
+For an complete overview of possible endpoints and usage of the OpenAtlas API
+also visit our
+`Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/0.3/>`_.
 
-The API links at entity views are only visible for user who have activated
-**Show API links** in their :doc:`profile`.
-
-The base url of the current OpenAtlas API is api/
-
-Settings: :doc:`/admin/api`
-
-Documentation: /swagger
