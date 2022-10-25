@@ -12,10 +12,10 @@ Artifact can be entered here, e.g. a coin
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * :doc:`/tools/map`
 * :doc:`reference_system`
 * **Owned by** - the :doc:`actor` who owns the artifact

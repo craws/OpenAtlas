@@ -20,9 +20,9 @@ in one go.
 Form fields
 -----------
 * **File** - here you can chose a file from your computer
-* :doc:`/form/name` - if empty it will be prefilled after the file selection with the filename
+* :doc:`/ui/name` - if empty it will be prefilled after the file selection with the filename
 * **License** - which works like a :doc:`type`, it is a good practice to define one
-* :doc:`/form/description`
+* :doc:`/ui/description`
 
 
 Can be linked via tabs to

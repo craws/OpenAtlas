@@ -30,7 +30,7 @@ but the interface elements to add them will disappear.
 
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones
   (editor or above)
-* **Time** - show time fields in forms, see :doc:`/form/date`
+* **Time** - show time fields in forms, see :doc:`/ui/date`
 
 Display
 -------

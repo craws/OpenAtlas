@@ -13,10 +13,10 @@ and age of an individual can be entered in the stratigraphic unit entry mask. Fo
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * :doc:`/tools/map`
 * **Owned by** - the :doc:`actor` who owns the artifact
 
