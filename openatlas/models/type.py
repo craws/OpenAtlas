@@ -15,6 +15,7 @@ class Type(Entity):
     count_subs = 0
     category = ''
     multiple = False
+    required = False
     directional = False
 
     def __init__(self, row: dict[str, Any]) -> None:
@@ -55,6 +56,7 @@ class Type(Entity):
             else:
                 type_.category = hierarchies[type_.id]['category']
                 type_.multiple = hierarchies[type_.id]['multiple']
+                type_.required = hierarchies[type_.id]['required']
                 type_.directional = hierarchies[type_.id]['directional']
                 for class_ in g.classes.values():
                     if class_.hierarchies and type_.id in class_.hierarchies:

@@ -75,11 +75,17 @@
                       {{ tree|safe }}
                     </div>
                     <div class="col-5 contentbox">
-                      {% if not type_.value_type %}
+                      {% if category != 'value' %}
                         <p>
                           <strong>{{ _('selection')|uc_first }}</strong>:
                           {{ _('multiple') if type_.multiple else _('single') }}
                         </p>
+                        {% if category != 'system' %}
+                          <p>
+                            <strong>{{ _('required')|uc_first }}</strong>:
+                            {{ _('true') if type_.required else _('false') }}
+                          </p>
+                        {% endif %}
                       {% endif %}
                       {% if type_.classes %}
                         <p>
