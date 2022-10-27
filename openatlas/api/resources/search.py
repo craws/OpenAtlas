@@ -6,7 +6,7 @@ from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
 from openatlas.api.resources.util import (
     get_linked_entities_id_api)
-from openatlas.api.resources.model_mapper import get_all_links_inverse, \
+from openatlas.api.resources.model_mapper import get_all_links_of_entities_inverse, \
     flatten_list_and_remove_duplicates
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -77,7 +77,7 @@ def get_search_values(
 def search_for_value(
         values: Tuple[int, float],
         parameter: dict[str, Any]) -> list[int]:
-    links = get_all_links_inverse(values[0])
+    links = get_all_links_of_entities_inverse(values[0])
     ids = []
     for link_ in links:
         if link_.description and search_entity(

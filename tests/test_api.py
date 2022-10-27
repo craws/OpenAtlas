@@ -567,19 +567,21 @@ class Api03(ApiTestCase):
                 self.app.get(url_for('api_03.subunits', id_=place.id)),
                 self.app.get(
                     url_for('api_03.subunits', id_=place.id, download=True))]:
-                rv = rv.get_json()[str(place.id)][0]
-            assert bool(rv['id'] == place.id)
-            assert bool(rv['openatlasClassName'] == "place")
-            assert bool(rv['children'] == [feature.id])
-            rv = rv['properties']
-            assert bool(rv['name'] == place.name)
-            assert bool(rv['description'] == place.description)
-            assert bool(rv['aliases'] == [alias.name])
-            assert bool(rv['externalReferences'])
-            assert bool(rv['timespan'])
-            assert bool(rv['standardType'])
-            assert bool(rv['files'])
-            assert bool(rv['types'])
+                rv = rv.get_json()[str(place.id)]
+                for item in rv:
+                    if item['id'] == place.id:
+                        assert bool(item['id'] == place.id)
+                        assert bool(item['openatlasClassName'] == "place")
+                        assert bool(item['children'] == [feature.id])
+                        item = item['properties']
+                        assert bool(item['name'] == place.name)
+                        assert bool(item['description'] == place.description)
+                        assert bool(item['aliases'] == [alias.name])
+                        assert bool(item['externalReferences'])
+                        assert bool(item['timespan'])
+                        assert bool(item['standardType'])
+                        assert bool(item['files'])
+                        assert bool(item['types'])
 
             rv = self.app.get(
                 url_for('api_03.subunits', id_=place.id, count=True))

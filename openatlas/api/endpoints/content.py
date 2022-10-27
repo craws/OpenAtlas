@@ -1,25 +1,16 @@
-import json
-from typing import Any, Union
+from typing import Union
 
 from flasgger import swag_from
-from flask import Response, g, jsonify
+from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas import app
-from openatlas.api.formats.csv import export_database_csv
-from openatlas.api.formats.xml import export_database_xml
-from openatlas.api.resources.database_mapper import get_all_entities, \
-    get_all_links, get_properties, get_property_hierarchy, get_classes, \
-    get_cidoc_hierarchy
-from openatlas.api.resources.parser import gis, language
+from openatlas.api.resources.parser import language
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
-    class_overview_template, content_template, geometries_template,
-    overview_template)
-from openatlas.api.resources.util import get_geometries
+    class_overview_template, content_template, overview_template)
 from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.models.content import get_translation
-from openatlas.models.export import current_date_for_filename
 
 
 class GetContent(Resource):
@@ -53,23 +44,6 @@ class ClassMapping(Resource):
             class_overview_template()), 200
 
 
-class GetGeometricEntities(Resource):
-    @staticmethod
-    @swag_from(
-        "../swagger/geometric_entities.yml",
-        endpoint="api_03.geometric_entities")
-    def get() -> Union[int, Response, tuple[Any, int]]:
-        parser = gis.parse_args()
-        output: dict[str, Any] = {
-            'type': 'FeatureCollection',
-            'features': get_geometries(parser)}
-        if parser['count'] == 'true':
-            return jsonify(len(output['features']))
-        if parser['download'] == 'true':
-            return download(output, geometries_template(), 'geometries')
-        return marshal(output, geometries_template()), 200
-
-
 class SystemClassCount(Resource):
     @staticmethod
     @swag_from(
@@ -79,42 +53,3 @@ class SystemClassCount(Resource):
         return marshal(get_overview_counts(), overview_template()), 200
 
 
-class ExportDatabase(Resource):
-    @staticmethod
-    @swag_from(
-        "../swagger/system_class_count.yml",
-        endpoint="api_03.export_database")
-    def get(format_: str) -> Union[tuple[Resource, int], Response]:
-        geoms = [ExportDatabase.get_geometries_dict(geom) for geom in
-                 get_geometries({'geometry': 'gisAll'})]
-        tables = {
-            'entities': get_all_entities(),
-            'links': get_all_links(),
-            'properties': get_properties(),
-            'property_hierarchy': get_property_hierarchy(),
-            'classes': get_classes(),
-            'class_hierarchy': get_cidoc_hierarchy(),
-            'geometries': geoms}
-        filename = f'{current_date_for_filename()}-export'
-        if format_ == 'csv':
-            return export_database_csv(tables, filename)
-        if format_ == 'xml':
-            return export_database_xml(tables, filename)
-        return Response(
-            json.dumps({key: str(value) for key, value in tables.items()}),
-            mimetype='application/json',
-            headers={
-                'Content-Disposition': f'attachment;filename={filename}.json'})
-
-    @staticmethod
-    def get_geometries_dict(
-            geom: dict[str, Any]) -> dict[str, Any]:
-        return {
-            'id': geom['properties']['id'],
-            'locationId': geom['properties']['locationId'],
-            'objectId': geom['properties']['objectId'],
-            'name': geom['properties']['name'],
-            'objectName': geom['properties']['objectName'],
-            'objectDescription': geom['properties']['objectDescription'],
-            'coordinates': geom['geometry']['coordinates'],
-            'type': geom['geometry']['type']}

@@ -6,11 +6,11 @@ from openatlas.database.link import Link as DbLink
 from openatlas.database.entity import Entity as DbEntity
 
 
-def get_all_entities() -> list[dict[str, Any]]:
+def get_all_entities_as_dict() -> list[dict[str, Any]]:
     return DbEntity.get_all_entities()
 
 
-def get_all_links() -> list[dict[str, Any]]:
+def get_all_links_as_dict() -> list[dict[str, Any]]:
     return DbLink.get_all_links()
 
 

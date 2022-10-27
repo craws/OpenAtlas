@@ -21,7 +21,7 @@ python-gettext==4.0
 python-Levenshtein==0.20.7
 rdflib-jsonld==0.6.0
 rdflib==5.0.0
-Wand==0.6.5
+Wand==0.6.10
 werkzeug==1.0.1
 wtforms==2.2.1
 

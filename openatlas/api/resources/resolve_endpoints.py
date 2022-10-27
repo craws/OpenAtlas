@@ -26,8 +26,8 @@ from openatlas.api.resources.util import (
     get_key,
     link_parser_check, link_parser_check_inverse, parser_str_to_dict,
     remove_duplicate_entities)
-from openatlas.api.resources.model_mapper import get_all_links, \
-    get_all_links_inverse
+from openatlas.api.resources.model_mapper import get_all_links_of_entities, \
+    get_all_links_of_entities_inverse
 from openatlas.models.entity import Entity
 
 
@@ -86,8 +86,8 @@ def get_entity_formatted(
         return get_geojson_v2([entity], parser)
     return get_linked_places_entity(
         entity,
-        get_all_links(entity.id),
-        get_all_links_inverse(entity.id),
+        get_all_links_of_entities(entity.id),
+        get_all_links_of_entities_inverse(entity.id),
         parser)
 
 
