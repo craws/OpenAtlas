@@ -15,10 +15,10 @@ CIDOC documentation: :cidoc_entity:`E21 Person<e21-person>` and
 
 Form fields
 -----------
-* :doc:`/form/name`
-* :doc:`/form/alias`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/name`
+* :doc:`/ui/alias`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * **Residence** - a :doc:`place`, e.g. the location of an institute or the main residence of an actor
 * **Born in / Begins in** - the :doc:`place` where a person was born or a group began
 * **Died in / Ends in** - the :doc:`place` where a person died or a group ended
