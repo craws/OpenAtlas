@@ -736,7 +736,6 @@ span[id^="value-type-switcher-"]{
   background-color: #e9ecef !important;
 }
 
-
 .modal-body{
   overflow:auto;
   max-height:calc(100vh - 200px);
