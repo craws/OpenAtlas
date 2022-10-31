@@ -47,7 +47,7 @@
           class="{{ config.CSS.button.primary }}"
           data-bs-dismiss="modal"
           onclick="selectFromTreeMulti({{ field.id }})">
-          {{ _('close')|uc_first }}
+          {{ _('save')|uc_first }}
         </button>
       </div>
     </div>
@@ -125,4 +125,8 @@
         $("#{{ field.id }}-tree").jstree(true).show_all();
       }
     });
+
+    $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
+        selectFromTreeMulti({{ field.id }});
+    })
   </script>
