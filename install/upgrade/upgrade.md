@@ -22,6 +22,9 @@ base, then run the database upgrade script, then restart Apache:
 ### 7.7.0 to 7.8.0
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
+Please note that, like announced, the deprecated API version 0.2 was removed
+in this release.
+
 ### 7.6.x to 7.7.0
 7.7.0.sql is needed but wil be taken care of by the database upgrade script.
 
