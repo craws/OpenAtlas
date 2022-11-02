@@ -34,3 +34,8 @@
     </div>
   </div>
 </div>
+<script>
+    $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
+        selectFromTableMulti('{{ field.id }}');
+})
+</script>

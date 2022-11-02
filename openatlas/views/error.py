@@ -4,7 +4,7 @@ from typing import Any
 from flask import jsonify, render_template, request
 
 from openatlas import app
-from openatlas.api.v02.resources.error import MethodNotAllowedError
+from openatlas.api.resources.error import MethodNotAllowedError
 
 
 @app.errorhandler(400)

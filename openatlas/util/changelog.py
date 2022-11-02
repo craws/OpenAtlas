@@ -1,4 +1,8 @@
 versions = {
+    '7.8.0': ['TBA',  {
+        'feature': {
+            '1835': 'Improved form selection behavior',
+            '1843': 'API: remove version 0.2'}}],
     '7.7.0': ['2022-10-18', {
         'feature': {
             '1587': 'Link artifacts and human remains to places directly',
