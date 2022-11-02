@@ -3,6 +3,8 @@ API
 
 .. toctree::
 
+Introduction
+------------
 This page provides an overview of the OpenAtlas Application Programming
 Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API provided is
 `RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
