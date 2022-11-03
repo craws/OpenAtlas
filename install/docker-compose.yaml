@@ -1,0 +1,17 @@
+version: "3.9"
+services:
+  openatlas:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+        - POSTGRES_DB=openatlas
+        - POSTGRES_HOST=postgres
+        - POSTGRES_PASSWORD=verysecret
+        - POSTGRES_USER=openatlas
+  postgres:
+    image: "postgis/postgis:13-3.3"
+    environment:
+      - POSTGRES_DB=openatlas
+      - POSTGRES_PASSWORD=verysecret
+      - POSTGRES_USER=openatlas

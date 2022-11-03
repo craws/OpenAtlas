@@ -15,18 +15,18 @@ popd
 
 source /etc/apache2/envvars
 
-cookie_key=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c${1:-32};echo;)
+cookie_key=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
 export COOKIE_KEY=${COOKIE_KEY:-$cookie_key}
 export MAIL_PASSWORD=${MAIL_PASSWORD:-CHANGE ME}
 
 cat <<EOF > /var/www/openatlas/instance/production.py
-DATABASE_NAME = '$POSTGRES_DB'
-DATABASE_USER = '$POSTGRES_USER'
-DATABASE_HOST = '$POSTGRES_HOST'
-DATABASE_PORT = 5432
-DATABASE_PASS = '$POSTGRES_PASSWORD'
-MAIL_PASSWORD = '$MAIL_PASSWORD'
-SECRET_KEY = '$COOKIE_KEY'  # Used for cookies
+DATABASE_NAME='$POSTGRES_DB'
+DATABASE_USER='$POSTGRES_USER'
+DATABASE_HOST='$POSTGRES_HOST'
+DATABASE_PORT=5432
+DATABASE_PASS='$POSTGRES_PASSWORD'
+MAIL_PASSWORD='$MAIL_PASSWORD'
+SECRET_KEY='$COOKIE_KEY'  # Used for cookies
 EOF
 
 echo ""
