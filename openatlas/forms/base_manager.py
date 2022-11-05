@@ -272,7 +272,7 @@ class ArtifactBaseManager(BaseManager):
             'actor': TableField(
                 _('owned by'),
                 add_dynamic=['person', 'group']),
-            'place': TableField()}
+            'place': TableField(add_dynamic=['place'])}
 
     def populate_insert(self) -> None:
         if self.origin and self.origin.class_.view == 'place':
