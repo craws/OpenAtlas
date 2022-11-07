@@ -14,9 +14,7 @@
           <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
       </a>
       {{ _('model')|button(url_for('model_index'))|safe }}
-      <a
-        class="{{ config.CSS.button.primary }}"
-        href="{{ url_for('index', view='reference_system') }}">
+      <a class="{{ config.CSS.button.primary }}" href="{{ url_for('index', view='reference_system') }}">
           {{ _('reference systems')|uc_first }}
       </a>
       {{ _('network visualization')|button(url_for('model_network'))|safe }}

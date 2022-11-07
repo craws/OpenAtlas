@@ -25,6 +25,14 @@ class Type(Entity):
         self.classes: list[str] = []
 
     @staticmethod
+    def hierarchy_required_add(id_: int) -> None:
+        Db.hierarchy_required_add(id_)
+
+    @staticmethod
+    def hierarchy_required_remove(id_: int) -> None:
+        Db.hierarchy_required_remove(id_)
+
+    @staticmethod
     def get_all() -> dict[int, Type]:
         types = {}
         for row in \

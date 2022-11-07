@@ -80,10 +80,17 @@
                           <strong>{{ _('selection')|uc_first }}</strong>:
                           {{ _('multiple') if type_.multiple else _('single') }}
                         </p>
-                        {% if category != 'system' %}
+                        {% if category in ['custom', 'place', 'standard'] %}
                           <p>
                             <strong>{{ _('required')|uc_first }}</strong>:
                             {{ _('true') if type_.required else _('false') }}
+                            {% if 'manager'|is_authorized %}
+                              {% if type_.required %}
+                                {{ _('remove required')|button(url_for('required_remove', id_=type_.id))|safe }}
+                              {% else %}
+                                {{ _('make required')|button(url_for('required_risk', id_=type_.id))|safe }}
+                              {% endif %}
+                            {% endif %}
                           </p>
                         {% endif %}
                       {% endif %}

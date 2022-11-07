@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title_name %} - SQL{% endblock %}
+{% block content %}
+  {{ buttons|button_bar|safe }}
+  <h2>
+    {{ _('Attention: be careful with setting types to required') }}
+  </h2>
+  <p>
+    <input id="required_risk_aware" type="checkbox">
+    {{ _("I'm aware of the risk.") }}
+  </p>
+  <div class="toolbar">
+    {{ _('proceed')|button(id_='proceed_button', url='#')|safe }}
+  </div>
+{% endblock %}
+
+{% block script %}
+  <script>
+    $(document).ready(function () {
+      $('#required_risk_aware').change(function() {
+        if (this.checked) {
+          $("#proceed_button").attr("href", "{{ url_for('required_add', id_=id_) }}")
+        } else {
+          $("#proceed_button").attr("href", "")
+        }
+      });
+    })
+  </script>
+{% endblock %}

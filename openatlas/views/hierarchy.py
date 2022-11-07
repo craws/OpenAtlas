@@ -8,12 +8,12 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.forms.form import get_manager
+from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
     display_form, get_entities_linked_to_type_recursive, link, required_group,
-    sanitize,
-    uc_first)
+    sanitize, uc_first)
 
 
 @app.route('/hierarchy/insert/<category>', methods=['POST', 'GET'])
@@ -138,3 +138,30 @@ def hierarchy_delete(id_: int) -> Response:
     type_.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('type_index'))
+
+
+@app.route('/hierarchy/required_risk/<int:id_>')
+@required_group('manager')
+def required_risk(id_: int) -> Response:
+    entity = Entity.get_by_id(id_)
+    return render_template(
+        'type/required.html',
+        id_=id_,
+        entity=entity,
+        crumbs=[[_('types'), url_for('type_index')], entity, _('required')])
+
+
+@app.route('/hierarchy/required_add/<int:id_>')
+@required_group('manager')
+def required_add(id_: int) -> Response:
+    Type.hierarchy_required_add(id_)
+    flash(_('info update'), 'info')
+    return redirect(url_for('view', id_=id_))
+
+
+@app.route('/hierarchy/required_remove/<int:id_>')
+@required_group('manager')
+def required_remove(id_: int) -> Response:
+    Type.hierarchy_required_remove(id_)
+    flash(_('info update'), 'info')
+    return redirect(url_for('view', id_=id_))
