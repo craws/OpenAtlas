@@ -12,10 +12,10 @@ To start entering a new :doc:`Place</entity/place>` click the **Place**
 button in the :doc:`menu</ui/menu>`. Then use the **+ Place** button to get
 to the respective form. The following information can be entered:
 
-* Choose a descriptive :doc:`/form/name`; as in all other forms, a name is
+* Choose a descriptive :doc:`/ui/name`; as in all other forms, a name is
   required to save data
 * If a place has several designations or is also known by other names, note
-  them under :doc:`/form/alias`. Please keep in mind: Place names in other
+  them under :doc:`/ui/alias`. Please keep in mind: Place names in other
   languages can be covered by using **Geonames** as
   :doc:`/entity/reference_system`
 * Select a fitting :doc:`/entity/type` from the list. If none can be found,
@@ -24,7 +24,7 @@ to the respective form. The following information can be entered:
 * Add an **administrative unit** or **historical place** and/or link the
   place to an :doc:`/entity/reference_system` (see a tutorial
   :doc:`here<reference_systems>`)
-* You can also add a :doc:`/form/date` and a free text :doc:`/form/description`
+* You can also add a :doc:`/ui/date` and a free text :doc:`/ui/description`
 
 How to use the map
 ******************

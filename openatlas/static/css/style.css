@@ -735,3 +735,9 @@ span[id^="value-type-switcher-"]{
   padding: .75rem 1rem !important;
   background-color: #e9ecef !important;
 }
+
+.modal-body{
+  overflow:auto;
+  max-height:calc(100vh - 200px);
+  width:100%;
+}

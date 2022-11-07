@@ -54,8 +54,8 @@ with an example value type **Dimensions** with the sub types **Height** and
 
 Form fields
 -----------
-* :doc:`/form/name`
-* :doc:`/form/description`
+* :doc:`/ui/name`
+* :doc:`/ui/description`
 * :doc:`reference_system`
-* :doc:`/form/date`
+* :doc:`/ui/date`
 * A super (type) if it is a sub type of another type

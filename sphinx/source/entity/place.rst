@@ -14,11 +14,11 @@ For step by step instructions have a look at our :doc:`/examples/places`.
 
 Form fields
 -----------
-* :doc:`/form/name`
-* :doc:`/form/alias`
+* :doc:`/ui/name`
+* :doc:`/ui/alias`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * :doc:`/tools/map`
 * **Administrative Unit**
 * **Historical Place**

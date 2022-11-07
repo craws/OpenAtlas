@@ -14,7 +14,6 @@ development specific documentation in our Redmine
 
    overview
    entity/index
-   form/index
    tools/index
    admin/index
    ui/index
