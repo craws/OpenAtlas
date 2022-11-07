@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import (
-    NoneOf, NumberRange, Optional as OptionalValidator)
+    InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
 from openatlas.models.openatlas_class import OpenatlasClass
@@ -251,15 +251,16 @@ def add_types(manager: Any) -> None:
             form = AddDynamicType() if is_authorized('editor') else None
             if form:
                 getattr(form, f'{type_.id}-dynamic').label.text = 'super'
+            validators = [InputRequired()] if type_.required else []
             if type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeMultiField(str(type_.id), form=form))
+                    TreeMultiField(str(type_.id), validators, form=form))
             else:
                 setattr(
                     manager.form_class,
                     str(type_.id),
-                    TreeField(str(type_.id), form=form))
+                    TreeField(str(type_.id), validators, form=form))
             if type_.category == 'value':
                 add_value_type_fields(manager.form_class, type_.subs)

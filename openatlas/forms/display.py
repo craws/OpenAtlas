@@ -47,6 +47,8 @@ def html_form(
                 html += add_row(field, label, button_icon(type_))
                 html += add_value_type(form, type_)
                 continue
+            if field.flags.required and field.label.text:
+                label += ' *'
             tooltip_ = '' \
                 if 'is_type_form' in form else f' {tooltip(type_.description)}'
             html += add_row(field, label + tooltip_)
