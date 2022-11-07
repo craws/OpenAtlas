@@ -1,0 +1,58 @@
+<div id="drag-n-drop" class="drag-n-drop">
+    <p></p>
+</div>
+
+<script>
+    const dropContainer = document.getElementById('drag-n-drop')
+    const fileInput = document.getElementById('file')
+
+
+    function highlight(e) {
+        dropContainer.classList.add('highlight')
+    }
+
+    function unhighlight(e) {
+        dropContainer.classList.remove('highlight')
+    }
+
+    dropContainer.addEventListener("dragenter", function (e) {
+        highlight();
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    dropContainer.addEventListener("dragover", function (e) {
+        highlight();
+        e.preventDefault();
+        e.stopPropagation();
+    });
+    dropContainer.addEventListener("dragleave", function (e) {
+        unhighlight();
+        e.preventDefault();
+        e.stopPropagation();
+    });
+
+    dropContainer.addEventListener("drop", function (e) {
+
+
+        updateFiles([...e.dataTransfer.files])
+        fileInput.files = e.dataTransfer.files;
+
+
+        unhighlight();
+        e.preventDefault();
+        e.stopPropagation();
+
+    });
+
+    function updateFiles(files) {
+        const dropContainer = document.getElementById('drag-n-drop')
+
+        files?.forEach(file => {
+            console.log(file)
+            const fileDiv = document.createElement('div');
+            fileDiv.innerHTML = `<span><i class="fa fa-file"></i></span><p>${file.name}</p>`
+            dropContainer.appendChild(fileDiv)
+
+        })
+    }
+</script>

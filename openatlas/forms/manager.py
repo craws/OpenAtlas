@@ -12,7 +12,7 @@ from wtforms.validators import (
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager)
-from openatlas.forms.field import TableField, TableMultiField, TreeField
+from openatlas.forms.field import TableField, TableMultiField, TreeField, DragNDropField
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -211,7 +211,7 @@ class FileManager(BaseManager):
     def additional_fields(self) -> dict[str, Any]:
         fields = {}
         if not self.entity:
-            fields['file'] = MultipleFileField(_('file'), [InputRequired()])
+            fields['file'] = DragNDropField(_('file'), [InputRequired()])
             setattr(self.form_class, 'validate_file', file)
         if not self.entity \
                 and self.origin \

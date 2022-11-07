@@ -741,3 +741,14 @@ span[id^="value-type-switcher-"]{
   max-height:calc(100vh - 200px);
   width:100%;
 }
+
+.drag-n-drop{
+  min-height: 250px;
+  width:100%;
+  border: grey dashed;
+  border-radius: 0;
+}
+
+.drag-n-drop.highlight{
+  background: grey;
+}
