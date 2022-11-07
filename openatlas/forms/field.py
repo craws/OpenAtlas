@@ -222,7 +222,7 @@ class DragNDrop(FileInput):
 class DragNDropField(FileField):
     """A :class:`FileField` that allows choosing multiple files."""
 
-    widget = FileInput(multiple=True)
+    widget = DragNDrop(multiple=True)
 
     def process_formdata(self, valuelist):
         self.data = valuelist

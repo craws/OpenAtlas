@@ -55,6 +55,7 @@ $(document).ready(function () {
 
   /* When selecting a file for upload: if name is empty, fill with filename without extension */
   $('#file').on("change", function () {
+    setFilesOfDropField([...$('#file')[0].files])
     if ($('#name').val() == '') {
       var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
       $('#name').val(filename.replace(/\.[^/.]+$/, ""));
@@ -336,4 +337,20 @@ function removeAccents(data) {
       .replace(/[\u0300-\u036f]/g, '');
   }
   return data;
+}
+
+function setFilesOfDropField(files) {
+  const dropContainer = document.getElementById('drag-n-drop')
+  dropContainer.innerHTML = '';
+  files?.forEach(file => {
+    const fileDiv = document.createElement('div');
+    fileDiv.classList.add('drag-drop-item');
+    fileDiv.innerHTML = `
+                            <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
+                                <div class="card-body">
+                                <i class="fa fa-file"></i>
+                                ${file.name}
+                            </div>`
+    dropContainer.appendChild(fileDiv)
+  })
 }

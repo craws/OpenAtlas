@@ -1,58 +1,52 @@
 <div id="drag-n-drop" class="drag-n-drop">
-    <p></p>
+    <div class="instruction-text">Drop Your Files Here</div>
 </div>
 
 <script>
     const dropContainer = document.getElementById('drag-n-drop')
     const fileInput = document.getElementById('file')
 
-
-    function highlight(e) {
-        dropContainer.classList.add('highlight')
-    }
-
-    function unhighlight(e) {
-        dropContainer.classList.remove('highlight')
-    }
-
     dropContainer.addEventListener("dragenter", function (e) {
-        highlight();
+        dropContainer.classList.add('highlight')
+
         e.preventDefault();
         e.stopPropagation();
     });
     dropContainer.addEventListener("dragover", function (e) {
-        highlight();
+        dropContainer.classList.add('highlight')
+
         e.preventDefault();
         e.stopPropagation();
     });
     dropContainer.addEventListener("dragleave", function (e) {
-        unhighlight();
+        dropContainer.classList.remove('highlight')
+
         e.preventDefault();
         e.stopPropagation();
     });
 
     dropContainer.addEventListener("drop", function (e) {
+        if ($('#name').val() == '') {
+            const filename = e.dataTransfer.files[0].name;
+            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+        }
 
+        const newFiles = new DataTransfer();
+        [...fileInput.files, ...e.dataTransfer.files].forEach(x => newFiles.items.add(x));
+        fileInput.files = newFiles.files
+        setFilesOfDropField([...fileInput.files])
+        dropContainer.classList.remove('highlight')
 
-        updateFiles([...e.dataTransfer.files])
-        fileInput.files = e.dataTransfer.files;
-
-
-        unhighlight();
         e.preventDefault();
         e.stopPropagation();
 
     });
 
-    function updateFiles(files) {
-        const dropContainer = document.getElementById('drag-n-drop')
 
-        files?.forEach(file => {
-            console.log(file)
-            const fileDiv = document.createElement('div');
-            fileDiv.innerHTML = `<span><i class="fa fa-file"></i></span><p>${file.name}</p>`
-            dropContainer.appendChild(fileDiv)
-
-        })
-    }
+    $('#file').on("change", function () {
+        if ($('#name').val() == '') {
+            var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
+            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+        }
+    });
 </script>
