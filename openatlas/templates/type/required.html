@@ -2,16 +2,15 @@
 {% block title_name %} - SQL{% endblock %}
 {% block content %}
   {{ buttons|button_bar|safe }}
-  <h2>
+  <p>
     {{ _('Attention: be careful with setting types to required') }}
-  </h2>
+  </p>
   {% if untyped_count != '0' %}
     {{ untyped_count }}
     {{ _("entities have no type. Be aware, that these than can't be updated, without setting this type.") }}
   {% endif %}
   <p>
-    <input id="required_risk_aware" type="checkbox">
-    {{ _("I'm aware of the risk.") }}
+    <input id="required_risk_aware" type="checkbox"> {{ _("I'm aware of the risk.") }}
   </p>
   <div class="toolbar">
     {{ _('proceed')|button(id_='proceed_button', url='#')|safe }}
