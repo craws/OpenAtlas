@@ -148,6 +148,7 @@ def required_risk(id_: int) -> Response:
         'type/required.html',
         id_=id_,
         entity=entity,
+        untyped_count=format_number(len(Type.get_untyped(id_))),
         crumbs=[[_('types'), url_for('type_index')], entity, _('required')])
 
 
@@ -155,6 +156,7 @@ def required_risk(id_: int) -> Response:
 @required_group('manager')
 def required_add(id_: int) -> Response:
     Type.hierarchy_required_add(id_)
+    g.logger.log('info', 'types', f'Setting hierarchy {id_} to required')
     flash(_('info update'), 'info')
     return redirect(url_for('view', id_=id_))
 
@@ -163,5 +165,6 @@ def required_add(id_: int) -> Response:
 @required_group('manager')
 def required_remove(id_: int) -> Response:
     Type.hierarchy_required_remove(id_)
+    g.logger.log('info', 'types', f'Setting hierarchy {id_} to not required')
     flash(_('info update'), 'info')
     return redirect(url_for('view', id_=id_))

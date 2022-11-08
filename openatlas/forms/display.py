@@ -4,6 +4,7 @@ from typing import Any, Optional, TYPE_CHECKING
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
@@ -49,9 +50,12 @@ def html_form(
                 continue
             if field.flags.required and field.label.text:
                 label += ' *'
-            tooltip_ = '' \
-                if 'is_type_form' in form else f' {tooltip(type_.description)}'
-            html += add_row(field, label + tooltip_)
+            tooltip_ = ''
+            if 'is_type_form' not in form:
+                tooltip_ = type_.description
+                if field.flags.required and current_user.group == 'admin':
+                    tooltip_ += f"&#013;{_('tooltip_required_type')}"
+            html += add_row(field, label + tooltip(tooltip_))
             continue
 
         if field.id == 'save':
