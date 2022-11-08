@@ -51,10 +51,11 @@ def html_form(
             if field.flags.required and field.label.text:
                 label += ' *'
             tooltip_ = ''
-            if 'is_type_form' not in form:
+            if 'is_type_form' not in form:  # pragma: no cover
                 tooltip_ = type_.description
-                if field.flags.required and current_user.group == 'admin':
-                    tooltip_ += f"&#013;{_('tooltip_required_type')}"
+                if field.flags.required \
+                        and current_user.group == 'contributor':
+                    tooltip_ += "&#013;" + str(_('tooltip_required_type'))
             html += add_row(field, label + tooltip(tooltip_))
             continue
 

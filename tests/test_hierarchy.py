@@ -48,6 +48,28 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_insert', category='custom'))
             assert b'+ Custom' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                sex_hierarchy = Type.get_hierarchy('Sex')
+
+            rv = self.app.get(
+                url_for('required_risk', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Be careful with making types required' in rv.data
+
+            rv = self.app.get(
+                url_for('required_add', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+
+            rv = self.app.get(url_for('insert', class_='person'))
+            assert b'Sex *' in rv.data
+
+            rv = self.app.get(
+                url_for('required_remove', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+
             data = {'name': 'My secret type', 'description': 'Very important!'}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=hierarchy.id),
