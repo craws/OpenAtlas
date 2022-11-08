@@ -222,9 +222,7 @@ def get_subunits_from_id(
 def get_links_from_list_of_links(
         entities: list[int],
         links: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    data = {
-        'links': [],
-        'links_inverse': []}
+    data: dict[str, list[Any]] = {'links': [], 'links_inverse': []}
     for link_ in links:
         if link_['domain_id'] in entities:
             data['links'].append(link_)

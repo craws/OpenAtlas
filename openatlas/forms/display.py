@@ -52,7 +52,7 @@ def html_form(
                 label += ' *'
             tooltip_ = ''
             if 'is_type_form' not in form:  # pragma: no cover
-                tooltip_ = type_.description
+                tooltip_ = type_.description or ''
                 if field.flags.required \
                         and current_user.group == 'contributor':
                     tooltip_ += "&#013;" + str(_('tooltip_required_type'))

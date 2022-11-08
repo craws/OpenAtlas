@@ -142,7 +142,7 @@ def hierarchy_delete(id_: int) -> Response:
 
 @app.route('/hierarchy/required_risk/<int:id_>')
 @required_group('manager')
-def required_risk(id_: int) -> Response:
+def required_risk(id_: int) -> str:
     entity = Entity.get_by_id(id_)
     return render_template(
         'type/required.html',
