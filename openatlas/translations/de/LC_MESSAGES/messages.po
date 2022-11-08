@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-08 13:42+0100\n"
-"PO-Revision-Date: 2022-11-08 14:42+0100\n"
+"POT-Creation-Date: 2022-11-08 15:21+0100\n"
+"PO-Revision-Date: 2022-11-08 15:35+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -152,11 +152,18 @@ msgstr "Typ"
 msgid "super"
 msgstr "Super"
 
-#: openatlas/forms/display.py:207 openatlas/templates/layout.html:35
+#: openatlas/forms/display.py:58
+msgid "tooltip_required_type"
+msgstr ""
+"Die Eingabe dieses Typen ist erforderlich aber du hast keine Berechtigung neue "
+"Typen anzulegen. Für den Fall, dass das ein Problem ist, solltest du das dem "
+"Projektmanagement melden."
+
+#: openatlas/forms/display.py:208 openatlas/templates/layout.html:35
 msgid "hide"
 msgstr "ausblenden"
 
-#: openatlas/forms/display.py:208 openatlas/templates/layout.html:34
+#: openatlas/forms/display.py:209 openatlas/templates/layout.html:34
 #: openatlas/templates/type/index.html:107 openatlas/templates/type/index.html:113
 #: openatlas/templates/util/reference_system_switch.html:6
 msgid "show"
@@ -1187,7 +1194,7 @@ msgstr ""
 msgid "I'm aware of the risk and have read the documentation."
 msgstr "Ich bin mir der Risiken bewusst und habe die Dokumentation gelesen."
 
-#: openatlas/templates/sql/index.html:13 openatlas/templates/type/required.html:17
+#: openatlas/templates/sql/index.html:13 openatlas/templates/type/required.html:16
 msgid "proceed"
 msgstr "weiter"
 
@@ -1267,7 +1274,7 @@ msgstr ""
 "Entitäten haben diesen Typ nicht. Diese können dann auch nicht mehr gespeichert "
 "werden, solange dieser Typ nicht gesetzt wurde."
 
-#: openatlas/templates/type/required.html:14
+#: openatlas/templates/type/required.html:13
 msgid "I'm aware of the risk."
 msgstr ""
 "Ich bin mir der Risiken bewusst, aber möchte die Eingabe dieses Typen trotzdem "

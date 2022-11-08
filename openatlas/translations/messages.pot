@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2022-11-08 13:42+0100\n"
+"POT-Creation-Date: 2022-11-08 15:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -155,11 +155,15 @@ msgstr ""
 msgid "super"
 msgstr ""
 
-#: openatlas/forms/display.py:207 openatlas/templates/layout.html:35
+#: openatlas/forms/display.py:58
+msgid "tooltip_required_type"
+msgstr ""
+
+#: openatlas/forms/display.py:208 openatlas/templates/layout.html:35
 msgid "hide"
 msgstr ""
 
-#: openatlas/forms/display.py:208 openatlas/templates/layout.html:34
+#: openatlas/forms/display.py:209 openatlas/templates/layout.html:34
 #: openatlas/templates/type/index.html:107
 #: openatlas/templates/type/index.html:113
 #: openatlas/templates/util/reference_system_switch.html:6
@@ -1174,7 +1178,7 @@ msgid "I'm aware of the risk and have read the documentation."
 msgstr ""
 
 #: openatlas/templates/sql/index.html:13
-#: openatlas/templates/type/required.html:17
+#: openatlas/templates/type/required.html:16
 msgid "proceed"
 msgstr ""
 
@@ -1248,7 +1252,7 @@ msgid ""
 "without setting this type."
 msgstr ""
 
-#: openatlas/templates/type/required.html:14
+#: openatlas/templates/type/required.html:13
 msgid "I'm aware of the risk."
 msgstr ""
 
