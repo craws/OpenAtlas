@@ -4,7 +4,7 @@ from typing import Any
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from wtforms import (
-    BooleanField, HiddenField, MultipleFileField, SelectField,
+    BooleanField, HiddenField, SelectField,
     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import (
     InputRequired, Optional as OptionalValidator, URL)
