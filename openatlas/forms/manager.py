@@ -140,7 +140,9 @@ class AdministrativeUnitManager(BaseManager):
         root = self.get_root_type()
         return {
             'is_type_form': HiddenField(),
-            str(root.id): TreeField(str(root.id))}
+            str(root.id): TreeField(
+                str(root.id),
+                filter_ids=[self.entity.id] if self.entity else [])}
 
     def populate_update(self) -> None:
         super().populate_update()
