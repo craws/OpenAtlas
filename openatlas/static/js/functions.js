@@ -342,15 +342,67 @@ function removeAccents(data) {
 function setFilesOfDropField(files) {
   const dropContainer = document.getElementById('drag-n-drop')
   dropContainer.innerHTML = '';
-  files?.forEach(file => {
+  files?.forEach((file, index) => {
     const fileDiv = document.createElement('div');
     fileDiv.classList.add('drag-drop-item');
     fileDiv.innerHTML = `
                             <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
                                 <div class="card-body">
-                                <i class="fa fa-file"></i>
+                                <i class="card-icon fa fa-file"></i>
+                                <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
                                 ${file.name}
                             </div>`
     dropContainer.appendChild(fileDiv)
   })
+}
+
+function removeFile(index) {
+  const fileInput = document.getElementById('file')
+  const filesList = [...fileInput.files];
+  filesList.splice(index, 1);
+  setFile(fileInput, filesList)
+  setFilesOfDropField(filesList)
+
+}
+
+function setFile(fileInput, fileList) {
+  const newFiles = new DataTransfer();
+  fileList.forEach(x => newFiles.items.add(x));
+  fileInput.files = newFiles.files;
+}
+
+function addDragNDropListeners(dropContainer) {
+  dropContainer.addEventListener("dragenter", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragover", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragleave", function (e) {
+    dropContainer.classList.remove('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  dropContainer.addEventListener("drop", function (e) {
+
+    if ($('#name').val() == '') {
+      const filename = e.dataTransfer.files[0].name;
+      $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+    }
+    const fileInput = document.getElementById('file')
+    setFile(fileInput, [...fileInput.files, ...e.dataTransfer.files]);
+    setFilesOfDropField([...fileInput.files])
+    dropContainer.classList.remove('highlight')
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
 }

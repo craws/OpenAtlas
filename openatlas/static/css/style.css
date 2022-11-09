@@ -780,7 +780,7 @@ span[id^="value-type-switcher-"] {
     text-overflow: ellipsis;
 }
 
-.drag-n-drop .drag-drop-item .card-body svg {
+.drag-n-drop .drag-drop-item .card-body .card-icon {
     font-size: 1.4rem;
     color: grey;
     margin-right: 4px;
@@ -790,4 +790,15 @@ span[id^="value-type-switcher-"] {
     min-height: 120px;
     display: grid;
     place-content: center;
+}
+
+.drag-n-drop .drag-drop-item .card-body .close-icon {
+    position:absolute;
+    top:5px;
+    right:5px;
+    color:grey;
+    cursor: pointer;
+}
+.drag-n-drop .drag-drop-item .card-body .close-icon:hover {
+    color:black;
 }

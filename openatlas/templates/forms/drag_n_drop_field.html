@@ -3,50 +3,5 @@
 </div>
 
 <script>
-    const dropContainer = document.getElementById('drag-n-drop')
-    const fileInput = document.getElementById('file')
-
-    dropContainer.addEventListener("dragenter", function (e) {
-        dropContainer.classList.add('highlight')
-
-        e.preventDefault();
-        e.stopPropagation();
-    });
-    dropContainer.addEventListener("dragover", function (e) {
-        dropContainer.classList.add('highlight')
-
-        e.preventDefault();
-        e.stopPropagation();
-    });
-    dropContainer.addEventListener("dragleave", function (e) {
-        dropContainer.classList.remove('highlight')
-
-        e.preventDefault();
-        e.stopPropagation();
-    });
-
-    dropContainer.addEventListener("drop", function (e) {
-        if ($('#name').val() == '') {
-            const filename = e.dataTransfer.files[0].name;
-            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
-        }
-
-        const newFiles = new DataTransfer();
-        [...fileInput.files, ...e.dataTransfer.files].forEach(x => newFiles.items.add(x));
-        fileInput.files = newFiles.files
-        setFilesOfDropField([...fileInput.files])
-        dropContainer.classList.remove('highlight')
-
-        e.preventDefault();
-        e.stopPropagation();
-
-    });
-
-
-    $('#file').on("change", function () {
-        if ($('#name').val() == '') {
-            var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
-            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
-        }
-    });
+    addDragNDropListeners(document.getElementById('drag-n-drop'))
 </script>
