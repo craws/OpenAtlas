@@ -787,7 +787,7 @@ span[id^="value-type-switcher-"] {
 }
 
 .drag-n-drop .instruction-text {
-    min-height: 120px;
+    min-height: 100px;
     display: grid;
     place-content: center;
 }

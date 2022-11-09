@@ -362,6 +362,9 @@ function removeFile(index) {
   filesList.splice(index, 1);
   setFile(fileInput, filesList)
   setFilesOfDropField(filesList)
+  if(filesList.length === 0){
+    document.getElementById('drag-n-drop').innerHTML = `<div class="instruction-text">Drop Your Files Here</div>`
+  }
 
 }
 
