@@ -108,5 +108,3 @@ class GetTypeTree(Resource):
             'count': type_.count,
             'count_subs': type_.count_subs,
             'category': type_.category}
-
-

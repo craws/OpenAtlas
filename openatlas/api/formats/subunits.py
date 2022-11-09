@@ -66,7 +66,8 @@ def get_geometries_thanados(
 def check_geometries(geom: dict[str, Any]) \
         -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
     if geom['type'] == 'Polygon':  # pragma: no cover
-        return [transform_coordinates(k) for i in geom['coordinates'] for k in i]
+        return [
+            transform_coordinates(k) for i in geom['coordinates'] for k in i]
     if geom['type'] == 'LineString':  # pragma: no cover
         return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
@@ -75,7 +76,9 @@ def check_geometries(geom: dict[str, Any]) \
 
 
 def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:
-    return [{'coordinate': {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
+    return [
+        {'coordinate':
+             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
@@ -209,9 +212,11 @@ def get_subunits_from_id(
         entities_dict[entity_.id] = {
             'entity': entity_,
             'links':
-                [Link(link_) for link_ in links['links'] if link_['domain_id'] == entity_.id],
+                [Link(link_) for link_ in links['links']
+                 if link_['domain_id'] == entity_.id],
             'links_inverse':
-                [Link(link_) for link_ in links['links_inverse'] if link_['range_id'] == entity_.id],
+                [Link(link_) for link_ in links['links_inverse']
+                 if link_['range_id'] == entity_.id],
             'ext_reference_links': ext_reference_links,
             'root_id': entity.id,
             'latest_modified': latest_modified,
@@ -222,9 +227,7 @@ def get_subunits_from_id(
 def get_links_from_list_of_links(
         entities: list[int],
         links: list[dict[str, Any]]) -> dict[str, list[dict[str, Any]]]:
-    data = {
-        'links': [],
-        'links_inverse': []}
+    data: dict[str, list[Any]] = {'links': [], 'links_inverse': []}
     for link_ in links:
         if link_['domain_id'] in entities:
             data['links'].append(link_)
