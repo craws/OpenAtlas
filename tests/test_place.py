@@ -337,7 +337,7 @@ class PlaceTest(TestBaseCase):
             assert b"I'm a stratigraphic unit" in rv.data
             data = {
                 'name': 'You never find me',
-                'place': stratigraphic_id,
+                'artifact_super': stratigraphic_id,
                 Type.get_hierarchy('Dimensions').subs[0]: 50,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
@@ -352,21 +352,23 @@ class PlaceTest(TestBaseCase):
                 url_for('update', id_=find_id),
                 data=data,
                 follow_redirects=True)
-            assert b'50' in rv.data
+            assert b'Changes have been saved.' in rv.data
 
             # Create a second artifact to test siblings pager
-            self.app.post(
+            rv = self.app.post(
                 url_for(
                     'insert',
                     class_='artifact',
                     origin_id=stratigraphic_id),
+                follow_redirects=True,
                 data=data)
+            assert b'An entry has been created' in rv.data
 
             self.app.get(url_for('update', id_=find_id))
             data = {
                 'name': 'My human remains',
                 'actor': actor.id,
-                'place': stratigraphic_id,
+                'human_remains_super': stratigraphic_id,
                 human_remains_type.id: str([human_remains_type_sub.id]),
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
