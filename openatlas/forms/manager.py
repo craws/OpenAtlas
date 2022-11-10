@@ -169,7 +169,32 @@ class AdministrativeUnitManager(BaseManager):
 
 
 class ArtifactManager(ArtifactBaseManager):
-    pass
+
+    def additional_fields(self) -> dict[str, Any]:
+        filter_ids = []
+        if entity := self.entity:
+            filter_ids = \
+                [entity.id] + \
+                [e.id for e in entity.get_linked_entities_recursive('P46')]
+        return dict(super().additional_fields(), **{
+                'artifact_super': TableField(
+                    _('super'),
+                    filter_ids=filter_ids,
+                    add_dynamic=['place'])})
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.view in ['artifact', 'place']:
+            self.form.artifact_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if super_ := self.entity.get_linked_entity('P46', inverse=True):
+            self.form.artifact_super.data = super_.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.form.artifact_super.data:
+            self.add_link('P46', self.form.artifact_super.data, inverse=True)
 
 
 class BibliographyManager(BaseManager):
@@ -241,7 +266,35 @@ class GroupManager(ActorBaseManager):
 
 
 class HumanRemainsManager(ArtifactBaseManager):
-    pass
+
+    def additional_fields(self) -> dict[str, Any]:
+        filter_ids = []
+        if entity := self.entity:
+            filter_ids = \
+                [entity.id] + \
+                [e.id for e in entity.get_linked_entities_recursive('P46')]
+        return dict(super().additional_fields(), **{
+            'human_remains_super': TableField(
+                _('super'),
+                filter_ids=filter_ids,
+                add_dynamic=['place'])})
+
+    def populate_insert(self) -> None:
+        if self.origin and self.origin.class_.view in ['artifact', 'place']:
+            self.form.human_remains_super.data = str(self.origin.id)
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if super_ := self.entity.get_linked_entity('P46', inverse=True):
+            self.form.human_remains_super.data = super_.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        if self.form.human_remains_super.data:
+            self.add_link(
+                'P46',
+                self.form.human_remains_super.data,
+                inverse=True)
 
 
 class HierarchyCustomManager(HierarchyBaseManager):
