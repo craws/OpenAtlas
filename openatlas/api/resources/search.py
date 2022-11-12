@@ -6,8 +6,8 @@ from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
 from openatlas.api.resources.util import (
     get_linked_entities_id_api)
-from openatlas.api.resources.model_mapper import get_all_links_of_entities_inverse, \
-    flatten_list_and_remove_duplicates
+from openatlas.api.resources.model_mapper import (
+    get_all_links_of_entities_inverse, flatten_list_and_remove_duplicates)
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 

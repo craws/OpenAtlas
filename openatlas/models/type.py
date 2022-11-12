@@ -15,6 +15,7 @@ class Type(Entity):
     count_subs = 0
     category = ''
     multiple = False
+    required = False
     directional = False
 
     def __init__(self, row: dict[str, Any]) -> None:
@@ -22,6 +23,14 @@ class Type(Entity):
         self.root: list[int] = []
         self.subs: list[int] = []
         self.classes: list[str] = []
+
+    @staticmethod
+    def hierarchy_required_add(id_: int) -> None:
+        Db.hierarchy_required_add(id_)
+
+    @staticmethod
+    def hierarchy_required_remove(id_: int) -> None:
+        Db.hierarchy_required_remove(id_)
 
     @staticmethod
     def get_all() -> dict[int, Type]:
@@ -55,6 +64,7 @@ class Type(Entity):
             else:
                 type_.category = hierarchies[type_.id]['category']
                 type_.multiple = hierarchies[type_.id]['multiple']
+                type_.required = hierarchies[type_.id]['required']
                 type_.directional = hierarchies[type_.id]['directional']
                 for class_ in g.classes.values():
                     if class_.hierarchies and type_.id in class_.hierarchies:
@@ -226,19 +236,16 @@ class Type(Entity):
     def get_untyped(hierarchy_id: int) -> list[Entity]:
         hierarchy = g.types[hierarchy_id]
         classes = hierarchy.classes
-        if hierarchy.name in ('Administrative unit', 'Historical place'):
-            classes = 'object_location'  # pragma: no cover
         untyped = []
         for entity in Entity.get_by_class(classes, types=True):
             linked = False
-            for type_ in entity.types:
+            entity_to_check = entity
+            if hierarchy.name in ('Administrative unit', 'Historical place'):
+                entity_to_check = entity.get_linked_entity('P53', types=True)
+            for type_ in entity_to_check.types:
                 if type_.root[0] == hierarchy_id:
                     linked = True
                     break
             if not linked:
-                if classes == 'object_location':  # pragma: no cover
-                    if entity.get_linked_entity('P53', True):
-                        untyped.append(entity)
-                else:
-                    untyped.append(entity)
+                untyped.append(entity)
         return untyped
