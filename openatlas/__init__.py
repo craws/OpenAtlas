@@ -110,7 +110,3 @@ def get_file_stats(
             'size': convert_size(file_.stat().st_size),
             'date': file_.stat().st_ctime}
     return stats
-
-
-if __name__ == "__main__":  # pragma: no cover - only used when imported
-    app.run()
