@@ -289,8 +289,8 @@ Entity endpoint
      - Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
        item. Combine up to four of the aforementioned endpoints in a single
        query; each request has to be a new parameter; Possible parameters are:
-       ?entities={id}, ?classes={cidoc_class_code}, ?codes={view_name},
-       ?system_classes={system_class}(2)
+       ?entities={id}, ?classes={cidoc-class-code}, ?codes={view-name},
+       ?system_classes={system-class}(2)
 
 
 **Multiple entities** - Results in list form include related entities and
@@ -303,8 +303,7 @@ Entity endpoint
    * - API endpoint
      - Possible parameters
      - Description
-   * - /api/1.0/entities/cidoc-class/
-       {cidoc-class}
+   * - /api/1.0/entities/cidoc-class/{cidoc-class}
      - limit, column, sort, search, first, last, show, relation-type, type-id,
        count, download, format, export, page
      - Retrieve a list of entities, based on their CIDOC CRM class code(1)(2),
@@ -325,11 +324,197 @@ Entity endpoint
        'find', 'group', 'human_remains', 'move', 'object_location', 'person',
        'place', 'reference_system', 'source', 'stratigraphic_unit',
        'source_translation', 'type')(1)(2).
+   * - api1.0//entities/last-entered/{n} (n represents a number between 1
+       and 100)
+     - show, relation-type, download, format, export
+     - Retrieves the last entered ebtities. n represents the amount of entities
+       retrieved (up to 100). The pagination information is always **null**
+   * - /api/1.0/entities/linked-to-entity/{id}
+     - limit, column, sort, search, first, last, show, relation-type, type-id,
+       count, download, format, export, page
+     - Retrieves a list of entities linked to the stated entity (2)
+   * - /api/1.0/entities/linked-to-type/{id}
+     - limit, column, sort, search, first, last, show, relation-type, type-id,
+       count, download, format, export, page
+     - Retrieves a list of entities based on their OpenAtlas type ID (2)(3).
+       For an endpoint that lists all available  types, see "type endpoints"
+   * - /api/entities/1.0/linked-to-type-including-subtypes/{id}
+     - limit, column, sort, search, first, last, show, relation-type, type-id,
+       count, download, format, export, page
+
+(1) All codes available in OpenAtlas can be found under
+`OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
+(2) The result can be filtered, sorted, and manipulated through different
+parameters. By default 20 entities in alphabetical order are shown.
+(3) Available IDs can be obtained by using the type-tree or node-overview
+endpoint.
+Required parameters are shown as **bold**.
+
+Type endpoints
+**************
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * -/api/1.0/types/hierarchy/
+     - download
+     - Retrives a list of all OpenAtlas types, sorted by custom, place,
+       standard, and value; replaces the older /api/node_overview endpoint
+   * - /api/1.0/types/hierarchy/standard/
+     - download
+     - Retrieves a list of all standard types
+   * - /api/1.0/types/hierarchy/value/
+     - download
+     - Retrieves a list of all value types
+   * - /api/1.0/types/hierarchy/custom/
+     - download
+     - Retrieves a list of all custom types
+   * - /api/1.0/types/hierarchy/place/
+     - download
+     - Retrieves a list of all place types
+   * - /api/1.0/types/hierarchy/reference-system/
+     - download
+     - Retrieves a list of all reference system types
+   * - /api/1.0/types/hierarchy/system-types/
+     - download
+     - Retrieves a list of all system types
+   * - /api/1.0/types/list/
+     - download
+     - Retrieves a list of all OpenAtlas types, including their information
+
+Administrative endpoints
+************************
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - /api/1.0/export-database/{format}
+     - none
+     - Downloads all information in an OpenAtlas instance as CSV, XML or JSON
+   * - api/1.0/openatlas-classes/
+     - download
+     - Retrieves a list of all available classes, their CIDOC CRM mapping,
+       their view, which icon can be used, if aliases and reference systems are
+       allowed, which standard type it has, and how many entities are linked
+   * - /api/1.0/content/
+     - download, lang
+     - Retrieves a detailed list of information on available frontend content
+       in an OpenAtlas instance - intro, legal, notice, contact, and size of
+       processed images
+   * - /api/1.0/system-class-count/
+     - download
+     - Retrieves a detailed list of the number of entities connected to a
+       system class
+
+Special entities and output formats
+***********************************
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - /api/1.0/subunits/{id}
+     - download, format, count
+     - Displays all subunits of a place in a special format as used by the
+       `THANADOS <https://thanados.net>`_ project. This cann only be used for
+       **Places**. As format only XML can be chosen
+   * - /api/1.0/geometric-entities/
+     - count, download, geometry
+     - Retrieves a **GeoJSON** of all chosen geometries in an OpenAtlas
+       instance
+
+Image endpoints
+***************
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - /api/1.0/display/{id}
+     - download, image-size
+     - Retrieves the respective image if it has a license
 
 
 
 
 Version 0.3
 -----------
+
+Entity endpoint
+***************
+
+**Single entities**
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - /api/0.3/entity/{id}
+     - show, download,export,format
+     - Retrieves all information about a single entity
+
+**Query** - Combine several or all entity endpoints in one query
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - api/0.3/entities/query/
+     - **ids**, **cidoc-classes**, **menu-item**, **classes**,
+       **linked-to-entity**, **linked-to-type**,
+       **linked-to-type-including-subtypes**, limit, column, sort, search,
+       first, last, show, relation_type, type_id, count, download, format,
+       export, page
+     - Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
+       item. Combine up to four of the aforementioned endpoints in a single
+       query; each request has to be a new parameter; Possible parameters are:
+       ?entities={id}, ?classes={cidoc_class_code}, ?codes={view_name},
+       ?system_classes={system_class}(2)
+
+**Multiple entities** - Results in list form include related entities and
+       pagination
+
+.. list-table::
+   :widths: 25 25 50
+   :header-rows: 1
+
+   * - API endpoint
+     - Possible parameters
+     - Description
+   * - /api/0.3/view_class/{view_class}
+     - limit, column, sort, search, first, last, show, relation_type, type_id,
+       count, download, format, export, page
+     - Used to retrieve a JSON list of entities based on their OpenAtlas class
+       view
+   * - /api/0.3/system_class/{system_class}
+     - limit, column, sort, search, first, last, show, relation_type, count,
+       download, format, export, page
+     - Retrieves a list of entities, based on their OpenAtlas system class name
+       as JSON (1)(2)
+   * - /api/0.3/latest/{n} (n represents a number between 1 and 100)
+     - show, relation_type, download, format, export
+     - Used to retrieve the last entry/entries made; the number {latest}/{n}
+       represents the amount of entities retrieved and can be between 1 and
+       100. The pagination information is always **null**
 
 
