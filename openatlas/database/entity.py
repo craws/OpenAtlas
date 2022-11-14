@@ -20,15 +20,12 @@ class Entity:
     def get_by_ids(
             ids: Iterable[int],
             types: bool = False,
-            aliases: bool = False,
-            sort_by_name: bool = True) -> list[dict[str, Any]]:
+            aliases: bool = False) -> list[dict[str, Any]]:
         if not ids:
             return []
         g.cursor.execute(
             Entity.select_sql(types, aliases) +
-            ' WHERE e.id IN %(ids)s '
-            ' GROUP BY e.id '
-            f"{' ORDER BY e.name ' if sort_by_name else ''}",
+            ' WHERE e.id IN %(ids)s GROUP BY e.id ',
             {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
