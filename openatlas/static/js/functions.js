@@ -341,7 +341,8 @@ function removeAccents(data) {
 
 function setFilesOfDropField(files) {
   const dropContainer = document.getElementById('drag-n-drop')
-  dropContainer.innerHTML = '';
+  dropContainer.children[0].style.display = "none";
+  dropContainer.children[1].innerHTML = '';
   files?.forEach((file, index) => {
     const fileDiv = document.createElement('div');
     fileDiv.classList.add('drag-drop-item');
@@ -352,7 +353,7 @@ function setFilesOfDropField(files) {
                                 <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
                                 ${file.name}
                             </div>`
-    dropContainer.appendChild(fileDiv)
+    dropContainer.children[1].appendChild(fileDiv)
   })
 }
 
@@ -363,7 +364,7 @@ function removeFile(index) {
   setFile(fileInput, filesList)
   setFilesOfDropField(filesList)
   if(filesList.length === 0){
-    document.getElementById('drag-n-drop').innerHTML = `<div class="instruction-text">Drop Your Files Here</div>`
+    document.getElementById('drag-n-drop').children[0].style.display = "";
   }
 
 }
@@ -395,17 +396,20 @@ function addDragNDropListeners(dropContainer) {
   });
 
   dropContainer.addEventListener("drop", function (e) {
+    const allowedTypes = ["gif", "jpeg", "jpg", "pdf", "png", "txt", "zip"]
+    const allowedFiles = [...e.dataTransfer.files].filter(x => allowedTypes.includes(x.name.split(('.')).at(-1)))
+    if (allowedFiles.length > 0) {
+      const fileInput = document.getElementById('file')
+      setFile(fileInput, [...fileInput.files, ...allowedFiles]);
+      setFilesOfDropField([...fileInput.files])
 
-    if ($('#name').val() == '') {
-      const filename = e.dataTransfer.files[0].name;
-      $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+      if ($('#name').val() == '') {
+        const filename = allowedFiles[0].name;
+        $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+      }
     }
-    const fileInput = document.getElementById('file')
-    setFile(fileInput, [...fileInput.files, ...e.dataTransfer.files]);
-    setFilesOfDropField([...fileInput.files])
     dropContainer.classList.remove('highlight')
     e.preventDefault();
     e.stopPropagation();
   });
-
 }
