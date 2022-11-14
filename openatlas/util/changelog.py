@@ -2,6 +2,7 @@ versions = {
     '7.8.0': ['TBA',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
+            '1647': 'Composition of Artifacts',
             '1835': 'Improved form selection behavior',
             '1863': 'Add a place at artifacts and human remains dynamically',
             '1843': 'API: remove version 0.2'}}],

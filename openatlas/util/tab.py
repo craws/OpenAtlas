@@ -124,11 +124,16 @@ class Tab:
                         g.classes[item].label,
                         url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            for item in g.view_class_mapping['artifact']:
+            if entity and entity.class_.name != 'human_remains':
                 self.buttons.append(
                     button(
-                        g.classes[item].label,
-                        url_for('insert', class_=item, origin_id=id_)))
+                        g.classes['artifact'].label,
+                        url_for('insert', class_='artifact', origin_id=id_)))
+            if entity and entity.class_.name != 'artifact':
+                self.buttons.append(
+                    button(
+                        g.classes['human_remains'].label,
+                        url_for('insert', class_='human_remains', origin_id=id_)))
         elif name == 'entities':
             if id_ and id_ in g.types:
                 type_ = g.types[id_]

@@ -17,7 +17,8 @@ class ArtifactTest(TestBaseCase):
                 alice = User.get_by_username('Alice')
                 place = insert_entity('Home', 'place')
 
-            rv = self.app.get(url_for('insert', class_='artifact'))
+            rv = self.app.get(
+                url_for('insert', class_='artifact', origin_id=place.id))
             assert b'+ Artifact' in rv.data
 
             rv = self.app.post(
@@ -25,7 +26,7 @@ class ArtifactTest(TestBaseCase):
                 data={
                     'name': 'Love-letter',
                     'actor': actor.id,
-                    'place': place.id},
+                    'artifact_super': place.id},
                 follow_redirects=True)
             assert b'Love-letter' in rv.data
 
@@ -44,7 +45,7 @@ class ArtifactTest(TestBaseCase):
                 data={
                     'name': 'A little hate',
                     'description': 'makes nothing better',
-                    'place': place.id})
+                    'artifact_super': place.id})
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('entity_add_source', id_=artifact.id))

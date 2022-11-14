@@ -236,19 +236,16 @@ class Type(Entity):
     def get_untyped(hierarchy_id: int) -> list[Entity]:
         hierarchy = g.types[hierarchy_id]
         classes = hierarchy.classes
-        if hierarchy.name in ('Administrative unit', 'Historical place'):
-            classes = 'object_location'  # pragma: no cover
         untyped = []
         for entity in Entity.get_by_class(classes, types=True):
             linked = False
-            for type_ in entity.types:
+            entity_to_check = entity
+            if hierarchy.name in ('Administrative unit', 'Historical place'):
+                entity_to_check = entity.get_linked_entity('P53', types=True)
+            for type_ in entity_to_check.types:
                 if type_.root[0] == hierarchy_id:
                     linked = True
                     break
             if not linked:
-                if classes == 'object_location':  # pragma: no cover
-                    if entity.get_linked_entity('P53', True):
-                        untyped.append(entity)
-                else:
-                    untyped.append(entity)
+                untyped.append(entity)
         return untyped
