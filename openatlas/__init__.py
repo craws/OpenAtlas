@@ -56,7 +56,7 @@ def before_request() -> None:
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
 
-    if request.path.startswith('/static'):  # pragma: no cover
+    if request.path.startswith('/static'):
         return  # Avoid files overhead if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
@@ -110,7 +110,3 @@ def get_file_stats(
             'size': convert_size(file_.stat().st_size),
             'date': file_.stat().st_ctime}
     return stats
-
-
-if __name__ == "__main__":  # pragma: no cover
-    app.run()

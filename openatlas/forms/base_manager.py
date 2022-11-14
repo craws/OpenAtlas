@@ -269,21 +269,13 @@ class ArtifactBaseManager(BaseManager):
 
     def additional_fields(self) -> dict[str, Any]:
         return {
-            'actor': TableField(
-                _('owned by'),
-                add_dynamic=['person', 'group']),
-            'place': TableField()}
-
-    def populate_insert(self) -> None:
-        if self.origin and self.origin.class_.view == 'place':
-            self.form.place.data = str(self.origin.id)
+            'actor':
+                TableField(_('owned by'), add_dynamic=['person', 'group'])}
 
     def populate_update(self) -> None:
         super().populate_update()
         if owner := self.entity.get_linked_entity('P52'):
             self.form.actor.data = owner.id
-        if super_ := self.entity.get_linked_entity('P46', inverse=True):
-            self.form.place.data = super_.id
 
     def process_form(self) -> None:
         super().process_form()
@@ -291,8 +283,6 @@ class ArtifactBaseManager(BaseManager):
         self.data['links']['delete_inverse'].add('P46')
         if self.form.actor.data:
             self.add_link('P52', self.form.actor.data)
-        if self.form.place.data:
-            self.add_link('P46', self.form.place.data, inverse=True)
 
 
 class EventBaseManager(BaseManager):

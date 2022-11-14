@@ -20,13 +20,13 @@ base, then run the database upgrade script, then restart Apache:
     sudo service apache2 restart
 
 ### 7.7.0 to 7.8.0
-A code base update (e.g. with git pull) and a webserver restart is sufficient.
+7.8.0.sql is needed but will be taken care of by the database upgrade script.
 
 Please note that, like announced, the deprecated API version 0.2 was removed
 in this release.
 
 ### 7.6.x to 7.7.0
-7.7.0.sql is needed but wil be taken care of by the database upgrade script.
+7.7.0.sql is needed but will be taken care of by the database upgrade script.
 
 NPM packages need to be upgraded:
 
@@ -49,10 +49,10 @@ the 0.3 version before the next release.
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
 ### 7.4.0 to 7.5.0
-7.5.0.sql is needed but wil be taken care of by the database upgrade script.
+7.5.0.sql is needed but will be taken care of by the database upgrade script.
 
 ### 7.3.0 to 7.4.0
-7.4.0.sql is needed but wil be taken care of by the database upgrade script.
+7.4.0.sql is needed but will be taken care of by the database upgrade script.
 
 The new stable API version is now 0.3 (instead 0.2). Systems using the API
 (e.g. presentation sites) should be checked and adapted if needed.
@@ -65,7 +65,7 @@ NPM packages need to be upgraded for the Bootstrap upgrade:
     $ ~/.local/bin/calmjs npm --install openatlas
 
 ### 7.2.0 to 7.3.0
-7.3.0.sql is needed (wil be taken care of by the database upgrade script).
+7.3.0.sql is needed but will be taken care of by the database upgrade script.
 
 #### Database changes
 The **gis** schema tables were merged into one table to the model schema
@@ -78,7 +78,7 @@ version **0.3** will be the new default. Version 0.2. will still be available
 (probably about 2 releases) until it will be removed.
 
 ### 7.1.x to 7.2.0
-7.2.0.sql is needed (wil be taken care of by the database upgrade script).
+7.2.0.sql is needed but will be taken care of by the database upgrade script.
 
 For the new map system NPM packages have to be upgraded:
 
@@ -91,7 +91,7 @@ For the new map system NPM packages have to be upgraded:
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 
 ### 7.0.x to 7.1.0
-7.1.0.sql is needed (wil be taken care of by the database upgrade script).
+7.1.0.sql is needed but will be taken care of by the database upgrade script.
 
 #### Update to current CIDOC CRM version 7.1.1
 Because classes and properties have changed, adaptions for e.g. presentation

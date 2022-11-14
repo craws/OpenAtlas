@@ -151,6 +151,10 @@ class TypeTest(TestBaseCase):
             assert b'No entries' in rv.data
 
             rv = self.app.get(
+                url_for('show_untyped_entities', id_=admin_unit_id))
+            assert b'Home' in rv.data
+
+            rv = self.app.get(
                 url_for('type_delete', id_=actor_type.id),
                 follow_redirects=True)
             assert b'Forbidden' in rv.data

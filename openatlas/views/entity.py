@@ -57,6 +57,7 @@ def view(id_: int) -> Union[str, Response]:
         tabs |= add_tabs_for_actor(entity, event_links)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
+        tabs['artifact'] = Tab('artifact', entity=entity)
     elif entity.class_.view == 'event':
         tabs |= add_tabs_for_event(entity)
     elif entity.class_.view == 'file':

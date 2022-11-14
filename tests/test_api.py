@@ -64,7 +64,7 @@ class Api03(ApiTestCase):
             assert bool(rv['person'])
 
             for rv in [
-                self.app.get(url_for(f'api_03.geometric_entities')),
+                self.app.get(url_for('api_03.geometric_entities')),
                 self.app.get(
                     url_for('api_03.geometric_entities', download=True))]:
                 rv = rv.get_json()

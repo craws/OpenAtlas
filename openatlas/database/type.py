@@ -53,10 +53,27 @@ class Type:
     def get_hierarchies() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT h.id, h.name, h.category, h.multiple, h.directional
+            SELECT
+                h.id, h.name, h.category, h.multiple, h.directional, h.required
             FROM web.hierarchy h;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def hierarchy_required_add(id_: int) -> None:
+        g.cursor.execute(
+            """
+            UPDATE web.hierarchy SET required = true WHERE id = %(id)s;
+            """,
+            {'id': id_})
+
+    @staticmethod
+    def hierarchy_required_remove(id_: int) -> None:
+        g.cursor.execute(
+            """
+            UPDATE web.hierarchy SET required = false WHERE id = %(id)s;
+            """,
+            {'id': id_})
 
     @staticmethod
     def insert_hierarchy(data: dict[str, Any]) -> None:
