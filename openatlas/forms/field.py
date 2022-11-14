@@ -7,7 +7,8 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import Field, FloatField, HiddenField, StringField, TextAreaField, MultipleFileField, FileField
+from wtforms import (
+    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
 from wtforms.widgets import HiddenInput, TextInput, FileInput
 
 from openatlas.forms.util import get_table_content
@@ -214,15 +215,15 @@ class DragNDrop(FileInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
-        return super().__call__(field, **kwargs) + render_template(
-            'forms/drag_n_drop_field.html',
-            )
+        return super().__call__(field, **kwargs) + \
+            render_template('forms/drag_n_drop_field.html')
 
 
 class DragNDropField(FileField):
     """A :class:`FileField` that allows choosing multiple files."""
 
+    data: list
     widget = DragNDrop(multiple=True)
 
-    def process_formdata(self, valuelist):
-        self.data = valuelist
+    def process_formdata(self, value_list: list) -> None:
+        self.data = value_list
