@@ -44,7 +44,11 @@ entity_.add_argument(
         'id',
         'name',
         'cidoc_class',
-        'system_class',))
+        'system_class',
+        'begin_from',
+        'begin_to',
+        'end_from',
+        'end_to'))
 entity_.add_argument(
     'search',
     type=str,

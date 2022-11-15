@@ -49,7 +49,11 @@ def resolve_entities(
         return export_csv_for_network_analysis(entities, parser)
     if not entities:
         raise NoEntityAvailable
-    result = get_json_output(sorting(entities, parser), parser)
+    result = get_json_output(
+        sorting(
+            remove_duplicate_entities(entities),
+            parser),
+        parser)
     if parser['format'] in app.config['RDF_FORMATS']:
         return Response(
             rdf_output(result['results'], parser),
@@ -68,12 +72,11 @@ def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
 
 
 def sorting(entities: list[Entity], parser: dict[str, Any]) -> list[Entity]:
-    entities = remove_duplicate_entities(entities)
     if 'latest' in request.path:
         return entities
     return sorted(
         entities,
-        key=lambda entity: get_key(entity, parser['column']),
+        key=lambda entity: get_key(entity, parser),
         reverse=bool(parser['sort'] == 'desc'))
 
 
