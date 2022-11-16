@@ -222,8 +222,8 @@ class DragNDrop(FileInput):
 class DragNDropField(FileField):
     """A :class:`FileField` that allows choosing multiple files."""
 
-    data: list
+    data: list[str]
     widget = DragNDrop(multiple=True)
 
-    def process_formdata(self, value_list: list) -> None:
+    def process_formdata(self, value_list: list[str]) -> None:
         self.data = value_list
