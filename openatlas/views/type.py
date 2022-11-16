@@ -78,6 +78,7 @@ def type_delete(id_: int) -> Response:
 @app.route('/type/delete_recursive/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def type_delete_recursive(id_: int) -> Union[str, Response]:
+
     class DeleteRecursiveTypesForm(FlaskForm):
         confirm_delete = BooleanField(
             _("I'm sure to delete this type, it's subs and links"),
@@ -117,7 +118,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
             sub.count,
             sub.description])
     if root_name in app.config['PROPERTY_TYPES']:
-        for row in Link.get_links_by_type(type_):
+        for row in Link.get_links_by_type_recursive(type_, []):
             tabs['entities'].table.header = [_('domain'), _('range')]
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
