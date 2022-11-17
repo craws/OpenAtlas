@@ -1,5 +1,5 @@
 versions = {
-    '7.8.0': ['TBA',  {
+    '7.8.0': ['2022-11-18',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
             '1647': 'Composition of artifacts and human remains',
