@@ -59,3 +59,16 @@ Form fields
 * :doc:`reference_system`
 * :doc:`/ui/date`
 * A super (type) if it is a sub type of another type
+
+Making types required
+---------------------
+It is possible making specifying of types required. This can be done at the
+type overview in the right information display of the respective type by users
+who have at least manager permissions.
+
+Be careful with making types required, especially when there are users who
+aren't permitted to create new ones. It may put them in an awkward situation at
+data entry and, as a result, may even reduce the data quality.
+
+Also keep in mind, that existing entries which haven't set this type, will than
+not be possible to update, without setting the required type.
