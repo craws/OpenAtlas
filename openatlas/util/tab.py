@@ -133,7 +133,10 @@ class Tab:
                 self.buttons.append(
                     button(
                         g.classes['human_remains'].label,
-                        url_for('insert', class_='human_remains', origin_id=id_)))
+                        url_for(
+                            'insert',
+                            class_='human_remains',
+                            origin_id=id_)))
         elif name == 'entities':
             if id_ and id_ in g.types:
                 type_ = g.types[id_]

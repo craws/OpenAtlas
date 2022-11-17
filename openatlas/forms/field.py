@@ -225,5 +225,5 @@ class DragNDropField(FileField):
     data: list[str]
     widget = DragNDrop(multiple=True)
 
-    def process_formdata(self, value_list: list[str]) -> None:
-        self.data = value_list
+    def process_formdata(self, valuelist: list[str]) -> None:
+        self.data = valuelist
