@@ -51,5 +51,3 @@ class SystemClassCount(Resource):
         endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal(get_overview_counts(), overview_template()), 200
-
-
