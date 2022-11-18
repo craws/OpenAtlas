@@ -1,4 +1,8 @@
 versions = {
+    '7.9.0': ['TBA', {
+        'feature': {
+            '1820': 'API: use existing GeoJSON definitions for swagger'}
+    }],
     '7.8.0': ['2022-11-18',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
