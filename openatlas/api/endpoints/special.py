@@ -24,9 +24,6 @@ from openatlas.models.export import current_date_for_filename
 
 class GetGeometricEntities(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/geometric_entities.yml",
-        endpoint="api_03.geometric_entities")
     def get() -> Union[int, Response, tuple[Any, int]]:
         parser = gis.parse_args()
         output: dict[str, Any] = {
@@ -41,9 +38,6 @@ class GetGeometricEntities(Resource):
 
 class ExportDatabase(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/system_class_count.yml",
-        endpoint="api_03.export_database")
     def get(format_: str) -> Union[tuple[Resource, int], Response]:
         geoms = [ExportDatabase.get_geometries_dict(geom) for geom in
                  get_geometries({'geometry': 'gisAll'})]
@@ -82,7 +76,6 @@ class ExportDatabase(Resource):
 
 class GetSubunits(Resource):
     @staticmethod
-    @swag_from("../swagger/subunits.yml", endpoint="api_03.subunits")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parser = entity_.parse_args()
         entity = get_entity_by_id(id_)

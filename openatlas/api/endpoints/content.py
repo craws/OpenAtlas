@@ -15,7 +15,6 @@ from openatlas.models.content import get_translation
 
 class GetContent(Resource):
     @staticmethod
-    @swag_from("../swagger/content.yml", endpoint="api_03.content")
     def get() -> Union[tuple[Resource, int], Response]:
         parser = language.parse_args()
         lang = parser['lang']
@@ -32,7 +31,6 @@ class GetContent(Resource):
 
 class ClassMapping(Resource):
     @staticmethod
-    @swag_from("../swagger/class_mapping.yml", endpoint="api_03.class_mapping")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal([{
             "systemClass": class_.name,
@@ -46,8 +44,5 @@ class ClassMapping(Resource):
 
 class SystemClassCount(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/system_class_count.yml",
-        endpoint="api_03.system_class_count")
     def get() -> Union[tuple[Resource, int], Response]:
         return marshal(get_overview_counts(), overview_template()), 200
