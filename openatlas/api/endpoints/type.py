@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
