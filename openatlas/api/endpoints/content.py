@@ -1,15 +1,14 @@
 from typing import Union
 
-from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource, marshal
 
 from openatlas import app
+from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.api.resources.parser import language
 from openatlas.api.resources.resolve_endpoints import download
 from openatlas.api.resources.templates import (
     class_overview_template, content_template, overview_template)
-from openatlas.api.resources.model_mapper import get_overview_counts
 from openatlas.models.content import get_translation
 
 

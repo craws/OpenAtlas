@@ -1,22 +1,19 @@
 from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
 from openatlas.api.resources.error import (
     InvalidLimitError, InvalidSubunitError, QueryEmptyError)
+from openatlas.api.resources.model_mapper import (
+    get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
+    get_entities_by_view_classes, get_entity_by_id, get_latest_entities)
 from openatlas.api.resources.parser import entity_, query
 from openatlas.api.resources.resolve_endpoints import (
     resolve_entities, resolve_entity)
 from openatlas.api.resources.util import (
-    get_entities_linked_to_special_type,
-    get_entities_linked_to_special_type_recursive,
-    get_linked_entities_api, get_entities_from_type_with_subs)
-from openatlas.api.resources.model_mapper import (
-    get_entity_by_id, get_entities_by_ids, get_latest_entities,
-    get_by_cidoc_classes, get_entities_by_view_classes,
-    get_entities_by_system_classes)
+    get_entities_from_type_with_subs, get_entities_linked_to_special_type,
+    get_entities_linked_to_special_type_recursive, get_linked_entities_api)
 
 
 class GetByCidocClass(Resource):

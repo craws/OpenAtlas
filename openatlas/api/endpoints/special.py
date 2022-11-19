@@ -1,7 +1,6 @@
 import json
-from typing import Union, Any
+from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, jsonify
 from flask_restful import Resource, marshal
 
@@ -9,14 +8,13 @@ from openatlas.api.formats.csv import export_database_csv
 from openatlas.api.formats.subunits import get_subunits_from_id
 from openatlas.api.formats.xml import export_database_xml
 from openatlas.api.resources.database_mapper import (
-    get_all_entities_as_dict, get_all_links_as_dict, get_properties,
-    get_property_hierarchy, get_classes, get_cidoc_hierarchy)
+    get_all_entities_as_dict, get_all_links_as_dict, get_cidoc_hierarchy,
+    get_classes, get_properties, get_property_hierarchy)
 from openatlas.api.resources.error import NotAPlaceError
 from openatlas.api.resources.model_mapper import get_entity_by_id
-
-from openatlas.api.resources.parser import gis, entity_
-from openatlas.api.resources.resolve_endpoints import download, \
-    resolve_subunits
+from openatlas.api.resources.parser import entity_, gis
+from openatlas.api.resources.resolve_endpoints import (
+    download, resolve_subunits)
 from openatlas.api.resources.templates import geometries_template
 from openatlas.api.resources.util import get_geometries
 from openatlas.models.export import current_date_for_filename
@@ -39,8 +37,9 @@ class GetGeometricEntities(Resource):
 class ExportDatabase(Resource):
     @staticmethod
     def get(format_: str) -> Union[tuple[Resource, int], Response]:
-        geoms = [ExportDatabase.get_geometries_dict(geom) for geom in
-                 get_geometries({'geometry': 'gisAll'})]
+        geoms = [
+            ExportDatabase.get_geometries_dict(geom)
+            for geom in get_geometries({'geometry': 'gisAll'})]
         tables = {
             'entities': get_all_entities_as_dict(),
             'links': get_all_links_as_dict(),
@@ -61,8 +60,7 @@ class ExportDatabase(Resource):
                 'Content-Disposition': f'attachment;filename={filename}.json'})
 
     @staticmethod
-    def get_geometries_dict(
-            geom: dict[str, Any]) -> dict[str, Any]:
+    def get_geometries_dict(geom: dict[str, Any]) -> dict[str, Any]:
         return {
             'id': geom['properties']['id'],
             'locationId': geom['properties']['locationId'],
