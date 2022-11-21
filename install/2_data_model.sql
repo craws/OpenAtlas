@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 13.5 (Debian 13.5-0+deb11u1)
--- Dumped by pg_dump version 13.5 (Debian 13.5-0+deb11u1)
+-- Dumped from database version 13.8 (Debian 13.8-0+deb11u1)
+-- Dumped by pg_dump version 13.8 (Debian 13.8-0+deb11u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -875,6 +875,8 @@ The related instance of E53 Place should be seen as a wider approximation of the
 This property is a shortcut of the more fully developed path from E4 Period through P161 has spatial projection, E53 Place, P89 falls within to E53 Place. E4 Period is a subclass of E92 Spacetime Volume. By the definition of P161 has spatial projection an instance of E4 Period takes place on all its spatial projections, that is, instances of E53 Place. Something happening at a given place can also be considered to happen at a larger place containing the first. For example, the assault on the Bastille July 14th 1789 took place in the area covered by Paris in 1789 but also in the area covered by France in 1789.'),
 	(26, 'P140', 'E1', 'E13', 'assigned attribute to', 'was attributed by', 'This property associates an instance of E13 Attribute Assignment with the instance of E1 CRM Entity about which it made an attribution. The instance of E1 CRM Entity plays the role of the domain of the attribution.
 The kind of attribution made should be documented using P177 assigned property type.'),
+	(41, 'P10', 'E92', 'E92', 'falls within', 'contains', 'This property associates an instance of E92 Spacetime Volume with another instance of E92 Spacetime Volume that falls within the latter. In other words, all points in the former are also points in the latter.
+This property is transitive and reflexive.'),
 	(27, 'P52', 'E39', 'E18', 'has current owner', 'is current owner of', 'This property identifies the instance of E21 Person or E74 Group that was the owner of an instance of E18 Physical Thing at the time of validity of the record or database containing the statement that uses this property.
 This property is a shortcut for the more detailed path from E18 Physical Thing through, P24i changed ownership through, E8 Acquisition, P22 transferred title to to E39 Actor, if and only if this acquisition event is the most recent.'),
 	(28, 'P98', 'E21', 'E67', 'brought into life', 'was born', 'This property links an instance of E67 Birth event to an instance of E21 Person in the role of offspring.
@@ -914,8 +916,6 @@ This property is non-symmetric.'),
 Destruction implies the end of an item’s life as a subject of cultural documentation – the physical matter of which the item was composed may in fact continue to exist. An instance of E6 Destruction may be contiguous with an instance of E12 Production that brings into existence a derived object composed partly of matter from the destroyed object.'),
 	(40, 'P136', 'E1', 'E83', 'was based on', 'supported type creation', 'This property identifies one or more instances of E1 CRM Entity that were used as evidence to declare a new instance of E55 Type.
 The examination of these items is often the only objective way to understand the precise characteristics of a new type. Such items should be deposited in a museum or similar institution for that reason. The taxonomic role renders the specific relationship of each item to the type, such as "holotype" or "original element".'),
-	(41, 'P10', 'E92', 'E92', 'falls within', 'contains', 'This property associates an instance of E92 Spacetime Volume with another instance of E92 Spacetime Volume that falls within the latter. In other words, all points in the former are also points in the latter.
-This property is transitive and reflexive.'),
 	(42, 'P8', 'E18', 'E4', 'took place on or within', 'witnessed', 'This property describes the location of an instance of E4 Period with respect to an instance of E19 Physical Object.
 This property is a shortcut of the more fully developed path from E4 Period through P7 took place at, E53 Place, P156i is occupied by E18 Physical Thing.
 It describes a period that can be located with respect to the space defined by an E19 Physical Object such as a ship or a building. The precise geographical location of the object during the period in question may be unknown or unimportant.
@@ -972,6 +972,8 @@ This property is not transitive. This property is symmetric.'),
 	(65, 'P16', 'E70', 'E7', 'used specific object', 'was used for', 'This property describes the use of material or immaterial things in a way essential to the performance or the outcome of an instance of E7 Activity.
 This property typically applies to tools, instruments, moulds, raw materials and items embedded in a product. It implies that the presence of the object in question was a necessary condition for the action. For example, the activity of writing this text required the use of a computer. An immaterial thing can be used if at least one of its carriers is present. For example, the software tools on a computer.
 Another example is the use of a particular name by a particular group of people over some span to identify a thing, such as a settlement. In this case, the physical carriers of this name are at least the people understanding its use.'),
+	(89, 'P14', 'E39', 'E7', 'carried out by', 'performed', 'This property describes the active participation of an instance of E39 Actor in an instance of E7 Activity.
+It implies causal or legal responsibility. The P14.1 in the role of property of the property specifies the nature of an Actor’s participation.'),
 	(66, 'P107', 'E39', 'E74', 'has current or former member', 'is current or former member of', 'This property associates an instance of E74 Group with an instance of E39 Actor that is or has been a member thereof.
 Instances of E74 Group and E21 Person, may all be members of instances of E74 Group.An instance of E74 Group may be founded initially without any member.
 This property is a shortcut of the more fully developed path from E74 Group, P144i gained member by, E85 Joining, P143 joined to E39 Actor.
@@ -998,6 +1000,11 @@ Note that biological fathers are not necessarily participants in the Birth (see 
 Joining events allow for describing people becoming members of a group with the more detailed path E74 Group, P144i gained member by, E85 Joining, P143 joined, E39 Actor, compared to the shortcut offered by P107 has current or former member (is current or former member of).'),
 	(102, 'P110', 'E24', 'E79', 'augmented', 'was augmented by', 'This property identifies the instance of E24 Physical Human-Made Thing that is added to (augmented) in an instance of E79 Part Addition.
 Although an instance of E79 Part Addition event normally concerns only one instance of E24 Physical Human-Made Thing, it is possible to imagine circumstances under which more than one item might be added to (augmented). For example, the artist Jackson Pollock trailing paint onto multiple canvasses.'),
+	(86, 'P62', 'E1', 'E24', 'depicts', 'is depicted by', 'This property identifies something that is depicted by an instance of E24 Physical Human-Made Thing. Depicting is meant in the sense that an instance of E24 Physical Human-Made Thing intentionally shows, through its optical qualities or form, a representation of the entity depicted. Photographs are by default regarded as being intentional in this sense. Anything that is designed to change the properties of the depiction, such as an e-book reader, is specifically excluded. The property does not pertain to inscriptions or any other information encoding.
+This property is a shortcut of the more fully developed path from E24 Physical Human-Made Thing through P65 shows visual item, E36 Visual Item, P138 represents to E1 CRM Entity. P138.1 mode of depiction allows the nature of the depiction to be refined.'),
+	(87, 'P24', 'E18', 'E8', 'transferred title of', 'changed ownership through', 'This property identifies the instance(s) of E18 Physical Thing involved in an instance of E8 Acquisition.
+In reality, an acquisition must refer to at least one transferred item.'),
+	(90, 'P31', 'E18', 'E11', 'has modified', 'was modified by', 'This property identifies the instance of E18 Physical Thing modified in an instance of E11 Modification.'),
 	(76, 'P165', 'E90', 'E73', 'incorporates', 'is incorporated in', 'This property associates an instance of E73 Information Object with an instance of E90 Symbolic Object (or any of its subclasses) that was included in it.
 This property makes it possible to recognise the autonomous status of the incorporated signs, which were created in a distinct context, and can be incorporated in many instances of E73 Information Object, and to highlight the difference between structural and accidental whole-part relationships between conceptual entities.
 It accounts for many cultural facts that are quite frequent and significant: the inclusion of a poem in an anthology, the re-use of an operatic aria in a new opera, the use of a reproduction of a painting for a book cover or a CD booklet, the integration of textual quotations, the presence of lyrics in a song that sets those lyrics to music, the presence of the text of a play in a movie based on that play, etc.
@@ -1027,14 +1034,7 @@ This property is a shortcut for the more detailed path from E18 Physical Thing t
 	(85, 'P134', 'E7', 'E7', 'continued', 'was continued by', 'This property associates two instances of E7 Activity, where the domain is considered as an intentional continuation of the range. A continuation of an activity may happen when the continued activity is still ongoing or after the continued activity has completely ended. The continuing activity may have started already before it decided to continue the other one. Continuation implies a coherence of intentions and outcomes of the involved activities.
 This property is not transitive.'),
 	(103, 'P160', 'E52', 'E92', 'has temporal projection', 'is temporal projection of', 'This property describes the temporal projection of an instance of E92 Spacetime Volume. The property P4 has time-span is the same as P160 has temporal projection if it is used to document an instance of E4 Period or any subclass of it.'),
-	(86, 'P62', 'E1', 'E24', 'depicts', 'is depicted by', 'This property identifies something that is depicted by an instance of E24 Physical Human-Made Thing. Depicting is meant in the sense that an instance of E24 Physical Human-Made Thing intentionally shows, through its optical qualities or form, a representation of the entity depicted. Photographs are by default regarded as being intentional in this sense. Anything that is designed to change the properties of the depiction, such as an e-book reader, is specifically excluded. The property does not pertain to inscriptions or any other information encoding.
-This property is a shortcut of the more fully developed path from E24 Physical Human-Made Thing through P65 shows visual item, E36 Visual Item, P138 represents to E1 CRM Entity. P138.1 mode of depiction allows the nature of the depiction to be refined.'),
-	(87, 'P24', 'E18', 'E8', 'transferred title of', 'changed ownership through', 'This property identifies the instance(s) of E18 Physical Thing involved in an instance of E8 Acquisition.
-In reality, an acquisition must refer to at least one transferred item.'),
 	(88, 'P67', 'E1', 'E89', 'refers to', 'is referred to by', 'This property documents that an instance of E89 Propositional Object makes a statement about an instance of E1 CRM Entity. P67 refers to (is referred to by) has the P67.1 has type link to an instance of E55 Type. This is intended to allow a more detailed description of the type of reference. This differs from P129 is about (is subject of), which describes the primary subject or subjects of the instance of E89 Propositional Object.'),
-	(89, 'P14', 'E39', 'E7', 'carried out by', 'performed', 'This property describes the active participation of an instance of E39 Actor in an instance of E7 Activity.
-It implies causal or legal responsibility. The P14.1 in the role of property of the property specifies the nature of an Actor’s participation.'),
-	(90, 'P31', 'E18', 'E11', 'has modified', 'was modified by', 'This property identifies the instance of E18 Physical Thing modified in an instance of E11 Modification.'),
 	(91, 'P103', 'E55', 'E71', 'was intended for', 'was intention of', 'This property links an instance of E71 Human-Made Thing to an instance of E55 Type describing its intended usage.
 It creates a relation between specific human-made things, both physical and immaterial, to types of intended methods and techniques of use. Note: A link between specific human-made things and a specific use activity should be expressed using P19 was intended use of (was made for).'),
 	(92, 'P5', 'E3', 'E3', 'consists of', 'forms part of', 'This property describes the decomposition of an instance of E3 Condition State into discrete, subsidiary states.
@@ -1202,8 +1202,8 @@ Although a joining activity normally concerns only one instance of E74 Group, it
 Joining events allow for describing people becoming members of a group with a more detailed path from E74 Group through, P144i gained member by, E85 Joining, P143 joined, E39 Actor, compared to the shortcut offered by P107 has current or former member (is current or former member of).
 The property P144.1 kind of member can be used to specify the type of membership or the role the member has in the group.'),
 	(148, 'OA7', 'E39', 'E39', 'has relationship to', NULL, 'OA7 is used to link two Actors (E39) via a certain relationship E39 Actor linked with E39 Actor: E39 (Actor) - P11i (participated in) - E5 (Event) - P11 (had participant) - E39 (Actor) Example: [ Stefan (E21)] participated in [ Relationship from Stefan to Joachim (E5)] had participant [Joachim (E21)] The connecting event is defined by an entity of class E55 (Type): [Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]'),
-	(149, 'OA8', 'E53', 'E77', ' begins in', NULL, 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
-	(150, 'OA9', 'E53', 'E77', ' begins in', NULL, 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
+	(149, 'OA8', 'E53', 'E77', ' begins in', 'is first appearance of', 'OA8 is used to link the beginning of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]'),
+	(150, 'OA9', 'E53', 'E77', ' begins in', 'is last appearance of', 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]');
 
 
 --
@@ -2016,10 +2016,10 @@ INSERT INTO model.property_i18n VALUES
 	(803, 'P144', 'zh', '加入', '获得成员'),
 	(804, 'OA7', 'en', 'has relationship to', NULL),
 	(805, 'OA7', 'de', 'hat Beziehung zu', NULL),
-	(806, 'OA8', 'en', 'begins in', NULL),
-	(807, 'OA8', 'de', 'beginnt in', NULL),
-	(808, 'OA9', 'en', 'ends in', NULL),
-	(809, 'OA9', 'de', 'endet in', NULL);
+	(807, 'OA8', 'de', 'beginnt in', 'ist erster Ort von'),
+	(806, 'OA8', 'en', 'begins in', 'is first appearance of'),
+	(809, 'OA9', 'de', 'endet in', 'ist letzter Ort von'),
+	(808, 'OA9', 'en', 'ends in', 'is last appearance of');
 
 
 --
@@ -2159,3 +2159,4 @@ SELECT pg_catalog.setval('model.property_inheritance_id_seq', 1, false);
 --
 -- PostgreSQL database dump complete
 --
+
