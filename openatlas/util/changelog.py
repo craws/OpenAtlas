@@ -1,6 +1,7 @@
 versions = {
     '7.9.0': ['TBA', {
         'feature': {
+            '1885': 'Inverse translations for OA properties',
             '1820': 'API: use existing GeoJSON definitions for swagger'}
     }],
     '7.8.0': ['2022-11-18',  {
