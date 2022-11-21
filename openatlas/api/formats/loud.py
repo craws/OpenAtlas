@@ -2,30 +2,36 @@ from typing import Any
 
 from flask import url_for
 
+from openatlas.api.formats.linked_places import relation_type
+
 
 def get_loud_entities(
         data: dict[str, Any],
-        parser: dict[str, Any]) -> Any:
+        parser: dict[str, Any],
+        loud: dict[str, str]) -> Any:
     properties_dict: dict[str, list] = {}
-    for link in data['links']:
-        property_name = link.property.i18n['en'].replace(' ', '_')
+    for link_ in data['links']:
+        if link_.property.code in ['OA7', 'OA8', 'OA9']:
+            continue
+        property_name = loud[relation_type(link_).replace(' ', '_')]
         properties_dict.setdefault(property_name, [])
         properties_dict[property_name].append(
             {
-                'id': url_for('view', id_=link.range.id, _external=True),
-                'type': link.range.cidoc_class.name,
-                '_label': link.range.name
+                'id': url_for('view', id_=link_.range.id, _external=True),
+                'type': link_.range.cidoc_class.name,
+                '_label': link_.range.name
             }
         )
-    for link in data['links_inverse']:
-        property_name = link.property.i18n['en']
-        property_name = property_name.replace(' ', '_')
+    for link_ in data['links_inverse']:
+        if link_.property.code in ['OA7', 'OA8', 'OA9']:
+            continue
+        property_name = loud[relation_type(link_, True).replace(' ', '_')]
         properties_dict.setdefault(property_name, [])
         properties_dict[property_name].append(
             {
-                'id': url_for('view', id_=link.domain.id, _external=True),
-                'type': link.domain.cidoc_class.name,
-                '_label': link.domain.name
+                'id': url_for('view', id_=link_.domain.id, _external=True),
+                'type': link_.domain.cidoc_class.name,
+                '_label': link_.domain.name
             }
         )
 

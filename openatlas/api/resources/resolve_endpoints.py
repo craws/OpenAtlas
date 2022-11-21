@@ -1,5 +1,6 @@
 import itertools
 import json
+import pathlib
 from typing import Any, Union
 
 from flask import Response, jsonify, request
@@ -185,7 +186,8 @@ def get_entities_formatted(
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
     if parser['format'] == 'loud':
-        return [get_loud_entities(item, parser)
+        loud = parse_loud_contex()
+        return [get_loud_entities(item, parser, loud)
                 for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
@@ -197,6 +199,19 @@ def get_entities_formatted(
                 parser))
     return result
 
+# Todo: This is just for test reasons make it prettier
+def parse_loud_contex() -> dict[str, str]:
+    file = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
+    with open(file) as file:
+        output = {}
+        for key, value in json.load(file)['@context'].items():
+            if isinstance(value, dict):
+                output[value['@id']] = key
+                if '@context' in value.keys():
+                    for key2, value2 in value['@context'].items():
+                        if isinstance(value, dict):
+                            output[value2['@id']] = key2
+    return output
 
 def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
     if parser['first'] and int(parser['first']) in total:
