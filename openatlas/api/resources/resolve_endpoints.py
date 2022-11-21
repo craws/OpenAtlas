@@ -10,6 +10,7 @@ from openatlas.api.formats.csv import export_entities_csv, \
     export_csv_for_network_analysis
 from openatlas.api.formats.geojson import get_geojson_v2, get_geojson
 from openatlas.api.formats.linked_places import get_linked_places_entity
+from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
@@ -20,7 +21,7 @@ from openatlas.api.resources.search_validation import (
     iterate_validation)
 from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
-    linked_places_template, subunit_template)
+    linked_places_template, subunit_template, loud_pagination)
 from openatlas.api.resources.util import (
     get_entities_by_type,
     get_key,
@@ -68,6 +69,8 @@ def resolve_entities(
 def get_entities_template(parser: dict[str, str]) -> dict[str, Any]:
     if parser['format'] in ['geojson', 'geojson-v2']:
         return geojson_pagination()
+    if parser['format'] == 'loud':
+        return loud_pagination()
     return linked_place_pagination(parser)
 
 
@@ -181,6 +184,9 @@ def get_entities_formatted(
         entities_dict[link_.domain.id]['links'].append(link_)
     for link_ in link_parser_check_inverse(entities, parser):
         entities_dict[link_.range.id]['links_inverse'].append(link_)
+    if parser['format'] == 'loud':
+        return [get_loud_entities(item, parser)
+                for item in entities_dict.values()]
     result = []
     for item in entities_dict.values():
         result.append(
