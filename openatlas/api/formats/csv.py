@@ -165,7 +165,7 @@ def get_grouped_entities(entities: list[dict[str, Any]]) -> dict[str, Any]:
                 entities,
                 key=lambda entity: entity['openatlas_class_name']),
             key=lambda entity: entity['openatlas_class_name']):
-        grouped_entities[class_] = entities_
+        grouped_entities[class_] = list(entities_)
     return grouped_entities
 
 
