@@ -199,6 +199,7 @@ def get_entities_formatted(
                 parser))
     return result
 
+
 # Todo: This is just for test reasons make it prettier
 def parse_loud_contex() -> dict[str, str]:
     file = pathlib.Path(app.root_path) / 'api' / 'linked-art.json'
@@ -212,6 +213,7 @@ def parse_loud_contex() -> dict[str, str]:
                         if isinstance(value, dict):
                             output[value2['@id']] = key2
     return output
+
 
 def get_start_entity(total: list[int], parser: dict[str, Any]) -> list[Any]:
     if parser['first'] and int(parser['first']) in total:

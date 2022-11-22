@@ -10,15 +10,21 @@ def get_loud_entities(
         parser: dict[str, Any],
         loud: dict[str, str]) -> Any:
     properties_dict: dict[str, list] = {}
+    # Set name to properties
+    properties_dict['identified_by'] = [{
+        "type": "Name",
+        "content": data['entity'].name
+    }]
+
     for link_ in data['links']:
         if link_.property.code in ['OA7', 'OA8', 'OA9']:
             continue
         property_name = loud[relation_type(link_).replace(' ', '_')]
-        properties_dict.setdefault(property_name, [])
+
         properties_dict[property_name].append(
             {
                 'id': url_for('view', id_=link_.range.id, _external=True),
-                'type': link_.range.cidoc_class.name,
+                'type': link_.range.cidoc_class.i18n['en'],
                 '_label': link_.range.name
             }
         )
@@ -30,7 +36,7 @@ def get_loud_entities(
         properties_dict[property_name].append(
             {
                 'id': url_for('view', id_=link_.domain.id, _external=True),
-                'type': link_.domain.cidoc_class.name,
+                'type': link_.domain.cidoc_class.i18n['en'],
                 '_label': link_.domain.name
             }
         )
