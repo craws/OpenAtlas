@@ -10,9 +10,9 @@ from werkzeug.wrappers import Response
 from wtforms import BooleanField, SubmitField, TextAreaField
 
 from openatlas import app
+from openatlas.display.tab import Tab
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.tab import Tab
 from openatlas.util.util import (
     button, display_form, is_authorized, link, manual, required_group,
     uc_first)

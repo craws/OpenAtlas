@@ -8,6 +8,8 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display import display
+from openatlas.display.tab import Tab
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -16,7 +18,6 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, display_form,
@@ -44,6 +45,16 @@ def view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
+    tabs = getattr(
+        display,
+        f'{entity.class_.name.capitalize()}Display')(entity).tabs
+    return render_template(
+        'tabs.html',
+        entity=entity,
+        tabs=tabs,
+        # crumbs=add_crumbs(entity, 'view')
+    )
+
     event_links = None  # Needed for actor and info data
     tabs = {'info': Tab('info')}
     if isinstance(entity, Type):
@@ -66,8 +77,6 @@ def view(id_: int) -> Union[str, Response]:
         tabs |= add_tabs_for_place(entity)
     elif entity.class_.view == 'reference':
         tabs |= add_tabs_for_reference(entity)
-    elif entity.class_.view == 'source':
-        tabs |= add_tabs_for_source(entity)
 
     overlays = None  # Needed for place
     if entity.class_.view in [
@@ -325,21 +334,6 @@ def edit_link(url: str) -> Optional[str]:
     return link(_('edit'), url) if is_authorized('contributor') else None
 
 
-def remove_link(
-        name: str,
-        link_: Link,
-        origin: Entity,
-        tab: str) -> Optional[str]:
-    if not is_authorized('contributor'):
-        return None  # pragma: no cover
-    url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
-    return link(
-        _('remove'),
-        f'{url}#tab-{tab}',
-        js="return confirm('{x}')".format(
-            x=_('Remove %(name)s?', name=name.replace("'", ''))))
-
-
 def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
     tabs = {
         'subs': Tab('subs', entity=entity),
@@ -452,7 +446,7 @@ def add_tabs_for_actor(
         else:
             data.append(edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        data.append(remove_link(link_.domain.name, link_, entity, 'event'))
+        # data.append(remove_link(link_.domain.name, link_, entity, 'event'))
         tabs['event'].table.rows.append(data)
     for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
         type_ = ''
@@ -476,7 +470,8 @@ def add_tabs_for_actor(
             link_.description,
             edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            remove_link(related.name, link_, entity, 'relation')])
+            # remove_link(related.name, link_, entity, 'relation')
+        ])
     for link_ in entity.get_links('P107', True):
         data = [
             link(link_.domain),
@@ -486,7 +481,8 @@ def add_tabs_for_actor(
             link_.description,
             edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            remove_link(link_.domain.name, link_, entity, 'member-of')]
+            # remove_link(link_.domain.name, link_, entity, 'member-of')
+        ]
         tabs['member_of'].table.rows.append(data)
     if entity.class_.name != 'group':
         del tabs['member']
@@ -500,7 +496,8 @@ def add_tabs_for_actor(
                 link_.description,
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                remove_link(link_.range.name, link_, entity, 'member')])
+                # remove_link(link_.range.name, link_, entity, 'member')
+            ])
     for link_ in entity.get_links('P52', True):
         data = [
             link(link_.domain),
@@ -540,7 +537,8 @@ def add_tabs_for_event(entity: Entity) -> dict[str, Tab]:
             link_.description,
             edit_link(
                 url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            remove_link(link_.range.name, link_, entity, 'actor')])
+            # remove_link(link_.range.name, link_, entity, 'actor')
+        ])
     entity.linked_places = [
         location.get_linked_entity_safe('P53', True) for location
         in entity.get_linked_entities(['P7', 'P26', 'P27'])]
@@ -557,15 +555,14 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     for link_ in entity.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
-        data.append(
-            remove_link(range_.name, link_, entity, range_.class_.name))
+        # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     for link_ in entity.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
         data.append(edit_link(
             url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        data.append(remove_link(link_.domain.name, link_, entity, 'reference'))
+        # data.append(remove_link(link_.domain.name, link_, entity, 'reference'))
         tabs['reference'].table.rows.append(data)
     return tabs
 
@@ -632,31 +629,7 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
         data.append(link_.description)
         data.append(edit_link(
             url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        data.append(
-            remove_link(range_.name, link_, entity, range_.class_.name))
-        tabs[range_.class_.view].table.rows.append(data)
-    return tabs
-
-
-def add_tabs_for_source(entity: Entity) -> dict[str, Tab]:
-    tabs = {}
-    for name in [
-            'actor', 'artifact', 'feature', 'event', 'place',
-            'stratigraphic_unit', 'text']:
-        tabs[name] = Tab(name, entity=entity)
-    for text in entity.get_linked_entities('P73', types=True):
-        tabs['text'].table.rows.append([
-            link(text),
-            next(iter(text.types)).name if text.types else '',
-            text.description])
-    for link_ in entity.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data.append(remove_link(
-            range_.name,
-            link_,
-            entity,
-            range_.class_.name))
+        # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs
 
