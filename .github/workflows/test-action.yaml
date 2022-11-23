@@ -1,8 +1,6 @@
 name: 'OpenAtlas Github Tests'
 on:
-  push:
-    branches:
-      - features/**
+  push: {}
 jobs:
   openatlas_build:
     runs-on: ubuntu-latest
