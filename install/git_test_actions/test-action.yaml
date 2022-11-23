@@ -1,0 +1,26 @@
+name: 'OpenAtlas Github Tests'
+description: 'Automated tests for OpenAtlas in GitHub'
+on:
+  push:
+    branches:
+      - main
+      - features/**
+  pull_request:
+    branches:
+      - main
+jobs:
+  docker:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Start containers
+        run: docker-compose -f "docker-compose-tests.yml" up -d --build
+
+      - name: Run tests
+        run: python3 -m nose
+
+      - name: Stop containers
+        if: always()
+        run: docker-compose -f "docker-compose-tests.yml" down
+
