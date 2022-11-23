@@ -79,8 +79,7 @@ def view(id_: int) -> Union[str, Response]:
         tabs |= add_tabs_for_reference(entity)
 
     overlays = None  # Needed for place
-    if entity.class_.view in [
-            'actor', 'artifact', 'event', 'place', 'source', 'type']:
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'type']:
         if not isinstance(entity, Type):
             tabs['reference'] = Tab('reference', entity=entity)
         if entity.class_.view == 'artifact':
@@ -89,7 +88,6 @@ def view(id_: int) -> Union[str, Response]:
                 data = get_base_table_data(link_.domain)
                 tabs['event'].table.rows.append(data)
         tabs['file'] = Tab('file', entity=entity)
-        entity.image_id = entity.get_profile_image_id()
         if entity.class_.view == 'place' \
                 and is_authorized('editor') \
                 and current_user.settings['module_map_overlay']:

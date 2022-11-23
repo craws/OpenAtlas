@@ -1,3 +1,4 @@
+from openatlas import app
 from openatlas.display.base_display import BaseDisplay
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
@@ -7,10 +8,12 @@ from openatlas.util.util import get_base_table_data, link
 class SourceDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
+
+        from openatlas.views.entity import get_profile_image_table_link
         super().add_tabs()
         for name in [
                 'actor', 'artifact', 'feature', 'event', 'place',
-                'stratigraphic_unit', 'text']:
+                'stratigraphic_unit', 'text', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=self.entity)
         for text in self.entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
@@ -27,3 +30,24 @@ class SourceDisplay(BaseDisplay):
                     self.entity,
                     range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
+        for link_ in self.entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    get_profile_image_table_link(
+                        domain,
+                        self.entity,
+                        extension,
+                        self.entity.image_id))
+                if not self.entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    self.entity.image_id = domain.id
+            data.append(
+                remove_link(
+                    domain.name,
+                    link_,
+                    self.entity,
+                    domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)
