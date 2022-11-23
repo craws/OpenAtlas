@@ -9,9 +9,8 @@ set -o pipefail
 
 export DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 psql $DB_URL -c "CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;"
-pushd /var/www/openatlas/install
-cat 1_structure.sql 2_data_model.sql 3_data_web.sql 4_data_type.sql | psql $DB_URL -f -
-popd
+
+source /start.sh
 
 source /etc/apache2/envvars
 

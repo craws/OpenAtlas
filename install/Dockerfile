@@ -12,9 +12,10 @@ RUN export DEBIAN_FRONTEND=noninteractive &&\
     mkdir -p /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm &&\
     chown -R www-data:www-data /var/www/openatlas /var/www/.cache /var/www/.local /var/www/.npm /var/log/apache2 /var/run/apache2
 COPY entrypoint.sh /entrypoint.sh
+COPY start.sh /start.sh
 COPY example_apache.conf /etc/apache2/sites-available/000-default.conf
-RUN chmod a+x /entrypoint.sh &&\
-    dos2unix /entrypoint.sh &&\
+RUN chmod a+x /entrypoint.sh /start.sh &&\
+    dos2unix /entrypoint.sh /start.sh &&\
     sed -i 's~^Listen.*~Listen 8080~' /etc/apache2/ports.conf &&\
     sed -i 's~^<VirtualHost \*:80>~<VirtualHost *:8080>~' /etc/apache2/sites-available/000-default.conf &&\
     sed -i 's~ServerName.*~~' /etc/apache2/sites-available/000-default.conf
