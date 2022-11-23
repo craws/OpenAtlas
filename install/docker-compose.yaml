@@ -11,8 +11,8 @@ services:
         - POSTGRES_USER=openatlas
     volumes:
       - ./openatlas/uploads:/var/www/openatlas/openatlas/uploads
-      - ./openatlas/processed_images:/var/www/openatlas/openatlas/processed_images
-      - ./openatlas/export:/var/www/openatlas/openatlas/export
+      - ./openatlas/processed_images/resized:/var/www/openatlas/openatlas/processed_images/resized
+      - ./openatlas/export/sql:/var/www/openatlas/openatlas/export/sql
     depends_on:
       - postgres
   postgres:

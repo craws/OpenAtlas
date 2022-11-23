@@ -12,7 +12,7 @@ then
       echo "Database is empty. Please install backup manually"
     fi
     pushd install/upgrade/ || exit
-    python3 database_upgrade.py || exit
+    python3 ./database_upgrade.py || exit
     popd || exit
 else
     echo "Database does not exist"

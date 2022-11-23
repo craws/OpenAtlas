@@ -10,8 +10,6 @@ set -o pipefail
 export DB_URL="postgres://$POSTGRES_USER:$POSTGRES_PASSWORD@$POSTGRES_HOST:5432/$POSTGRES_DB"
 psql $DB_URL -c "CREATE EXTENSION IF NOT EXISTS postgis; CREATE EXTENSION IF NOT EXISTS unaccent;"
 
-source /start.sh
-
 source /etc/apache2/envvars
 
 cookie_key=$(< /dev/urandom tr -dc _A-Z-a-z-0-9 | head -c 32;echo;)
@@ -27,6 +25,8 @@ DATABASE_PASS='$POSTGRES_PASSWORD'
 MAIL_PASSWORD='$MAIL_PASSWORD'
 SECRET_KEY='$COOKIE_KEY'  # Used for cookies
 EOF
+
+source /start.sh
 
 echo ""
 exec "$@"
