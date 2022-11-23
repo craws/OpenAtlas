@@ -20,7 +20,7 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: |
-            ${{ inputs.registry_root }}${{ inputs.image_tagged }}/${{ github.ref_name }}
+            ghcr.io/acdh-oeaw/openatlas/container-preview/${{ github.ref_name }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
