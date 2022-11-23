@@ -9,9 +9,17 @@ services:
         - POSTGRES_HOST=postgres
         - POSTGRES_PASSWORD=verysecret
         - POSTGRES_USER=openatlas
+    volumes:
+      - ./openatlas/uploads:/var/www/openatlas/openatlas/uploads
+      - ./openatlas/processed_images:/var/www/openatlas/openatlas/processed_images
+      - ./openatlas/export:/var/www/openatlas/openatlas/export
+    depends_on:
+      - postgres
   postgres:
     image: "postgis/postgis:13-3.3"
     environment:
       - POSTGRES_DB=openatlas
       - POSTGRES_PASSWORD=verysecret
       - POSTGRES_USER=openatlas
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
