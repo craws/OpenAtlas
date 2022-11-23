@@ -26,6 +26,8 @@ MAIL_PASSWORD='$MAIL_PASSWORD'
 SECRET_KEY='$COOKIE_KEY'  # Used for cookies
 EOF
 
+
+
 source check_database.sh
 
 echo ""
