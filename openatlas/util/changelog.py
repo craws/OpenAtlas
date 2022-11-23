@@ -3,7 +3,9 @@ versions = {
         'feature': {
             '1882': 'Log dynamically created entities',
             '1885': 'Inverse translations for OA properties',
-            '1820': 'API: use existing GeoJSON definitions for swagger'}
+            '1820': 'API: use existing GeoJSON definitions for swagger'},
+        'fix': {
+            '1888': 'CSV data export missing data'}
     }],
     '7.8.0': ['2022-11-18',  {
         'feature': {
