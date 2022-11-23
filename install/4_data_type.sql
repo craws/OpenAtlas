@@ -128,7 +128,7 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P127', (SELECT id FROM model.entity WHERE name='Open license'), (SELECT id FROM model.entity WHERE name='CC BY-SA 4.0'));
 
 INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, description) VALUES
-    ('E55', 'type', 'Actor actor relation', 'Categories for the relationship between two actors. This may be a mutual relationship (e.g. actor A is friend of actor B and vice versa), or a directional relationship (e.g. actor A is the child of actor B, while actor B is the parent of actor A).'),
+    ('E55', 'type', 'Actor relation', 'Categories for the relationship between two actors. This may be a mutual relationship (e.g. actor A is friend of actor B and vice versa), or a directional relationship (e.g. actor A is the child of actor B, while actor B is the parent of actor A).'),
     ('E55', 'type', 'Kindredship', Null),
     ('E55', 'type', 'Parent of (Child of)', Null),
     ('E55', 'type', 'Social', Null),
@@ -141,10 +141,10 @@ INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, descript
     ('E55', 'type', 'Economical', Null),
     ('E55', 'type', 'Provider of (Customer of)', Null);
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-    ('P127', (SELECT id FROM model.entity WHERE name='Actor actor relation'), (SELECT id FROM model.entity WHERE name='Kindredship')),
-    ('P127', (SELECT id FROM model.entity WHERE name='Actor actor relation'), (SELECT id FROM model.entity WHERE name='Social')),
-    ('P127', (SELECT id FROM model.entity WHERE name='Actor actor relation'), (SELECT id FROM model.entity WHERE name='Political')),
-    ('P127', (SELECT id FROM model.entity WHERE name='Actor actor relation'), (SELECT id FROM model.entity WHERE name='Economical')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Actor relation'), (SELECT id FROM model.entity WHERE name='Kindredship')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Actor relation'), (SELECT id FROM model.entity WHERE name='Social')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Actor relation'), (SELECT id FROM model.entity WHERE name='Political')),
+    ('P127', (SELECT id FROM model.entity WHERE name='Actor relation'), (SELECT id FROM model.entity WHERE name='Economical')),
     ('P127', (SELECT id FROM model.entity WHERE name='Kindredship'), (SELECT id FROM model.entity WHERE name='Parent of (Child of)')),
     ('P127', (SELECT id FROM model.entity WHERE name='Social'), (SELECT id FROM model.entity WHERE name='Friend of')),
     ('P127', (SELECT id FROM model.entity WHERE name='Social'), (SELECT id FROM model.entity WHERE name='Enemy of')),
@@ -343,7 +343,7 @@ INSERT INTO model.link (property_code, domain_id, range_id) VALUES
 
 INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
     ((SELECT id FROM model.entity WHERE name='Actor function'), 'Actor function', 'standard', False, False),
-    ((SELECT id FROM model.entity WHERE name='Actor actor relation'), 'Actor actor relation', 'standard', False, True),
+    ((SELECT id FROM model.entity WHERE name='Actor relation'), 'Actor relation', 'standard', False, True),
     ((SELECT id FROM model.entity WHERE name='Administrative unit'), 'Administrative unit', 'place', True, False),
     ((SELECT id FROM model.entity WHERE name='Artifact'), 'Artifact', 'standard', False, False),
     ((SELECT id FROM model.entity WHERE name='Bibliography'), 'Bibliography', 'standard', False, False),
@@ -367,7 +367,7 @@ INSERT INTO web.hierarchy (id, name, category, multiple, directional) VALUES
 INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, reference_system_allowed, new_types_allowed, write_access_group_name, layout_color, layout_icon, standard_type_id) VALUES
     ('acquisition',          'E8',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('activity',             'E7',  false, true,  true,  'contributor', '#0000FF', 'mdi-calendar',   (SELECT id FROM model.entity WHERE name = 'Event' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
-    ('actor_actor_relation', NULL,  false, false, false, 'contributor', NULL,      NULL,             (SELECT id FROM model.entity WHERE name = 'Actor actor relation' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
+    ('actor_relation',       NULL,  false, false, false, 'contributor', NULL,      NULL,             (SELECT id FROM model.entity WHERE name = 'Actor relation' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('actor_function',       NULL,  false, false, false, 'contributor', NULL,      NULL,             (SELECT id FROM model.entity WHERE name = 'Actor function' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
     ('appellation',          'E41', false, false, false, 'contributor', NULL,      NULL,             NULL),
     ('artifact',             'E22', false, true,  true,  'contributor', '#EE82EE', 'mdi-shapes',     (SELECT id FROM model.entity WHERE name = 'Artifact' AND cidoc_class_code = 'E55' ORDER BY id ASC LIMIT 1)),
@@ -392,7 +392,7 @@ INSERT INTO model.openatlas_class (name, cidoc_class_code, alias_allowed, refere
 
 INSERT INTO web.hierarchy_openatlas_class (hierarchy_id, openatlas_class_name) VALUES
     ((SELECT id FROM web.hierarchy WHERE name='Actor function'), 'actor_function'),
-    ((SELECT id FROM web.hierarchy WHERE name='Actor actor relation'), 'actor_actor_relation'),
+    ((SELECT id FROM web.hierarchy WHERE name='Actor relation'), 'actor_relation'),
     ((SELECT id FROM web.hierarchy WHERE name='Administrative unit'), 'place'),
     ((SELECT id FROM web.hierarchy WHERE name='Artifact'), 'artifact'),
     ((SELECT id FROM web.hierarchy WHERE name='Bibliography'), 'bibliography'),

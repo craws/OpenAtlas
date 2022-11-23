@@ -1,6 +1,20 @@
 versions = {
-    '7.7.0': ['TBA', {
+    '7.8.0': ['2022-11-18',  {
         'feature': {
+            '1400': 'Make specific types required at data entry',
+            '1647': 'Composition of artifacts and human remains',
+            '1863': 'Add a place at artifacts and human remains dynamically',
+            '1835': 'Improved form selection behavior',
+            '1508': 'Drag and drop field for file upload',
+            '1844': 'Show entities in relation type delete overview',
+            '1843': 'API: remove version 0.2',
+            '1873': 'API: Order entities by date',
+            '1841': 'Refactor'},
+        'fix': {
+            '1867': 'Sort issue at first column of form field tables'}}],
+    '7.7.0': ['2022-10-18', {
+        'feature': {
+            '1587': 'Link artifacts and human remains to places directly',
             '1541': 'Linking references to multiple subunits',
             '1641': 'Acquisition in combination with artifacts',
             '1785': 'Forms: add places dynamically',
@@ -8,6 +22,8 @@ versions = {
             '1790': 'Map: make intersecting polygons selectable',
             '1811': 'Checks for orphaned subunits',
             '1823': 'Show class at activity view',
+            '1736': 'Keep form map data after failed backend validation',
+            '1801': 'Refactor and improvements',
             '1802': 'Move CSV export functions to API',
             '1751': 'Manual: add model documentation',
             '1807': 'API: New geojson format'}}],

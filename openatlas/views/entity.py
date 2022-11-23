@@ -13,7 +13,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_place, get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -58,6 +57,7 @@ def view(id_: int) -> Union[str, Response]:
         tabs |= add_tabs_for_actor(entity, event_links)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
+        tabs['artifact'] = Tab('artifact', entity=entity)
     elif entity.class_.view == 'event':
         tabs |= add_tabs_for_event(entity)
     elif entity.class_.view == 'file':
@@ -139,19 +139,19 @@ def view(id_: int) -> Union[str, Response]:
                     int(row[0].replace('<a href="/entity/', '').split('"')[0]))
             )
 
-    place_structure = None
+    structure = None
     gis_data = None
     if entity.class_.view in ['artifact', 'place']:
-        place_structure = get_structure(entity)
-        if place_structure:
-            for item in place_structure['subunits']:
-                tabs[item.class_.name].table.rows.append(
-                    get_base_table_data(item))
-        gis_data = Gis.get_all([entity], place_structure)
+        if structure := entity.get_structure():
+            for item in structure['subunits']:
+                name = 'artifact' if item.class_.view == 'artifact' \
+                    else item.class_.name
+                tabs[name].table.rows.append(get_base_table_data(item))
+        gis_data = Gis.get_all([entity], structure)
         if gis_data['gisPointSelected'] == '[]' \
                 and gis_data['gisPolygonSelected'] == '[]' \
                 and gis_data['gisLineSelected'] == '[]' \
-                and (not place_structure or not place_structure['super_id']):
+                and (not structure or not structure['supers']):
             gis_data = {}
     entity.info_data = get_entity_data(entity, event_links=event_links)
     if not gis_data:  # Has to be after get_entity_data()
@@ -167,8 +167,9 @@ def view(id_: int) -> Union[str, Response]:
             buttons.append(download_button(entity))
         else:
             buttons.append(
-                f'<span class="error">{uc_first(_("missing file"))}</span>')
-    buttons.append(siblings_pager(entity, place_structure))
+                '<span class="error">' + uc_first(_("missing file")) +
+                '</span>')
+    buttons.append(siblings_pager(entity, structure))
     tabs['info'].content = render_template(
         'entity/view.html',
         buttons=buttons,
@@ -181,7 +182,7 @@ def view(id_: int) -> Union[str, Response]:
         'tabs.html',
         tabs=tabs,
         gis_data=gis_data,
-        crumbs=add_crumbs(entity, place_structure),
+        crumbs=add_crumbs(entity, structure),
         entity=entity)
 
 
@@ -205,32 +206,22 @@ def get_profile_image_table_link(
 
 def add_crumbs(
         entity: Union[Entity, Type],
-        structure: Optional[dict[str, Any]]) -> list[str]:
-    label = _(entity.class_.view.replace('_', ' '))
-    crumbs = [
-        [label, url_for('index', view=entity.class_.view)],
-        entity.name]
+        structure: Optional[dict[str, Any]]) -> list[Any]:
+    crumbs: list[Any] = [[
+        _(entity.class_.view.replace('_', ' ')),
+        url_for('index', view=entity.class_.view)]]
     if structure:
-        crumbs = [[g.classes['place'].label, url_for('index', view='place')]]
-        if entity.class_.name == 'artifact':
-            crumbs = [[
-                g.classes['artifact'].label,
-                url_for('index', view='artifact')]]
-        crumbs += [
-            structure['place'],
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            entity.name]
+        for super_ in structure['supers']:
+            crumbs.append(link(super_))
     elif isinstance(entity, Type):
         crumbs = [[_('types'), url_for('type_index')]]
         if entity.root:
             crumbs += [g.types[type_id] for type_id in entity.root]
-        crumbs.append(entity.name)
     elif entity.class_.view == 'source_translation':
         crumbs = [
             [_('source'), url_for('index', view='source')],
-            entity.get_linked_entity('P73', True),
-            entity.name]
+            entity.get_linked_entity('P73', True)]
+    crumbs.append(entity.name)
     return crumbs
 
 
@@ -369,31 +360,33 @@ def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
             'human_remains']
     if any(item in g.types[entity.root[0]].classes for item in place_classes):
         tabs['entities'].table.header.append('place')
-    for item in entity.get_linked_entities(
-            ['P2', 'P89'],
-            inverse=True,
-            types=True):
-        if item.class_.name in ['location', 'reference_system']:
-            continue  # pragma: no cover
-        if item.class_.name == 'object_location':
-            item = item.get_linked_entity_safe('P53', inverse=True)
-        data = [link(item)]
-        if entity.category == 'value':
-            data.append(format_number(item.types[entity]))
-        data.append(item.class_.label)
-        data.append(item.description)
-        if item.class_.name in place_classes:
-            data.append(link(get_place(item)))
-        else:
-            data.append('')
-        tabs['entities'].table.rows.append(data)
-    if not tabs['entities'].table.rows:
-        # If no entities available get links with this type_id
+    root = g.types[entity.root[0]] if entity.root else entity
+    if root.name in app.config['PROPERTY_TYPES']:
         tabs['entities'].table.header = [_('domain'), _('range')]
         for row in Link.get_links_by_type(entity):
             tabs['entities'].table.rows.append([
                 link(Entity.get_by_id(row['domain_id'])),
                 link(Entity.get_by_id(row['range_id']))])
+    else:
+        for item in entity.get_linked_entities(
+                ['P2', 'P89'],
+                inverse=True,
+                types=True):
+            if item.class_.name in ['location', 'reference_system']:
+                continue  # pragma: no cover
+            if item.class_.name == 'object_location':
+                item = item.get_linked_entity_safe('P53', inverse=True)
+            data = [link(item)]
+            if entity.category == 'value':
+                data.append(format_number(item.types[entity]))
+            data.append(item.class_.label)
+            data.append(item.description)
+            root_place = ''
+            if item.class_.name in place_classes:
+                if roots := item.get_linked_entities_recursive('P46', True):
+                    root_place = link(roots[0])
+            data.append(root_place)
+            tabs['entities'].table.rows.append(data)
     return tabs
 
 
@@ -558,8 +551,7 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
             'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'human_remains', 'reference',
-            'type']:
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
         tabs[name] = Tab(name, entity=entity)
     entity.image_id = entity.id if get_file_path(entity.id) else None
     for link_ in entity.get_links('P67'):
@@ -582,17 +574,13 @@ def add_tabs_for_place(entity: Entity) -> dict[str, Tab]:
     tabs = {
         'source': Tab('source', entity=entity),
         'event': Tab('event', entity=entity),
-        'reference': Tab('reference', entity=entity)}
+        'reference': Tab('reference', entity=entity),
+        'artifact': Tab('artifact', entity=entity)}
     if entity.class_.name == 'place':
         tabs['actor'] = Tab('actor', entity=entity)
         tabs['feature'] = Tab('feature', entity=entity)
     elif entity.class_.name == 'feature':
-        tabs['stratigraphic_unit'] = Tab(
-            'stratigraphic_unit',
-            entity=entity)
-    elif entity.class_.name == 'stratigraphic_unit':
-        tabs['artifact'] = Tab('artifact', entity=entity)
-        tabs['human_remains'] = Tab('human_remains', entity=entity)
+        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', entity=entity)
     entity.location = entity.get_linked_entity_safe('P53', types=True)
     events = []  # Collect events to display actors
     event_ids = []  # Keep track of event ids to prevent event doubles
@@ -636,7 +624,7 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
             'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'human_remains', 'artifact', 'file']:
+            'stratigraphic_unit', 'artifact', 'file']:
         tabs[name] = Tab(name, entity=entity)
     for link_ in entity.get_links('P67'):
         range_ = link_.range
@@ -653,7 +641,7 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
 def add_tabs_for_source(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
-            'actor', 'artifact', 'feature', 'event', 'human_remains', 'place',
+            'actor', 'artifact', 'feature', 'event', 'place',
             'stratigraphic_unit', 'text']:
         tabs[name] = Tab(name, entity=entity)
     for text in entity.get_linked_entities('P73', types=True):
@@ -682,7 +670,7 @@ def add_note_tab(entity: Entity) -> Tab:
             if note['public'] else uc_first(_('private')),
             link(User.get_by_id(note['user_id'])),
             note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">'
-            f'{uc_first(_("view"))}</a>']
+            f'<a href="{url_for("note_view", id_=note["id"])}">' +
+            uc_first(_("view")) + '</a>']
         tab.table.rows.append(data)
     return tab

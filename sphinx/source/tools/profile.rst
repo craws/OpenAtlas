@@ -25,14 +25,12 @@ General
 Modules
 -------
 Here you can adjust shown interface elements to your preferences. You still see
-e.g. existing subunits even when you deactivate them but the interface elements
-to add them will disappear.
+e.g. already entered hours, minutes and seconds even when you deactivate them
+but the interface elements to add them will disappear.
 
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones
   (editor or above)
-* **Subunits** - to insert archeological subunits at places,
-  see: :doc:`/entity/place`
-* **Time** - show time fields in forms, see :doc:`/form/date`
+* **Time** - show time fields in forms, see :doc:`/ui/date`
 
 Display
 -------

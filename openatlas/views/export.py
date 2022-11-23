@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import Any, Union
+from typing import Union
 
 from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _

@@ -15,7 +15,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
     (SELECT id FROM web.group WHERE name = 'admin'));
 
 INSERT INTO web.settings (name, value) VALUES
-    ('database_version', '7.5.0'),
+    ('database_version', '7.8.0'),
     ('api_public', ''),
     ('default_language', 'en'),
     ('table_rows', '25'),
@@ -41,7 +41,6 @@ INSERT INTO web.settings (name, value) VALUES
     ('minimum_jstree_search', '1'),
     ('minimum_password_length', '12'),
     ('module_map_overlay', 'True'),
-    ('module_sub_units', 'True'),
     ('module_time', ''),
     ('profile_image_width', '200'),
     ('random_password_length', '16'),

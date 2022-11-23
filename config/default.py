@@ -5,7 +5,7 @@ from config.database_versions import DATABASE_VERSIONS
 
 root_path = Path(__file__).parent.parent / 'openatlas'
 
-VERSION = '7.7.0'
+VERSION = '7.8.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
@@ -93,4 +93,8 @@ CSS = {
         'secondary': 'btn btn-secondary btn-xsm'}}
 
 # Property types work differently, e.g. no move functionality
-PROPERTY_TYPES = ['Actor actor relation', 'Actor function', 'Involvement']
+PROPERTY_TYPES = [
+    'Actor relation',
+    'Actor function',
+    'External reference match',
+    'Involvement']

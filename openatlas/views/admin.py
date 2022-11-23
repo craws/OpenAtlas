@@ -291,7 +291,7 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a> '
+                    f'<a href="{url}">' + uc_first(_("remove")) + '</a> '
                     f'{type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
@@ -483,7 +483,7 @@ def admin_orphans() -> str:
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_subunits': Tab(
-            'orphaned_sub_units',
+            'orphaned_subunits',
             table=Table([
                 'id',
                 'name',
@@ -736,8 +736,9 @@ def admin_newsletter() -> Union[str, Response]:
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'tabs.html',
-        tabs={'tab': Tab('newsletter', form=form, table=table)},
+        'admin/newsletter.html',
+        form=form,
+        table=table,
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

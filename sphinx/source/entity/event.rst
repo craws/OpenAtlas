@@ -24,10 +24,10 @@ CIDOC documentation: :cidoc_entity:`E5 Event<e5-event>`,
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * **Location** - a :doc:`place` where the event occurred
 * **Sub event of** - events can be part of another event,
   e.g. a battle as a sub event of a war.
@@ -54,7 +54,9 @@ For step by step instructions have a look at our :doc:`/examples/index`.
 
 Acquisition
 ***********
-* **Given Place** - to select which :doc:`places <place>` changed ownership.
+* **Given place** - to select which :doc:`places <place>` changed ownership.
+* **Given artifact** - to select which :doc:`artifacts <artifact>`
+  changed ownership.
 
 To add **recipients** and **donors** go to the **Actor** tab, add actors and
 select as activity:

@@ -15,7 +15,6 @@ from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
@@ -98,26 +97,19 @@ def add_crumbs(
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
     crumbs: list[Any] = [
-        [label, url_for('index', view=origin.class_.view if origin else view)],
-        origin]
+        [label, url_for('index', view=origin.class_.view if origin else view)]]
     if class_ == 'source_translation' and origin and not insert_:
         crumbs = [
             [_('source'), url_for('index', view='source')],
-            origin.get_linked_entity('P73', True),
-            origin]
-    if structure:
-        crumbs = [
-            [_('place'), url_for('index', view='place')],
-            structure['place']
-            if origin and origin.class_.name != 'place' else '',
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            origin]
+            origin.get_linked_entity('P73', True)]
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
             crumbs += [g.types[type_id] for type_id in origin.root]
-        crumbs += [origin]
+    if structure:
+        crumbs += structure['supers']
+    else:
+        crumbs.append(origin)
     sibling_count = 0
     if origin \
             and origin.class_.name == 'stratigraphic_unit' \
@@ -156,7 +148,7 @@ def get_place_info_for_insert(
         origin: Optional[Entity]) -> dict[str, Any]:
     if class_view not in ['artifact', 'place']:
         return {'structure': None, 'gis_data': None, 'overlays': None}
-    structure = get_structure(super_=origin)
+    structure = origin.get_structure_for_insert() if origin else None
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
@@ -171,7 +163,7 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
             'gis_data': None,
             'overlays': None,
             'location': None}
-    structure = get_structure(entity)
+    structure = entity.get_structure()
     return {
         'structure': structure,
         'gis_data': Gis.get_all([entity], structure),

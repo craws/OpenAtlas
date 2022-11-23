@@ -261,6 +261,18 @@ def get_table_content(
                 ['activity', 'acquisition', 'move', 'production'],
                 types=True,
                 aliases=aliases)
+        elif class_name == 'artifact_super':
+            class_ = 'place'
+            entities = Entity.get_by_class(
+                g.view_class_mapping['place'] + ['artifact'],
+                types=True,
+                aliases=aliases)
+        elif class_name == 'human_remains_super':
+            class_ = 'place'
+            entities = Entity.get_by_class(
+                g.view_class_mapping['place'] + ['human_remains'],
+                types=True,
+                aliases=aliases)
         else:
             class_ = class_name
             entities = Entity.get_by_view(
@@ -279,7 +291,8 @@ def get_table_content(
 
 
 def format_name_and_aliases(entity: Entity, field_id: str) -> str:
-    link = f"""<a href='#' onclick="selectFromTable(this,
+    link = \
+        f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
         '{field_id}', {entity.id})">{entity.name}</a>"""
     if entity.aliases:  # pragma: no cover
         html = f'<p>{link}</p>'

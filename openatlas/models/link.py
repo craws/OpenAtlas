@@ -12,6 +12,7 @@ from openatlas.util.util import (
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
+    from openatlas.models.type import Type
 
 
 class Link:
@@ -141,6 +142,17 @@ class Link:
             types=types)
 
     @staticmethod
+    def get_linked_entities_recursive(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        from openatlas.models.entity import Entity
+        return Entity.get_by_ids(
+            Db.get_linked_entities_recursive(id_, code, inverse),
+            types=types)
+
+    @staticmethod
     def get_linked_entity_safe(
             id_: int,
             code: str,
@@ -203,8 +215,17 @@ class Link:
         return Link(Db.get_by_id(id_))
 
     @staticmethod
-    def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
+    def get_links_by_type(type_: Type) -> list[dict[str, Any]]:
         return Db.get_links_by_type(type_.id)
+
+    @staticmethod
+    def get_links_by_type_recursive(
+            type_: Type,
+            result: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        result += Db.get_links_by_type(type_.id)
+        for sub_id in type_.subs:
+            result = Link.get_links_by_type_recursive(g.types[sub_id], result)
+        return result
 
     @staticmethod
     def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:

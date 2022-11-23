@@ -14,7 +14,7 @@ class TypeTest(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor_type = Type.get_hierarchy('Actor actor relation')
+                actor_type = Type.get_hierarchy('Actor relation')
                 dimension_type = Type.get_hierarchy('Dimensions')
                 historical_type = Type.get_hierarchy('Historical place')
                 sex_type = Type.get_hierarchy('Sex')
@@ -28,11 +28,11 @@ class TypeTest(TestBaseCase):
             assert b'Historical place' in rv.data
 
             rv = self.app.get(url_for('type_index'))
-            assert b'Actor actor relation' in rv.data
+            assert b'Actor relation' in rv.data
 
             rv = self.app.get(
                 url_for('insert', class_='type', origin_id=actor_type.id))
-            assert b'Actor actor relation' in rv.data
+            assert b'Actor relation' in rv.data
 
             data = {
                 'name': 'My secret type',
@@ -151,6 +151,10 @@ class TypeTest(TestBaseCase):
             assert b'No entries' in rv.data
 
             rv = self.app.get(
+                url_for('show_untyped_entities', id_=admin_unit_id))
+            assert b'Home' in rv.data
+
+            rv = self.app.get(
                 url_for('type_delete', id_=actor_type.id),
                 follow_redirects=True)
             assert b'Forbidden' in rv.data
@@ -191,6 +195,18 @@ class TypeTest(TestBaseCase):
             rv = self.app.get(
                 url_for('type_delete_recursive', id_=sex_type.subs[0]),
                 follow_redirects=True)
+            assert b'Warning' in rv.data
+
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                actor.link(
+                    'P74',
+                    location,
+                    type_id=g.types[actor_type.subs[0]].id)
+            rv = self.app.get(
+                url_for(
+                    'type_delete_recursive',
+                    id_=g.types[actor_type.subs[0]].id))
             assert b'Warning' in rv.data
 
             rv = self.app.post(

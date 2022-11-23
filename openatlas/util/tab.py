@@ -4,7 +4,6 @@ from typing import Optional, TYPE_CHECKING
 
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas.util.table import Table
@@ -22,6 +21,7 @@ _('invalid involvement dates')
 _('unlinked')
 _('missing files')
 _('orphaned files')
+_('orphaned subunits')
 _('circular dependencies')
 
 
@@ -119,25 +119,33 @@ class Tab:
                         type_='involvement',
                         origin_id=id_)))
             for item in g.view_class_mapping['actor']:
-                self.buttons.append(button(
-                    g.classes[item].label,
-                    url_for('insert', class_=item, origin_id=id_)))
+                self.buttons.append(
+                    button(
+                        g.classes[item].label,
+                        url_for('insert', class_=item, origin_id=id_)))
         elif name == 'artifact':
-            if class_ and class_.name != 'stratigraphic_unit':
+            if entity and entity.class_.name != 'human_remains':
                 self.buttons.append(
                     button(
-                        'link',
-                        url_for('link_insert', id_=id_, view='artifact')))
-            self.buttons.append(
-                button(
-                    g.classes[name].label,
-                    url_for('insert', class_=name, origin_id=id_)))
+                        g.classes['artifact'].label,
+                        url_for('insert', class_='artifact', origin_id=id_)))
+            if entity and entity.class_.name != 'artifact':
+                self.buttons.append(
+                    button(
+                        g.classes['human_remains'].label,
+                        url_for(
+                            'insert',
+                            class_='human_remains',
+                            origin_id=id_)))
         elif name == 'entities':
-            if id_:
-                self.buttons.append(
-                    button(
-                        _('move entities'),
-                        url_for('type_move_entities', id_=id_)))
+            if id_ and id_ in g.types:
+                type_ = g.types[id_]
+                root = g.types[type_.root[0]] if type_.root else type_
+                if root.category not in ['system', 'value']:
+                    self.buttons.append(
+                        button(
+                            _('move entities'),
+                            url_for('type_move_entities', id_=id_)))
         elif name == 'event':
             if view == 'file':
                 self.buttons.append(
@@ -173,9 +181,7 @@ class Tab:
                             g.classes[item].label,
                             url_for('insert', class_=item, origin_id=id_)))
         elif name == 'feature':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'place':
+            if class_ and class_.name == 'place':
                 self.buttons.append(
                     button(
                         g.classes[name].label,
@@ -193,14 +199,6 @@ class Tab:
                 button(
                     g.classes[name].label,
                     url_for('insert', class_=name, origin_id=id_)))
-        elif name == 'human_remains':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'stratigraphic_unit':
-                self.buttons.append(
-                    button(
-                        g.classes[name].label,
-                        url_for('insert', origin_id=id_, class_=name)))
         elif name == 'member':
             self.buttons.append(
                 button(
@@ -241,7 +239,7 @@ class Tab:
                     'link',
                     url_for(
                         'insert_relation',
-                        type_='actor_actor_relation',
+                        type_='actor_relation',
                         origin_id=id_)))
             for item in g.view_class_mapping['actor']:
                 self.buttons.append(
@@ -265,9 +263,7 @@ class Tab:
                     g.classes['source'].label,
                     url_for('insert', class_=name, origin_id=id_)))
         elif name == 'stratigraphic_unit':
-            if current_user.settings['module_sub_units'] \
-                    and class_ \
-                    and class_.name == 'feature':
+            if class_ and class_.name == 'feature':
                 self.buttons.append(
                     button(
                         g.classes['stratigraphic_unit'].label,

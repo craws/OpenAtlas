@@ -43,6 +43,11 @@ Orphaned files
 **************
 Files that have no corresponding entity are listed here.
 
+Orphaned subunits
+*****************
+Subunits that are missing a connection to the level above. E.g. a feature
+without a connection to a place.
+
 Circular dependencies
 *********************
 A check if an entity is linked to itself. This could happen e.g. if a person is

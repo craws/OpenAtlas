@@ -3,13 +3,13 @@ Time Spans
 
 .. toctree::
 
-This section is focused on how the :doc:`Date</form/date>` input fields work
+This section is focused on how the :doc:`Date</ui/date>` input fields work
 and how to put in time spans correctly.
 
 Where to find the input fields
 ------------------------------
 
-:doc:`Date</form/date>` input fields can be found on the following:
+:doc:`Date</ui/date>` input fields can be found on the following:
 
 * All forms connected to :doc:`Events</entity/event>`
 * All forms connected to :doc:`Actors</entity/actor>`

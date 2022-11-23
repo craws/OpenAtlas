@@ -39,6 +39,7 @@ def process_standard_fields(manager: Any) -> None:
                     'CSRFTokenField',
                     'HiddenField',
                     'MultipleFileField',
+                    'DragNDropField',
                     'SelectField',
                     'SelectMultipleField',
                     'SubmitField',
@@ -97,7 +98,7 @@ def process_standard_fields(manager: Any) -> None:
 
 def process_origin(manager: Any) -> None:
     if not manager.entity:
-        return None
+        return
     if manager.origin.class_.view == 'reference':
         if manager.entity.class_.name == 'file':
             manager.add_link(
@@ -121,6 +122,7 @@ def process_origin(manager: Any) -> None:
     elif manager.origin.class_.view in ['source', 'file'] \
             and manager.entity.class_.name != 'source_translation':
         manager.add_link('P67', manager.origin, inverse=True)
+    return
 
 
 def process_dates(manager: Any) -> dict[str, Any]:

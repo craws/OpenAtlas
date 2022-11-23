@@ -48,6 +48,28 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_insert', category='custom'))
             assert b'+ Custom' in rv.data
 
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                sex_hierarchy = Type.get_hierarchy('Sex')
+
+            rv = self.app.get(
+                url_for('required_risk', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Be careful with making types required' in rv.data
+
+            rv = self.app.get(
+                url_for('required_add', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+
+            rv = self.app.get(url_for('insert', class_='person'))
+            assert b'Sex *' in rv.data
+
+            rv = self.app.get(
+                url_for('required_remove', id_=sex_hierarchy.id),
+                follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+
             data = {'name': 'My secret type', 'description': 'Very important!'}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=hierarchy.id),
@@ -65,9 +87,7 @@ class HierarchyTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy.id),
-                data={
-                    'name': 'Actor actor relation',
-                    'entity_id': hierarchy.id},
+                data={'name': 'Actor relation', 'entity_id': hierarchy.id},
                 follow_redirects=True)
             assert b'The name is already in use' in rv.data
 
@@ -93,7 +113,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.get(url_for('hierarchy_update', id_=value_type.id))
             assert b'valued' in rv.data
 
-            relation_type = Type.get_hierarchy('Actor actor relation')
+            relation_type = Type.get_hierarchy('Actor relation')
             rv = self.app.get(
                 url_for('hierarchy_update', id_=relation_type.id),
                 follow_redirects=True)

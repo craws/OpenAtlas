@@ -1,0 +1,318 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Places &mdash; OpenAtlas 7.8.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="References Systems" href="reference_systems.html" />
+    <link rel="prev" title="Move events" href="move_event.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Examples</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="index.html#general">General</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#archaeological">Archaeological</a></li>
+<li class="toctree-l2"><a class="reference internal" href="index.html#historical">Historical</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="index.html">Examples</a> &raquo;</li>
+        
+      <li>Places</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="places">
+<h1>Places<a class="headerlink" href="#places" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>Here you can find out how to enter new places and how to use the map.</p>
+<div class="section" id="create-a-new-place">
+<h2>Create a new place<a class="headerlink" href="#create-a-new-place" title="Permalink to this headline">¶</a></h2>
+<p>To start entering a new <a class="reference internal" href="../entity/place.html"><span class="doc">Place</span></a> click the <strong>Place</strong>
+button in the <a class="reference internal" href="../ui/menu.html"><span class="doc">menu</span></a>. Then use the <strong>+ Place</strong> button to get
+to the respective form. The following information can be entered:</p>
+<ul class="simple">
+<li><p>Choose a descriptive <a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a>; as in all other forms, a name is
+required to save data</p></li>
+<li><p>If a place has several designations or is also known by other names, note
+them under <a class="reference internal" href="../ui/alias.html"><span class="doc">Alias</span></a>. Please keep in mind: Place names in other
+languages can be covered by using <strong>Geonames</strong> as
+<a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a></p></li>
+<li><p>Select a fitting <a class="reference internal" href="../entity/type.html"><span class="doc">Type</span></a> from the list. If none can be found,
+you can add new types (depending on your user group). You can find more
+information on types and how to add new ones <a class="reference internal" href="types.html"><span class="doc">here</span></a></p></li>
+<li><p>Add an <strong>administrative unit</strong> or <strong>historical place</strong> and/or link the
+place to an <a class="reference internal" href="../entity/reference_system.html"><span class="doc">Reference System</span></a> (see a tutorial
+<a class="reference internal" href="reference_systems.html"><span class="doc">here</span></a>)</p></li>
+<li><p>You can also add a <a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a> and a free text <a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
+</ul>
+<div class="section" id="how-to-use-the-map">
+<h3>How to use the map<a class="headerlink" href="#how-to-use-the-map" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference internal" href="../tools/map.html"><span class="doc">Map</span></a> has multiple functionalities:</p>
+<ul class="simple">
+<li><p>You can zoom in and out by using the <strong>+</strong> and <strong>-</strong> button or make the
+map full screen as well</p></li>
+<li><p>Use the magnifying glass to search for places. Type a place name in the
+search field, press enter and choose the correct place from the list. The
+map will zoom to the chosen location and a pop-up will be shown.
+You can choose from the following options:</p>
+<ul>
+<li><p><strong>Import ID</strong> will import the related Geonames ID into your form</p></li>
+<li><p><strong>Import Coordinates</strong> will import the related coordinates and show a
+marker on the map</p></li>
+<li><p><strong>Import ID and Coordinates</strong></p></li>
+</ul>
+</li>
+<li><p>The map on which the visualization is based can be changed by hovering
+over the layer button Here, for example, “Landscape”, “Street Map” or ”
+Satellite” views are available. In addition, various settings for the maps
+can be made here, e.g. whether clusters or markers are to be displayed</p></li>
+<li><p>The map can also be used to set your own markers for locations. Four
+different modes are available for this:</p>
+<ul>
+<li><p><strong>Centerpoint</strong>: Sets a point at the position a physical thing is
+located at</p></li>
+<li><p><strong>Linestring</strong>: A line can be drawn to show the location of e.g. a
+border or an old river bed. Double-click on the last drawn point to end
+the drawing mode</p></li>
+<li><p><strong>Shape</strong>: via the rectangle you can draw a shape that represents
+the location - use this if the exact location of a physical thing is
+known e.g. for a certain building with known location or a grave in a
+burial ground plot. To close the polygon click on the first drawn point;
+<strong>please note</strong>: drawing shapes with holes is not possible.</p></li>
+<li><p><strong>Area</strong>: Use the polygon to describe an area where the
+physical thing is/was located, but whose exact location is unknown.
+<strong>Please note</strong>: Select the marked area large enough to be 100% sure that
+the object is/was located in it. To close the polygon click on the first
+drawn point; <strong>please note</strong>: drawing shapes with holes is not possible.</p></li>
+<li><p>After the marker/polygon has been drawn, further information can be entered
+into the pop-up, e.g. a name or a description as free text. This is
+optional but useful in case you draw multiple geometries for one entry.
+In addition, data about the polygon and coordinates can be
+copied from the corresponding field of the pop-up window</p></li>
+<li><p>By clicking on the drawn shape or marker, these can be edited and/or
+deleted</p></li>
+<li><p>All the entered information is saved when pressing the <strong>Insert</strong> button</p></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="section" id="reference-systems-geonames">
+<h3>Reference Systems - GeoNames<a class="headerlink" href="#reference-systems-geonames" title="Permalink to this headline">¶</a></h3>
+<p>You can also link your data to GeoNames without using the map. To do so,
+type the respective GeoNames identifier in the dedicated field and choose if
+it is an exact match or close match. <strong>Please note</strong>: As for all references
+systems, information can not be saved without stating which kind of match
+it is.</p>
+<p>By clicking the <strong>Insert</strong> or <strong>Insert and continue</strong> button you can save
+the information</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="reference_systems.html" class="btn btn-neutral float-right" title="References Systems" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="move_event.html" class="btn btn-neutral float-left" title="Move events" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1146,7 +1146,7 @@
             },
             "type" : "array"
           },
-          "actor_actor_relation" : {
+          "actor_relation" : {
             "items" : {
               "$ref" : "#/components/schemas/TypesByViewClassEntry"
             },
@@ -1706,7 +1706,7 @@
           "name" : "system_class",
           "required" : true,
           "schema" : {
-            "enum" : [ "all", "administrative_unit", "type", "acquisition", "activity", "actor_actor_relation", "actor_function", "appellation", "artifact", "bibliography", "edition", "external_reference", "feature file", "group", "human_remains", "involvement", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit" ],
+            "enum" : [ "all", "administrative_unit", "type", "acquisition", "activity", "actor_relation", "actor_function", "appellation", "artifact", "bibliography", "edition", "external_reference", "feature file", "group", "human_remains", "involvement", "move", "object_location", "person", "place", "production", "reference_system", "source", "source_translation", "stratigraphic_unit" ],
             "type" : "string"
           }
         }, {

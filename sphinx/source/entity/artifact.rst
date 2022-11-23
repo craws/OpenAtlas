@@ -12,19 +12,22 @@ Artifact can be entered here, e.g. a coin
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * :doc:`/tools/map`
 * :doc:`reference_system`
+* **Super** - a :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit` or
+  artifact, which it is a part of
 * **Owned by** - the :doc:`actor` who owns the artifact
 
 
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
-* :doc:`event` - about movement with a **Move** event or creation with a **Production** event
+* :doc:`event` - about movement with a **Move** event or creation with
+  a **Production** event
 * :doc:`reference`
 * :doc:`file`
 

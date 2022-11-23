@@ -33,6 +33,7 @@ if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.link import Link
     from openatlas.models.type import Type
+    from openatlas.models.user import User
 
 
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
@@ -75,12 +76,13 @@ def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
         if item == 'type':
             html += \
                 f'<a href="{url_for("type_index")}" ' \
-                f'class="nav-item nav-link {active}">' \
-                f'{uc_first(_("types"))}</a>'
+                f'class="nav-item nav-link {active}">' + \
+                uc_first(_("types")) + '</a>'
         else:
             html += \
                 f'<a href="{url_for("index", view=item)}" ' \
-                f'class="nav-item nav-link {active}">{uc_first(_(item))}</a>'
+                f'class="nav-item nav-link {active}">' + uc_first(_(item)) + \
+                '</a>'
     return html
 
 
@@ -180,8 +182,7 @@ def get_base_table_data(entity: Entity, show_links: bool = True) -> list[Any]:
         data.append(
             g.file_stats[entity.id]['ext']
             if entity.id in g.file_stats else 'N/A')
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place'] \
-            or entity.class_.name == 'human_remains':
+    if entity.class_.view in ['actor', 'artifact', 'event', 'place']:
         data.append(entity.first)
         data.append(entity.last)
     data.append(entity.description)
@@ -245,7 +246,7 @@ def get_entity_data(
             appears_first, appears_last = get_appearance(event_links)
             data[_('appears first')] = appears_first
             data[_('appears last')] = appears_last
-    elif entity.class_.name in ['artifact', 'human_remains']:
+    elif entity.class_.view == 'artifact':
         data[_('source')] = \
             [link(source) for source in entity.get_linked_entities('P128')]
         data[_('owned by')] = link(entity.get_linked_entity('P52'))
@@ -277,8 +278,9 @@ def get_entity_data(
             data[_('given place')] = []
             data[_('given artifact')] = []
             for item in entity.get_linked_entities('P24'):
-                var = 'artifact' if item.class_.name == 'artifact' else 'place'
-                data[_(f'given {var}')].append(link(item))
+                label = _('given artifact') \
+                    if item.class_.name == 'artifact' else _('given place')
+                data[label].append(link(item))
         if entity.class_.name == 'production':
             data[_('produced')] = \
                 [link(item) for item in entity.get_linked_entities('P108')]
@@ -607,7 +609,7 @@ def display_citation_example(code: str) -> str:
     if code != 'reference':
         return ''
     if text := get_translation('citation_example'):
-        return f'<h1>{uc_first(_("citation_example"))}</h1>{text}'
+        return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
     return ''  # pragma: no cover
 
 
@@ -678,7 +680,7 @@ def get_type_data(entity: Entity) -> dict[str, Any]:
 
 
 @app.template_filter()
-def description(entity: Union[Entity, Project]) -> str:
+def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
     html = ''
     if isinstance(entity, Entity) \
@@ -686,7 +688,7 @@ def description(entity: Union[Entity, Project]) -> str:
         from openatlas.views.anthropology import print_result
         if result := print_result(entity):
             html += \
-                f"<h2>{uc_first(_('anthropological analyses'))}</h2>" \
+                "<h2>" + uc_first(_('anthropological analyses')) + '</h2>' \
                 f"<p>{result}</p>"
     if not entity.description:
         return html
@@ -748,7 +750,8 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-        f'<a title="{uc_first("manual")}" href="/static/manual/{site}.html" ' \
+        '<a title="' + uc_first("manual") + \
+        f'" href="/static/manual/{site}.html" ' \
         f'class="manual" target="_blank" ><i class="fas fa-book"></i></a>'
 
 

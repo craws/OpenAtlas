@@ -109,6 +109,17 @@ class Entity:
             inverse=inverse,
             types=types)
 
+    def get_linked_entities_recursive(
+            self,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        return Link.get_linked_entities_recursive(
+            self.id,
+            code,
+            inverse=inverse,
+            types=types)
+
     def link(self,
              code: str,
              range_: Union[Entity, list[Entity]],
@@ -292,6 +303,24 @@ class Entity:
             if count > 1 and not g.types[id_].multiple:
                 return id_
         return None
+
+    def get_structure(self) -> dict[str, list[Entity]]:
+        structure: dict[str, list[Entity]] = {
+            'siblings': [],
+            'supers': self.get_linked_entities_recursive('P46', inverse=True),
+            'subunits': self.get_linked_entities('P46', types=True)}
+        if structure['supers']:
+            structure['siblings'] = \
+                structure['supers'][-1].get_linked_entities('P46')
+        return structure
+
+    def get_structure_for_insert(self) -> dict[str, list[Entity]]:
+        return {
+            'siblings': self.get_linked_entities('P46'),
+            'subunits': [],
+            'supers':
+                self.get_linked_entities_recursive('P46', inverse=True) +
+                [self]}
 
     @staticmethod
     def get_invalid_dates() -> list[Entity]:

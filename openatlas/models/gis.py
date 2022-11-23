@@ -46,21 +46,20 @@ class Gis:
             'polygon_point': []}
 
         # Include GIS of subunits which would be otherwise omitted
-        subunit_ids = [
-            subunit.id for subunit in structure['subunits']] \
-            if structure else []
-        sibling_ids = [
-            sibling.id for sibling in structure['siblings']] \
-            if structure else []
+        subunit_ids = []
+        sibling_ids = []
         extra_ids = [0]
         if structure:
+            subunit_ids = [e.id for e in structure['subunits']]
+            sibling_ids = [e.id for e in structure['siblings']]
+            super_id = [structure['supers'][-1].id] \
+                if structure['supers'] else []
             extra_ids = [
                 objects[0].id if objects else 0] \
-                + [structure['super_id']] \
+                + super_id \
                 + subunit_ids \
                 + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
-
         place_root = Type.get_hierarchy('Place')
         for row in Db.get_all(extra_ids):
             description = row['description'].replace('"', '\"') \
@@ -97,8 +96,9 @@ class Gis:
                         item['properties']['objectType'] = \
                             type_.name.replace('"', '\"')
                         break
-
-            if structure and row['object_id'] == structure['super_id']:
+            if structure \
+                    and structure['supers'] \
+                    and row['object_id'] == structure['supers'][-1].id:
                 extra['supers'].append(item)
             elif row['object_id'] in object_ids:
                 selected[shape].append(item)
@@ -114,8 +114,10 @@ class Gis:
                     row['polygon_point'])
                 if row['object_id'] in object_ids:
                     selected['polygon_point'].append(polygon_point_item)
-                elif row['object_id'] and structure and \
-                        row['object_id'] == structure['super_id']:
+                elif row['object_id'] \
+                        and structure \
+                        and structure['supers'] \
+                        and row['object_id'] == structure['supers'][-1].id:
                     extra['supers'].append(polygon_point_item)
                 elif row['object_id'] in subunit_ids:  # pragma no cover
                     extra['subs'].append(polygon_point_item)

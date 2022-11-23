@@ -55,6 +55,7 @@ $(document).ready(function () {
 
   /* When selecting a file for upload: if name is empty, fill with filename without extension */
   $('#file').on("change", function () {
+    setFilesOfDropField([...$('#file')[0].files])
     if ($('#name').val() == '') {
       var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
       $('#name').val(filename.replace(/\.[^/.]+$/, ""));
@@ -336,4 +337,79 @@ function removeAccents(data) {
       .replace(/[\u0300-\u036f]/g, '');
   }
   return data;
+}
+
+function setFilesOfDropField(files) {
+  const dropContainer = document.getElementById('drag-n-drop')
+  dropContainer.children[0].style.display = "none";
+  dropContainer.children[1].innerHTML = '';
+  files?.forEach((file, index) => {
+    const fileDiv = document.createElement('div');
+    fileDiv.classList.add('drag-drop-item');
+    fileDiv.innerHTML = `
+                            <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
+                                <div class="card-body">
+                                <i class="card-icon fa fa-file"></i>
+                                <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
+                                ${file.name}
+                            </div>`
+    dropContainer.children[1].appendChild(fileDiv)
+  })
+}
+
+function removeFile(index) {
+  const fileInput = document.getElementById('file')
+  const filesList = [...fileInput.files];
+  filesList.splice(index, 1);
+  setFile(fileInput, filesList)
+  setFilesOfDropField(filesList)
+  if(filesList.length === 0){
+    document.getElementById('drag-n-drop').children[0].style.display = "";
+  }
+
+}
+
+function setFile(fileInput, fileList) {
+  const newFiles = new DataTransfer();
+  fileList.forEach(x => newFiles.items.add(x));
+  fileInput.files = newFiles.files;
+}
+
+function addDragNDropListeners(dropContainer) {
+  dropContainer.addEventListener("dragenter", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragover", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragleave", function (e) {
+    dropContainer.classList.remove('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  dropContainer.addEventListener("drop", function (e) {
+    const allowedTypes = ["gif", "jpeg", "jpg", "pdf", "png", "txt", "zip"]
+    const allowedFiles = [...e.dataTransfer.files].filter(x => allowedTypes.includes(x.name.split(('.')).at(-1)))
+    if (allowedFiles.length > 0) {
+      const fileInput = document.getElementById('file')
+      setFile(fileInput, [...fileInput.files, ...allowedFiles]);
+      setFilesOfDropField([...fileInput.files])
+
+      if ($('#name').val() == '') {
+        const filename = allowedFiles[0].name;
+        $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+      }
+    }
+    dropContainer.classList.remove('highlight')
+    e.preventDefault();
+    e.stopPropagation();
+  });
 }

@@ -25,7 +25,7 @@ class Entity:
             return []
         g.cursor.execute(
             Entity.select_sql(types, aliases) +
-            ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name',
+            ' WHERE e.id IN %(ids)s GROUP BY e.id ',
             {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
