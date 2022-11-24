@@ -24,7 +24,7 @@ class ExportSqlForm(FlaskForm):
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
-        app.config['EXPORT_DIR'] / 'sql',
+        app.config['EXPORT_DIR'],
         filename,
         as_attachment=True)
 
@@ -32,7 +32,7 @@ def download_sql(filename: str) -> Response:
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'sql'
+    path = app.config['EXPORT_DIR']
     writable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writable:
@@ -78,7 +78,7 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
 @required_group('admin')
 def delete_export(type_: str, filename: str) -> Response:
     try:
-        (app.config['EXPORT_DIR'] / type_ / filename).unlink()
+        (app.config['EXPORT_DIR'] / filename).unlink()
         g.logger.log('info', 'file', f'{type_} file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:

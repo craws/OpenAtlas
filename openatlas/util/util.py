@@ -148,7 +148,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_DIR'] / 'sql'
+    path = app.config['EXPORT_DIR']
     latest_file = None
     latest_file_date = None
     for file in [

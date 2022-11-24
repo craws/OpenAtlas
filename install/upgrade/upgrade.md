@@ -22,23 +22,21 @@ base, then run the database upgrade script, then restart Apache:
 ### 7.8.0 to 7.9.0
 7.9.0.sql is needed but will be taken care of by the database upgrade script.
 
-In this version the following folders, including all sub folders and files, 
-    
+#### New file structure
+In this version the following folders, including all sub folders and files,
+
     openatlas/uploads/
     openatlas/export/
     openatlas/processed_images/
 
-have to be moved manually to 
-    
-    files/
-
-E.g. 
+have to be moved manually to the **files** directory, e.g.
 
     # mv openatlas/uploads/* files/uploads/
     # mv openatlas/export/sql/* files/export/
     # mv openatlas/processed_images/ files/processed_images/
 
-Be aware, that external backup scripts might need to be adapted.
+Be aware, that external applications/scripts, e.g. backup scripts or
+presentation sites might need adaptions too.
 
 ### 7.7.0 to 7.8.0
 7.8.0.sql is needed but will be taken care of by the database upgrade script.

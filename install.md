@@ -100,17 +100,9 @@ Test Apache configuration and restart
     # apache2ctl configtest
     # service apache2 restart
 
-### File Upload and Export
+Make the **files** directory writable for the Apache user, e.g.:
 
-Make these directories writable for the Apache user:
-
-    files/uploads
-    files/export/sql
-    files/processed_images/resized
-
-e.g.
-
-    # chown -R www-data files/
+    # chown -R www-data files
 
 ### Finishing
 
