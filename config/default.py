@@ -4,6 +4,7 @@ from pathlib import Path
 from config.database_versions import DATABASE_VERSIONS
 
 root_path = Path(__file__).parent.parent / 'openatlas'
+files_path = Path(__file__).parent.parent / 'files'
 
 VERSION = '7.9.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
@@ -29,11 +30,11 @@ DISPLAY_FILE_EXTENSIONS = \
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
 TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
-EXPORT_DIR = Path(root_path) / 'export'
-UPLOAD_DIR = Path(root_path) / 'uploads'
+EXPORT_DIR = Path(files_path) / 'export'
+UPLOAD_DIR = Path(files_path) / 'uploads'
 
 # Image processing
-PROCESSED_IMAGE_DIR = Path(root_path) / 'processed_images'
+PROCESSED_IMAGE_DIR = Path(files_path) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',

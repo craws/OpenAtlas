@@ -18,10 +18,10 @@ openatlas/tests/cover
 cover
 
 # created files
-openatlas/uploads/
-openatlas/export/csv/
-openatlas/export/sql/
-openatlas/processed_images/
+files/uploads/
+files/export/csv/
+files/export/sql/
+files/processed_images/
 
 # ide
 .idea

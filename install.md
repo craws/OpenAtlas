@@ -104,15 +104,13 @@ Test Apache configuration and restart
 
 Make these directories writable for the Apache user:
 
-    openatlas/uploads
-    openatlas/export/sql
-    openatlas/processed_images/resized
+    files/uploads
+    files/export/sql
+    files/processed_images/resized
 
 e.g.
 
-    # chown www-data openatlas/uploads
-    # chown www-data openatlas/export/sql
-    # chown www-data openatlas/processed_images/resized
+    # chown -R www-data files/
 
 ### Finishing
 
