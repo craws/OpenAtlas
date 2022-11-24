@@ -34,9 +34,11 @@ have to be moved manually to
 
 E.g. 
 
-    # mv openatlas/uploads/ files/
-    # mv openatlas/export/ files/
-    # mv openatlas/processed_images/ files/
+    # mv openatlas/uploads/* files/uploads/
+    # mv openatlas/export/sql/* files/export/
+    # mv openatlas/processed_images/ files/processed_images/
+
+Be aware, that external backup scripts might need to be adapted.
 
 ### 7.7.0 to 7.8.0
 7.8.0.sql is needed but will be taken care of by the database upgrade script.
