@@ -44,15 +44,17 @@ def view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
+    structure = None
+    gis_data = None
     tabs = getattr(
         display,
         f'{entity.class_.name.capitalize()}Display')(entity).tabs
     return render_template(
         'tabs.html',
-        entity=entity,
         tabs=tabs,
-        # crumbs=add_crumbs(entity, 'view')
-    )
+        entity=entity,
+        gis_data=gis_data,
+        crumbs=add_crumbs(entity, structure))
 
     event_links = None  # Needed for actor and info data
     tabs = {'info': Tab('info')}
@@ -145,8 +147,6 @@ def view(id_: int) -> Union[str, Response]:
                     int(row[0].replace('<a href="/entity/', '').split('"')[0]))
             )
 
-    structure = None
-    gis_data = None
     if entity.class_.view in ['artifact', 'place']:
         if structure := entity.get_structure():
             for item in structure['subunits']:
@@ -183,12 +183,6 @@ def view(id_: int) -> Union[str, Response]:
         overlays=overlays,
         title=entity.name,
         problematic_type_id=problematic_type_id)
-    return render_template(
-        'tabs.html',
-        tabs=tabs,
-        gis_data=gis_data,
-        crumbs=add_crumbs(entity, structure),
-        entity=entity)
 
 
 def get_profile_image_table_link(
