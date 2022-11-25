@@ -19,10 +19,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    bookmark_toggle, button, display_delete_link, display_form,
-    download_button, get_base_table_data, get_entity_data,
-    get_file_path, is_authorized, link, manual, required_group,
-    siblings_pager, uc_first)
+    button, display_form, get_base_table_data, get_file_path, is_authorized,
+    link, required_group, uc_first)
 from openatlas.views.entity_index import file_preview
 from openatlas.views.link import AddReferenceForm
 
@@ -44,19 +42,16 @@ def view(id_: int) -> Union[str, Response]:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
 
-    structure = None
-    gis_data = None
-    tabs = getattr(
+    manager = getattr(
         display,
-        f'{entity.class_.name.capitalize()}Display')(entity).tabs
+        f'{entity.class_.name.capitalize()}Display')(entity)
     return render_template(
         'tabs.html',
-        tabs=tabs,
+        tabs=manager.tabs,
         entity=entity,
-        gis_data=gis_data,
-        crumbs=add_crumbs(entity, structure))
+        gis_data=manager.gis_data,
+        crumbs=add_crumbs(entity, manager.structure))
 
-    event_links = None  # Needed for actor and info data
     tabs = {'info': Tab('info')}
     if isinstance(entity, Type):
         tabs |= add_tabs_for_type(entity)
@@ -159,30 +154,6 @@ def view(id_: int) -> Union[str, Response]:
                 and gis_data['gisLineSelected'] == '[]' \
                 and (not structure or not structure['supers']):
             gis_data = {}
-    entity.info_data = get_entity_data(entity, event_links=event_links)
-    if not gis_data:  # Has to be after get_entity_data()
-        gis_data = Gis.get_all(entity.linked_places) \
-            if entity.linked_places else None
-    problematic_type_id = entity.check_too_many_single_type_links()
-    buttons = [manual(f'entity/{entity.class_.view}')]
-    buttons += add_buttons(entity, bool(problematic_type_id))
-    buttons.append(bookmark_toggle(entity.id))
-    if entity.class_.view == 'file':
-        if entity.image_id:
-            buttons.append(download_button(entity))
-        else:
-            buttons.append(
-                '<span class="error">' + uc_first(_("missing file")) +
-                '</span>')
-    buttons.append(siblings_pager(entity, structure))
-    tabs['info'].content = render_template(
-        'entity/view.html',
-        buttons=buttons,
-        entity=entity,
-        gis_data=gis_data,
-        overlays=overlays,
-        title=entity.name,
-        problematic_type_id=problematic_type_id)
 
 
 def get_profile_image_table_link(
@@ -222,33 +193,6 @@ def add_crumbs(
             entity.get_linked_entity('P73', True)]
     crumbs.append(entity.name)
     return crumbs
-
-
-def add_buttons(entity: Entity, type_problem: bool = False) -> list[str]:
-    if not is_authorized(entity.class_.write_access):
-        return []  # pragma: no cover
-    buttons = []
-    if isinstance(entity, Type):
-        if entity.root and entity.category != 'system':
-            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-            buttons.append(display_delete_link(entity))
-    elif isinstance(entity, ReferenceSystem):
-        buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-        if not entity.classes and not entity.system:
-            buttons.append(display_delete_link(entity))
-    elif entity.class_.name == 'source_translation':
-        buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-        buttons.append(display_delete_link(entity))
-    else:
-        if not type_problem:
-            buttons.append(button(_('edit'), url_for('update', id_=entity.id)))
-        if entity.class_.view != 'place' \
-                or not entity.get_linked_entities('P46'):
-            buttons.append(display_delete_link(entity))
-    if entity.class_.name == 'stratigraphic_unit':
-        buttons.append(
-            button(_('tools'), url_for('anthropology_index', id_=entity.id)))
-    return buttons
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
