@@ -51,3 +51,4 @@ class SourceDisplay(BaseDisplay):
                     self.entity,
                     domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
+        self.add_note_tab()

@@ -17,11 +17,10 @@ from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, display_form,
-    download_button, format_date, get_base_table_data, get_entity_data,
+    download_button, get_base_table_data, get_entity_data,
     get_file_path, is_authorized, link, manual, required_group,
     siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
@@ -165,7 +164,6 @@ def view(id_: int) -> Union[str, Response]:
         gis_data = Gis.get_all(entity.linked_places) \
             if entity.linked_places else None
     problematic_type_id = entity.check_too_many_single_type_links()
-    tabs['note'] = add_note_tab(entity)
     buttons = [manual(f'entity/{entity.class_.view}')]
     buttons += add_buttons(entity, bool(problematic_type_id))
     buttons.append(bookmark_toggle(entity.id))
@@ -630,18 +628,3 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
         # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs
-
-
-def add_note_tab(entity: Entity) -> Tab:
-    tab = Tab('note', entity=entity)
-    for note in current_user.get_notes_by_entity_id(entity.id):
-        data = [
-            format_date(note['created']),
-            uc_first(_('public'))
-            if note['public'] else uc_first(_('private')),
-            link(User.get_by_id(note['user_id'])),
-            note['text'],
-            f'<a href="{url_for("note_view", id_=note["id"])}">' +
-            uc_first(_("view")) + '</a>']
-        tab.table.rows.append(data)
-    return tab
