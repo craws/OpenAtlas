@@ -1,0 +1,356 @@
+
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>Features &mdash; OpenAtlas 7.9.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/style.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Entity" href="entity/index.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> OpenAtlas
+          
+
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                7.9.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Features</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#geolocating">Geolocating</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-interface">User interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-management">User management</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-exchange">Data exchange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#anthropological-analyses">Anthropological Analyses</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="entity/index.html">Entity</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tools/index.html">Tools</a></li>
+<li class="toctree-l1"><a class="reference internal" href="admin/index.html">Admin</a></li>
+<li class="toctree-l1"><a class="reference internal" href="ui/index.html">UI Elements</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model/index.html">Model</a></li>
+<li class="toctree-l1"><a class="reference internal" href="examples/index.html">Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="troubleshooting/index.html">Troubleshooting</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">OpenAtlas</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content style-external-links">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Features</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="features">
+<h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="model">
+<h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="cidoc-crm">
+<h3>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Permalink to this headline">¶</a></h3>
+<p>The web interface provides tools to enter and manipulate data which will be
+saved in a <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> compatible model to a
+<a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database. A main focus of OpenAtlas
+is to design a web interface that allows users not to focus on the underlying
+data model but to enter data in a convenient and easy way. Therefore, the
+CIDOC CRM specification was imported into the system. It can be browsed and is
+used to verify link conformity between entities. Additionally, link
+combinations can be tested manually e.g. when planning model extensions.</p>
+</div>
+<div class="section" id="system-custom-and-value-types">
+<h3>System, Custom and Value Types<a class="headerlink" href="#system-custom-and-value-types" title="Permalink to this headline">¶</a></h3>
+<p>Due to this feature, the model and user interface forms can be adapted for
+specific research interests. Already provided system types can be extended.
+Additionally, it is possible to add new types e.g. “hair color” for persons.
+These type hierarchies can be configured to allow single or multiple choices.
+A type can be used for multiple entities e.g. a hierarchy like “importance”
+for places, actors and groups. Furthermore, value types can be created to add
+numeric values e.g. weight or material composition of a find.</p>
+</div>
+<div class="section" id="linked-data">
+<h3>Linked data<a class="headerlink" href="#linked-data" title="Permalink to this headline">¶</a></h3>
+<p>Entries can be linked to external reference systems using
+<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based precision.
+<a class="reference external" href="https://www.geonames.org/">GeoNames</a> and
+<a class="reference external" href="https://www.wikidata.org/">Wikidata</a> are already included in
+the default application using their APIs and more can be added. Also linking
+generic references, e.g. providing a URL for an actor to a Wikipedia entry is
+possible.</p>
+</div>
+<div class="section" id="spatial-and-temporal-fuzziness">
+<h3>Spatial and Temporal Fuzziness<a class="headerlink" href="#spatial-and-temporal-fuzziness" title="Permalink to this headline">¶</a></h3>
+<p>In many cases the spatial or temporal position respectively extent of an entity
+is not known precisely. Therefore, OpenAtlas allows defining time-spans
+(earliest/latest begin and earliest/latest end) or areas in which the temporal
+respectively spatial extent can be located with a 100% certainty.</p>
+</div>
+<div class="section" id="archaeological-subunits">
+<h3>Archaeological Subunits<a class="headerlink" href="#archaeological-subunits" title="Permalink to this headline">¶</a></h3>
+<p>These allow detailed mapping of archaeological finds, e.g. in a cemetery. They
+are used in a strict hierarchy: Place -&gt; Feature (e.g. a grave) -&gt;
+Stratigraphic Unit (e.g. a coffin or skeleton) -&gt;
+Find (e.g. grave goods) and Human Remains
+(e.g. for anthropological information on the burial).</p>
+</div>
+<div class="section" id="data-integrity-check-functions">
+<h3>Data integrity check functions<a class="headerlink" href="#data-integrity-check-functions" title="Permalink to this headline">¶</a></h3>
+<p>Because data integrity is important for the quality of research data, we
+implemented functions to check possible inconsistencies including checks for
+orphaned data, date inconsistency, duplicates, similar names, invalid links,
+unused types and more.</p>
+</div>
+</div>
+<div class="section" id="geolocating">
+<h2>Geolocating<a class="headerlink" href="#geolocating" title="Permalink to this headline">¶</a></h2>
+<p>Places with known location can be entered into an interactive map based on
+<a class="reference external" href="https://leafletjs.com/">Leaflet</a>, which features different view layers,
+allows for zooming, fullscreen mode, clustering, searching and much more.
+<a class="reference external" href="https://postgis.net/">PostGIS</a> is used for creating and manipulating spatial
+data. Therefore, it is possible to enter location as needed as multiple points,
+lines, areas and shapes.</p>
+</div>
+<div class="section" id="user-interface">
+<h2>User interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>File upload</p></li>
+<li><p>Interactive map</p></li>
+<li><p>Search and Filters</p></li>
+<li><p>Bookmarks and notes</p></li>
+<li><p>Internationalization</p></li>
+<li><p>User manual</p></li>
+<li><p>Network visualization</p></li>
+</ul>
+<p>Due to the integration of <a class="reference external" href="https://d3js.org/">D3.js</a> it is possible to
+visualize data as a network graph in 2D and 3D.</p>
+<p>An English user manual corresponding to the current software version is provided in the application itself. Throughout the application are context specific links to the manual but there are also manual entries about step-by-step examples, troubleshoot instructions and more. Feel free to take a look at the user manual of the demo version.</p>
+<p>Multiple languages for the user interface are implemented with <a class="reference external" href="https://www.gnu.org/software/gettext/">gettext</a>. At the moment English and German are available. Easy extension to other languages is possible, when translations available.</p>
+<p>To allow quick navigation, even in a big data set, full-text search is possible. Additionally, a refined advanced search can be used to filter the results (e.g. only actors or a search in descriptions). Tables and tree views, that can have many entries, have a full-text filter for convenience. The map provides a search field for a GeoNames search.</p>
+<p>Files can be uploaded and linked with entities. It is possible to link one file to multiple entities (e.g. a group picture showing different actors) and the other way round. Files are available to download in the original size. In the admin interface the upload file size limit and allowed extensions can be configured.</p>
+<p>Newsletter. This feature enables managers and admins to send newsletters. An editable receiver list with users who have opted in is shown. Newsletters will contain an unsubscribe link.</p>
+<p>Bookmarks and notes are user specific and can be used to e.g. mark entries which need further editing. Already bookmarked entities and notes are shown on the start page after login.</p>
+</div>
+<div class="section" id="user-management">
+<h2>User management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Users and groups can be used to grant different access levels</p></li>
+<li><p>Newsletter</p></li>
+<li><p>Password reset</p></li>
+</ul>
+</div>
+<div class="section" id="data-exchange">
+<h2>Data exchange<a class="headerlink" href="#data-exchange" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="api">
+<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
+<p>An application programming interface (API) for easier exchange with other
+information system was implemented. The output is based on
+<a class="reference external" href="https://json-ld.org/spec/latest/json-ld/">JSON-LD</a> syntax and
+<a class="reference external" href="https://tools.ietf.org/html/rfc7946">GeoJSON</a>.
+<a class="reference external" href="https://github.com/LinkedPasts/linked-places">Linked Places</a>
+was used as standard.</p>
+</div>
+<div class="section" id="export">
+<h3>Export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h3>
+<p>A CSV export for single tables and an SQL export (pg_dump) are implemented in
+the admin interface.</p>
+</div>
+<div class="section" id="import">
+<h3>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
+<p>CSV lists can be imported, e.g. a list of places (name, description, dates and
+point coordinates).</p>
+</div>
+</div>
+<div class="section" id="anthropological-analyses">
+<h2>Anthropological Analyses<a class="headerlink" href="#anthropological-analyses" title="Permalink to this headline">¶</a></h2>
+<p>Anthropological analysis tools allow to enter data that derived from analyses
+on human remains. A tool to do sex estimation based on the method given by
+Ferembach et al. 1979 was implemented already.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="entity/index.html" class="btn btn-neutral float-right" title="Entity" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="overview.html" class="btn btn-neutral float-left" title="Overview" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+        <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
+        <script type="text/javascript">
+            <!-- Adds target=_blank to external links -->
+            $(document).ready(function () {
+                $('a[href^="http://"], a[href^="https://"]').not('a[class*=internal]').attr('target', '_blank');
+            });
+        </script>
+
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
