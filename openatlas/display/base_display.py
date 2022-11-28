@@ -1,19 +1,23 @@
 from typing import Any, Optional, Union
 
-from flask import render_template, url_for
+from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.database.gis import Gis
-from openatlas.database.link import Link
-from openatlas.database.type import Type
-from openatlas.database.user import User
+from openatlas import app
 from openatlas.display.tab import Tab
+from openatlas.display.util import remove_link
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
+from openatlas.models.link import Link
+from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
+from openatlas.models.type import Type
+from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, display_delete_link, download_button, format_date,
-    get_entity_data, is_authorized, link, manual, siblings_pager, uc_first)
+    bookmark_toggle, button, display_delete_link, external_url, format_date,
+    format_entity_date, get_appearance, get_base_table_data, get_system_data,
+    get_type_data, is_authorized, link, manual, uc_first)
 
 
 class BaseDisplay:
@@ -21,12 +25,15 @@ class BaseDisplay:
     entity: Union[Entity, Type]
     tabs: dict[str, Tab]
     event_links: Optional[list[Link]] = None  # Needed for actor and info data
-    gis_data: list[dict[str, Any]] = None
+    linked_places: list[Entity]  # Related places for map
+    gis_data: dict[str, Any] = None
     structure = None
     overlays = None
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
         self.entity = entity
+        self.event_links = []
+        self.linked_places = []
         self.add_tabs()
         self.add_info_content()  # Call later because of profile image
         self.entity.image_id = entity.get_profile_image_id()
@@ -35,18 +42,15 @@ class BaseDisplay:
         self.tabs = {'info': Tab('info')}
 
     def add_info_content(self):
-        self.entity.info_data = get_entity_data(
-            self.entity,
-            event_links=self.event_links)
-        #if not self.gis_data:
-        #    self.gis_data = Gis.get_all(self.entity.linked_places) \
-        #        if self.entity.linked_places else None
-
+        self.entity.info_data = self.get_entity_data()
         problematic_type_id = self.entity.check_too_many_single_type_links()
         buttons = [manual(f'entity/{self.entity.class_.view}')]
         buttons += self.add_buttons(bool(problematic_type_id))
         buttons.append(bookmark_toggle(self.entity.id))
-        #if self.entity.class_.view == 'file':
+        # if not self.gis_data:
+        #    self.gis_data = Gis.get_all(self.entity.linked_places) \
+        #        if self.entity.linked_places else None
+        # if self.entity.class_.view == 'file':
         #    if self.entity.image_id:
         #        buttons.append(download_button(self.entity))
         #    else:
@@ -86,11 +90,13 @@ class BaseDisplay:
                     button(_('edit'), url_for('update', id_=self.entity.id)))
                 buttons.append(display_delete_link(self.entity))
         elif isinstance(self.entity, ReferenceSystem):
-            buttons.append(button(_('edit'), url_for('update', id_=self.entity.id)))
+            buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
             if not self.entity.classes and not self.entity.system:
                 buttons.append(display_delete_link(self.entity))
         elif self.entity.class_.name == 'source_translation':
-            buttons.append(button(_('edit'), url_for('update', id_=self.entity.id)))
+            buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
             buttons.append(display_delete_link(self.entity))
         else:
             if not type_problem:
@@ -105,3 +111,299 @@ class BaseDisplay:
                     _('tools'),
                     url_for('anthropology_index', id_=self.entity.id)))
         return buttons
+
+    def get_profile_image_table_link(
+            self,
+            file: Entity,
+            extension: str) -> str:
+        if file.id == self.entity.image_id:
+            return link(
+                _('unset'),
+                url_for('file_remove_profile_image', entity_id=self.entity.id))
+        if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
+                g.settings['image_processing']
+                and extension in app.config['ALLOWED_IMAGE_EXT']):
+            return link(
+                _('set'),
+                url_for(
+                    'set_profile_image',
+                    id_=file.id,
+                    origin_id=self.entity.id))
+        return ''  # pragma: no cover
+
+    def get_entity_data(self) -> dict[str, Any]:
+        entity = self.entity
+        data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
+
+        # Dates
+        from_link = ''
+        to_link = ''
+        if entity.class_.name == 'move':  # Add places to dates if it's a move
+            if place_from := entity.get_linked_entity('P27'):
+                from_link = \
+                    link(place_from.get_linked_entity_safe('P53', True)) + ' '
+            if place_to := entity.get_linked_entity('P26'):
+                to_link = link(
+                    place_to.get_linked_entity_safe('P53', True)) + ' '
+        data[_('begin')] = from_link + format_entity_date(entity, 'begin')
+        data[_('end')] = to_link + format_entity_date(entity, 'end')
+
+        # Types
+        if entity.standard_type:
+            title = ' > '.join(
+                [g.types[id_].name for id_ in entity.standard_type.root])
+            data[_('type')] = \
+                f'<span title="{title}">{link(entity.standard_type)}</span>'
+        data.update(get_type_data(entity))
+
+        # Class specific information
+        from openatlas.models.type import Type
+        from openatlas.models.reference_system import ReferenceSystem
+        if isinstance(entity, Type):
+            data[_('super')] = link(g.types[entity.root[-1]])
+            if entity.category == 'value':
+                data[_('unit')] = entity.description
+            data[_('ID for imports')] = entity.id
+        elif isinstance(entity, ReferenceSystem):
+            data[_('website URL')] = external_url(entity.website_url)
+            data[_('resolver URL')] = external_url(entity.resolver_url)
+            data[_('example ID')] = entity.placeholder
+        elif entity.class_.view == 'actor':
+            begin_object = None
+            if begin_place := entity.get_linked_entity('OA8'):
+                begin_object = begin_place.get_linked_entity_safe('P53', True)
+                self.linked_places.append(begin_object)
+            end_object = None
+            if end_place := entity.get_linked_entity('OA9'):
+                end_object = end_place.get_linked_entity_safe('P53', True)
+                self.linked_places.append(end_object)
+            if residence := entity.get_linked_entity('P74'):
+                residence_object =\
+                    residence.get_linked_entity_safe('P53', True)
+                self.linked_places.append(residence_object)
+                data[_('residence')] = link(residence_object)
+            data[_('alias')] = list(entity.aliases.values())
+            data[_('begin')] = \
+                format_entity_date(entity, 'begin', begin_object)
+            data[_('end')] = format_entity_date(entity, 'end', end_object)
+            if self.event_links:
+                appears_first, appears_last = get_appearance(self.event_links)
+                data[_('appears first')] = appears_first
+                data[_('appears last')] = appears_last
+        elif entity.class_.view == 'artifact':
+            data[_('source')] = \
+                [link(source) for source in entity.get_linked_entities('P128')]
+            data[_('owned by')] = link(entity.get_linked_entity('P52'))
+        elif entity.class_.view == 'event':
+            data[_('sub event of')] = link(entity.get_linked_entity('P9'))
+            data[_('preceding event')] = link(
+                entity.get_linked_entity('P134', True))
+            data[_('succeeding event')] = \
+                '<br>'.join(
+                    [link(e) for e in entity.get_linked_entities('P134')])
+            if entity.class_.name == 'move':
+                person_data = []
+                artifact_data = []
+                for linked_entity in entity.get_linked_entities('P25'):
+                    if linked_entity.class_.name == 'person':
+                        person_data.append(linked_entity)
+                    elif linked_entity.class_.view == 'artifact':
+                        artifact_data.append(linked_entity)
+                data[_('person')] = [link(item) for item in person_data]
+                data[_('artifact')] = [link(item) for item in artifact_data]
+            else:
+                if place := entity.get_linked_entity('P7'):
+                    data[_('location')] = link(
+                        place.get_linked_entity_safe('P53', True))
+            if entity.class_.name == 'acquisition':
+                data[_('recipient')] = \
+                    [link(actor) for actor in
+                     entity.get_linked_entities('P22')]
+                data[_('donor')] = \
+                    [link(donor) for donor in
+                     entity.get_linked_entities('P23')]
+                data[_('given place')] = []
+                data[_('given artifact')] = []
+                for item in entity.get_linked_entities('P24'):
+                    label = _('given artifact') \
+                        if item.class_.name == 'artifact' else _('given place')
+                    data[label].append(link(item))
+            if entity.class_.name == 'production':
+                data[_('produced')] = \
+                    [link(item) for item in entity.get_linked_entities('P108')]
+        elif entity.class_.view == 'file':
+            data[_('size')] = g.file_stats[entity.id]['size'] \
+                if entity.id in g.file_stats else 'N/A'
+            data[_('extension')] = g.file_stats[entity.id]['ext'] \
+                if entity.id in g.file_stats else 'N/A'
+        elif entity.class_.view == 'source':
+            data[_('artifact')] = [
+                link(artifact) for artifact in
+                entity.get_linked_entities('P128', inverse=True)]
+        if hasattr(current_user, 'settings'):
+            data |= get_system_data(entity)
+        if not self.gis_data and self.linked_places:
+            self.gis_data = Gis.get_all(self.linked_places)
+        self.add_note_tab()
+        return data
+
+
+class ActorDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        from openatlas.views.entity import edit_link
+        super().add_tabs()
+        for name in [
+                'source', 'event', 'relation', 'member_of', 'member',
+                'artifact', 'reference', 'file']:
+            self.tabs[name] = Tab(name, entity=self.entity)
+        self.event_links = \
+            self.entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
+        for link_ in self.event_links:
+            event = link_.domain
+            link_.object_ = None  # Needed for first/last appearance
+            for place in event.get_linked_entities(['P7', 'P26', 'P27']):
+                object_ = place.get_linked_entity_safe('P53', True)
+                self.linked_places.append(object_)
+                link_.object_ = object_
+            first = link_.first
+            if not link_.first and event.first:
+                first = f'<span class="inactive">{event.first}</span>'
+            last = link_.last
+            if not link_.last and event.last:
+                last = f'<span class="inactive">{event.last}</span>'
+            data = [
+                link(event),
+                event.class_.label,
+                _('moved')
+                if link_.property.code == 'P25' else link(link_.type),
+                first,
+                last,
+                link_.description]
+            if link_.property.code == 'P25':
+                data.append('')
+            else:
+                data.append(
+                    edit_link(
+                        url_for(
+                            'link_update',
+                            id_=link_.id,
+                            origin_id=self.entity.id)))
+            data.append(
+                remove_link(link_.domain.name, link_, self.entity, 'event'))
+            self.tabs['event'].table.rows.append(data)
+        for link_ in self.entity.get_links('OA7') + \
+                self.entity.get_links('OA7', True):
+            type_ = ''
+            if self.entity.id == link_.domain.id:
+                related = link_.range
+                if link_.type:
+                    type_ = link(
+                        link_.type.get_name_directed(),
+                        url_for('view', id_=link_.type.id))
+            else:
+                related = link_.domain
+                if link_.type:
+                    type_ = link(
+                        link_.type.get_name_directed(True),
+                        url_for('view', id_=link_.type.id))
+            self.tabs['relation'].table.rows.append([
+                type_,
+                link(related),
+                link_.first,
+                link_.last,
+                link_.description,
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)),
+                remove_link(related.name, link_, self.entity, 'relation')])
+        for link_ in self.entity.get_links('P107', True):
+            data = [
+                link(link_.domain),
+                link(link_.type),
+                link_.first,
+                link_.last,
+                link_.description,
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)),
+                remove_link(link_.domain.name, link_, self.entity, 'member-of')
+            ]
+            self.tabs['member_of'].table.rows.append(data)
+        if self.entity.class_.name != 'group':
+            del self.tabs['member']
+        else:
+            for link_ in self.entity.get_links('P107'):
+                self.tabs['member'].table.rows.append([
+                    link(link_.range),
+                    link(link_.type),
+                    link_.first,
+                    link_.last,
+                    link_.description,
+                    edit_link(
+                        url_for(
+                            'link_update',
+                            id_=link_.id,
+                            origin_id=self.entity.id)),
+                    remove_link(link_.range.name, link_, self.entity, 'member')
+                ])
+        for link_ in self.entity.get_links('P52', True):
+            data = [
+                link(link_.domain),
+                link_.domain.class_.label,
+                link(link_.domain.standard_type),
+                link_.domain.first,
+                link_.domain.last,
+                link_.domain.description]
+            self.tabs['artifact'].table.rows.append(data)
+        for link_ in self.entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    self.get_profile_image_table_link(
+                        domain,
+                        extension))
+                if not self.entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    self.entity.image_id = domain.id
+                if self.entity.class_.view == 'place' \
+                        and is_authorized('editor') \
+                        and current_user.settings['module_map_overlay']:
+                    overlays = Overlay.get_by_object(self.entity)
+                    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                        if domain.id in overlays:
+                            data.append(edit_link(
+                                url_for(
+                                    'overlay_update',
+                                    id_=overlays[domain.id].id)))
+                        else:
+                            data.append(link(_('link'), url_for(
+                                'overlay_insert',
+                                image_id=domain.id,
+                                place_id=self.entity.id,
+                                link_id=link_.id)))
+                    else:  # pragma: no cover
+                        data.append('')
+            if domain.class_.view not in ['source', 'file']:
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
+                if domain.class_.view == 'reference_system':
+                    self.entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(
+                    domain.name,
+                    link_,
+                    self.entity,
+                    domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)

@@ -57,11 +57,6 @@ def view(id_: int) -> Union[str, Response]:
         tabs |= add_tabs_for_type(entity)
     elif isinstance(entity, ReferenceSystem):
         tabs |= add_tabs_for_reference_system(entity)
-    elif entity.class_.view == 'actor':
-        event_links = entity.get_links(
-            ['P11', 'P14', 'P22', 'P23', 'P25'],
-            True)
-        tabs |= add_tabs_for_actor(entity, event_links)
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
         tabs['artifact'] = Tab('artifact', entity=entity)
@@ -154,24 +149,6 @@ def view(id_: int) -> Union[str, Response]:
                 and gis_data['gisLineSelected'] == '[]' \
                 and (not structure or not structure['supers']):
             gis_data = {}
-
-
-def get_profile_image_table_link(
-        file: Entity,
-        entity: Entity,
-        extension: str,
-        profile_image_id: Optional[int] = None) -> str:
-    if file.id == profile_image_id:
-        return link(
-            _('unset'),
-            url_for('file_remove_profile_image', entity_id=entity.id))
-    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
-            g.settings['image_processing']
-            and extension in app.config['ALLOWED_IMAGE_EXT']):
-        return link(
-            _('set'),
-            url_for('set_profile_image', id_=file.id, origin_id=entity.id))
-    return ''  # pragma: no cover
 
 
 def add_crumbs(
@@ -344,103 +321,6 @@ def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
                     'reference_system_remove_class',
                     system_id=entity.id,
                     class_name=name))]
-    return tabs
-
-
-def add_tabs_for_actor(
-        entity: Entity,
-        event_links: list[Link]) -> dict[str, Tab]:
-    tabs = {}
-    for name in [
-            'source', 'event', 'relation', 'member_of', 'member', 'artifact']:
-        tabs[name] = Tab(name, entity=entity)
-    for link_ in event_links:
-        event = link_.domain
-        link_.object_ = None  # Needed for first/last appearance
-        for place in event.get_linked_entities(['P7', 'P26', 'P27']):
-            object_ = place.get_linked_entity_safe('P53', True)
-            entity.linked_places.append(object_)
-            link_.object_ = object_
-        first = link_.first
-        if not link_.first and event.first:
-            first = f'<span class="inactive">{event.first}</span>'
-        last = link_.last
-        if not link_.last and event.last:
-            last = f'<span class="inactive">{event.last}</span>'
-        data = [
-            link(event),
-            event.class_.label,
-            _('moved')
-            if link_.property.code == 'P25' else link(link_.type),
-            first,
-            last,
-            link_.description]
-        if link_.property.code == 'P25':
-            data.append('')
-        else:
-            data.append(edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        # data.append(remove_link(link_.domain.name, link_, entity, 'event'))
-        tabs['event'].table.rows.append(data)
-    for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
-        type_ = ''
-        if entity.id == link_.domain.id:
-            related = link_.range
-            if link_.type:
-                type_ = link(
-                    link_.type.get_name_directed(),
-                    url_for('view', id_=link_.type.id))
-        else:
-            related = link_.domain
-            if link_.type:
-                type_ = link(
-                    link_.type.get_name_directed(True),
-                    url_for('view', id_=link_.type.id))
-        tabs['relation'].table.rows.append([
-            type_,
-            link(related),
-            link_.first,
-            link_.last,
-            link_.description,
-            edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            # remove_link(related.name, link_, entity, 'relation')
-        ])
-    for link_ in entity.get_links('P107', True):
-        data = [
-            link(link_.domain),
-            link(link_.type),
-            link_.first,
-            link_.last,
-            link_.description,
-            edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            # remove_link(link_.domain.name, link_, entity, 'member-of')
-        ]
-        tabs['member_of'].table.rows.append(data)
-    if entity.class_.name != 'group':
-        del tabs['member']
-    else:
-        for link_ in entity.get_links('P107'):
-            tabs['member'].table.rows.append([
-                link(link_.range),
-                link(link_.type),
-                link_.first,
-                link_.last,
-                link_.description,
-                edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
-                # remove_link(link_.range.name, link_, entity, 'member')
-            ])
-    for link_ in entity.get_links('P52', True):
-        data = [
-            link(link_.domain),
-            link_.domain.class_.label,
-            link(link_.domain.standard_type),
-            link_.domain.first,
-            link_.domain.last,
-            link_.domain.description]
-        tabs['artifact'].table.rows.append(data)
     return tabs
 
 

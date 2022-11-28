@@ -1,5 +1,5 @@
 from openatlas import app
-from openatlas.display.base_display import BaseDisplay
+from openatlas.display.base_display import ActorDisplay, BaseDisplay
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
 from openatlas.util.util import get_base_table_data, link
@@ -8,8 +8,6 @@ from openatlas.util.util import get_base_table_data, link
 class SourceDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
-
-        from openatlas.views.entity import get_profile_image_table_link
         super().add_tabs()
         for name in [
                 'actor', 'artifact', 'feature', 'event', 'place',
@@ -36,11 +34,9 @@ class SourceDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    get_profile_image_table_link(
+                    self.get_profile_image_table_link(
                         domain,
-                        self.entity,
-                        extension,
-                        self.entity.image_id))
+                        extension))
                 if not self.entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     self.entity.image_id = domain.id
@@ -52,3 +48,8 @@ class SourceDisplay(BaseDisplay):
                     domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
+
+
+class PersonDisplay(ActorDisplay):
+
+    pass
