@@ -40,11 +40,23 @@ def sql_export(postfix: Optional[str] = '') -> bool:
         except Exception:  # pragma: no cover
             return False
     else:  # pragma: no cover
-        os.popen(
-            f'"{shutil.which("pg_dump")}" '
-            '-h 127.0.0.1 '
-            f'-d {app.config["DATABASE_NAME"]} '
-            f'-U {app.config["DATABASE_USER"]} '
-            f'-p {app.config["DATABASE_PORT"]} '
-            f'> {file}')
+        command = \
+            "pg_dump.exe " \
+            f"-d {app.config['DATABASE_NAME']} " \
+            f"-U {app.config['DATABASE_USER']} " \
+            f"-p {app.config['DATABASE_PORT']} " \
+            f"-f {file}"
+        try:
+            subprocess.Popen(
+                command,
+                shell=False,
+                stdin=subprocess.PIPE,
+                env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
+            with open(os.devnull, 'w') as null:
+                subprocess.Popen(
+                    ['7z', 'a', f'{file}.7z', file],
+                    stdout=null).wait()
+            file.unlink()
+        except Exception:  # pragma: no cover
+            return False
     return True
