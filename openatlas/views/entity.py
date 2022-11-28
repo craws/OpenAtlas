@@ -60,8 +60,6 @@ def view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'artifact':
         tabs['source'] = Tab('source', entity=entity)
         tabs['artifact'] = Tab('artifact', entity=entity)
-    elif entity.class_.view == 'event':
-        tabs |= add_tabs_for_event(entity)
     elif entity.class_.view == 'file':
         tabs |= add_tabs_for_file(entity)
     elif entity.class_.view == 'place':
@@ -241,10 +239,6 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             f"{_('link')} {_('reference')}"])
 
 
-def edit_link(url: str) -> Optional[str]:
-    return link(_('edit'), url) if is_authorized('contributor') else None
-
-
 def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
     tabs = {
         'subs': Tab('subs', entity=entity),
@@ -324,41 +318,6 @@ def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
     return tabs
 
 
-def add_tabs_for_event(entity: Entity) -> dict[str, Tab]:
-    tabs = {}
-    for name in ['subs', 'source', 'actor']:
-        tabs[name] = Tab(name, entity=entity)
-    for sub_event in entity.get_linked_entities(
-            'P9',
-            inverse=True,
-            types=True):
-        tabs['subs'].table.rows.append(get_base_table_data(sub_event))
-    tabs['actor'].table.header.insert(5, _('activity'))
-    for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
-        first = link_.first
-        if not link_.first and entity.first:
-            first = f'<span class="inactive">{entity.first}</span>'
-        last = link_.last
-        if not link_.last and entity.last:
-            last = f'<span class="inactive">{entity.last}</span>'
-        tabs['actor'].table.rows.append([
-            link(link_.range),
-            link_.range.class_.label,
-            link_.type.name if link_.type else '',
-            first,
-            last,
-            g.properties[link_.property.code].name_inverse,
-            link_.description,
-            edit_link(
-                url_for('link_update', id_=link_.id, origin_id=entity.id)),
-            # remove_link(link_.range.name, link_, entity, 'actor')
-        ])
-    entity.linked_places = [
-        location.get_linked_entity_safe('P53', True) for location
-        in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-    return tabs
-
-
 def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     tabs = {}
     for name in [
@@ -374,8 +333,8 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     for link_ in entity.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
-        data.append(edit_link(
-            url_for('link_update', id_=link_.id, origin_id=entity.id)))
+        #data.append(edit_link(
+        #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
         # data.append(remove_link(link_.domain.name, link_, entity, 'reference'))
         tabs['reference'].table.rows.append(data)
     return tabs
@@ -441,8 +400,8 @@ def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
         range_ = link_.range
         data = get_base_table_data(range_)
         data.append(link_.description)
-        data.append(edit_link(
-            url_for('link_update', id_=link_.id, origin_id=entity.id)))
+        #data.append(edit_link(
+        #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
         # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
         tabs[range_.class_.view].table.rows.append(data)
     return tabs

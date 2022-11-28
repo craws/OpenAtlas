@@ -1,8 +1,21 @@
 from openatlas import app
-from openatlas.display.base_display import ActorDisplay, BaseDisplay
+from openatlas.display.base_display import (
+    ActorDisplay, BaseDisplay, EventsDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
 from openatlas.util.util import get_base_table_data, link
+
+
+class GroupDisplay(ActorDisplay):
+    pass
+
+
+class MoveDisplay(EventsDisplay):
+    pass
+
+
+class PersonDisplay(ActorDisplay):
+    pass
 
 
 class SourceDisplay(BaseDisplay):
@@ -48,8 +61,3 @@ class SourceDisplay(BaseDisplay):
                     domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
-
-
-class PersonDisplay(ActorDisplay):
-
-    pass

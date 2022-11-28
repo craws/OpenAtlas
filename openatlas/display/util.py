@@ -21,3 +21,7 @@ def remove_link(
         f'{url}#tab-{tab}',
         js="return confirm('{x}')".format(
             x=_('Remove %(name)s?', name=name.replace("'", ''))))
+
+
+def edit_link(url: str) -> Optional[str]:
+    return link(_('edit'), url) if is_authorized('contributor') else None

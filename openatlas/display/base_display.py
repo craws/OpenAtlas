@@ -6,7 +6,7 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.util import remove_link
+from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -251,7 +251,6 @@ class BaseDisplay:
 class ActorDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
-        from openatlas.views.entity import edit_link
         super().add_tabs()
         for name in [
                 'source', 'event', 'relation', 'member_of', 'member',
@@ -407,3 +406,39 @@ class ActorDisplay(BaseDisplay):
                     self.entity,
                     domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
+
+
+class EventsDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        entity = self.entity
+        for name in ['subs', 'source', 'actor', 'reference', 'file']:
+            self.tabs[name] = Tab(name, entity=entity)
+        for sub_event in entity.get_linked_entities(
+                'P9',
+                inverse=True,
+                types=True):
+            self.tabs['subs'].table.rows.append(get_base_table_data(sub_event))
+        self.tabs['actor'].table.header.insert(5, _('activity'))
+        for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
+            first = link_.first
+            if not link_.first and entity.first:
+                first = f'<span class="inactive">{entity.first}</span>'
+            last = link_.last
+            if not link_.last and entity.last:
+                last = f'<span class="inactive">{entity.last}</span>'
+            self.tabs['actor'].table.rows.append([
+                link(link_.range),
+                link_.range.class_.label,
+                link_.type.name if link_.type else '',
+                first,
+                last,
+                g.properties[link_.property.code].name_inverse,
+                link_.description,
+                edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(link_.range.name, link_, entity, 'actor')])
+        entity.linked_places = [
+            location.get_linked_entity_safe('P53', True) for location
+            in entity.get_linked_entities(['P7', 'P26', 'P27'])]
