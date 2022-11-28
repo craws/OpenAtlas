@@ -212,35 +212,34 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Edit' in rv.data
 
-            if os.name == "posix":  # Ignore for other OS e.g. Windows
-                with app.test_request_context():
-                    app.preprocess_request()  # type: ignore
-                    overlay = Overlay.get_by_object(place)
-                    overlay_id = overlay[list(overlay.keys())[0]].id
-                rv = self.app.get(
-                    url_for(
-                        'overlay_update',
-                        id_=overlay_id,
-                        place_id=place.id,
-                        link_id=link_id))
-                assert b'42' in rv.data
+            with app.test_request_context():
+                app.preprocess_request()  # type: ignore
+                overlay = Overlay.get_by_object(place)
+                overlay_id = overlay[list(overlay.keys())[0]].id
+            rv = self.app.get(
+                url_for(
+                    'overlay_update',
+                    id_=overlay_id,
+                    place_id=place.id,
+                    link_id=link_id))
+            assert b'42' in rv.data
 
-                rv = self.app.post(
-                    url_for(
-                        'overlay_update',
-                        id_=overlay_id,
-                        place_id=place.id,
-                        link_id=link_id),
-                    data=data,
-                    follow_redirects=True)
-                assert b'Changes have been saved' in rv.data
+            rv = self.app.post(
+                url_for(
+                    'overlay_update',
+                    id_=overlay_id,
+                    place_id=place.id,
+                    link_id=link_id),
+                data=data,
+                follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
 
-                self.app.get(
-                    url_for(
-                        'overlay_remove',
-                        id_=overlay_id,
-                        place_id=place.id),
-                    follow_redirects=True)
+            self.app.get(
+                url_for(
+                    'overlay_remove',
+                    id_=overlay_id,
+                    place_id=place.id),
+                follow_redirects=True)
 
             rv = self.app.get(url_for('entity_add_file', id_=place.id))
             assert b'Link file' in rv.data
