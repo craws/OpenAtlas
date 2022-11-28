@@ -177,63 +177,24 @@
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="cidoc-crm">
-<h3>CIDOC CRM<a class="headerlink" href="#cidoc-crm" title="Permalink to this headline">¶</a></h3>
-<p>The web interface provides tools to enter and manipulate data which will be
-saved in a <a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> compatible model to a
-<a class="reference external" href="https://www.postgresql.org/">PostgreSQL</a> database. A main focus of OpenAtlas
-is to design a web interface that allows users not to focus on the underlying
-data model but to enter data in a convenient and easy way. Therefore, the
-CIDOC CRM specification was imported into the system. It can be browsed and is
-used to verify link conformity between entities. Additionally, link
-combinations can be tested manually e.g. when planning model extensions.</p>
-</div>
-<div class="section" id="system-custom-and-value-types">
-<h3>System, Custom and Value Types<a class="headerlink" href="#system-custom-and-value-types" title="Permalink to this headline">¶</a></h3>
-<p>Due to this feature, the model and user interface forms can be adapted for
-specific research interests. Already provided system types can be extended.
-Additionally, it is possible to add new types e.g. “hair color” for persons.
-These type hierarchies can be configured to allow single or multiple choices.
-A type can be used for multiple entities e.g. a hierarchy like “importance”
-for places, actors and groups. Furthermore, value types can be created to add
-numeric values e.g. weight or material composition of a find.</p>
-</div>
-<div class="section" id="linked-data">
-<h3>Linked data<a class="headerlink" href="#linked-data" title="Permalink to this headline">¶</a></h3>
-<p>Entries can be linked to external reference systems using
-<a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a> based precision.
-<a class="reference external" href="https://www.geonames.org/">GeoNames</a> and
-<a class="reference external" href="https://www.wikidata.org/">Wikidata</a> are already included in
-the default application using their APIs and more can be added. Also linking
-generic references, e.g. providing a URL for an actor to a Wikipedia entry is
-possible.</p>
-</div>
-<div class="section" id="spatial-and-temporal-fuzziness">
-<h3>Spatial and Temporal Fuzziness<a class="headerlink" href="#spatial-and-temporal-fuzziness" title="Permalink to this headline">¶</a></h3>
-<p>In many cases the spatial or temporal position respectively extent of an entity
-is not known precisely. Therefore, OpenAtlas allows defining time-spans
-(earliest/latest begin and earliest/latest end) or areas in which the temporal
-respectively spatial extent can be located with a 100% certainty.</p>
-</div>
-<div class="section" id="archaeological-subunits">
-<h3>Archaeological Subunits<a class="headerlink" href="#archaeological-subunits" title="Permalink to this headline">¶</a></h3>
-<p>These allow detailed mapping of archaeological finds, e.g. in a cemetery. They
-are used in a strict hierarchy: Place -&gt; Feature (e.g. a grave) -&gt;
-Stratigraphic Unit (e.g. a coffin or skeleton) -&gt;
-Find (e.g. grave goods) and Human Remains
-(e.g. for anthropological information on the burial).</p>
-</div>
-<div class="section" id="data-integrity-check-functions">
-<h3>Data integrity check functions<a class="headerlink" href="#data-integrity-check-functions" title="Permalink to this headline">¶</a></h3>
-<p>Because data integrity is important for the quality of research data, we
-implemented functions to check possible inconsistencies including checks for
-orphaned data, date inconsistency, duplicates, similar names, invalid links,
-unused types and more.</p>
-</div>
+<ul class="simple">
+<li><p>The OpenAtlas <a class="reference internal" href="model/index.html"><span class="doc">Model</span></a> is based on the international standard of
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a></p></li>
+<li><p><a class="reference internal" href="entity/type.html"><span class="doc">Types</span></a> can be used to adapt for specific research topics</p></li>
+<li><p><strong>Linked Open Data (LOD)</strong> with <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>
+based precision via <a class="reference internal" href="entity/reference_system.html"><span class="doc">Reference Systems</span></a></p></li>
+<li><p>Solutions to deal with <a class="reference internal" href="tools/map.html"><span class="doc">spatial</span></a> and
+<a class="reference internal" href="ui/date.html"><span class="doc">temporal</span></a> uncertainty</p></li>
+<li><p>Detailed mapping for
+<a class="reference internal" href="examples/archaeological_data.html"><span class="doc">archaeological finds</span></a></p></li>
+<li><p><a class="reference internal" href="admin/data_integrity_checks.html"><span class="doc">Data integrity check</span></a> functions</p></li>
+<li><p><a class="reference internal" href="model/link_checker.html"><span class="doc">Model link checker</span></a> to confirm CIDOC CRM validity</p></li>
+</ul>
 </div>
 <div class="section" id="geolocating">
 <h2>Geolocating<a class="headerlink" href="#geolocating" title="Permalink to this headline">¶</a></h2>
-<p>Places with known location can be entered into an interactive map based on
+<p>Places with known location can be entered into an interactive
+<a class="reference internal" href="tools/map.html"><span class="doc">Map</span></a> based on
 <a class="reference external" href="https://leafletjs.com/">Leaflet</a>, which features different view layers,
 allows for zooming, fullscreen mode, clustering, searching and much more.
 <a class="reference external" href="https://postgis.net/">PostGIS</a> is used for creating and manipulating spatial

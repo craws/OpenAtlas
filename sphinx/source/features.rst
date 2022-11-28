@@ -4,69 +4,23 @@ Features
 Model
 -----
 
-CIDOC CRM
-*********
-
-The web interface provides tools to enter and manipulate data which will be
-saved in a `CIDOC CRM <https://www.cidoc-crm.org/>`_ compatible model to a
-`PostgreSQL <https://www.postgresql.org/>`_ database. A main focus of OpenAtlas
-is to design a web interface that allows users not to focus on the underlying
-data model but to enter data in a convenient and easy way. Therefore, the
-CIDOC CRM specification was imported into the system. It can be browsed and is
-used to verify link conformity between entities. Additionally, link
-combinations can be tested manually e.g. when planning model extensions.
-
-System, Custom and Value Types
-******************************
-
-Due to this feature, the model and user interface forms can be adapted for
-specific research interests. Already provided system types can be extended.
-Additionally, it is possible to add new types e.g. "hair color" for persons.
-These type hierarchies can be configured to allow single or multiple choices.
-A type can be used for multiple entities e.g. a hierarchy like "importance"
-for places, actors and groups. Furthermore, value types can be created to add
-numeric values e.g. weight or material composition of a find.
-
-Linked data
-***********
-
-Entries can be linked to external reference systems using
-`SKOS <https://www.w3.org/TR/skos-primer/>`_ based precision.
-`GeoNames <https://www.geonames.org/>`_ and
-`Wikidata <https://www.wikidata.org/>`_ are already included in
-the default application using their APIs and more can be added. Also linking
-generic references, e.g. providing a URL for an actor to a Wikipedia entry is
-possible.
-
-Spatial and Temporal Fuzziness
-******************************
-
-In many cases the spatial or temporal position respectively extent of an entity
-is not known precisely. Therefore, OpenAtlas allows defining time-spans
-(earliest/latest begin and earliest/latest end) or areas in which the temporal
-respectively spatial extent can be located with a 100% certainty.
-
-Archaeological Subunits
-***********************
-
-These allow detailed mapping of archaeological finds, e.g. in a cemetery. They
-are used in a strict hierarchy: Place -> Feature (e.g. a grave) ->
-Stratigraphic Unit (e.g. a coffin or skeleton) ->
-Find (e.g. grave goods) and Human Remains
-(e.g. for anthropological information on the burial).
-
-Data integrity check functions
-**********************************
-
-Because data integrity is important for the quality of research data, we
-implemented functions to check possible inconsistencies including checks for
-orphaned data, date inconsistency, duplicates, similar names, invalid links,
-unused types and more.
+* The OpenAtlas :doc:`/model/index` is based on the international standard of
+  `CIDOC CRM <https://www.cidoc-crm.org/>`_
+* :doc:`Types </entity/type>` can be used to adapt for specific research topics
+* **Linked Open Data (LOD)** with `SKOS <https://www.w3.org/TR/skos-primer/>`_
+  based precision via :doc:`Reference Systems </entity/reference_system>`
+* Solutions to deal with :doc:`spatial </tools/map>` and
+  :doc:`temporal </ui/date>` uncertainty
+* Detailed mapping for
+  :doc:`archaeological finds </examples/archaeological_data>`
+* :doc:`Data integrity check</admin/data_integrity_checks>` functions
+* :doc:`Model link checker<model/link_checker>` to confirm CIDOC CRM validity
 
 Geolocating
 -----------
 
-Places with known location can be entered into an interactive map based on
+Places with known location can be entered into an interactive
+:doc:`/tools/map` based on
 `Leaflet <https://leafletjs.com/>`_, which features different view layers,
 allows for zooming, fullscreen mode, clustering, searching and much more.
 `PostGIS <https://postgis.net/>`_ is used for creating and manipulating spatial
