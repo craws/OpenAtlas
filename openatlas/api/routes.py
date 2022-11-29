@@ -1,6 +1,5 @@
 from flask_restful import Api
 
-from openatlas.api.arche.import_single_entity import ImportSingleArcheEntity
 from openatlas.api.endpoints.content import ClassMapping, \
     GetContent, SystemClassCount
 from openatlas.api.endpoints.special import GetGeometricEntities, \
@@ -94,8 +93,3 @@ def add_routes_v03(api: Api) -> None:
         DisplayImage,
         '/display/<path:filename>',
         endpoint='display')
-
-    api.add_resource(
-        ImportSingleArcheEntity,
-        '/import_arche_entity/<int:id_>',
-        endpoint='import_arche_entity')

@@ -71,8 +71,9 @@ JSON_FORMATS = {
     'geojson-v2': 'application/json'}
 API_FORMATS = RDF_FORMATS | JSON_FORMATS
 # Used to connect to ACDH-CH ARCHE systems
-ARCHE_ID = ''
-ARCHE_BASE_URL = ''
+ARCHE_ID = None
+ARCHE_COLLECTION_IDS = None
+ARCHE_BASE_URL = None
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
