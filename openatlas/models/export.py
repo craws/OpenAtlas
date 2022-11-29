@@ -28,12 +28,14 @@ def sql_export(postfix: Optional[str] = '') -> bool:
         f"-p {app.config['DATABASE_PORT']} " \
         f"-f {file}"
     try:
+        root = os.environ['SYSTEMROOT'] if 'SYSTEMROOT' in os.environ else ''
         subprocess.Popen(
             command,
             shell=True,
             stdin=subprocess.PIPE,
-            env={'PGPASSWORD': app.config['DATABASE_PASS'],
-                 'SYSTEMROOT': os.environ['SYSTEMROOT']}).wait()
+            env={
+                'PGPASSWORD': app.config['DATABASE_PASS'],
+                'SYSTEMROOT': root}).wait()
         with open(os.devnull, 'w') as null:
             subprocess.Popen(
                 ['7z', 'a', f'{file}.7z', file],
