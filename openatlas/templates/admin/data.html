@@ -20,6 +20,9 @@
     {% if 'admin'|is_authorized %}
       {{ _('execute SQL')|button(url_for('sql_index'))|safe }}
     {% endif %}
+    {% if config.ARCHE_ID %}
+      {{ 'ARCHE'|button(url_for('arche_index'))|safe }}
+    {% endif %}
   </div>
 {% endif %}
 {% if 'admin'|is_authorized and g.settings.image_processing %}
