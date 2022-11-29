@@ -7,12 +7,12 @@ Introduction
 ------------
 
 This page provides an overview of the OpenAtlas Application Programming
-Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API provided is
+Interface (`API <https://en.wikipedia.org/wiki/API>`_). The API is
 `RESTlike <https://restfulapi.net/rest-architectural-constraints/>`_
 to provide easy access to the data included.
 For an complete overview of possible endpoints and usage of the OpenAtlas API
 also visit our
-`Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/0.3/>`_.
+`Swagger documentation <https://app.swaggerhub.com/apis/ctot-nondef/OpenAtlas/>`_.
 
 Quick Start Guide
 -----------------
@@ -37,8 +37,8 @@ Example: **demo.openatlas.eu/api/0.3/entity/5117**
   (demo.openatlas.eu/api/0.3/entity/**5117**; 5117 is an ID as required by the
   entity endpoint) - all required values are stated in the list below
 * **Parameters**: Used to structure additional information for a given URL;
-  they are added to the end of an URL after the “?” symbol
-  (demo.openatlas.eu/api/0.3/entity/5117**?download=true**). For more
+  they are added to the end of an URL after the "?" symbol
+  (demo.openatlas.eu/api/0.3/entity/5117?download=true). For more
   information see this `article <https://www.botify.com/learn/basics/what-are-url-parameters#:~:text=URL%20parameters%20(also%20known%20as,by%20the%20'%26'%20symbol.>`_.
 
 Using the above-mentioned **https://demo.openatlas.eu/api/1/entity/5117**
@@ -244,7 +244,7 @@ Endpoint definition
 
 Two different methods are provided to access the OpenAtlas API:
 
-* Access via an OpenAtlas instance’s user interface
+* Access via an OpenAtlas instance's user interface
 * Access via another application if settings allow for it
 
 Endpoints provide information about one or more entities in the OpenAtlas
@@ -289,12 +289,11 @@ Entity endpoint
      - Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
        item. Combine up to four of the aforementioned endpoints in a single
        query; each request has to be a new parameter; Possible parameters are:
-       ?entities={id}, ?classes={cidoc-class-code}, ?codes={view-name},
-       ?system_classes={system-class}(2)
+       entities={id}, classes={cidoc-class-code}, codes={view-name},
+       system_classes={system-class}(2)
 
 
-**Multiple entities** - Results in list form include related entities and
-       pagination
+**Multiple entities** - Results in list form include related entities and pagination
 
 .. list-table::
    :widths: 25 25 50
@@ -307,7 +306,7 @@ Entity endpoint
      - limit, column, sort, search, first, last, show, relation-type, type-id,
        count, download, format, export, page
      - Retrieve a list of entities, based on their CIDOC CRM class code(1)(2),
-       e.g. “E18” or “E22” (see :doc:`CIDOC CRM </model/cidoc_crm>`)
+       e.g. "E18" or "E22" (see :doc:`CIDOC CRM </model/cidoc_crm>`)
    * - /api/1.0/entities/menu-item/{menu-item}
      - limit, column, sort, search, first, last, show, relation-type, type-id,
        count, download, format, export, page
@@ -324,7 +323,7 @@ Entity endpoint
        'find', 'group', 'human_remains', 'move', 'object_location', 'person',
        'place', 'reference_system', 'source', 'stratigraphic_unit',
        'source_translation', 'type')(1)(2).
-   * - api1.0//entities/last-entered/{n} (n represents a number between 1
+   * - /api/1.0/entities/last-entered/{n} (n represents a number between 1
        and 100)
      - show, relation-type, download, format, export
      - Retrieves the last entered ebtities. n represents the amount of entities
@@ -341,6 +340,7 @@ Entity endpoint
    * - /api/entities/1.0/linked-to-type-including-subtypes/{id}
      - limit, column, sort, search, first, last, show, relation-type, type-id,
        count, download, format, export, page
+     - Retrieve a list of entities, based on their OpenAtlas type ID including all connected subtypes(2)(3)
 
 (1) All codes available in OpenAtlas can be found under
 `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_
@@ -360,7 +360,7 @@ Type endpoints
    * - API endpoint
      - Possible parameters
      - Description
-   * -/api/1.0/types/hierarchy/
+   * - /api/1.0/types/hierarchy/
      - download
      - Retrives a list of all OpenAtlas types, sorted by custom, place,
        standard, and value; replaces the older /api/node_overview endpoint
