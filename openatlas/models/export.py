@@ -18,45 +18,28 @@ def sql_export(postfix: Optional[str] = '') -> bool:
     file = \
         app.config['EXPORT_DIR'] / 'sql' \
         / f'{current_date_for_filename()}_dump{postfix}.sql'
-    if os.name == 'posix':
-        command = \
-            "pg_dump " \
-            f"-h {app.config['DATABASE_HOST']} " \
-            f"-d {app.config['DATABASE_NAME']} " \
-            f"-U {app.config['DATABASE_USER']} " \
-            f"-p {app.config['DATABASE_PORT']} " \
-            f"-f {file}"
-        try:
+    pg_dump = "pg_dump" if os.name == 'posix' \
+        else f'"{shutil.which("pg_dump.exe")}"'
+    command = \
+        f"{pg_dump} " \
+        f"-h {app.config['DATABASE_HOST']} " \
+        f"-d {app.config['DATABASE_NAME']} " \
+        f"-U {app.config['DATABASE_USER']} " \
+        f"-p {app.config['DATABASE_PORT']} " \
+        f"-f {file}"
+    try:
+        subprocess.Popen(
+            command,
+            shell=True,
+            stdin=subprocess.PIPE,
+            env={'PGPASSWORD': app.config['DATABASE_PASS'],
+                 'SYSTEMROOT': os.environ['SYSTEMROOT']}).wait()
+        with open(os.devnull, 'w') as null:
             subprocess.Popen(
-                command,
-                shell=True,
-                stdin=subprocess.PIPE,
-                env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
-            with open(os.devnull, 'w') as null:
-                subprocess.Popen(
-                    ['7z', 'a', f'{file}.7z', file],
-                    stdout=null).wait()
-            file.unlink()
-        except Exception:  # pragma: no cover
-            return False
-    else:  # pragma: no cover
-        command = \
-            "pg_dump.exe " \
-            f"-d {app.config['DATABASE_NAME']} " \
-            f"-U {app.config['DATABASE_USER']} " \
-            f"-p {app.config['DATABASE_PORT']} " \
-            f"-f {file}"
-        try:
-            subprocess.Popen(
-                command,
-                shell=False,
-                stdin=subprocess.PIPE,
-                env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
-            with open(os.devnull, 'w') as null:
-                subprocess.Popen(
-                    ['7z', 'a', f'{file}.7z', file],
-                    stdout=null).wait()
-            file.unlink()
-        except Exception:  # pragma: no cover
-            return False
+                ['7z', 'a', f'{file}.7z', file],
+                stdout=null).wait()
+        file.unlink()
+    except Exception:  # pragma: no cover
+        return False
+
     return True
