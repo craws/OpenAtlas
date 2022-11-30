@@ -73,23 +73,23 @@ jobs:
         run: |
           set -x
           cat <<EOF > testing.py
-          DATABASE_NAME='$POSTGRES_DB'
-          DATABASE_USER='$POSTGRES_USER'
-          DATABASE_HOST='$POSTGRES_HOST'
+          DATABASE_NAME='openatlas_test'
+          DATABASE_USER='openatlas'
+          DATABASE_HOST='postgres'
           DATABASE_PORT=5432
-          DATABASE_PASS='$POSTGRES_PASSWORD'
-          MAIL_PASSWORD='$MAIL_PASSWORD'
+          DATABASE_PASS='verysecret'
+          MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           IS_UNIT_TEST = True
           DEBUG = True
           EOF
           cat <<EOF > production.py
-          DATABASE_NAME='$POSTGRES_DB'
-          DATABASE_USER='$POSTGRES_USER'
-          DATABASE_HOST='$POSTGRES_HOST'
+          DATABASE_NAME='openatlas'
+          DATABASE_USER='openatlas'
+          DATABASE_HOST='postgres'
           DATABASE_PORT=5432
-          DATABASE_PASS='$POSTGRES_PASSWORD'
-          MAIL_PASSWORD='$MAIL_PASSWORD'
+          DATABASE_PASS='verysecret'
+          MAIL_PASSWORD='asdQWEtzu123'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           EOF
           cat testing.py
