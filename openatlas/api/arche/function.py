@@ -47,6 +47,12 @@ def filter_all_files(req: Response) -> dict[str, Any]:
                     'originalFileLink': uri,
                     'thumbnailLink':
                         f'{app.config["ARCHE_THUMBNAIL"]}{uri}&width=400'}
+            if str(value[0]) == 'image/tiff':
+                files['images'][uri.rsplit('/', 1)[1]] = {
+                    'metadataARCHE': node,
+                    'originalFileLink': uri,
+                    'thumbnailLink':
+                        f'{app.config["ARCHE_THUMBNAIL"]}{uri}&width=400'}
     return files
 
 
