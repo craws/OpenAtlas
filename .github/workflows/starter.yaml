@@ -82,5 +82,15 @@ jobs:
           IS_UNIT_TEST = True
           DEBUG = True
           EOF
+          cat <<EOF > production.py
+          DATABASE_NAME='$POSTGRES_DB'
+          DATABASE_USER='$POSTGRES_USER'
+          DATABASE_HOST='$POSTGRES_HOST'
+          DATABASE_PORT=5432
+          DATABASE_PASS='$POSTGRES_PASSWORD'
+          MAIL_PASSWORD='$MAIL_PASSWORD'
+          SECRET_KEY='$COOKIE_KEY'  # Used for cookies
+          EOF
+          docker cp production.py openatlas:/var/www/openatlas/instance/
           docker cp testing.py openatlas:/var/www/openatlas/instance/
           docker exec openatlas /bin/bash -c "cd /var/www/openatlas/;python3 -m nose"
