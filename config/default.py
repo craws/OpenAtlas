@@ -74,7 +74,7 @@ API_FORMATS = RDF_FORMATS | JSON_FORMATS
 ARCHE_ID = None
 ARCHE_COLLECTION_IDS = None
 ARCHE_BASE_URL = None
-ARCHE_THUMBNAIL = 'https://arche-thumbnails.acdh.oeaw.ac.at/?id='
+ARCHE_THUMBNAIL = 'https://arche-thumbnails.acdh.oeaw.ac.at/'
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
