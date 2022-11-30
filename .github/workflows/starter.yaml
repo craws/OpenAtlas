@@ -54,6 +54,10 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Create openatlas network
+        run: |
+          docker network create --internal openatlas
+
       - name: Create postgis container
         run: |
           docker run --rm -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas --name postgres --network openatlas postgis/postgis:13-3.3
