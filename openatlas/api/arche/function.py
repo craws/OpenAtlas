@@ -31,18 +31,21 @@ def filter_all_files(req: Response) -> dict[str, Any]:
         for prop, value in node.items():
             if 'metadata.json' in str(value[0]):
                 files['metadata'][uri.rsplit('/', 1)[1]] = {
+                    'metadataARCHE': node,
                     'metadataFile': requests.get(uri).json(),
                     'isMetadataFor':
                         get_jpeg_from_metadata(node['isMetadataFor'])}
             if '_not_unique_values.json' in str(value[0]):
                 files['not_unique_values'][uri.rsplit('/', 1)[1]] = {
+                    'metadataARCHE': node,
                     'metadataFile': requests.get(uri).json(),
                     'isMetadataFor':
                         get_jpeg_from_metadata(node['isMetadataFor'])}
             if str(value[0]) == 'image/jpeg':
                 files['images'][uri.rsplit('/', 1)[1]] = {
-                    'originalFile': uri,
-                    'thumbnail':
+                    'metadataARCHE': node,
+                    'originalFileLink': uri,
+                    'thumbnailLink':
                         f'{app.config["ARCHE_THUMBNAIL"]}{uri}&width=400'}
     return files
 
