@@ -1,9 +1,13 @@
+from flask_babel import lazy_gettext as _
+from flask_login import current_user
+
 from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
-from openatlas.util.util import get_base_table_data, link
+from openatlas.util.util import get_base_table_data, is_authorized, link, \
+    uc_first
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -28,6 +32,20 @@ class MoveDisplay(EventsDisplay):
 
 class PersonDisplay(ActorDisplay):
     pass
+
+
+class PlaceDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for name in ['reference', 'file']:
+            self.tabs[name] = Tab(name, entity=self.entity)
+        if is_authorized('editor') \
+                and current_user.settings['module_map_overlay']:
+            self.tabs['file'].table.header.append(uc_first(_('overlay')))
+
+    def add_info_content(self):
+        super().add_info_content()
 
 
 class ProductionDisplay(EventsDisplay):

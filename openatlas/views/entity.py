@@ -76,11 +76,6 @@ def view(id_: int) -> Union[str, Response]:
             for link_ in entity.get_links(['P24', 'P25', 'P108'], True):
                 data = get_base_table_data(link_.domain)
                 tabs['event'].table.rows.append(data)
-        tabs['file'] = Tab('file', entity=entity)
-        if entity.class_.view == 'place' \
-                and is_authorized('editor') \
-                and current_user.settings['module_map_overlay']:
-            tabs['file'].table.header.append(uc_first(_('overlay')))
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
