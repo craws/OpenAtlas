@@ -92,6 +92,8 @@ jobs:
           MAIL_PASSWORD='$MAIL_PASSWORD'
           SECRET_KEY='$COOKIE_KEY'  # Used for cookies
           EOF
+          cat testing.py
+          cat production.py
           docker cp production.py openatlas:/var/www/openatlas/instance/
           docker cp testing.py openatlas:/var/www/openatlas/instance/
           docker exec openatlas /bin/bash -c "cd /var/www/openatlas/;python3 -m nose"
