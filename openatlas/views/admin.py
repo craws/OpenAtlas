@@ -2,6 +2,7 @@ import datetime
 import importlib
 import math
 import os
+import shutil
 from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
@@ -762,12 +763,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail
+    stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
     return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+        'total': convert_size(stats.total),
+        'free': convert_size(stats.free),
+        'percent': 100 - math.ceil(stats.free / (stats.total / 100))}
