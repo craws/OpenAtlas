@@ -10,7 +10,6 @@ from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -365,30 +364,10 @@ class ActorDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(
-                        domain,
-                        extension))
+                    self.get_profile_image_table_link(domain, extension))
                 if not self.entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     self.entity.image_id = domain.id
-                if self.entity.class_.view == 'place' \
-                        and is_authorized('editor') \
-                        and current_user.settings['module_map_overlay']:
-                    overlays = Overlay.get_by_object(self.entity)
-                    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        if domain.id in overlays:
-                            data.append(edit_link(
-                                url_for(
-                                    'overlay_update',
-                                    id_=overlays[domain.id].id)))
-                        else:
-                            data.append(link(_('link'), url_for(
-                                'overlay_insert',
-                                image_id=domain.id,
-                                place_id=self.entity.id,
-                                link_id=link_.id)))
-                    else:  # pragma: no cover
-                        data.append('')
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
@@ -442,3 +421,23 @@ class EventsDisplay(BaseDisplay):
         entity.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
+        for link_ in entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    self.get_profile_image_table_link(domain, extension))
+                if not entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    entity.image_id = domain.id
+            if domain.class_.view not in ['source', 'file']:
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+                if domain.class_.view == 'reference_system':
+                    entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(domain.name, link_, entity, domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)

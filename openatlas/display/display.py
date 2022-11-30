@@ -6,6 +6,18 @@ from openatlas.display.util import remove_link
 from openatlas.util.util import get_base_table_data, link
 
 
+class AcquisitionDisplay(EventsDisplay):
+    pass
+
+
+class ActivityDisplay(EventsDisplay):
+    pass
+
+
+class EventDisplay(EventsDisplay):
+    pass
+
+
 class GroupDisplay(ActorDisplay):
     pass
 
@@ -15,6 +27,10 @@ class MoveDisplay(EventsDisplay):
 
 
 class PersonDisplay(ActorDisplay):
+    pass
+
+
+class ProductionDisplay(EventsDisplay):
     pass
 
 
