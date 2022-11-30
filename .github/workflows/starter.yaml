@@ -67,7 +67,7 @@ jobs:
 
       - name: Create openatlas container
         run: |
-          docker run --rm -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/${{ github.repository }}/container-preview:${{ github.ref_name }}
+          docker run --rm -d -e POSTGRES_PASSWORD=verysecret -e POSTGRES_DB=openatlas_test -e POSTGRES_USER=openatlas -e POSTGRES_HOST=postgres --name openatlas --network openatlas ghcr.io/$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')/container-preview:${{ github.ref_name }}
 
       - name: Execute tests
         run: |
