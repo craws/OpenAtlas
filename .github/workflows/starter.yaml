@@ -94,4 +94,4 @@ jobs:
           EOF
           docker cp production.py openatlas:/var/www/openatlas/instance/
           docker cp testing.py openatlas:/var/www/openatlas/instance/
-          docker exec openatlas /bin/bash -c "cd /var/www/openatlas/;python3 -m nose"
+          docker exec -i openatlas /bin/bash -c "cd /var/www/openatlas/;python3 -m nose"
