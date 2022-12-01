@@ -7,7 +7,8 @@ versions = {
             '1893': 'Code coverage for Windows'},
         'fix': {
             '1874': 'API: Outdated Swagger File',
-            '1888': 'CSV data export missing data'}
+            '1888': 'CSV data export missing data',
+            '1899': 'Map overlay not shown on feature level'}
     }],
     '7.8.0': ['2022-11-18',  {
         'feature': {
