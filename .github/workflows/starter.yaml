@@ -94,7 +94,7 @@ jobs:
           docker cp production.py openatlas:/var/www/openatlas/instance/
           docker cp testing.py openatlas:/var/www/openatlas/instance/
           docker start openatlas
-          docker exec -i openatlas /bin/bash -c "python3 --version && cd /var/www/openatlas/ && python3 -m nose && echo passed"
+          docker exec -i openatlas /bin/bash -c "python3 --version && nosetests3 --version && cd /var/www/openatlas/ && nosetests3 && echo passed"
 #
 #      - name: Execute tests
 #        run: |
