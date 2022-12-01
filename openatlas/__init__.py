@@ -24,8 +24,7 @@ app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
-if os.name == "posix":
-    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
 # pylint: disable=wrong-import-position, import-outside-toplevel
