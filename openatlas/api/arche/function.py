@@ -7,7 +7,26 @@ from requests import Response
 from openatlas import app
 
 
-def fetch_files() -> dict[int, Any]:
+def get_data_for_import(data: dict[int, Any]) -> list[dict[str, Any]]:
+    import_list = []
+    for collection in data:
+        for metadata_id, metadata in data[collection]['metadata'].items():
+            import_list.append({
+                'image_id': metadata['isMetadataFor'],
+                'creator': metadata['metadataFile']['EXIF:Artist'],
+                'latitude': metadata['metadataFile']['EXIF:GPSLatitude'],
+                'longitude': metadata['metadataFile']['EXIF:GPSLongitude'],
+                # 'description': metadata['metadataFile']['XMP:Description'],
+                'name': metadata['metadataFile']['IPTC:ObjectName'],
+                'date': metadata['metadataFile']['XMP:DateCreated'],
+                'image_link': data[collection]['jpeg']
+                [metadata['isMetadataFor']]['originalFileLink'],
+                'image_link_thumbnail': data[collection]['jpeg']
+                [metadata['isMetadataFor']]['thumbnailLink']})
+    return import_list
+
+
+def fetch_arche_data() -> dict[int, Any]:
     collections = {}
     for id_ in app.config['ARCHE_COLLECTION_IDS']:
         req = requests.get(
