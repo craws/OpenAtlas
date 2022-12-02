@@ -108,8 +108,7 @@ def add_crumbs(
             crumbs += [g.types[type_id] for type_id in origin.root]
     if structure:
         crumbs += structure['supers']
-    else:
-        crumbs.append(origin)
+    crumbs.append(origin if not insert_ else None)
     sibling_count = 0
     if origin \
             and origin.class_.name == 'stratigraphic_unit' \
