@@ -180,11 +180,14 @@
 <h1>Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The interactive map is a tool to present and enter the location of places.</p>
+<p>The interactive map (based on <a class="reference external" href="https://leafletjs.com/">Leaflet</a>) is a tool
+to present and enter the location of places. <a class="reference external" href="https://postgis.net/">PostGIS</a>
+is used for creating and manipulating spatial data.</p>
 <div class="section" id="navigation">
 <h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the upper left corner.</p></li>
+<li><p>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the
+upper left corner.</p></li>
 <li><p>You can drag the content with the mouse (left click and hold)</p></li>
 <li><p>Change the basemap at the layer button in the upper right corner.</p></li>
 <li><p>Switch to full screen with the rectangle in the upper left.</p></li>
@@ -192,35 +195,41 @@
 </div>
 <div class="section" id="search">
 <h2>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
-<p>With the magnifying glass icon in the upper left you can search for (current) places at
-<a class="reference external" href="https://www.geonames.org/">GeoNames</a>.</p>
+<p>With the magnifying glass icon in the upper left you can search for (current)
+places at <a class="reference external" href="https://www.geonames.org/">GeoNames</a>.</p>
 </div>
 <div class="section" id="adding-new-geometries">
 <h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this headline">¶</a></h2>
-<p>When in insert or update mode of a place you have following options available (can be combined):</p>
+<p>When in insert or update mode of a place you have following options available
+(can be combined):</p>
 <ul class="simple">
 <li><p>Set a marker/point at the position where the physical thing is located.</p></li>
-<li><p>Draw a line connected to a physical objects spatial characteristics, e.g. the course of a road.</p></li>
+<li><p>Draw a line connected to a physical objects spatial characteristics, e.g.
+the course of a road.</p></li>
 <li><p>Draw the shape of a physical thing if the precise extend is known.</p></li>
-<li><p>Draw the area in which the physical thing is located. E.g. if its precise shape is not known but known to be within a certain area.</p></li>
+<li><p>Draw the area in which the physical thing is located. E.g. if its precise
+shape is not known but known to be within a certain area.</p></li>
 </ul>
 </div>
 <div class="section" id="id1">
 <h2>GeoNames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
-<p>The <em>GeoNames ID</em> field can either be manually entered or imported from a map search result.</p>
+<p>The <em>GeoNames ID</em> field can either be manually entered or imported from a map
+search result.</p>
 <p>The checkbox <strong>exact match</strong> can be used if there is a high
-degree of confidence that the concepts can be used interchangeably. By default it is a
-<strong>close match</strong>, which means that the concepts are sufficiently similar that they can be used
-interchangeably in some information retrieval applications. Please refer to
-<a class="reference external" href="https://www.w3.org/TR/skos-reference/">SKOS</a> for further information.</p>
+degree of confidence that the concepts can be used interchangeably. By default
+it is a <strong>close match</strong>, which means that the concepts are sufficiently similar
+that they can be used interchangeably in some information retrieval
+applications. Please refer to <a class="reference external" href="https://www.w3.org/TR/skos-reference/">SKOS</a>
+for further information.</p>
 </div>
 <div class="section" id="map-overlay">
 <h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Permalink to this headline">¶</a></h2>
-<p>If you have the module map overlay activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>, added overlays for places will
-be visible on the map by default and can be toggled at map layer button at the upper right corner.</p>
-<p>To insert new overlays (only available for editors and admins) go to the view of a specific place.
-After adding an image file in the file tab you can click <strong>add</strong> in the overlay column to enter
-coordinates (Easting and Northing) for:</p>
+<p>If you have the module map overlay activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>, added
+overlays for places will be visible on the map by default and can be toggled
+at map layer button at the upper right corner.</p>
+<p>To insert new overlays (only available for editors and admins) go to the view
+of a specific place. After adding an image file in the file tab you can click
+<strong>add</strong> in the overlay column to enter coordinates (Easting and Northing) for:</p>
 <ul class="simple">
 <li><p>top left corner</p></li>
 <li><p>top right corner</p></li>

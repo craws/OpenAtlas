@@ -93,10 +93,9 @@
 <li class="toctree-l1"><a class="reference internal" href="overview.html">Overview</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Features</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#geolocating">Geolocating</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#user-interface">User interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-exchange">Data exchange</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#user-management">User management</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#anthropological-analyses">Anthropological Analyses</a></li>
 </ul>
 </li>
@@ -177,85 +176,56 @@
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<p>The OpenAtlas <a class="reference internal" href="model/index.html"><span class="doc">Model</span></a> is based on the international standard of
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a></p>
 <ul class="simple">
-<li><p>The OpenAtlas <a class="reference internal" href="model/index.html"><span class="doc">Model</span></a> is based on the international standard of
-<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a></p></li>
 <li><p><a class="reference internal" href="entity/type.html"><span class="doc">Types</span></a> can be used to adapt for specific research topics</p></li>
-<li><p><strong>Linked Open Data (LOD)</strong> with <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>
+<li><p>Linked Open Data (LOD) with <a class="reference external" href="https://www.w3.org/TR/skos-primer/">SKOS</a>
 based precision via <a class="reference internal" href="entity/reference_system.html"><span class="doc">Reference Systems</span></a></p></li>
-<li><p>Solutions to deal with <a class="reference internal" href="tools/map.html"><span class="doc">spatial</span></a> and
+<li><p>Mapping <a class="reference internal" href="tools/map.html"><span class="doc">spatial</span></a> and
 <a class="reference internal" href="ui/date.html"><span class="doc">temporal</span></a> uncertainty</p></li>
-<li><p>Detailed mapping for
+<li><p>Detailed mapping of
 <a class="reference internal" href="examples/archaeological_data.html"><span class="doc">archaeological finds</span></a></p></li>
 <li><p><a class="reference internal" href="admin/data_integrity_checks.html"><span class="doc">Data integrity check</span></a> functions</p></li>
 <li><p><a class="reference internal" href="model/link_checker.html"><span class="doc">Model link checker</span></a> to confirm CIDOC CRM validity</p></li>
 </ul>
 </div>
-<div class="section" id="geolocating">
-<h2>Geolocating<a class="headerlink" href="#geolocating" title="Permalink to this headline">¶</a></h2>
-<p>Places with known location can be entered into an interactive
-<a class="reference internal" href="tools/map.html"><span class="doc">Map</span></a> based on
-<a class="reference external" href="https://leafletjs.com/">Leaflet</a>, which features different view layers,
-allows for zooming, fullscreen mode, clustering, searching and much more.
-<a class="reference external" href="https://postgis.net/">PostGIS</a> is used for creating and manipulating spatial
-data. Therefore, it is possible to enter location as needed as multiple points,
-lines, areas and shapes.</p>
-</div>
 <div class="section" id="user-interface">
 <h2>User interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>File upload</p></li>
-<li><p>Interactive map</p></li>
-<li><p>Search and Filters</p></li>
-<li><p>Bookmarks and notes</p></li>
-<li><p>Internationalization</p></li>
-<li><p>User manual</p></li>
-<li><p>Network visualization</p></li>
-</ul>
-<p>Due to the integration of <a class="reference external" href="https://d3js.org/">D3.js</a> it is possible to
-visualize data as a network graph in 2D and 3D.</p>
-<p>An English user manual corresponding to the current software version is provided in the application itself. Throughout the application are context specific links to the manual but there are also manual entries about step-by-step examples, troubleshoot instructions and more. Feel free to take a look at the user manual of the demo version.</p>
-<p>Multiple languages for the user interface are implemented with <a class="reference external" href="https://www.gnu.org/software/gettext/">gettext</a>. At the moment English and German are available. Easy extension to other languages is possible, when translations available.</p>
-<p>To allow quick navigation, even in a big data set, full-text search is possible. Additionally, a refined advanced search can be used to filter the results (e.g. only actors or a search in descriptions). Tables and tree views, that can have many entries, have a full-text filter for convenience. The map provides a search field for a GeoNames search.</p>
-<p>Files can be uploaded and linked with entities. It is possible to link one file to multiple entities (e.g. a group picture showing different actors) and the other way round. Files are available to download in the original size. In the admin interface the upload file size limit and allowed extensions can be configured.</p>
-<p>Newsletter. This feature enables managers and admins to send newsletters. An editable receiver list with users who have opted in is shown. Newsletters will contain an unsubscribe link.</p>
-<p>Bookmarks and notes are user specific and can be used to e.g. mark entries which need further editing. Already bookmarked entities and notes are shown on the start page after login.</p>
-</div>
-<div class="section" id="user-management">
-<h2>User management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><p>Users and groups can be used to grant different access levels</p></li>
-<li><p>Newsletter</p></li>
-<li><p>Password reset</p></li>
+<li><p>Interactive <a class="reference internal" href="tools/map.html"><span class="doc">Map</span></a> for places with known location</p></li>
+<li><p><a class="reference internal" href="entity/file.html"><span class="doc">File</span></a> upload</p></li>
+<li><p><a class="reference internal" href="tools/search.html"><span class="doc">Search</span></a> and <a class="reference internal" href="ui/table.html"><span class="doc">Table</span></a> filter functions for quick
+navigation</p></li>
+<li><p><a class="reference internal" href="tools/network.html"><span class="doc">Network visualization</span></a></p></li>
+<li><p>Bookmarks and public or private notes</p></li>
+<li><p>User manual (English) with context specific links throughout the application</p></li>
+<li><p>User interface internationalization (currently English and German)
+using <a class="reference external" href="https://www.gnu.org/software/gettext/">gettext</a></p></li>
 </ul>
 </div>
 <div class="section" id="data-exchange">
 <h2>Data exchange<a class="headerlink" href="#data-exchange" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="api">
-<h3>API<a class="headerlink" href="#api" title="Permalink to this headline">¶</a></h3>
-<p>An application programming interface (API) for easier exchange with other
-information system was implemented. The output is based on
-<a class="reference external" href="https://json-ld.org/spec/latest/json-ld/">JSON-LD</a> syntax and
-<a class="reference external" href="https://tools.ietf.org/html/rfc7946">GeoJSON</a>.
-<a class="reference external" href="https://github.com/LinkedPasts/linked-places">Linked Places</a>
-was used as standard.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="tools/api.html"><span class="doc">API</span></a> for easier exchange with other information system</p></li>
+<li><p><a class="reference internal" href="admin/export.html"><span class="doc">Export</span></a> functions for multiple formats</p></li>
+<li><p><a class="reference internal" href="admin/import.html"><span class="doc">Import</span></a> of CSV files</p></li>
+</ul>
 </div>
-<div class="section" id="export">
-<h3>Export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h3>
-<p>A CSV export for single tables and an SQL export (pg_dump) are implemented in
-the admin interface.</p>
-</div>
-<div class="section" id="import">
-<h3>Import<a class="headerlink" href="#import" title="Permalink to this headline">¶</a></h3>
-<p>CSV lists can be imported, e.g. a list of places (name, description, dates and
-point coordinates).</p>
-</div>
+<div class="section" id="user-management">
+<h2>User management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p><a class="reference internal" href="admin/user.html"><span class="doc">User</span></a> and groups can be used to grant different access levels</p></li>
+<li><p>Newsletter with an editable receiver list and automated unsubscribe links</p></li>
+<li><p>Password reset</p></li>
+</ul>
 </div>
 <div class="section" id="anthropological-analyses">
 <h2>Anthropological Analyses<a class="headerlink" href="#anthropological-analyses" title="Permalink to this headline">¶</a></h2>
-<p>Anthropological analysis tools allow to enter data that derived from analyses
-on human remains. A tool to do sex estimation based on the method given by
-Ferembach et al. 1979 was implemented already.</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="tools/anthropological_analyses.html"><span class="doc">Sex estimation</span></a> based on the method
+given by Ferembach et al. 1979</p></li>
+</ul>
 </div>
 </div>
 
