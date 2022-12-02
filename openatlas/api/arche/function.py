@@ -46,20 +46,11 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
             return image['__uri__']
 
 
-def fetch_arche_data_deprecated() -> dict[int, Any]:
-    collections = {}
-    for id_ in app.config['ARCHE_COLLECTION_IDS']:
-        req = requests.get(
-            f"{app.config['ARCHE_BASE_URL']}/api/{id_}/metadata",
-            headers={'Accept': 'application/n-triples'})
-        collections[id_] = sort_data_deprecated(n_triples_to_json(req))
-    return collections
-
-
 ###############################################################################
 # Script from                                                                 #
 # https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html  #
 ###############################################################################
+
 def n_triples_to_json(req: Response) -> dict[str, Any]:
     context = get_arche_context()
     data = rdflib.Graph()
@@ -110,6 +101,17 @@ def get_arche_context() -> dict[str, Any]:
 ########################################
 # Can be deleted if not needed anymore #
 ########################################
+
+def fetch_arche_data_deprecated() -> dict[int, Any]:
+    collections = {}
+    for id_ in app.config['ARCHE_COLLECTION_IDS']:
+        req = requests.get(
+            f"{app.config['ARCHE_BASE_URL']}/api/{id_}/metadata",
+            headers={'Accept': 'application/n-triples'})
+        collections[id_] = sort_data_deprecated(n_triples_to_json(req))
+    return collections
+
+
 def sort_data_deprecated(data: dict[str, Any]) -> dict[str, Any]:
     files = {
         'metadata': {},

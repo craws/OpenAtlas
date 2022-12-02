@@ -28,8 +28,9 @@ def arche_index() -> str:
 @required_group('manager')
 def arche_fetch() -> str:
     content = {
-        _('data'): str(fetch_arche_data_deprecated()),
-        'OpenAtlas import data': str(fetch_arche_data())}
+        # delete 'complete data' for performance or if not needed anymore
+        _('complete data'): str(fetch_arche_data_deprecated()),
+        _('import data'): str(fetch_arche_data())}
     return render_template(
         'tabs.html',
         tabs={'info': Tab('info', content=display_info(content))},
