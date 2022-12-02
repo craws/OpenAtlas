@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Search &mdash; OpenAtlas 7.8.0 documentation</title>
+  <title>Search &mdash; OpenAtlas 7.9.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                7.8.0
+                7.9.0
               </div>
             
           
@@ -91,6 +91,7 @@
             
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Search</a></li>
@@ -179,31 +180,38 @@
 <h1>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The global search finds entities containing the search term in their name or aliases. It is:</p>
+<p>To allow quick navigation, even in a big data set, the global full-text search
+can find entities containing the search term in their name or aliases. It is:</p>
 <ul class="simple">
 <li><p>Not case sensitive, e.g. <strong>aDa lovelacE</strong> will find <strong>Ada Lovelace</strong></p></li>
 <li><p>Full text, e.g. <strong>da Love</strong> will find <strong>Ada Lovelace</strong></p></li>
 <li><p>Unaccented, e.g. <strong>Lovē</strong> will find <strong>Love</strong> and vice-versa</p></li>
-<li><p>You can use <em>%</em> as a placeholder, e.g. <strong>Ada L%ce</strong> will find <strong>Ada Lovelace</strong></p></li>
+<li><p>You can use <em>%</em> as a placeholder, e.g. <strong>Ada L%ce</strong> will
+find <strong>Ada Lovelace</strong></p></li>
 </ul>
-<p>After clicking on the search button in the top right you will be redirected to a result page where
-more options are available:</p>
+<p>Additionally, a refined advanced search can be used to filter the results
+where more options are available:</p>
 <ul class="simple">
-<li><p><strong>Only entities edited by me</strong> - show only entities which you have created or edited.</p></li>
+<li><p><strong>Only entities edited by me</strong> - show only entities which you have created or
+edited.</p></li>
 <li><p><strong>Also search in description</strong> - searches in description and date comments</p></li>
 <li><p><strong>Classes</strong> - search only in selected classes, e.g. Place</p></li>
 <li><p><strong>Dates</strong></p>
 <ul>
-<li><p>This filter is only active if at least the <strong>from</strong> or <strong>to</strong> year is filled out.</p></li>
-<li><p>If only a year is provide the <strong>from</strong> date will be <strong>YYYY-01-01</strong>, the <strong>to</strong> date will be <strong>YYYY-12-31</strong></p></li>
+<li><p>This filter is only active if at least the <strong>from</strong> or <strong>to</strong> year is
+filled out.</p></li>
+<li><p>If only a year is provide the <strong>from</strong> date will be <strong>YYYY-01-01</strong>,
+the <strong>to</strong> date will be <strong>YYYY-12-31</strong></p></li>
 <li><p>If only a year and a month is provided it will be the last of this month.</p></li>
-<li><p>If the option <strong>Include dateless entities</strong> is checked, entities without dates will be found too.</p></li>
+<li><p>If the option <strong>Include dateless entities</strong> is checked, entities without
+dates will be found too.</p></li>
 </ul>
 </li>
 </ul>
-<p>Because entities can have up to 4 date values (time span for begin and time span for end) they will
-be added to the result if at least one date meets the criteria. E.g. a person that lived from <strong>1540
-to 1560</strong> will be found when the <strong>from year</strong> value is <strong>1550</strong>.</p>
+<p>Because entities can have up to 4 date values (time span for begin and time
+span for end) they will be added to the result if at least one date meets the
+criteria. E.g. a person that lived from <strong>1540 to 1560</strong> will be found when
+the <strong>from year</strong> value is <strong>1550</strong>.</p>
 </div>
 
 

@@ -13,6 +13,7 @@ development specific documentation in our Redmine
    :maxdepth: 2
 
    overview
+   features
    entity/index
    tools/index
    admin/index
