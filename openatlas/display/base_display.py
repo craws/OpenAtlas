@@ -441,3 +441,61 @@ class EventsDisplay(BaseDisplay):
             data.append(
                 remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
+
+class PlaceBaseDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        entity = self.entity
+        for name in ['source', 'event', 'reference', 'artifact']:
+            self.tabs[name] = Tab(name, entity=entity)
+        if self.entity.class_.name == 'place':
+            self.tabs['actor'] = Tab('actor', entity=entity)
+            self.tabs['feature'] = Tab('feature', entity=entity)
+        elif self.entity.class_.name == 'feature':
+            self.tabs['stratigraphic_unit'] =\
+                Tab('stratigraphic_unit', entity=entity)
+        self.tabs['file'] = Tab('file', entity=entity)
+        if is_authorized('editor') \
+                and current_user.settings['module_map_overlay']:
+            self.tabs['file'].table.header.append(uc_first(_('overlay')))
+
+        entity.location = entity.get_linked_entity_safe('P53', types=True)
+        events = []  # Collect events to display actors
+        event_ids = []  # Keep track of event ids to prevent event doubles
+        for event in entity.location.get_linked_entities(
+                ['P7', 'P24', 'P26', 'P27'],
+                inverse=True):
+            events.append(event)
+            self.tabs['event'].table.rows.append(get_base_table_data(event))
+            event_ids.append(event.id)
+        for event in entity.get_linked_entities('P24', inverse=True):
+            if event.id not in event_ids:  # Don't add again if already in table
+                self.tabs['event'].table.rows.append(get_base_table_data(event))
+                events.append(event)
+        if entity.class_.name == 'place':
+            for link_ in entity.location.get_links(
+                    ['P74', 'OA8', 'OA9'],
+                    inverse=True):
+                actor = Entity.get_by_id(link_.domain.id)
+                self.tabs['actor'].table.rows.append([
+                    link(actor),
+                    g.properties[link_.property.code].name,
+                    actor.class_.name,
+                    actor.first,
+                    actor.last,
+                    actor.description])
+            actor_ids = []
+            for event in events:
+                for actor in event.get_linked_entities(
+                        ['P11', 'P14', 'P22', 'P23']):
+                    if actor.id in actor_ids:
+                        continue  # pragma: no cover
+                    actor_ids.append(actor.id)
+                    self.tabs['actor'].table.rows.append([
+                        link(actor),
+                        f"{_('participated at an event')}",
+                        event.class_.name, '', '', ''])
+
+    def add_info_content(self):
+        super().add_info_content()
