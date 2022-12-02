@@ -7,8 +7,8 @@ The OpenAtlas :doc:`/model/index` is based on the international standard of
 `CIDOC CRM <https://www.cidoc-crm.org/>`_
 
 * :doc:`Types </entity/type>` can be used to adapt for specific research topics
-* Linked Open Data (LOD) with `SKOS <https://www.w3.org/TR/skos-primer/>`_
-  based precision via :doc:`Reference Systems </entity/reference_system>`
+* :doc:`Reference Systems </entity/reference_system>` for
+  Linked Open Data (LOD)
 * Mapping :doc:`spatial </tools/map>` and
   :doc:`temporal </ui/date>` uncertainty
 * Detailed mapping of
@@ -18,13 +18,14 @@ The OpenAtlas :doc:`/model/index` is based on the international standard of
 
 User interface
 --------------
-* Interactive :doc:`/tools/map` for places with known location
-* :doc:`/entity/file` upload
+* :doc:`Interactive map </tools/map>` to enter places with a known location
+* :doc:`File upload </entity/file>`
 * :doc:`/tools/search` and :doc:`/ui/table` filter functions for quick
   navigation
 * :doc:`/tools/network`
-* Bookmarks and public or private notes
-* User manual (English) with context specific links throughout the application
+* :doc:`/tools/notes` and bookmarks
+* :doc:`User manual </index>` (English) with context specific links throughout
+  the application
 * User interface internationalization (currently English and German)
   using `gettext <https://www.gnu.org/software/gettext/>`_
 
