@@ -7,80 +7,59 @@ from requests import Response
 from openatlas import app
 
 
-def get_data_for_import(data: dict[int, Any]) -> list[dict[str, Any]]:
-    import_list = []
-    for collection in data:
-        for metadata_id, metadata in data[collection]['metadata'].items():
-            import_list.append({
-                'image_id': metadata['isMetadataFor'],
-                'creator': metadata['metadataFile']['EXIF:Artist'],
-                'latitude': metadata['metadataFile']['EXIF:GPSLatitude'],
-                'longitude': metadata['metadataFile']['EXIF:GPSLongitude'],
-                # 'description': metadata['metadataFile']['XMP:Description'],
-                'name': metadata['metadataFile']['IPTC:ObjectName'],
-                'date': metadata['metadataFile']['XMP:DateCreated'],
-                'image_link': data[collection]['jpeg']
-                [metadata['isMetadataFor']]['originalFileLink'],
-                'image_link_thumbnail': data[collection]['jpeg']
-                [metadata['isMetadataFor']]['thumbnailLink']})
-    return import_list
-
-
 def fetch_arche_data() -> dict[int, Any]:
     collections = {}
     for id_ in app.config['ARCHE_COLLECTION_IDS']:
         req = requests.get(
             f"{app.config['ARCHE_BASE_URL']}/api/{id_}/metadata",
             headers={'Accept': 'application/n-triples'})
-        collections[id_] = sort_data(n_triples_to_json(req))
+        collections[id_] = get_metadata(n_triples_to_json(req))
     return collections
 
 
-def sort_data(data: dict[str, Any]) -> dict[str, Any]:
-    files = {
-        'metadata': {},
-        'not_unique_values': {},
-        'jpeg': {},
-        'tiff': {}}
+def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
+    metadata = {}
     for uri, node in data.items():
-        uri_split = uri.rsplit('/', 1)[1]
-        for prop, value in node.items():
-            if 'metadata' in str(value[0]):
-                files['metadata'][uri_split] = json_dict(uri, node)
-            if 'not_unique_values' in str(value[0]):
-                files['not_unique_values'][uri_split] = json_dict(uri, node)
-            if str(value[0]) in ['image/jpeg', 'image/tiff']:
-                value = str(value[0].rsplit('/', 1)[1])
-                files[value][uri_split] = image_dict(uri, node)
-    return files
+        for value in node.values():
+            if '_metadata.json' in str(value[0]):
+                json_ = requests.get(uri).json()
+                image_url = get_linked_image(node['isMetadataFor'])
+                metadata[uri.rsplit('/', 1)[1]] = {
+                    'image_id': image_url.rsplit('/', 1)[1],
+                    'image_link': image_url,
+                    'image_link_thumbnail':
+                        f"{app.config['ARCHE_THUMBNAIL']}"
+                        f"{image_url.replace('https://', '')}?width=400",
+                    'creator': json_['EXIF:Artist'],
+                    'latitude': json_['EXIF:GPSLatitude'],
+                    'longitude': json_['EXIF:GPSLongitude'],
+                    'description': json_['XMP:Description']
+                        if 'XMP:Description' in json_ else '',
+                    'name': json_['IPTC:ObjectName'],
+                    'date': json_['XMP:DateCreated']}
+    return metadata
 
 
-def json_dict(uri: str, node: dict[str, Any]) -> dict[str, Any]:
-    return {
-        'metadataARCHE': node,
-        'metadataFile': requests.get(uri).json(),
-        'isMetadataFor': get_linked_image_id(node['isMetadataFor'])}
-
-
-def image_dict(uri: str, node: dict[str, Any]) -> dict[str, Any]:
-    return {
-        'metadataARCHE': node,
-        'originalFileLink': uri,
-        'thumbnailLink':
-            f"{app.config['ARCHE_THUMBNAIL']}"
-            f"{uri.replace('https://', '')}?width=400"}
-
-
-def get_linked_image_id(data: list[dict[str, Any]]) -> str:
+def get_linked_image(data: list[dict[str, Any]]) -> str:
     for image in data:
         if str(image['mime'][0]) == 'image/jpeg':
-            return image['__uri__'].rsplit('/', 1)[1]
+            return image['__uri__']
 
 
-########################
-# Script from
-# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html
-########################
+def fetch_arche_data_deprecated() -> dict[int, Any]:
+    collections = {}
+    for id_ in app.config['ARCHE_COLLECTION_IDS']:
+        req = requests.get(
+            f"{app.config['ARCHE_BASE_URL']}/api/{id_}/metadata",
+            headers={'Accept': 'application/n-triples'})
+        collections[id_] = sort_data_deprecated(n_triples_to_json(req))
+    return collections
+
+
+###############################################################################
+# Script from                                                                 #
+# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html  #
+###############################################################################
 def n_triples_to_json(req: Response) -> dict[str, Any]:
     context = get_arche_context()
     data = rdflib.Graph()
@@ -126,3 +105,48 @@ def get_arche_context() -> dict[str, Any]:
         'https://vocabs.acdh.oeaw.ac.at/schema#isMetadataFor'
     # flip the context so it's uri->shortName
     return {v: k for k, v in context.items() if isinstance(v, str)}
+
+
+########################################
+# Can be deleted if not needed anymore #
+########################################
+def sort_data_deprecated(data: dict[str, Any]) -> dict[str, Any]:
+    files = {
+        'metadata': {},
+        'not_unique_values': {},
+        'jpeg': {},
+        'tiff': {}}
+    for uri, node in data.items():
+        uri_split = uri.rsplit('/', 1)[1]
+        for prop, value in node.items():
+            if 'metadata' in str(value[0]):
+                files['metadata'][uri_split] = json_dict_deprecated(uri, node)
+            if 'not_unique_values' in str(value[0]):
+                files['not_unique_values'][uri_split] \
+                    = json_dict_deprecated(uri, node)
+            if str(value[0]) in ['image/jpeg', 'image/tiff']:
+                value = str(value[0].rsplit('/', 1)[1])
+                files[value][uri_split] = image_dict_deprecated(uri, node)
+    return files
+
+
+def json_dict_deprecated(uri: str, node: dict[str, Any]) -> dict[str, Any]:
+    return {
+        'metadataARCHE': node,
+        'metadataFile': requests.get(uri).json(),
+        'isMetadataFor': get_linked_image_id_deprecated(node['isMetadataFor'])}
+
+
+def image_dict_deprecated(uri: str, node: dict[str, Any]) -> dict[str, Any]:
+    return {
+        'metadataARCHE': node,
+        'originalFileLink': uri,
+        'thumbnailLink':
+            f"{app.config['ARCHE_THUMBNAIL']}"
+            f"{uri.replace('https://', '')}?width=400"}
+
+
+def get_linked_image_id_deprecated(data: list[dict[str, Any]]) -> str:
+    for image in data:
+        if str(image['mime'][0]) == 'image/jpeg':
+            return image['__uri__'].rsplit('/', 1)[1]

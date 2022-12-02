@@ -1,7 +1,8 @@
 from flask import render_template, url_for
 
 from openatlas import app
-from openatlas.api.arche.function import fetch_arche_data, get_data_for_import
+from openatlas.api.arche.function import fetch_arche_data_deprecated, \
+     fetch_arche_data
 from openatlas.util.tab import Tab
 from openatlas.util.util import required_group, display_info, button, \
     is_authorized
@@ -26,10 +27,9 @@ def arche_index() -> str:
 @app.route('/arche/fetch')
 @required_group('manager')
 def arche_fetch() -> str:
-    arche_data = fetch_arche_data()
     content = {
-        _('data'): str(arche_data),
-        'OpenAtlas import data': str(get_data_for_import(arche_data))}
+        _('data'): str(fetch_arche_data_deprecated()),
+        'OpenAtlas import data': str(fetch_arche_data())}
     return render_template(
         'tabs.html',
         tabs={'info': Tab('info', content=display_info(content))},
