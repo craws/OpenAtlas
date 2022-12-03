@@ -11,8 +11,8 @@ The OpenAtlas :doc:`/model/index` is based on the international standard of
   Linked Open Data (LOD)
 * Mapping :doc:`spatial </tools/map>` and
   :doc:`temporal </ui/date>` uncertainty
-* Detailed mapping of
-  :doc:`archaeological finds </examples/archaeological_data>`
+* :doc:`Archaeological finds </examples/archaeological_data>`
+  with detailed mapping
 * :doc:`Data integrity check</admin/data_integrity_checks>` functions
 * :doc:`Model link checker<model/link_checker>` to confirm CIDOC CRM validity
 
@@ -24,8 +24,8 @@ User interface
   navigation
 * :doc:`/tools/network`
 * :doc:`/tools/notes` and bookmarks
-* :doc:`User manual </index>` (English) with context specific links throughout
-  the application
+* :doc:`User manual </index>` (English) with :doc:`/examples/index` and context
+  specific links in the application
 * User interface internationalization (currently English and German)
   using `gettext <https://www.gnu.org/software/gettext/>`_
 
@@ -38,7 +38,8 @@ Data exchange
 User management
 ---------------
 * :doc:`/admin/user` and groups can be used to grant different access levels
-* Newsletter with an editable receiver list and automated unsubscribe links
+* :doc:`/tools/profile` settings to adapt for personal workflows
+* Newsletter function with automated unsubscribe links
 * Password reset
 
 Anthropological Analyses
