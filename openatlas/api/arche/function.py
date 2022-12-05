@@ -5,6 +5,9 @@ import requests
 from requests import Response
 
 from openatlas import app
+from openatlas.models.entity import Entity
+from openatlas.models.imports import is_float
+from openatlas.database.gis import Gis as Db
 
 
 def fetch_arche_data() -> dict[int, Any]:
@@ -29,12 +32,12 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
                     'image_link': image_url,
                     'image_link_thumbnail':
                         f"{app.config['ARCHE_THUMBNAIL']}"
-                        f"{image_url.replace('https://', '')}?width=400",
+                        f"{image_url.replace('https://', '')}?width=1200",
                     'creator': json_['EXIF:Artist'],
                     'latitude': json_['EXIF:GPSLatitude'],
                     'longitude': json_['EXIF:GPSLongitude'],
                     'description': json_['XMP:Description']
-                        if 'XMP:Description' in json_ else '',
+                    if 'XMP:Description' in json_ else '',
                     'name': json_['IPTC:ObjectName'],
                     'date': json_['EXIF:CreateDate']}
     return metadata
@@ -44,6 +47,46 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
     for image in data:
         if str(image['mime'][0]) == 'image/jpeg':
             return image['__uri__']
+
+
+def import_arche_data() -> list[Entity]:
+    entities = []
+    for entries in fetch_arche_data().values():
+        for metadata in entries.values():
+            name = metadata['name']
+
+            artifact = Entity.insert(
+                'artifact',
+                name.rsplit('.', 1)[0],
+                metadata['description'])
+            dates = {'begin_from': metadata['date']}
+            artifact.update({'attributes': dates})
+
+            location = Entity.insert('object_location', f"Location of {name}")
+            artifact.link('P53', location)
+            if is_float(metadata['longitude']) \
+                    and is_float(metadata['latitude']):
+                Db.insert(
+                    shape='Point',
+                    data={
+                        'entity_id': location.id,
+                        'name': name,
+                        'description': '',
+                        'type': 'centerpoint',
+                        'geojson':
+                            f'{{"type":"Point", "coordinates": '
+                            f'[{metadata["longitude"]},'
+                            f'{metadata["latitude"]}]}}'})
+
+            file = Entity.insert('file', name, metadata['description'])
+            file_response = requests.get(metadata['image_link_thumbnail'])
+            filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
+            open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
+                .write(file_response.content)
+            file.link('P67', range_=artifact)
+            entities.append(artifact)
+            entities.append(file)
+    return entities
 
 
 ###############################################################################
