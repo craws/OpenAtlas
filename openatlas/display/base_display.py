@@ -10,6 +10,7 @@ from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
@@ -23,6 +24,7 @@ class BaseDisplay:
 
     entity: Union[Entity, Type]
     tabs: dict[str, Tab]
+    events: Optional[list[Entity]]
     event_links: Optional[list[Link]] = None  # Needed for actor and info data
     linked_places: list[Entity]  # Related places for map
     gis_data: dict[str, Any] = None
@@ -31,6 +33,7 @@ class BaseDisplay:
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
         self.entity = entity
+        self.events = []
         self.event_links = []
         self.linked_places = []
         self.add_tabs()
@@ -442,6 +445,7 @@ class EventsDisplay(BaseDisplay):
                 remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
 
+
 class PlaceBaseDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
@@ -460,42 +464,58 @@ class PlaceBaseDisplay(BaseDisplay):
                 and current_user.settings['module_map_overlay']:
             self.tabs['file'].table.header.append(uc_first(_('overlay')))
 
+        for link_ in entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    self.get_profile_image_table_link(domain, extension))
+                if not entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    entity.image_id = domain.id
+                if entity.class_.view == 'place' \
+                        and is_authorized('editor') \
+                        and current_user.settings['module_map_overlay']:
+                    overlays = Overlay.get_by_object(entity)
+                    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                        if domain.id in overlays:
+                            data.append(edit_link(
+                                url_for(
+                                    'overlay_update',
+                                    id_=overlays[domain.id].id)))
+                        else:
+                            data.append(link(_('link'), url_for(
+                                'overlay_insert',
+                                image_id=domain.id,
+                                place_id=entity.id,
+                                link_id=link_.id)))
+                    else:  # pragma: no cover
+                        data.append('')
+            if domain.class_.view not in ['source', 'file']:
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+                if domain.class_.view == 'reference_system':
+                    entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(domain.name, link_, entity, domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)
+
         entity.location = entity.get_linked_entity_safe('P53', types=True)
-        events = []  # Collect events to display actors
         event_ids = []  # Keep track of event ids to prevent event doubles
         for event in entity.location.get_linked_entities(
                 ['P7', 'P24', 'P26', 'P27'],
                 inverse=True):
-            events.append(event)
+            self.events.append(event)
             self.tabs['event'].table.rows.append(get_base_table_data(event))
             event_ids.append(event.id)
         for event in entity.get_linked_entities('P24', inverse=True):
-            if event.id not in event_ids:  # Don't add again if already in table
-                self.tabs['event'].table.rows.append(get_base_table_data(event))
-                events.append(event)
-        if entity.class_.name == 'place':
-            for link_ in entity.location.get_links(
-                    ['P74', 'OA8', 'OA9'],
-                    inverse=True):
-                actor = Entity.get_by_id(link_.domain.id)
-                self.tabs['actor'].table.rows.append([
-                    link(actor),
-                    g.properties[link_.property.code].name,
-                    actor.class_.name,
-                    actor.first,
-                    actor.last,
-                    actor.description])
-            actor_ids = []
-            for event in events:
-                for actor in event.get_linked_entities(
-                        ['P11', 'P14', 'P22', 'P23']):
-                    if actor.id in actor_ids:
-                        continue  # pragma: no cover
-                    actor_ids.append(actor.id)
-                    self.tabs['actor'].table.rows.append([
-                        link(actor),
-                        f"{_('participated at an event')}",
-                        event.class_.name, '', '', ''])
+            if event.id not in event_ids:  # Don't add again
+                self.tabs['event'].table.rows.append(
+                    get_base_table_data(event))
+                self.events.append(event)
 
     def add_info_content(self):
         super().add_info_content()

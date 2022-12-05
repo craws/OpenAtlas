@@ -1,8 +1,12 @@
+from flask import g
+from flask_babel import lazy_gettext as _
+
 from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
+from openatlas.models.entity import Entity
 from openatlas.util.util import get_base_table_data, link
 
 
@@ -31,7 +35,31 @@ class PersonDisplay(ActorDisplay):
 
 
 class PlaceDisplay(PlaceBaseDisplay):
-    pass
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for link_ in self.entity.location.get_links(
+                ['P74', 'OA8', 'OA9'],
+                inverse=True):
+            actor = Entity.get_by_id(link_.domain.id)
+            self.tabs['actor'].table.rows.append([
+                link(actor),
+                g.properties[link_.property.code].name,
+                actor.class_.name,
+                actor.first,
+                actor.last,
+                actor.description])
+        actor_ids = []
+        for event in self.events:
+            for actor in event.get_linked_entities(
+                    ['P11', 'P14', 'P22', 'P23']):
+                if actor.id in actor_ids:
+                    continue  # pragma: no cover
+                actor_ids.append(actor.id)
+                self.tabs['actor'].table.rows.append([
+                    link(actor),
+                    f"{_('participated at an event')}",
+                    event.class_.name, '', '', ''])
 
 
 class ProductionDisplay(EventsDisplay):
