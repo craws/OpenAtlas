@@ -36,7 +36,7 @@ def get_metadata(data: dict[str, Any]) -> dict[str, Any]:
                     'description': json_['XMP:Description']
                         if 'XMP:Description' in json_ else '',
                     'name': json_['IPTC:ObjectName'],
-                    'date': json_['XMP:DateCreated']}
+                    'date': json_['EXIF:CreateDate']}
     return metadata
 
 
