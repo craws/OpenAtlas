@@ -6,7 +6,7 @@ from requests import Response
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.imports import is_float
+from openatlas.models.imports import is_float, Import
 from openatlas.database.gis import Gis as Db
 
 
