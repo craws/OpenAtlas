@@ -6,13 +6,13 @@ from flask_babel import lazy_gettext as _
 from wtforms import (
     BooleanField, HiddenField, SelectField,
     SelectMultipleField, StringField, SubmitField, TextAreaField, widgets)
-from wtforms.validators import (
-    InputRequired, Optional as OptionalValidator, URL)
+from wtforms.validators import InputRequired, Optional, URL
 
 from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager)
-from openatlas.forms.field import TableField, TableMultiField, TreeField, DragNDropField
+from openatlas.forms.field import (
+    TableField, TableMultiField, TreeField, DragNDropField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -466,12 +466,10 @@ class ReferenceSystemManager(BaseManager):
         precision_id = str(Type.get_hierarchy('External reference match').id)
         choices = ReferenceSystem.get_class_choices(self.entity)
         return {
-            'website_url': StringField(
-                _('website URL'),
-                [OptionalValidator(), URL()]),
+            'website_url': StringField(_('website URL'), [Optional(), URL()]),
             'resolver_url': StringField(
                 _('resolver URL'),
-                [OptionalValidator(), URL()]),
+                [Optional(), URL()]),
             'placeholder': StringField(_('example ID')),
             precision_id: TreeField(precision_id),
             'classes': SelectMultipleField(
