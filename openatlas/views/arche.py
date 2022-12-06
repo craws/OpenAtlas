@@ -5,7 +5,6 @@ from openatlas import app
 from openatlas.api.arche.function import fetch_arche_data, import_arche_data
 from openatlas.database.connect import Transaction
 from openatlas.models.imports import Import
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, display_info, button, \
@@ -33,6 +32,7 @@ def arche_index() -> str:
 def arche_fetch() -> str:
     tabs = {}
     content = {_('warning'): []}
+    arche_data = fetch_arche_data()
     ################################################
     # Development data, can be deleted in production
     ################################################
@@ -51,14 +51,18 @@ def arche_fetch() -> str:
             arche_ref = system
     if not arche_ref:
         content[_('warning')]. \
-            append(str(_('external reference to ARCHE not existing')))
-    if arche_ref and not 'artifact' in arche_ref.classes:
-        content[_('warning')]. \
-            append(str(_('artifact not added to external reference')))
-    if arche_ref and 'artifact' in arche_ref.classes:
-        content[_('import data')] = button(
-            _('import arche data'), url_for('arche_import_data'))
-
+            append(str(_('RefSys: external reference to ARCHE not existing')))
+    if arche_ref:
+        if 'artifact' not in arche_ref.classes:
+            content[_('warning')]. \
+                append(
+                str(_('RefSys: artifact not added to external reference')))
+        if not arche_ref.precision_default_id:
+            content[_('warning')]. \
+                append(str(_('RefSys: set default match')))
+        if 'artifact' in arche_ref.classes and arche_ref.precision_default_id:
+            content[_('import data')] = button(
+                _('import arche data'), url_for('arche_import_data'))
     #####################################
     # Create table of entities from ARCHE
     #####################################
@@ -67,7 +71,7 @@ def arche_fetch() -> str:
         header=['ID', _('name'), _('image link'), _('image thumbnail link'),
                 _('creator'), _('latitude'), _('longitude'), _('description'),
                 _('date')])
-    for entries in fetch_arche_data().values():
+    for entries in arche_data.values():
         for metadata in entries.values():
             import_.rows.append([
                 metadata['image_id'],
