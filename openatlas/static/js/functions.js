@@ -259,10 +259,10 @@ function selectFromTree(name, id, text) {
 }
 
 function selectFromTreeMulti(name, value_type = false) {
-  var checkedNames = '';
-  var ids = $('#' + name + '-tree').jstree('get_selected');
+  let checkedNames = [];
+  const ids = $('#' + name + '-tree').jstree('get_selected');
   ids.forEach(function (item, index, array) {
-    var type_ = $('#' + name + '-tree').jstree().get_node(item);
+    const type_ = $('#' + name + '-tree').jstree().get_node(item);
     if (value_type) {
       $('#' + name + '-button').after('<span> ' + type_['text'] + '</span>');
       $('#' + name + '-button').after(
@@ -275,10 +275,10 @@ function selectFromTreeMulti(name, value_type = false) {
         }));
       $('#' + name + '-button').after($('<br>'));
     } else {
-      checkedNames += type_['text'] + "<br>";
+      checkedNames.push(type_['text']);
     }
   });
-  $("#" + name + "-selection").html(checkedNames);
+  $("#" + name + "-selection").html(checkedNames.map(x => `<span class="badge bg-gray text-black me-1"> ${x}</span>`));
   if (ids.length > 0) {
     $("#" + name).val('[' + ids + ']');
   } else {
@@ -296,16 +296,16 @@ function selectFromTable(element, table, id,label= undefined) {
 }
 
 function selectFromTableMulti(name) {
-  var checkedNames = '';
-  var ids = [];
+  let checkedNames = [];
+  let ids = [];
   $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
     function () {
       if ($(this).is(':checked')) {
-        checkedNames += $(this).val() + '<br>';
+        checkedNames += $(this).val();
         ids.push($(this).attr('id'));
       }
     });
-  $('#' + name + '-selection').html(checkedNames);
+  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black me-1"> ${x}</span>`));
   $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 
@@ -412,4 +412,26 @@ function addDragNDropListeners(dropContainer) {
     e.preventDefault();
     e.stopPropagation();
   });
+}
+
+// removable list field
+
+function addListElement(id){
+      const list = document.getElementById(id);
+      const lastIndex = list.lastChild?.getElementsByTagName('input')?.item(0)?.id;
+      const lastId = parseInt(lastIndex.split('-').pop(),10)
+
+      const newField = document.createElement('li')
+      newField.innerHTML = `
+                            <div class="d-flex">
+                                <input id="${id}-${lastId + 1}"  name="${id}-${lastId + 1}" class="form-control form-control-sm" type="text"/>
+                                <button onclick="removeListField('${id}-${lastId + 1}')" type="button" class="btn btn-sm btn-secondary ms-1"><icon class="fa fa-minus"></icon></button>
+                            </div>`
+      list.appendChild(newField)
+}
+
+function removeListField(id){
+  console.log(id)
+        const el = document.getElementById(id);
+        el.parentElement?.closest('li')?.remove();
 }

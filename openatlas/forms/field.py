@@ -9,7 +9,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, TextInput, FileInput
+from wtforms.widgets import HiddenInput, TextInput, FileInput, Input
 
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
@@ -18,20 +18,22 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, is_authorized
 
 
-class RemovableListInput(TextInput):
+class RemovableListInput(HiddenInput):
     def __call__(
             self,
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
+
         [name, index] = field.id.split('-')
         return super().__call__(field, **kwargs) + render_template(
             'forms/removable_list_field.html',
+            value=field.data,
             name=name,
             id=index)
 
 
-class RemovableListField(Field):
+class RemovableListField(HiddenField):
     widget = RemovableListInput()
 
     def _value(self) -> str:
@@ -227,3 +229,24 @@ class DragNDropField(FileField):
 
     def process_formdata(self, valuelist: list[str]) -> None:
         self.data = valuelist
+
+
+class ValueType(Input):
+    def __call__(
+            self,
+            field: RemovableListField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
+        return super().__call__(field, **kwargs) + \
+            render_template('forms/value_tye_field.html')
+
+
+class ValueTypeField(Field):
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+
+    widget = ValueType()
