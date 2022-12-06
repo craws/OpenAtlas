@@ -33,10 +33,15 @@ def arche_index() -> str:
 def arche_fetch() -> str:
     tabs = {}
     content = {_('warning'): []}
+    ################################################
     # Development data, can be deleted in production
+    ################################################
     # content[_('complete data')] = str(fetch_arche_data_deprecated())
     # content[_('sanitized data')] = str(arche_import_data)
 
+    ################################
+    # Check ARCHE external reference
+    ################################
     # Can't use the function because of the abort.
     # arche_ref = ReferenceSystem.get_by_name('ARCHE')
 
@@ -54,6 +59,9 @@ def arche_fetch() -> str:
         content[_('import data')] = button(
             _('import arche data'), url_for('arche_import_data'))
 
+    #####################################
+    # Create table of entities from ARCHE
+    #####################################
     names = []
     import_ = Table(
         header=['ID', _('name'), _('image link'), _('image thumbnail link'),
@@ -72,7 +80,11 @@ def arche_fetch() -> str:
                 metadata['description'],
                 metadata['date']])
             names.append(metadata['name'].lower())
+    tabs['fetched entities'] = Tab('fetched_entities', table=import_)
 
+    #########################################
+    # Check for duplicates and give a warning (should be done by ext ref ids)
+    #########################################
     if duplicates := Import.check_duplicates('file', names):
         dup_table = Table(header=['name'])
         for i in duplicates:
@@ -80,8 +92,9 @@ def arche_fetch() -> str:
         tabs['duplicates'] = Tab('duplicates', table=dup_table)
         content[_('warning')].append(str(_('there are duplicates')))
 
-    tabs['fetched entities'] = Tab('fetched_entities', table=import_)
-
+    ###########################################################
+    # Add import tab at last, so every warning can be displayed
+    ###########################################################
     tabs['import'] = Tab('import', content=display_info(content))
     return render_template(
         'tabs.html',
