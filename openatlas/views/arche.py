@@ -5,6 +5,7 @@ from openatlas import app
 from openatlas.api.arche.function import fetch_arche_data, import_arche_data
 from openatlas.database.connect import Transaction
 from openatlas.models.imports import Import
+from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, display_info, button, \
@@ -31,12 +32,27 @@ def arche_index() -> str:
 @required_group('manager')
 def arche_fetch() -> str:
     tabs = {}
-    content = {
-        _('import data'): button(
-            _('import arche data'), url_for('arche_import_data'))}
+    content = {_('warning'): []}
     # Development data, can be deleted in production
     # content[_('complete data')] = str(fetch_arche_data_deprecated())
     # content[_('sanitized data')] = str(arche_import_data)
+
+    # Can't use the function because of the abort.
+    # arche_ref = ReferenceSystem.get_by_name('ARCHE')
+
+    arche_ref = None
+    for system in g.reference_systems.values():
+        if system.name == 'ARCHE':
+            arche_ref = system
+    if not arche_ref:
+        content[_('warning')]. \
+            append(str(_('external reference to ARCHE not existing')))
+    if arche_ref and not 'artifact' in arche_ref.classes:
+        content[_('warning')]. \
+            append(str(_('artifact not added to external reference')))
+    if arche_ref and 'artifact' in arche_ref.classes:
+        content[_('import data')] = button(
+            _('import arche data'), url_for('arche_import_data'))
 
     names = []
     import_ = Table(
@@ -62,9 +78,9 @@ def arche_fetch() -> str:
         for i in duplicates:
             dup_table.rows.append([i])
         tabs['duplicates'] = Tab('duplicates', table=dup_table)
-        content[_('warning')] = str(_('there are duplicates'))
+        content[_('warning')].append(str(_('there are duplicates')))
 
-    tabs['fetched entities'] = Tab('fetched_entities',  table=import_)
+    tabs['fetched entities'] = Tab('fetched_entities', table=import_)
 
     tabs['import'] = Tab('import', content=display_info(content))
     return render_template(
