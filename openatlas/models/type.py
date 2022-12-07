@@ -241,7 +241,8 @@ class Type(Entity):
             linked = False
             entity_to_check = entity
             if hierarchy.name in ('Administrative unit', 'Historical place'):
-                entity_to_check = entity.get_linked_entity('P53', types=True)
+                entity_to_check = \
+                    entity.get_linked_entity_safe('P53', types=True)
             for type_ in entity_to_check.types:
                 if type_.root[0] == hierarchy_id:
                     linked = True

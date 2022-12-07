@@ -1,27 +1,23 @@
 from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, g
 from flask_restful import Resource
 
 from openatlas.api.resources.error import (
     InvalidLimitError, InvalidSubunitError, QueryEmptyError)
+from openatlas.api.resources.model_mapper import (
+    get_by_cidoc_classes, get_entities_by_ids, get_entities_by_system_classes,
+    get_entities_by_view_classes, get_entity_by_id, get_latest_entities)
 from openatlas.api.resources.parser import entity_, query
 from openatlas.api.resources.resolve_endpoints import (
     resolve_entities, resolve_entity)
 from openatlas.api.resources.util import (
-    get_entities_linked_to_special_type,
-    get_entities_linked_to_special_type_recursive,
-    get_linked_entities_api, get_entities_from_type_with_subs)
-from openatlas.api.resources.model_mapper import (
-    get_entity_by_id, get_entities_by_ids, get_latest_entities,
-    get_by_cidoc_classes, get_entities_by_view_classes,
-    get_entities_by_system_classes)
+    get_entities_from_type_with_subs, get_entities_linked_to_special_type,
+    get_entities_linked_to_special_type_recursive, get_linked_entities_api)
 
 
 class GetByCidocClass(Resource):
     @staticmethod
-    @swag_from("../swagger/cidoc_class.yml", endpoint="api_03.cidoc_class")
     def get(cidoc_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
@@ -32,7 +28,6 @@ class GetByCidocClass(Resource):
 
 class GetBySystemClass(Resource):
     @staticmethod
-    @swag_from("../swagger/system_class.yml", endpoint="api_03.system_class")
     def get(system_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
@@ -43,7 +38,6 @@ class GetBySystemClass(Resource):
 
 class GetByViewClass(Resource):
     @staticmethod
-    @swag_from("../swagger/view_class.yml", endpoint="api_03.view_class")
     def get(view_class: str) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
@@ -54,9 +48,6 @@ class GetByViewClass(Resource):
 
 class GetEntitiesLinkedToEntity(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/entities_linked_to_entity.yml",
-        endpoint="api_03.entities_linked_to_entity")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entities(
             get_linked_entities_api(id_),
@@ -66,7 +57,6 @@ class GetEntitiesLinkedToEntity(Resource):
 
 class GetLatest(Resource):
     @staticmethod
-    @swag_from("../swagger/latest.yml", endpoint="api_03.latest")
     def get(limit: int) \
             -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if not 0 < limit < 101:
@@ -79,7 +69,6 @@ class GetLatest(Resource):
 
 class GetTypeEntities(Resource):
     @staticmethod
-    @swag_from("../swagger/type_entities.yml", endpoint="api_03.type_entities")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if id_ not in g.types:
             raise InvalidSubunitError
@@ -93,9 +82,6 @@ class GetTypeEntities(Resource):
 
 class GetTypeEntitiesAll(Resource):
     @staticmethod
-    @swag_from(
-        "../swagger/type_entities_all.yml",
-        endpoint="api_03.type_entities_all")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         if id_ not in g.types:
             raise InvalidSubunitError
@@ -107,7 +93,6 @@ class GetTypeEntitiesAll(Resource):
 
 class GetQuery(Resource):
     @staticmethod
-    @swag_from("../swagger/query.yml", endpoint="api_03.query")
     def get() -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         parser = query.parse_args()
         if not any([parser['entities'],
@@ -131,6 +116,5 @@ class GetQuery(Resource):
 
 class GetEntity(Resource):
     @staticmethod
-    @swag_from("../swagger/entity.yml", endpoint="api_03.entity")
     def get(id_: int) -> Union[tuple[Resource, int], Response, dict[str, Any]]:
         return resolve_entity(get_entity_by_id(id_), entity_.parse_args())

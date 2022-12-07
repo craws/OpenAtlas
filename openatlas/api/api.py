@@ -12,11 +12,6 @@ app.config['SWAGGER'] = {
     'uiversion': 3,
     "swagger_version": "2.0",
     "specs": [{
-        "version": "0.3",
-        "title": "OpenAtlas Api",
-        "termsOfService":
-            "https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html",
-        "description": 'This is the stable version of the OpenAtlas API',
         "endpoint": '03',
         "license": {
             "name": "Apache 2.0",

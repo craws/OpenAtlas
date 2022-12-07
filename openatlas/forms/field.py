@@ -7,8 +7,9 @@ from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import Field, FloatField, HiddenField, StringField, TextAreaField
-from wtforms.widgets import HiddenInput, TextInput
+from wtforms import (
+    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
+from wtforms.widgets import HiddenInput, TextInput, FileInput
 
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
@@ -206,3 +207,23 @@ class TreeField(HiddenField):
         self.type_id = type_id or self.id
         self.filters_ids = filter_ids
     widget = TreeSelect()
+
+
+class DragNDrop(FileInput):
+    def __call__(
+            self,
+            field: RemovableListField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
+        return super().__call__(field, **kwargs) + \
+            render_template('forms/drag_n_drop_field.html')
+
+
+class DragNDropField(FileField):
+    """A :class:`FileField` that allows choosing multiple files."""
+
+    data: list[str]
+    widget = DragNDrop(multiple=True)
+
+    def process_formdata(self, valuelist: list[str]) -> None:
+        self.data = valuelist

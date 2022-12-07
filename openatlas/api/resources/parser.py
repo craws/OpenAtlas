@@ -44,7 +44,11 @@ entity_.add_argument(
         'id',
         'name',
         'cidoc_class',
-        'system_class',))
+        'system_class',
+        'begin_from',
+        'begin_to',
+        'end_from',
+        'end_to'))
 entity_.add_argument(
     'search',
     type=str,
@@ -154,8 +158,9 @@ query.add_argument(
         'all', 'acquisition', 'activity', 'administrative_unit', 'appellation',
         'artifact', 'bibliography', 'edition', 'file', 'external_reference',
         'feature', 'group', 'human_remains', 'move', 'object_location',
-        'person', 'place', 'source', 'reference_system', 'stratigraphic_unit',
-        'source_translation', 'type'))
+        'person', 'place', 'production', 'source', 'reference_system',
+        'stratigraphic_unit', 'source_translation', 'type',
+        'type_anthropology'))
 
 image = default.copy()
 image.add_argument(

@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Type &mdash; OpenAtlas 7.8.0 documentation</title>
+  <title>Type &mdash; OpenAtlas 7.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -29,7 +29,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                7.8.0
+                7.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Entity</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="source.html">Source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="event.html">Event</a></li>
@@ -152,6 +153,17 @@ with an example value type <strong>Dimensions</strong> with the sub types <stron
 <li><p><a class="reference internal" href="../ui/date.html"><span class="doc">Date</span></a></p></li>
 <li><p>A super (type) if it is a sub type of another type</p></li>
 </ul>
+</section>
+<section id="making-types-required">
+<h2>Making types required<a class="headerlink" href="#making-types-required" title="Permalink to this headline"></a></h2>
+<p>It is possible making specifying of types required. This can be done at the
+type overview in the right information display of the respective type by users
+who have at least manager permissions.</p>
+<p>Be careful with making types required, especially when there are users who
+aren’t permitted to create new ones. It may put them in an awkward situation at
+data entry and, as a result, may even reduce the data quality.</p>
+<p>Also keep in mind, that existing entries which haven’t set this type, will than
+not be possible to update, without setting the required type.</p>
 </section>
 </section>
 

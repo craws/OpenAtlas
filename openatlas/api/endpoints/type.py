@@ -1,7 +1,6 @@
 from collections import defaultdict
 from typing import Any, Union
 
-from flasgger import swag_from
 from flask import Response, g, url_for
 from flask_restful import Resource, marshal
 
@@ -28,8 +27,6 @@ def walk_type_tree(types: list[int]) -> list[dict[str, Any]]:
 
 class GetTypeByViewClass(Resource):
     @staticmethod
-    @swag_from("../swagger/type_by_view_class.yml",
-               endpoint="api_03.type_by_view_class")
     def get() -> Union[tuple[Resource, int], Response]:
         types = GetTypeByViewClass.get_type_by_view()
         if default.parse_args()['download']:
@@ -53,7 +50,6 @@ class GetTypeByViewClass(Resource):
 
 class GetTypeOverview(Resource):
     @staticmethod
-    @swag_from("../swagger/type_overview.yml", endpoint="api_03.type_overview")
     def get() -> Union[tuple[Resource, int], Response]:
         types = GetTypeOverview.get_type_overview()
         if default.parse_args()['download']:
@@ -82,7 +78,6 @@ class GetTypeOverview(Resource):
 
 class GetTypeTree(Resource):
     @staticmethod
-    @swag_from("../swagger/type_tree.yml", endpoint="api_03.type_tree")
     def get() -> Union[tuple[Resource, int], Response]:
         type_tree = {'typeTree': GetTypeTree.get_type_tree()}
         if entity_.parse_args()['download']:

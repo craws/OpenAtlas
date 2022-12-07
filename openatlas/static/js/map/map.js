@@ -244,7 +244,7 @@ const allSelected = [
     ...gisPointSibling,
     ...gisPointSubs,
 ];
-if (allSelected.filter(pointFilter)?.length > 0)
+if (allSelected?.length > 0)
     map.fitBounds(L.featureGroup(allSelectedLayer).getBounds(), {
         maxZoom: mapDefaultZoom,
     });

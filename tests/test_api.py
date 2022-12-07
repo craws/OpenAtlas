@@ -184,6 +184,13 @@ class Api03(ApiTestCase):
                     column='id',
                     relation_type='P2',
                     type_id=boundary_mark.id)),
+                self.app.get(url_for(
+                    'api_03.view_class',
+                    view_class='place',
+                    sort='desc',
+                    column='begin_from',
+                    relation_type='P2',
+                    type_id=boundary_mark.id)),
                 self.app.get(url_for('api_03.latest', limit=2)),
                 self.app.get(
                     url_for('api_03.system_class', system_class='artifact')),

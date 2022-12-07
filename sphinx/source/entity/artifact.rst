@@ -18,6 +18,8 @@ Form fields
 * :doc:`/ui/description`
 * :doc:`/tools/map`
 * :doc:`reference_system`
+* **Super** - a :doc:`place`, :doc:`feature`, :doc:`stratigraphic_unit` or
+  artifact, which it is a part of
 * **Owned by** - the :doc:`actor` who owns the artifact
 
 

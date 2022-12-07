@@ -1,12 +1,11 @@
 [MASTER]
+disable=C0111, broad-except, cyclic-import, duplicate-code
+good-names=i,j,k,ex,Run,_,e,js,bc,id,rv,ip  # default is i,j,k,ex,Run,_
 ignore=openatlas.wsgi
 min-public-methods=0
-disable=C0111  # missing-docstring
-good-names=i,j,k,ex,Run,_,e,js,bc,id,rv,ip  # default is i,j,k,ex,Run,_
 
 [FORMAT]
 max-line-length=79
 
 [TYPECHECK]
 ignored-classes=Form
-disable=cyclic-import, duplicate-code  # Too noisy for now, turn on again later

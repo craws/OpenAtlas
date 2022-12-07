@@ -19,11 +19,13 @@ base, then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
+### 7.8.0 to 7.9.0
+7.9.0.sql is needed but will be taken care of by the database upgrade script.
+
 ### 7.7.0 to 7.8.0
 7.8.0.sql is needed but will be taken care of by the database upgrade script.
 
-Please note that, like announced, the deprecated API version 0.2 was removed
-in this release.
+Like announced, the deprecated API version 0.2 was removed in this release.
 
 ### 7.6.x to 7.7.0
 7.7.0.sql is needed but will be taken care of by the database upgrade script.

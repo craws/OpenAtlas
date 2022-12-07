@@ -293,7 +293,8 @@ Entity endpoint
        system_classes={system-class}(2)
 
 
-**Multiple entities** - Results in list form include related entities and pagination
+**Multiple entities** - Results in list form include related entities and
+pagination
 
 .. list-table::
    :widths: 25 25 50
@@ -449,72 +450,45 @@ Image endpoints
      - Retrieves the respective image if it has a license
 
 
+:doc:`Version 0.3<api_version0_3>`
+----------------------------------
+
+:doc:`Version 0.2<api_version0_2>`
+----------------------------------
+
+:doc:`Version 0.1<api_version0_1>`
+----------------------------------
+
+Error handling
+--------------
+OpenAtlas uses conventional HTTP response codes to indicate the success or
+failure of an API request. Codes in the 2xx range indicate a successful request
+while those in the 4xx range signal an error - providing the information was
+not possible. Codes in the 5xx range indicate a server error.
+If any issues occur when using the OpenAtlas API, a case-specific error message
+is provided in JSON format, describing the error in more detail.
+
+Example:
+
+..code-block::
+
+  {
+      “title”: “entity does not exist”,
+       “message”: “Requested entity does not exist. Try another ID”
+       “timestamp”: “Tue, 19 Jul 2022 13:59:13 GMT”,
+       “status”: 404
+   }
+
+If an invalid endpoint parameter value e.g. ?sort=kfs instead of ?sort=desc is
+entered, Flask catches this via its own
+`Flask-RESTful <https://flask-restful.readthedocs.io/en/latest/>`_ extension.
+An error message is provided by its own error handler
+`error handler <https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling>`_
 
 
-Version 0.3
------------
+Authentification guide
+----------------------
+No authentication is needed to use the OpenAtlas API.
 
-Entity endpoint
-***************
-
-**Single entities**
-
-.. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - API endpoint
-     - Possible parameters
-     - Description
-   * - /api/0.3/entity/{id}
-     - show, download,export,format
-     - Retrieves all information about a single entity
-
-**Query** - Combine several or all entity endpoints in one query
-
-.. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - API endpoint
-     - Possible parameters
-     - Description
-   * - api/0.3/entities/query/
-     - **ids**, **cidoc-classes**, **menu-item**, **classes**,
-       **linked-to-entity**, **linked-to-type**,
-       **linked-to-type-including-subtypes**, limit, column, sort, search,
-       first, last, show, relation_type, type_id, count, download, format,
-       export, page
-     - Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
-       item. Combine up to four of the aforementioned endpoints in a single
-       query; each request has to be a new parameter; Possible parameters are:
-       ?entities={id}, ?classes={cidoc_class_code}, ?codes={view_name},
-       ?system_classes={system_class}(2)
-
-**Multiple entities** - Results in list form include related entities and
-       pagination
-
-.. list-table::
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - API endpoint
-     - Possible parameters
-     - Description
-   * - /api/0.3/view_class/{view_class}
-     - limit, column, sort, search, first, last, show, relation_type, type_id,
-       count, download, format, export, page
-     - Used to retrieve a JSON list of entities based on their OpenAtlas class
-       view
-   * - /api/0.3/system_class/{system_class}
-     - limit, column, sort, search, first, last, show, relation_type, count,
-       download, format, export, page
-     - Retrieves a list of entities, based on their OpenAtlas system class name
-       as JSON (1)(2)
-   * - /api/0.3/latest/{n} (n represents a number between 1 and 100)
-     - show, relation_type, download, format, export
-     - Used to retrieve the last entry/entries made; the number {latest}/{n}
-       represents the amount of entities retrieved and can be between 1 and
-       100. The pagination information is always **null**
 
 

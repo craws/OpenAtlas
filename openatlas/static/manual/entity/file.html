@@ -5,7 +5,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>File &mdash; OpenAtlas 7.8.0 documentation</title>
+  <title>File &mdash; OpenAtlas 7.9.0 documentation</title>
       <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="../_static/style.css" type="text/css" />
@@ -29,7 +29,7 @@
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
           </a>
               <div class="version">
-                7.8.0
+                7.9.0
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -41,6 +41,7 @@
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Entity</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="source.html">Source</a></li>
 <li class="toctree-l2"><a class="reference internal" href="event.html">Event</a></li>
@@ -94,25 +95,29 @@
 <div class="toctree-wrapper compound">
 </div>
 <p>CIDOC documentation: <a class="reference external" href="https://www.cidoc-crm.org/Entity/e31-document/version-7.1.1">E31 Document</a></p>
-<p>A file overview can be seen navigating to <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> item <strong>Admin</strong> at the right top of the site.
-The first tab will be <strong>Files</strong> with a <strong>List</strong> button to show all files.</p>
+<p>A file overview can be seen navigating to <a class="reference internal" href="../ui/menu.html"><span class="doc">Menu</span></a> item <strong>Admin</strong> at the
+right top of the site. The first tab will be <strong>Files</strong> with a <strong>List</strong> button
+to show all files.</p>
 <p>On the index page already entered entities are listed in a <a class="reference internal" href="../ui/table.html"><span class="doc">Table</span></a>.</p>
 <ul class="simple">
 <li><p>Click on the <strong>+</strong> button to enter a new one.</p></li>
 <li><p>Click on the <strong>name</strong> of an entry in the list to access the <strong>detail view</strong>.</p></li>
 <li><p>To edit or delete an entry click on the <strong>Edit</strong> button in the <strong>detail view.</strong></p></li>
 </ul>
-<p>If entities are linked to displayable files the first one is shown in the info tab but can be
-changed to another one in the files tab of the entity.</p>
-<p>Files can be uploaded by editors if they don’t exceed the upload size limit and have an allowed
-extension. Both criteria are displayed at the upload form. It is possible to upload multiple files
-in one go.</p>
+<p>If entities are linked to displayable files the first one is shown in the info
+tab but can be changed to another one in the files tab of the entity.</p>
+<p>Files can be uploaded by editors if they don’t exceed the upload size limit and
+have an allowed extension. Both criteria are displayed at the upload form. It
+is possible to upload multiple files in one go. They can either be selected in
+the file field or drag and dropped into the specified area.</p>
 <section id="form-fields">
 <h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this headline"></a></h2>
 <ul class="simple">
 <li><p><strong>File</strong> - here you can chose a file from your computer</p></li>
-<li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a> - if empty it will be prefilled after the file selection with the filename</p></li>
-<li><p><strong>License</strong> - which works like a <a class="reference internal" href="type.html"><span class="doc">Type</span></a>, it is a good practice to define one</p></li>
+<li><p><a class="reference internal" href="../ui/name.html"><span class="doc">Name</span></a> - if empty it will be prefilled after the file selection with
+the filename</p></li>
+<li><p><strong>License</strong> - which works like a <a class="reference internal" href="type.html"><span class="doc">Type</span></a>, it is a good practice to define
+one</p></li>
 <li><p><a class="reference internal" href="../ui/description.html"><span class="doc">Description</span></a></p></li>
 </ul>
 </section>
@@ -129,24 +134,28 @@ in one go.</p>
 <section id="settings">
 <h2>Settings<a class="headerlink" href="#settings" title="Permalink to this headline"></a></h2>
 <ul class="simple">
-<li><p><strong>Maximum file size in MB</strong> - this limits also the total size of multiple file upload</p></li>
-<li><p><strong>Profile image width in pixel</strong> - this only influences the layout of info tabs</p></li>
-<li><p><strong>Allowed file extensions</strong> - enter file extensions witout a dot and separated with a space e.g.</p></li>
+<li><p><strong>Maximum file size in MB</strong> - this limits also the total size of multiple
+file upload</p></li>
+<li><p><strong>Profile image width in pixel</strong> - this only influences the layout of info
+tabs</p></li>
+<li><p><strong>Allowed file extensions</strong> - enter file extensions without a dot and
+separated with a space e.g.</p></li>
 </ul>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">gif</span> <span class="n">jpg</span> <span class="n">jpeg</span>
 </pre></div>
 </div>
-<p>Images that can be displayed in the browser are defined through their extensions and can be changed
-in the configuration file (e.g. instance/production.py) default is:</p>
+<p>Images that can be displayed in the browser are defined through their
+extensions and can be changed in the configuration file
+(e.g. instance/production.py) default is:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">DISPLAY_FILE_EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;.bmp&#39;</span><span class="p">,</span> <span class="s1">&#39;.gif&#39;</span><span class="p">,</span> <span class="s1">&#39;.ico&#39;</span><span class="p">,</span> <span class="s1">&#39;.jpeg&#39;</span><span class="p">,</span> <span class="s1">&#39;.jpg&#39;</span><span class="p">,</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="s1">&#39;.svg&#39;</span><span class="p">]</span>
 </pre></div>
 </div>
 </section>
 <section id="logo">
 <h2>Logo<a class="headerlink" href="#logo" title="Permalink to this headline"></a></h2>
-<p>You can chose a custom logo. The file has to be uploaded before and has to have a display file
-extension. The displayed logo has a max-height of 120 px. If you selected a larger one the browser
-will try to scale it.</p>
+<p>You can chose a custom logo. The file has to be uploaded before and has to have
+a display file extension. The displayed logo has a max-height of 120 px. If you
+selected a larger one the browser will try to scale it.</p>
 </section>
 <section id="image-preview">
 <h2>Image preview<a class="headerlink" href="#image-preview" title="Permalink to this headline"></a></h2>
