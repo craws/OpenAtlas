@@ -1,11 +1,29 @@
 versions = {
-    '7.8.0': ['TBA',  {
+    '7.9.0': ['TBA', {
+        'feature': {
+            '1882': 'Log dynamically created entities',
+            '1885': 'Inverse translations for OA properties',
+            '1869': 'Manual: add feature list',
+            '1820': 'API: use existing GeoJSON definitions for swagger',
+            '1893': 'Code coverage for Windows'},
+        'fix': {
+            '1874': 'API: Outdated Swagger File',
+            '1888': 'CSV data export missing data',
+            '1899': 'Map overlay not shown on feature level'}
+    }],
+    '7.8.0': ['2022-11-18',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
-            '1647': 'Composition of Artifacts',
-            '1835': 'Improved form selection behavior',
+            '1647': 'Composition of artifacts and human remains',
             '1863': 'Add a place at artifacts and human remains dynamically',
-            '1843': 'API: remove version 0.2'}}],
+            '1835': 'Improved form selection behavior',
+            '1508': 'Drag and drop field for file upload',
+            '1844': 'Show entities in relation type delete overview',
+            '1843': 'API: remove version 0.2',
+            '1873': 'API: Order entities by date',
+            '1841': 'Refactor'},
+        'fix': {
+            '1867': 'Sort issue at first column of form field tables'}}],
     '7.7.0': ['2022-10-18', {
         'feature': {
             '1587': 'Link artifacts and human remains to places directly',

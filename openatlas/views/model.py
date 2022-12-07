@@ -45,12 +45,10 @@ def model_index() -> str:
             'domain': domain,
             'property': property_,
             'range': range_,
-            'domain_valid': property_.find_object(
-                'domain_class_code',
-                domain.code),
-            'range_valid': property_.find_object(
-                'range_class_code',
-                range_.code)}
+            'domain_valid':
+                property_.find_object('domain_class_code', domain.code),
+            'range_valid':
+                property_.find_object('range_class_code', range_.code)}
     return render_template(
         'model/index.html',
         form=form,

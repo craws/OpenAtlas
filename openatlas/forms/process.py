@@ -39,6 +39,7 @@ def process_standard_fields(manager: Any) -> None:
                     'CSRFTokenField',
                     'HiddenField',
                     'MultipleFileField',
+                    'DragNDropField',
                     'SelectField',
                     'SelectMultipleField',
                     'SubmitField',

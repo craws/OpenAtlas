@@ -35,6 +35,7 @@ def ajax_add_type() -> str:
             request.form['description'])
         entity.link(link[cidoc_code], g.types[int(request.form['superType'])])
         Transaction.commit()
+        g.logger.log_user(entity.id, 'insert')
         return str(entity.id)
     except Exception as _e:  # pragma: no cover
         Transaction.rollback()
@@ -63,9 +64,8 @@ def ajax_create_entity() -> str:
                     'object_location',
                     f'Location of {request.form["name"]}'))
         if 'standardType' in request.form and request.form['standardType']:
-            entity.link(
-                'P2',
-                g.types[int(request.form['standardType'])])
+            entity.link('P2', g.types[int(request.form['standardType'])])
+        g.logger.log_user(entity.id, 'insert')
         return str(entity.id)
     except Exception as _e:  # pragma: no cover
         g.logger.log('error', 'ajax', _e)

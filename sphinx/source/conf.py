@@ -3,8 +3,8 @@
 from typing import List
 
 # pylint: disable=invalid-name
-version = '7.8.0'
-release = '7.8.0'
+version = '7.9.0'
+release = '7.9.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'

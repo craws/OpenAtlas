@@ -39,7 +39,7 @@ def html_form(
             if not type_.subs:
                 continue  # pragma: no cover
             label = type_.name
-            if type_.category == 'standard':
+            if type_.category == 'standard' and type_.name != 'License':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))

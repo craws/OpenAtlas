@@ -6,7 +6,7 @@ BEGIN;
 -- Raise database version
 UPDATE web.settings SET value = '7.8.0' WHERE name = 'database_version';
 
--- Option to make types required (#1400)
+-- Add a boolean field to hierarchy to mark types as required (#1400)
 ALTER TABLE web.hierarchy ADD COLUMN "required" boolean DEFAULT false NOT NULL;
 
 END;

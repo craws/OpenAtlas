@@ -1,7 +1,9 @@
 import ast
 from typing import Any, Optional, Union
 
+import numpy
 from flask import g, json
+from numpy import datetime64
 
 from openatlas.api.resources.error import (
     InvalidSearchSyntax)
@@ -100,12 +102,17 @@ def get_entities_by_type(
     return new_entities
 
 
-def get_key(entity: Entity, parser: str) -> str:
-    if parser == 'cidoc_class':
+def get_key(entity: Entity, parser: dict[str, Any]) -> Union[datetime64, str]:
+    if parser['column'] == 'cidoc_class':
         return entity.cidoc_class.name
-    if parser == 'system_class':
+    if parser['column'] == 'system_class':
         return entity.class_.name
-    return getattr(entity, parser)
+    if parser['column'] in ['begin_from', 'begin_to', 'end_from', 'end_to']:
+        if not getattr(entity, parser['column']):
+            date = ("-" if parser["sort"] == 'desc' else "") \
+                   + '9999999-01-01T00:00:00'
+            return numpy.datetime64(date)
+    return getattr(entity, parser['column'])
 
 
 def remove_duplicate_entities(entities: list[Entity]) -> list[Entity]:
