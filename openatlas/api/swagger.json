@@ -1502,7 +1502,7 @@
             "type" : "string",
             "enum" : [ "Polygon" ]
           },
-          "coordinates'" : {
+          "coordinates" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/LinearRing"

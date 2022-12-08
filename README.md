@@ -42,9 +42,6 @@ Please refer to [install.md](install.md) for requirements and installation.
 **Moritz Großfurtner** - Frontend Development
 ([moritz.großfurtner@oeaw.ac.at](mailto:moritz.großfurtner@oeaw.ac.at)
 
-**Veronika Gründhammer** - Project Administration
-([veronika.gruendhammer@oeaw.ac.at](mailto:veronika.gruendhammer@oeaw.ac.at))
-
 **Jan Belik** - Logo Design and Design Consulting
 ([buero@janbelik.com](mailto:buero@janbelik.com))
 
