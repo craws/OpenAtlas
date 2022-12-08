@@ -1,4 +1,7 @@
 versions = {
+    '7.8.1': ['2022-12-08', {
+        'fix': {
+            '1911': 'Problem when adding members to groups'}}],
     '7.8.0': ['2022-11-18',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
