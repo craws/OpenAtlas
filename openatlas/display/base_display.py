@@ -49,9 +49,10 @@ class BaseDisplay:
         buttons = [manual(f'entity/{self.entity.class_.view}')]
         buttons += self.add_buttons(bool(problematic_type_id))
         buttons.append(bookmark_toggle(self.entity.id))
-        # if not self.gis_data:
-        #    self.gis_data = Gis.get_all(self.entity.linked_places) \
-        #        if self.entity.linked_places else None
+
+        if self.linked_places and not self.gis_data:
+            self.gis_data = Gis.get_all(self.linked_places)
+
         # if self.entity.class_.view == 'file':
         #    if self.entity.image_id:
         #        buttons.append(download_button(self.entity))
@@ -516,6 +517,18 @@ class PlaceBaseDisplay(BaseDisplay):
                 self.tabs['event'].table.rows.append(
                     get_base_table_data(event))
                 self.events.append(event)
+
+        if structure := entity.get_structure():
+            for item in structure['subunits']:
+                name = 'artifact' if item.class_.view == 'artifact' \
+                    else item.class_.name
+                self.tabs[name].table.rows.append(get_base_table_data(item))
+        self.gis_data = Gis.get_all([entity], structure)
+        if self.gis_data['gisPointSelected'] == '[]' \
+                and self.gis_data['gisPolygonSelected'] == '[]' \
+                and self.gis_data['gisLineSelected'] == '[]' \
+                and (not structure or not structure['supers']):
+            self.gis_data = {}
 
     def add_info_content(self):
         super().add_info_content()

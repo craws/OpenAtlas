@@ -12,7 +12,6 @@ from openatlas.display import display
 from openatlas.display.tab import Tab
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
@@ -127,19 +126,6 @@ def view(id_: int) -> Union[str, Response]:
                 file_preview(
                     int(row[0].replace('<a href="/entity/', '').split('"')[0]))
             )
-
-    if entity.class_.view in ['artifact', 'place']:
-        if structure := entity.get_structure():
-            for item in structure['subunits']:
-                name = 'artifact' if item.class_.view == 'artifact' \
-                    else item.class_.name
-                tabs[name].table.rows.append(get_base_table_data(item))
-        gis_data = Gis.get_all([entity], structure)
-        if gis_data['gisPointSelected'] == '[]' \
-                and gis_data['gisPolygonSelected'] == '[]' \
-                and gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['supers']):
-            gis_data = {}
 
 
 def add_crumbs(
