@@ -40,10 +40,9 @@ def view(id_: int) -> Union[str, Response]:
         if not entity.class_.view:
             flash(_("This entity can't be viewed directly."), 'error')
             abort(400)
-
-    manager = getattr(
-        display,
-        f'{entity.class_.name.capitalize()}Display')(entity)
+    class_name = \
+        f"{''.join(i.capitalize() for i in entity.class_.name.split('_'))}"
+    manager = getattr(display, f'{class_name}Display')(entity)
     return render_template(
         'tabs.html',
         tabs=manager.tabs,

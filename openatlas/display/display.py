@@ -109,3 +109,7 @@ class SourceDisplay(BaseDisplay):
                     domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
+
+
+class SourceTranslationDisplay(BaseDisplay):
+    pass
