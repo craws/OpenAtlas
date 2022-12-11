@@ -17,7 +17,7 @@ from openatlas.models.user import User
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, external_url, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
-    get_type_data, is_authorized, link, manual, uc_first)
+    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
 
 
 class BaseDisplay:
@@ -30,6 +30,8 @@ class BaseDisplay:
     gis_data: dict[str, Any] = None
     structure = None
     overlays = None
+    crumbs = None
+    buttons = None
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
         self.entity = entity
@@ -37,21 +39,39 @@ class BaseDisplay:
         self.event_links = []
         self.linked_places = []
         self.add_tabs()
+        self.add_crumbs()
         self.add_info_content()  # Call later because of profile image
         self.entity.image_id = entity.get_profile_image_id()
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
 
+    def add_crumbs(self) -> None:
+        self.crumbs = [[
+            _(self.entity.class_.view.replace('_', ' ')),
+            url_for('index', view=self.entity.class_.view)]]
+        if self.structure:
+            for super_ in self.structure['supers']:
+                self.crumbs.append(link(super_))
+        elif isinstance(self.entity, Type):
+            self.crumbs = [[_('types'), url_for('type_index')]]
+            if self.entity.root:
+                self.crumbs += \
+                    [g.types[type_id] for type_id in self.entity.root]
+        elif self.entity.class_.view == 'source_translation':
+            self.crumbs = [
+                [_('source'), url_for('index', view='source')],
+                self.entity.get_linked_entity('P73', True)]
+        self.crumbs.append(self.entity.name)
+
     def add_info_content(self):
         self.entity.info_data = self.get_entity_data()
         problematic_type_id = self.entity.check_too_many_single_type_links()
-        buttons = [manual(f'entity/{self.entity.class_.view}')]
-        buttons += self.add_buttons(bool(problematic_type_id))
-        buttons.append(bookmark_toggle(self.entity.id))
-
+        self.add_buttons(bool(problematic_type_id))
+        self.buttons.append(bookmark_toggle(self.entity.id))
         if self.linked_places and not self.gis_data:
             self.gis_data = Gis.get_all(self.linked_places)
+        self.buttons.append(siblings_pager(self.entity, self.structure))
 
         # if self.entity.class_.view == 'file':
         #    if self.entity.image_id:
@@ -60,10 +80,10 @@ class BaseDisplay:
         #        buttons.append(
         #            '<span class="error">' + uc_first(_("missing file")) +
         #            '</span>')
-        # buttons.append(siblings_pager(self.entity, self.structure))
+
         self.tabs['info'].content = render_template(
             'entity/view.html',
-            buttons=buttons,
+            buttons=self.buttons,
             entity=self.entity,
             gis_data=self.gis_data,
             overlays=self.overlays,
@@ -83,37 +103,36 @@ class BaseDisplay:
                 uc_first(_("view")) + '</a>']
             self.tabs['note'].table.rows.append(data)
 
-    def add_buttons(self, type_problem: bool = False) -> list[str]:
+    def add_buttons(self, type_problem: bool = False) -> None:
+        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         if not is_authorized(self.entity.class_.write_access):
-            return []  # pragma: no cover
-        buttons = []
+            return  # pragma: no cover
         if isinstance(self.entity, Type):
             if self.entity.root and self.entity.category != 'system':
-                buttons.append(
+                self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
-                buttons.append(display_delete_link(self.entity))
+                self.buttons.append(display_delete_link(self.entity))
         elif isinstance(self.entity, ReferenceSystem):
-            buttons.append(
+            self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
             if not self.entity.classes and not self.entity.system:
-                buttons.append(display_delete_link(self.entity))
+                self.buttons.append(display_delete_link(self.entity))
         elif self.entity.class_.name == 'source_translation':
-            buttons.append(
+            self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            buttons.append(display_delete_link(self.entity))
+            self.buttons.append(display_delete_link(self.entity))
         else:
             if not type_problem:
-                buttons.append(
+                self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             if self.entity.class_.view != 'place' \
                     or not self.entity.get_linked_entities('P46'):
-                buttons.append(display_delete_link(self.entity))
+                self.buttons.append(display_delete_link(self.entity))
         if self.entity.class_.name == 'stratigraphic_unit':
-            buttons.append(
+            self.buttons.append(
                 button(
                     _('tools'),
                     url_for('anthropology_index', id_=self.entity.id)))
-        return buttons
 
     def get_profile_image_table_link(
             self,
@@ -517,8 +536,8 @@ class PlaceBaseDisplay(BaseDisplay):
                 self.tabs['event'].table.rows.append(
                     get_base_table_data(event))
                 self.events.append(event)
-
         if structure := entity.get_structure():
+            self.structure = structure
             for item in structure['subunits']:
                 name = 'artifact' if item.class_.view == 'artifact' \
                     else item.class_.name

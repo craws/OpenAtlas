@@ -1,4 +1,4 @@
-from typing import Any, Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -48,7 +48,7 @@ def view(id_: int) -> Union[str, Response]:
         tabs=manager.tabs,
         entity=entity,
         gis_data=manager.gis_data,
-        crumbs=add_crumbs(entity, manager.structure))
+        crumbs=manager.crumbs)
 
     tabs = {'info': Tab('info')}
     if isinstance(entity, Type):
@@ -125,27 +125,6 @@ def view(id_: int) -> Union[str, Response]:
                 file_preview(
                     int(row[0].replace('<a href="/entity/', '').split('"')[0]))
             )
-
-
-def add_crumbs(
-        entity: Union[Entity, Type],
-        structure: Optional[dict[str, Any]]) -> list[Any]:
-    crumbs: list[Any] = [[
-        _(entity.class_.view.replace('_', ' ')),
-        url_for('index', view=entity.class_.view)]]
-    if structure:
-        for super_ in structure['supers']:
-            crumbs.append(link(super_))
-    elif isinstance(entity, Type):
-        crumbs = [[_('types'), url_for('type_index')]]
-        if entity.root:
-            crumbs += [g.types[type_id] for type_id in entity.root]
-    elif entity.class_.view == 'source_translation':
-        crumbs = [
-            [_('source'), url_for('index', view='source')],
-            entity.get_linked_entity('P73', True)]
-    crumbs.append(entity.name)
-    return crumbs
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])

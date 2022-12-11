@@ -18,11 +18,23 @@ class ActivityDisplay(EventsDisplay):
     pass
 
 
+class ArtifactDisplay(PlaceBaseDisplay):
+    pass
+
+
 class EventDisplay(EventsDisplay):
     pass
 
 
+class FeatureDisplay(PlaceBaseDisplay):
+    pass
+
+
 class GroupDisplay(ActorDisplay):
+    pass
+
+
+class HumanRemainsDisplay(PlaceBaseDisplay):
     pass
 
 
@@ -112,4 +124,8 @@ class SourceDisplay(BaseDisplay):
 
 
 class SourceTranslationDisplay(BaseDisplay):
+    pass
+
+
+class StratigraphicUnitDisplay(PlaceBaseDisplay):
     pass
