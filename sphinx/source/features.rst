@@ -20,12 +20,12 @@ User interface
 --------------
 * :doc:`Interactive map </tools/map>` to enter places with a known location
 * :doc:`File upload </entity/file>`
-* :doc:`/tools/search` and :doc:`/ui/table` filter functions for quick
+* :doc:`/tools/search` and :doc:`table </ui/table>` filter functions for quick
   navigation
 * :doc:`/tools/network`
 * :doc:`/tools/notes` and bookmarks
-* :doc:`User manual </index>` (English) with :doc:`/examples/index` and context
-  specific links in the application
+* :doc:`User manual </index>` (English) with :doc:`examples </examples/index>`
+  and context specific links in the application
 * User interface internationalization (currently English and German)
   using `gettext <https://www.gnu.org/software/gettext/>`_
 
