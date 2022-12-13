@@ -81,17 +81,14 @@ def process_standard_fields(manager: Any) -> None:
         elif key.startswith('reference_system_id_'):
             system = Entity.get_by_id(
                 int(key.replace('reference_system_id_', '')))
-            precision_field = getattr(
-                manager.form,
-                key.replace('id_', 'precision_'))
             manager.data['links']['delete_reference_system'] = True
-            if value:
+            if value['value']:
                 manager.add_link(
                     'P67',
                     system,
-                    value,
+                    value['value'],
                     inverse=True,
-                    type_id=precision_field.data)
+                    type_id=value['precision'])
         else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 

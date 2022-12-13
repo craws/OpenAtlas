@@ -20,11 +20,9 @@ def html_form(
         form: Any,
         form_id: Optional[str] = None,
         manual_page: Optional[str] = None) -> str:
-    reference_systems_added = False
     html = ''
     for field in form:
-        if isinstance(field, ValueFloatField) or field.id.startswith(
-                ('insert_', 'reference_system_precision')):
+        if isinstance(field, ValueFloatField):
             continue  # These will be added in combination with other fields
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
@@ -79,11 +77,6 @@ def html_form(
                 f'<div class="toolbar text-wrap">{" ".join(buttons)}</div>')
             continue
 
-        if field.id.startswith('reference_system_id_'):
-            if not reference_systems_added:
-                html += add_reference_systems(form)
-                reference_systems_added = True
-            continue
         html += add_row(field, form_id=form_id)
     return html
 
@@ -108,32 +101,6 @@ def add_row(
         value=value,
         field_css=field_css,
         row_css=row_css)
-
-
-def add_reference_systems(form: Any) -> str:
-    html = ''
-    switch_class = ''
-    errors = False
-    fields = []
-    for field in form:
-        if field.id.startswith('reference_system_id_'):
-            fields.append(field)
-            if field.errors:
-                errors = True  # pragma: no cover
-    if len(fields) > 3 and not errors:  # pragma: no cover
-        switch_class = 'reference-system-switch'
-        html = render_template('util/reference_system_switch.html')
-    for field in fields:
-        precision_field = getattr(form, field.id.replace('id_', 'precision_'))
-        class_ = field.label.text \
-            if field.label.text in ['GeoNames', 'Wikidata'] else ''
-        html += add_row(
-            field,
-            field.label,
-            f'{field(class_=class_)} {precision_field.label} '
-            f'{precision_field}',
-            row_css=f'external-reference {switch_class}')
-    return html
 
 
 def add_value_type(

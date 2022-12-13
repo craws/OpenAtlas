@@ -39,7 +39,7 @@ $(document).ready(function () {
 
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
-        $(".date-switch").toggleClass('display-none');
+        $(".date-switch").toggleClass('d-none');
         $(this).text(function (i, text) {
             return $.trim(text) === show ? hide : show;
         })
@@ -48,7 +48,7 @@ $(document).ready(function () {
     /* Hide date fields if there are any and if they are empty */
     if ($('#begin_year_from').length &&
         $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
-        $('.date-switch').addClass('display-none');
+        $('.date-switch').addClass('d-none');
     }
 
     /* Hide value type fields with class* wildcard selector */
@@ -142,7 +142,7 @@ $(document).ready(function () {
     });
 
     //add required to reference precision if reference is set
-    $("[id^=reference_system_id]").on('change', function () {
+    $("[id^=reference_system_value]").on('change', function () {
         const select = $(`#reference_system_precision_${this.id.split('_').pop()}`);
         if (!this.value?.length)
             select.removeClass('required');

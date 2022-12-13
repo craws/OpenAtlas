@@ -4,11 +4,11 @@ from typing import Any
 from flask import g
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import IntegerField, SelectField, StringField, TextAreaField
+from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField, ReferenceField
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import is_authorized, uc_first
@@ -28,19 +28,12 @@ def add_reference_systems(class_: OpenatlasClass, form: Any) -> None:
         setattr(
             form,
             f'reference_system_id_{system.id}',
-            StringField(
+            ReferenceField(
                 uc_first(system.name),
-                [OptionalValidator()],
                 description=system.description,
-                render_kw={
-                    'autocomplete': 'off',
-                    'placeholder': system.placeholder}))
-        setattr(
-            form,
-            f'reference_system_precision_{system.id}',
-            SelectField(
-                _('precision'),
+                placeholder=system.placeholder,
                 choices=precisions,
+                reference_system_id=system.id,
                 default=system.precision_default_id))
 
 

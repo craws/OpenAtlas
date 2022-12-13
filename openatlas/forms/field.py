@@ -9,7 +9,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, TextInput, FileInput, Input
+from wtforms.widgets import HiddenInput, FileInput, Input
 
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
@@ -24,7 +24,6 @@ class RemovableListInput(HiddenInput):
             field: RemovableListField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
-
         [name, index] = field.id.split('-')
         return super().__call__(field, **kwargs) + render_template(
             'forms/removable_list_field.html',
@@ -38,6 +37,41 @@ class RemovableListField(HiddenField):
 
     def _value(self) -> str:
         return self.data
+
+
+class ReferenceInput(Input):
+    def __call__(
+            self,
+            field: ReferenceField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
+        return render_template('forms/reference_field.html', field=field)
+
+
+class ReferenceField(Field):
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            choices: Optional[list[tuple[str, str]]] = None,
+            placeholder: Optional[str] = None,
+            reference_system_id: int = 0,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.placeholder = placeholder
+        self.choices = choices
+        self.reference_system_id = reference_system_id
+        self.data = {"value": "", "precision": ""}
+
+    def _value(self):
+        return self.data
+
+    def process_formdata(self, valuelist):
+        self.data = {"value": valuelist[0] if len(valuelist) == 2 else '',
+                     "precision": valuelist[1] if len(valuelist) == 2 else ''
+                     }
+
+    widget = ReferenceInput()
 
 
 class TableMultiSelect(HiddenInput):
@@ -83,6 +117,7 @@ class TableMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
+
     widget = TableMultiSelect()
 
 
@@ -143,6 +178,7 @@ class TableField(HiddenField):
         self.related_tables = related_tables or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
+
     widget = TableSelect()
 
 
@@ -208,6 +244,7 @@ class TreeField(HiddenField):
         self.form = form
         self.type_id = type_id or self.id
         self.filters_ids = filter_ids
+
     widget = TreeSelect()
 
 
@@ -218,7 +255,7 @@ class DragNDrop(FileInput):
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
         return super().__call__(field, **kwargs) + \
-            render_template('forms/drag_n_drop_field.html')
+               render_template('forms/drag_n_drop_field.html')
 
 
 class DragNDropField(FileField):
@@ -229,24 +266,3 @@ class DragNDropField(FileField):
 
     def process_formdata(self, valuelist: list[str]) -> None:
         self.data = valuelist
-
-
-class ValueType(Input):
-    def __call__(
-            self,
-            field: RemovableListField,
-            *args: Any,
-            **kwargs: Any) -> RemovableListInput:
-        return super().__call__(field, **kwargs) + \
-            render_template('forms/value_tye_field.html')
-
-
-class ValueTypeField(Field):
-    def __init__(
-            self,
-            label: str,
-            validators: Any = None,
-            **kwargs: Any) -> None:
-        super().__init__(label, validators, **kwargs)
-
-    widget = ValueType()
