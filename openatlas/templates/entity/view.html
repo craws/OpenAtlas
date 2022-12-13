@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-6">
+  <div class="{{ 'col-lg-6' if gis_data else 'col' }}">
     {% if problematic_type_id %}
       <div class="error">
         {{ _('Editing is disabled because of multiple links to the single type') }}
@@ -22,7 +22,7 @@
     {{ entity|description|safe }}
   </div>
   {% if gis_data %}
-    <div class="col-6">
+    <div class="col-lg-6">
       <div id="map" class="map"></div>
       <script src="/static/js/map/map.js"></script>
     </div>

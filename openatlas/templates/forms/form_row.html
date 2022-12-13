@@ -1,17 +1,17 @@
-<div class="table-row {{ row_css }}">
-  <div>
+<div class="mb-2 row">
+  <label class="col-sm-auto mr-1 col-form-label text-sm-end" style="min-width: 160px">
     {% if label is string %}
       {{ label|safe }}
     {% else %}
       {{ field.label|safe }}
     {% endif %}
     {{ field.description|tooltip|safe }}
-  </div>
-  <div class="table-cell">
-    {% if value %}
+  </label>
+  <div class="col">
+   {% if value %}
       {{ value|safe }}
     {% else %}
-      {{ field(class_=field_css)|replace('> ', '>')|safe }}
+      {{ field(class_=field_css + ' form-control form-control-sm')|replace('> ', '>')|safe }}
     {% endif %}
     {% if field.errors %}
       <span class="error">

@@ -1,7 +1,8 @@
-<input
+<div class="d-flex">
+  <input
   id="{{ field.id }}-button"
   name="{{ field.id }}-button"
-  class="table-select {% if field.flags.required %}required{% endif %}"
+  class="table-select {% if field.flags.required %}required{% endif %} form-control form-control-sm"
   type="text"
   placeholder="{{ _('change')|uc_first }}"
   onfocus="this.blur()"
@@ -11,11 +12,12 @@
 <a
   href="#"
   id="{{ field.id }}-clear"
-  class="{{ config.CSS.button.secondary }}"
+  class="{{ config.CSS.button.secondary }} ms-1"
   {% if not selection %}style="display: none;"{% endif %}
   onclick="clearSelect('{{ field.id }}');">
     {{ _('clear')|uc_first }}
 </a>
+</div>
 <div
   id="{{ field.id }}-modal"
   class="modal fade"

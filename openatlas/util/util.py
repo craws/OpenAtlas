@@ -391,7 +391,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
     if warnings:
-        return f'<p class="error">{"<br>".join(warnings)}<p>'
+        return f'<p class="alert alert-danger">{"<br>".join(warnings)}<p>'
     return ''  # pragma: no cover
 
 
@@ -765,7 +765,7 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<div class="data-table">{html_form(form, form_id, manual_page)}' \
+        f'<div class="data-table container">{html_form(form, form_id, manual_page)}' \
         f'</div></form>'
 
 

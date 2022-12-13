@@ -1,8 +1,9 @@
+<div class="d-flex">
 <input
   id="{{ field.id }}-button"
   name="{{ field.id }}-button"
   type="text"
-  class="table-select {% if field.flags.required %}required{% endif %}"
+  class="form-control form-control-sm table-select {% if field.flags.required %}required{% endif %}"
   onfocus="this.blur()"
   onclick="$('#{{ field.id }}-modal').modal('show')"
   readonly="readonly"
@@ -12,10 +13,11 @@
   href="#"
   id="{{ field.id }}-clear"
   {% if not selection %}style="display: none;"{% endif %}
-  class="{{ config.CSS.button.secondary }}"
+  class="{{ config.CSS.button.secondary }} ms-1"
   onclick="clearSelect('{{ field.id }}');">
   {{ _('clear')|uc_first }}
 </a>
+</div>
 <div
   id="{{ field.id }}-modal"
   class="modal fade"
@@ -37,20 +39,21 @@
         </button>
       </div>
       <div class="modal-body">
+      <div class="d-flex">
         <input
-          class="tree-filter"
+          class="tree-filter form-control"
           id="{{ field.id }}-tree-search"
           placeholder="{{ _('type to search')|uc_first }}"
           type="text">
         {% if field.form %}
           <button type="button" id="add-{{ type }}--{{ field.id }}"
-                  class="btn-outline-primary btn-xsm btn"
+                  class="btn-outline-primary btn text-nowrap ms-1"
                   data-bs-toggle="modal"
                   data-bs-target="#add-type-modal-{{ field.id }}">
             + {{  _('type')|uc_first if root.category == 'standard' else root.name }}
           </button>
         {% endif %}
-
+</div>
         <div id="{{ field.id }}-tree"
              style="text-align: left!important;"></div>
       </div>

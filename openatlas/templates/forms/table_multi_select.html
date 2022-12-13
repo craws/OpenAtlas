@@ -5,8 +5,11 @@
     {{ _('change')|uc_first }}
 </span>
 <br>
+
 <div id="{{ field.id }}-selection" class="selection" style="text-align:left;">
-  {{ '<br>'.join(selection)|safe }}
+  {% for s in selection %}
+  <span class="badge bg-primary">{{ s }}</span>
+{% endfor %}
 </div>
 <div id="{{ field.id }}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
   <div class="modal-dialog" role="document" style="max-width: 100%!important;">

@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block content %}
   <div class="row">
-    <div class="col">
+    <div class="{{ 'col-lg-6' if gis_data else 'col' }}">
       {{ buttons|button_bar|safe }}
       {{ table.display()|safe }}
     </div>
     {% if gis_data %}
-      <div class="col">
+      <div class="col-lg-6">
         <div id="map"></div>
       </div>
     {% endif %}
