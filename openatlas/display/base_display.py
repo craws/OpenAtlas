@@ -15,9 +15,11 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, display_delete_link, external_url, format_date,
+    bookmark_toggle, button, display_delete_link, download_button,
+    external_url, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
     get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
+from openatlas.views.entity_index import file_preview
 
 
 class BaseDisplay:
@@ -73,13 +75,25 @@ class BaseDisplay:
             self.gis_data = Gis.get_all(self.linked_places)
         self.buttons.append(siblings_pager(self.entity, self.structure))
 
-        # if self.entity.class_.view == 'file':
-        #    if self.entity.image_id:
-        #        buttons.append(download_button(self.entity))
-        #    else:
-        #        buttons.append(
-        #            '<span class="error">' + uc_first(_("missing file")) +
-        #            '</span>')
+        if 'file' in self.tabs \
+                and current_user.settings['table_show_icons'] \
+                and g.settings['image_processing']:
+            self.tabs['file'].table.header.insert(1, uc_first(_('icon')))
+            for row in self.tabs['file'].table.rows:
+                row.insert(
+                    1,
+                    file_preview(
+                        int(
+                            row[0].
+                            replace('<a href="/entity/', '').split('"')[0])))
+
+        if self.entity.class_.view == 'file':
+            if self.entity.image_id:
+                self.buttons.append(download_button(self.entity))
+            else:
+                self.buttons.append(
+                    '<span class="error">' + uc_first(_("missing file")) +
+                    '</span>')
 
         self.tabs['info'].content = render_template(
             'entity/view.html',

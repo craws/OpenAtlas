@@ -1,4 +1,4 @@
-from flask import g
+from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
 from openatlas import app
@@ -6,9 +6,9 @@ from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
-from openatlas.display.util import remove_link
+from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
-from openatlas.util.util import get_base_table_data, link
+from openatlas.util.util import get_base_table_data, get_file_path, link
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -25,6 +25,38 @@ class ArtifactDisplay(PlaceBaseDisplay):
 
 class BibliographyDisplay(ReferenceBaseDisplay):
     pass
+
+class FileDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for name in [
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'reference', 'type']:
+            self.tabs[name] = Tab(name, entity=self.entity)
+        self.entity.image_id = self.entity.id \
+            if get_file_path(self.entity.id) else None
+        for link_ in self.entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data.append(remove_link(
+                range_.name,
+                link_,
+                self.entity,
+                range_.class_.name))
+            self.tabs[range_.class_.view].table.rows.append(data)
+        for link_ in self.entity.get_links('P67', True):
+            data = get_base_table_data(link_.domain)
+            data.append(link_.description)
+            data.append(edit_link(
+                url_for('link_update', id_=link_.id, origin_id=self.entity.id)))
+            data.append(
+                remove_link(
+                    link_.domain.name,
+                    link_,
+                    self.entity,
+                    'reference'))
+            self.tabs['reference'].table.rows.append(data)
 
 class EditionDisplay(ReferenceBaseDisplay):
     pass
