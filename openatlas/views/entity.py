@@ -63,7 +63,6 @@ def view(id_: int) -> Union[str, Response]:
     elif entity.class_.view == 'reference':
         tabs |= add_tabs_for_reference(entity)
 
-    overlays = None  # Needed for place
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'type']:
         if not isinstance(entity, Type):
             tabs['reference'] = Tab('reference', entity=entity)
@@ -294,21 +293,4 @@ def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
         #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
         # data.append(remove_link(link_.domain.name, link_, entity, 'reference'))
         tabs['reference'].table.rows.append(data)
-    return tabs
-
-
-def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
-    tabs = {}
-    for name in [
-            'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'file']:
-        tabs[name] = Tab(name, entity=entity)
-    for link_ in entity.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data.append(link_.description)
-        #data.append(edit_link(
-        #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
-        tabs[range_.class_.view].table.rows.append(data)
     return tabs

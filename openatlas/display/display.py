@@ -3,7 +3,8 @@ from flask_babel import lazy_gettext as _
 
 from openatlas import app
 from openatlas.display.base_display import (
-    ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay)
+    ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
+    ReferenceBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
 from openatlas.models.entity import Entity
@@ -13,38 +14,38 @@ from openatlas.util.util import get_base_table_data, link
 class AcquisitionDisplay(EventsDisplay):
     pass
 
-
 class ActivityDisplay(EventsDisplay):
     pass
-
 
 class ArtifactDisplay(PlaceBaseDisplay):
     pass
 
+class BibliographyDisplay(ReferenceBaseDisplay):
+    pass
+
+class EditionDisplay(ReferenceBaseDisplay):
+    pass
 
 class EventDisplay(EventsDisplay):
     pass
 
+class ExternalReferenceDisplay(ReferenceBaseDisplay):
+    pass
 
 class FeatureDisplay(PlaceBaseDisplay):
     pass
 
-
 class GroupDisplay(ActorDisplay):
     pass
-
 
 class HumanRemainsDisplay(PlaceBaseDisplay):
     pass
 
-
 class MoveDisplay(EventsDisplay):
     pass
 
-
 class PersonDisplay(ActorDisplay):
     pass
-
 
 class PlaceDisplay(PlaceBaseDisplay):
 

@@ -468,6 +468,9 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
+    def add_info_content(self):
+        super().add_info_content()
+
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -549,5 +552,28 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not structure or not structure['supers']):
             self.gis_data = {}
 
-    def add_info_content(self):
-        super().add_info_content()
+class ReferenceBaseDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for name in [
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'file']:
+            self.tabs[name] = Tab(name, entity=self.entity)
+        for link_ in self.entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data.append(link_.description)
+            data.append(
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
+            data.append(
+                remove_link(
+                    range_.name,
+                    link_,
+                    self.entity,
+                    range_.class_.name))
+            self.tabs[range_.class_.view].table.rows.append(data)
