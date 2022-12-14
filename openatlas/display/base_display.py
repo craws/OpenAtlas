@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
 from flask import g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
 from openatlas import app
@@ -577,3 +577,57 @@ class ReferenceBaseDisplay(BaseDisplay):
                     self.entity,
                     range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
+
+class TypeBaseDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        self.tabs['subs'] = Tab('subs', entity=self.entity)
+        self.tabs['entities'] = Tab('entities', entity=self.entity)
+        for sub_id in self.entity.subs:
+            sub = g.types[sub_id]
+            self.tabs['subs'].table.rows.append([
+                link(sub),
+                sub.count,
+                sub.description])
+        if self.entity.category == 'value':
+            self.tabs['entities'].table.header = \
+                [_('name'), _('value'), _('class'), _('info')]
+        place_classes = [
+            'feature',
+            'stratigraphic_unit',
+            'artifact',
+            'human_remains']
+        if any(item in g.types[self.entity.root[0]].classes for item in
+               place_classes):
+            self.tabs['entities'].table.header.append('place')
+        root = g.types[self.entity.root[0]] if self.entity.root \
+            else self.entity
+        if root.name in app.config['PROPERTY_TYPES']:
+            self.tabs['entities'].table.header = [_('domain'), _('range')]
+            for row in Link.get_links_by_type(self.entity):
+                self.tabs['entities'].table.rows.append([
+                    link(Entity.get_by_id(row['domain_id'])),
+                    link(Entity.get_by_id(row['range_id']))])
+        else:
+            for item in self.entity.get_linked_entities(
+                    ['P2', 'P89'],
+                    inverse=True,
+                    types=True):
+                if item.class_.name in ['location', 'reference_system']:
+                    continue  # pragma: no cover
+                if item.class_.name == 'object_location':
+                    item = item.get_linked_entity_safe('P53', inverse=True)
+                data = [link(item)]
+                if self.entity.category == 'value':
+                    data.append(format_number(item.types[self.entity]))
+                data.append(item.class_.label)
+                data.append(item.description)
+                root_place = ''
+                if item.class_.name in place_classes:
+                    if roots := item.get_linked_entities_recursive('P46',
+                                                                   True):
+                        root_place = link(roots[0])
+                data.append(root_place)
+                self.tabs['entities'].table.rows.append(data)
+

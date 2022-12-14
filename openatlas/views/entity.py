@@ -1,7 +1,7 @@
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -12,7 +12,6 @@ from openatlas.display import display
 from openatlas.display.tab import Tab
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
@@ -60,8 +59,6 @@ def view(id_: int) -> Union[str, Response]:
         tabs['artifact'] = Tab('artifact', entity=entity)
     elif entity.class_.view == 'file':
         tabs |= add_tabs_for_file(entity)
-    elif entity.class_.view == 'reference':
-        tabs |= add_tabs_for_reference(entity)
 
     if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'type']:
         if not isinstance(entity, Type):
@@ -194,57 +191,6 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             entity,
             f"{_('link')} {_('reference')}"])
 
-
-def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
-    tabs = {
-        'subs': Tab('subs', entity=entity),
-        'entities': Tab('entities', entity=entity)}
-    for sub_id in entity.subs:
-        sub = g.types[sub_id]
-        tabs['subs'].table.rows.append([
-            link(sub),
-            sub.count,
-            sub.description])
-    if entity.category == 'value':
-        tabs['entities'].table.header = \
-            [_('name'), _('value'), _('class'), _('info')]
-    place_classes = [
-            'feature',
-            'stratigraphic_unit',
-            'artifact',
-            'human_remains']
-    if any(item in g.types[entity.root[0]].classes for item in place_classes):
-        tabs['entities'].table.header.append('place')
-    root = g.types[entity.root[0]] if entity.root else entity
-    if root.name in app.config['PROPERTY_TYPES']:
-        tabs['entities'].table.header = [_('domain'), _('range')]
-        for row in Link.get_links_by_type(entity):
-            tabs['entities'].table.rows.append([
-                link(Entity.get_by_id(row['domain_id'])),
-                link(Entity.get_by_id(row['range_id']))])
-    else:
-        for item in entity.get_linked_entities(
-                ['P2', 'P89'],
-                inverse=True,
-                types=True):
-            if item.class_.name in ['location', 'reference_system']:
-                continue  # pragma: no cover
-            if item.class_.name == 'object_location':
-                item = item.get_linked_entity_safe('P53', inverse=True)
-            data = [link(item)]
-            if entity.category == 'value':
-                data.append(format_number(item.types[entity]))
-            data.append(item.class_.label)
-            data.append(item.description)
-            root_place = ''
-            if item.class_.name in place_classes:
-                if roots := item.get_linked_entities_recursive('P46', True):
-                    root_place = link(roots[0])
-            data.append(root_place)
-            tabs['entities'].table.rows.append(data)
-    return tabs
-
-
 def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
     tabs = {}
     for name in entity.classes:
@@ -272,7 +218,6 @@ def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
                     system_id=entity.id,
                     class_name=name))]
     return tabs
-
 
 def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
     tabs = {}

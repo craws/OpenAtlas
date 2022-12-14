@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
-    ReferenceBaseDisplay)
+    ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import remove_link
 from openatlas.models.entity import Entity
@@ -15,6 +15,9 @@ class AcquisitionDisplay(EventsDisplay):
     pass
 
 class ActivityDisplay(EventsDisplay):
+    pass
+
+class AdministrativeUnitDisplay(TypeBaseDisplay):
     pass
 
 class ArtifactDisplay(PlaceBaseDisplay):
@@ -123,10 +126,11 @@ class SourceDisplay(BaseDisplay):
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
 
-
 class SourceTranslationDisplay(BaseDisplay):
     pass
 
-
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
+    pass
+
+class TypeDisplay(TypeBaseDisplay):
     pass
