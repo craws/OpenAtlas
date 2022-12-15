@@ -4,7 +4,7 @@ Features
 OpenAtlas is developed for easy acquisition, editing, and management of
 research data from the humanities as well as related research fields. Special
 emphasis is placed on making data entry as easy and convenient as possible for
-researchers while maintaining high standards in the programming of the
+researchers while maintaining high standards in the development of the
 software. The features listed below contribute significantly to this effort.
 
 Model
