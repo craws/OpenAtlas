@@ -1,75 +1,36 @@
 
-
-
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  
   <title>Data integrity checks &mdash; OpenAtlas 7.9.0 documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/style.css" type="text/css" />
   
-
-  
-  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="../_static/style.css" type="text/css" />
-
-  
-  
-
-  
-  
-
-  
-
-  
-  
-    
-      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-    
-    <script type="text/javascript" src="../_static/js/theme.js"></script>
-
-    
+    <script src="../_static/js/theme.js"></script>
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Import" href="import.html" />
     <link rel="prev" title="Content" href="content.html" /> 
 </head>
 
-<body class="wy-body-for-nav">
-
-   
+<body class="wy-body-for-nav"> 
   <div class="wy-grid-for-nav">
-    
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-          
-
-          
             <a href="../index.html" class="icon icon-home"> OpenAtlas
-          
-
-          
-            
             <img src="../_static/logo.png" class="logo" alt="Logo"/>
-          
           </a>
-
-          
-            
-            
               <div class="version">
                 7.9.0
               </div>
-            
-          
-
-          
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
     <input type="text" name="q" placeholder="Search docs" />
@@ -77,18 +38,7 @@
     <input type="hidden" name="area" value="default" />
   </form>
 </div>
-
-          
-        </div>
-
-        
-        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
-          
-            
-            
-              
-            
-            
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../overview.html">Overview</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../features.html">Features</a></li>
@@ -116,73 +66,32 @@
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
 </ul>
 
-            
-          
         </div>
-        
       </div>
     </nav>
 
-    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
-
-      
-      <nav class="wy-nav-top" aria-label="top navigation">
-        
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
           <a href="../index.html">OpenAtlas</a>
-        
       </nav>
 
-
       <div class="wy-nav-content">
-        
         <div class="rst-content style-external-links">
-        
-          
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<div role="navigation" aria-label="breadcrumbs navigation">
-
+          <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-    
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
-        
           <li><a href="index.html">Admin</a> &raquo;</li>
-        
       <li>Data integrity checks</li>
-    
-    
       <li class="wy-breadcrumbs-aside">
-        
-          
-        
       </li>
-    
   </ul>
-
-  
   <hr/>
 </div>
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
-            
-  <div class="section" id="data-integrity-checks">
-<h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Permalink to this headline">¶</a></h1>
+             
+  <section id="data-integrity-checks">
+<h1>Data integrity checks<a class="headerlink" href="#data-integrity-checks" title="Permalink to this headline"></a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>The quality of data is very important to us. Although ultimately the data
@@ -195,63 +104,63 @@ e.g. when importing data from other projects or deleting files outside of the
 application. Because data integrity is important for the quality of research we
 implemented functions to check possible inconsistencies which are described in
 detail below.</p>
-<div class="section" id="orphans">
-<h2>Orphans<a class="headerlink" href="#orphans" title="Permalink to this headline">¶</a></h2>
-<div class="section" id="id1">
-<h3>Orphans<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<section id="orphans">
+<h2>Orphans<a class="headerlink" href="#orphans" title="Permalink to this headline"></a></h2>
+<section id="id1">
+<h3>Orphans<a class="headerlink" href="#id1" title="Permalink to this headline"></a></h3>
 <p>In this tab entries like dates which are not linked are shown. They could be
 artifacts from imports or bugs and can be deleted. If they seem to appear
 regularly again (without imports or known bugs) please report that issue.</p>
-</div>
-<div class="section" id="entities-without-links">
-<h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="entities-without-links">
+<h3>Entities without links<a class="headerlink" href="#entities-without-links" title="Permalink to this headline"></a></h3>
 <p>Entries shown have no relation to other entities. That could be ok but maybe
 they are artifacts or were forgotten to link.</p>
-</div>
-<div class="section" id="type">
-<h3>Type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="type">
+<h3>Type<a class="headerlink" href="#type" title="Permalink to this headline"></a></h3>
 <p>These types were created but have no sub types or associated data. Maybe they
 originate from thefirst install or were never used.</p>
-</div>
-<div class="section" id="missing-files">
-<h3>Missing files<a class="headerlink" href="#missing-files" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="missing-files">
+<h3>Missing files<a class="headerlink" href="#missing-files" title="Permalink to this headline"></a></h3>
 <p>Here are listed file entities which have no corresponding file, most likely
 because the file itself doesn’t exist anymore.</p>
-</div>
-<div class="section" id="orphaned-files">
-<h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="orphaned-files">
+<h3>Orphaned files<a class="headerlink" href="#orphaned-files" title="Permalink to this headline"></a></h3>
 <p>Files that have no corresponding entity are listed here.</p>
-</div>
-<div class="section" id="orphaned-subunits">
-<h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="orphaned-subunits">
+<h3>Orphaned subunits<a class="headerlink" href="#orphaned-subunits" title="Permalink to this headline"></a></h3>
 <p>Subunits that are missing a connection to the level above. E.g. a feature
 without a connection to a place.</p>
-</div>
-<div class="section" id="circular-dependencies">
-<h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Permalink to this headline">¶</a></h3>
+</section>
+<section id="circular-dependencies">
+<h3>Circular dependencies<a class="headerlink" href="#circular-dependencies" title="Permalink to this headline"></a></h3>
 <p>A check if an entity is linked to itself. This could happen e.g. if a person is
 married to herself or a type has itself as super. It shouldn’t be possible to
 create circular dependencies within the application. Nevertheless it’s a useful
 check for e.g. if data is imported from other systems.</p>
-</div>
-</div>
-<div class="section" id="check-dates">
-<h2>Check dates<a class="headerlink" href="#check-dates" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="check-dates">
+<h2>Check dates<a class="headerlink" href="#check-dates" title="Permalink to this headline"></a></h2>
 <p>In this tab invalid date combinations are shown, e.g. begin dates which are
 later than end dates. These entries should be cleared up otherwise they cannot
 be updated because the user interface won’t allow saving entries with invalid
 date combinations.</p>
-</div>
-<div class="section" id="check-links">
-<h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="check-links">
+<h2>Check links<a class="headerlink" href="#check-links" title="Permalink to this headline"></a></h2>
 <p>With this function every link will be checked for CIDOC validity. Depending on
 the amount of data this could take some time. Data entered with the OpenAtlas
 user interface should always be CIDOC valid but in case of e.g. imported
 data this check should be used afterwards. If invalid links are found they
 should be dealt with outside the application.</p>
-</div>
-<div class="section" id="check-link-duplicates">
-<h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="check-link-duplicates">
+<h2>Check link duplicates<a class="headerlink" href="#check-link-duplicates" title="Permalink to this headline"></a></h2>
 <p>There are actually two checks:</p>
 <p>The first one checks for duplicate links which are identically and can be
 safely deleted when clicking the <em>Delete link duplicates</em> button.</p>
@@ -263,9 +172,9 @@ entry. Here you have the option to look at these and remove the wrong ones
 clicking on the <strong>Remove</strong> link beside the entries in the last column.</p>
 <p>Both checks shouldn’t find anything wrong with data entered with the
 application but nevertheless it could happen because of imports or unknown bugs.</p>
-</div>
-<div class="section" id="check-similar-names">
-<h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="check-similar-names">
+<h2>Check similar names<a class="headerlink" href="#check-similar-names" title="Permalink to this headline"></a></h2>
 <p>Here you can search for similar names. Depending on selection and data volume
 this might take some time.</p>
 <ul class="simple">
@@ -276,34 +185,27 @@ means absolute identical</p></li>
 <p>The function uses the <a class="reference external" href="https://pypi.org/project/fuzzywuzzy/">fuzzywuzzy</a>
 package is used which in turn uses the
 <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
-           
           </div>
-          <footer>
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="import.html" class="btn btn-neutral float-right" title="Import" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="content.html" class="btn btn-neutral float-left" title="Content" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="import.html" class="btn btn-neutral float-right" title="Import" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>
-
-    </p>
+    <p></p>
   </div>
-    
-    
-    
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
-    
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
-    
     provided by <a href="https://readthedocs.org">Read the Docs</a>.
+  
         <p>CC-BY 4.0, Alexander Watzinger and the OpenAtlas team</p>
         <script type="text/javascript">
             <!-- Adds target=_blank to external links -->
@@ -316,22 +218,13 @@ package is used which in turn uses the
 </footer>
         </div>
       </div>
-
     </section>
-
   </div>
-  
-
-  <script type="text/javascript">
+  <script>
       jQuery(function () {
           SphinxRtdTheme.Navigation.enable(true);
       });
-  </script>
-
-  
-  
-    
-   
+  </script> 
 
 </body>
 </html>
