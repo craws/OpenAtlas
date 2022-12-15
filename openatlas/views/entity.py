@@ -1,8 +1,7 @@
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_number, lazy_gettext as _
-from flask_login import current_user
+from flask_babel import lazy_gettext as _
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
@@ -12,15 +11,10 @@ from openatlas.display import display
 from openatlas.display.tab import Tab
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
-from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, display_form, get_base_table_data, get_file_path, is_authorized,
-    link, required_group, uc_first)
-from openatlas.views.entity_index import file_preview
+    button, display_form, is_authorized, link, required_group, uc_first)
 from openatlas.views.link import AddReferenceForm
 
 
@@ -50,81 +44,8 @@ def view(id_: int) -> Union[str, Response]:
         gis_data=manager.gis_data,
         crumbs=manager.crumbs)
 
-    tabs = {'info': Tab('info')}
-    if isinstance(entity, Type):
-        tabs |= add_tabs_for_type(entity)
-    elif isinstance(entity, ReferenceSystem):
-        tabs |= add_tabs_for_reference_system(entity)
-    elif entity.class_.view == 'artifact':
-        tabs['source'] = Tab('source', entity=entity)
-        tabs['artifact'] = Tab('artifact', entity=entity)
-    elif entity.class_.view == 'file':
-        tabs |= add_tabs_for_file(entity)
-    elif entity.class_.view == 'reference':
-        tabs |= add_tabs_for_reference(entity)
-
-    overlays = None  # Needed for place
-    if entity.class_.view in ['actor', 'artifact', 'event', 'place', 'type']:
-        if not isinstance(entity, Type):
-            tabs['reference'] = Tab('reference', entity=entity)
-        if entity.class_.view == 'artifact':
-            tabs['event'] = Tab('event', entity=entity)
-            for link_ in entity.get_links(['P24', 'P25', 'P108'], True):
-                data = get_base_table_data(link_.domain)
-                tabs['event'].table.rows.append(data)
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
-                extension = data[3]
-                data.append(
-                    get_profile_image_table_link(
-                        domain,
-                        entity,
-                        extension,
-                        entity.image_id))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-                if entity.class_.view == 'place' \
-                        and is_authorized('editor') \
-                        and current_user.settings['module_map_overlay']:
-                    overlays = Overlay.get_by_object(entity)
-                    if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        if domain.id in overlays:
-                            data.append(edit_link(
-                                url_for(
-                                    'overlay_update',
-                                    id_=overlays[domain.id].id)))
-                        else:
-                            data.append(link(_('link'), url_for(
-                                'overlay_insert',
-                                image_id=domain.id,
-                                place_id=entity.id,
-                                link_id=link_.id)))
-                    else:  # pragma: no cover
-                        data.append('')
-            if domain.class_.view not in ['source', 'file']:
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            tabs[domain.class_.view].table.rows.append(data)
-
-    if 'file' in tabs \
-            and current_user.settings['table_show_icons'] \
-            and g.settings['image_processing']:
-        tabs['file'].table.header.insert(1, uc_first(_('icon')))
-        for row in tabs['file'].table.rows:
-            row.insert(
-                1,
-                file_preview(
-                    int(row[0].replace('<a href="/entity/', '').split('"')[0]))
-            )
+    #if isinstance(entity, ReferenceSystem):
+    #    tabs |= add_tabs_for_reference_system(entity)
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
@@ -195,57 +116,6 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             entity,
             f"{_('link')} {_('reference')}"])
 
-
-def add_tabs_for_type(entity: Type) -> dict[str, Tab]:
-    tabs = {
-        'subs': Tab('subs', entity=entity),
-        'entities': Tab('entities', entity=entity)}
-    for sub_id in entity.subs:
-        sub = g.types[sub_id]
-        tabs['subs'].table.rows.append([
-            link(sub),
-            sub.count,
-            sub.description])
-    if entity.category == 'value':
-        tabs['entities'].table.header = \
-            [_('name'), _('value'), _('class'), _('info')]
-    place_classes = [
-            'feature',
-            'stratigraphic_unit',
-            'artifact',
-            'human_remains']
-    if any(item in g.types[entity.root[0]].classes for item in place_classes):
-        tabs['entities'].table.header.append('place')
-    root = g.types[entity.root[0]] if entity.root else entity
-    if root.name in app.config['PROPERTY_TYPES']:
-        tabs['entities'].table.header = [_('domain'), _('range')]
-        for row in Link.get_links_by_type(entity):
-            tabs['entities'].table.rows.append([
-                link(Entity.get_by_id(row['domain_id'])),
-                link(Entity.get_by_id(row['range_id']))])
-    else:
-        for item in entity.get_linked_entities(
-                ['P2', 'P89'],
-                inverse=True,
-                types=True):
-            if item.class_.name in ['location', 'reference_system']:
-                continue  # pragma: no cover
-            if item.class_.name == 'object_location':
-                item = item.get_linked_entity_safe('P53', inverse=True)
-            data = [link(item)]
-            if entity.category == 'value':
-                data.append(format_number(item.types[entity]))
-            data.append(item.class_.label)
-            data.append(item.description)
-            root_place = ''
-            if item.class_.name in place_classes:
-                if roots := item.get_linked_entities_recursive('P46', True):
-                    root_place = link(roots[0])
-            data.append(root_place)
-            tabs['entities'].table.rows.append(data)
-    return tabs
-
-
 def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
     tabs = {}
     for name in entity.classes:
@@ -272,43 +142,4 @@ def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
                     'reference_system_remove_class',
                     system_id=entity.id,
                     class_name=name))]
-    return tabs
-
-
-def add_tabs_for_file(entity: Entity) -> dict[str, Tab]:
-    tabs = {}
-    for name in [
-            'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'reference', 'type']:
-        tabs[name] = Tab(name, entity=entity)
-    entity.image_id = entity.id if get_file_path(entity.id) else None
-    for link_ in entity.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
-        tabs[range_.class_.view].table.rows.append(data)
-    for link_ in entity.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        data.append(link_.description)
-        #data.append(edit_link(
-        #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        # data.append(remove_link(link_.domain.name, link_, entity, 'reference'))
-        tabs['reference'].table.rows.append(data)
-    return tabs
-
-
-def add_tabs_for_reference(entity: Entity) -> dict[str, Tab]:
-    tabs = {}
-    for name in [
-            'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'file']:
-        tabs[name] = Tab(name, entity=entity)
-    for link_ in entity.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data.append(link_.description)
-        #data.append(edit_link(
-        #    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-        # data.append(remove_link(range_.name, link_, entity, range_.class_.name))
-        tabs[range_.class_.view].table.rows.append(data)
     return tabs

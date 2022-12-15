@@ -1,7 +1,7 @@
 from typing import Any, Optional, Union
 
 from flask import g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 
 from openatlas import app
@@ -15,9 +15,11 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, display_delete_link, external_url, format_date,
+    bookmark_toggle, button, display_delete_link, download_button,
+    external_url, format_date,
     format_entity_date, get_appearance, get_base_table_data, get_system_data,
     get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
+from openatlas.views.entity_index import file_preview
 
 
 class BaseDisplay:
@@ -73,13 +75,25 @@ class BaseDisplay:
             self.gis_data = Gis.get_all(self.linked_places)
         self.buttons.append(siblings_pager(self.entity, self.structure))
 
-        # if self.entity.class_.view == 'file':
-        #    if self.entity.image_id:
-        #        buttons.append(download_button(self.entity))
-        #    else:
-        #        buttons.append(
-        #            '<span class="error">' + uc_first(_("missing file")) +
-        #            '</span>')
+        if 'file' in self.tabs \
+                and current_user.settings['table_show_icons'] \
+                and g.settings['image_processing']:
+            self.tabs['file'].table.header.insert(1, uc_first(_('icon')))
+            for row in self.tabs['file'].table.rows:
+                row.insert(
+                    1,
+                    file_preview(
+                        int(
+                            row[0].
+                            replace('<a href="/entity/', '').split('"')[0])))
+
+        if self.entity.class_.view == 'file':
+            if self.entity.image_id:
+                self.buttons.append(download_button(self.entity))
+            else:
+                self.buttons.append(
+                    '<span class="error">' + uc_first(_("missing file")) +
+                    '</span>')
 
         self.tabs['info'].content = render_template(
             'entity/view.html',
@@ -468,6 +482,9 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
+    def add_info_content(self):
+        super().add_info_content()
+
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -549,5 +566,82 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not structure or not structure['supers']):
             self.gis_data = {}
 
-    def add_info_content(self):
-        super().add_info_content()
+class ReferenceBaseDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for name in [
+            'source', 'event', 'actor', 'place', 'feature',
+            'stratigraphic_unit', 'artifact', 'file']:
+            self.tabs[name] = Tab(name, entity=self.entity)
+        for link_ in self.entity.get_links('P67'):
+            range_ = link_.range
+            data = get_base_table_data(range_)
+            data.append(link_.description)
+            data.append(
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
+            data.append(
+                remove_link(
+                    range_.name,
+                    link_,
+                    self.entity,
+                    range_.class_.name))
+            self.tabs[range_.class_.view].table.rows.append(data)
+
+class TypeBaseDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        self.tabs['subs'] = Tab('subs', entity=self.entity)
+        self.tabs['entities'] = Tab('entities', entity=self.entity)
+        for sub_id in self.entity.subs:
+            sub = g.types[sub_id]
+            self.tabs['subs'].table.rows.append([
+                link(sub),
+                sub.count,
+                sub.description])
+        if self.entity.category == 'value':
+            self.tabs['entities'].table.header = \
+                [_('name'), _('value'), _('class'), _('info')]
+        place_classes = [
+            'feature',
+            'stratigraphic_unit',
+            'artifact',
+            'human_remains']
+        if any(item in g.types[self.entity.root[0]].classes for item in
+               place_classes):
+            self.tabs['entities'].table.header.append('place')
+        root = g.types[self.entity.root[0]] if self.entity.root \
+            else self.entity
+        if root.name in app.config['PROPERTY_TYPES']:
+            self.tabs['entities'].table.header = [_('domain'), _('range')]
+            for row in Link.get_links_by_type(self.entity):
+                self.tabs['entities'].table.rows.append([
+                    link(Entity.get_by_id(row['domain_id'])),
+                    link(Entity.get_by_id(row['range_id']))])
+        else:
+            for item in self.entity.get_linked_entities(
+                    ['P2', 'P89'],
+                    inverse=True,
+                    types=True):
+                if item.class_.name in ['location', 'reference_system']:
+                    continue  # pragma: no cover
+                if item.class_.name == 'object_location':
+                    item = item.get_linked_entity_safe('P53', inverse=True)
+                data = [link(item)]
+                if self.entity.category == 'value':
+                    data.append(format_number(item.types[self.entity]))
+                data.append(item.class_.label)
+                data.append(item.description)
+                root_place = ''
+                if item.class_.name in place_classes:
+                    if roots := item.get_linked_entities_recursive('P46',
+                                                                   True):
+                        root_place = link(roots[0])
+                data.append(root_place)
+                self.tabs['entities'].table.rows.append(data)
+
