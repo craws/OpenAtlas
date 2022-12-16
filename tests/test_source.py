@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class SourceTest(TestBaseCase):
@@ -21,7 +21,7 @@ class SourceTest(TestBaseCase):
                     'person',
                     'Gillian Anderson Gillian Anderson',
                     'person')
-                artifact = Entity.insert('artifact', 'I care for you')
+                artifact = insert_entity('I care for you', 'artifact')
                 inscribed_artifact = Entity.insert(
                     'artifact',
                     'Artifact with text')
@@ -123,6 +123,8 @@ class SourceTest(TestBaseCase):
                 url_for('entity_add_reference', id_=source.id),
                 data={'reference': reference.id, 'page': '777'},
                 follow_redirects=True)
+            # Todo: fix page display at reference tab of source
+            print(rv.data)
             assert b'777' in rv.data
 
             rv = self.app.get(url_for(

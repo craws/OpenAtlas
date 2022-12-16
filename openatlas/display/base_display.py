@@ -598,6 +598,7 @@ class TypeBaseDisplay(BaseDisplay):
         super().add_tabs()
         self.tabs['subs'] = Tab('subs', entity=self.entity)
         self.tabs['entities'] = Tab('entities', entity=self.entity)
+        self.tabs['file'] = Tab('file', entity=self.entity)
         for sub_id in self.entity.subs:
             sub = g.types[sub_id]
             self.tabs['subs'].table.rows.append([
@@ -639,9 +640,31 @@ class TypeBaseDisplay(BaseDisplay):
                 data.append(item.description)
                 root_place = ''
                 if item.class_.name in place_classes:
-                    if roots := item.get_linked_entities_recursive('P46',
-                                                                   True):
+                    if roots := item.get_linked_entities_recursive(
+                            'P46',
+                            True):
                         root_place = link(roots[0])
                 data.append(root_place)
                 self.tabs['entities'].table.rows.append(data)
+
+        for link_ in self.entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    self.get_profile_image_table_link(domain, extension))
+                if not self.entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    self.entity.image_id = domain.id
+            if domain.class_.view not in ['source', 'file']:
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=self.entity.id)))
+                if domain.class_.view == 'reference_system':
+                    self.entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(domain.name, link_, self.entity, domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)
 
