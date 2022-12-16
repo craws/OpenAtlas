@@ -123,8 +123,6 @@ class SourceTest(TestBaseCase):
                 url_for('entity_add_reference', id_=source.id),
                 data={'reference': reference.id, 'page': '777'},
                 follow_redirects=True)
-            # Todo: fix page display at reference tab of source
-            print(rv.data)
             assert b'777' in rv.data
 
             rv = self.app.get(url_for(

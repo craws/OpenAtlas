@@ -184,6 +184,17 @@ class SourceDisplay(BaseDisplay):
                 if not self.entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     self.entity.image_id = domain.id
+            if domain.class_.view != 'file':
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
+                if domain.class_.view == \
+                        'reference_system':  # pragma: no cover
+                    self.entity.reference_systems.append(link_)
+                    continue
             data.append(
                 remove_link(
                     domain.name,

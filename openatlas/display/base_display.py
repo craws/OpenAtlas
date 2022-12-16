@@ -278,8 +278,6 @@ class BaseDisplay:
                 entity.get_linked_entities('P128', inverse=True)]
         if hasattr(current_user, 'settings'):
             data |= get_system_data(entity)
-        if not self.gis_data and self.linked_places:
-            self.gis_data = Gis.get_all(self.linked_places)
         self.add_note_tab()
         return data
 
@@ -472,7 +470,8 @@ class EventsDisplay(BaseDisplay):
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
+                if domain.class_.view \
+                        == 'reference_system':  # pragma: no cover
                     entity.reference_systems.append(link_)
                     continue
             data.append(
@@ -657,10 +656,14 @@ class TypeBaseDisplay(BaseDisplay):
                 if not self.entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     self.entity.image_id = domain.id
-            if domain.class_.view not in ['source', 'file']:
+            if domain.class_.view \
+                    not in ['source', 'file']:  # pragma: no cover
                 data.append(link_.description)
                 data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=self.entity.id)))
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)))
                 if domain.class_.view == 'reference_system':
                     self.entity.reference_systems.append(link_)
                     continue
