@@ -24,7 +24,7 @@ from openatlas.views.entity_index import file_preview
 
 class BaseDisplay:
 
-    entity: Union[Entity, Type]
+    entity: Union[Entity, ReferenceSystem, Type]
     tabs: dict[str, Tab]
     events: Optional[list[Entity]]
     event_links: Optional[list[Link]] = None  # Needed for actor and info data

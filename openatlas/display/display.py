@@ -8,7 +8,9 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
-from openatlas.util.util import get_base_table_data, get_file_path, link
+from openatlas.util.table import Table
+from openatlas.util.util import (
+    button, get_base_table_data, get_file_path, is_authorized, link)
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -113,6 +115,34 @@ class PlaceDisplay(PlaceBaseDisplay):
 class ProductionDisplay(EventsDisplay):
     pass
 
+class ReferenceSystemDisplay(BaseDisplay):
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for name in self.entity.classes:
+            self.tabs[name] = Tab(
+                name,
+                entity=self.entity,
+                table=Table([_('entity'), 'id', _('precision')]))
+        for link_ in self.entity.get_links('P67'):
+            name = link_.description
+            if self.entity.resolver_url:
+                name = \
+                    f'<a href="{self.entity.resolver_url}{name}"' \
+                    f' target="_blank" rel="noopener noreferrer">{name}</a>'
+            self.tabs[link_.range.class_.name].table.rows.append([
+                link(link_.range),
+                name,
+                link_.type.name])
+        for name in self.entity.classes:
+            self.tabs[name].buttons = []
+            if not self.tabs[name].table.rows and is_authorized('manager'):
+                self.tabs[name].buttons = [button(
+                    _('remove'),
+                    url_for(
+                        'reference_system_remove_class',
+                        system_id=self.entity.id,
+                        class_name=name))]
 
 class SourceDisplay(BaseDisplay):
 

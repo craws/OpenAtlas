@@ -8,13 +8,9 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display import display
-from openatlas.display.tab import Tab
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, display_form, is_authorized, link, required_group, uc_first)
+from openatlas.util.util import display_form, required_group, uc_first
 from openatlas.views.link import AddReferenceForm
 
 
@@ -43,10 +39,6 @@ def view(id_: int) -> Union[str, Response]:
         entity=entity,
         gis_data=manager.gis_data,
         crumbs=manager.crumbs)
-
-    #if isinstance(entity, ReferenceSystem):
-    #    tabs |= add_tabs_for_reference_system(entity)
-
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
@@ -115,31 +107,3 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_('reference')}"])
-
-def add_tabs_for_reference_system(entity: ReferenceSystem) -> dict[str, Tab]:
-    tabs = {}
-    for name in entity.classes:
-        tabs[name] = Tab(
-            name,
-            entity=entity,
-            table=Table([_('entity'), 'id', _('precision')]))
-    for link_ in entity.get_links('P67'):
-        name = link_.description
-        if entity.resolver_url:
-            name = \
-                f'<a href="{entity.resolver_url}{name}"' \
-                f' target="_blank" rel="noopener noreferrer">{name}</a>'
-        tabs[link_.range.class_.name].table.rows.append([
-            link(link_.range),
-            name,
-            link_.type.name])
-    for name in entity.classes:
-        tabs[name].buttons = []
-        if not tabs[name].table.rows and is_authorized('manager'):
-            tabs[name].buttons = [button(
-                _('remove'),
-                url_for(
-                    'reference_system_remove_class',
-                    system_id=entity.id,
-                    class_name=name))]
-    return tabs
