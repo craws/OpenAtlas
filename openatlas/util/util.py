@@ -31,7 +31,6 @@ from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.type import Type
     from openatlas.models.user import User
 
 
@@ -314,26 +313,6 @@ def convert_size(size_bytes: int) -> str:
 def delete_link(name: str, url: str) -> str:
     confirm = _('Delete %(name)s?', name=name.replace("'", ''))
     return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
-
-
-def display_delete_link(entity: Union[Entity, Type]) -> str:
-    from openatlas.models.type import Type
-    confirm = ''
-    if isinstance(entity, Type):
-        url = url_for('type_delete', id_=entity.id)
-        if entity.count or entity.subs:
-            url = url_for('type_delete_recursive', id_=entity.id)
-    else:
-        if current_user.group == 'contributor':  # pragma: no cover
-            info = g.logger.get_log_info(entity.id)
-            if not info['creator'] or info['creator'].id != current_user.id:
-                return ''
-        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
-        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-    return button(
-        _('delete'),
-        url,
-        onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
 @app.template_filter()

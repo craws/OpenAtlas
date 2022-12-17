@@ -16,9 +16,9 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, display_delete_link, download_button,
-    external_link, format_date, get_base_table_data, get_type_data,
-    is_authorized, link, manual, siblings_pager, uc_first)
+    bookmark_toggle, button, download_button, external_link, format_date,
+    get_base_table_data, get_type_data, is_authorized, link, manual,
+    siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -126,23 +126,23 @@ class BaseDisplay:
             if self.entity.root and self.entity.category != 'system':
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
-                self.buttons.append(display_delete_link(self.entity))
+                self.buttons.append(self.display_delete_link())
         elif isinstance(self.entity, ReferenceSystem):
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
             if not self.entity.classes and not self.entity.system:
-                self.buttons.append(display_delete_link(self.entity))
+                self.buttons.append(self.display_delete_link())
         elif self.entity.class_.name == 'source_translation':
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(display_delete_link(self.entity))
+            self.buttons.append(self.display_delete_link())
         else:
             if not type_problem:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             if self.entity.class_.view != 'place' \
                     or not self.entity.get_linked_entities('P46'):
-                self.buttons.append(display_delete_link(self.entity))
+                self.buttons.append(self.display_delete_link())
         if self.entity.class_.name == 'stratigraphic_unit':
             self.buttons.append(
                 button(
@@ -305,6 +305,29 @@ class BaseDisplay:
             data['API'] = \
                 render_template('util/api_links.html', entity=self.entity)
         return data
+
+    def display_delete_link(self) -> str:
+        entity = self.entity
+        confirm = ''
+        if isinstance(entity, Type):
+            url = url_for('type_delete', id_=entity.id)
+            if entity.count or entity.subs:
+                url = url_for('type_delete_recursive', id_=entity.id)
+        else:
+            if current_user.group == 'contributor':  # pragma: no cover
+                info = g.logger.get_log_info(entity.id)
+                if not info['creator'] \
+                        or info['creator'].id != current_user.id:
+                    return ''
+            url = url_for(
+                'index',
+                view=entity.class_.view,
+                delete_id=entity.id)
+            confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+        return button(
+            _('delete'),
+            url,
+            onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
 class ActorDisplay(BaseDisplay):
