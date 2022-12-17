@@ -17,8 +17,8 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, download_button,
-    external_link, format_date, get_base_table_data, get_system_data,
-    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
+    external_link, format_date, get_base_table_data, get_type_data,
+    is_authorized, link, manual, siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -278,8 +278,32 @@ class BaseDisplay:
                 link(artifact) for artifact in
                 entity.get_linked_entities('P128', inverse=True)]
         if hasattr(current_user, 'settings'):
-            data |= get_system_data(entity)
+            data |= self.get_system_data()
         self.add_note_tab()
+        return data
+
+    def get_system_data(self) -> dict[str, Any]:
+        data = {}
+        if 'entity_show_class' in current_user.settings \
+                and current_user.settings['entity_show_class']:
+            data[_('class')] = link(self.entity.cidoc_class)
+        info = g.logger.get_log_info(self.entity.id)
+        if 'entity_show_dates' in current_user.settings \
+                and current_user.settings['entity_show_dates']:
+            data[_('created')] = \
+                f"{format_date(self.entity.created)} {link(info['creator'])}"
+            if info['modified']:
+                data[_('modified')] = \
+                    f"{format_date(info['modified'])} {link(info['modifier'])}"
+        if 'entity_show_import' in current_user.settings \
+                and current_user.settings['entity_show_import']:
+            data[_('imported from')] = link(info['project'])
+            data[_('imported by')] = link(info['importer'])
+            data['origin ID'] = info['origin_id']
+        if 'entity_show_api' in current_user.settings \
+                and current_user.settings['entity_show_api']:
+            data['API'] = \
+                render_template('util/api_links.html', entity=self.entity)
         return data
 
 

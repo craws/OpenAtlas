@@ -303,30 +303,6 @@ def external_link(url: Union[str, None], label: Optional[str] = '') -> str:
         f'{label or url}</a>' if url else ''
 
 
-def get_system_data(entity: Entity) -> dict[str, Any]:
-    data = {}
-    if 'entity_show_class' in current_user.settings \
-            and current_user.settings['entity_show_class']:
-        data[_('class')] = link(entity.cidoc_class)
-    info = g.logger.get_log_info(entity.id)
-    if 'entity_show_dates' in current_user.settings \
-            and current_user.settings['entity_show_dates']:
-        data[_('created')] = \
-            f"{format_date(entity.created)} {link(info['creator'])}"
-        if info['modified']:
-            data[_('modified')] = \
-                f"{format_date(info['modified'])} {link(info['modifier'])}"
-    if 'entity_show_import' in current_user.settings \
-            and current_user.settings['entity_show_import']:
-        data[_('imported from')] = link(info['project'])
-        data[_('imported by')] = link(info['importer'])
-        data['origin ID'] = info['origin_id']
-    if 'entity_show_api' in current_user.settings \
-            and current_user.settings['entity_show_api']:
-        data['API'] = render_template('util/api_links.html', entity=entity)
-    return data
-
-
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0 B"  # pragma: no cover
