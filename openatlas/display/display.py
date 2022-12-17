@@ -10,7 +10,8 @@ from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, get_base_table_data, get_file_path, is_authorized, link)
+    button, external_link, get_base_table_data, get_file_path, is_authorized,
+    link)
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -148,14 +149,12 @@ class ReferenceSystemDisplay(BaseDisplay):
                 entity=self.entity,
                 table=Table([_('entity'), 'id', _('precision')]))
         for link_ in self.entity.get_links('P67'):
-            name = link_.description
-            if self.entity.resolver_url:
-                name = \
-                    f'<a href="{self.entity.resolver_url}{name}"' \
-                    f' target="_blank" rel="noopener noreferrer">{name}</a>'
             self.tabs[link_.range.class_.name].table.rows.append([
                 link(link_.range),
-                name,
+                external_link(
+                    f'{self.entity.resolver_url}{link_.description}',
+                    link_.description)
+                if self.entity.resolver_url else link_.description,
                 link_.type.name])
         for name in self.entity.classes:
             self.tabs[name].buttons = []

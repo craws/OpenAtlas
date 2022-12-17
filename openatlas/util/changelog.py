@@ -1,3 +1,5 @@
+from openatlas.util.util import external_link
+
 versions = {
     '7.9.0': ['TBA', {
         'feature': {
@@ -728,5 +730,5 @@ versions = {
     '0.0.1': ['2014-11-05', {
         'feature': {
             '':
-                'Initial version based on the "Zend Base" project from '
-                '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}
+                'Initial version based on the "Zend Base" project from ' +
+                external_link("https://craws.net", 'craws.net')}}]}

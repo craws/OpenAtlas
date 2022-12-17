@@ -296,10 +296,11 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
-def external_url(url: Union[str, None]) -> str:
+@app.template_filter()
+def external_link(url: Union[str, None], label: Optional[str] = '') -> str:
     return \
-        f'<a target="blank_" rel="noopener noreferrer" href="{url}">' \
-        f'{url}</a>' if url else ''
+        f'<a target="_blank" rel="noopener noreferrer" href="{url}">' \
+        f'{label or url}</a>' if url else ''
 
 
 def get_system_data(entity: Entity) -> dict[str, Any]:
@@ -569,9 +570,9 @@ def manual(site: str) -> str:
         # print(f'Missing manual link: {path}')
         return ''
     return \
-        '<a title="' + uc_first("manual") + \
-        f'" href="/static/manual/{site}.html" ' \
-        f'class="manual" target="_blank" ><i class="fas fa-book"></i></a>'
+        '<a title="' + uc_first("manual") + '" ' \
+        f'href="/static/manual/{site}.html" class="manual" target="_blank" ' \
+        'rel="noopener noreferrer"><i class="fas fa-book"></i></a>'
 
 
 @app.template_filter()

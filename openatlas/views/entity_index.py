@@ -15,7 +15,7 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.image_processing import check_processed_image
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, external_url, format_date, get_base_table_data, get_file_path,
+    button, external_link, format_date, get_base_table_data, get_file_path,
     is_authorized, link, manual, required_group)
 
 
@@ -83,8 +83,8 @@ def get_table(view: str) -> Table:
             table.rows.append([
                 link(system),
                 system.count or '',
-                external_url(system.website_url),
-                external_url(system.resolver_url),
+                external_link(system.website_url),
+                external_link(system.resolver_url),
                 system.placeholder,
                 link(g.types[system.precision_default_id])
                 if system.precision_default_id else '',
