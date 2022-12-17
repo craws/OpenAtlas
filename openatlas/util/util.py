@@ -272,11 +272,6 @@ def tooltip(text: str) -> str:
         </span>""".format(title=text.replace('"', "'"))
 
 
-def get_file_extension(entity: Union[int, Entity]) -> str:
-    path = get_file_path(entity if isinstance(entity, int) else entity.id)
-    return path.suffix if path else 'N/A'
-
-
 def get_file_path(
         entity: Union[int, Entity],
         size: Optional[str] = None) -> Optional[Path]:

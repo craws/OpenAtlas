@@ -17,8 +17,7 @@ from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import (
-    get_base_table_data, get_file_extension, uc_first)
+from openatlas.util.util import get_base_table_data, get_file_path, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.link import Link
@@ -195,13 +194,11 @@ class GlobalSearchForm(FlaskForm):
 def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
     def get_logo() -> str:
         if g.settings['logo_file_id']:
-            ext = get_file_extension(int(g.settings['logo_file_id']))
-            if ext != 'N/A':
+            if path := get_file_path(int(g.settings['logo_file_id'])):
                 return url_for(
                     'display_logo',
-                    filename=f"{g.settings['logo_file_id']}{ext}")
+                    filename=f"{g.settings['logo_file_id']}{path.suffix}")
         return str(Path('/static') / 'images' / 'layout' / 'logo.png')
-
     return dict(
         get_logo=get_logo(),
         search_form=GlobalSearchForm(prefix='global'))
