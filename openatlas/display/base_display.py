@@ -6,7 +6,7 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.util import edit_link, remove_link
+from openatlas.display.util import ext_references, edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -16,9 +16,9 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, download_button,
-    external_url, format_date,
-    format_entity_date, get_appearance, get_base_table_data, get_system_data,
-    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
+    external_url, format_date, format_entity_date, get_appearance,
+    get_base_table_data, get_system_data, get_type_data, is_authorized, link,
+    manual, siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -102,6 +102,7 @@ class BaseDisplay:
             gis_data=self.gis_data,
             overlays=self.overlays,
             title=self.entity.name,
+            ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=problematic_type_id)
 
     def add_note_tab(self) -> None:
@@ -565,13 +566,14 @@ class PlaceBaseDisplay(BaseDisplay):
                 and (not structure or not structure['supers']):
             self.gis_data = {}
 
+
 class ReferenceBaseDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
         for name in [
-            'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'file']:
+                'source', 'event', 'actor', 'place', 'feature',
+                'stratigraphic_unit', 'artifact', 'file']:
             self.tabs[name] = Tab(name, entity=self.entity)
         for link_ in self.entity.get_links('P67'):
             range_ = link_.range
@@ -590,6 +592,7 @@ class ReferenceBaseDisplay(BaseDisplay):
                     self.entity,
                     range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
+
 
 class TypeBaseDisplay(BaseDisplay):
 
@@ -668,6 +671,9 @@ class TypeBaseDisplay(BaseDisplay):
                     self.entity.reference_systems.append(link_)
                     continue
             data.append(
-                remove_link(domain.name, link_, self.entity, domain.class_.view))
+                remove_link(
+                    domain.name,
+                    link_,
+                    self.entity,
+                    domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
-

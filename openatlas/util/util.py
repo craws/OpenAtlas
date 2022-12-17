@@ -49,11 +49,6 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
 
 
 @app.template_filter()
-def display_external_references(entity: Entity) -> str:
-    return render_template('util/external_references.html', entity=entity)
-
-
-@app.template_filter()
 def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
     if entity:
