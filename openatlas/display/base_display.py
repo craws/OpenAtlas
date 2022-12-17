@@ -6,7 +6,8 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.display.util import ext_references, edit_link, remove_link
+from openatlas.display.util import (
+    edit_link, ext_references, format_entity_date, get_appearance, remove_link)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -16,9 +17,8 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
     bookmark_toggle, button, display_delete_link, download_button,
-    external_url, format_date, format_entity_date, get_appearance,
-    get_base_table_data, get_system_data, get_type_data, is_authorized, link,
-    manual, siblings_pager, uc_first)
+    external_url, format_date, get_base_table_data, get_system_data,
+    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 
 

@@ -17,8 +17,8 @@ from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_extension, \
-    uc_first
+from openatlas.util.util import (
+    get_base_table_data, get_file_extension, uc_first)
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.link import Link

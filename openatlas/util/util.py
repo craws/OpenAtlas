@@ -31,7 +31,6 @@ from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
-    from openatlas.models.link import Link
     from openatlas.models.type import Type
     from openatlas.models.user import User
 
@@ -113,24 +112,6 @@ def sanitize(string: str, mode: Optional[str] = None) -> str:
 @app.template_filter()
 def test_file(file_name: str) -> Optional[str]:
     return file_name if (Path(app.root_path) / file_name).is_file() else None
-
-
-def format_entity_date(
-        entity: Union[Entity, Link],
-        type_: str,  # begin or end
-        object_: Optional[Entity] = None) -> str:
-    html = link(object_) if object_ else ''
-    if getattr(entity, f'{type_}_from'):
-        html += ', ' if html else ''
-        if getattr(entity, f'{type_}_to'):
-            html += _(
-                'between %(begin)s and %(end)s',
-                begin=format_date(getattr(entity, f'{type_}_from')),
-                end=format_date(getattr(entity, f'{type_}_to')))
-        else:
-            html += format_date(getattr(entity, f'{type_}_from'))
-    comment = getattr(entity, f'{type_}_comment')
-    return html + (f" ({comment})" if comment else '')
 
 
 def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
@@ -289,49 +270,6 @@ def tooltip(text: str) -> str:
         <span>
             <i class="fas fa-info-circle tooltipicon" title="{title}"></i>
         </span>""".format(title=text.replace('"', "'"))
-
-
-def get_appearance(event_links: list[Link]) -> tuple[str, str]:
-    # Get first/last appearance year from events for actors without begin/end
-    first_year = None
-    last_year = None
-    first_string = ''
-    last_string = ''
-    for link_ in event_links:
-        event = link_.domain
-        actor = link_.range
-        event_link = link(_('event'), url_for('view', id_=event.id))
-        if not actor.first:
-            if link_.first \
-                    and (not first_year or int(link_.first) < int(first_year)):
-                first_year = link_.first
-                first_string = \
-                    f"{format_entity_date(link_, 'begin', link_.object_)} " \
-                    f"{_('at an')} {event_link}"
-            elif event.first \
-                    and (not first_year or int(event.first) < int(first_year)):
-                first_year = event.first
-                first_string = \
-                    f"{format_entity_date(event, 'begin', link_.object_)}" \
-                    f" {_('at an')} {event_link}"
-        if not actor.last:
-            if link_.last \
-                    and (not last_year or int(link_.last) > int(last_year)):
-                last_year = link_.last
-                last_string = \
-                    f"{format_entity_date(link_, 'end', link_.object_)} " \
-                    f"{_('at an')} {event_link}"
-            elif event.last \
-                    and (not last_year or int(event.last) > int(last_year)):
-                last_year = event.last
-                last_string = \
-                    f"{format_entity_date(event, 'end', link_.object_)} " \
-                    f"{_('at an')} {event_link}"
-    return first_string, last_string
-
-
-def format_datetime(value: Any) -> str:
-    return value.replace(microsecond=0).isoformat() if value else ''
 
 
 def get_file_extension(entity: Union[int, Entity]) -> str:

@@ -35,8 +35,8 @@ from openatlas.util.image_processing import (
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_file_path, is_authorized, link, manual,
-    required_group, sanitize, send_mail, uc_first)
+    get_file_path, is_authorized, link, manual, required_group, sanitize,
+    send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -657,8 +657,10 @@ def admin_log() -> str:
                 user = link(User.get_by_id(row['user_id']))
             except AttributeError:  # pragma: no cover - user already deleted
                 user = f"id {row['user_id']}"
+
         table.rows.append([
-            format_datetime(row['created']),
+            row['created'].replace(microsecond=0).isoformat()
+            if row['created'] else '',
             f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
             row['type'],
             row['message'],
