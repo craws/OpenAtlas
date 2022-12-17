@@ -16,11 +16,14 @@ from openatlas.util.util import (
 class AcquisitionDisplay(EventsDisplay):
     pass
 
+
 class ActivityDisplay(EventsDisplay):
     pass
 
+
 class AdministrativeUnitDisplay(TypeBaseDisplay):
     pass
+
 
 class ArtifactDisplay(PlaceBaseDisplay):
 
@@ -30,16 +33,18 @@ class ArtifactDisplay(PlaceBaseDisplay):
             self.tabs['event'].table.rows.append(
                 get_base_table_data(link_.domain))
 
+
 class BibliographyDisplay(ReferenceBaseDisplay):
     pass
+
 
 class FileDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
         for name in [
-            'source', 'event', 'actor', 'place', 'feature',
-            'stratigraphic_unit', 'artifact', 'reference', 'type']:
+                'source', 'event', 'actor', 'place', 'feature',
+                'stratigraphic_unit', 'artifact', 'reference', 'type']:
             self.tabs[name] = Tab(name, entity=self.entity)
         self.entity.image_id = self.entity.id \
             if get_file_path(self.entity.id) else None
@@ -56,7 +61,10 @@ class FileDisplay(BaseDisplay):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
             data.append(edit_link(
-                url_for('link_update', id_=link_.id, origin_id=self.entity.id)))
+                url_for(
+                    'link_update',
+                    id_=link_.id,
+                    origin_id=self.entity.id)))
             data.append(
                 remove_link(
                     link_.domain.name,
@@ -65,29 +73,38 @@ class FileDisplay(BaseDisplay):
                     'reference'))
             self.tabs['reference'].table.rows.append(data)
 
+
 class EditionDisplay(ReferenceBaseDisplay):
     pass
+
 
 class EventDisplay(EventsDisplay):
     pass
 
+
 class ExternalReferenceDisplay(ReferenceBaseDisplay):
     pass
+
 
 class FeatureDisplay(PlaceBaseDisplay):
     pass
 
+
 class GroupDisplay(ActorDisplay):
     pass
+
 
 class HumanRemainsDisplay(PlaceBaseDisplay):
     pass
 
+
 class MoveDisplay(EventsDisplay):
     pass
 
+
 class PersonDisplay(ActorDisplay):
     pass
+
 
 class PlaceDisplay(PlaceBaseDisplay):
 
@@ -120,6 +137,7 @@ class PlaceDisplay(PlaceBaseDisplay):
 class ProductionDisplay(EventsDisplay):
     pass
 
+
 class ReferenceSystemDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
@@ -148,6 +166,7 @@ class ReferenceSystemDisplay(BaseDisplay):
                         'reference_system_remove_class',
                         system_id=self.entity.id,
                         class_name=name))]
+
 
 class SourceDisplay(BaseDisplay):
 
@@ -204,11 +223,14 @@ class SourceDisplay(BaseDisplay):
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
 
+
 class SourceTranslationDisplay(BaseDisplay):
     pass
 
+
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
     pass
+
 
 class TypeDisplay(TypeBaseDisplay):
     pass
