@@ -7,8 +7,7 @@ from flask_babel import lazy_gettext as _
 
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import (
-    external_link, format_date, is_authorized, link,  uc_first)
+from openatlas.util.util import format_date, is_authorized, link, uc_first
 
 
 def remove_link(
@@ -36,9 +35,10 @@ def ext_references(links: list[Link]) -> str:
     html = '<h2>' + uc_first(_("external reference systems")) + '</h2>'
     for link_ in links:
         system = g.reference_systems[link_.domain.id]
-        html += external_link(
+        html += link(
             f'{system.resolver_url}{link_.description}',
-            link_.description) if system.resolver_url else link_.description
+            link_.description,
+            external=True) if system.resolver_url else link_.description
         html += \
             f' ({ g.types[link_.type.id].name } ' + _('at') + \
             f' { link(link_.domain) })<br>'

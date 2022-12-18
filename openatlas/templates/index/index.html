@@ -6,17 +6,12 @@
 <div style="float:left; ">
   <div class="toolbar">
     <p>
-      <a
-        class="{{ config.CSS.button.primary }}"
-        href="/static/manual/index.html"
-        target="_blank"
-        rel="noopener noreferrer">
-          <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
-      </a>
+      {{
+        ('<i class="fas fa-book"></i> ' + _('manual')|uc_first)|
+        link("/static/manual/index.html", class_=config.CSS.button.primary, external=True)|safe
+      }}
       {{ _('model')|button(url_for('model_index'))|safe }}
-      <a class="{{ config.CSS.button.primary }}" href="{{ url_for('index', view='reference_system') }}">
-          {{ _('reference systems')|uc_first }}
-      </a>
+      {{ (_('reference systems')|uc_first)|link(url_for('index', view='reference_system'), class_=config.CSS.button.primary)|safe }}
       {{ _('network visualization')|button(url_for('model_network'))|safe }}
     </p>
     <p>

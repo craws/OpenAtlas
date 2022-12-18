@@ -16,9 +16,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, download_button, external_link, format_date,
-    get_base_table_data, get_type_data, is_authorized, link, manual,
-    siblings_pager, uc_first)
+    bookmark_toggle, button, download_button, format_date, get_base_table_data,
+    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -202,8 +201,10 @@ class BaseDisplay:
                 data[_('unit')] = entity.description
             data[_('ID for imports')] = entity.id
         elif isinstance(entity, ReferenceSystem):
-            data[_('website URL')] = external_link(entity.website_url)
-            data[_('resolver URL')] = external_link(entity.resolver_url)
+            data[_('website URL')] = \
+                link(entity.website_url, entity.website_url, external=True)
+            data[_('resolver URL')] = \
+                link(entity.resolver_url, entity.resolver_url, external=True)
             data[_('example ID')] = entity.placeholder
         elif entity.class_.view == 'actor':
             begin_object = None

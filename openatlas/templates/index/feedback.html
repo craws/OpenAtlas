@@ -7,7 +7,7 @@
     <li>
       <p>
         {{ _('feedback redmine') }}:
-        {{ "https://redmine.openatlas.eu/projects/uni"|external_link("https://redmine.openatlas.eu")| safe }}
+        {{ "https://redmine.openatlas.eu/projects/uni"|link("https://redmine.openatlas.eu", external=True)| safe }}
       </p>
     </li>
     {% if g.settings.mail_recipients_feedback[0] %}

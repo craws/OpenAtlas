@@ -10,9 +10,7 @@
   {% endif %}
   {% if entity.class_.view == 'file' %}
     {% if path.suffix.lower() in ext %}
-      <a href="{{ url }}" rel="noopener noreferrer" target="_blank">
-        <img style="{{ style }}" alt="image" src="{{ src }}">
-      </a>
+      {{ ('<img style="' + style + '" alt="image" src="' + src + '">')|link(url, external=True)|safe }}
     {% else %}
       {{ _('no preview available')|uc_first }}
     {% endif %}

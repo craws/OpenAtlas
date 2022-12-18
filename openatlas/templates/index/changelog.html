@@ -13,7 +13,7 @@
           <li class="changelog">
             {% if issue_number %}
               {{ issue_type|uc_first }}
-              {{ ("https://redmine.openatlas.eu/issues/" + issue_number)|external_link(issue_number)|safe }}
+              {{ ("https://redmine.openatlas.eu/issues/" + issue_number)|link(issue_number, external=True)|safe }}
               {{ issue_text|safe }}
             {% else %}
               {{ issue_text|safe }}

@@ -295,13 +295,6 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     return value.date().isoformat().replace(' 00:00:00', '')
 
 
-@app.template_filter()
-def external_link(url: Union[str, None], label: Optional[str] = '') -> str:
-    return \
-        f'<a target="_blank" rel="noopener noreferrer" href="{url}">' \
-        f'{label or url}</a>' if url else ''
-
-
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0 B"  # pragma: no cover
@@ -321,14 +314,16 @@ def link(
         url: Optional[str] = None,
         class_: Optional[str] = '',
         uc_first_: Optional[bool] = True,
-        js: Optional[str] = None) -> str:
+        js: Optional[str] = None,
+        external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
         label = uc_first(str(object_)) if uc_first_ else object_
-        class_ = 'class="{class_}"' if class_ else ''
-        return f'<a href="{url}" {class_} {js}>{label}</a>'
+        class_ = f'class="{class_}"' if class_ else ''
+        ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
+        return f'<a href="{url}" {class_} {js} {ext}>{label}</a>'
     if isinstance(object_, Entity):
         return link(
             object_.name,
