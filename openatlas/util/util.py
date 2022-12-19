@@ -4,7 +4,6 @@ import math
 import os
 import re
 import smtplib
-from collections import defaultdict
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
@@ -366,13 +365,11 @@ def button(
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
 
-
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
     return \
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
         if buttons else ''
-
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
@@ -381,29 +378,6 @@ def display_citation_example(code: str) -> str:
     if text := get_translation('citation_example'):
         return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
     return ''  # pragma: no cover
-
-
-def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
-    if not structure or len(structure['siblings']) < 2:
-        return ''
-    structure['siblings'].sort(key=lambda x: x.id)
-    prev_id = None
-    next_id = None
-    position = None
-    for counter, sibling in enumerate(structure['siblings']):
-        position = counter + 1
-        prev_id = sibling.id if sibling.id < entity.id else prev_id
-        if sibling.id > entity.id:
-            next_id = sibling.id
-            position = counter
-            break
-    parts = []
-    if prev_id:  # pragma: no cover
-        parts.append(button('<', url_for('view', id_=prev_id)))
-    if next_id:
-        parts.append(button('>', url_for('view', id_=next_id)))
-    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
-    return ' '.join(parts)
 
 
 @app.template_filter()
@@ -433,22 +407,6 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
     return render_template('util/info_data.html', data=data)
 
 
-def get_type_data(entity: Entity) -> dict[str, Any]:
-    if entity.location:
-        entity.types.update(entity.location.types)  # Add location types
-    data: dict[str, Any] = defaultdict(list)
-    for type_, value in sorted(entity.types.items(), key=lambda x: x[0].name):
-        if entity.standard_type and type_.id == entity.standard_type.id:
-            continue  # Standard type is already added
-        html = f"""
-            <span title="{" > ".join([g.types[i].name for i in type_.root])}">
-                {link(type_)}</span>"""
-        if type_.category == 'value':
-            html += f' {float(value):g} {type_.description}'
-        data[g.types[type_.root[0]].name].append(html)
-    return {key: data[key] for key in sorted(data.keys())}
-
-
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
@@ -471,15 +429,6 @@ def description(entity: Union[Entity, Project, User]) -> str:
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
-
-
-def download_button(entity: Entity) -> str:
-    if entity.image_id:
-        if path := get_file_path(entity.image_id):
-            return button(
-                _('download'),
-                url_for('download_file', filename=path.name))
-    return ''  # pragma: no cover
 
 
 @app.template_filter()

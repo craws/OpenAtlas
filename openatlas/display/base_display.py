@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import Any, Optional, Union
 
 from flask import g, render_template, url_for
@@ -16,8 +17,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, download_button, format_date, get_base_table_data,
-    get_type_data, is_authorized, link, manual, siblings_pager, uc_first)
+    bookmark_toggle, button, format_date, get_base_table_data, get_file_path,
+    is_authorized, link, manual, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -65,6 +66,24 @@ class BaseDisplay:
                 self.entity.get_linked_entity('P73', True)]
         self.crumbs.append(self.entity.name)
 
+
+    def get_type_data(self) -> dict[str, Any]:
+        if self.entity.location:  # Add location types
+            self.entity.types.update(self.entity.location.types)
+        data: dict[str, Any] = defaultdict(list)
+        for type_, value in sorted(
+                self.entity.types.items(),
+                key=lambda x: x[0].name):
+            if self.entity.standard_type and type_.id \
+                    == self.entity.standard_type.id:
+                continue  # Standard type is already added
+            title = " > ".join([g.types[i].name for i in type_.root])
+            html = f'<span title="{title}">{link(type_)}</span>'
+            if type_.category == 'value':
+                html += f' {float(value):g} {type_.description}'
+            data[g.types[type_.root[0]].name].append(html)
+        return {key: data[key] for key in sorted(data.keys())}
+
     def add_info_content(self):
         self.entity.info_data = self.get_entity_data()
         problematic_type_id = self.entity.check_too_many_single_type_links()
@@ -72,8 +91,7 @@ class BaseDisplay:
         self.buttons.append(bookmark_toggle(self.entity.id))
         if self.linked_places and not self.gis_data:
             self.gis_data = Gis.get_all(self.linked_places)
-        self.buttons.append(siblings_pager(self.entity, self.structure))
-
+        self.buttons.append(self.siblings_pager())
         if 'file' in self.tabs \
                 and current_user.settings['table_show_icons'] \
                 and g.settings['image_processing']:
@@ -85,10 +103,13 @@ class BaseDisplay:
                         int(
                             row[0].
                             replace('<a href="/entity/', '').split('"')[0])))
-
         if self.entity.class_.view == 'file':
-            if self.entity.image_id:
-                self.buttons.append(download_button(self.entity))
+            if self.entity.image_id and \
+                    (path := get_file_path(self.entity.image_id)):
+                self.buttons.append(
+                    button(
+                        _('download'),
+                        url_for('download_file', filename=path.name)))
             else:
                 self.buttons.append(
                     '<span class="error">' + uc_first(_("missing file")) +
@@ -167,6 +188,30 @@ class BaseDisplay:
                     origin_id=self.entity.id))
         return ''  # pragma: no cover
 
+
+    def siblings_pager(self) -> str:
+        if not self.structure or len(self.structure['siblings']) < 2:
+            return ''
+        self.structure['siblings'].sort(key=lambda x: x.id)
+        prev_id = None
+        next_id = None
+        position = None
+        for counter, sibling in enumerate(self.structure['siblings']):
+            position = counter + 1
+            prev_id = sibling.id if sibling.id < self.entity.id else prev_id
+            if sibling.id > self.entity.id:
+                next_id = sibling.id
+                position = counter
+                break
+        parts = []
+        if prev_id:  # pragma: no cover
+            parts.append(button('<', url_for('view', id_=prev_id)))
+        if next_id:
+            parts.append(button('>', url_for('view', id_=next_id)))
+        parts.append(f"{position} {_('of')} {len(self.structure['siblings'])}")
+        return ' '.join(parts)
+
+
     def get_entity_data(self) -> dict[str, Any]:
         entity = self.entity
         data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
@@ -190,7 +235,7 @@ class BaseDisplay:
                 [g.types[id_].name for id_ in entity.standard_type.root])
             data[_('type')] = \
                 f'<span title="{title}">{link(entity.standard_type)}</span>'
-        data.update(get_type_data(entity))
+        data.update(self.get_type_data())
 
         # Class specific information
         from openatlas.models.type import Type
