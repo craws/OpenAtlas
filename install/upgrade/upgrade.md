@@ -22,6 +22,9 @@ base, then run the database upgrade script, then restart Apache:
 ### 7.8.0 to 7.9.0
 7.9.0.sql is needed but will be taken care of by the database upgrade script.
 
+### 7.8.0 to 7.8.1
+7.8.1.sql is needed but will be taken care of by the database upgrade script.
+
 ### 7.7.0 to 7.8.0
 7.8.0.sql is needed but will be taken care of by the database upgrade script.
 

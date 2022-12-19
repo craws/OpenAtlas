@@ -34,7 +34,6 @@ class Entity:
         self.reference_systems: list[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
-        self.linked_places: list[Entity] = []  # Related places for map
         self.location: Optional[Entity] = None  # Respective location if place
         self.info_data: dict[str, Union[str, list[str], None]]
 

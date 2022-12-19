@@ -14,9 +14,9 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import, is_float
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, datetime64_to_timestamp, display_form, format_date,

@@ -10,11 +10,11 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     get_entities_linked_to_type_recursive, link, manual, required_group,
