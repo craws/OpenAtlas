@@ -1,7 +1,7 @@
 const variables = {}
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
 function switch_value_type(id) {
-    $(".value-type-switch" + id).toggleClass('display-none');
+    $(".value-type-switch" + id).toggleClass('d-none');
     $("#value-type-switcher-" + id).toggleClass('rotate-90');
 }
 
