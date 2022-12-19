@@ -11,7 +11,7 @@
    {% if value %}
       {{ value|safe }}
     {% else %}
-      {{ field(class_=field_css + ' form-control form-control-sm')|replace('> ', '>')|safe }}
+      {{ field(class_=field_css)|safe }}
     {% endif %}
     {% if field.errors %}
       <span class="error">

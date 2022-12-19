@@ -70,3 +70,25 @@ form li svg.svg-inline--fa{
 .no-label label{
     display:none
 }
+
+.input-height-sm{
+    min-height: calc(1.5em + .5rem + 2px);
+}
+
+.width-full{
+    width:100%;
+}
+
+.rotate-90 {
+
+}
+
+.value-type-field[data-show=""]{
+    display: none!important;
+}
+.value-type-switcher[data-show="true"]{
+    rotate:90deg;
+}
+.value-type-switcher{
+    transition:all ease-in 100ms;
+}

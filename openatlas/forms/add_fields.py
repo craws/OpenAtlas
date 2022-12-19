@@ -8,7 +8,7 @@ from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField, ReferenceField
+from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField, ValueTypeField
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import is_authorized, uc_first
@@ -212,7 +212,7 @@ def add_value_type_fields(form_class: FlaskForm, subs: list[int]) -> None:
         setattr(
             form_class,
             str(sub.id),
-            ValueFloatField(sub.name, [OptionalValidator()]))
+            ValueTypeField(sub.name, sub.id, [OptionalValidator()]))
         add_value_type_fields(form_class, sub.subs)
 
 

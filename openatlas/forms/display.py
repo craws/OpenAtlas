@@ -9,7 +9,8 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.field import ValueFloatField
+from openatlas.forms.field import ValueFloatField, ValueTypeField
+from openatlas.forms.util import value_type_expand_icon
 from openatlas.util.util import manual, tooltip, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -22,8 +23,15 @@ def html_form(
         manual_page: Optional[str] = None) -> str:
     html = ''
     for field in form:
-        if isinstance(field, ValueFloatField):
-            continue  # These will be added in combination with other fields
+        if isinstance(field, ValueTypeField):
+            html += f'''
+                <div class="row">
+                  <div  class="col-sm-auto mr-1 text-sm-end" style="min-width: 160px"></div>
+                  <div class = col>
+                    {field()}
+                  </div>
+                </div>'''
+            continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
@@ -43,8 +51,8 @@ def html_form(
                 label = uc_first(_('super'))
             if type_.category == 'value' and 'is_type_form' not in form:
                 field.description = type_.description
-                html += add_row(field, label, button_icon(type_))
-                html += add_value_type(form, type_)
+                html += add_row(field, label, value_type_expand_icon(type_))
+                #html += add_value_type(form, type_)
                 continue
             if field.flags.required and field.label.text:
                 label += ' *'
@@ -122,7 +130,7 @@ def add_value_type(
                   class="d-flex justify-content-between"
                   style="width:16.15em;">
                 <div class="ms-{level} position-relative text-wrap">
-                  <div class="value-type-expander">{button_icon(sub)}</div>
+                  <div class="value-type-expander">{value_type_expand_icon(sub)}</div>
                   {sub.name}
                 </div>
                 {field(class_='value-type')}
@@ -133,15 +141,6 @@ def add_value_type(
           </div>
         </div>"""
     return html
-
-
-def button_icon(type_: Type) -> str:
-    if not type_.subs:
-        return ''
-    onclick = f'switch_value_type({type_.id})' if len(type_.subs) != 0 else ''
-    return \
-        f'<span id="value-type-switcher-{type_.id}" class="btn btn-xsm" ' \
-        f'onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>'
 
 
 def add_dates(form: Any) -> str:

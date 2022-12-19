@@ -78,7 +78,7 @@ def process_standard_fields(manager: Any) -> None:
             elif not manager.entity or manager.entity.class_.view != 'type':
                 manager.data['links']['delete'].add('P2')
                 manager.add_link('P2', [g.types[id_] for id_ in value])
-        elif field_type == 'ValueFloatField':
+        elif field_type == 'ValueTypeField':
             if value is not None:  # Allow the number zero
                 manager.add_link('P2', g.types[int(key)], value)
         elif key.startswith('reference_system_id_'):

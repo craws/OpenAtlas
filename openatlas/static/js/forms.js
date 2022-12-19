@@ -1,8 +1,21 @@
 const variables = {}
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
-function switch_value_type(id) {
-    $(".value-type-switch" + id).toggleClass('d-none');
-    $("#value-type-switcher-" + id).toggleClass('rotate-90');
+function switch_value_type(id,el) {
+    console.log(el.dataset.show,id,el)
+    if(el.dataset.show){
+        el.dataset.show = ''
+        $(`.value-type-field.sub-of-${id}, .value-type-field.sub-of-${id} .value-type-switcher`).each(function() {
+            console.log('hallo')
+        this.dataset.show='';
+        });
+    }
+    else{
+         $(`.value-type-field.direct-sub-of-${id}`).each(function() {
+            console.log('hallo')
+        this.dataset.show='true';
+        });
+         el.dataset.show = 'true'
+    }
 }
 
 $(document).ready(function () {

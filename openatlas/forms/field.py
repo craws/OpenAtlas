@@ -8,10 +8,10 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, FileInput, Input, TextInput
+    Field, FloatField, HiddenField, StringField, TextAreaField, FileField, FieldList)
+from wtforms.widgets import HiddenInput, FileInput, Input, TextInput, HTMLString
 
-from openatlas.forms.util import get_table_content
+from openatlas.forms.util import get_table_content, value_type_expand_icon
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
@@ -38,33 +38,41 @@ class RemovableListField(HiddenField):
     def _value(self) -> str:
         return self.data
 
+
 class ValueTypeInput(TextInput):
     def __call__(
             self,
-            field: RemovableListField,
+            field: ValueTypeField,
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
-        sub_fields = []
-
-        for sub_id in field.subs:
-            sub = g.types[sub_id]
-            sub_fields.append(ValueTypeField(sub.name, [OptionalValidator()], subs=sub.subs, form=field.form).bind(form=field.form,name=sub_id))
-        return render_template(
-            'forms/value_type_field.html', field=field, sub_fields=sub_fields)
+        type_ = g.types[field.type_id]
+        unit_text = f'''<div class="input-group-text d-inline-block text-truncate"
+                    title="{type_.description}" style="max-width:80px;font-size:0.8rem">{type_.description}</div>'''
+        sub_of = ' '.join([f'sub-of-{i}' for i in type_.root])
+        padding = len(type_.root)
+        return HTMLString(f'''
+        <div class=" mb-2 value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-flex align-items-end" data-show="">
+                <div class="text-end d-flex justify-content-end align-items-end pe-2" style="width:{padding}rem">
+                { value_type_expand_icon(type_) if type_.subs else ''}</div>
+                  <div class="width-full">
+                    <label for="{field.id}">{type_.name}</label>
+                    <div class="input-group">
+                      <input type="text" class="form-control form-control-sm" name="{field.id}" id="{field.id}" />
+                      {unit_text if type_.description else ''}
+                    </div>
+                    </div>
+                </div>''')
 
 
 class ValueTypeField(FloatField):
-
     def __init__(
             self,
             label: str,
+            type_id: int,
             validators: Any = None,
-            subs: list[int] = None,
-            form: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
-        self.subs = subs
-        self.form = form
+        self.type_id = type_id
 
     widget = ValueTypeInput()
 

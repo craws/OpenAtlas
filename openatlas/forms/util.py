@@ -297,3 +297,9 @@ def format_name_and_aliases(entity: Entity, field_id: str) -> str:
             html += alias if i else f'<p>{alias}</p>'
         return html
     return link
+
+def value_type_expand_icon(type_: Type) -> str:
+    return f'''<i onclick="switch_value_type({type_.id},this)" 
+                role="button" 
+                id="value-type-switcher-{type_.id}" 
+                class="fa fa-chevron-right value-type-switcher input-height-sm"></i>'''
