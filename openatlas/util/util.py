@@ -494,11 +494,25 @@ def display_profile_image(entity: Entity) -> str:
     if g.settings['image_processing'] and check_processed_image(path.name):
         if path_ := get_file_path(entity.image_id, size):
             resized = url_for('display_file', filename=path_.name, size=size)
-    return render_template(
-        'util/profile_image.html',
-        entity=entity,
-        path=path,
-        resized=resized)
+    url = url_for('display_file', filename=path.name)
+    src = resized or url
+    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+    if resized:
+        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+        ext = app.config["ALLOWED_IMAGE_EXT"]
+    if entity.class_.view == 'file':
+        html = uc_first(_('no preview available'))
+        if path.suffix.lower() in ext:
+            html = link(
+                f'<img style="{style}" alt="image" src="{src}">',
+                url,
+                external=True)
+    else:
+        html = link(
+            f'<img style="{style}" alt="image" src="{src}">',
+            url_for('view', id_=entity.image_id))
+    return f'<div id="profile-image-div">{html}</div>'
 
 
 @contextfilter
