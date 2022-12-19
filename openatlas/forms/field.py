@@ -9,14 +9,14 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, FileInput, Input
+from wtforms.widgets import HiddenInput, FileInput, Input, TextInput
 
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, is_authorized
-
+from wtforms.validators import (Optional as OptionalValidator)
 
 class RemovableListInput(HiddenInput):
     def __call__(
@@ -37,6 +37,36 @@ class RemovableListField(HiddenField):
 
     def _value(self) -> str:
         return self.data
+
+class ValueTypeInput(TextInput):
+    def __call__(
+            self,
+            field: RemovableListField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
+        sub_fields = []
+
+        for sub_id in field.subs:
+            sub = g.types[sub_id]
+            sub_fields.append(ValueTypeField(sub.name, [OptionalValidator()], subs=sub.subs, form=field.form).bind(form=field.form,name=sub_id))
+        return render_template(
+            'forms/value_type_field.html', field=field, sub_fields=sub_fields)
+
+
+class ValueTypeField(FloatField):
+
+    def __init__(
+            self,
+            label: str,
+            validators: Any = None,
+            subs: list[int] = None,
+            form: Any = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.subs = subs
+        self.form = form
+
+    widget = ValueTypeInput()
 
 
 class ReferenceInput(Input):
