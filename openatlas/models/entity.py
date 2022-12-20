@@ -35,7 +35,6 @@ class Entity:
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
         self.location: Optional[Entity] = None  # Respective location if place
-        self.info_data: dict[str, Union[str, list[str], None]]
 
         self.standard_type = None
         self.types: dict[Type, str] = {}

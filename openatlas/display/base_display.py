@@ -85,7 +85,6 @@ class BaseDisplay:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_info_content(self):
-        self.entity.info_data = self.get_entity_data()
         problematic_type_id = self.entity.check_too_many_single_type_links()
         self.add_buttons(bool(problematic_type_id))
         self.buttons.append(bookmark_toggle(self.entity.id))
@@ -103,22 +102,11 @@ class BaseDisplay:
                         int(
                             row[0].
                             replace('<a href="/entity/', '').split('"')[0])))
-        if self.entity.class_.view == 'file':
-            if self.entity.image_id and \
-                    (path := get_file_path(self.entity.image_id)):
-                self.buttons.append(
-                    button(
-                        _('download'),
-                        url_for('download_file', filename=path.name)))
-            else:
-                self.buttons.append(
-                    '<span class="error">' + uc_first(_("missing file")) +
-                    '</span>')
-
         self.tabs['info'].content = render_template(
             'entity/view.html',
             buttons=self.buttons,
             entity=self.entity,
+            info_data=self.get_entity_data(),
             gis_data=self.gis_data,
             overlays=self.overlays,
             title=self.entity.name,
@@ -168,6 +156,16 @@ class BaseDisplay:
                 button(
                     _('tools'),
                     url_for('anthropology_index', id_=self.entity.id)))
+        if self.entity.class_.view == 'file':
+            if path := get_file_path(self.entity.id):
+                self.buttons.append(
+                    button(
+                        _('download'),
+                        url_for('download_file', filename=path.name)))
+            else:
+                self.buttons.append(
+                    '<span class="error">' + uc_first(_("missing file")) +
+                    '</span>')
 
     def get_profile_image_table_link(
             self,
@@ -323,6 +321,8 @@ class BaseDisplay:
             data[_('artifact')] = [
                 link(artifact) for artifact in
                 entity.get_linked_entities('P128', inverse=True)]
+
+
         if hasattr(current_user, 'settings'):
             data |= self.get_system_data()
         self.add_note_tab()
