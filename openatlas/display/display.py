@@ -224,7 +224,12 @@ class SourceDisplay(BaseDisplay):
 
 
 class SourceTranslationDisplay(BaseDisplay):
-    pass
+
+    def add_crumbs(self) -> None:
+        self.crumbs = [
+            [_('source'), url_for('index', view='source')],
+            self.entity.get_linked_entity('P73', True)]
+        self.crumbs.append(self.entity.name)
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):

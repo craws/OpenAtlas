@@ -58,15 +58,6 @@ class BaseDisplay:
         if self.structure:
             for super_ in self.structure['supers']:
                 self.crumbs.append(link(super_))
-        elif isinstance(self.entity, Type):
-            self.crumbs = [[_('types'), url_for('type_index')]]
-            if self.entity.root:
-                self.crumbs += \
-                    [g.types[type_id] for type_id in self.entity.root]
-        elif self.entity.class_.view == 'source_translation':
-            self.crumbs = [
-                [_('source'), url_for('index', view='source')],
-                self.entity.get_linked_entity('P73', True)]
         self.crumbs.append(self.entity.name)
 
     def get_type_data(self) -> dict[str, Any]:
@@ -127,8 +118,8 @@ class BaseDisplay:
     def add_buttons(self) -> None:
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         if not is_authorized(self.entity.class_.write_access):
-            return  # pragma: no cover
-        if isinstance(self.entity, Type):
+            pass  # pragma: no cover
+        elif isinstance(self.entity, Type):
             if self.entity.root and self.entity.category != 'system':
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
@@ -685,6 +676,11 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
+
+    def add_crumbs(self) -> None:
+        self.crumbs = [[_('types'), url_for('type_index')]]
+        self.crumbs += [g.types[type_id] for type_id in self.entity.root]
+        self.crumbs.append(self.entity.name)
 
     def add_tabs(self) -> None:
         super().add_tabs()
