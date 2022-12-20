@@ -34,14 +34,17 @@ class BaseDisplay:
     overlays = None
     crumbs = None
     buttons = None
+    problematic_type: bool = False
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
         self.entity = entity
         self.events = []
         self.event_links = []
         self.linked_places = []
+        self.problematic_type = self.entity.check_too_many_single_type_links()
         self.add_tabs()
         self.add_crumbs()
+        self.add_buttons()
         self.add_info_content()  # Call later because of profile image
         self.entity.image_id = entity.get_profile_image_id()
 
@@ -66,7 +69,6 @@ class BaseDisplay:
                 self.entity.get_linked_entity('P73', True)]
         self.crumbs.append(self.entity.name)
 
-
     def get_type_data(self) -> dict[str, Any]:
         if self.entity.location:  # Add location types
             self.entity.types.update(self.entity.location.types)
@@ -85,12 +87,8 @@ class BaseDisplay:
         return {key: data[key] for key in sorted(data.keys())}
 
     def add_info_content(self):
-        problematic_type_id = self.entity.check_too_many_single_type_links()
-        self.add_buttons(bool(problematic_type_id))
-        self.buttons.append(bookmark_toggle(self.entity.id))
         if self.linked_places and not self.gis_data:
             self.gis_data = Gis.get_all(self.linked_places)
-        self.buttons.append(self.siblings_pager())
         if 'file' in self.tabs \
                 and current_user.settings['table_show_icons'] \
                 and g.settings['image_processing']:
@@ -111,7 +109,7 @@ class BaseDisplay:
             overlays=self.overlays,
             title=self.entity.name,
             ext_references=ext_references(self.entity.reference_systems),
-            problematic_type_id=problematic_type_id)
+            problematic_type_id=self.problematic_type)
 
     def add_note_tab(self) -> None:
         self.tabs['note'] = Tab('note', entity=self.entity)
@@ -126,7 +124,7 @@ class BaseDisplay:
                 uc_first(_("view")) + '</a>']
             self.tabs['note'].table.rows.append(data)
 
-    def add_buttons(self, type_problem: bool = False) -> None:
+    def add_buttons(self) -> None:
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         if not is_authorized(self.entity.class_.write_access):
             return  # pragma: no cover
@@ -145,7 +143,7 @@ class BaseDisplay:
                 button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(self.display_delete_link())
         else:
-            if not type_problem:
+            if not self.problematic_type:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             if self.entity.class_.view != 'place' \
@@ -166,6 +164,8 @@ class BaseDisplay:
                 self.buttons.append(
                     '<span class="error">' + uc_first(_("missing file")) +
                     '</span>')
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.buttons.append(self.siblings_pager())
 
     def get_profile_image_table_link(
             self,
@@ -185,7 +185,6 @@ class BaseDisplay:
                     id_=file.id,
                     origin_id=self.entity.id))
         return ''  # pragma: no cover
-
 
     def siblings_pager(self) -> str:
         if not self.structure or len(self.structure['siblings']) < 2:
@@ -208,7 +207,6 @@ class BaseDisplay:
             parts.append(button('>', url_for('view', id_=next_id)))
         parts.append(f"{position} {_('of')} {len(self.structure['siblings'])}")
         return ' '.join(parts)
-
 
     def get_entity_data(self) -> dict[str, Any]:
         entity = self.entity
@@ -321,7 +319,6 @@ class BaseDisplay:
             data[_('artifact')] = [
                 link(artifact) for artifact in
                 entity.get_linked_entities('P128', inverse=True)]
-
 
         if hasattr(current_user, 'settings'):
             data |= self.get_system_data()
