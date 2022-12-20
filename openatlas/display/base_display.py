@@ -42,10 +42,13 @@ class BaseDisplay:
         self.event_links = []
         self.linked_places = []
         self.problematic_type = self.entity.check_too_many_single_type_links()
+
         self.add_tabs()
+        self.add_note_tab()
+        self.add_file_tab_thumbnails()
         self.add_crumbs()
         self.add_buttons()
-        self.add_info_content()  # Call later because of profile image
+        self.add_info_tab_content()  # Call later because of profile image
         self.entity.image_id = entity.get_profile_image_id()
 
     def add_tabs(self) -> None:
@@ -77,26 +80,25 @@ class BaseDisplay:
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
 
-    def add_info_content(self):
-        if self.linked_places and not self.gis_data:
-            self.gis_data = Gis.get_all(self.linked_places)
+    def add_file_tab_thumbnails(self):
         if 'file' in self.tabs \
                 and current_user.settings['table_show_icons'] \
                 and g.settings['image_processing']:
             self.tabs['file'].table.header.insert(1, uc_first(_('icon')))
             for row in self.tabs['file'].table.rows:
-                row.insert(
-                    1,
-                    file_preview(
-                        int(
-                            row[0].
-                            replace('<a href="/entity/', '').split('"')[0])))
+                row.insert(1, file_preview(
+                    int(row[0]
+                        .replace('<a href="/entity/', '')
+                        .split('"')[0])))
+
+    def add_info_tab_content(self) -> None:
         self.tabs['info'].content = render_template(
             'entity/view.html',
             buttons=self.buttons,
             entity=self.entity,
             info_data=self.get_entity_data(),
-            gis_data=self.gis_data,
+            gis_data=Gis.get_all(self.linked_places)
+            if self.linked_places and not self.gis_data else self.gis_data,
             overlays=self.overlays,
             title=self.entity.name,
             ext_references=ext_references(self.entity.reference_systems),
@@ -313,7 +315,6 @@ class BaseDisplay:
 
         if hasattr(current_user, 'settings'):
             data |= self.get_system_data()
-        self.add_note_tab()
         return data
 
     def get_system_data(self) -> dict[str, Any]:
@@ -563,8 +564,8 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
-    def add_info_content(self):
-        super().add_info_content()
+    def add_info_tab_content(self):
+        super().add_info_tab_content()
 
     def add_tabs(self) -> None:
         super().add_tabs()
