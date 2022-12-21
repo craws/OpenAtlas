@@ -152,10 +152,11 @@ class ProductionDisplay(EventsDisplay):
 class ReferenceSystemDisplay(BaseDisplay):
 
     def add_buttons(self) -> None:
-        self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
-        if not self.entity.classes and not self.entity.system:
-            self.buttons.append(self.display_delete_link())
+        if is_authorized(self.entity.class_.write_access):
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+            if not self.entity.classes and not self.entity.system:
+                self.buttons.append(self.display_delete_link())
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -243,9 +244,10 @@ class SourceDisplay(BaseDisplay):
 class SourceTranslationDisplay(BaseDisplay):
 
     def add_buttons(self) -> None:
-        self.buttons.append(
-            button(_('edit'), url_for('update', id_=self.entity.id)))
-        self.buttons.append(self.display_delete_link())
+        if is_authorized(self.entity.class_.write_access):
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+            self.buttons.append(self.display_delete_link())
 
     def add_crumbs(self) -> None:
         self.crumbs = [

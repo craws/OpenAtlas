@@ -48,8 +48,7 @@ class BaseDisplay:
         self.add_file_tab_thumbnails()
         self.add_crumbs()
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
-        if is_authorized(self.entity.class_.write_access):
-            self.add_buttons()
+        self.add_buttons()
         self.buttons.append(bookmark_toggle(self.entity.id))
         self.buttons.append(self.siblings_pager())
         if self.linked_places:
@@ -123,10 +122,11 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        if not self.problematic_type:
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-        self.buttons.append(self.display_delete_link())
+        if is_authorized(self.entity.class_.write_access):
+            if not self.problematic_type:
+                self.buttons.append(
+                    button(_('edit'), url_for('update', id_=self.entity.id)))
+            self.buttons.append(self.display_delete_link())
 
     def get_profile_image_table_link(
             self,
@@ -533,11 +533,12 @@ class EventsDisplay(BaseDisplay):
 class PlaceBaseDisplay(BaseDisplay):
 
     def add_buttons(self) -> None:
-        if not self.problematic_type:
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-        if not self.entity.get_linked_entities('P46'):
-            self.buttons.append(self.display_delete_link())
+        if is_authorized(self.entity.class_.write_access):
+            if not self.problematic_type:
+                self.buttons.append(
+                    button(_('edit'), url_for('update', id_=self.entity.id)))
+            if not self.entity.get_linked_entities('P46'):
+                self.buttons.append(self.display_delete_link())
 
     def add_info_tab_content(self):
         super().add_info_tab_content()
@@ -654,7 +655,8 @@ class ReferenceBaseDisplay(BaseDisplay):
 class TypeBaseDisplay(BaseDisplay):
 
     def add_buttons(self) -> None:
-        if self.entity.root and self.entity.category != 'system':
+        if is_authorized(self.entity.class_.write_access) \
+                and self.entity.root and self.entity.category != 'system':
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(self.display_delete_link())
