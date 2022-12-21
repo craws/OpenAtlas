@@ -241,7 +241,7 @@ class SourceTranslationDisplay(BaseDisplay):
     def add_crumbs(self) -> None:
         self.crumbs = [
             [_('source'), url_for('index', view='source')],
-            self.entity.get_linked_entity('P73', True)]
+            self.entity.get_linked_entity_safe('P73', True)]
         self.crumbs.append(self.entity.name)
 
 

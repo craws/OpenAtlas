@@ -28,13 +28,13 @@ class BaseDisplay:
     entity: Union[Entity, ReferenceSystem, Type]
     tabs: dict[str, Tab]
     events: Optional[list[Entity]]
-    event_links: Optional[list[Link]] = None  # Needed for actor and info data
+    event_links: Optional[list[Link]]  # Needed for actor and info data
     linked_places: list[Entity]  # Related places for map
     gis_data: dict[str, Any] = None
     structure = None
     overlays = None
-    crumbs = None
-    buttons = None
+    crumbs: list[Any]
+    buttons: list[str]
     problematic_type: bool = False
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
@@ -85,7 +85,7 @@ class BaseDisplay:
             data[g.types[type_.root[0]].name].append(html)
         return {key: data[key] for key in sorted(data.keys())}
 
-    def add_file_tab_thumbnails(self):
+    def add_file_tab_thumbnails(self) -> None:
         if 'file' in self.tabs \
                 and current_user.settings['table_show_icons'] \
                 and g.settings['image_processing']:
@@ -476,7 +476,7 @@ class PlaceBaseDisplay(BaseDisplay):
             if not self.entity.get_linked_entities('P46'):
                 self.buttons.append(delete_link(self.entity))
 
-    def add_info_tab_content(self):
+    def add_info_tab_content(self) -> None:
         super().add_info_tab_content()
 
     def add_tabs(self) -> None:
@@ -547,17 +547,17 @@ class PlaceBaseDisplay(BaseDisplay):
                 self.tabs['event'].table.rows.append(
                     get_base_table_data(event))
                 self.events.append(event)
-        if structure := entity.get_structure():
-            self.structure = structure
-            for item in structure['subunits']:
+        self.structure = entity.get_structure()
+        if self.structure:
+            for item in self.structure['subunits']:
                 name = 'artifact' if item.class_.view == 'artifact' \
                     else item.class_.name
                 self.tabs[name].table.rows.append(get_base_table_data(item))
-        self.gis_data = Gis.get_all([entity], structure)
+        self.gis_data = Gis.get_all([entity], self.structure)
         if self.gis_data['gisPointSelected'] == '[]' \
                 and self.gis_data['gisPolygonSelected'] == '[]' \
                 and self.gis_data['gisLineSelected'] == '[]' \
-                and (not structure or not structure['supers']):
+                and (not self.structure or not self.structure['supers']):
             self.gis_data = {}
 
 

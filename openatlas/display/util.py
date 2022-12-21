@@ -156,7 +156,7 @@ def profile_image_table_link(
     return ''  # pragma: no cover
 
 
-def delete_link(entity) -> str:
+def delete_link(entity: Entity) -> str:
     confirm = ''
     if isinstance(entity, Type):
         url = url_for('type_delete', id_=entity.id)
@@ -175,7 +175,9 @@ def delete_link(entity) -> str:
         onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
-def siblings_pager(entity: Entity, structure: dict[str, list[Entity]]) -> str:
+def siblings_pager(
+        entity: Entity,
+        structure: Optional[dict[str, list[Entity]]] = None) -> str:
     if not structure or len(structure['siblings']) < 2:
         return ''
     structure['siblings'].sort(key=lambda x: x.id)
