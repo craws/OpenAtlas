@@ -6,8 +6,8 @@ from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
-from openatlas.display.util import edit_link, profile_image_table_link, \
-    remove_link
+from openatlas.display.util import (
+    delete_link, edit_link, profile_image_table_link, remove_link)
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -157,7 +157,7 @@ class ReferenceSystemDisplay(BaseDisplay):
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
             if not self.entity.classes and not self.entity.system:
-                self.buttons.append(self.display_delete_link())
+                self.buttons.append(delete_link(self.entity))
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -236,7 +236,7 @@ class SourceTranslationDisplay(BaseDisplay):
         if is_authorized(self.entity.class_.write_access):
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(self.display_delete_link())
+            self.buttons.append(delete_link(self.entity))
 
     def add_crumbs(self) -> None:
         self.crumbs = [

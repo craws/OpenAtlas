@@ -4,13 +4,15 @@ from typing import Optional, Union
 
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.type import Type
 from openatlas.util.image_processing import check_processed_image
 from openatlas.util.util import (
-    format_date, get_file_path, is_authorized, link, uc_first)
+    button, format_date, get_file_path, is_authorized, link, uc_first)
 
 
 def remove_link(
@@ -152,3 +154,45 @@ def profile_image_table_link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover
+
+
+def delete_link(entity) -> str:
+    confirm = ''
+    if isinstance(entity, Type):
+        url = url_for('type_delete', id_=entity.id)
+        if entity.count or entity.subs:
+            url = url_for('type_delete_recursive', id_=entity.id)
+    else:
+        if current_user.group == 'contributor':  # pragma: no cover
+            info = g.logger.get_log_info(entity.id)
+            if not info['creator'] or info['creator'].id != current_user.id:
+                return ''
+        url = url_for('index', view=entity.class_.view, delete_id=entity.id)
+        confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
+    return button(
+        _('delete'),
+        url,
+        onclick=f"return confirm('{confirm}')" if confirm else '')
+
+
+def siblings_pager(entity: Entity, structure: dict[str, list[Entity]]) -> str:
+    if not structure or len(structure['siblings']) < 2:
+        return ''
+    structure['siblings'].sort(key=lambda x: x.id)
+    prev_id = None
+    next_id = None
+    position = None
+    for counter, sibling in enumerate(structure['siblings']):
+        position = counter + 1
+        prev_id = sibling.id if sibling.id < entity.id else prev_id
+        if sibling.id > entity.id:
+            next_id = sibling.id
+            position = counter
+            break
+    parts = []
+    if prev_id:  # pragma: no cover
+        parts.append(button('<', url_for('view', id_=prev_id)))
+    if next_id:
+        parts.append(button('>', url_for('view', id_=next_id)))
+    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
+    return ' '.join(parts)

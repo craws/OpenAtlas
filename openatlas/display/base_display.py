@@ -8,8 +8,8 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    edit_link, ext_references, format_entity_date, get_appearance,
-    profile_image, profile_image_table_link, remove_link)
+    delete_link, edit_link, ext_references, format_entity_date, get_appearance,
+    profile_image, profile_image_table_link, remove_link, siblings_pager)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -51,7 +51,7 @@ class BaseDisplay:
         self.buttons = [manual(f'entity/{self.entity.class_.view}')]
         self.add_buttons()
         self.buttons.append(bookmark_toggle(self.entity.id))
-        self.buttons.append(self.siblings_pager())
+        self.buttons.append(siblings_pager(self.entity, self.structure))
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
@@ -126,29 +126,7 @@ class BaseDisplay:
             if not self.problematic_type:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(self.display_delete_link())
-
-    def siblings_pager(self) -> str:
-        if not self.structure or len(self.structure['siblings']) < 2:
-            return ''
-        self.structure['siblings'].sort(key=lambda x: x.id)
-        prev_id = None
-        next_id = None
-        position = None
-        for counter, sibling in enumerate(self.structure['siblings']):
-            position = counter + 1
-            prev_id = sibling.id if sibling.id < self.entity.id else prev_id
-            if sibling.id > self.entity.id:
-                next_id = sibling.id
-                position = counter
-                break
-        parts = []
-        if prev_id:  # pragma: no cover
-            parts.append(button('<', url_for('view', id_=prev_id)))
-        if next_id:
-            parts.append(button('>', url_for('view', id_=next_id)))
-        parts.append(f"{position} {_('of')} {len(self.structure['siblings'])}")
-        return ' '.join(parts)
+            self.buttons.append(delete_link(self.entity))
 
     def get_entity_data(self) -> dict[str, Any]:
         entity = self.entity
@@ -289,29 +267,6 @@ class BaseDisplay:
             data['API'] = \
                 render_template('util/api_links.html', entity=self.entity)
         return data
-
-    def display_delete_link(self) -> str:
-        entity = self.entity
-        confirm = ''
-        if isinstance(entity, Type):
-            url = url_for('type_delete', id_=entity.id)
-            if entity.count or entity.subs:
-                url = url_for('type_delete_recursive', id_=entity.id)
-        else:
-            if current_user.group == 'contributor':  # pragma: no cover
-                info = g.logger.get_log_info(entity.id)
-                if not info['creator'] \
-                        or info['creator'].id != current_user.id:
-                    return ''
-            url = url_for(
-                'index',
-                view=entity.class_.view,
-                delete_id=entity.id)
-            confirm = _('Delete %(name)s?', name=entity.name.replace('\'', ''))
-        return button(
-            _('delete'),
-            url,
-            onclick=f"return confirm('{confirm}')" if confirm else '')
 
 
 class ActorDisplay(BaseDisplay):
@@ -519,7 +474,7 @@ class PlaceBaseDisplay(BaseDisplay):
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             if not self.entity.get_linked_entities('P46'):
-                self.buttons.append(self.display_delete_link())
+                self.buttons.append(delete_link(self.entity))
 
     def add_info_tab_content(self):
         super().add_info_tab_content()
@@ -640,7 +595,7 @@ class TypeBaseDisplay(BaseDisplay):
                 and self.entity.root and self.entity.category != 'system':
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(self.display_delete_link())
+            self.buttons.append(delete_link(self.entity))
 
     def add_crumbs(self) -> None:
         self.crumbs = [[_('types'), url_for('type_index')]]

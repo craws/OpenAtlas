@@ -34,7 +34,7 @@ from openatlas.util.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, convert_size, delete_link, display_form, display_info, format_date,
+    button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
     send_mail, uc_first)
 
@@ -529,6 +529,7 @@ def admin_orphans() -> str:
         if file.name != '.gitignore' \
                 and os.path.isfile(file) \
                 and int(file.stem) not in entity_file_ids:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
@@ -538,9 +539,10 @@ def admin_orphans() -> str:
                 link(
                     _('download'),
                     url_for('download_file', filename=file.name)),
-                delete_link(
-                    file.name,
-                    url_for('admin_file_delete', filename=file.name))])
+                link(
+                    _('delete'),
+                    url_for('admin_file_delete', filename=file.name),
+                    js=f"return confirm('{confirm}')")])
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():

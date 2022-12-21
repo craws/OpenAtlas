@@ -13,7 +13,7 @@ from openatlas import app
 from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    convert_size, delete_link, is_authorized, link, required_group, uc_first)
+    convert_size, is_authorized, link, required_group, uc_first)
 
 
 class ExportSqlForm(FlaskForm):
@@ -66,10 +66,12 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
                 _('download'),
                 url_for(f'download_{type_}', filename=file.name))]
         if is_authorized('admin') and writable:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
-                delete_link(
-                    file.name,
-                    url_for('delete_export', type_=type_, filename=file.name)))
+                link(
+                    _('delete'),
+                    url_for('delete_export', type_=type_, filename=file.name),
+                    js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return table
 

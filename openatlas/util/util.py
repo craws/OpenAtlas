@@ -301,11 +301,6 @@ def convert_size(size_bytes: int) -> str:
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
 
 
-def delete_link(name: str, url: str) -> str:
-    confirm = _('Delete %(name)s?', name=name.replace("'", ''))
-    return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
-
-
 @app.template_filter()
 def link(
         object_: Any,
