@@ -5,9 +5,12 @@ from typing import Optional, Union
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
+from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import format_date, is_authorized, link, uc_first
+from openatlas.util.image_processing import check_processed_image
+from openatlas.util.util import (
+    format_date, get_file_path, is_authorized, link, uc_first)
 
 
 def remove_link(
@@ -100,3 +103,52 @@ def format_entity_date(
             html += format_date(getattr(entity, f'{type_}_from'))
     comment = getattr(entity, f'{type_}_comment')
     return html + (f" ({comment})" if comment else '')
+
+
+def profile_image(entity: Entity) -> str:
+    if not entity.image_id:
+        return ''
+    path = get_file_path(entity.image_id)
+    if not path:
+        return ''  # pragma: no cover
+    resized = None
+    size = app.config['IMAGE_SIZE']['thumbnail']
+    if g.settings['image_processing'] and check_processed_image(path.name):
+        if path_ := get_file_path(entity.image_id, size):
+            resized = url_for('display_file', filename=path_.name, size=size)
+    url = url_for('display_file', filename=path.name)
+    src = resized or url
+    style = f'max-width:{g.settings["profile_image_width"]}px;'
+    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
+    if resized:
+        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
+        ext = app.config["ALLOWED_IMAGE_EXT"]
+    if entity.class_.view == 'file':
+        html = uc_first(_('no preview available'))
+        if path.suffix.lower() in ext:
+            html = link(
+                f'<img style="{style}" alt="image" src="{src}">',
+                url,
+                external=True)
+    else:
+        html = link(
+            f'<img style="{style}" alt="image" src="{src}">',
+            url_for('view', id_=entity.image_id))
+    return f'<div id="profile-image-div">{html}</div>'
+
+
+def profile_image_table_link(
+        entity: Entity,
+        file: Entity,
+        extension: str) -> str:
+    if file.id == entity.image_id:
+        return link(
+            _('unset'),
+            url_for('file_remove_profile_image', entity_id=entity.id))
+    if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
+            g.settings['image_processing']
+            and extension in app.config['ALLOWED_IMAGE_EXT']):
+        return link(
+            _('set'),
+            url_for('set_profile_image', id_=file.id, origin_id=entity.id))
+    return ''  # pragma: no cover

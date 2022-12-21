@@ -26,7 +26,6 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -365,11 +364,13 @@ def button(
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
 
+
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
     return \
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
         if buttons else ''
+
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
@@ -429,39 +430,6 @@ def description(entity: Union[Entity, Project, User]) -> str:
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
-
-
-@app.template_filter()
-def display_profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
-    if not path:
-        return ''  # pragma: no cover
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
-    if entity.class_.view == 'file':
-        html = uc_first(_('no preview available'))
-        if path.suffix.lower() in ext:
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
-    else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'<div id="profile-image-div">{html}</div>'
 
 
 @contextfilter

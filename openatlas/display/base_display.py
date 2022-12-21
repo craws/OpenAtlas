@@ -8,7 +8,8 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    edit_link, ext_references, format_entity_date, get_appearance, remove_link)
+    edit_link, ext_references, format_entity_date, get_appearance,
+    profile_image, profile_image_table_link, remove_link)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -96,14 +97,14 @@ class BaseDisplay:
                         .split('"')[0])))
 
     def add_info_tab_content(self) -> None:
+        self.tabs['info'].buttons = self.buttons
         self.tabs['info'].content = render_template(
             'entity/view.html',
-            buttons=self.buttons,
             entity=self.entity,
+            profile_image=profile_image(self.entity),
             info_data=self.get_entity_data(),
             gis_data=self.gis_data,
             overlays=self.overlays,
-            title=self.entity.name,
             ext_references=ext_references(self.entity.reference_systems),
             problematic_type_id=self.problematic_type)
 
@@ -126,25 +127,6 @@ class BaseDisplay:
                 self.buttons.append(
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(self.display_delete_link())
-
-    def get_profile_image_table_link(
-            self,
-            file: Entity,
-            extension: str) -> str:
-        if file.id == self.entity.image_id:
-            return link(
-                _('unset'),
-                url_for('file_remove_profile_image', entity_id=self.entity.id))
-        if extension in app.config['DISPLAY_FILE_EXTENSIONS'] or (
-                g.settings['image_processing']
-                and extension in app.config['ALLOWED_IMAGE_EXT']):
-            return link(
-                _('set'),
-                url_for(
-                    'set_profile_image',
-                    id_=file.id,
-                    origin_id=self.entity.id))
-        return ''  # pragma: no cover
 
     def siblings_pager(self) -> str:
         if not self.structure or len(self.structure['siblings']) < 2:
@@ -449,7 +431,7 @@ class ActorDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(domain, extension))
+                    profile_image_table_link(self.entity, domain, extension))
                 if not self.entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     self.entity.image_id = domain.id
@@ -512,7 +494,7 @@ class EventsDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(domain, extension))
+                    profile_image_table_link(self.entity, domain, extension))
                 if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
@@ -564,7 +546,7 @@ class PlaceBaseDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(domain, extension))
+                    profile_image_table_link(self.entity, domain, extension))
                 if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
@@ -667,16 +649,17 @@ class TypeBaseDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
-        self.tabs['subs'] = Tab('subs', entity=self.entity)
-        self.tabs['entities'] = Tab('entities', entity=self.entity)
-        self.tabs['file'] = Tab('file', entity=self.entity)
-        for sub_id in self.entity.subs:
+        entity = self.entity
+        self.tabs['subs'] = Tab('subs', entity=entity)
+        self.tabs['entities'] = Tab('entities', entity=entity)
+        self.tabs['file'] = Tab('file', entity=entity)
+        for sub_id in entity.subs:
             sub = g.types[sub_id]
             self.tabs['subs'].table.rows.append([
                 link(sub),
                 sub.count,
                 sub.description])
-        if self.entity.category == 'value':
+        if entity.category == 'value':
             self.tabs['entities'].table.header = \
                 [_('name'), _('value'), _('class'), _('info')]
         place_classes = [
@@ -684,19 +667,18 @@ class TypeBaseDisplay(BaseDisplay):
             'stratigraphic_unit',
             'artifact',
             'human_remains']
-        if any(item in g.types[self.entity.root[0]].classes for item in
-               place_classes):
+        if any(item in g.types[entity.root[0]].classes for item
+               in place_classes):
             self.tabs['entities'].table.header.append('place')
-        root = g.types[self.entity.root[0]] if self.entity.root \
-            else self.entity
+        root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
             self.tabs['entities'].table.header = [_('domain'), _('range')]
-            for row in Link.get_links_by_type(self.entity):
+            for row in Link.get_links_by_type(entity):
                 self.tabs['entities'].table.rows.append([
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
         else:
-            for item in self.entity.get_linked_entities(
+            for item in entity.get_linked_entities(
                     ['P2', 'P89'],
                     inverse=True,
                     types=True):
@@ -705,8 +687,8 @@ class TypeBaseDisplay(BaseDisplay):
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]
-                if self.entity.category == 'value':
-                    data.append(format_number(item.types[self.entity]))
+                if entity.category == 'value':
+                    data.append(format_number(item.types[entity]))
                 data.append(item.class_.label)
                 data.append(item.description)
                 root_place = ''
@@ -718,31 +700,24 @@ class TypeBaseDisplay(BaseDisplay):
                 data.append(root_place)
                 self.tabs['entities'].table.rows.append(data)
 
-        for link_ in self.entity.get_links('P67', inverse=True):
+        for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(domain, extension))
-                if not self.entity.image_id \
+                    profile_image_table_link(entity, domain, extension))
+                if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    self.entity.image_id = domain.id
+                    entity.image_id = domain.id
             if domain.class_.view \
                     not in ['source', 'file']:  # pragma: no cover
                 data.append(link_.description)
                 data.append(edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)))
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
                 if domain.class_.view == 'reference_system':
-                    self.entity.reference_systems.append(link_)
+                    entity.reference_systems.append(link_)
                     continue
             data.append(
-                remove_link(
-                    domain.name,
-                    link_,
-                    self.entity,
-                    domain.class_.view))
+                remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)

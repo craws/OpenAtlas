@@ -6,7 +6,8 @@ from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
-from openatlas.display.util import edit_link, remove_link
+from openatlas.display.util import edit_link, profile_image_table_link, \
+    remove_link
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -189,54 +190,42 @@ class SourceDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
+        entity = self.entity
         for name in [
                 'actor', 'artifact', 'feature', 'event', 'place',
                 'stratigraphic_unit', 'text', 'reference', 'file']:
-            self.tabs[name] = Tab(name, entity=self.entity)
-        for text in self.entity.get_linked_entities('P73', types=True):
+            self.tabs[name] = Tab(name, entity=entity)
+        for text in entity.get_linked_entities('P73', types=True):
             self.tabs['text'].table.rows.append([
                 link(text),
                 next(iter(text.types)).name if text.types else '',
                 text.description])
-        for link_ in self.entity.get_links('P67'):
+        for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(
-                remove_link(
-                    range_.name,
-                    link_,
-                    self.entity,
-                    range_.class_.name))
+                remove_link(range_.name, link_, entity, range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in self.entity.get_links('P67', inverse=True):
+        for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    self.get_profile_image_table_link(
-                        domain,
-                        extension))
-                if not self.entity.image_id \
+                    profile_image_table_link(entity, domain, extension))
+                if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    self.entity.image_id = domain.id
+                    entity.image_id = domain.id
             if domain.class_.view != 'file':
                 data.append(link_.description)
                 data.append(edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)))
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
                 if domain.class_.view == \
                         'reference_system':  # pragma: no cover
-                    self.entity.reference_systems.append(link_)
+                    entity.reference_systems.append(link_)
                     continue
             data.append(
-                remove_link(
-                    domain.name,
-                    link_,
-                    self.entity,
-                    domain.class_.view))
+                remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
         self.add_note_tab()
 
