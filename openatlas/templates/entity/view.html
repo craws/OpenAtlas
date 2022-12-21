@@ -14,11 +14,11 @@
         {{ entity|display_profile_image|safe }}
       {% endif %}
       <div style="float:left;">
-        {{ entity.info_data|display_info|safe }}
+        {{ info_data|display_info|safe }}
       </div>
     </div>
     <div style="clear:both;"></div>
-    {{ entity|display_external_references|safe }}
+    {{ ext_references|safe }}
     {{ entity|description|safe }}
   </div>
   {% if gis_data %}

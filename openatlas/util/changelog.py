@@ -1,12 +1,21 @@
+from openatlas.util.util import link
+
 versions = {
     '7.9.0': ['TBA', {
         'feature': {
             '1882': 'Log dynamically created entities',
             '1885': 'Inverse translations for OA properties',
-            '1820': 'API: use existing GeoJSON definitions for swagger'},
+            '1869': 'Manual: add feature list',
+            '1820': 'API: use existing GeoJSON definitions for swagger',
+            '1893': 'Code coverage for Windows'},
         'fix': {
-            '1888': 'CSV data export missing data'}
+            '1874': 'API: Outdated Swagger File',
+            '1888': 'CSV data export missing data',
+            '1899': 'Map overlay not shown on feature level'}
     }],
+    '7.8.1': ['2022-12-08', {
+        'fix': {
+            '1911': 'Problem when adding members to groups'}}],
     '7.8.0': ['2022-11-18',  {
         'feature': {
             '1400': 'Make specific types required at data entry',
@@ -721,5 +730,5 @@ versions = {
     '0.0.1': ['2014-11-05', {
         'feature': {
             '':
-                'Initial version based on the "Zend Base" project from '
-                '<a target="_blank" href="https://craws.net">craws.net</a>'}}]}
+                'Initial version based on the "Zend Base" project from ' +
+                link("https://craws.net", 'craws.net', external=True)}}]}

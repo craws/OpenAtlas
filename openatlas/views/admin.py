@@ -2,6 +2,7 @@ import datetime
 import importlib
 import math
 import os
+import shutil
 from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
@@ -16,6 +17,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
     ModulesForm, SimilarForm, TestMailForm)
@@ -30,12 +32,11 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_file_path, is_authorized, link, manual,
-    required_group, sanitize, send_mail, uc_first)
+    get_file_path, is_authorized, link, manual, required_group, sanitize,
+    send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -656,8 +657,10 @@ def admin_log() -> str:
                 user = link(User.get_by_id(row['user_id']))
             except AttributeError:  # pragma: no cover - user already deleted
                 user = f"id {row['user_id']}"
+
         table.rows.append([
-            format_datetime(row['created']),
+            row['created'].replace(microsecond=0).isoformat()
+            if row['created'] else '',
             f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
             row['type'],
             row['message'],
@@ -762,12 +765,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail
+    stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
     return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+        'total': convert_size(stats.total),
+        'free': convert_size(stats.free),
+        'percent': 100 - math.ceil(stats.free / (stats.total / 100))}

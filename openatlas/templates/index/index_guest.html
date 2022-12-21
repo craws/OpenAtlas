@@ -2,5 +2,5 @@
   <p>{{ intro|safe }}</p>
 {% endif %}
 <h1>OpenAtlas</h1>
-<a target="_blank" rel="noopener noreferrer" href="https://openatlas.eu/">OpenAtlas</a>
+{{ "https://openatlas.eu/"|link("OpenAtlas", external=True)|safe }}
 {{ _('text_intro') }}

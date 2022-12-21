@@ -48,7 +48,7 @@ Can be linked via tabs to
 Places and their subunits
 -------------------------
 In OpenAtlas a place is a physical thing that has a certain position and/or
-extend in space that can be connected to various other information (temporal,
+extends in space that can be connected to various other information (temporal,
 spatial, events, sources etc.). Furthermore, places can be divided into
 multiple subunits to record archaeological information. For more information
 on those subunits see :doc:`feature`, :doc:`stratigraphic_unit`,

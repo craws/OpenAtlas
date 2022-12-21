@@ -56,8 +56,8 @@ class Overlay:
                 and not current_user.settings['module_map_overlay']:
             return {}  # pragma: no cover - tests can't access user settings
 
-        ids = [object_.id] +\
-              [e.id for e in object_.get_linked_entities_recursive('P46')]
+        ids = [object_.id] + \
+            [e.id for e in object_.get_linked_entities_recursive('P46', True)]
         return {row['image_id']: Overlay(row) for row in Db.get_by_object(ids)}
 
     @staticmethod

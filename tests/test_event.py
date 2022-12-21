@@ -6,7 +6,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class EventTest(TestBaseCase):
@@ -27,7 +27,7 @@ class EventTest(TestBaseCase):
                 actor = Entity.insert('person', actor_name)
                 file = Entity.insert('file', 'X-Files')
                 source = Entity.insert('source', 'Necronomicon')
-                carrier = Entity.insert('artifact', 'Artifact')
+                artifact = insert_entity('artifact', 'artifact')
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
@@ -93,13 +93,13 @@ class EventTest(TestBaseCase):
                     'name': 'Keep it moving',
                     'place_to': residence_id,
                     'place_from': residence_id,
-                    'artifact': carrier.id,
+                    'artifact': artifact.id,
                     'person': actor.id,
                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('view', id_=move_id))
             assert b'Keep it moving' in rv.data
-            rv = self.app.get(url_for('view', id_=carrier.id))
+            rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'Keep it moving' in rv.data
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
@@ -108,13 +108,13 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='production'),
                 data={
                     'name': 'A very productive event',
-                    'artifact': carrier.id,
+                    'artifact': artifact.id,
                     self.precision_wikidata: ''})
             production_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('view', id_=production_id))
             assert b'Artifact' in rv.data
 
-            rv = self.app.get(url_for('view', id_=carrier.id))
+            rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'A very productive event' in rv.data
 
             rv = self.app.get(url_for('update', id_=production_id))

@@ -34,9 +34,7 @@ class Entity:
         self.reference_systems: list[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
-        self.linked_places: list[Entity] = []  # Related places for map
         self.location: Optional[Entity] = None  # Respective location if place
-        self.info_data: dict[str, Union[str, list[str], None]]
 
         self.standard_type = None
         self.types: dict[Type, str] = {}
@@ -292,7 +290,7 @@ class Entity:
             return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> Optional[int]:
+    def check_too_many_single_type_links(self) -> bool:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -301,8 +299,8 @@ class Entity:
                 type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return id_
-        return None
+                return True
+        return False
 
     def get_structure(self) -> dict[str, list[Entity]]:
         structure: dict[str, list[Entity]] = {

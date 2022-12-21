@@ -38,6 +38,9 @@ have to be moved manually to the **files** directory, e.g.
 Be aware, that external applications/scripts, e.g. backup scripts or
 presentation sites might need adaptions too.
 
+### 7.8.0 to 7.8.1
+7.8.1.sql is needed but will be taken care of by the database upgrade script.
+
 ### 7.7.0 to 7.8.0
 7.8.0.sql is needed but will be taken care of by the database upgrade script.
 
