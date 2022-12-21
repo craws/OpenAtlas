@@ -17,8 +17,8 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.util import (
-    bookmark_toggle, button, format_date, get_base_table_data, get_file_path,
-    is_authorized, link, manual, uc_first)
+    bookmark_toggle, button, format_date, get_base_table_data, is_authorized,
+    link, manual, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -47,7 +47,13 @@ class BaseDisplay:
         self.add_note_tab()
         self.add_file_tab_thumbnails()
         self.add_crumbs()
-        self.add_buttons()
+        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
+        if is_authorized(self.entity.class_.write_access):
+            self.add_buttons()
+        self.buttons.append(bookmark_toggle(self.entity.id))
+        self.buttons.append(self.siblings_pager())
+        if self.linked_places:
+            self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
         self.entity.image_id = entity.get_profile_image_id()
 
@@ -97,8 +103,7 @@ class BaseDisplay:
             buttons=self.buttons,
             entity=self.entity,
             info_data=self.get_entity_data(),
-            gis_data=Gis.get_all(self.linked_places)
-            if self.linked_places and not self.gis_data else self.gis_data,
+            gis_data=self.gis_data,
             overlays=self.overlays,
             title=self.entity.name,
             ext_references=ext_references(self.entity.reference_systems),
@@ -118,47 +123,10 @@ class BaseDisplay:
             self.tabs['note'].table.rows.append(data)
 
     def add_buttons(self) -> None:
-        self.buttons = [manual(f'entity/{self.entity.class_.view}')]
-        if not is_authorized(self.entity.class_.write_access):
-            pass  # pragma: no cover
-        elif isinstance(self.entity, Type):
-            if self.entity.root and self.entity.category != 'system':
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-                self.buttons.append(self.display_delete_link())
-        elif isinstance(self.entity, ReferenceSystem):
+        if not self.problematic_type:
             self.buttons.append(
                 button(_('edit'), url_for('update', id_=self.entity.id)))
-            if not self.entity.classes and not self.entity.system:
-                self.buttons.append(self.display_delete_link())
-        elif self.entity.class_.name == 'source_translation':
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(self.display_delete_link())
-        else:
-            if not self.problematic_type:
-                self.buttons.append(
-                    button(_('edit'), url_for('update', id_=self.entity.id)))
-            if self.entity.class_.view != 'place' \
-                    or not self.entity.get_linked_entities('P46'):
-                self.buttons.append(self.display_delete_link())
-        if self.entity.class_.name == 'stratigraphic_unit':
-            self.buttons.append(
-                button(
-                    _('tools'),
-                    url_for('anthropology_index', id_=self.entity.id)))
-        if self.entity.class_.view == 'file':
-            if path := get_file_path(self.entity.id):
-                self.buttons.append(
-                    button(
-                        _('download'),
-                        url_for('download_file', filename=path.name)))
-            else:
-                self.buttons.append(
-                    '<span class="error">' + uc_first(_("missing file")) +
-                    '</span>')
-        self.buttons.append(bookmark_toggle(self.entity.id))
-        self.buttons.append(self.siblings_pager())
+        self.buttons.append(self.display_delete_link())
 
     def get_profile_image_table_link(
             self,
@@ -564,6 +532,13 @@ class EventsDisplay(BaseDisplay):
 
 class PlaceBaseDisplay(BaseDisplay):
 
+    def add_buttons(self) -> None:
+        if not self.problematic_type:
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+        if not self.entity.get_linked_entities('P46'):
+            self.buttons.append(self.display_delete_link())
+
     def add_info_tab_content(self):
         super().add_info_tab_content()
 
@@ -677,6 +652,12 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
+
+    def add_buttons(self) -> None:
+        if self.entity.root and self.entity.category != 'system':
+            self.buttons.append(
+                button(_('edit'), url_for('update', id_=self.entity.id)))
+            self.buttons.append(self.display_delete_link())
 
     def add_crumbs(self) -> None:
         self.crumbs = [[_('types'), url_for('type_index')]]

@@ -10,7 +10,7 @@ from openatlas.display.util import edit_link, remove_link
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, get_base_table_data, get_file_path, is_authorized, link)
+    button, get_base_table_data, get_file_path, is_authorized, link, uc_first)
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -39,6 +39,17 @@ class BibliographyDisplay(ReferenceBaseDisplay):
 
 
 class FileDisplay(BaseDisplay):
+
+    def add_buttons(self) -> None:
+        super().add_buttons()
+        if path := get_file_path(self.entity.id):
+            self.buttons.append(
+                button(
+                    _('download'),
+                    url_for('download_file', filename=path.name)))
+            return
+        self.buttons.append(
+            '<span class="error">' + uc_first(_("missing file")) + '</span>')
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -140,6 +151,12 @@ class ProductionDisplay(EventsDisplay):
 
 class ReferenceSystemDisplay(BaseDisplay):
 
+    def add_buttons(self) -> None:
+        self.buttons.append(
+            button(_('edit'), url_for('update', id_=self.entity.id)))
+        if not self.entity.classes and not self.entity.system:
+            self.buttons.append(self.display_delete_link())
+
     def add_tabs(self) -> None:
         super().add_tabs()
         for name in self.entity.classes:
@@ -225,6 +242,11 @@ class SourceDisplay(BaseDisplay):
 
 class SourceTranslationDisplay(BaseDisplay):
 
+    def add_buttons(self) -> None:
+        self.buttons.append(
+            button(_('edit'), url_for('update', id_=self.entity.id)))
+        self.buttons.append(self.display_delete_link())
+
     def add_crumbs(self) -> None:
         self.crumbs = [
             [_('source'), url_for('index', view='source')],
@@ -233,7 +255,13 @@ class SourceTranslationDisplay(BaseDisplay):
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
-    pass
+
+    def add_buttons(self) -> None:
+        super().add_buttons()
+        self.buttons.append(
+            button(
+                _('tools'),
+                url_for('anthropology_index', id_=self.entity.id)))
 
 
 class TypeDisplay(TypeBaseDisplay):
