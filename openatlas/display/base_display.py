@@ -42,7 +42,7 @@ class BaseDisplay:
         self.event_links = []
         self.linked_places = []
         self.problematic_type = self.entity.check_too_many_single_type_links()
-
+        self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
         self.add_note_tab()
         self.add_file_tab_thumbnails()
@@ -54,7 +54,6 @@ class BaseDisplay:
         if self.linked_places:
             self.gis_data = Gis.get_all(self.linked_places)
         self.add_info_tab_content()  # Call later because of profile image
-        self.entity.image_id = entity.get_profile_image_id()
 
     def add_tabs(self) -> None:
         self.tabs = {'info': Tab('info')}
