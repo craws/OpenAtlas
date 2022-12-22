@@ -377,6 +377,10 @@ class PlaceTest(TestBaseCase):
                     origin_id=stratigraphic_id),
                 data=data)
             human_remains_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(url_for('view', id_=human_remains_id))
+            assert b'My human remains' in rv.data
+
             rv = self.app.get(url_for('update', id_=human_remains_id))
             assert b'My human remains' in rv.data
 

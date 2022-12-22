@@ -84,6 +84,7 @@ class EventTest(TestBaseCase):
                     wikidata: 'Q123',
                     self.precision_wikidata: precision})
             event_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
 
@@ -97,10 +98,13 @@ class EventTest(TestBaseCase):
                     'person': actor.id,
                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('view', id_=move_id))
             assert b'Keep it moving' in rv.data
+
             rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'Keep it moving' in rv.data
+
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
 

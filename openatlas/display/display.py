@@ -7,7 +7,8 @@ from openatlas.display.base_display import (
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    delete_link, edit_link, profile_image_table_link, remove_link)
+    delete_link, edit_link, format_entity_date, profile_image_table_link,
+    remove_link)
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (
@@ -15,7 +16,15 @@ from openatlas.util.util import (
 
 
 class AcquisitionDisplay(EventsDisplay):
-    pass
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('recipient')] = \
+            [link(actor) for actor in self.entity.get_linked_entities('P22')]
+        self.data[_('donor')] = \
+            [link(donor) for donor in self.entity.get_linked_entities('P23')]
+        self.data[_('given object')] = \
+            [link(item) for item in self.entity.get_linked_entities('P24')]
 
 
 class ActivityDisplay(EventsDisplay):
@@ -27,6 +36,12 @@ class AdministrativeUnitDisplay(TypeBaseDisplay):
 
 
 class ArtifactDisplay(PlaceBaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('source')] = [
+            link(source) for source in self.entity.get_linked_entities('P128')]
+        self.data[_('owned by')] = link(self.entity.get_linked_entity('P52'))
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -40,6 +55,13 @@ class BibliographyDisplay(ReferenceBaseDisplay):
 
 
 class FileDisplay(BaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('size')] = g.file_stats[self.entity.id]['size'] \
+            if self.entity.id in g.file_stats else 'N/A'
+        self.data[_('extension')] = g.file_stats[self.entity.id]['ext'] \
+            if self.entity.id in g.file_stats else 'N/A'
 
     def add_buttons(self) -> None:
         super().add_buttons()
@@ -106,12 +128,29 @@ class GroupDisplay(ActorDisplay):
     pass
 
 
-class HumanRemainsDisplay(PlaceBaseDisplay):
+class HumanRemainsDisplay(ArtifactDisplay):
     pass
 
 
 class MoveDisplay(EventsDisplay):
-    pass
+
+    def add_data(self) -> None:
+        super().add_data()
+        if place_from := self.entity.get_linked_entity('P27'):
+            self.data[_('begin')] = format_entity_date(
+                self.entity,
+                'begin',
+                place_from.get_linked_entity_safe('P53', True))
+        if place_to := self.entity.get_linked_entity('P26'):
+            self.data[_('end')] = format_entity_date(
+                self.entity,
+                'end',
+                place_to.get_linked_entity_safe('P53', True))
+        moved = {'actor': [], 'artifact': []}
+        for entity in self.entity.get_linked_entities('P25'):
+            moved[entity.class_.view].append(link(entity))
+        self.data[_('person')] = moved['actor']
+        self.data[_('artifact')] = moved['artifact']
 
 
 class PersonDisplay(ActorDisplay):
@@ -147,10 +186,26 @@ class PlaceDisplay(PlaceBaseDisplay):
 
 
 class ProductionDisplay(EventsDisplay):
-    pass
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('produced')] = [
+            link(item) for item in self.entity.get_linked_entities('P108')]
 
 
 class ReferenceSystemDisplay(BaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('website URL')] = link(
+            self.entity.website_url,
+            self.entity.website_url,
+            external=True)
+        self.data[_('resolver URL')] = link(
+            self.entity.resolver_url,
+            self.entity.resolver_url,
+            external=True)
+        self.data[_('example ID')] = self.entity.placeholder
 
     def add_buttons(self) -> None:
         if is_authorized(self.entity.class_.write_access):
@@ -187,6 +242,12 @@ class ReferenceSystemDisplay(BaseDisplay):
 
 
 class SourceDisplay(BaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('artifact')] = [
+            link(artifact) for artifact in
+            self.entity.get_linked_entities('P128', inverse=True)]
 
     def add_tabs(self) -> None:
         super().add_tabs()

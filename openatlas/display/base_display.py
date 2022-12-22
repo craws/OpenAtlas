@@ -36,6 +36,7 @@ class BaseDisplay:
     crumbs: list[Any]
     buttons: list[str]
     problematic_type: bool = False
+    data: dict[str, Any]
 
     def __init__(self, entity: Union[Entity, Type]) -> None:
         self.entity = entity
@@ -97,15 +98,15 @@ class BaseDisplay:
                         .split('"')[0])))
 
     def add_info_tab_content(self) -> None:
-        data = self.get_entity_data()
+        self.add_data()
         if hasattr(current_user, 'settings'):
-            data |= self.get_system_data()
+            self.data |= self.get_system_data()
         self.tabs['info'].buttons = self.buttons
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
             profile_image=profile_image(self.entity),
-            info_data=data,
+            info_data=self.data,
             gis_data=self.gis_data,
             overlays=self.overlays,
             ext_references=ext_references(self.entity.reference_systems),
@@ -131,114 +132,17 @@ class BaseDisplay:
                     button(_('edit'), url_for('update', id_=self.entity.id)))
             self.buttons.append(delete_link(self.entity))
 
-    def get_entity_data(self) -> dict[str, Any]:
-        entity = self.entity
-        data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
-        from_link = ''
-        to_link = ''
-        if entity.class_.name == 'move':  # Add places to dates
-            if place_from := entity.get_linked_entity('P27'):
-                from_link = \
-                    link(place_from.get_linked_entity_safe('P53', True)) + ' '
-            if place_to := entity.get_linked_entity('P26'):
-                to_link = link(
-                    place_to.get_linked_entity_safe('P53', True)) + ' '
-        data[_('begin')] = from_link + format_entity_date(entity, 'begin')
-        data[_('end')] = to_link + format_entity_date(entity, 'end')
-        if entity.standard_type:
-            title = ' > '.join(
-                [g.types[id_].name for id_ in entity.standard_type.root])
-            data[_('type')] = \
-                f'<span title="{title}">{link(entity.standard_type)}</span>'
-        data.update(self.get_type_data())
-
-        # Class specific information
-        from openatlas.models.type import Type
-        from openatlas.models.reference_system import ReferenceSystem
-        if isinstance(entity, Type):
-            data[_('super')] = link(g.types[entity.root[-1]])
-            if entity.category == 'value':
-                data[_('unit')] = entity.description
-            data[_('ID for imports')] = entity.id
-        elif isinstance(entity, ReferenceSystem):
-            data[_('website URL')] = \
-                link(entity.website_url, entity.website_url, external=True)
-            data[_('resolver URL')] = \
-                link(entity.resolver_url, entity.resolver_url, external=True)
-            data[_('example ID')] = entity.placeholder
-        elif entity.class_.view == 'actor':
-            begin_object = None
-            if begin_place := entity.get_linked_entity('OA8'):
-                begin_object = begin_place.get_linked_entity_safe('P53', True)
-                self.linked_places.append(begin_object)
-            end_object = None
-            if end_place := entity.get_linked_entity('OA9'):
-                end_object = end_place.get_linked_entity_safe('P53', True)
-                self.linked_places.append(end_object)
-            if residence := entity.get_linked_entity('P74'):
-                residence_object =\
-                    residence.get_linked_entity_safe('P53', True)
-                self.linked_places.append(residence_object)
-                data[_('residence')] = link(residence_object)
-            data[_('alias')] = list(entity.aliases.values())
-            data[_('begin')] = \
-                format_entity_date(entity, 'begin', begin_object)
-            data[_('end')] = format_entity_date(entity, 'end', end_object)
-            if self.event_links:
-                appears_first, appears_last = get_appearance(self.event_links)
-                data[_('appears first')] = appears_first
-                data[_('appears last')] = appears_last
-        elif entity.class_.view == 'artifact':
-            data[_('source')] = \
-                [link(source) for source in entity.get_linked_entities('P128')]
-            data[_('owned by')] = link(entity.get_linked_entity('P52'))
-        elif entity.class_.view == 'event':
-            data[_('sub event of')] = link(entity.get_linked_entity('P9'))
-            data[_('preceding event')] = link(
-                entity.get_linked_entity('P134', True))
-            data[_('succeeding event')] = \
-                '<br>'.join(
-                    [link(e) for e in entity.get_linked_entities('P134')])
-            if entity.class_.name == 'move':
-                person_data = []
-                artifact_data = []
-                for linked_entity in entity.get_linked_entities('P25'):
-                    if linked_entity.class_.name == 'person':
-                        person_data.append(linked_entity)
-                    elif linked_entity.class_.view == 'artifact':
-                        artifact_data.append(linked_entity)
-                data[_('person')] = [link(item) for item in person_data]
-                data[_('artifact')] = [link(item) for item in artifact_data]
-            else:
-                if place := entity.get_linked_entity('P7'):
-                    data[_('location')] = link(
-                        place.get_linked_entity_safe('P53', True))
-            if entity.class_.name == 'acquisition':
-                data[_('recipient')] = \
-                    [link(actor) for actor in
-                     entity.get_linked_entities('P22')]
-                data[_('donor')] = \
-                    [link(donor) for donor in
-                     entity.get_linked_entities('P23')]
-                data[_('given place')] = []
-                data[_('given artifact')] = []
-                for item in entity.get_linked_entities('P24'):
-                    label = _('given artifact') \
-                        if item.class_.name == 'artifact' else _('given place')
-                    data[label].append(link(item))
-            if entity.class_.name == 'production':
-                data[_('produced')] = \
-                    [link(item) for item in entity.get_linked_entities('P108')]
-        elif entity.class_.view == 'file':
-            data[_('size')] = g.file_stats[entity.id]['size'] \
-                if entity.id in g.file_stats else 'N/A'
-            data[_('extension')] = g.file_stats[entity.id]['ext'] \
-                if entity.id in g.file_stats else 'N/A'
-        elif entity.class_.view == 'source':
-            data[_('artifact')] = [
-                link(artifact) for artifact in
-                entity.get_linked_entities('P128', inverse=True)]
-        return data
+    def add_data(self) -> None:
+        self.data = {
+            _('alias'): list(self.entity.aliases.values()),
+            _('begin'): format_entity_date(self.entity, 'begin'),
+            _('end'): format_entity_date(self.entity, 'end')}
+        if self.entity.standard_type:
+            var = ' > '.join(
+                [g.types[id_].name for id_ in self.entity.standard_type.root])
+            self.data[_('type')] = \
+                f'<span title="{var}">{link(self.entity.standard_type)}</span>'
+        self.data.update(self.get_type_data())
 
     def get_system_data(self) -> dict[str, Any]:
         data = {}
@@ -266,6 +170,27 @@ class BaseDisplay:
 
 
 class ActorDisplay(BaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        if begin_place := self.entity.get_linked_entity('OA8'):
+            begin_object = begin_place.get_linked_entity_safe('P53', True)
+            self.linked_places.append(begin_object)
+            self.data[_('begin')] = \
+                format_entity_date(self.entity, 'begin', begin_object)
+        if end_place := self.entity.get_linked_entity('OA9'):
+            end_object = end_place.get_linked_entity_safe('P53', True)
+            self.linked_places.append(end_object)
+            self.data[_('end')] = \
+                format_entity_date(self.entity, 'end', end_object)
+        if residence := self.entity.get_linked_entity('P74'):
+            residence_object = residence.get_linked_entity_safe('P53', True)
+            self.linked_places.append(residence_object)
+            self.data[_('residence')] = link(residence_object)
+        if self.event_links:
+            appears_first, appears_last = get_appearance(self.event_links)
+            self.data[_('appears first')] = appears_first
+            self.data[_('appears last')] = appears_last
 
     def add_tabs(self) -> None:
         super().add_tabs()
@@ -407,6 +332,19 @@ class ActorDisplay(BaseDisplay):
 
 class EventsDisplay(BaseDisplay):
 
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('sub event of')] = \
+            link(self.entity.get_linked_entity('P9'))
+        self.data[_('preceding event')] = link(
+            self.entity.get_linked_entity('P134', True))
+        self.data[_('succeeding event')] = \
+            '<br>'.join(
+                [link(e) for e in self.entity.get_linked_entities('P134')])
+        if place := self.entity.get_linked_entity('P7'):
+            self.data[_('location')] = \
+                link(place.get_linked_entity_safe('P53', True))
+
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -472,9 +410,6 @@ class PlaceBaseDisplay(BaseDisplay):
             if not self.entity.get_linked_entities('P46'):
                 self.buttons.append(delete_link(self.entity))
 
-    def add_info_tab_content(self) -> None:
-        super().add_info_tab_content()
-
     def add_tabs(self) -> None:
         super().add_tabs()
         entity = self.entity
@@ -484,7 +419,7 @@ class PlaceBaseDisplay(BaseDisplay):
             self.tabs['actor'] = Tab('actor', entity=entity)
             self.tabs['feature'] = Tab('feature', entity=entity)
         elif self.entity.class_.name == 'feature':
-            self.tabs['stratigraphic_unit'] =\
+            self.tabs['stratigraphic_unit'] = \
                 Tab('stratigraphic_unit', entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
         if is_authorized('editor') \
@@ -532,6 +467,8 @@ class PlaceBaseDisplay(BaseDisplay):
 
         entity.location = entity.get_linked_entity_safe('P53', types=True)
         event_ids = []  # Keep track of event ids to prevent event doubles
+
+        # Todo: Artifact gets double P24
         for event in entity.location.get_linked_entities(
                 ['P7', 'P24', 'P26', 'P27'],
                 inverse=True):
@@ -585,6 +522,13 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
+
+    def add_data(self) -> None:
+        super().add_data()
+        self.data[_('super')] = link(g.types[self.entity.root[-1]])
+        if self.entity.category == 'value':
+            self.data[_('unit')] = self.entity.description
+        self.data[_('ID for imports')] = self.entity.id
 
     def add_buttons(self) -> None:
         if is_authorized(self.entity.class_.write_access) \
