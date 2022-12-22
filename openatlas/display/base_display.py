@@ -97,12 +97,15 @@ class BaseDisplay:
                         .split('"')[0])))
 
     def add_info_tab_content(self) -> None:
+        data = self.get_entity_data()
+        if hasattr(current_user, 'settings'):
+            data |= self.get_system_data()
         self.tabs['info'].buttons = self.buttons
         self.tabs['info'].content = render_template(
             'entity/view.html',
             entity=self.entity,
             profile_image=profile_image(self.entity),
-            info_data=self.get_entity_data(),
+            info_data=data,
             gis_data=self.gis_data,
             overlays=self.overlays,
             ext_references=ext_references(self.entity.reference_systems),
@@ -131,11 +134,9 @@ class BaseDisplay:
     def get_entity_data(self) -> dict[str, Any]:
         entity = self.entity
         data: dict[str, Any] = {_('alias'): list(entity.aliases.values())}
-
-        # Dates
         from_link = ''
         to_link = ''
-        if entity.class_.name == 'move':  # Add places to dates if it's a move
+        if entity.class_.name == 'move':  # Add places to dates
             if place_from := entity.get_linked_entity('P27'):
                 from_link = \
                     link(place_from.get_linked_entity_safe('P53', True)) + ' '
@@ -144,8 +145,6 @@ class BaseDisplay:
                     place_to.get_linked_entity_safe('P53', True)) + ' '
         data[_('begin')] = from_link + format_entity_date(entity, 'begin')
         data[_('end')] = to_link + format_entity_date(entity, 'end')
-
-        # Types
         if entity.standard_type:
             title = ' > '.join(
                 [g.types[id_].name for id_ in entity.standard_type.root])
@@ -239,9 +238,6 @@ class BaseDisplay:
             data[_('artifact')] = [
                 link(artifact) for artifact in
                 entity.get_linked_entities('P128', inverse=True)]
-
-        if hasattr(current_user, 'settings'):
-            data |= self.get_system_data()
         return data
 
     def get_system_data(self) -> dict[str, Any]:
