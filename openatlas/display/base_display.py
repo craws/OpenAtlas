@@ -145,6 +145,30 @@ class BaseDisplay:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
 
+    def add_reference_tables_data(self) -> None:
+        entity = self.entity
+        for link_ in entity.get_links('P67', inverse=True):
+            domain = link_.domain
+            data = get_base_table_data(domain)
+            if domain.class_.view == 'file':  # pragma: no cover
+                extension = data[3]
+                data.append(
+                    profile_image_table_link(entity, domain, extension))
+                if not entity.image_id \
+                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                    entity.image_id = domain.id
+            if domain.class_.view not in ['source', 'file']:
+                data.append(link_.description)
+                data.append(edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
+                if domain.class_.view \
+                        == 'reference_system':  # pragma: no cover
+                    entity.reference_systems.append(link_)
+                    continue
+            data.append(
+                remove_link(domain.name, link_, entity, domain.class_.view))
+            self.tabs[domain.class_.view].table.rows.append(data)
+
 
 class ActorDisplay(BaseDisplay):
 
@@ -177,6 +201,7 @@ class ActorDisplay(BaseDisplay):
                 'artifact', 'reference', 'file']:
             if entity.class_.name == 'group' or name != 'member':
                 self.tabs[name] = Tab(name, entity=entity)
+        self.add_reference_tables_data()
         self.event_links = \
             entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
         for link_ in self.event_links:
@@ -233,26 +258,6 @@ class ActorDisplay(BaseDisplay):
                 link_.domain.first,
                 link_.domain.last,
                 link_.domain.description])
-        for link_ in entity.get_links('P67', True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-            if domain.class_.view not in ['source', 'file']:
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
 
 
 class EventsDisplay(BaseDisplay):
@@ -275,25 +280,19 @@ class EventsDisplay(BaseDisplay):
         entity = self.entity
         for name in ['subs', 'source', 'actor', 'reference', 'file']:
             self.tabs[name] = Tab(name, entity=entity)
-        for sub_event in entity.get_linked_entities(
-                'P9',
-                inverse=True,
-                types=True):
-            self.tabs['subs'].table.rows.append(get_base_table_data(sub_event))
+        self.add_reference_tables_data()
+        for sub in entity.get_linked_entities('P9', inverse=True, types=True):
+            self.tabs['subs'].table.rows.append(get_base_table_data(sub))
         self.tabs['actor'].table.header.insert(5, _('activity'))
         for link_ in entity.get_links(['P11', 'P14', 'P22', 'P23']):
-            first = link_.first
-            if not link_.first and entity.first:
-                first = f'<span class="inactive">{entity.first}</span>'
-            last = link_.last
-            if not link_.last and entity.last:
-                last = f'<span class="inactive">{entity.last}</span>'
             self.tabs['actor'].table.rows.append([
                 link(link_.range),
                 link_.range.class_.label,
                 link_.type.name if link_.type else '',
-                first,
-                last,
+                link_.first or f'<span class="inactive">{entity.first}</span>'
+                if entity.first else '',
+                link_.last or f'<span class="inactive">{entity.last}</span>'
+                if entity.last else '',
                 g.properties[link_.property.code].name_inverse,
                 link_.description,
                 edit_link(
@@ -302,27 +301,6 @@ class EventsDisplay(BaseDisplay):
         entity.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(self.entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-            if domain.class_.view not in ['source', 'file']:
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view \
-                        == 'reference_system':  # pragma: no cover
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
 
 
 class PlaceBaseDisplay(BaseDisplay):
