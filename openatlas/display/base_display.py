@@ -318,14 +318,15 @@ class PlaceBaseDisplay(BaseDisplay):
         entity = self.entity
         for name in ['source', 'event', 'reference', 'artifact']:
             self.tabs[name] = Tab(name, entity=entity)
-        if self.entity.class_.name == 'place':
+        if entity.class_.name == 'place':
             self.tabs['actor'] = Tab('actor', entity=entity)
             self.tabs['feature'] = Tab('feature', entity=entity)
-        elif self.entity.class_.name == 'feature':
+        elif entity.class_.name == 'feature':
             self.tabs['stratigraphic_unit'] = \
                 Tab('stratigraphic_unit', entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
-        if is_authorized('editor') \
+        if entity.class_.view == 'place' \
+                and is_authorized('editor') \
                 and current_user.settings['module_map_overlay']:
             self.tabs['file'].table.header.append(uc_first(_('overlay')))
 
@@ -335,7 +336,7 @@ class PlaceBaseDisplay(BaseDisplay):
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    profile_image_table_link(self.entity, domain, extension))
+                    profile_image_table_link(entity, domain, extension))
                 if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
@@ -370,19 +371,16 @@ class PlaceBaseDisplay(BaseDisplay):
 
         entity.location = entity.get_linked_entity_safe('P53', types=True)
         event_ids = []  # Keep track of event ids to prevent event doubles
-
-        # Todo: Artifact gets double P24
-        for event in entity.location.get_linked_entities(
-                ['P7', 'P24', 'P26', 'P27'],
-                inverse=True):
-            self.events.append(event)
-            self.tabs['event'].table.rows.append(get_base_table_data(event))
-            event_ids.append(event.id)
-        for event in entity.get_linked_entities('P24', inverse=True):
-            if event.id not in event_ids:  # Don't add again
+        for event in \
+                entity.get_linked_entities(['P24', 'P25', 'P108'], True) + \
+                entity.location.get_linked_entities(
+                    ['P7', 'P26', 'P27'],
+                    True):
+            if event.id not in event_ids:
+                self.events.append(event)
                 self.tabs['event'].table.rows.append(
                     get_base_table_data(event))
-                self.events.append(event)
+                event_ids.append(event.id)
         self.structure = entity.get_structure()
         if self.structure:
             for item in self.structure['subunits']:

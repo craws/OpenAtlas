@@ -43,12 +43,6 @@ class ArtifactDisplay(PlaceBaseDisplay):
             link(source) for source in self.entity.get_linked_entities('P128')]
         self.data[_('owned by')] = link(self.entity.get_linked_entity('P52'))
 
-    def add_tabs(self) -> None:
-        super().add_tabs()
-        for link_ in self.entity.get_links(['P24', 'P25', 'P108'], True):
-            self.tabs['event'].table.rows.append(
-                get_base_table_data(link_.domain))
-
 
 class BibliographyDisplay(ReferenceBaseDisplay):
     pass
