@@ -9,7 +9,8 @@ from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
     delete_link, edit_link, ext_references, format_entity_date, get_appearance,
-    profile_image, profile_image_table_link, remove_link, siblings_pager)
+    get_system_data, profile_image, profile_image_table_link, remove_link,
+    siblings_pager)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -100,7 +101,7 @@ class BaseDisplay:
     def add_info_tab_content(self) -> None:
         self.add_data()
         if hasattr(current_user, 'settings'):
-            self.data |= self.get_system_data()
+            self.data |= get_system_data(self.entity)
         self.tabs['info'].buttons = self.buttons
         self.tabs['info'].content = render_template(
             'entity/view.html',
@@ -144,30 +145,6 @@ class BaseDisplay:
                 f'<span title="{var}">{link(self.entity.standard_type)}</span>'
         self.data.update(self.get_type_data())
 
-    def get_system_data(self) -> dict[str, Any]:
-        data = {}
-        if 'entity_show_class' in current_user.settings \
-                and current_user.settings['entity_show_class']:
-            data[_('class')] = link(self.entity.cidoc_class)
-        info = g.logger.get_log_info(self.entity.id)
-        if 'entity_show_dates' in current_user.settings \
-                and current_user.settings['entity_show_dates']:
-            data[_('created')] = \
-                f"{format_date(self.entity.created)} {link(info['creator'])}"
-            if info['modified']:
-                data[_('modified')] = \
-                    f"{format_date(info['modified'])} {link(info['modifier'])}"
-        if 'entity_show_import' in current_user.settings \
-                and current_user.settings['entity_show_import']:
-            data[_('imported from')] = link(info['project'])
-            data[_('imported by')] = link(info['importer'])
-            data['origin ID'] = info['origin_id']
-        if 'entity_show_api' in current_user.settings \
-                and current_user.settings['entity_show_api']:
-            data['API'] = \
-                render_template('util/api_links.html', entity=self.entity)
-        return data
-
 
 class ActorDisplay(BaseDisplay):
 
@@ -194,139 +171,87 @@ class ActorDisplay(BaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
+        entity = self.entity
         for name in [
                 'source', 'event', 'relation', 'member_of', 'member',
                 'artifact', 'reference', 'file']:
-            self.tabs[name] = Tab(name, entity=self.entity)
+            if entity.class_.name == 'group' or name != 'member':
+                self.tabs[name] = Tab(name, entity=entity)
         self.event_links = \
-            self.entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
+            entity.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
         for link_ in self.event_links:
             event = link_.domain
             link_.object_ = None  # Needed for first/last appearance
             for place in event.get_linked_entities(['P7', 'P26', 'P27']):
-                object_ = place.get_linked_entity_safe('P53', True)
-                self.linked_places.append(object_)
-                link_.object_ = object_
-            first = link_.first
-            if not link_.first and event.first:
-                first = f'<span class="inactive">{event.first}</span>'
-            last = link_.last
-            if not link_.last and event.last:
-                last = f'<span class="inactive">{event.last}</span>'
-            data = [
+                link_.object_ = place.get_linked_entity_safe('P53', True)
+                self.linked_places.append(link_.object_)
+            self.tabs['event'].table.rows.append([
                 link(event),
                 event.class_.label,
                 _('moved')
                 if link_.property.code == 'P25' else link(link_.type),
-                first,
-                last,
-                link_.description]
-            if link_.property.code == 'P25':
-                data.append('')
-            else:
-                data.append(
-                    edit_link(
-                        url_for(
-                            'link_update',
-                            id_=link_.id,
-                            origin_id=self.entity.id)))
-            data.append(
-                remove_link(link_.domain.name, link_, self.entity, 'event'))
-            self.tabs['event'].table.rows.append(data)
-        for link_ in self.entity.get_links('OA7') + \
-                self.entity.get_links('OA7', True):
-            type_ = ''
-            if self.entity.id == link_.domain.id:
-                related = link_.range
-                if link_.type:
-                    type_ = link(
-                        link_.type.get_name_directed(),
-                        url_for('view', id_=link_.type.id))
-            else:
-                related = link_.domain
-                if link_.type:
-                    type_ = link(
-                        link_.type.get_name_directed(True),
-                        url_for('view', id_=link_.type.id))
+                link_.first or (
+                    f'<span class="inactive">{event.first}</span>'
+                    if event.first else ''),
+                link_.last or (
+                    f'<span class="inactive">{event.last}</span>'
+                    if event.last else ''),
+                link_.description,
+                '' if link_.property.code == 'P25' else
+                edit_link(
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(link_.domain.name, link_, entity, 'event')])
+        for link_ in entity.get_links('OA7') + entity.get_links('OA7', True):
+            related = link_.range \
+                if entity.id == link_.domain.id else link_.domain
             self.tabs['relation'].table.rows.append([
-                type_,
+                '' if not link_.type else link(
+                    link_.type.get_name_directed(entity.id != link_.domain.id),
+                    url_for('view', id_=link_.type.id)),
                 link(related),
                 link_.first,
                 link_.last,
                 link_.description,
                 edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)),
-                remove_link(related.name, link_, self.entity, 'relation')])
-        for link_ in self.entity.get_links('P107', True):
-            data = [
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(related.name, link_, entity, 'relation')])
+        for link_ in entity.get_links('P107', True):
+            self.tabs['member_of'].table.rows.append([
                 link(link_.domain),
                 link(link_.type),
                 link_.first,
                 link_.last,
                 link_.description,
                 edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)),
-                remove_link(link_.domain.name, link_, self.entity, 'member-of')
-            ]
-            self.tabs['member_of'].table.rows.append(data)
-        if self.entity.class_.name != 'group':
-            del self.tabs['member']
-        else:
-            for link_ in self.entity.get_links('P107'):
-                self.tabs['member'].table.rows.append([
-                    link(link_.range),
-                    link(link_.type),
-                    link_.first,
-                    link_.last,
-                    link_.description,
-                    edit_link(
-                        url_for(
-                            'link_update',
-                            id_=link_.id,
-                            origin_id=self.entity.id)),
-                    remove_link(link_.range.name, link_, self.entity, 'member')
-                ])
-        for link_ in self.entity.get_links('P52', True):
-            data = [
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)),
+                remove_link(link_.domain.name, link_, entity, 'member-of')])
+        for link_ in entity.get_links('P52', True):
+            self.tabs['artifact'].table.rows.append([
                 link(link_.domain),
                 link_.domain.class_.label,
                 link(link_.domain.standard_type),
                 link_.domain.first,
                 link_.domain.last,
-                link_.domain.description]
-            self.tabs['artifact'].table.rows.append(data)
-        for link_ in self.entity.get_links('P67', inverse=True):
+                link_.domain.description])
+        for link_ in entity.get_links('P67', True):
             domain = link_.domain
             data = get_base_table_data(domain)
             if domain.class_.view == 'file':  # pragma: no cover
                 extension = data[3]
                 data.append(
-                    profile_image_table_link(self.entity, domain, extension))
-                if not self.entity.image_id \
+                    profile_image_table_link(entity, domain, extension))
+                if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    self.entity.image_id = domain.id
+                    entity.image_id = domain.id
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)))
+                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
                 if domain.class_.view == 'reference_system':
-                    self.entity.reference_systems.append(link_)
+                    entity.reference_systems.append(link_)
                     continue
             data.append(
-                remove_link(
-                    domain.name,
-                    link_,
-                    self.entity,
-                    domain.class_.view))
+                remove_link(domain.name, link_, entity, domain.class_.view))
             self.tabs[domain.class_.view].table.rows.append(data)
 
 

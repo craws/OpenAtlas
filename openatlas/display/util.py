@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from typing import Optional, Union
+from typing import Any, Optional, Union
 
-from flask import g, url_for
+from flask import g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
@@ -198,3 +198,27 @@ def siblings_pager(
         parts.append(button('>', url_for('view', id_=next_id)))
     parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
     return ' '.join(parts)
+
+
+def get_system_data(entity: Entity) -> dict[str, Any]:
+    data = {}
+    if 'entity_show_class' in current_user.settings \
+            and current_user.settings['entity_show_class']:
+        data[_('class')] = link(entity.cidoc_class)
+    info = g.logger.get_log_info(entity.id)
+    if 'entity_show_dates' in current_user.settings \
+            and current_user.settings['entity_show_dates']:
+        data[_('created')] = \
+            f"{format_date(entity.created)} {link(info['creator'])}"
+        if info['modified']:
+            data[_('modified')] = \
+                f"{format_date(info['modified'])} {link(info['modifier'])}"
+    if 'entity_show_import' in current_user.settings \
+            and current_user.settings['entity_show_import']:
+        data[_('imported from')] = link(info['project'])
+        data[_('imported by')] = link(info['importer'])
+        data['origin ID'] = info['origin_id']
+    if 'entity_show_api' in current_user.settings \
+            and current_user.settings['entity_show_api']:
+        data['API'] = render_template('util/api_links.html', entity=entity)
+    return data

@@ -125,7 +125,22 @@ class FeatureDisplay(PlaceBaseDisplay):
 
 
 class GroupDisplay(ActorDisplay):
-    pass
+
+    def add_tabs(self) -> None:
+        super().add_tabs()
+        for link_ in self.entity.get_links('P107'):
+            self.tabs['member'].table.rows.append([
+                link(link_.range),
+                link(link_.type),
+                link_.first,
+                link_.last,
+                link_.description,
+                edit_link(
+                    url_for(
+                        'link_update',
+                        id_=link_.id,
+                        origin_id=self.entity.id)),
+                remove_link(link_.range.name, link_, self.entity, 'member')])
 
 
 class HumanRemainsDisplay(ArtifactDisplay):
