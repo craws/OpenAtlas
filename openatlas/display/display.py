@@ -60,45 +60,34 @@ class FileDisplay(BaseDisplay):
     def add_buttons(self) -> None:
         super().add_buttons()
         if path := get_file_path(self.entity.id):
-            self.buttons.append(
-                button(
-                    _('download'),
-                    url_for('download_file', filename=path.name)))
+            self.buttons.append(button(
+                _('download'),
+                url_for('download_file', filename=path.name)))
             return
         self.buttons.append(
             '<span class="error">' + uc_first(_("missing file")) + '</span>')
 
     def add_tabs(self) -> None:
         super().add_tabs()
+        entity = self.entity
         for name in [
                 'source', 'event', 'actor', 'place', 'feature',
                 'stratigraphic_unit', 'artifact', 'reference', 'type']:
-            self.tabs[name] = Tab(name, entity=self.entity)
-        self.entity.image_id = self.entity.id \
-            if get_file_path(self.entity.id) else None
-        for link_ in self.entity.get_links('P67'):
+            self.tabs[name] = Tab(name, entity=entity)
+        entity.image_id = entity.id if get_file_path(entity.id) else None
+        for link_ in entity.get_links('P67'):
             range_ = link_.range
             data = get_base_table_data(range_)
-            data.append(remove_link(
-                range_.name,
-                link_,
-                self.entity,
-                range_.class_.name))
+            data.append(
+                remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in self.entity.get_links('P67', True):
+        for link_ in entity.get_links('P67', True):
             data = get_base_table_data(link_.domain)
             data.append(link_.description)
             data.append(edit_link(
-                url_for(
-                    'link_update',
-                    id_=link_.id,
-                    origin_id=self.entity.id)))
+                url_for('link_update', id_=link_.id, origin_id=entity.id)))
             data.append(
-                remove_link(
-                    link_.domain.name,
-                    link_,
-                    self.entity,
-                    'reference'))
+                remove_link(link_.domain.name, link_, entity, 'reference'))
             self.tabs['reference'].table.rows.append(data)
 
 
@@ -129,11 +118,10 @@ class GroupDisplay(ActorDisplay):
                 link_.first,
                 link_.last,
                 link_.description,
-                edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)),
+                edit_link(url_for(
+                    'link_update',
+                    id_=link_.id,
+                    origin_id=self.entity.id)),
                 remove_link(link_.range.name, link_, self.entity, 'member')])
 
 
@@ -145,16 +133,16 @@ class MoveDisplay(EventsDisplay):
 
     def add_data(self) -> None:
         super().add_data()
-        if place_from := self.entity.get_linked_entity('P27'):
+        if from_ := self.entity.get_linked_entity('P27'):
             self.data[_('begin')] = format_entity_date(
                 self.entity,
                 'begin',
-                place_from.get_linked_entity_safe('P53', True))
-        if place_to := self.entity.get_linked_entity('P26'):
+                from_.get_linked_entity_safe('P53', True))
+        if to := self.entity.get_linked_entity('P26'):
             self.data[_('end')] = format_entity_date(
                 self.entity,
                 'end',
-                place_to.get_linked_entity_safe('P53', True))
+                to.get_linked_entity_safe('P53', True))
         moved = {'actor': [], 'artifact': []}
         for entity in self.entity.get_linked_entities('P25'):
             moved[entity.class_.view].append(link(entity))
@@ -170,9 +158,8 @@ class PlaceDisplay(PlaceBaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
-        for link_ in self.entity.location.get_links(
-                ['P74', 'OA8', 'OA9'],
-                inverse=True):
+        for link_ in \
+                self.entity.location.get_links(['P74', 'OA8', 'OA9'], True):
             actor = Entity.get_by_id(link_.domain.id)
             self.tabs['actor'].table.rows.append([
                 link(actor),
@@ -183,15 +170,14 @@ class PlaceDisplay(PlaceBaseDisplay):
                 actor.description])
         actor_ids = []
         for event in self.events:
-            for actor in event.get_linked_entities(
-                    ['P11', 'P14', 'P22', 'P23']):
-                if actor.id in actor_ids:
-                    continue  # pragma: no cover
-                actor_ids.append(actor.id)
-                self.tabs['actor'].table.rows.append([
-                    link(actor),
-                    f"{_('participated at an event')}",
-                    event.class_.name, '', '', ''])
+            for actor in \
+                    event.get_linked_entities(['P11', 'P14', 'P22', 'P23']):
+                if actor.id not in actor_ids:
+                    actor_ids.append(actor.id)
+                    self.tabs['actor'].table.rows.append([
+                        link(actor),
+                        f"{_('participated at an event')}",
+                        event.class_.name, '', '', ''])
 
 
 class ProductionDisplay(EventsDisplay):
@@ -274,7 +260,7 @@ class SourceDisplay(BaseDisplay):
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(
-                remove_link(range_.name, link_, entity, range_.class_.name))
+                remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
@@ -302,27 +288,20 @@ class SourceDisplay(BaseDisplay):
 
 class SourceTranslationDisplay(BaseDisplay):
 
-    def add_buttons(self) -> None:
-        if is_authorized(self.entity.class_.write_access):
-            self.buttons.append(
-                button(_('edit'), url_for('update', id_=self.entity.id)))
-            self.buttons.append(delete_link(self.entity))
-
     def add_crumbs(self) -> None:
         self.crumbs = [
             [_('source'), url_for('index', view='source')],
-            self.entity.get_linked_entity_safe('P73', True)]
-        self.crumbs.append(self.entity.name)
+            self.entity.get_linked_entity_safe('P73', True),
+            self.entity.name]
 
 
 class StratigraphicUnitDisplay(PlaceBaseDisplay):
 
     def add_buttons(self) -> None:
         super().add_buttons()
-        self.buttons.append(
-            button(
-                _('tools'),
-                url_for('anthropology_index', id_=self.entity.id)))
+        self.buttons.append(button(
+            _('tools'),
+            url_for('anthropology_index', id_=self.entity.id)))
 
 
 class TypeDisplay(TypeBaseDisplay):

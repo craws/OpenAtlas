@@ -346,10 +346,9 @@ class PlaceBaseDisplay(BaseDisplay):
                     overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         if domain.id in overlays:
-                            data.append(edit_link(
-                                url_for(
-                                    'overlay_update',
-                                    id_=overlays[domain.id].id)))
+                            data.append(edit_link(url_for(
+                                'overlay_update',
+                                id_=overlays[domain.id].id)))
                         else:
                             data.append(link(_('link'), url_for(
                                 'overlay_insert',
@@ -407,18 +406,15 @@ class ReferenceBaseDisplay(BaseDisplay):
             range_ = link_.range
             data = get_base_table_data(range_)
             data.append(link_.description)
-            data.append(
-                edit_link(
-                    url_for(
-                        'link_update',
-                        id_=link_.id,
-                        origin_id=self.entity.id)))
-            data.append(
-                remove_link(
-                    range_.name,
-                    link_,
-                    self.entity,
-                    range_.class_.name))
+            data.append(edit_link(url_for(
+                'link_update',
+                id_=link_.id,
+                origin_id=self.entity.id)))
+            data.append(remove_link(
+                range_.name,
+                link_,
+                self.entity,
+                range_.class_.name))
             self.tabs[range_.class_.view].table.rows.append(data)
 
 
@@ -449,22 +445,21 @@ class TypeBaseDisplay(BaseDisplay):
         self.tabs['subs'] = Tab('subs', entity=entity)
         self.tabs['entities'] = Tab('entities', entity=entity)
         self.tabs['file'] = Tab('file', entity=entity)
+        self.add_reference_tables_data()
         for sub_id in entity.subs:
-            sub = g.types[sub_id]
             self.tabs['subs'].table.rows.append([
-                link(sub),
-                sub.count,
-                sub.description])
+                link(g.types[sub_id]),
+                g.types[sub_id].count,
+                g.types[sub_id].description])
         if entity.category == 'value':
             self.tabs['entities'].table.header = \
                 [_('name'), _('value'), _('class'), _('info')]
-        place_classes = [
+        classes_ = [
             'feature',
             'stratigraphic_unit',
             'artifact',
             'human_remains']
-        if any(item in g.types[entity.root[0]].classes for item
-               in place_classes):
+        if any(item in g.types[entity.root[0]].classes for item in classes_):
             self.tabs['entities'].table.header.append('place')
         root = g.types[entity.root[0]] if entity.root else entity
         if root.name in app.config['PROPERTY_TYPES']:
@@ -474,10 +469,7 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['domain_id'])),
                     link(Entity.get_by_id(row['range_id']))])
         else:
-            for item in entity.get_linked_entities(
-                    ['P2', 'P89'],
-                    inverse=True,
-                    types=True):
+            for item in entity.get_linked_entities(['P2', 'P89'], True, True):
                 if item.class_.name in ['location', 'reference_system']:
                     continue  # pragma: no cover
                 if item.class_.name == 'object_location':
@@ -488,32 +480,9 @@ class TypeBaseDisplay(BaseDisplay):
                 data.append(item.class_.label)
                 data.append(item.description)
                 root_place = ''
-                if item.class_.name in place_classes:
-                    if roots := item.get_linked_entities_recursive(
-                            'P46',
-                            True):
+                if item.class_.name in classes_:
+                    if roots := \
+                            item.get_linked_entities_recursive('P46', True):
                         root_place = link(roots[0])
                 data.append(root_place)
                 self.tabs['entities'].table.rows.append(data)
-
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-            if domain.class_.view \
-                    not in ['source', 'file']:  # pragma: no cover
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
