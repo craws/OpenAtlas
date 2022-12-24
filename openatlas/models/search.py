@@ -50,13 +50,13 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
         entity.end_from,
         entity.end_to]
     if not data['from_date']:
-        begin_ok = True  # pragma: no cover
+        begin_ok = True
     else:
         for date in dates:
             if date and date >= data['from_date']:
                 begin_ok = True
     if not data['to_date']:
-        end_ok = True  # pragma: no cover
+        end_ok = True
     else:
         for date in dates:
             if date and date <= data['to_date']:

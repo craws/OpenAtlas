@@ -8,7 +8,7 @@ from openatlas.database.anthropology import Anthropology as Db
 from openatlas.models.link import Link
 from openatlas.models.type import Type
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
 
 

@@ -15,7 +15,7 @@ from openatlas.util.util import (
     datetime64_to_timestamp, format_date_part, get_base_table_data, sanitize,
     timestamp_to_datetime64)
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.type import Type
     from openatlas.models.reference_system import ReferenceSystem
 
@@ -133,7 +133,7 @@ class Entity:
             description: Optional[str] = None,
             inverse: bool = False) -> None:
         if not range_:
-            return  # pragma: no cover
+            return
         # range_ = string value from a form, can be empty, int or int list
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
@@ -271,7 +271,7 @@ class Entity:
         if not self.image_id:
             for link_ in self.get_links('P67', inverse=True):
                 domain = link_.domain
-                if domain.class_.view == 'file':  # pragma: no cover
+                if domain.class_.view == 'file':
                     data = get_base_table_data(domain)
                     if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
                         self.image_id = domain.id
@@ -286,7 +286,7 @@ class Entity:
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
-        if inverse and len(name_parts) > 1:  # pragma: no cover
+        if inverse and len(name_parts) > 1:
             return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
         return name_parts[0]
 
@@ -373,7 +373,7 @@ class Entity:
             class_name: str,
             name: str,
             description: Optional[str] = None) -> Union[Entity, Type]:
-        if not name:  # pragma: no cover
+        if not name:
             g.logger.log('error', 'model', 'Insert entity without name')
             abort(422)
         id_ = Db.insert({
@@ -404,7 +404,7 @@ class Entity:
         data = Db.get_by_id(id_, types, aliases)
         if not data:
             if 'activity' in request.path:  # Re-raise if in user activity view
-                raise AttributeError  # pragma: no cover
+                raise AttributeError
             abort(418)
         return Entity(data)
 

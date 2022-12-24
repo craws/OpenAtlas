@@ -30,7 +30,7 @@ class CidocClass:
             return self.i18n[get_locale()]
         if g.settings['default_language'] in self.i18n:
             return self.i18n[g.settings['default_language']]
-        return getattr(self, '_name')  # pragma: no cover
+        return getattr(self, '_name')
 
     @staticmethod
     def get_all() -> dict[str, CidocClass]:

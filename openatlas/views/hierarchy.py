@@ -35,7 +35,7 @@ def hierarchy_insert(category: str) -> Union[str, Response]:
             manager.process_form()
             manager.entity.update(manager.data, new=True)
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -80,7 +80,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
             manager.process_form()
             manager.entity.update(manager.data)
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -114,11 +114,11 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
 def remove_class(id_: int, class_name: str) -> Response:
     root = g.types[id_]
     if Type.get_form_count(root, class_name):
-        abort(403)  # pragma: no cover
+        abort(403)
     try:
         Type.remove_class_from_hierarchy(class_name, root.id)
         flash(_('info update'), 'info')
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         g.logger.log(
             'error',
             'database',

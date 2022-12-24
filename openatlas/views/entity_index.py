@@ -24,7 +24,7 @@ from openatlas.util.util import (
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # Delete before showing index to prevent additional redirect
-        if current_user.group == 'contributor':  # pragma: no cover
+        if current_user.group == 'contributor':
             info = g.logger.get_log_info(delete_id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 abort(403)
@@ -116,7 +116,7 @@ def delete_entity(id_: int) -> Optional[str]:
     url = None
     entity = Entity.get_by_id(id_)
     if not is_authorized(entity.class_.write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
@@ -139,7 +139,7 @@ def delete_entity(id_: int) -> Optional[str]:
     elif entity.class_.name == 'file':
         try:
             delete_files(id_)
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             g.logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
             return url_for('view', id_=id_)

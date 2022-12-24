@@ -265,7 +265,7 @@ class SourceDisplay(BaseDisplay):
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
+            if domain.class_.view == 'file':
                 extension = data[3]
                 data.append(
                     profile_image_table_link(entity, domain, extension))
@@ -276,8 +276,7 @@ class SourceDisplay(BaseDisplay):
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == \
-                        'reference_system':  # pragma: no cover
+                if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)
                     continue
             data.append(

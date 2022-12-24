@@ -12,7 +12,7 @@ from openatlas.util.util import uc_first
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
     for file_ in request.files.getlist('file'):
-        if not file_:  # pragma: no cover
+        if not file_:
             field.errors.append(_('no file to upload'))
         elif not (
                 '.' in file_.filename

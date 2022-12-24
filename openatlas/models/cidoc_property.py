@@ -32,7 +32,7 @@ class CidocProperty:
             return self.i18n[locale_session]
         if g.settings['default_language'] in self.i18n:
             return self.i18n[g.settings['default_language']]
-        return getattr(self, '_name')  # pragma: no cover
+        return getattr(self, '_name')
 
     @property
     def name_inverse(self) -> str:
@@ -42,7 +42,7 @@ class CidocProperty:
             return self.i18n_inverse[locale_session]
         if g.settings['default_language'] in self.i18n_inverse:
             return self.i18n_inverse[g.settings['default_language']]
-        return getattr(self, '_name_inverse')  # pragma: no cover
+        return getattr(self, '_name_inverse')
 
     def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)

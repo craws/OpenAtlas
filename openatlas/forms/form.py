@@ -17,7 +17,7 @@ from openatlas.models.link import Link
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.type import Type
 
 

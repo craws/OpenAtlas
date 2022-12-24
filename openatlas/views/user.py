@@ -47,7 +47,7 @@ class UserForm(FlaskForm):
         if self.user_id:
             user = User.get_by_id(self.user_id)
             if not user:
-                abort(404)  # pragma: no cover
+                abort(404)
             username = user.username
             user_email = user.email
         if username != self.username.data \
@@ -112,7 +112,7 @@ def user_activity(user_id: int = 0) -> str:
         try:
             entity = Entity.get_by_id(row['entity_id'])
             entity_name = link(entity)
-        except AttributeError:  # pragma: no cover - entity already deleted
+        except AttributeError:  # entity already deleted
             entity = None  # type: ignore
             entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
@@ -134,7 +134,7 @@ def user_activity(user_id: int = 0) -> str:
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     entities_count = ''
     if count := User.get_created_entities_count(user.id):
         entities_count = \
@@ -213,9 +213,9 @@ def user_entities(id_: int) -> str:
 def user_update(id_: int) -> Union[str, Response]:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     if user.group == 'admin' and current_user.group != 'admin':
-        abort(403)  # pragma: no cover
+        abort(403)
     form = UserForm(obj=user)
     form.user_id = id_
     del form.password, form.password2, form.send_info, \
@@ -263,7 +263,7 @@ def user_insert() -> Union[str, Response]:
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
         flash(_('user created'), 'info')
-        if g.settings['mail'] and form.send_info.data:  # pragma: no cover
+        if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=g.settings['site_name'])

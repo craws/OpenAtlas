@@ -49,7 +49,7 @@ def type_index() -> str:
         'system': {}}
     for type_ in [type_ for type_ in g.types.values() if not type_.root]:
         if type_.category not in types:
-            continue  # pragma: no cover, remove after anthropology features
+            continue  # remove after anthropology features
         types[type_.category][type_] = render_template(
             'forms/tree_select_item.html',
             name=sanitize(type_.name),
@@ -143,7 +143,7 @@ def type_move_entities(id_: int) -> Union[str, Response]:
     type_ = g.types[id_]
     root = g.types[type_.root[0]]
     if root.category in ['system', 'value']:
-        abort(403)  # pragma: no cover
+        abort(403)
     form = get_move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()

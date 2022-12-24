@@ -9,7 +9,7 @@ from openatlas.database.gis import Gis as Db
 from openatlas.models.type import Type
 from openatlas.util.util import sanitize
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
 
@@ -145,11 +145,11 @@ class Gis:
     def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
             if shape not in data or not data[shape]:
-                continue  # pragma: no cover
+                continue
             for item in json.loads(data[shape]):
                 if not item['geometry']['coordinates'] \
                         or item['geometry']['coordinates'] == [[]]:
-                    continue  # pragma: no cover
+                    continue
                 if item['properties']['shapeType'] != 'centerpoint' \
                         and not Db.test_geom(json.dumps(item['geometry'])):
                     raise InvalidGeomException

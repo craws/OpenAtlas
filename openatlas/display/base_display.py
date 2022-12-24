@@ -150,7 +150,7 @@ class BaseDisplay:
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
+            if domain.class_.view == 'file':
                 extension = data[3]
                 data.append(
                     profile_image_table_link(entity, domain, extension))
@@ -161,8 +161,7 @@ class BaseDisplay:
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view \
-                        == 'reference_system':  # pragma: no cover
+                if domain.class_.view == 'reference_system':
                     entity.reference_systems.append(link_)
                     continue
             data.append(
@@ -333,7 +332,7 @@ class PlaceBaseDisplay(BaseDisplay):
         for link_ in entity.get_links('P67', inverse=True):
             domain = link_.domain
             data = get_base_table_data(domain)
-            if domain.class_.view == 'file':  # pragma: no cover
+            if domain.class_.view == 'file':
                 extension = data[3]
                 data.append(
                     profile_image_table_link(entity, domain, extension))
@@ -355,7 +354,7 @@ class PlaceBaseDisplay(BaseDisplay):
                                 image_id=domain.id,
                                 place_id=entity.id,
                                 link_id=link_.id)))
-                    else:  # pragma: no cover
+                    else:
                         data.append('')
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
@@ -471,7 +470,7 @@ class TypeBaseDisplay(BaseDisplay):
         else:
             for item in entity.get_linked_entities(['P2', 'P89'], True, True):
                 if item.class_.name in ['location', 'reference_system']:
-                    continue  # pragma: no cover
+                    continue
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]

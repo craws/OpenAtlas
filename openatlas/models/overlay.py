@@ -8,7 +8,7 @@ from openatlas import app
 from openatlas.database.overlay import Overlay as Db
 from openatlas.util.util import get_file_path
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
 
 
@@ -54,7 +54,7 @@ class Overlay:
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
         if not app.config['IS_UNIT_TEST'] \
                 and not current_user.settings['module_map_overlay']:
-            return {}  # pragma: no cover - tests can't access user settings
+            return {}
 
         ids = [object_.id] + \
             [e.id for e in object_.get_linked_entities_recursive('P46', True)]

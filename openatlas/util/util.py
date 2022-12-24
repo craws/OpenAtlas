@@ -27,7 +27,7 @@ from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
 
@@ -83,7 +83,7 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False  # pragma: no cover - AnonymousUserMixin has no group
+        return False
     if current_user.group == 'admin' \
             or current_user.group == group \
             or (current_user.group == 'manager'
@@ -181,7 +181,7 @@ def send_mail(
         subject: str,
         text: str,
         recipients: Union[str, list[str]],
-        log_body: bool = True) -> bool:  # pragma: no cover
+        log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
         Set log_body to False for sensitive data, e.g. password mails
@@ -256,7 +256,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                     "User OpenAtlas with default password is still active!")
     if warnings:
         return f'<p class="error">{"<br>".join(warnings)}<p>'
-    return ''  # pragma: no cover
+    return ''
 
 
 @app.template_filter()
@@ -278,7 +278,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+            ext = app.config['PROCESSED_EXT']
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -295,7 +295,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B"  # pragma: no cover
+        return "0 B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
@@ -373,7 +373,7 @@ def display_citation_example(code: str) -> str:
         return ''
     if text := get_translation('citation_example'):
         return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
-    return ''  # pragma: no cover
+    return ''
 
 
 @app.template_filter()
@@ -467,7 +467,7 @@ def display_form(
 
 class MLStripper(HTMLParser):
 
-    def error(self: MLStripper, message: str) -> None:  # pragma: no cover
+    def error(self: MLStripper, message: str) -> None:
         pass
 
     def __init__(self) -> None:

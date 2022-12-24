@@ -21,7 +21,7 @@ class Network:
         nodes = []
         for row in Db.get_entities(classes):
             if row['id'] in mapping or row['id'] in entities:
-                continue  # pragma: no cover - Locations are mapped to objects
+                continue  # Locations are mapped to objects
             nodes.append({
                 'id': row['id'],
                 'label' if dimensions else

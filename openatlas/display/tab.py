@@ -9,7 +9,7 @@ from flask_wtf import FlaskForm
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
 
 # Needed for translations of tab titles

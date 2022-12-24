@@ -39,7 +39,7 @@ def export_sql() -> Union[str, Response]:
         if sql_export():
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
-        else:  # pragma: no cover
+        else:
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))

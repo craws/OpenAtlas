@@ -62,7 +62,7 @@ def update(id_: int) -> Union[str, Response]:
     place_info = get_place_info_for_update(entity)
     manager = get_manager(entity=entity)
     if manager.form.validate_on_submit():
-        if was_modified(manager.form, entity):  # pragma: no cover
+        if was_modified(manager.form, entity):
             del manager.form.save
             flash(_('error modified'), 'error')
             return render_template(
@@ -115,7 +115,7 @@ def add_crumbs(
             and structure \
             and insert_:
         for item in structure['siblings']:
-            if item.class_.name == class_:  # pragma: no cover
+            if item.class_.name == class_:
                 sibling_count += 1
     siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
     return crumbs + \
@@ -131,7 +131,7 @@ def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
             or not g.classes[class_].view \
             or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
 
 
 def check_update_access(entity: Entity) -> None:
@@ -193,7 +193,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(_('entity created'), 'info')
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         for filename in filenames:
             (app.config['UPLOAD_DIR'] / filename).unlink()
@@ -216,7 +216,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:  # pragma: no cover
+    except InvalidGeomException as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
@@ -226,7 +226,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
                 'update',
                 id_=manager.entity.id,
                 origin_id=manager.origin.id if manager.origin else None)
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')

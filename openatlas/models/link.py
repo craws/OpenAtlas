@@ -10,7 +10,7 @@ from openatlas.database.link import Link as Db
 from openatlas.util.util import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.entity import Entity
     from openatlas.models.type import Type
 
@@ -94,7 +94,7 @@ class Link:
                     'range_class_code',
                     range_.class_.cidoc_class.code):
                 range_error = False
-            if domain_error or range_error:  # pragma: no cover
+            if domain_error or range_error:
                 text = \
                     f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
                     f" > {property_code} > {range_.class_.cidoc_class.code}"
@@ -120,7 +120,7 @@ class Link:
             code,
             inverse=inverse,
             types=types)
-        if len(result) > 1:  # pragma: no cover
+        if len(result) > 1:
             g.logger.log(
                 'error',
                 'model',
@@ -159,7 +159,7 @@ class Link:
             inverse: bool = False,
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:  # pragma: no cover
+        if not entity:
             g.logger.log(
                 'error',
                 'model',
@@ -288,16 +288,16 @@ class Link:
         data = []
         for type_ in g.types.values():
             if type_.root or type_.multiple or type_.category == 'value':
-                continue  # pragma: no cover
+                continue
             type_ids = Type.get_all_sub_ids(type_)
             if not type_ids:
-                continue  # pragma: no cover
+                continue
             for id_ in Db.check_single_type_duplicates(type_ids):
                 offending_types = []
                 entity = Entity.get_by_id(id_, types=True)
                 for entity_types in entity.types:
                     if g.types[entity_types.root[0]].id != type_.id:
-                        continue  # pragma: no cover
+                        continue
                     offending_types.append(entity_types)
                 data.append({
                     'entity': entity,

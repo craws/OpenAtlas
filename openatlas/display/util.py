@@ -21,7 +21,7 @@ def remove_link(
         origin: Entity,
         tab: str) -> Optional[str]:
     if not is_authorized('contributor'):
-        return None  # pragma: no cover
+        return None
     url = url_for('link_delete', id_=link_.id, origin_id=origin.id)
     return link(
         _('remove'),
@@ -112,7 +112,7 @@ def profile_image(entity: Entity) -> str:
         return ''
     path = get_file_path(entity.image_id)
     if not path:
-        return ''  # pragma: no cover
+        return ''
     resized = None
     size = app.config['IMAGE_SIZE']['thumbnail']
     if g.settings['image_processing'] and check_processed_image(path.name):
@@ -153,7 +153,7 @@ def profile_image_table_link(
         return link(
             _('set'),
             url_for('set_profile_image', id_=file.id, origin_id=entity.id))
-    return ''  # pragma: no cover
+    return ''
 
 
 def delete_link(entity: Entity) -> str:
@@ -163,7 +163,7 @@ def delete_link(entity: Entity) -> str:
         if entity.count or entity.subs:
             url = url_for('type_delete_recursive', id_=entity.id)
     else:
-        if current_user.group == 'contributor':  # pragma: no cover
+        if current_user.group == 'contributor':
             info = g.logger.get_log_info(entity.id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 return ''
@@ -192,7 +192,7 @@ def siblings_pager(
             position = counter
             break
     parts = []
-    if prev_id:  # pragma: no cover
+    if prev_id:
         parts.append(button('<', url_for('view', id_=prev_id)))
     if next_id:
         parts.append(button('>', url_for('view', id_=next_id)))

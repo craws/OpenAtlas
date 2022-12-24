@@ -82,7 +82,7 @@ def before_request() -> None:
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
-            raise AccessDeniedError  # pragma: no cover
+            raise AccessDeniedError
 
 
 @app.after_request

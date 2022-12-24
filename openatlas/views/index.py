@@ -65,7 +65,7 @@ def overview() -> str:
             uc_first(_("view")) + '</a>'])
     for name, count in Entity.get_overview_counts().items():
         if not count:
-            continue  # pragma: no cover
+            continue
         url = url_for('index', view=g.class_view_mapping[name])
         if name == 'administrative_unit':
             url = f"{url_for('type_index')}#menu-tab-place"
@@ -114,7 +114,7 @@ def index_feedback() -> Union[str, Response]:
         save = SubmitField(_('send'))
 
     form = FeedbackForm()
-    if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
+    if form.validate_on_submit() and g.settings['mail']:
         body = \
             f'{form.subject.data} from {current_user.username} ' \
             f'({current_user.id}) {current_user.email} at ' \
@@ -158,7 +158,7 @@ def index_changelog() -> str:
 def index_unsubscribe(code: str) -> str:
     user = User.get_by_unsubscribe_code(code)
     content = _('unsubscribe link not valid')
-    if user:  # pragma: no cover
+    if user:
         user.settings['newsletter'] = ''
         user.unsubscribe_code = ''
         user.update()

@@ -19,7 +19,7 @@ from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_path, uc_first
 
-if TYPE_CHECKING:  # pragma: no cover
+if TYPE_CHECKING:
     from openatlas.models.link import Link
 
 
@@ -41,7 +41,7 @@ def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
             value = current_user.settings[field.name]
         elif field.name in g.settings:
             value = g.settings[field.name]
-        else:  # pragma: no cover
+        else:
             value = ''  # In case of a missing setting after an update
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
@@ -85,7 +85,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
                 'file_upload_allowed_extension']:
             field.data = ' '.join(g.settings[field.name])
             continue
-        if field.name not in g.settings:  # pragma: no cover
+        if field.name not in g.settings:
             field.data = ''  # In case of a missing setting after an update
             continue
         field.data = g.settings[field.name]
@@ -120,7 +120,7 @@ def populate_insert_form(
             if origin.id != root_id else None
 
 
-def was_modified(form: FlaskForm, entity: Entity) -> bool:  # pragma: no cover
+def was_modified(form: FlaskForm, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
@@ -205,8 +205,7 @@ def inject_template_functions() -> dict[str, Union[str, GlobalSearchForm]]:
 
 
 def check_if_entity_has_time(
-        entity: Optional[Union[Entity, Link, Type]]
-) -> bool:   # pragma: no cover
+        entity: Optional[Union[Entity, Link, Type]]) -> bool:
     if not entity:
         return False
     for item in [
@@ -291,7 +290,7 @@ def format_name_and_aliases(entity: Entity, field_id: str) -> str:
     link = \
         f"""<a value="{entity.name}"  href='#' onclick="selectFromTable(this,
         '{field_id}', {entity.id})">{entity.name}</a>"""
-    if entity.aliases:  # pragma: no cover
+    if entity.aliases:
         html = f'<p>{link}</p>'
         for i, alias in enumerate(entity.aliases.values()):
             html += alias if i else f'<p>{alias}</p>'

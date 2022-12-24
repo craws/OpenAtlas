@@ -88,7 +88,7 @@ class Type(Entity):
         for type_ in g.types.values():
             if type_.name == name and not type_.root:
                 return type_.subs
-        return []  # pragma: no cover
+        return []
 
     @staticmethod
     def check_hierarchy_exists(name: str) -> list[Type]:

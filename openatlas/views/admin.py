@@ -97,7 +97,7 @@ def admin_index(
     if is_authorized('admin'):
         form = TestMailForm()
         if form.validate_on_submit() \
-                and g.settings['mail']:  # pragma: no cover
+                and g.settings['mail']:
             subject = _(
                 'Test mail from %(site_name)s',
                 site_name=g.settings['site_name'])
@@ -324,7 +324,7 @@ def admin_delete_single_type_duplicate(
 @required_group('manager')
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
-        abort(403)  # pragma: no cover
+        abort(403)
     form_name = f"{uc_first(category)}Form"
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
@@ -344,7 +344,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             g.logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -422,9 +422,9 @@ def admin_check_dates() -> str:
             entity.description])
     for link_ in Link.get_invalid_link_dates():
         name = ''
-        if link_.property.code == 'OA7':  # pragma: no cover
+        if link_.property.code == 'OA7':
             name = 'relation'
-        elif link_.property.code == 'P107':  # pragma: no cover
+        elif link_.property.code == 'P107':
             name = 'member'
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             name = 'involvement'
@@ -450,7 +450,7 @@ def admin_check_dates() -> str:
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-        if not tab.table.rows:  # pragma: no cover
+        if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     return render_template(
         'tabs.html',
@@ -577,7 +577,7 @@ def admin_orphans() -> str:
 
 @app.route('/admin/file/delete/<filename>')
 @required_group('contributor')
-def admin_file_delete(filename: str) -> Response:  # pragma: no cover
+def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
             (app.config['UPLOAD_DIR'] / filename).unlink()
@@ -609,7 +609,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 @required_group('manager')
 def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - Logo already set
+        abort(418)  # Logo already set
     if id_:
         Settings.set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
@@ -657,7 +657,7 @@ def admin_log() -> str:
         if row['user_id']:
             try:
                 user = link(User.get_by_id(row['user_id']))
-            except AttributeError:  # pragma: no cover - user already deleted
+            except AttributeError:  # User already deleted
                 user = f"id {row['user_id']}"
 
         table.rows.append([
@@ -708,7 +708,7 @@ def admin_newsletter() -> Union[str, Response]:
 
     form = NewsLetterForm()
     form.save.label.text = uc_first(_('send'))
-    if form.validate_on_submit():  # pragma: no cover
+    if form.validate_on_submit():
         count = 0
         for user_id in request.form.getlist('recipient'):
             user = User.get_by_id(user_id)
@@ -732,9 +732,7 @@ def admin_newsletter() -> Union[str, Response]:
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in User.get_all():
-        if user \
-                and user.settings['newsletter'] \
-                and user.active:  # pragma: no cover
+        if user and user.settings['newsletter'] and user.active:
             table.rows.append([
                 user.username,
                 user.email,
