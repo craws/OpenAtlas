@@ -184,13 +184,15 @@ def send_mail(
         log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
-        Set log_body to False for sensitive data, e.g. password mails
+        Set log_body to False for sensitive data, e.g. password mails.
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
         return False
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
-    try:
+    if app.config['IS_UNIT_TEST']:
+        return True
+    try:  # pragma: no cover
         with smtplib.SMTP(
                 g.settings['mail_transport_host'],
                 g.settings['mail_transport_port']) as smtp:
@@ -212,21 +214,21 @@ def send_mail(
                 f'Subject: {subject}'
             log_text += f' Content: {text}' if log_body else ''
             g.logger.log('info', 'mail', f'Mail send from {from_}', log_text)
-    except smtplib.SMTPAuthenticationError as e:
+    except smtplib.SMTPAuthenticationError as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
         flash(_('error mail send'), 'error')
-        return False
-    return True
+        return False  # pragma: no cover
+    return True  # pragma: no cover
 
 
 @contextfilter

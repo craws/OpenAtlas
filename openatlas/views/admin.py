@@ -93,24 +93,22 @@ def admin_index(
             content.append(sanitize(languages[language], 'text'))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         tables['content'].rows.append(content)
-    form = None
-    if is_authorized('admin'):
-        form = TestMailForm()
-        if form.validate_on_submit() \
-                and g.settings['mail']:
-            subject = _(
-                'Test mail from %(site_name)s',
-                site_name=g.settings['site_name'])
-            body = _(
-                'This test mail was sent by %(username)s',
-                username=current_user.username)
-            body += f" {_('at')} '{request.headers['Host']}"
-            if send_mail(subject, body, form.receiver.data):
-                flash(_(
-                    'A test mail was sent to %(email)s.',
-                    email=form.receiver.data), 'info')
-        else:
-            form.receiver.data = current_user.email
+    form = TestMailForm() if is_authorized('admin') \
+        and g.settings['mail'] else None
+    if form and form.validate_on_submit():
+        subject = _(
+            'Test mail from %(site_name)s',
+            site_name=g.settings['site_name'])
+        body = _(
+            'This test mail was sent by %(username)s',
+            username=current_user.username)
+        body += f" {_('at')} {request.headers['Host']}"
+        if send_mail(subject, body, form.receiver.data):
+            flash(_(
+                'A test mail was sent to %(email)s.',
+                email=form.receiver.data), 'info')
+    elif form and request.method == 'GET':
+        form.receiver.data = current_user.email
     tabs = {
         'files': Tab(
             _('files'),
