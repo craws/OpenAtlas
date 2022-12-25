@@ -53,7 +53,7 @@ def get_geometries_thanados(
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
-            for item in geom['geometries']:  # pragma: no cover
+            for item in geom['geometries']:
                 item['coordinates'] = check_geometries(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
@@ -65,14 +65,14 @@ def get_geometries_thanados(
 
 def check_geometries(geom: dict[str, Any]) \
         -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
-    if geom['type'] == 'Polygon':  # pragma: no cover
+    if geom['type'] == 'Polygon':
         return [
             transform_coordinates(k) for i in geom['coordinates'] for k in i]
-    if geom['type'] == 'LineString':  # pragma: no cover
+    if geom['type'] == 'LineString':
         return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
         return transform_coordinates(geom['coordinates'])
-    return None  # pragma: no cover
+    return None
 
 
 def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:

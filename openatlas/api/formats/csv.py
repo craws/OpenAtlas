@@ -52,7 +52,7 @@ def build_entity_dataframe(
         'coordinates': geom['coordinates']}
     if relations:
         for key, value in get_csv_links(entity).items():
-            data[key] = ' | '.join(list(map(str, value)))  # pragma: no cover
+            data[key] = ' | '.join(list(map(str, value)))
         for key, value in get_csv_types(entity).items():
             data[key] = ' | '.join(list(map(str, value)))
     return data
@@ -118,7 +118,7 @@ def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
 
 def get_csv_geometry(entity: Entity) -> dict[str, Any]:
     if entity.cidoc_class.code != 'E53':
-        return {'type': None, 'coordinates': None}  # pragma: no cover
+        return {'type': None, 'coordinates': None}
     geoms = Gis.get_by_id(entity.id)
     if geoms:
         return {key: [geom[key] for geom in geoms] for key in geoms[0]}

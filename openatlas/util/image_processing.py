@@ -21,8 +21,8 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
     try:
         if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
             return image_resizing(name, file_format, size)
-        return False  # pragma: no cover
-    except OSError as e:  # pragma: no cover
+        return False
+    except OSError as e:
         g.logger.log(
             'info',
             'image processing',
@@ -52,7 +52,7 @@ def check_processed_image(filename: str) -> bool:
             return loop_through_processed_folders(
                 filename.rsplit('.', 1)[0].lower(),
                 file_format)
-    except OSError as e:  # pragma: no cover
+    except OSError as e:
         g.logger.log(
             'info',
             'image processing',
@@ -68,7 +68,7 @@ def loop_through_processed_folders(name: str, file_format: str) -> bool:
         path = Path(app.config['RESIZED_IMAGES']) / size / f"{name}{ext}"
         if not path.is_file() \
                 and not safe_resize_image(name, file_format, size):
-            return False  # pragma: no cover
+            return False
     return True
 
 
@@ -81,7 +81,7 @@ def create_folder(folder: Path) -> bool:
     try:
         folder.mkdir()
         return True
-    except OSError as e:  # pragma: no cover
+    except OSError as e:
         g.logger.log('info', 'image processing', 'failed to create folder', e)
         return False
 
@@ -92,7 +92,7 @@ def delete_orphaned_resized_images() -> None:
         for file in path.glob('**/*'):
             file_name = file.name.rsplit('.', 1)[0].lower()
             if not file_name.isdigit() or int(file_name) not in g.file_stats:
-                file.unlink()  # pragma: no cover
+                file.unlink()
 
 
 def create_resized_images() -> None:
