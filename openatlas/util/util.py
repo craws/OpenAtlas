@@ -191,7 +191,7 @@ def send_mail(
         return False
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
     if app.config['IS_UNIT_TEST']:
-        return True
+        return True  # To test mail functions w/o sending them
     try:  # pragma: no cover
         with smtplib.SMTP(
                 g.settings['mail_transport_host'],

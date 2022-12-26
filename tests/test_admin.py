@@ -99,39 +99,8 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
 
-            rv = self.app.post(
-                url_for('admin_settings', category='mail'),
-                follow_redirects=True,
-                data={
-                    'mail': True,
-                    'mail_transport_username': 'whatever',
-                    'mail_transport_host': 'localhost',
-                    'mail_transport_port': '23',
-                    'mail_from_email': 'max@example.com',
-                    'mail_from_name': 'Max Headroom',
-                    'mail_recipients_feedback': 'headroom@example.com'})
-            assert b'Max Headroom' in rv.data
-
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
-
-            rv = self.app.post(
-                url_for('admin_index'),
-                data={'receiver': 'test@example.com'},
-                follow_redirects=True)
-            assert b'A test mail was sent' in rv.data
-
-            rv = self.app.get(url_for('admin_newsletter'))
-            assert b'Newsletter' in rv.data
-
-            rv = self.app.post(
-                url_for('admin_newsletter'),
-                data={
-                    'subject': 'test',
-                    'body': 'test',
-                    'recipient': [self.alice_id]},
-                follow_redirects=True)
-            assert b'Newsletter send: 1' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data

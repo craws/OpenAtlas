@@ -22,9 +22,6 @@ class IndexTests(TestBaseCase):
 
             self.app.get(url_for('index_content', item='contact'))
             self.app.get(url_for('set_locale', language='en'))
-            rv = self.app.get(url_for('reset_password'))
-            assert b'Forgot your password?' not in rv.data
-
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
 
@@ -46,12 +43,6 @@ class IndexTests(TestBaseCase):
 
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
-
-            rv = self.app.get(url_for('reset_password'))
-            assert b'Forgot your password?' in rv.data
-
-            rv = self.app.get(url_for('reset_confirm', code='1234'))
-            assert b'404' in rv.data
 
             rv = self.app.get(url_for('index_unsubscribe', code='1234'))
             assert b'invalid' in rv.data

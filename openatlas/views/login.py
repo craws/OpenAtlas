@@ -132,7 +132,7 @@ def reset_password() -> Union[str, Response]:
                     _('A password reset confirmation mail was send '
                       'to %(email)s.', email=email),
                     'info')
-            else:
+            else:  # pragma: no cover
                 flash(
                     _('Failed to send password reset confirmation mail '
                       'to %(email)s.', email=email),
@@ -180,7 +180,7 @@ def reset_confirm(code: str) -> Response:
         flash(
             _('A new password was sent to %(email)s.', email=user.email),
             'info')
-    else:
+    else:  # pragma: no cover
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),
             'error')
