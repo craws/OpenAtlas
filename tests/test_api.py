@@ -2,12 +2,12 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, FilterColumnError, FilterLogicalOperatorError,
-    FilterOperatorError, InvalidCidocClassCode, InvalidCodeError,
-    InvalidLimitError, InvalidSearchSyntax, InvalidSubunitError,
-    InvalidSystemClassError, LastEntityError, NoEntityAvailable,
-    NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
-    ValueNotIntegerError)
+    AccessDeniedError, EntityDoesNotExistError, FilterColumnError,
+    FilterLogicalOperatorError, FilterOperatorError, InvalidCidocClassCode,
+    InvalidCodeError, InvalidLimitError, InvalidSearchSyntax,
+    InvalidSubunitError, InvalidSystemClassError, LastEntityError,
+    NoEntityAvailable, NoSearchStringError, NotAPlaceError, QueryEmptyError,
+    TypeIDError, ValueNotIntegerError)
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from tests.base import (
     ApiTestCase, get_bool, get_bool_inverse, get_class_mapping,
@@ -21,7 +21,6 @@ class Api03(ApiTestCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-
                 for entity in get_by_cidoc_classes(['all']):
                     if entity.name == 'Location of Shire':
                         location = entity
@@ -717,3 +716,9 @@ class Api03(ApiTestCase):
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
+
+            self.app.get(url_for('logout'))
+            app.config['ALLOWED_IPS'] = []
+            with self.assertRaises(AccessDeniedError):
+                self.app.get(
+                    url_for('api_03.view_class', view_class='place'))
