@@ -15,7 +15,7 @@
     <p>
       {{ _('allowed extensions')|uc_first }}:
       <span style="font-weight: bold;">csv</span> -
-      {{ _('example files')|uc_first }}: <a href="/static/import/example.csv">example.csv</a>
+      {{ _('example files')|uc_first }}: <a href="/static/example.csv">example.csv</a>
     </p>
     {{ form|display_form(manual_page='admin/import')|safe }}
     {% for item in messages.error %}

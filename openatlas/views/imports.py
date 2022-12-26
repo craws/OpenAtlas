@@ -1,4 +1,5 @@
 import collections
+import pathlib
 from typing import Optional, Union
 
 import numpy
@@ -161,13 +162,8 @@ class ImportForm(FlaskForm):
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        file_ = request.files['file']
-        if not file_:
-            self.file.errors.append(_('no file to upload'))
-            valid = False
-        elif not (
-                '.' in file_.filename
-                and file_.filename.rsplit('.', 1)[1].lower() == 'csv'):
+        if pathlib.Path(request.files['file'].filename) \
+                .suffix.lower() != '.csv':
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -231,7 +227,7 @@ def import_data(project_id: int, class_: str) -> str:
                         type_ids = []
                         for type_id in str(value).split():
                             if Import.check_type_id(type_id, class_):
-                                type_ids.append(type_id)
+                                type_ids.append(type_id)  # pragma: no cover
                             else:
                                 type_ids.append(
                                     f'<span class="error">{type_id}</span>')
@@ -274,7 +270,6 @@ def import_data(project_id: int, class_: str) -> str:
             if invalid_geoms:
                 messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
-            # Checking for data inconsistency
             if missing_name_count:
                 messages['warn'].append(
                     f"{_('empty names')}: {missing_name_count}")
@@ -320,7 +315,7 @@ def import_data(project_id: int, class_: str) -> str:
                 g.logger.log('info', 'import', f'import: {len(checked_data)}')
                 flash(f"{_('import of')}: {len(checked_data)}", 'info')
                 imported = True
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 Transaction.rollback()
                 g.logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
