@@ -32,9 +32,6 @@ class AdminTests(TestBaseCase):
             assert b'Forsaken file' in rv.data
             assert b'Forsaken subunit' in rv.data
 
-            rv = self.app.get(url_for('admin_newsletter'))
-            assert b'Newsletter' in rv.data
-
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
 
@@ -123,6 +120,18 @@ class AdminTests(TestBaseCase):
                 data={'receiver': 'test@example.com'},
                 follow_redirects=True)
             assert b'A test mail was sent' in rv.data
+
+            rv = self.app.get(url_for('admin_newsletter'))
+            assert b'Newsletter' in rv.data
+
+            rv = self.app.post(
+                url_for('admin_newsletter'),
+                data={
+                    'subject': 'test',
+                    'body': 'test',
+                    'recipient': [self.alice_id]},
+                follow_redirects=True)
+            assert b'Newsletter send: 1' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data

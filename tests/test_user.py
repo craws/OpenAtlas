@@ -1,10 +1,8 @@
 from typing import Any
 
 from flask import url_for
-from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.models.user import User
 from tests.base import TestBaseCase
 
 
@@ -32,12 +30,6 @@ class UserTests(TestBaseCase):
             'continue_': 'yes',
             'send_info': ''}
         with app.app_context():
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                alice = User.get_by_username('Alice')
-                if not alice:
-                    abort(404)  # For Mypy
-                alice.remove_newsletter()
             rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
 
@@ -55,7 +47,7 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
 
-            rv = self.app.get(url_for('user_update', id_=alice.id))
+            rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'Alice' in rv.data
 
             data['description'] = 'The warrant officer'
@@ -84,7 +76,10 @@ class UserTests(TestBaseCase):
             assert b'Activity' in rv.data
 
             rv = self.app.get(
-                url_for('admin_index', action='delete_user', id_=alice.id))
+                url_for(
+                    'admin_index',
+                    action='delete_user',
+                    id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data
 
             self.app.get(url_for('logout'))
