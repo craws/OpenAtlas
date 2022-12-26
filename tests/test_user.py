@@ -69,23 +69,25 @@ class UserTests(TestBaseCase):
                 url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
 
-            data = {'name': 'test', 'description': 'test'}
-            self.app.post(url_for('insert', class_='bibliography'), data=data)
+            self.app.post(
+                url_for('insert', class_='bibliography'),
+                data={'name': 'test', 'description': 'test'})
             rv = self.app.get(url_for('user_activity'))
             assert b'Activity' in rv.data
 
             rv = self.app.get(url_for('user_activity', user_id=user_id))
             assert b'Activity' in rv.data
 
-            data = {'limit': 'all', 'action': 'all', 'user': 'all'}
-            rv = self.app.post(url_for('user_activity', data=data))
+            rv = self.app.post(
+                url_for('user_activity'),
+                data={'limit': 'all', 'action': 'all', 'user': 'all'})
             assert b'Activity' in rv.data
 
             rv = self.app.get(
                 url_for('admin_index', action='delete_user', id_=alice.id))
             assert b'403 - Forbidden' in rv.data
 
-            self.app.get(url_for('logout'), follow_redirects=True)
+            self.app.get(url_for('logout'))
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Forgot your password?' not in rv.data
 
@@ -93,4 +95,13 @@ class UserTests(TestBaseCase):
                 '/login',
                 data={'username': 'Editor', 'password': 'test'})
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            assert b'403 - Forbidden' in rv.data
+
+            self.app.get(url_for('logout'))
+            self.app.post(
+                '/login',
+                data={'username': 'Manager', 'password': 'test'})
+            rv = self.app.get(
+                url_for('admin_settings', category='mail'),
+                follow_redirects=True)
             assert b'403 - Forbidden' in rv.data

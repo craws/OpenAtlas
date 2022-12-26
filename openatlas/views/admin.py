@@ -342,7 +342,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             g.logger.log('info', 'settings', 'Settings updated')
             Transaction.commit()
             flash(_('info update'), 'info')
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -358,7 +358,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             [
                 _('admin'),
                 f"{url_for('admin_index')}"
-                f"#tab-{'data' if category == 'api' else category}"],
+                f"#tab-{category.replace('api', 'data')}"],
             _(category)])
 
 
