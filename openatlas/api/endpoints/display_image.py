@@ -12,8 +12,9 @@ from openatlas.util.image_processing import check_processed_image
 
 
 class DisplayImage(Resource):
+
     @staticmethod
-    def get(filename: str) -> Response:
+    def get(filename: str) -> Response:  # pragma: no cover
         entity = get_entity_by_id(int(Pathlib_path(filename).stem))
         license_ = get_license(entity)
         if not license_:

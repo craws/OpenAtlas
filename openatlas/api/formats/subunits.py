@@ -4,12 +4,12 @@ from typing import Any, Optional, Union
 from flask import g
 
 from openatlas.api.resources.database_mapper import get_all_links_as_dict
+from openatlas.api.resources.model_mapper import (
+    get_all_links_of_entities_inverse, get_entities_by_ids)
 from openatlas.api.resources.util import (
-    get_geometric_collection, get_license, get_reference_systems,
-    remove_duplicate_entities, replace_empty_list_values_in_dict_with_none,
-    filter_link_list_by_property_codes)
-from openatlas.api.resources.model_mapper import \
-    get_all_links_of_entities_inverse, get_entities_by_ids
+    filter_link_list_by_property_codes, get_geometric_collection,
+    get_license, get_reference_systems, remove_duplicate_entities,
+    replace_empty_list_values_in_dict_with_none)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import get_file_path
@@ -53,7 +53,7 @@ def get_geometries_thanados(
     if parser['format'] == 'xml' and geom:
         if geom['type'] == 'GeometryCollection':
             geometries = []
-            for item in geom['geometries']:
+            for item in geom['geometries']:  # pragma: no cover
                 item['coordinates'] = check_geometries(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
@@ -65,20 +65,20 @@ def get_geometries_thanados(
 
 def check_geometries(geom: dict[str, Any]) \
         -> Union[list[list[dict[str, Any]]], list[dict[str, Any]], None]:
-    if geom['type'] == 'Polygon':
+    if geom['type'] == 'Polygon':  # pragma: no cover
         return [
             transform_coordinates(k) for i in geom['coordinates'] for k in i]
-    if geom['type'] == 'LineString':
+    if geom['type'] == 'LineString':  # pragma: no cover
         return [transform_coordinates(k) for k in geom['coordinates']]
     if geom['type'] == 'Point':
         return transform_coordinates(geom['coordinates'])
-    return None
+    return None  # pragma: no cover
 
 
 def transform_coordinates(coordinates: list[float]) -> list[dict[str, Any]]:
     return [
         {'coordinate':
-             {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
+            {'longitude': coordinates[0], 'latitude': coordinates[1]}}]
 
 
 def get_properties(data: dict[str, Any]) -> dict[str, Any]:
