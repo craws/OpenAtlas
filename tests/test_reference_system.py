@@ -96,7 +96,6 @@ class ReferenceSystemTest(TestBaseCase):
             rv = self.app.get(url_for('update', id_=person_id))
             assert b'Q123' in rv.data
 
-            # Testing errors
             rv = self.app.post(
                 url_for('insert', class_='reference_system'),
                 data={'name': 'GeoNames'},

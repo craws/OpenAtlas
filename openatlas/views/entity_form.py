@@ -62,7 +62,7 @@ def update(id_: int) -> Union[str, Response]:
     place_info = get_place_info_for_update(entity)
     manager = get_manager(entity=entity)
     if manager.form.validate_on_submit():
-        if was_modified(manager.form, entity):
+        if was_modified(manager.form, entity):  # pragma: no cover
             del manager.form.save
             flash(_('error modified'), 'error')
             return render_template(
@@ -109,17 +109,14 @@ def add_crumbs(
     if structure:
         crumbs += structure['supers']
     crumbs.append(origin if not insert_ else None)
-    sibling_count = 0
-    if origin \
-            and origin.class_.name == 'stratigraphic_unit' \
-            and structure \
-            and insert_:
-        for item in structure['siblings']:
-            if item.class_.name == class_:
-                sibling_count += 1
-    siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
-    return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+    if not insert_:
+        return crumbs + [_('edit')]
+    siblings = ''
+    if structure and origin and origin.class_.name == 'stratigraphic_unit':
+        if count := len(
+                [i for i in structure['siblings'] if i.class_.name == class_]):
+            siblings = f" ({count} {_('exists')})" if count else ''
+    return crumbs + [f'+ {g.classes[class_].label}{siblings}']
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -234,12 +231,11 @@ def save(manager: BaseManager) -> Union[str, Response]:
             url = url_for(
                 'update',
                 id_=manager.entity.id,
-                origin_id=manager.origin.id
-                if manager.origin else None)
+                origin_id=manager.origin.id if manager.origin else None)
         else:
-            url = url_for('index', view=g.classes[manager.class_.name].view)
-            if manager.class_.name in ['administrative_unit', 'type']:
-                url = url_for('type_index')
+            url = url_for('type_index') if \
+                manager.class_.name in ['administrative_unit', 'type'] else \
+                url_for('index', view=g.classes[manager.class_.name].view)
     return url
 
 
