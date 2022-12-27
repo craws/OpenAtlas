@@ -418,21 +418,13 @@ def admin_check_dates() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for link_ in Link.get_invalid_link_dates():
-        name = ''
-        if link_.property.code == 'OA7':
-            name = 'relation'
-        elif link_.property.code == 'P107':
-            name = 'member'
-        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
-            name = 'involvement'
+    for item in Link.get_invalid_link_dates():
         tabs['link_dates'].table.rows.append([
             link(
-                _(name),
-                url_for('link_update', id_=link_.id, origin_id=link_.domain.id)
-            ),
-            link(link_.domain),
-            link(link_.range)])
+                item.property.name,
+                url_for('link_update', id_=item.id, origin_id=item.domain.id)),
+            link(item.domain),
+            link(item.range)])
     for link_ in Link.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
@@ -484,12 +476,7 @@ def admin_orphans() -> str:
         'orphaned_subunits': Tab(
             'orphaned_subunits',
             table=Table([
-                'id',
-                'name',
-                'class',
-                'created',
-                'modified',
-                'description'])),
+                'id', 'name', 'class', 'created', 'modified', 'description'])),
         'circular': Tab('circular_dependencies', table=Table(
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
@@ -540,7 +527,8 @@ def admin_orphans() -> str:
                 link(
                     _('delete'),
                     url_for('admin_file_delete', filename=file.name),
-                    js=f"return confirm('{confirm}')")])
+                    js=f"return confirm('{confirm}')")]) \
+                if is_authorized('editor') else ''
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():
@@ -574,7 +562,7 @@ def admin_orphans() -> str:
 
 
 @app.route('/admin/file/delete/<filename>')
-@required_group('contributor')
+@required_group('editor')
 def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
@@ -585,21 +573,19 @@ def admin_file_delete(filename: str) -> Response:
             flash(_('error file delete'), 'error')
         return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
-    if is_authorized('admin'):  # Delete all files with no corresponding entity
+    # Delete all files with no corresponding entity
+    if is_authorized('admin'):  # pragma: no cover - don't test, ever
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
-        for file in app.config['UPLOAD_DIR'].iterdir():
-            if file.name != '.gitignore' and int(
-                    file.stem) not in entity_file_ids:
+        for f in app.config['UPLOAD_DIR'].iterdir():
+            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
                 try:
-                    (app.config['UPLOAD_DIR'] / file.name).unlink()
+                    (app.config['UPLOAD_DIR'] / f.name).unlink()
                 except Exception as e:
                     g.logger.log(
-                        'error',
-                        'file',
-                        f'deletion of {file.name} failed',
-                        e)
+                        'error', 'file', f'deletion of {f.name} failed', e)
                     flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
+    return redirect(
+        f"{url_for('admin_orphans')}#tab-orphaned-files")  # pragma: no cover
 
 
 @app.route('/admin/logo/')
@@ -607,7 +593,7 @@ def admin_file_delete(filename: str) -> Response:
 @required_group('manager')
 def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     if g.settings['logo_file_id']:
-        abort(418)  # Logo already set
+        abort(418)  # pragma: no cover - logo already set
     if id_:
         Settings.set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
@@ -653,11 +639,9 @@ def admin_log() -> str:
     for row in logs:
         user = None
         if row['user_id']:
-            try:
-                user = link(User.get_by_id(row['user_id']))
-            except AttributeError:  # User already deleted
-                user = f"id {row['user_id']}"
-
+            user = f"user id: {row['user_id']}"
+            if user_ := User.get_by_id(row['user_id']):
+                user = link(user_)
         table.rows.append([
             row['created'].replace(microsecond=0).isoformat()
             if row['created'] else '',

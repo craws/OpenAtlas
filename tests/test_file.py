@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 
 class FileTest(TestBaseCase):
 
-    def test_event(self) -> None:
+    def test_file(self) -> None:
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore

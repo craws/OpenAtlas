@@ -252,11 +252,8 @@ def import_data(project_id: int, class_: str) -> str:
                                 row[item] = value
                             except ValueError:
                                 row[item] = ''
-                                if str(value) == 'NaT':
-                                    value = ''
-                                else:
-                                    value = \
-                                        f'<span class="error">{value}</span>'
+                                value = '' if str(value) == 'NaT' else \
+                                    f'<span class="error">{value}</span>'
                     table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:

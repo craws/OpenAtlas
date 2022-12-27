@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import g, url_for
 
 from openatlas import app
@@ -35,12 +37,28 @@ class AdminTests(TestBaseCase):
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
 
-            rv = self.app.get(
-                url_for('admin_log_delete', follow_redirects=True))
+            rv = self.app.get(url_for('admin_check_dates'))
+            assert b'Congratulations, everything looks fine!' in rv.data
+
+            rv = self.app.get(url_for('admin_log_delete'))
             assert b'Login' not in rv.data
 
             rv = self.app.get(url_for('admin_check_links'))
             assert b'Invalid linked entity' in rv.data
+
+            file_ = 'Test77.txt'
+            with open(Path(app.config['UPLOAD_DIR'] / file_), 'w') as _file:
+                pass
+
+            rv = self.app.get(
+                url_for('admin_file_delete', filename=file_),
+                follow_redirects=True)
+            assert b'Test77.txt was deleted' in rv.data
+
+            rv = self.app.get(
+                url_for('admin_file_delete', filename=file_),
+                follow_redirects=True)
+            assert b'An error occurred when trying to delete' in rv.data
 
             with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
