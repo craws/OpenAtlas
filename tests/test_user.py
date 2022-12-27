@@ -92,6 +92,9 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'403 - Forbidden' in rv.data
 
+            rv = self.app.post(url_for('insert', class_='reference_system'))
+            assert b'403 - Forbidden' in rv.data
+
             self.app.get(url_for('logout'))
             self.app.post(
                 '/login',

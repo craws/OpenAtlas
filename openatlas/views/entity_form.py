@@ -193,7 +193,7 @@ def insert_files(manager: BaseManager) -> Union[str, Response]:
         Transaction.commit()
         url = get_redirect_url(manager)
         flash(_('entity created'), 'info')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         Transaction.rollback()
         for filename in filenames:
             (app.config['UPLOAD_DIR'] / filename).unlink()

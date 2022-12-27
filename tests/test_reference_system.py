@@ -29,8 +29,8 @@ class ReferenceSystemTest(TestBaseCase):
                 'classes': ['place']}
             rv = self.app.post(
                 url_for('insert', class_='reference_system'),
-                follow_redirects=True,
-                data=data)
+                data=data,
+                follow_redirects=True)
             assert b'An entry has been created.' in rv.data
 
             wikipedia_id = ReferenceSystem.get_by_name('Wikipedia').id
@@ -99,8 +99,8 @@ class ReferenceSystemTest(TestBaseCase):
             # Testing errors
             rv = self.app.post(
                 url_for('insert', class_='reference_system'),
-                follow_redirects=True,
-                data={'name': 'GeoNames'})
+                data={'name': 'GeoNames'},
+                follow_redirects=True)
             assert b'A transaction error occurred' in rv.data
 
             rv = self.app.get(
@@ -108,7 +108,7 @@ class ReferenceSystemTest(TestBaseCase):
                     'index',
                     view='reference_system',
                     delete_id=geonames.id))
-            assert b'403' in rv.data
+            assert b'403 - Forbidden' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='person'),
