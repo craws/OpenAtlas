@@ -14,7 +14,6 @@ from openatlas.display.tab import Tab
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import (
     get_entities_linked_to_type_recursive, link, manual, required_group,
@@ -53,7 +52,7 @@ def type_index() -> str:
         types[type_.category][type_] = render_template(
             'forms/tree_select_item.html',
             name=sanitize(type_.name),
-            data=walk_tree(Type.get_types(type_.name)))
+            data=walk_tree(type_.subs))
     return render_template(
         'type/index.html',
         buttons=[manual('entity/type')],
@@ -94,7 +93,7 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
         abort(403)
     form = DeleteRecursiveTypesForm()
     if form.validate_on_submit() and form.confirm_delete.data:
-        for sub_id in Type.get_all_sub_ids(type_):
+        for sub_id in type_.get_sub_ids_recursive():
             g.types[sub_id].delete()
         type_.delete()
         flash(_('types deleted'), 'info')
@@ -111,12 +110,9 @@ def type_delete_recursive(id_: int) -> Union[str, Response]:
             form=form),
         'subs': Tab('subs', entity=type_),
         'entities': Tab('entities', entity=type_)}
-    for sub_id in Type.get_all_sub_ids(type_):
+    for sub_id in type_.get_sub_ids_recursive():
         sub = g.types[sub_id]
-        tabs['subs'].table.rows.append([
-            link(sub),
-            sub.count,
-            sub.description])
+        tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
     if root_name in app.config['PROPERTY_TYPES']:
         for row in Link.get_links_by_type_recursive(type_, []):
             tabs['entities'].table.header = [_('domain'), _('range')]
@@ -147,8 +143,7 @@ def type_move_entities(id_: int) -> Union[str, Response]:
     form = get_move_form(type_)
     if form.validate_on_submit():
         Transaction.begin()
-        Type.move_entities(
-            type_,
+        type_.move_entities(
             getattr(form, str(root.id)).data,
             form.checkbox_values.data)
         Transaction.commit()
@@ -175,9 +170,8 @@ def type_move_entities(id_: int) -> Union[str, Response]:
 @app.route('/type/untyped/<int:id_>')
 @required_group('editor')
 def show_untyped_entities(id_: int) -> str:
-    hierarchy = g.types[id_]
     table = Table(['name', 'class', 'first', 'last', 'description'])
-    for entity in Type.get_untyped(hierarchy.id):
+    for entity in g.types[id_].get_untyped():
         table.rows.append([
             link(entity),
             entity.class_.label,
@@ -187,10 +181,10 @@ def show_untyped_entities(id_: int) -> str:
     return render_template(
         'content.html',
         content=table.display(),
-        entity=hierarchy,
+        entity=g.types[id_],
         crumbs=[
             [_('types'), url_for('type_index')],
-            link(hierarchy),
+            link(g.types[id_]),
             _('untyped entities')])
 
 

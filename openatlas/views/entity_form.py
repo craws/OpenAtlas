@@ -227,7 +227,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         Transaction.rollback()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and manager.entity:
+        if action == 'update' and manager.entity:  # pragma: no cover
             url = url_for(
                 'update',
                 id_=manager.entity.id,

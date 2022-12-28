@@ -283,24 +283,21 @@ class Link:
 
     @staticmethod
     def check_single_type_duplicates() -> list[dict[str, Any]]:
-        from openatlas.models.type import Type
         from openatlas.models.entity import Entity
         data = []
         for type_ in g.types.values():
             if type_.root or type_.multiple or type_.category == 'value':
                 continue
-            type_ids = Type.get_all_sub_ids(type_)
-            if not type_ids:
-                continue
-            for id_ in Db.check_single_type_duplicates(type_ids):
-                offending_types = []
-                entity = Entity.get_by_id(id_, types=True)
-                for entity_types in entity.types:
-                    if g.types[entity_types.root[0]].id != type_.id:
-                        continue
-                    offending_types.append(entity_types)
-                data.append({
-                    'entity': entity,
-                    'type': type_,
-                    'offending_types': offending_types})
+            if type_ids := type_.get_sub_ids_recursive():
+                for id_ in Db.check_single_type_duplicates(type_ids):
+                    offending_types = []
+                    entity = Entity.get_by_id(id_, types=True)
+                    for entity_types in entity.types:
+                        if g.types[entity_types.root[0]].id != type_.id:
+                            continue
+                        offending_types.append(entity_types)
+                    data.append({
+                        'entity': entity,
+                        'type': type_,
+                        'offending_types': offending_types})
         return data

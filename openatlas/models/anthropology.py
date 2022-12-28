@@ -205,7 +205,7 @@ class SexEstimation:
 
     @staticmethod
     def prepare_feature_types() -> None:
-        for category_id in Type.get_types('Features for sexing'):
+        for category_id in Type.get_hierarchy('Features for sexing').subs:
             for id_ in g.types[category_id].subs:
                 SexEstimation.features[g.types[id_].name]['id'] = \
                     g.types[id_].id

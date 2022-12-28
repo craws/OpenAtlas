@@ -96,6 +96,11 @@ class ActorTests(TestBaseCase):
                     'checkbox_values': str([actor_id])})
             assert b'Entities were updated' in rv.data
 
+            rv = self.app.get(
+                url_for('remove_class', id_=sex_type.id, name='person'),
+                follow_redirects=True)
+            assert b'403' in rv.data
+
             self.app.post(
                 url_for('insert', class_='person', origin_id=actor_id),
                 data=data)

@@ -313,7 +313,7 @@ def admin_check_link_duplicates(
 def admin_delete_single_type_duplicate(
         entity_id: int,
         type_id: int) -> Response:
-    Type.remove_by_entity_and_type(entity_id, type_id)
+    g.types[type_id].remove_entity_links(entity_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
 

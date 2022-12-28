@@ -70,13 +70,13 @@ class HierarchyTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
-            data = {'name': 'My secret type', 'description': 'Very important!'}
             rv = self.app.post(
                 url_for('insert', class_='type', origin_id=hierarchy.id),
-                data=data)
+                data={'name': 'Secret type', 'description': 'Very important!'})
             type_id = rv.location.split('/')[-1]
+
             rv = self.app.get(
-                url_for('remove_class', id_=hierarchy.id, class_name='person'),
+                url_for('remove_class', id_=hierarchy.id, name='person'),
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
