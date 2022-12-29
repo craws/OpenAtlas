@@ -23,6 +23,12 @@ class MailTests(TestBaseCase):
                     'mail_recipients_feedback': 'headroom@example.com'})
             assert b'Max Headroom' in rv.data
 
+            rv = self.app.get(url_for('index_unsubscribe', code='666'))
+            assert b'invalid' in rv.data
+
+            rv = self.app.get(url_for('index_unsubscribe', code='1234'))
+            assert b'You have successfully unsubscribed' in rv.data
+
             rv = self.app.post(
                 url_for('admin_index'),
                 data={'receiver': 'test@example.com'},
@@ -40,6 +46,15 @@ class MailTests(TestBaseCase):
                     'recipient': [self.alice_id]},
                 follow_redirects=True)
             assert b'Newsletter send: 1' in rv.data
+
+            rv = self.app.get(url_for('index_feedback'))
+            assert b'Thank you' in rv.data
+
+            rv = self.app.post(
+                url_for('index_feedback'),
+                data={'subject': 'question', 'description': 'Why me?'},
+                follow_redirects=True)
+            assert b'Thank you for your feedback' in rv.data
 
             rv = self.app.get(url_for('reset_password'))
             assert b'Forgot your password?' not in rv.data
