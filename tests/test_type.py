@@ -225,6 +225,5 @@ class TypeTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('type_delete_recursive', id_=actor_type.id),
-                data={'confirm_delete': True},
-                follow_redirects=True)
+                data={'confirm_delete': True})
             assert b'403 - Forbidden' in rv.data

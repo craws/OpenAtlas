@@ -18,3 +18,6 @@ VALUES
 
 -- Citation example
 INSERT INTO web.i18n (name, language, text) VALUES ('citation_example', 'en', 'citation example');
+
+-- Log entry for none existing entity
+INSERT INTO web.user_log (user_id, entity_id, action) VALUES (2, 6666, 'insert');

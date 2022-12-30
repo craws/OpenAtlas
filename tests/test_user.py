@@ -9,30 +9,19 @@ from tests.base import TestBaseCase
 class UserTests(TestBaseCase):
 
     def test_user(self) -> None:
-        data = {
-            'active': '',
-            'username': 'Ripley',
-            'email': 'ripley@nostromo.org',
-            'password': 'you_never_guess_this',
-            'password2': 'you_never_guess_this',
-            'group': 'admin',
-            'name': 'Ripley Weaver',
-            'description': '',
-            'send_info': ''}
-        data2 = {
-            'active': '',
-            'username': 'Newt',
-            'email': 'newt@nostromo.org',
-            'password': 'you_never_guess_this',
-            'password2': 'you_never_guess_this',
-            'group': 'admin',
-            'name': 'Newt',
-            'continue_': 'yes',
-            'send_info': ''}
+
         with app.app_context():
             rv: Any = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
 
+            data = {
+                'active': '',
+                'username': 'Ripley',
+                'email': 'ripley@nostromo.org',
+                'password': 'you_never_guess_this',
+                'password2': 'you_never_guess_this',
+                'group': 'admin',
+                'name': 'Ripley Weaver'}
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
             data['password'] = 'too short'
@@ -41,11 +30,23 @@ class UserTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('user_insert'),
-                follow_redirects=True, data=data2)
+                data={
+                    'active': '',
+                    'username': 'Newt',
+                    'email': 'newt@nostromo.org',
+                    'password': 'you_never_guess_this',
+                    'password2': 'you_never_guess_this',
+                    'group': 'admin',
+                    'name': 'Newt',
+                    'continue_': 'yes'},
+                follow_redirects=True)
             assert b'Newt' not in rv.data
 
             rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
+
+            rv = self.app.get(url_for('user_view', id_=666))
+            assert b'404' in rv.data
 
             rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'Alice' in rv.data
@@ -57,6 +58,9 @@ class UserTests(TestBaseCase):
                 follow_redirects=True)
             assert b'The warrant officer' in rv.data
 
+            rv = self.app.post(url_for('user_update', id_=1234), data=data)
+            assert b'404' in rv.data
+
             rv = self.app.get(
                 url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
@@ -67,12 +71,9 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_activity'))
             assert b'Activity' in rv.data
 
-            rv = self.app.get(url_for('user_activity', user_id=user_id))
-            assert b'Activity' in rv.data
-
             rv = self.app.post(
-                url_for('user_activity'),
-                data={'limit': 'all', 'action': 'all', 'user': 'all'})
+                url_for('user_activity', user_id=user_id),
+                data={'limit': 100, 'user': 0, 'action': 'all'})
             assert b'Activity' in rv.data
 
             rv = self.app.get(
@@ -89,7 +90,7 @@ class UserTests(TestBaseCase):
             self.app.post(
                 '/login',
                 data={'username': 'Editor', 'password': 'test'})
-            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            rv = self.app.get(url_for('user_insert'))
             assert b'403 - Forbidden' in rv.data
 
             rv = self.app.post(url_for('insert', class_='reference_system'))
@@ -99,7 +100,8 @@ class UserTests(TestBaseCase):
             self.app.post(
                 '/login',
                 data={'username': 'Manager', 'password': 'test'})
-            rv = self.app.get(
-                url_for('admin_settings', category='mail'),
-                follow_redirects=True)
+            rv = self.app.get(url_for('admin_settings', category='mail'))
+            assert b'403 - Forbidden' in rv.data
+
+            rv = self.app.get(url_for('user_update', id_=self.alice_id))
             assert b'403 - Forbidden' in rv.data

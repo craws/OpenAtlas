@@ -97,8 +97,7 @@ class ActorTests(TestBaseCase):
             assert b'Entities were updated' in rv.data
 
             rv = self.app.get(
-                url_for('remove_class', id_=sex_type.id, name='person'),
-                follow_redirects=True)
+                url_for('remove_class', id_=sex_type.id, name='person'))
             assert b'403' in rv.data
 
             self.app.post(

@@ -56,6 +56,20 @@ class MailTests(TestBaseCase):
                 follow_redirects=True)
             assert b'Thank you for your feedback' in rv.data
 
+            rv = self.app.post(
+                url_for('user_insert'),
+                data={
+                    'active': '',
+                    'username': 'Ripley',
+                    'email': 'ripley@nostromo.org',
+                    'password': 'you_never_guess_this',
+                    'password2': 'you_never_guess_this',
+                    'group': 'admin',
+                    'name': 'Ripley Weaver',
+                    'send_info': True},
+                follow_redirects=True)
+            assert b'A user was created' in rv.data
+
             rv = self.app.get(url_for('reset_password'))
             assert b'Forgot your password?' not in rv.data
 
