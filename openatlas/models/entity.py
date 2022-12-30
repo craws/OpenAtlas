@@ -15,7 +15,7 @@ from openatlas.util.util import (
     datetime64_to_timestamp, format_date_part, get_base_table_data, sanitize,
     timestamp_to_datetime64)
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type
     from openatlas.models.reference_system import ReferenceSystem
 

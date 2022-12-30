@@ -10,7 +10,7 @@ from openatlas.database.link import Link as Db
 from openatlas.util.util import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.type import Type
 

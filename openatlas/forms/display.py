@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -10,10 +8,8 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.forms.field import ValueFloatField
+from openatlas.models.type import Type
 from openatlas.util.util import manual, tooltip, uc_first
-
-if TYPE_CHECKING:
-    from openatlas.models.type import Type
 
 
 def html_form(

@@ -27,7 +27,7 @@ from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
 

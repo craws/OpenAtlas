@@ -1,15 +1,11 @@
-from __future__ import annotations
-
-from typing import Any, TYPE_CHECKING, Union
+from typing import Any, Union
 
 from flask import g
 
 from openatlas.database.anthropology import Anthropology as Db
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-
-if TYPE_CHECKING:
-    from openatlas.models.entity import Entity
 
 
 def get_types(id_: int) -> list[dict[str, Any]]:
@@ -23,8 +19,7 @@ class SexEstimation:
         'likely female': -0.3,  # -0,69 to -0.31
         'indifferent': 0.3,     # -0.3 to 0.3
         'likely male': 0.7,     # 0.31 to 0.69
-        'male': 2               # 0.7 to 2
-    }
+        'male': 2}              # 0.7 to 2
 
     options = {
         '': 0,

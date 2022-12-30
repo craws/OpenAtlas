@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -12,12 +14,8 @@ from openatlas.util.util import uc_first
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:
     for file_ in request.files.getlist('file'):
-        if not file_:
-            field.errors.append(_('no file to upload'))
-        elif not (
-                '.' in file_.filename
-                and file_.filename.rsplit('.', 1)[1].lower() in
-                g.settings['file_upload_allowed_extension']):
+        if not file_ or Path(file_.filename).suffix[1:] not in \
+                g.settings['file_upload_allowed_extension']:
             field.errors.append(uc_first(_('file type not allowed')))
 
 
