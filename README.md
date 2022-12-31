@@ -7,6 +7,7 @@ information is mapped as a network using classes and properties of the
 
 Documentation:
 [Manual](https://manual.openatlas.eu),
+[Features](https://manual.openatlas.eu/static/manual/features.html),
 [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),
 [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
@@ -30,7 +31,7 @@ Please refer to [install.md](install.md) for requirements and installation.
 **Alexander Watzinger** - Lead Developer and Concept
 ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
 
-**Bernhard Koschiček-Krombholz** - Software Development, API
+**Bernhard Koschiček-Krombholz** - Backend Development, API
 ([bernhard.koschicek-krombholz@oeaw.ac.at](mailto:bernhard.koschicek-krombholz@oeaw.ac.at))
 
 **Nina Richards** - Bioarchaeological Expertise
