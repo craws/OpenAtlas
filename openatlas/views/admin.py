@@ -527,8 +527,8 @@ def admin_orphans() -> str:
                 link(
                     _('delete'),
                     url_for('admin_file_delete', filename=file.name),
-                    js=f"return confirm('{confirm}')")]) \
-                if is_authorized('editor') else ''
+                    js=f"return confirm('{confirm}')")
+                if is_authorized('editor') else ''])
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():

@@ -44,8 +44,7 @@ class UserForm(FlaskForm):
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
-        if self.user_id:
-            user = User.get_by_id(self.user_id)
+        if self.user_id and (user := User.get_by_id(self.user_id)):
             username = user.username
             user_email = user.email
         if username != self.username.data \

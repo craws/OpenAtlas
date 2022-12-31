@@ -143,7 +143,7 @@ class MoveDisplay(EventsDisplay):
                 self.entity,
                 'end',
                 to.get_linked_entity_safe('P53', True))
-        moved = {'actor': [], 'artifact': []}
+        moved: dict[str, list[str]] = {'actor': [], 'artifact': []}
         for entity in self.entity.get_linked_entities('P25'):
             moved[entity.class_.view].append(link(entity))
         self.data[_('person')] = moved['actor']

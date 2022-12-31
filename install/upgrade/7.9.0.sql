@@ -1,4 +1,4 @@
--- Upgrade 7.8.0 to 7.9.0
+-- Upgrade 7.8.1 to 7.9.0
 -- Be sure to backup the database and read the upgrade notes before executing.
 
 BEGIN;

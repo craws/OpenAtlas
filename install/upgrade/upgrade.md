@@ -19,8 +19,28 @@ base, then run the database upgrade script, then restart Apache:
     sudo python3 install/upgrade/database_upgrade.py
     sudo service apache2 restart
 
-### 7.8.0 to 7.9.0
+### 7.8.x to 7.9.0
 7.9.0.sql is needed but will be taken care of by the database upgrade script.
+
+#### New file structure
+In this version the following folders, including all sub folders and files,
+
+    openatlas/uploads/
+    openatlas/export/
+    openatlas/processed_images/
+
+have to be moved manually to the **files** directory, e.g.
+
+    # mv openatlas/uploads/* files/uploads/
+    # mv openatlas/export/sql/* files/export/
+    # mv openatlas/processed_images/ files/processed_images/
+
+    # rmdir openatlas/uploads
+    # rmdir openatlas/export/sql
+    # rmdir openatlas/export
+
+Be aware, that external applications/scripts, e.g. backup scripts or
+presentation sites might need adaptions too.
 
 ### 7.8.0 to 7.8.1
 7.8.1.sql is needed but will be taken care of by the database upgrade script.
