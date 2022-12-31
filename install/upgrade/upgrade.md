@@ -35,6 +35,10 @@ have to be moved manually to the **files** directory, e.g.
     # mv openatlas/export/sql/* files/export/
     # mv openatlas/processed_images/ files/processed_images/
 
+    # rmdir openatlas/uploads
+    # rmdir openatlas/export/sql
+    # rmdir openatlas/export
+
 Be aware, that external applications/scripts, e.g. backup scripts or
 presentation sites might need adaptions too.
 
