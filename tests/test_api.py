@@ -14,9 +14,9 @@ from tests.base import (
     get_geom_properties, get_no_key)
 
 
-class Api03(ApiTestCase):
+class Api(ApiTestCase):
 
-    def test_api_03(self) -> None:
+    def test_api(self) -> None:
 
         with app.app_context():
             with app.test_request_context():
