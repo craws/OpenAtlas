@@ -2,12 +2,11 @@ from typing import Any, Tuple, Union
 
 from flask import g
 
+from openatlas.api.resources.model_mapper import (
+    flatten_list_and_remove_duplicates, get_all_links_of_entities_inverse)
 from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
-from openatlas.api.resources.util import (
-    get_linked_entities_id_api)
-from openatlas.api.resources.model_mapper import (
-    get_all_links_of_entities_inverse, flatten_list_and_remove_duplicates)
+from openatlas.api.resources.util import get_linked_entities_id_api
 from openatlas.models.entity import Entity
 
 
@@ -58,9 +57,10 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
 
 def get_search_values(
         category: str,
-        parameter: dict[str, Any]) -> list[Union[str, int, list]]:
-    values = [value.lower() if isinstance(value, str) else value
-              for value in parameter["values"]]
+        parameter: dict[str, Any]) -> list[Union[str, int, list[Any]]]:
+    values = [
+        value.lower() if isinstance(value, str) else value
+        for value in parameter["values"]]
     if category in ["typeIDWithSubs"]:
         return [[value] + get_sub_ids(value, []) for value in values]
     if category in ["relationToID"]:
@@ -128,11 +128,12 @@ def search_entity(
                 not all(item in entity_values for item in search_values))
     if operator_ == 'like':
         if logical_operator == 'or':
-            bool_ = bool(any(item in value for item in search_values
-                           for value in entity_values))
+            bool_ = bool(any(
+                item in value for item in search_values
+                for value in entity_values))
         if logical_operator == 'and':
-            bool_ = bool(all(item in ' '.join(entity_values)
-                           for item in search_values))
+            bool_ = bool(all(
+                item in ' '.join(entity_values) for item in search_values))
     if operator_ == 'greaterThan' and is_comparable:
         if logical_operator == 'or':
             bool_ = bool(any(item < entity_values for item in search_values))
