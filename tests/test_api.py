@@ -507,6 +507,14 @@ class Api(ApiTestCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='place',
+                    view_classes='artifact',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"notEqual",'
+                           f'"values":[{boundary_mark.id}],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    system_classes='place',
                     search="""{"entityName":[{"operator":"notEqual",
                                 "values":["Mordor"],
                                 "logicalOperator":"or"}]}"""))]:
@@ -524,6 +532,14 @@ class Api(ApiTestCase):
                            f'"values":[{boundary_mark.id},'
                            f'{height.id}],'
                            f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    system_classes='place',
+                    view_classes='artifact',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{boundary_mark.id}],'
+                           f'"logicalOperator":"and"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
