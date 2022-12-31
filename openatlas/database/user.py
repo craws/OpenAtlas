@@ -135,7 +135,7 @@ class User:
                 {'AND user_id = %(id)s' if int(user_id) else ''}
                 {'AND action = %(action)s' if action != 'all' else ''}
             ORDER BY created DESC
-            {'LIMIT %(limit)s' if int(limit) else ''}
+            {'LIMIT %(limit)s' if int(limit) else ''};
             """,
             {'limit': limit, 'id': user_id, 'action': action})
         return g.cursor.fetchall()

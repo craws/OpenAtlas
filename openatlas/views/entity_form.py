@@ -109,17 +109,14 @@ def add_crumbs(
     if structure:
         crumbs += structure['supers']
     crumbs.append(origin if not insert_ else None)
-    sibling_count = 0
-    if origin \
-            and origin.class_.name == 'stratigraphic_unit' \
-            and structure \
-            and insert_:
-        for item in structure['siblings']:
-            if item.class_.name == class_:  # pragma: no cover
-                sibling_count += 1
-    siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
-    return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+    if not insert_:
+        return crumbs + [_('edit')]
+    siblings = ''
+    if structure and origin and origin.class_.name == 'stratigraphic_unit':
+        if count := len(
+                [i for i in structure['siblings'] if i.class_.name == class_]):
+            siblings = f" ({count} {_('exists')})" if count else ''
+    return crumbs + [f'+ {g.classes[class_].label}{siblings}']
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -131,7 +128,7 @@ def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
             or not g.classes[class_].view \
             or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
 
 
 def check_update_access(entity: Entity) -> None:
@@ -216,7 +213,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:  # pragma: no cover
+    except InvalidGeomException as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
@@ -226,20 +223,19 @@ def save(manager: BaseManager) -> Union[str, Response]:
                 'update',
                 id_=manager.entity.id,
                 origin_id=manager.origin.id if manager.origin else None)
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and manager.entity:
+        if action == 'update' and manager.entity:  # pragma: no cover
             url = url_for(
                 'update',
                 id_=manager.entity.id,
-                origin_id=manager.origin.id
-                if manager.origin else None)
+                origin_id=manager.origin.id if manager.origin else None)
         else:
-            url = url_for('index', view=g.classes[manager.class_.name].view)
-            if manager.class_.name in ['administrative_unit', 'type']:
-                url = url_for('type_index')
+            url = url_for('type_index') if \
+                manager.class_.name in ['administrative_unit', 'type'] else \
+                url_for('index', view=g.classes[manager.class_.name].view)
     return url
 
 

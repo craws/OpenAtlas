@@ -9,7 +9,6 @@ from openatlas.api.resources.util import (
 from openatlas.api.resources.model_mapper import (
     get_all_links_of_entities_inverse, flatten_list_and_remove_duplicates)
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 def search(
@@ -20,7 +19,7 @@ def search(
 
 
 def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
-    new_subs = Type.get_all_sub_ids(g.types[id_])
+    new_subs = g.types[id_].get_sub_ids_recursive()
     subs.extend(new_subs)
     for sub in new_subs:
         get_sub_ids(sub, subs)

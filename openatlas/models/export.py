@@ -41,7 +41,7 @@ def sql_export(postfix: Optional[str] = '') -> bool:
                 ['7z', 'a', f'{file}.7z', file],
                 stdout=null).wait()
         file.unlink()
-    except Exception:  # pragma: no cover
+    except Exception:
         return False
 
     return True

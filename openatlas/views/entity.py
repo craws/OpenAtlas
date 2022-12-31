@@ -40,6 +40,7 @@ def view(id_: int) -> Union[str, Response]:
         gis_data=manager.gis_data,
         crumbs=manager.crumbs)
 
+
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def entity_add_file(id_: int) -> Union[str, Response]:

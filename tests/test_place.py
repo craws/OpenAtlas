@@ -167,7 +167,7 @@ class PlaceTest(TestBaseCase):
                 "description": "", 
                 "shapeType": "shape"}}]"""
             rv = self.app.post(
-                url_for('insert', class_='place', origin_id=source.id),
+                url_for('update', id_=place.id),
                 data=data,
                 follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
@@ -299,17 +299,11 @@ class PlaceTest(TestBaseCase):
 
             data['name'] = "It's not a bug, it's a feature!"
             data['place'] = place.id
-            rv = self.app.get(
-                url_for(
-                    'insert',
-                    class_='stratigraphic_unit',
-                    origin_id=place.id))
-            assert b'Insert and add artifact' in rv.data
-
             rv = self.app.post(
                 url_for('insert', class_='feature', origin_id=place.id),
                 data=data)
             feat_id = rv.location.split('/')[-1]
+
             self.app.get(url_for('insert', class_='place', origin_id=feat_id))
             self.app.get(url_for('update', id_=feat_id))
             self.app.post(url_for('update', id_=feat_id), data=data)
@@ -321,31 +315,30 @@ class PlaceTest(TestBaseCase):
                     class_='stratigraphic_unit',
                     origin_id=feat_id),
                 data=data)
-            stratigraphic_id = rv.location.split('/')[-1]
+            strati_id = rv.location.split('/')[-1]
 
-            self.app.get(url_for('update', id_=stratigraphic_id))
+            self.app.get(url_for('update', id_=strati_id))
             self.app.post(
-                url_for('update', id_=stratigraphic_id),
+                url_for('update', id_=strati_id),
                 data={'name': "I'm a stratigraphic unit", 'place': feat_id})
             rv = self.app.get(
                 url_for(
                     'insert',
                     class_='human_remains',
-                    origin_id=stratigraphic_id))
+                    origin_id=strati_id))
             assert b"I'm a stratigraphic unit" in rv.data
+
             data = {
                 'name': 'You never find me',
-                'artifact_super': stratigraphic_id,
+                'artifact_super': strati_id,
                 Type.get_hierarchy('Dimensions').subs[0]: 50,
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
-                url_for(
-                    'insert',
-                    class_='artifact',
-                    origin_id=stratigraphic_id),
+                url_for('insert', class_='artifact', origin_id=strati_id),
                 data=data)
             find_id = rv.location.split('/')[-1]
+
             rv = self.app.post(
                 url_for('update', id_=find_id),
                 data=data,
@@ -354,10 +347,7 @@ class PlaceTest(TestBaseCase):
 
             # Create a second artifact to test siblings pager
             rv = self.app.post(
-                url_for(
-                    'insert',
-                    class_='artifact',
-                    origin_id=stratigraphic_id),
+                url_for('insert', class_='artifact', origin_id=strati_id),
                 follow_redirects=True,
                 data=data)
             assert b'An entry has been created' in rv.data
@@ -366,17 +356,22 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': 'My human remains',
                 'actor': actor.id,
-                'human_remains_super': stratigraphic_id,
+                'human_remains_super': strati_id,
                 human_remains_type.id: str([human_remains_type_sub.id]),
                 self.precision_geonames: precision,
                 self.precision_wikidata: ''}
             rv = self.app.post(
-                url_for(
-                    'insert',
-                    class_='human_remains',
-                    origin_id=stratigraphic_id),
+                url_for('insert', class_='human_remains', origin_id=strati_id),
                 data=data)
             human_remains_id = rv.location.split('/')[-1]
+
+            rv = self.app.get(
+                url_for('insert', class_='human_remains', origin_id=strati_id))
+            assert b'exists' in rv.data
+
+            rv = self.app.get(url_for('view', id_=human_remains_id))
+            assert b'My human remains' in rv.data
+
             rv = self.app.get(url_for('update', id_=human_remains_id))
             assert b'My human remains' in rv.data
 
@@ -392,30 +387,29 @@ class PlaceTest(TestBaseCase):
             assert b'The entry has been deleted.' in rv.data
 
             # Anthropological features
-            rv = self.app.get(
-                url_for('anthropology_index', id_=stratigraphic_id))
+            rv = self.app.get(url_for('anthropology_index', id_=strati_id))
             assert b'Sex estimation' in rv.data
 
-            rv = self.app.get(url_for('sex', id_=stratigraphic_id))
+            rv = self.app.get(url_for('sex', id_=strati_id))
             assert b'Anthropological analyses' in rv.data
 
             rv = self.app.post(
-                url_for('sex_update', id_=stratigraphic_id),
+                url_for('sex_update', id_=strati_id),
                 follow_redirects=True,
                 data={'Glabella': 'Female'})
             assert b'-2.0' in rv.data
 
             rv = self.app.post(
-                url_for('sex_update', id_=stratigraphic_id),
-                follow_redirects=True,
-                data={'Glabella': 'Female'})
+                url_for('sex_update', id_=strati_id),
+                data={'Glabella': 'Female'},
+                follow_redirects=True)
             assert b'-2.0' in rv.data
 
-            rv = self.app.get(url_for('sex_update', id_=stratigraphic_id))
+            rv = self.app.get(url_for('sex_update', id_=strati_id))
             assert b'Glabella' in rv.data
 
             rv = self.app.post(
-                url_for('update', id_=stratigraphic_id),
+                url_for('update', id_=strati_id),
                 data={'name': 'New name'},
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data

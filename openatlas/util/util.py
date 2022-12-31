@@ -26,7 +26,6 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -84,7 +83,7 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False  # pragma: no cover - AnonymousUserMixin has no group
+        return False
     if current_user.group == 'admin' \
             or current_user.group == group \
             or (current_user.group == 'manager'
@@ -182,16 +181,18 @@ def send_mail(
         subject: str,
         text: str,
         recipients: Union[str, list[str]],
-        log_body: bool = True) -> bool:  # pragma: no cover
+        log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
-        Set log_body to False for sensitive data, e.g. password mails
+        Set log_body to False for sensitive data, e.g. password mails.
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
         return False
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
-    try:
+    if app.config['IS_UNIT_TEST']:
+        return True  # To test mail functions w/o sending them
+    try:  # pragma: no cover
         with smtplib.SMTP(
                 g.settings['mail_transport_host'],
                 g.settings['mail_transport_port']) as smtp:
@@ -213,21 +214,21 @@ def send_mail(
                 f'Subject: {subject}'
             log_text += f' Content: {text}' if log_body else ''
             g.logger.log('info', 'mail', f'Mail send from {from_}', log_text)
-    except smtplib.SMTPAuthenticationError as e:
+    except smtplib.SMTPAuthenticationError as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
         flash(_('error mail send'), 'error')
-        return False
-    return True
+        return False  # pragma: no cover
+    return True  # pragma: no cover
 
 
 @contextfilter
@@ -257,7 +258,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                     "User OpenAtlas with default password is still active!")
     if warnings:
         return f'<p class="error">{"<br>".join(warnings)}<p>'
-    return ''  # pragma: no cover
+    return ''
 
 
 @app.template_filter()
@@ -279,7 +280,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+            ext = app.config['PROCESSED_EXT']
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -296,15 +297,10 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B"  # pragma: no cover
+        return "0 B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
-
-
-def delete_link(name: str, url: str) -> str:
-    confirm = _('Delete %(name)s?', name=name.replace("'", ''))
-    return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
 @app.template_filter()
@@ -365,11 +361,13 @@ def button(
             class="{app.config['CSS']['button'][css]}"
             {f'onclick="{onclick}"' if onclick else ''}>{label}</{tag}>"""
 
+
 @app.template_filter()
 def button_bar(buttons: list[Any]) -> str:
     return \
         f'<div class="toolbar">{" ".join([str(b) for b in buttons])}</div>' \
         if buttons else ''
+
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
@@ -377,7 +375,7 @@ def display_citation_example(code: str) -> str:
         return ''
     if text := get_translation('citation_example'):
         return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
-    return ''  # pragma: no cover
+    return ''
 
 
 @app.template_filter()
@@ -431,39 +429,6 @@ def description(entity: Union[Entity, Project, User]) -> str:
         </div>"""
 
 
-@app.template_filter()
-def display_profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
-    if not path:
-        return ''  # pragma: no cover
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    url = url_for('display_file', filename=path.name)
-    src = resized or url
-    style = f'max-width:{g.settings["profile_image_width"]}px;'
-    ext = app.config["DISPLAY_FILE_EXTENSIONS"]
-    if resized:
-        style = f'max-width:{app.config["IMAGE_SIZE"]["thumbnail"]}px;'
-        ext = app.config["ALLOWED_IMAGE_EXT"]
-    if entity.class_.view == 'file':
-        html = uc_first(_('no preview available'))
-        if path.suffix.lower() in ext:
-            html = link(
-                f'<img style="{style}" alt="image" src="{src}">',
-                url,
-                external=True)
-    else:
-        html = link(
-            f'<img style="{style}" alt="image" src="{src}">',
-            url_for('view', id_=entity.image_id))
-    return f'<div id="profile-image-div">{html}</div>'
-
-
 @contextfilter
 @app.template_filter()
 def display_content_translation(_context: str, text: str) -> str:
@@ -504,7 +469,7 @@ def display_form(
 
 class MLStripper(HTMLParser):
 
-    def error(self: MLStripper, message: str) -> None:  # pragma: no cover
+    def error(self: MLStripper, message: str) -> None:
         pass
 
     def __init__(self) -> None:

@@ -102,9 +102,9 @@ class Gis:
                 extra['supers'].append(item)
             elif row['object_id'] in object_ids:
                 selected[shape].append(item)
-            elif row['object_id'] in subunit_ids:  # pragma no cover
+            elif row['object_id'] in subunit_ids:
                 extra['subs'].append(item)
-            elif row['object_id'] in sibling_ids:  # pragma no cover
+            elif row['object_id'] in sibling_ids:
                 extra['siblings'].append(item)
             else:
                 all_[shape].append(item)
@@ -119,9 +119,9 @@ class Gis:
                         and structure['supers'] \
                         and row['object_id'] == structure['supers'][-1].id:
                     extra['supers'].append(polygon_point_item)
-                elif row['object_id'] in subunit_ids:  # pragma no cover
+                elif row['object_id'] in subunit_ids:
                     extra['subs'].append(polygon_point_item)
-                elif row['object_id'] in sibling_ids:  # pragma no cover
+                elif row['object_id'] in sibling_ids:
                     extra['siblings'].append(polygon_point_item)
                 else:
                     all_['point'].append(polygon_point_item)
@@ -145,11 +145,11 @@ class Gis:
     def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
             if shape not in data or not data[shape]:
-                continue  # pragma: no cover
+                continue
             for item in json.loads(data[shape]):
                 if not item['geometry']['coordinates'] \
                         or item['geometry']['coordinates'] == [[]]:
-                    continue  # pragma: no cover
+                    continue
                 if item['properties']['shapeType'] != 'centerpoint' \
                         and not Db.test_geom(json.dumps(item['geometry'])):
                     raise InvalidGeomException

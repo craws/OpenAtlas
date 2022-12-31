@@ -22,7 +22,7 @@ def safe_resize_image(name: str, file_format: str, size: str) -> bool:
         if check_if_folder_exist(size, app.config['RESIZED_IMAGES']):
             return image_resizing(name, file_format, size)
         return False  # pragma: no cover
-    except OSError as e:  # pragma: no cover
+    except OSError as e:
         g.logger.log(
             'info',
             'image processing',
