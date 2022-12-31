@@ -17,8 +17,10 @@ versions = {
             '1896':
                 "Map doesn't zoom in automatically if it is a polygon or "
                 "linestring",
-            '1899': 'Map overlay not shown on feature level'}
-    }],
+            '1899': 'Map overlay not shown on feature level',
+            '1912':
+                'API: search for typeID with subs logically connected with '
+                'AND'}}],
     '7.8.1': ['2022-12-08', {
         'fix': {
             '1911': 'Problem when adding members to groups'}}],
