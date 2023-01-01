@@ -1,6 +1,7 @@
 from openatlas.util.util import link
 
 versions = {
+    '7.10.0': ['TBA', {}],
     '7.9.0': ['2023-01-01', {
         'feature': {
             '1882': 'Log dynamically created entities',
