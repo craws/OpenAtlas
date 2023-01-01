@@ -29,21 +29,20 @@ In this version the following folders, including all sub folders and files,
     openatlas/export/
     openatlas/processed_images/
 
-have to be moved manually to the **files** directory, e.g.
+have to be moved manually to the **files** directory, e.g. as root
 
-    $ mv openatlas/uploads/* files/uploads/
-    $ mv openatlas/export/sql/* files/export/
-    $ mv openatlas/processed_images/ files/processed_images/
+    # mv openatlas/uploads/* files/uploads/
+    # mv openatlas/export/sql/* files/export/
+    # mv openatlas/processed_images/ files/processed_images/
+    # chown -R www-data files
 
 Clean up:
 
-    $ rmdir openatlas/uploads
-    $ rmdir openatlas/export/sql
-    $ rmdir openatlas/export
-
-Set owner to Apache (as root):
-
-    # chown -R www-data files
+    # rm openatlas/uploads/.gitignore
+    # rmdir openatlas/uploads
+    # rm openatlas/export/sql/.gitignore
+    # rmdir openatlas/export/sql
+    # rmdir openatlas/export
 
 Be aware, that external applications/scripts, e.g. backup scripts or
 presentation sites might need adaptions too.
