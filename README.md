@@ -7,7 +7,7 @@ information is mapped as a network using classes and properties of the
 
 Documentation:
 [Manual](https://manual.openatlas.eu),
-[Features](https://manual.openatlas.eu/static/manual/features.html),
+[Features](https://manual.openatlas.eu/features.html),
 [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),
 [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
