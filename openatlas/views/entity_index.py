@@ -1,4 +1,3 @@
-import datetime
 from typing import Optional, Union
 
 from flask import flash, g, render_template, url_for
@@ -57,16 +56,11 @@ def get_table(view: str) -> Table:
         if g.settings['image_processing'] \
                 and current_user.settings['table_show_icons']:
             header.insert(1, _('icon'))
-    table = Table(header)
+    table = Table(header, order=[[0, 'desc']])
     if view == 'file':
         for entity in Entity.get_by_class('file', types=True):
-            date = 'N/A'
-            if entity.id in g.file_stats:
-                date = format_date(
-                    datetime.datetime.utcfromtimestamp(
-                        g.file_stats[entity.id]['date']))
             data = [
-                date,
+                format_date(entity.created),
                 link(entity),
                 link(entity.standard_type),
                 g.file_stats[entity.id]['size']
