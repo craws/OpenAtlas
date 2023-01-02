@@ -6,7 +6,7 @@ from config.database_versions import DATABASE_VERSIONS
 root_path = Path(__file__).parent.parent / 'openatlas'
 files_path = Path(__file__).parent.parent / 'files'
 
-VERSION = '7.10.0'
+VERSION = '7.9.1'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
