@@ -3,13 +3,13 @@ Time Spans
 
 .. toctree::
 
-This section is focused on how the :doc:`Date</form/date>` input fields work
+This section is focused on how the :doc:`Date</ui/date>` input fields work
 and how to put in time spans correctly.
 
 Where to find the input fields
 ------------------------------
 
-:doc:`Date</form/date>` input fields can be found on the following:
+:doc:`Date</ui/date>` input fields can be found on the following:
 
 * All forms connected to :doc:`Events</entity/event>`
 * All forms connected to :doc:`Actors</entity/actor>`
@@ -51,7 +51,7 @@ The following values can be put in:
 
 Years before the year 0 can be indicated by a preceding minus. Please note that
 years before the year 4713 BC (spelling -4713) cannot be entered at the moment
-due to software restrictions by PostgreSQL.
+due to software restrictions by `PostgreSQL <https://www.postgresql.org/>`_.
 Furthermore, as PostgreSQL uses the
 `Proleptic Gregorian calendar <https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar>`_,
 the year 0 can not be entered either.

@@ -1,63 +1,46 @@
-{% if current_user.is_authenticated %}
-  {% if tables.overview.rows %}
-    <div style="float:left;margin-right:2em;min-width: 500px;">
-      {{ tables.overview.display('overview')|safe }}
-    </div>
-  {% endif %}
-  <div style="float:left; ">
-    <div class="toolbar">
-      <p>
-        <a
-          class="{{ config.CSS.button.primary }}"
-          href="/static/manual/index.html"
-          target="_blank"
-          rel="noopener noreferrer">
-            <i class="fas fa-book"></i> {{ _('manual')|uc_first }}
-        </a>
-        {{ _('model')|button(url_for('model_index'))|safe }}
-        <a
-          class="{{ config.CSS.button.primary }}"
-          href="{{ url_for('index', view='reference_system') }}">
-            {{ _('reference systems')|uc_first }}
-        </a>
-        {{ _('network visualization')|button(url_for('model_network'))|safe }}
-      </p>
-      <p>
-        {{ _('want a new feature or experience any problems')|uc_first }}:
-        {{ _('tell us about it')|button(url_for('index_feedback'))|safe }}
-      </p>
-      {% if g.settings.mail and not current_user.settings.newsletter %}
-        <p>
-          {{ _('want to receive updates? Activate the newsletter in your')|uc_first }}
-          {{ _('profile')|button(url_for('profile_index'))|safe }}
-        </p>
-      {% endif %}
-    </div>
-    <p style="font-size:0.8em;margin-top:1em;">
-      {{ _('hello')|uc_first }} {{ current_user.username }}.
-      {% if session.login_previous_success %}
-        {{ _('last login')|uc_first }}: {{ session.login_previous_success }}
-        {% if session.login_previous_failures > 0 %}
-          - {{ _('failed logins')|uc_first }}: {{ session.login_previous_failures }}
-        {% endif %}
-      {% else %}
-        {{ _('first login') }}
-      {% endif %}
+{% if tables.overview.rows %}
+  <div style="float:left;margin-right:2em;min-width: 500px;">
+    {{ tables.overview.display('overview')|safe }}
+  </div>
+{% endif %}
+<div style="float:left; ">
+  <div class="toolbar">
+    <p>
+      {{
+        ('<i class="fas fa-book"></i> ' + _('manual')|uc_first)|
+        link("/static/manual/index.html", class_=config.CSS.button.primary, external=True)|safe
+      }}
+      {{ _('model')|button(url_for('model_index'))|safe }}
+      {{ (_('reference systems')|uc_first)|link(url_for('index', view='reference_system'), class_=config.CSS.button.primary)|safe }}
+      {{ _('network visualization')|button(url_for('model_network'))|safe }}
     </p>
-    {% if tables.latest.rows %}
-      <h1>{{ _('latest')|uc_first }}</h1>
-      {{ tables.latest.display('latest')|safe }}
-      <div class="toolbar">
-        {{ _('Show all activity')|button(url_for('user_activity'))|safe }}
-      </div>
+    <p>
+      {{ _('want a new feature or experience any problems')|uc_first }}:
+      {{ _('tell us about it')|button(url_for('index_feedback'))|safe }}
+    </p>
+    {% if g.settings.mail and not current_user.settings.newsletter %}
+      <p>
+        {{ _('want to receive updates? Activate the newsletter in your')|uc_first }}
+        {{ _('profile')|button(url_for('profile_index'))|safe }}
+      </p>
     {% endif %}
   </div>
-  <div style="clear:both;"></div>
-{% else %}
-  {% if intro: %}
-    <p>{{ intro|safe }}</p>
+  <p style="font-size:0.8em;margin-top:1em;">
+    {{ _('hello')|uc_first }} {{ current_user.username }}.
+    {% if session.login_previous_success %}
+      {{ _('last login')|uc_first }}: {{ session.login_previous_success }}
+      {% if session.login_previous_failures > 0 %}
+        - {{ _('failed logins')|uc_first }}: {{ session.login_previous_failures }}
+      {% endif %}
+    {% else %}
+      {{ _('first login') }}
+    {% endif %}
+  </p>
+  {% if tables.latest.rows %}
+    <h1>{{ _('latest')|uc_first }}</h1>
+    {{ tables.latest.display('latest')|safe }}
+    <div class="toolbar">
+      {{ _('Show all activity')|button(url_for('user_activity'))|safe }}
+    </div>
   {% endif %}
-  <h1>OpenAtlas</h1>
-  <a target="_blank" rel="noopener noreferrer" href="https://openatlas.eu/">OpenAtlas</a>
-  {{ _('text_intro') }}
-{% endif %}
+</div>

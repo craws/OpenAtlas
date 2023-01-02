@@ -1,18 +1,15 @@
-from __future__ import annotations
-
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.forms.field import ValueFloatField
+from openatlas.models.type import Type
 from openatlas.util.util import manual, tooltip, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 def html_form(
@@ -36,9 +33,9 @@ def html_form(
         if field.type in ['TreeField', 'TreeMultiField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
-                continue  # pragma: no cover
+                continue
             label = type_.name
-            if type_.category == 'standard':
+            if type_.category == 'standard' and type_.name != 'License':
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
@@ -47,9 +44,15 @@ def html_form(
                 html += add_row(field, label, button_icon(type_))
                 html += add_value_type(form, type_)
                 continue
-            tooltip_ = '' \
-                if 'is_type_form' in form else f' {tooltip(type_.description)}'
-            html += add_row(field, label + tooltip_)
+            if field.flags.required and field.label.text:
+                label += ' *'
+            tooltip_ = ''
+            if 'is_type_form' not in form:
+                tooltip_ = type_.description or ''
+                if field.flags.required \
+                        and current_user.group == 'contributor':
+                    tooltip_ += "&#013;" + str(_('tooltip_required_type'))
+            html += add_row(field, label + tooltip(tooltip_))
             continue
 
         if field.id == 'save':
@@ -112,8 +115,8 @@ def add_reference_systems(form: Any) -> str:
         if field.id.startswith('reference_system_id_'):
             fields.append(field)
             if field.errors:
-                errors = True  # pragma: no cover
-    if len(fields) > 3 and not errors:  # pragma: no cover
+                errors = True
+    if len(fields) > 3 and not errors:
         switch_class = 'reference-system-switch'
         html = render_template('util/reference_system_switch.html')
     for field in fields:

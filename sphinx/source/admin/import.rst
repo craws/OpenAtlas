@@ -63,7 +63,7 @@ Dates
 +++++
 Dates can be entered in the format **YYYY-MM-DD** in the fields **begin_from** and **end_from**.
 You can also use time spans in combinations with the fields **begin_to** and **end_to**,
-see: :doc:`/form/date`
+see: :doc:`/ui/date`
 
 * If the date format is incorrect they will be displayed in red and won't be imported
 * Missing values for time spans will be discarded silently, e.g. a valid value in **begin_to** but an empty value in **begin_from**

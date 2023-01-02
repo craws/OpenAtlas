@@ -70,27 +70,24 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = Entity.get_by_id(origin_id)
-
     if 'reference' in [domain.class_.view, range_.class_.view]:
         return reference_link_update(link_, origin)
-
     manager_name = 'involvement'
     tab = 'actor' if origin.class_.view == 'event' else 'event'
     if link_.property.code == 'OA7':
-        manager_name = 'actor_actor_relation'
+        manager_name = 'actor_relation'
         tab = 'relation'
     elif link_.property.code == 'P107':
         manager_name = 'actor_function'
         tab = f"member{'-of' if origin.id == range_.id else ''}"
     manager = get_manager(manager_name, origin=origin, link_=link_)
-
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
             manager.process_link_form()
             manager.link_.update()
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -111,37 +108,31 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    if type_.startswith('member'):
-        manager = get_manager('actor_function', origin=origin)
-    else:
-        manager = get_manager(type_, origin=origin)
+    manager = get_manager(
+        'actor_function' if type_.startswith('member') else type_,
+        origin=origin)
     if manager.form.validate_on_submit():
         Transaction.begin()
         try:
             manager.process_form()
             manager.update_link()
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if hasattr(manager.form, 'continue_') \
                 and manager.form.continue_.data == 'yes':
             return redirect(
-                url_for(
-                    'insert_relation',
-                    type_=type_,
-                    origin_id=origin_id))
-        tab = 'event'
-        if type_ == 'involvement':
-            tab = 'actor' if origin.class_.view == 'event' else 'event'
-        elif type_ == 'actor_actor_relation':
-            tab = 'relation'
-        elif type_ == 'member':
-            tab = 'member'
-        elif type_ == 'membership':
-            tab = 'member-of'
-        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tab}")
+                url_for('insert_relation', type_=type_, origin_id=origin_id))
+        tabs = {
+            'actor_relation': 'relation',
+            'event': 'event',
+            'involvement':
+                'actor' if origin.class_.view == 'event' else 'event',
+            'member': 'member',
+            'membership': 'member-of'}
+        return redirect(f"{url_for('view', id_=origin.id)}#tab-{tabs[type_]}")
     return render_template(
         'content.html',
         content=display_form(manager.form),

@@ -20,10 +20,10 @@ class RelationTests(TestBaseCase):
                 url_for(
                     'insert_relation',
                     origin_id=actor.id,
-                    type_='actor_actor_relation'))
-            assert b'Actor actor relation' in rv.data
+                    type_='actor_relation'))
+            assert b'Actor relation' in rv.data
 
-            relation_id = Type.get_hierarchy('Actor actor relation').id
+            relation_id = Type.get_hierarchy('Actor relation').id
             sub_id = g.types[relation_id].subs[0]
             sub_id2 = g.types[relation_id].subs[1]
             data = {
@@ -40,7 +40,7 @@ class RelationTests(TestBaseCase):
                 url_for(
                     'insert_relation',
                     origin_id=actor.id,
-                    type_='actor_actor_relation'),
+                    type_='actor_relation'),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
@@ -54,7 +54,7 @@ class RelationTests(TestBaseCase):
                 url_for(
                     'insert_relation',
                     origin_id=actor.id,
-                    type_='actor_actor_relation'),
+                    type_='actor_relation'),
                 data=data,
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data

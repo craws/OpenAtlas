@@ -13,9 +13,9 @@ CIDOC documentation: :cidoc_entity:`E31 Document<e31-document>`
 
 Form fields
 -----------
-* :doc:`/form/name` - or an **URL** field in case of an external references
+* :doc:`/ui/name` - or an **URL** field in case of an external references
 * :doc:`type`
-* :doc:`/form/description`
+* :doc:`/ui/description`
 
 Citation example
 ----------------

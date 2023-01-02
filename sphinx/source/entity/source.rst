@@ -13,7 +13,7 @@ in OpenAtlas at the **Source** menu item.
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
 * :doc:`/entity/artifact` - if the artifact contains the source
 * **Content** - a source content usually contains a summary or the whole text

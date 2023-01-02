@@ -53,10 +53,23 @@ class Type:
     def get_hierarchies() -> list[dict[str, Any]]:
         g.cursor.execute(
             """
-            SELECT h.id, h.name, h.category, h.multiple, h.directional
+            SELECT
+                h.id, h.name, h.category, h.multiple, h.directional, h.required
             FROM web.hierarchy h;
             """)
         return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def set_required(id_: int) -> None:
+        g.cursor.execute(
+            "UPDATE web.hierarchy SET required = true WHERE id = %(id)s;",
+            {'id': id_})
+
+    @staticmethod
+    def unset_required(id_: int) -> None:
+        g.cursor.execute(
+            "UPDATE web.hierarchy SET required = false WHERE id = %(id)s;",
+            {'id': id_})
 
     @staticmethod
     def insert_hierarchy(data: dict[str, Any]) -> None:
@@ -128,7 +141,7 @@ class Type:
             {'type_id': type_id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_form_count(class_name: str, type_ids: list[int]) -> int:
+    def get_class_count(name: str, type_ids: list[int]) -> int:
         g.cursor.execute(
             """
             SELECT COUNT(*) FROM model.link l
@@ -137,13 +150,11 @@ class Type:
             WHERE l.property_code = 'P2'
                 AND e.openatlas_class_name = %(class_name)s;
             """,
-            {'type_ids': tuple(type_ids), 'class_name': class_name})
+            {'type_ids': tuple(type_ids), 'class_name': name})
         return g.cursor.fetchone()['count']
 
     @staticmethod
-    def remove_class_from_hierarchy(
-            class_name: str,
-            hierarchy_id: int) -> None:
+    def remove_class(hierarchy_id: int, class_name: str) -> None:
         g.cursor.execute(
             """
             DELETE FROM web.hierarchy_openatlas_class
@@ -153,7 +164,7 @@ class Type:
             {'hierarchy_id': hierarchy_id, 'class_name': class_name})
 
     @staticmethod
-    def remove_by_entity_and_type(entity_id: int, type_id: int) -> None:
+    def remove_entity_links(type_id: int, entity_id: int) -> None:
         g.cursor.execute(
             """
             DELETE FROM model.link

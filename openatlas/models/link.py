@@ -12,6 +12,7 @@ from openatlas.util.util import (
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
+    from openatlas.models.type import Type
 
 
 class Link:
@@ -93,7 +94,7 @@ class Link:
                     'range_class_code',
                     range_.class_.cidoc_class.code):
                 range_error = False
-            if domain_error or range_error:  # pragma: no cover
+            if domain_error or range_error:
                 text = \
                     f"invalid CIDOC link {domain.class_.cidoc_class.code}" \
                     f" > {property_code} > {range_.class_.cidoc_class.code}"
@@ -119,7 +120,7 @@ class Link:
             code,
             inverse=inverse,
             types=types)
-        if len(result) > 1:  # pragma: no cover
+        if len(result) > 1:
             g.logger.log(
                 'error',
                 'model',
@@ -141,13 +142,24 @@ class Link:
             types=types)
 
     @staticmethod
+    def get_linked_entities_recursive(
+            id_: int,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        from openatlas.models.entity import Entity
+        return Entity.get_by_ids(
+            Db.get_linked_entities_recursive(id_, code, inverse),
+            types=types)
+
+    @staticmethod
     def get_linked_entity_safe(
             id_: int,
             code: str,
             inverse: bool = False,
             types: bool = False) -> Entity:
         entity = Link.get_linked_entity(id_, code, inverse, types)
-        if not entity:  # pragma: no cover
+        if not entity:
             g.logger.log(
                 'error',
                 'model',
@@ -203,8 +215,17 @@ class Link:
         return Link(Db.get_by_id(id_))
 
     @staticmethod
-    def get_links_by_type(type_: Entity) -> list[dict[str, Any]]:
+    def get_links_by_type(type_: Type) -> list[dict[str, Any]]:
         return Db.get_links_by_type(type_.id)
+
+    @staticmethod
+    def get_links_by_type_recursive(
+            type_: Type,
+            result: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        result += Db.get_links_by_type(type_.id)
+        for sub_id in type_.subs:
+            result = Link.get_links_by_type_recursive(g.types[sub_id], result)
+        return result
 
     @staticmethod
     def get_entity_ids_by_type_ids(types_: list[int]) -> list[int]:
@@ -262,24 +283,21 @@ class Link:
 
     @staticmethod
     def check_single_type_duplicates() -> list[dict[str, Any]]:
-        from openatlas.models.type import Type
         from openatlas.models.entity import Entity
         data = []
         for type_ in g.types.values():
             if type_.root or type_.multiple or type_.category == 'value':
-                continue  # pragma: no cover
-            type_ids = Type.get_all_sub_ids(type_)
-            if not type_ids:
-                continue  # pragma: no cover
-            for id_ in Db.check_single_type_duplicates(type_ids):
-                offending_types = []
-                entity = Entity.get_by_id(id_, types=True)
-                for entity_types in entity.types:
-                    if g.types[entity_types.root[0]].id != type_.id:
-                        continue  # pragma: no cover
-                    offending_types.append(entity_types)
-                data.append({
-                    'entity': entity,
-                    'type': type_,
-                    'offending_types': offending_types})
+                continue
+            if type_ids := type_.get_sub_ids_recursive():
+                for id_ in Db.check_single_type_duplicates(type_ids):
+                    offending_types = []
+                    entity = Entity.get_by_id(id_, types=True)
+                    for entity_types in entity.types:
+                        if g.types[entity_types.root[0]].id != type_.id:
+                            continue
+                        offending_types.append(entity_types)
+                    data.append({
+                        'entity': entity,
+                        'type': type_,
+                        'offending_types': offending_types})
         return data

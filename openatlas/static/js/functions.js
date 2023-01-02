@@ -55,6 +55,7 @@ $(document).ready(function () {
 
   /* When selecting a file for upload: if name is empty, fill with filename without extension */
   $('#file').on("change", function () {
+    setFilesOfDropField([...$('#file')[0].files])
     if ($('#name').val() == '') {
       var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
       $('#name').val(filename.replace(/\.[^/.]+$/, ""));
@@ -115,19 +116,19 @@ $(document).ready(function () {
     bootstrapVersion: '4',
     resolver: 'custom',
     formatResult: function (item) {
-        return {
-            value: item.id,
-            text: `${item.id} - ${item.label} - ${item.description}`
-        };
+      return {
+        value: item.id,
+        text: `${item.id} - ${item.label} - ${item.description}`
+      };
     },
     events: {
-        search: function (qry, callback) {
-            $.ajax(
-                `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
-            ).done(function (res) {
-                callback(res.search)
-            });
-        }
+      search: function (qry, callback) {
+        $.ajax(
+            `https://www.wikidata.org/w/api.php?action=wbsearchentities&language=en&format=json&origin=*&search=${qry}`,
+        ).done(function (res) {
+            callback(res.search)
+        });
+      }
     }
   }).on('autocomplete.select', function(evt,item) {
       $('.Wikidata').val(item.id);
@@ -145,7 +146,7 @@ function resizeText(multiplier) {
     document.body.style.fontSize = '1.0em';
   }
   document.body.style.fontSize =
-      parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
+    parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
 }
 
 /**
@@ -184,12 +185,15 @@ async function ajaxAddEntity(data) {
   return newEntityId;
 }
 
-function getTable(id,filterIds = []){
-  return $.ajax({
+async function refillTable(id, filterIds = []) {
+  const tableContent = await $.ajax({
     type: 'post',
     url: `/ajax/get_entity_table/${id}`,
-    data: {filterIds:JSON.stringify(filterIds)},
+    data: {filterIds: JSON.stringify(filterIds)},
   });
+  $(`#${id}-modal .modal-body-table`)
+    .empty()
+    .append($(`${tableContent}`));
 }
 
 async function ajaxAddType(data, fieldId, typeId, multiple=false) {
@@ -228,9 +232,9 @@ function fillTreeSelect(id,d,minimum_jstree_search){
       "plugins": ["search"],
       "core": {"check_callback": true, "data": d},
       "search": {
-          "case_insensitive": true,
-          "show_only_matches": true,
-          "show_only_matches_children": true
+        "case_insensitive": true,
+        "show_only_matches": true,
+        "show_only_matches_children": true
       },
   });
 
@@ -238,12 +242,12 @@ function fillTreeSelect(id,d,minimum_jstree_search){
       selectFromTree(`${id}`, data.node.id, data.node.text);
   });
   $(`#${id}-tree-search`).keyup(function () {
-      if (this.value.length >= minimum_jstree_search) {
-          $(`#${id}-tree`).jstree("search", $(this).val());
-      } else if (this.value.length == 0) {
-          $(`#${id}-tree`).jstree("search", $(this).val());
-          $(`#${id}-tree`).jstree(true).show_all();
-      }
+    if (this.value.length >= minimum_jstree_search) {
+      $(`#${id}-tree`).jstree("search", $(this).val());
+    } else if (this.value.length == 0) {
+      $(`#${id}-tree`).jstree("search", $(this).val());
+      $(`#${id}-tree`).jstree(true).show_all();
+    }
   });
 }
 
@@ -262,13 +266,13 @@ function selectFromTreeMulti(name, value_type = false) {
     if (value_type) {
       $('#' + name + '-button').after('<span> ' + type_['text'] + '</span>');
       $('#' + name + '-button').after(
-          $('<input>').attr({
-            type: 'text',
-            id: type_.id,
-            name: type_.id,
-            value: '20',
-            class: 'value_input'
-          }));
+        $('<input>').attr({
+          type: 'text',
+          id: type_.id,
+          name: type_.id,
+          value: '20',
+          class: 'value_input'
+        }));
       $('#' + name + '-button').after($('<br>'));
     } else {
       checkedNames += type_['text'] + "<br>";
@@ -295,12 +299,12 @@ function selectFromTableMulti(name) {
   var checkedNames = '';
   var ids = [];
   $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
-      function () {
-        if ($(this).is(':checked')) {
-          checkedNames += $(this).val() + '<br>';
-          ids.push($(this).attr('id'));
-        }
-      });
+    function () {
+      if ($(this).is(':checked')) {
+        checkedNames += $(this).val() + '<br>';
+        ids.push($(this).attr('id'));
+      }
+    });
   $('#' + name + '-selection').html(checkedNames);
   $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
@@ -329,8 +333,83 @@ function removeAccents(data) {
     // the accents wholesale. Note that we use the original data as well as
     // the new to allow for searching of either form.
     return data + ' ' + data
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '');
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '');
   }
   return data;
+}
+
+function setFilesOfDropField(files) {
+  const dropContainer = document.getElementById('drag-n-drop')
+  dropContainer.children[0].style.display = "none";
+  dropContainer.children[1].innerHTML = '';
+  files?.forEach((file, index) => {
+    const fileDiv = document.createElement('div');
+    fileDiv.classList.add('drag-drop-item');
+    fileDiv.innerHTML = `
+                            <div class="card" data-bs-toggle="tooltip" data-bs-placement="top" title="${file.name}">
+                                <div class="card-body">
+                                <i class="card-icon fa fa-file"></i>
+                                <i onclick="removeFile(${index})" class="close-icon fa fa-times"></i>
+                                ${file.name}
+                            </div>`
+    dropContainer.children[1].appendChild(fileDiv)
+  })
+}
+
+function removeFile(index) {
+  const fileInput = document.getElementById('file')
+  const filesList = [...fileInput.files];
+  filesList.splice(index, 1);
+  setFile(fileInput, filesList)
+  setFilesOfDropField(filesList)
+  if(filesList.length === 0){
+    document.getElementById('drag-n-drop').children[0].style.display = "";
+  }
+
+}
+
+function setFile(fileInput, fileList) {
+  const newFiles = new DataTransfer();
+  fileList.forEach(x => newFiles.items.add(x));
+  fileInput.files = newFiles.files;
+}
+
+function addDragNDropListeners(dropContainer) {
+  dropContainer.addEventListener("dragenter", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragover", function (e) {
+    dropContainer.classList.add('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+  dropContainer.addEventListener("dragleave", function (e) {
+    dropContainer.classList.remove('highlight')
+
+    e.preventDefault();
+    e.stopPropagation();
+  });
+
+  dropContainer.addEventListener("drop", function (e) {
+    const allowedTypes = ["gif", "jpeg", "jpg", "pdf", "png", "txt", "zip"]
+    const allowedFiles = [...e.dataTransfer.files].filter(x => allowedTypes.includes(x.name.split(('.')).at(-1)))
+    if (allowedFiles.length > 0) {
+      const fileInput = document.getElementById('file')
+      setFile(fileInput, [...fileInput.files, ...allowedFiles]);
+      setFilesOfDropField([...fileInput.files])
+
+      if ($('#name').val() == '') {
+        const filename = allowedFiles[0].name;
+        $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+      }
+    }
+    dropContainer.classList.remove('highlight')
+    e.preventDefault();
+    e.stopPropagation();
+  });
 }

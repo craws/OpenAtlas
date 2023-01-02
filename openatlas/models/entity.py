@@ -34,9 +34,7 @@ class Entity:
         self.reference_systems: list[Link] = []
         self.origin_id: Optional[int] = None  # When coming from another entity
         self.image_id: Optional[int] = None  # Profile image
-        self.linked_places: list[Entity] = []  # Related places for map
         self.location: Optional[Entity] = None  # Respective location if place
-        self.info_data: dict[str, Union[str, list[str], None]]
 
         self.standard_type = None
         self.types: dict[Type, str] = {}
@@ -109,6 +107,17 @@ class Entity:
             inverse=inverse,
             types=types)
 
+    def get_linked_entities_recursive(
+            self,
+            code: str,
+            inverse: bool = False,
+            types: bool = False) -> list[Entity]:
+        return Link.get_linked_entities_recursive(
+            self.id,
+            code,
+            inverse=inverse,
+            types=types)
+
     def link(self,
              code: str,
              range_: Union[Entity, list[Entity]],
@@ -124,7 +133,7 @@ class Entity:
             description: Optional[str] = None,
             inverse: bool = False) -> None:
         if not range_:
-            return  # pragma: no cover
+            return
         # range_ = string value from a form, can be empty, int or int list
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
@@ -262,7 +271,7 @@ class Entity:
         if not self.image_id:
             for link_ in self.get_links('P67', inverse=True):
                 domain = link_.domain
-                if domain.class_.view == 'file':  # pragma: no cover
+                if domain.class_.view == 'file':
                     data = get_base_table_data(domain)
                     if data[3] in app.config['DISPLAY_FILE_EXTENSIONS']:
                         self.image_id = domain.id
@@ -277,11 +286,11 @@ class Entity:
     def get_name_directed(self, inverse: bool = False) -> str:
         """Returns name part of a directed type e.g. parent of (child of)"""
         name_parts = self.name.split(' (')
-        if inverse and len(name_parts) > 1:  # pragma: no cover
+        if inverse and len(name_parts) > 1:
             return sanitize(name_parts[1][:-1], 'text')  # Remove close bracket
         return name_parts[0]
 
-    def check_too_many_single_type_links(self) -> Optional[int]:
+    def check_too_many_single_type_links(self) -> bool:
         type_dict: dict[int, int] = {}
         for type_ in self.types:
             if type_.root[0] in type_dict:
@@ -290,8 +299,26 @@ class Entity:
                 type_dict[type_.root[0]] = 1
         for id_, count in type_dict.items():
             if count > 1 and not g.types[id_].multiple:
-                return id_
-        return None
+                return True
+        return False
+
+    def get_structure(self) -> dict[str, list[Entity]]:
+        structure: dict[str, list[Entity]] = {
+            'siblings': [],
+            'supers': self.get_linked_entities_recursive('P46', inverse=True),
+            'subunits': self.get_linked_entities('P46', types=True)}
+        if structure['supers']:
+            structure['siblings'] = \
+                structure['supers'][-1].get_linked_entities('P46')
+        return structure
+
+    def get_structure_for_insert(self) -> dict[str, list[Entity]]:
+        return {
+            'siblings': self.get_linked_entities('P46'),
+            'subunits': [],
+            'supers':
+                self.get_linked_entities_recursive('P46', inverse=True) +
+                [self]}
 
     @staticmethod
     def get_invalid_dates() -> list[Entity]:
@@ -346,7 +373,7 @@ class Entity:
             class_name: str,
             name: str,
             description: Optional[str] = None) -> Union[Entity, Type]:
-        if not name:  # pragma: no cover
+        if not name:
             g.logger.log('error', 'model', 'Insert entity without name')
             abort(422)
         id_ = Db.insert({
@@ -377,7 +404,7 @@ class Entity:
         data = Db.get_by_id(id_, types, aliases)
         if not data:
             if 'activity' in request.path:  # Re-raise if in user activity view
-                raise AttributeError  # pragma: no cover
+                raise AttributeError
             abort(418)
         return Entity(data)
 

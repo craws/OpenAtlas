@@ -1,0 +1,6 @@
+{% if intro: %}
+  <p>{{ intro|safe }}</p>
+{% endif %}
+<h1>OpenAtlas</h1>
+{{ "OpenAtlas"|link("https://openatlas.eu/", external=True)|safe }}
+{{ _('text_intro') }}

@@ -15,7 +15,6 @@ from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
-from openatlas.models.place import get_structure
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
@@ -98,37 +97,26 @@ def add_crumbs(
         label = g.class_view_mapping[label]
     label = _(label.replace('_', ' '))
     crumbs: list[Any] = [
-        [label, url_for('index', view=origin.class_.view if origin else view)],
-        origin]
+        [label, url_for('index', view=origin.class_.view if origin else view)]]
     if class_ == 'source_translation' and origin and not insert_:
         crumbs = [
             [_('source'), url_for('index', view='source')],
-            origin.get_linked_entity('P73', True),
-            origin]
-    if structure:
-        crumbs = [
-            [_('place'), url_for('index', view='place')],
-            structure['place']
-            if origin and origin.class_.name != 'place' else '',
-            structure['feature'],
-            structure['stratigraphic_unit'],
-            origin]
+            origin.get_linked_entity('P73', True)]
     if view == 'type':
         crumbs = [[_('types'), url_for('type_index')]]
         if isinstance(origin, Type) and origin.root:
             crumbs += [g.types[type_id] for type_id in origin.root]
-        crumbs += [origin]
-    sibling_count = 0
-    if origin \
-            and origin.class_.name == 'stratigraphic_unit' \
-            and structure \
-            and insert_:
-        for item in structure['siblings']:
-            if item.class_.name == class_:  # pragma: no cover
-                sibling_count += 1
-    siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
-    return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+    if structure:
+        crumbs += structure['supers']
+    crumbs.append(origin if not insert_ else None)
+    if not insert_:
+        return crumbs + [_('edit')]
+    siblings = ''
+    if structure and origin and origin.class_.name == 'stratigraphic_unit':
+        if count := len(
+                [i for i in structure['siblings'] if i.class_.name == class_]):
+            siblings = f" ({count} {_('exists')})" if count else ''
+    return crumbs + [f'+ {g.classes[class_].label}{siblings}']
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -140,7 +128,7 @@ def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
             or not g.classes[class_].view \
             or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
 
 
 def check_update_access(entity: Entity) -> None:
@@ -156,7 +144,7 @@ def get_place_info_for_insert(
         origin: Optional[Entity]) -> dict[str, Any]:
     if class_view not in ['artifact', 'place']:
         return {'structure': None, 'gis_data': None, 'overlays': None}
-    structure = get_structure(super_=origin)
+    structure = origin.get_structure_for_insert() if origin else None
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
@@ -171,7 +159,7 @@ def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
             'gis_data': None,
             'overlays': None,
             'location': None}
-    structure = get_structure(entity)
+    structure = entity.get_structure()
     return {
         'structure': structure,
         'gis_data': Gis.get_all([entity], structure),
@@ -225,7 +213,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:  # pragma: no cover
+    except InvalidGeomException as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
@@ -235,20 +223,19 @@ def save(manager: BaseManager) -> Union[str, Response]:
                 'update',
                 id_=manager.entity.id,
                 origin_id=manager.origin.id if manager.origin else None)
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and manager.entity:
+        if action == 'update' and manager.entity:  # pragma: no cover
             url = url_for(
                 'update',
                 id_=manager.entity.id,
-                origin_id=manager.origin.id
-                if manager.origin else None)
+                origin_id=manager.origin.id if manager.origin else None)
         else:
-            url = url_for('index', view=g.classes[manager.class_.name].view)
-            if manager.class_.name in ['administrative_unit', 'type']:
-                url = url_for('type_index')
+            url = url_for('type_index') if \
+                manager.class_.name in ['administrative_unit', 'type'] else \
+                url_for('index', view=g.classes[manager.class_.name].view)
     return url
 
 

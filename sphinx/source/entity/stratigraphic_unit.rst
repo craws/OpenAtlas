@@ -11,10 +11,10 @@ archaeological workflow example see :doc:`/examples/archaeological_data`.
 
 Form fields
 -----------
-* :doc:`/form/name`
+* :doc:`/ui/name`
 * :doc:`type`
-* :doc:`/form/date`
-* :doc:`/form/description`
+* :doc:`/ui/date`
+* :doc:`/ui/description`
 * :doc:`/tools/map`
 
 Can be linked via tabs to

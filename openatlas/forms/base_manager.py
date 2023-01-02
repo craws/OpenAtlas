@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import time
 from typing import Any, Optional, Union
 
@@ -70,7 +68,8 @@ class BaseManager:
                 current_user.settings['module_time']
                 or check_if_entity_has_time(entity)))
         if 'description' in self.fields:
-            setattr(Form, 'description', TextAreaField(_('description')))
+            setattr(Form, 'description', TextAreaField(
+                _('content') if class_.name == 'source' else _('description')))
             if class_.name == 'type':
                 type_ = entity or origin
                 if isinstance(type_, Type):
@@ -83,12 +82,7 @@ class BaseManager:
             setattr(Form, 'gis_polygons', HiddenField(default='[]'))
             setattr(Form, 'gis_lines', HiddenField(default='[]'))
         self.add_buttons()
-        if self.link_:
-            self.form = Form(obj=self.link_)
-        elif self.entity:
-            self.form = Form(obj=self.entity)
-        else:
-            self.form = Form()
+        self.form = Form(obj=self.link_ or self.entity)
         self.customize_labels()
 
     def add_name_fields(self) -> None:
@@ -209,8 +203,7 @@ class BaseManager:
                 'resolver_url': self.form.resolver_url.data})
             return
         self.entity = Entity.insert(self.class_.name, self.form.name.data)
-        if self.class_.name == 'artifact' \
-                or g.classes[self.class_.name].view == 'place':
+        if self.class_.view in ['artifact', 'place']:
             self.entity.link(
                 'P53',
                 Entity.insert(
@@ -269,6 +262,27 @@ class ActorBaseManager(BaseManager):
                     inverse=True)
 
 
+class ArtifactBaseManager(BaseManager):
+    fields = ['name', 'date', 'description', 'continue', 'map']
+
+    def additional_fields(self) -> dict[str, Any]:
+        return {
+            'actor':
+                TableField(_('owned by'), add_dynamic=['person', 'group'])}
+
+    def populate_update(self) -> None:
+        super().populate_update()
+        if owner := self.entity.get_linked_entity('P52'):
+            self.form.actor.data = owner.id
+
+    def process_form(self) -> None:
+        super().process_form()
+        self.data['links']['delete'].add('P52')
+        self.data['links']['delete_inverse'].add('P46')
+        if self.form.actor.data:
+            self.add_link('P52', self.form.actor.data)
+
+
 class EventBaseManager(BaseManager):
     fields = ['name', 'date', 'description', 'continue']
 
@@ -283,15 +297,29 @@ class EventBaseManager(BaseManager):
         if self.entity:
             filter_ids = self.get_sub_ids(self.entity, [self.entity.id])
         fields = {
-            'event': TableField(_('sub event of'), filter_ids=filter_ids,
-                                add_dynamic=['event'])}
+            'event': TableField(
+                _('sub event of'),
+                filter_ids=filter_ids,
+                add_dynamic=[
+                    'activity',
+                    'acquisition',
+                    'event',
+                    'move',
+                    'production'],
+                related_tables=['event_preceding'])}
         if self.class_.name != 'event':
             fields['event_preceding'] = TableField(
                 _('preceding event'),
-                filter_ids=filter_ids)
+                filter_ids=filter_ids,
+                add_dynamic=[
+                    'activity',
+                    'acquisition',
+                    'move',
+                    'production'],
+                related_tables=['event'])
         if self.class_.name != 'move':
-            fields['place'] = TableField(_('location'),
-                                         add_dynamic=['place'])
+            fields['place'] = \
+                TableField(_('location'), add_dynamic=['place'])
         return fields
 
     def populate_update(self) -> None:
@@ -318,7 +346,8 @@ class EventBaseManager(BaseManager):
                 self.add_link(
                     'P7',
                     Link.get_linked_entity_safe(
-                        int(self.form.place.data), 'P53'))
+                        int(self.form.place.data),
+                        'P53'))
         if self.origin and self.origin.class_.view == 'actor':
             self.add_link('P11', self.origin, return_link_id=True)
 

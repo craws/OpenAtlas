@@ -27,7 +27,7 @@ def name_result(result: float) -> str:
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
-    return ''  # pragma: no cover
+    return ''
 
 
 def print_sex_result(entity: Entity) -> str:
@@ -45,7 +45,9 @@ def print_sex_result(entity: Entity) -> str:
 def tools_index(id_: int) -> Union[str, Response]:
     entity = Entity.get_by_id(id_)
     dating_buttons = [
-        button(_('radiocarbon dating'), url_for('carbon_update', id_=entity.id))]
+        button(
+            _('radiocarbon dating'),
+            url_for('carbon_update', id_=entity.id))]
     sex_buttons = [
         manual('tools/anthropological_analyses'),
         button(_('sex estimation'), url_for('sex', id_=entity.id)),
@@ -154,7 +156,7 @@ def sex_update(id_: int) -> Union[str, Response]:
             Transaction.begin()
             SexEstimation.save(entity, data, types)
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

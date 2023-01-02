@@ -25,7 +25,7 @@ class Entity:
             return []
         g.cursor.execute(
             Entity.select_sql(types, aliases) +
-            ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name',
+            ' WHERE e.id IN %(ids)s GROUP BY e.id ',
             {'ids': tuple(ids)})
         return [dict(row) for row in g.cursor.fetchall()]
 
@@ -134,6 +134,11 @@ class Entity:
             ORDER BY e.created DESC LIMIT %(limit)s;
             """,
             {'codes': tuple(classes), 'limit': limit})
+        return [dict(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_all_entities() -> list[dict[str, Any]]:
+        g.cursor.execute(Entity.select_sql())
         return [dict(row) for row in g.cursor.fetchall()]
 
     @staticmethod

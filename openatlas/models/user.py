@@ -74,7 +74,7 @@ class User(UserMixin):
             minutes=int(g.settings['failed_login_forget_minutes']))
         if unlocked > datetime.datetime.now():
             return True
-        return False  # pragma no cover - no waiting in tests
+        return False
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return Db.get_notes_by_entity_id(self.id, entity_id)
@@ -92,7 +92,7 @@ class User(UserMixin):
             return User(
                 user_data,
                 Db.get_bookmarks(user_id) if bookmarks else None)
-        return None  # pragma no cover - e.g. obsolete session values
+        return None  # e.g. obsolete session values
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
@@ -167,7 +167,7 @@ class User(UserMixin):
 
     @staticmethod
     def generate_password(
-            length: Optional[int] = None) -> str:  # pragma no cover
+            length: Optional[int] = None) -> str:
         length = length or g.settings['random_password_length']
         return ''.join(
             secrets.choice(

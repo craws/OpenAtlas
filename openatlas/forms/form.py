@@ -1,8 +1,6 @@
-from __future__ import annotations
+from typing import Optional
 
-from typing import Optional, TYPE_CHECKING
-
-from flask import g, render_template
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (
@@ -14,11 +12,9 @@ from openatlas.forms import base_manager, manager
 from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
 
 
 def get_manager(
@@ -33,7 +29,7 @@ def get_manager(
         entity=entity,
         origin=origin,
         link_=link_)
-    if not entity and not link_:
+    if request.method != 'POST' and not entity and not link_:
         manager_instance.populate_insert()
     return manager_instance
 
@@ -50,10 +46,7 @@ def get_add_reference_form(class_: str) -> FlaskForm:
 
 def get_table_form(class_: str, linked_entities: list[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes."""
-    if class_ == 'artifact':
-        entities = Entity.get_by_class(['artifact', 'human_remains'], True)
-    else:
-        entities = Entity.get_by_view(class_, types=True, aliases=True)
+    entities = Entity.get_by_view(class_, types=True, aliases=True)
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + g.table_headers[class_], order=[[1, 'asc']])
     for entity in entities:

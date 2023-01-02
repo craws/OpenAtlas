@@ -1,62 +1,30 @@
 import os
 from pathlib import Path
-from typing import Any, Union
+from typing import Union
 
 from flask import flash, g, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, SelectField, SubmitField
+from wtforms import SubmitField
 
 from openatlas import app
-from openatlas.models.export import csv_export, sql_export
+from openatlas.models.export import sql_export
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    convert_size, delete_link, is_authorized, link, required_group, uc_first)
+    convert_size, is_authorized, link, required_group, uc_first)
 
 
 class ExportSqlForm(FlaskForm):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(FlaskForm):
-    zip = BooleanField(_('export as ZIP and add info file'), default=True)
-    timestamps = BooleanField('created and modified dates', default=False)
-    gis_format = SelectField(
-        _('GIS format'),
-        choices=[
-            ('coordinates', _('coordinates')),
-            ('wkt', 'WKT'),
-            ('postgis', 'PostGIS Geometry')])
-    cidoc_class = BooleanField('cidoc class', default=True)
-    cidoc_class_inheritance = BooleanField(
-        'cidoc class inheritance',
-        default=True)
-    entity = BooleanField('entity', default=True)
-    link = BooleanField('link', default=True)
-    property = BooleanField('property', default=True)
-    property_inheritance = BooleanField(
-        'property inheritance',
-        default=True)
-    gis = BooleanField('gis', default=True)
-    save = SubmitField(uc_first(_('export CSV')))
-
-
 @app.route('/download/sql/<filename>')
 @required_group('manager')
 def download_sql(filename: str) -> Response:
     return send_from_directory(
-        app.config['EXPORT_DIR'] / 'sql',
-        filename,
-        as_attachment=True)
-
-
-@app.route('/download/csv/<filename>')
-@required_group('manager')
-def download_csv(filename: str) -> Any:
-    return send_from_directory(
-        app.config['EXPORT_DIR'] / 'csv',
+        app.config['EXPORT_DIR'],
         filename,
         as_attachment=True)
 
@@ -64,14 +32,14 @@ def download_csv(filename: str) -> Any:
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def export_sql() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'sql'
+    path = app.config['EXPORT_DIR']
     writable = os.access(path, os.W_OK)
     form = ExportSqlForm()
     if form.validate_on_submit() and writable:
         if sql_export():
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
-        else:  # pragma: no cover
+        else:
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
@@ -86,28 +54,6 @@ def export_sql() -> Union[str, Response]:
              f"{url_for('admin_index')}#tab-data"], _('export SQL')])
 
 
-@app.route('/export/csv', methods=['POST', 'GET'])
-@required_group('manager')
-def export_csv() -> Union[str, Response]:
-    path = app.config['EXPORT_DIR'] / 'csv'
-    writable = os.access(path, os.W_OK)
-    form = ExportCsvForm()
-    if form.validate_on_submit() and writable:
-        csv_export(form)
-        g.logger.log('info', 'database', 'CSV export')
-        flash(_('data was exported as CSV'), 'info')
-        return redirect(url_for('export_csv'))
-    return render_template(
-        'export.html',
-        form=form,
-        table=get_table('csv', path, writable),
-        writable=writable,
-        title=_('export CSV'),
-        crumbs=[
-            [_('admin'), f"{url_for('admin_index')}#tab-data"],
-            _('export CSV')])
-
-
 def get_table(type_: str, path: Path, writable: bool) -> Table:
     table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [
@@ -120,10 +66,12 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
                 _('download'),
                 url_for(f'download_{type_}', filename=file.name))]
         if is_authorized('admin') and writable:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             data.append(
-                delete_link(
-                    file.name,
-                    url_for('delete_export', type_=type_, filename=file.name)))
+                link(
+                    _('delete'),
+                    url_for('delete_export', type_=type_, filename=file.name),
+                    js=f"return confirm('{confirm}')"))
         table.rows.append(data)
     return table
 
@@ -132,7 +80,7 @@ def get_table(type_: str, path: Path, writable: bool) -> Table:
 @required_group('admin')
 def delete_export(type_: str, filename: str) -> Response:
     try:
-        (app.config['EXPORT_DIR'] / type_ / filename).unlink()
+        (app.config['EXPORT_DIR'] / filename).unlink()
         g.logger.log('info', 'file', f'{type_} file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:

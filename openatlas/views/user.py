@@ -44,10 +44,7 @@ class UserForm(FlaskForm):
         valid = FlaskForm.validate(self)
         username = ''
         user_email = ''
-        if self.user_id:
-            user = User.get_by_id(self.user_id)
-            if not user:
-                abort(404)  # pragma: no cover
+        if self.user_id and (user := User.get_by_id(self.user_id)):
             username = user.username
             user_email = user.email
         if username != self.username.data \
@@ -95,28 +92,30 @@ class ActivityForm(FlaskForm):
 def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + User.get_users_for_form()
+    limit = 100
+    user_id = user_id or 0
+    action = 'all'
     if form.validate_on_submit():
-        activity = User.get_activities(
-            int(form.limit.data),
-            int(form.user.data),
-            form.action.data)
-    elif user_id:
-        form.user.data = user_id
-        activity = User.get_activities(100, user_id, 'all')
-    else:
-        activity = User.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'], order=[[0, 'desc']])
-    for row in activity:
+        limit = int(form.limit.data)
+        user_id = int(form.user.data)
+    form.user.data = user_id
+    table = Table(
+        ['date', 'user', 'action', 'class', 'entity'],
+        order=[[0, 'desc']])
+    for row in User.get_activities(limit, user_id, action):
         try:
-            entity = link(Entity.get_by_id(row['entity_id']))
-        except AttributeError:  # pragma: no cover - entity already deleted
-            entity = f"id {row['entity_id']}"
+            entity = Entity.get_by_id(row['entity_id'])
+            entity_name = link(entity)
+        except AttributeError:  # Entity already deleted
+            entity = None  # type: ignore
+            entity_name = f"id {row['entity_id']}"
         user = User.get_by_id(row['user_id'])
         table.rows.append([
             format_date(row['created']),
             link(user) if user else f"id {row['user_id']}",
             _(row['action']),
-            entity])
+            _(entity.class_.label) if entity else '',
+            entity_name])
     return render_template(
         'content.html',
         content=display_form(form) + table.display(),
@@ -129,7 +128,7 @@ def user_activity(user_id: int = 0) -> str:
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     entities_count = ''
     if count := User.get_created_entities_count(user.id):
         entities_count = \
@@ -208,16 +207,16 @@ def user_entities(id_: int) -> str:
 def user_update(id_: int) -> Union[str, Response]:
     user = User.get_by_id(id_)
     if not user:
-        abort(404)  # pragma: no cover
+        abort(404)
     if user.group == 'admin' and current_user.group != 'admin':
-        abort(403)  # pragma: no cover
+        abort(403)
     form = UserForm(obj=user)
     form.user_id = id_
     del form.password, form.password2, form.send_info, \
         form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
-        # Active is always true for current user to prevent self deactivation
+        # Active is always True for current user to prevent self deactivation
         user.active = True if user.id == current_user.id else form.active.data
         user.real_name = form.real_name.data
         user.username = form.username.data
@@ -258,7 +257,7 @@ def user_insert() -> Union[str, Response]:
                 form.password.data.encode('utf-8'),
                 bcrypt.gensalt()).decode('utf-8')})
         flash(_('user created'), 'info')
-        if g.settings['mail'] and form.send_info.data:  # pragma: no cover
+        if g.settings['mail'] and form.send_info.data:
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=g.settings['site_name'])
@@ -274,7 +273,7 @@ def user_insert() -> Union[str, Response]:
                     _('Sent account information mail to %(email)s.',
                       email=form.email.data),
                     'info')
-            else:
+            else:  # pragma: no cover
                 flash(
                     _('Failed to send account details to %(email)s.',
                       email=form.email.data),

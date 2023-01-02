@@ -2,8 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.user import User
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class ArtifactTest(TestBaseCase):
@@ -14,14 +13,18 @@ class ArtifactTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 source = Entity.insert('source', 'Necronomicon')
                 actor = Entity.insert('person', 'Conan')
-                alice = User.get_by_username('Alice')
+                place = insert_entity('Home', 'place')
 
-            rv = self.app.get(url_for('insert', class_='artifact'))
+            rv = self.app.get(
+                url_for('insert', class_='artifact', origin_id=place.id))
             assert b'+ Artifact' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='artifact'),
-                data={'name': 'Love-letter', 'actor': actor.id},
+                data={
+                    'name': 'Love-letter',
+                    'actor': actor.id,
+                    'artifact_super': place.id},
                 follow_redirects=True)
             assert b'Love-letter' in rv.data
 
@@ -39,7 +42,8 @@ class ArtifactTest(TestBaseCase):
                 follow_redirects=True,
                 data={
                     'name': 'A little hate',
-                    'description': 'makes nothing better'})
+                    'description': 'makes nothing better',
+                    'artifact_super': place.id})
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('entity_add_source', id_=artifact.id))
@@ -79,11 +83,11 @@ class ArtifactTest(TestBaseCase):
             assert b'Conan' in rv.data
 
             rv = self.app.get(
-                url_for('index', view='artifact', delete_id=artifact.id))
-            assert b'has been deleted' in rv.data
+                url_for('index', view='artifact', delete_id=artifact.id),
+                follow_redirects=True)
+            assert b'The entry has been deleted.' in rv.data
 
-            alice_id = alice.id if alice else 0  # Just for Mypy
-            rv = self.app.get(url_for('user_view', id_=alice_id))
+            rv = self.app.get(url_for('user_view', id_=self.alice_id))
             assert b'<a href="/admin/user/entities/2">1</a>' in rv.data
 
             rv = self.app.post(
@@ -92,8 +96,8 @@ class ArtifactTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An entry has been created' in rv.data
 
-            rv = self.app.get(url_for('user_view', id_=alice_id))
+            rv = self.app.get(url_for('user_view', id_=self.alice_id))
             assert b'<a href="/admin/user/entities/2">2</a>' in rv.data
 
-            rv = self.app.get(url_for('user_entities', id_=alice_id))
+            rv = self.app.get(url_for('user_entities', id_=self.alice_id))
             assert b'This will be continued' in rv.data

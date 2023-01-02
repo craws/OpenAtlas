@@ -2,6 +2,7 @@ import datetime
 import importlib
 import math
 import os
+import shutil
 from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
@@ -16,6 +17,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
     ModulesForm, SimilarForm, TestMailForm)
@@ -30,12 +32,11 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
-    button, convert_size, delete_link, display_form, display_info, format_date,
-    format_datetime, get_file_path, is_authorized, link, manual,
-    required_group, sanitize, send_mail, uc_first)
+    button, convert_size, display_form, display_info, format_date,
+    get_file_path, is_authorized, link, manual, required_group, sanitize,
+    send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -92,24 +93,22 @@ def admin_index(
             content.append(sanitize(languages[language], 'text'))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         tables['content'].rows.append(content)
-    form = None
-    if is_authorized('admin'):
-        form = TestMailForm()
-        if form.validate_on_submit() \
-                and g.settings['mail']:  # pragma: no cover
-            subject = _(
-                'Test mail from %(site_name)s',
-                site_name=g.settings['site_name'])
-            body = _(
-                'This test mail was sent by %(username)s',
-                username=current_user.username)
-            body += f" {_('at')} '{request.headers['Host']}"
-            if send_mail(subject, body, form.receiver.data):
-                flash(_(
-                    'A test mail was sent to %(email)s.',
-                    email=form.receiver.data), 'info')
-        else:
-            form.receiver.data = current_user.email
+    form = TestMailForm() if is_authorized('admin') \
+        and g.settings['mail'] else None
+    if form and form.validate_on_submit():
+        subject = _(
+            'Test mail from %(site_name)s',
+            site_name=g.settings['site_name'])
+        body = _(
+            'This test mail was sent by %(username)s',
+            username=current_user.username)
+        body += f" {_('at')} {request.headers['Host']}"
+        if send_mail(subject, body, form.receiver.data):
+            flash(_(
+                'A test mail was sent to %(email)s.',
+                email=form.receiver.data), 'info')
+    elif form and request.method == 'GET':
+        form.receiver.data = current_user.email
     tabs = {
         'files': Tab(
             _('files'),
@@ -291,7 +290,7 @@ def admin_check_link_duplicates(
                     entity_id=row['entity'].id,
                     type_id=type_.id)
                 remove_links.append(
-                    f'<a href="{url}">{uc_first(_("remove"))}</a> '
+                    f'<a href="{url}">' + uc_first(_("remove")) + '</a> '
                     f'{type_.name}')
             tab.table.rows.append([
                 link(row['entity']),
@@ -314,7 +313,7 @@ def admin_check_link_duplicates(
 def admin_delete_single_type_duplicate(
         entity_id: int,
         type_id: int) -> Response:
-    Type.remove_by_entity_and_type(entity_id, type_id)
+    g.types[type_id].remove_entity_links(entity_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
 
@@ -323,7 +322,7 @@ def admin_delete_single_type_duplicate(
 @required_group('manager')
 def admin_settings(category: str) -> Union[str, Response]:
     if category in ['general', 'mail'] and not is_authorized('admin'):
-        abort(403)  # pragma: no cover
+        abort(403)
     form_name = f"{uc_first(category)}Form"
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
@@ -359,7 +358,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             [
                 _('admin'),
                 f"{url_for('admin_index')}"
-                f"#tab-{'data' if category == 'api' else category}"],
+                f"#tab-{category.replace('api', 'data')}"],
             _(category)])
 
 
@@ -419,21 +418,13 @@ def admin_check_dates() -> str:
             format_date(entity.created),
             format_date(entity.modified),
             entity.description])
-    for link_ in Link.get_invalid_link_dates():
-        name = ''
-        if link_.property.code == 'OA7':  # pragma: no cover
-            name = 'relation'
-        elif link_.property.code == 'P107':  # pragma: no cover
-            name = 'member'
-        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
-            name = 'involvement'
+    for item in Link.get_invalid_link_dates():
         tabs['link_dates'].table.rows.append([
             link(
-                _(name),
-                url_for('link_update', id_=link_.id, origin_id=link_.domain.id)
-            ),
-            link(link_.domain),
-            link(link_.range)])
+                item.property.name,
+                url_for('link_update', id_=item.id, origin_id=item.domain.id)),
+            link(item.domain),
+            link(item.range)])
     for link_ in Link.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
@@ -449,7 +440,7 @@ def admin_check_dates() -> str:
         tabs['involvement_dates'].table.rows.append(data)
     for tab in tabs.values():
         tab.buttons = [manual('admin/data_integrity_checks')]
-        if not tab.table.rows:  # pragma: no cover
+        if not tab.table.rows:
             tab.content = _('Congratulations, everything looks fine!')
     return render_template(
         'tabs.html',
@@ -483,14 +474,9 @@ def admin_orphans() -> str:
             'orphaned_files',
             table=Table(['name', 'size', 'date', 'ext'])),
         'orphaned_subunits': Tab(
-            'orphaned_sub_units',
+            'orphaned_subunits',
             table=Table([
-                'id',
-                'name',
-                'class',
-                'created',
-                'modified',
-                'description'])),
+                'id', 'name', 'class', 'created', 'modified', 'description'])),
         'circular': Tab('circular_dependencies', table=Table(
             ['entity'],
             [[link(e)] for e in Entity.get_entities_linked_to_itself()]))}
@@ -528,6 +514,7 @@ def admin_orphans() -> str:
         if file.name != '.gitignore' \
                 and os.path.isfile(file) \
                 and int(file.stem) not in entity_file_ids:
+            confirm = _('Delete %(name)s?', name=file.name.replace("'", ''))
             tabs['orphaned_files'].table.rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
@@ -537,9 +524,11 @@ def admin_orphans() -> str:
                 link(
                     _('download'),
                     url_for('download_file', filename=file.name)),
-                delete_link(
-                    file.name,
-                    url_for('admin_file_delete', filename=file.name))])
+                link(
+                    _('delete'),
+                    url_for('admin_file_delete', filename=file.name),
+                    js=f"return confirm('{confirm}')")
+                if is_authorized('editor') else ''])
 
     # Orphaned subunits (without connection to a P46 super)
     for entity in Entity.get_orphaned_subunits():
@@ -573,8 +562,8 @@ def admin_orphans() -> str:
 
 
 @app.route('/admin/file/delete/<filename>')
-@required_group('contributor')
-def admin_file_delete(filename: str) -> Response:  # pragma: no cover
+@required_group('editor')
+def admin_file_delete(filename: str) -> Response:
     if filename != 'all':  # Delete one file
         try:
             (app.config['UPLOAD_DIR'] / filename).unlink()
@@ -584,21 +573,19 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
             flash(_('error file delete'), 'error')
         return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
 
-    if is_authorized('admin'):  # Delete all files with no corresponding entity
+    # Delete all files with no corresponding entity
+    if is_authorized('admin'):  # pragma: no cover - don't test, ever
         entity_file_ids = [entity.id for entity in Entity.get_by_class('file')]
-        for file in app.config['UPLOAD_DIR'].iterdir():
-            if file.name != '.gitignore' and int(
-                    file.stem) not in entity_file_ids:
+        for f in app.config['UPLOAD_DIR'].iterdir():
+            if f.name != '.gitignore' and int(f.stem) not in entity_file_ids:
                 try:
-                    (app.config['UPLOAD_DIR'] / file.name).unlink()
+                    (app.config['UPLOAD_DIR'] / f.name).unlink()
                 except Exception as e:
                     g.logger.log(
-                        'error',
-                        'file',
-                        f'deletion of {file.name} failed',
-                        e)
+                        'error', 'file', f'deletion of {f.name} failed', e)
                     flash(_('error file delete'), 'error')
-    return redirect(f"{url_for('admin_orphans')}#tab-orphaned-files")
+    return redirect(
+        f"{url_for('admin_orphans')}#tab-orphaned-files")  # pragma: no cover
 
 
 @app.route('/admin/logo/')
@@ -606,7 +593,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 @required_group('manager')
 def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     if g.settings['logo_file_id']:
-        abort(418)  # pragma: no cover - Logo already set
+        abort(418)  # pragma: no cover - logo already set
     if id_:
         Settings.set_logo(id_)
         return redirect(f"{url_for('admin_index')}#tab-file")
@@ -652,12 +639,12 @@ def admin_log() -> str:
     for row in logs:
         user = None
         if row['user_id']:
-            try:
-                user = link(User.get_by_id(row['user_id']))
-            except AttributeError:  # pragma: no cover - user already deleted
-                user = f"id {row['user_id']}"
+            user = f"user id: {row['user_id']}"
+            if user_ := User.get_by_id(row['user_id']):
+                user = link(user_)
         table.rows.append([
-            format_datetime(row['created']),
+            row['created'].replace(microsecond=0).isoformat()
+            if row['created'] else '',
             f"{row['priority']} {app.config['LOG_LEVELS'][row['priority']]}",
             row['type'],
             row['message'],
@@ -703,7 +690,7 @@ def admin_newsletter() -> Union[str, Response]:
 
     form = NewsLetterForm()
     form.save.label.text = uc_first(_('send'))
-    if form.validate_on_submit():  # pragma: no cover
+    if form.validate_on_submit():
         count = 0
         for user_id in request.form.getlist('recipient'):
             user = User.get_by_id(user_id)
@@ -727,17 +714,16 @@ def admin_newsletter() -> Union[str, Response]:
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in User.get_all():
-        if user \
-                and user.settings['newsletter'] \
-                and user.active:  # pragma: no cover
+        if user and user.settings['newsletter'] and user.active:
             table.rows.append([
                 user.username,
                 user.email,
                 f'<input value="{user.id}" name="recipient" type="checkbox" '
                 f'checked="checked">'])
     return render_template(
-        'tabs.html',
-        tabs={'tab': Tab('newsletter', form=form, table=table)},
+        'admin/newsletter.html',
+        form=form,
+        table=table,
         title=_('newsletter'),
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],
@@ -761,12 +747,8 @@ def admin_delete_orphaned_resized_images() -> Response:
 
 
 def get_disk_space_info() -> Optional[dict[str, Any]]:
-    if os.name != "posix":  # pragma: no cover
-        return None
-    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail
+    stats = shutil.disk_usage(app.config['UPLOAD_DIR'])
     return {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+        'total': convert_size(stats.total),
+        'free': convert_size(stats.free),
+        'percent': 100 - math.ceil(stats.free / (stats.total / 100))}

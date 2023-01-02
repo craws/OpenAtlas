@@ -125,4 +125,8 @@
         $("#{{ field.id }}-tree").jstree(true).show_all();
       }
     });
+
+    $("#{{ field.id }}-modal").on("hidden.bs.modal", function (e) {
+        selectFromTreeMulti({{ field.id }});
+    })
   </script>

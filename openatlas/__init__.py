@@ -1,5 +1,4 @@
 import locale
-import os
 import sys
 from pathlib import Path
 from typing import Any, Optional
@@ -10,7 +9,7 @@ from flask_login import current_user
 from flask_wtf.csrf import CSRFProtect
 from psycopg2 import extras
 
-from openatlas.api.v02.resources.error import AccessDeniedError
+from openatlas.api.resources.error import AccessDeniedError
 from openatlas.database.connect import close_connection, open_connection
 
 app: Flask = Flask(__name__, instance_relative_config=True)
@@ -24,8 +23,7 @@ app.config.from_object('config.default')
 app.config.from_pyfile(f'{INSTANCE}.py')
 app.config['WTF_CSRF_TIME_LIMIT'] = None  # Set CSRF token valid for session
 
-if os.name == "posix":
-    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
 # pylint: disable=wrong-import-position, import-outside-toplevel
@@ -56,7 +54,7 @@ def before_request() -> None:
     from openatlas.models.settings import Settings
     from openatlas.models.reference_system import ReferenceSystem
 
-    if request.path.startswith('/static'):  # pragma: no cover
+    if request.path.startswith('/static'):
         return  # Avoid files overhead if not using Apache with static alias
     g.logger = Logger()
     g.db = open_connection(app.config)
@@ -83,7 +81,7 @@ def before_request() -> None:
         if not current_user.is_authenticated \
                 and not g.settings['api_public'] \
                 and ip not in app.config['ALLOWED_IPS']:
-            raise AccessDeniedError  # pragma: no cover
+            raise AccessDeniedError
 
 
 @app.after_request
@@ -110,7 +108,3 @@ def get_file_stats(
             'size': convert_size(file_.stat().st_size),
             'date': file_.stat().st_ctime}
     return stats
-
-
-if __name__ == "__main__":  # pragma: no cover
-    app.run()

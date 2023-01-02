@@ -41,5 +41,5 @@
     <script src="/static/js/map/map.js"></script>
     <script src="/static/js/map/draw.js"></script>
   {% endif %}
-  {{ view_name|display_citation_example }}
+  {{ view_name|display_citation_example|safe }}
 {% endblock %}

@@ -20,7 +20,7 @@ class Logger:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels)[list(log_levels.values()).index(priority_)]
         if int(g.settings['log_level']) < priority:
-            return  # pragma: no cover
+            return
         Db.log({
             'priority': priority,
             'type': type_,
