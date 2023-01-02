@@ -3,6 +3,7 @@ from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
@@ -35,7 +36,9 @@ def insert(
             return redirect(insert_files(manager))
         return redirect(save(manager))
     populate_insert_form(manager.form, class_, origin)
-    place_info = get_place_info_for_insert(g.classes[class_].view, origin)
+    place_info = {'structure': None, 'gis_data': None, 'overlays': None}
+    if g.classes[class_].view in ['artifact', 'place']:
+        place_info = get_place_info_for_insert(origin)
     return render_template(
         'entity/insert.html',
         form=manager.form,
@@ -139,32 +142,34 @@ def check_update_access(entity: Entity) -> None:
         abort(403)
 
 
-def get_place_info_for_insert(
-        class_view: str,
-        origin: Optional[Entity]) -> dict[str, Any]:
-    if class_view not in ['artifact', 'place']:
-        return {'structure': None, 'gis_data': None, 'overlays': None}
+def get_place_info_for_insert(origin: Optional[Entity]) -> dict[str, Any]:
     structure = origin.get_structure_for_insert() if origin else None
+    overlay = None
+    if current_user.settings['module_map_overlay'] \
+            and origin \
+            and origin.class_.view == 'place':
+        overlay = Overlay.get_by_object(origin)
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
-        'overlays': Overlay.get_by_object(origin)
-        if origin and origin.class_.view == 'place' else None}
+        'overlays': overlay}
 
 
 def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
-    if entity.class_.view not in ['artifact', 'place']:
-        return {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None,
-            'location': None}
-    structure = entity.get_structure()
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([entity], structure),
-        'overlays': Overlay.get_by_object(entity),
-        'location': entity.get_linked_entity_safe('P53', types=True)}
+    data: dict[str, Any] = {
+        'structure': None,
+        'gis_data': None,
+        'overlays': None,
+        'location': None}
+    if entity.class_.view in ['artifact', 'place']:
+        structure = entity.get_structure()
+        data = {
+            'structure': structure,
+            'gis_data': Gis.get_all([entity], structure),
+            'overlays': Overlay.get_by_object(entity)
+            if current_user.settings['module_map_overlay'] else None,
+            'location': entity.get_linked_entity_safe('P53', types=True)}
+    return data
 
 
 def insert_files(manager: BaseManager) -> Union[str, Response]:

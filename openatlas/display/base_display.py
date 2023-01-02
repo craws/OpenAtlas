@@ -342,8 +342,8 @@ class PlaceBaseDisplay(BaseDisplay):
                 if entity.class_.view == 'place' \
                         and is_authorized('editor') \
                         and current_user.settings['module_map_overlay']:
-                    overlays = Overlay.get_by_object(entity)
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                        overlays = Overlay.get_by_object(entity)
                         if domain.id in overlays:
                             data.append(edit_link(url_for(
                                 'overlay_update',

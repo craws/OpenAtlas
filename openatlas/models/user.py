@@ -72,9 +72,7 @@ class User(UserMixin):
             return False
         unlocked = self.login_last_failure + datetime.timedelta(
             minutes=int(g.settings['failed_login_forget_minutes']))
-        if unlocked > datetime.datetime.now():
-            return True
-        return False
+        return bool(unlocked > datetime.datetime.now())
 
     def get_notes_by_entity_id(self, entity_id: int) -> list[dict[str, Any]]:
         return Db.get_notes_by_entity_id(self.id, entity_id)
