@@ -70,7 +70,10 @@ def admin_index(
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
+    newsletter = False
     for user in User.get_all():
+        if user.settings['newsletter']:
+            newsletter = True
         user_entities = ''
         if count := User.get_created_entities_count(user.id):
             user_entities = \
@@ -129,8 +132,10 @@ def admin_index(
             buttons=[
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
-                button(_('newsletter'), url_for('admin_newsletter'))
-                if is_authorized('manager') and g.settings['mail'] else '',
+                button(_('newsletter'), url_for('admin_newsletter')) if (
+                    is_authorized('manager') and
+                    g.settings['mail'] and
+                    newsletter) else '',
                 button(_('user'), url_for('user_insert'))
                 if is_authorized('manager') else ''])}
     if is_authorized('admin'):
