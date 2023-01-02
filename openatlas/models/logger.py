@@ -19,18 +19,14 @@ class Logger:
             info: Union[str, Exception, None] = None) -> None:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels)[list(log_levels.values()).index(priority_)]
-        if int(g.settings['log_level']) < priority:
-            return
-        Db.log({
-            'priority': priority,
-            'type': type_,
-            'message': message,
-            'user_id': current_user.id
-            if hasattr(current_user, 'id') else None,
-            'info': '{method} {path}{info}'.format(
-                path=request.path,
-                method=request.method,
-                info=f'\n{info}' if info else '')})
+        if int(g.settings['log_level']) <= priority:
+            Db.log({
+                'priority': priority,
+                'type': type_,
+                'message': message,
+                'user_id': current_user.id
+                if hasattr(current_user, 'id') else None,
+                'info': f'{request.method} {request.method}\n{info}'})
 
     @staticmethod
     def get_system_logs(

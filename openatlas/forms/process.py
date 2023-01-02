@@ -95,7 +95,7 @@ def process_standard_fields(manager: Any) -> None:
                     value,
                     inverse=True,
                     type_id=precision_field.data)
-        else:
+        else:  # pragma: no cover
             abort(418, f'Form error: {key}, {field_type}, value={value}')
 
 

@@ -24,10 +24,7 @@ def get_content() -> dict[str, dict[str, str]]:
 
 
 def get_translation(name: str, lang: Optional[str] = None) -> str:
-    items = get_content()
-    if name not in items:
-        return ''
-    translations = items[name]
+    translations = get_content()[name]
     if lang and lang in translations and translations[lang]:
         return translations[lang]
     if translations[session['language']]:
