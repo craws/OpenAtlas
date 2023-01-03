@@ -42,11 +42,11 @@ class ReferenceSystem(Entity):
         for system in g.reference_systems.values():
             if system.name == name:
                 return system
-        abort(404)  # pragma: no cover
+        abort(404)
 
     def remove_class(self, class_name: str) -> None:
         for link_ in self.get_links('P67'):
-            if link_.range.class_.name == class_name:  # pragma: no cover
+            if link_.range.class_.name == class_name:
                 return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 

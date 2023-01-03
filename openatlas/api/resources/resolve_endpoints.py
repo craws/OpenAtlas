@@ -7,16 +7,17 @@ from flask import Response, jsonify, request
 from flask_restful import marshal
 
 from openatlas import app
-from openatlas.api.formats.csv import export_entities_csv, \
-    export_csv_for_network_analysis
-from openatlas.api.formats.geojson import get_geojson_v2, get_geojson
+from openatlas.api.formats.csv import (
+    export_csv_for_network_analysis, export_entities_csv)
+from openatlas.api.formats.geojson import get_geojson, get_geojson_v2
 from openatlas.api.formats.linked_places import get_linked_places_entity
 from openatlas.api.formats.loud import get_loud_entities
 from openatlas.api.formats.rdf import rdf_output
 from openatlas.api.formats.xml import subunit_xml
 from openatlas.api.resources.error import (
     EntityDoesNotExistError, LastEntityError, NoEntityAvailable, TypeIDError)
-
+from openatlas.api.resources.model_mapper import (
+    get_all_links_of_entities, get_all_links_of_entities_inverse)
 from openatlas.api.resources.search import search
 from openatlas.api.resources.search_validation import (
     iterate_validation)
@@ -24,12 +25,8 @@ from openatlas.api.resources.templates import (
     geojson_collection_template, geojson_pagination, linked_place_pagination,
     linked_places_template, subunit_template, loud_pagination)
 from openatlas.api.resources.util import (
-    get_entities_by_type,
-    get_key,
-    link_parser_check, link_parser_check_inverse, parser_str_to_dict,
-    remove_duplicate_entities)
-from openatlas.api.resources.model_mapper import get_all_links_of_entities, \
-    get_all_links_of_entities_inverse
+    get_entities_by_type, get_key, link_parser_check,
+    link_parser_check_inverse, parser_str_to_dict, remove_duplicate_entities)
 from openatlas.models.entity import Entity
 
 
@@ -38,9 +35,11 @@ def resolve_entities(
         parser: dict[str, Any],
         file_name: Union[int, str]) \
         -> Union[Response, dict[str, Any], tuple[Any, int]]:
-    if parser['type_id']:
-        if not (entities := get_entities_by_type(entities, parser)):
-            raise TypeIDError
+    if parser['type_id'] and not (
+            entities := get_entities_by_type(entities, parser)
+    ):  # pylint: disable=superfluous-parens
+        # check disabled because of pylint bug, fixed in pylint 2.10.0
+        raise TypeIDError
     if parser['search']:
         search_parser = parser_str_to_dict(parser['search'])
         if iterate_validation(search_parser):

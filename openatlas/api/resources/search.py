@@ -2,14 +2,12 @@ from typing import Any, Tuple, Union
 
 from flask import g
 
+from openatlas.api.resources.model_mapper import (
+    flatten_list_and_remove_duplicates, get_all_links_of_entities_inverse)
 from openatlas.api.resources.search_validation import (
     check_if_date, check_if_date_search)
-from openatlas.api.resources.util import (
-    get_linked_entities_id_api)
-from openatlas.api.resources.model_mapper import (
-    get_all_links_of_entities_inverse, flatten_list_and_remove_duplicates)
+from openatlas.api.resources.util import get_linked_entities_id_api
 from openatlas.models.entity import Entity
-from openatlas.models.type import Type
 
 
 def search(
@@ -20,7 +18,7 @@ def search(
 
 
 def get_sub_ids(id_: int, subs: list[Any]) -> list[Any]:
-    new_subs = Type.get_all_sub_ids(g.types[id_])
+    new_subs = g.types[id_].get_sub_ids_recursive()
     subs.extend(new_subs)
     for sub in new_subs:
         get_sub_ids(sub, subs)
@@ -45,13 +43,13 @@ def search_result(entity: Entity, parameter: dict[str, Any]) -> bool:
 def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
     parameter = {}
     for category, values in parser.items():
-        for i in values:
+        for value in values:
             parameter.update({
-                "search_values": get_search_values(category, i),
-                "logical_operator": i['logicalOperator']
-                if 'logicalOperator' in i else 'or',
+                "search_values": get_search_values(category, value),
+                "logical_operator": value['logicalOperator']
+                if 'logicalOperator' in value else 'or',
                 "operator": 'equal'
-                if category == "valueTypeID" else i['operator'],
+                if category == "valueTypeID" else value['operator'],
                 "category": category,
                 "is_date": check_if_date_search(category)})
     return parameter
@@ -59,12 +57,12 @@ def get_search_parameter(parser: dict[str, Any]) -> dict[str, Any]:
 
 def get_search_values(
         category: str,
-        parameter: dict[str, Any]) -> list[Union[str, int]]:
-    values = [value.lower() if isinstance(value, str) else value
-              for value in parameter["values"]]
+        parameter: dict[str, Any]) -> list[Union[str, int, list[Any]]]:
+    values = [
+        value.lower() if isinstance(value, str) else value
+        for value in parameter["values"]]
     if category in ["typeIDWithSubs"]:
-        values += flatten_list_and_remove_duplicates(
-            [get_sub_ids(value, []) for value in values])
+        return [[value] + get_sub_ids(value, []) for value in values]
     if category in ["relationToID"]:
         return flatten_list_and_remove_duplicates(
             [get_linked_entities_id_api(value) for value in values])
@@ -100,47 +98,63 @@ def search_entity(
         is_comparable: bool) -> bool:
     if not entity_values and (operator_ == 'like' or is_comparable):
         return False
-    out: bool = False
+    bool_: bool = False
+    if any(isinstance(i, list) for i in search_values):
+        if logical_operator == 'or':
+            search_values = flatten_list_and_remove_duplicates(search_values)
+        else:
+            bool_values = []
+            for search_value in search_values:
+                if operator_ == 'equal':
+                    if logical_operator == 'and':
+                        bool_values.append(bool(any(
+                            item in entity_values for item in search_value)))
+                if operator_ == 'notEqual':
+                    if logical_operator == 'and':
+                        bool_values.append(bool(not any(
+                            item in entity_values for item in search_value)))
+            return all(bool_values)
     if operator_ == 'equal':
         if logical_operator == 'or':
-            out = bool(any(item in entity_values for item in search_values))
+            bool_ = bool(any(item in entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(all(item in entity_values for item in search_values))
+            bool_ = bool(all(item in entity_values for item in search_values))
     if operator_ == 'notEqual':
         if logical_operator == 'or':
-            out = bool(
+            bool_ = bool(
                 not any(item in entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(
+            bool_ = bool(
                 not all(item in entity_values for item in search_values))
     if operator_ == 'like':
         if logical_operator == 'or':
-            out = bool(any(item in value for item in search_values
-                           for value in entity_values))
+            bool_ = bool(any(
+                item in value for item in search_values
+                for value in entity_values))
         if logical_operator == 'and':
-            out = bool(
-                all(item in ' '.join(entity_values) for item in search_values))
+            bool_ = bool(all(
+                item in ' '.join(entity_values) for item in search_values))
     if operator_ == 'greaterThan' and is_comparable:
         if logical_operator == 'or':
-            out = bool(any(item < entity_values for item in search_values))
+            bool_ = bool(any(item < entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(all(item < entity_values for item in search_values))
+            bool_ = bool(all(item < entity_values for item in search_values))
     if operator_ == 'greaterThanEqual' and is_comparable:
         if logical_operator == 'or':
-            out = bool(any(item <= entity_values for item in search_values))
+            bool_ = bool(any(item <= entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(all(item <= entity_values for item in search_values))
+            bool_ = bool(all(item <= entity_values for item in search_values))
     if operator_ == 'lesserThan' and is_comparable:
         if logical_operator == 'or':
-            out = bool(any(item > entity_values for item in search_values))
+            bool_ = bool(any(item > entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(all(item > entity_values for item in search_values))
+            bool_ = bool(all(item > entity_values for item in search_values))
     if operator_ == 'lesserThanEqual' and is_comparable:
         if logical_operator == 'or':
-            out = bool(any(item >= entity_values for item in search_values))
+            bool_ = bool(any(item >= entity_values for item in search_values))
         if logical_operator == 'and':
-            out = bool(all(item >= entity_values for item in search_values))
-    return out
+            bool_ = bool(all(item >= entity_values for item in search_values))
+    return bool_
 
 
 def value_to_be_searched(entity: Entity, key: str) -> Any:

@@ -44,7 +44,7 @@ class GetTypeByViewClass(Resource):
                     "id": type_.id,
                     "name": type_.name,
                     "category": type_.category,
-                    "children": walk_type_tree(Type.get_types(type_.name))})
+                    "children": walk_type_tree(type_.subs)})
         return types
 
 
@@ -72,7 +72,7 @@ class GetTypeOverview(Resource):
                 "id": type_.id,
                 "name": type_.name,
                 "viewClass": type_.classes,
-                "children": walk_type_tree(Type.get_types(type_.name))})
+                "children": walk_type_tree(type_.subs)})
         return types
 
 

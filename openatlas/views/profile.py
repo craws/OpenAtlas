@@ -14,9 +14,9 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.util.tab import Tab
 from openatlas.util.util import (
     button, display_form, display_info, is_authorized, manual, uc_first)
 
@@ -89,7 +89,7 @@ def profile_index() -> str:
 def profile_settings(category: str) -> Union[str, Response]:
     if category not in ['profile', 'display'] \
             and not is_authorized('contributor'):
-        abort(403)  # pragma: no cover
+        abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
@@ -114,7 +114,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

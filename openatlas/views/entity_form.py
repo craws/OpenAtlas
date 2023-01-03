@@ -3,6 +3,7 @@ from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
@@ -35,7 +36,9 @@ def insert(
             return redirect(insert_files(manager))
         return redirect(save(manager))
     populate_insert_form(manager.form, class_, origin)
-    place_info = get_place_info_for_insert(g.classes[class_].view, origin)
+    place_info = {'structure': None, 'gis_data': None, 'overlays': None}
+    if g.classes[class_].view in ['artifact', 'place']:
+        place_info = get_place_info_for_insert(origin)
     return render_template(
         'entity/insert.html',
         form=manager.form,
@@ -108,19 +111,15 @@ def add_crumbs(
             crumbs += [g.types[type_id] for type_id in origin.root]
     if structure:
         crumbs += structure['supers']
-    else:
-        crumbs.append(origin)
-    sibling_count = 0
-    if origin \
-            and origin.class_.name == 'stratigraphic_unit' \
-            and structure \
-            and insert_:
-        for item in structure['siblings']:
-            if item.class_.name == class_:  # pragma: no cover
-                sibling_count += 1
-    siblings = f" ({sibling_count} {_('exists')})" if sibling_count else ''
-    return crumbs + \
-        [f'+ {g.classes[class_].label}{siblings}' if insert_ else _('edit')]
+    crumbs.append(origin if not insert_ else None)
+    if not insert_:
+        return crumbs + [_('edit')]
+    siblings = ''
+    if structure and origin and origin.class_.name == 'stratigraphic_unit':
+        if count := len(
+                [i for i in structure['siblings'] if i.class_.name == class_]):
+            siblings = f" ({count} {_('exists')})" if count else ''
+    return crumbs + [f'+ {g.classes[class_].label}{siblings}']
 
 
 def check_geonames_module(class_: str) -> bool:
@@ -132,7 +131,7 @@ def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
             or not g.classes[class_].view \
             or not is_authorized(g.classes[class_].write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
 
 
 def check_update_access(entity: Entity) -> None:
@@ -143,32 +142,34 @@ def check_update_access(entity: Entity) -> None:
         abort(403)
 
 
-def get_place_info_for_insert(
-        class_view: str,
-        origin: Optional[Entity]) -> dict[str, Any]:
-    if class_view not in ['artifact', 'place']:
-        return {'structure': None, 'gis_data': None, 'overlays': None}
+def get_place_info_for_insert(origin: Optional[Entity]) -> dict[str, Any]:
     structure = origin.get_structure_for_insert() if origin else None
+    overlay = None
+    if current_user.settings['module_map_overlay'] \
+            and origin \
+            and origin.class_.view == 'place':
+        overlay = Overlay.get_by_object(origin)
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
-        'overlays': Overlay.get_by_object(origin)
-        if origin and origin.class_.view == 'place' else None}
+        'overlays': overlay}
 
 
 def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
-    if entity.class_.view not in ['artifact', 'place']:
-        return {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None,
-            'location': None}
-    structure = entity.get_structure()
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([entity], structure),
-        'overlays': Overlay.get_by_object(entity),
-        'location': entity.get_linked_entity_safe('P53', types=True)}
+    data: dict[str, Any] = {
+        'structure': None,
+        'gis_data': None,
+        'overlays': None,
+        'location': None}
+    if entity.class_.view in ['artifact', 'place']:
+        structure = entity.get_structure()
+        data = {
+            'structure': structure,
+            'gis_data': Gis.get_all([entity], structure),
+            'overlays': Overlay.get_by_object(entity)
+            if current_user.settings['module_map_overlay'] else None,
+            'location': entity.get_linked_entity_safe('P53', types=True)}
+    return data
 
 
 def insert_files(manager: BaseManager) -> Union[str, Response]:
@@ -217,7 +218,7 @@ def save(manager: BaseManager) -> Union[str, Response]:
         flash(
             _('entity created') if action == 'insert' else _('info update'),
             'info')
-    except InvalidGeomException as e:  # pragma: no cover
+    except InvalidGeomException as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
@@ -227,20 +228,19 @@ def save(manager: BaseManager) -> Union[str, Response]:
                 'update',
                 id_=manager.entity.id,
                 origin_id=manager.origin.id if manager.origin else None)
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         Transaction.rollback()
         g.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        if action == 'update' and manager.entity:
+        if action == 'update' and manager.entity:  # pragma: no cover
             url = url_for(
                 'update',
                 id_=manager.entity.id,
-                origin_id=manager.origin.id
-                if manager.origin else None)
+                origin_id=manager.origin.id if manager.origin else None)
         else:
-            url = url_for('index', view=g.classes[manager.class_.name].view)
-            if manager.class_.name in ['administrative_unit', 'type']:
-                url = url_for('type_index')
+            url = url_for('type_index') if \
+                manager.class_.name in ['administrative_unit', 'type'] else \
+                url_for('index', view=g.classes[manager.class_.name].view)
     return url
 
 

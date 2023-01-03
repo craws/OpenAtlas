@@ -2,26 +2,25 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.api.resources.error import (
-    EntityDoesNotExistError, FilterColumnError, FilterLogicalOperatorError,
-    FilterOperatorError, InvalidCidocClassCode, InvalidCodeError,
-    InvalidLimitError, InvalidSearchSyntax, InvalidSubunitError,
-    InvalidSystemClassError, LastEntityError, NoEntityAvailable,
-    NoSearchStringError, NotAPlaceError, QueryEmptyError, TypeIDError,
-    ValueNotIntegerError)
+    AccessDeniedError, EntityDoesNotExistError, FilterColumnError,
+    FilterLogicalOperatorError, FilterOperatorError, InvalidCidocClassCode,
+    InvalidCodeError, InvalidLimitError, InvalidSearchSyntax,
+    InvalidSubunitError, InvalidSystemClassError, LastEntityError,
+    NoEntityAvailable, NoSearchStringError, NotAPlaceError, QueryEmptyError,
+    TypeIDError, ValueNotIntegerError)
 from openatlas.api.resources.model_mapper import get_by_cidoc_classes
 from tests.base import (
     ApiTestCase, get_bool, get_bool_inverse, get_class_mapping,
     get_geom_properties, get_no_key)
 
 
-class Api03(ApiTestCase):
+class Api(ApiTestCase):
 
-    def test_api_03(self) -> None:
+    def test_api(self) -> None:
 
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-
                 for entity in get_by_cidoc_classes(['all']):
                     if entity.name == 'Location of Shire':
                         location = entity
@@ -508,6 +507,14 @@ class Api03(ApiTestCase):
                 self.app.get(url_for(
                     'api_03.query',
                     system_classes='place',
+                    view_classes='artifact',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"notEqual",'
+                           f'"values":[{boundary_mark.id}],'
+                           f'"logicalOperator":"and"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    system_classes='place',
                     search="""{"entityName":[{"operator":"notEqual",
                                 "values":["Mordor"],
                                 "logicalOperator":"or"}]}"""))]:
@@ -525,6 +532,14 @@ class Api03(ApiTestCase):
                            f'"values":[{boundary_mark.id},'
                            f'{height.id}],'
                            f'"logicalOperator":"or"}}]}}')),
+                self.app.get(url_for(
+                    'api_03.query',
+                    system_classes='place',
+                    view_classes='artifact',
+                    format='lp',
+                    search=f'{{"typeIDWithSubs":[{{"operator":"equal",'
+                           f'"values":[{boundary_mark.id}],'
+                           f'"logicalOperator":"and"}}]}}')),
                 self.app.get(url_for(
                     'api_03.query',
                     entities=place.id,
@@ -717,3 +732,9 @@ class Api03(ApiTestCase):
                     search='"beginFrom":[{"operator":"lesserThan",'
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
+
+            self.app.get(url_for('logout'))
+            app.config['ALLOWED_IPS'] = []
+            with self.assertRaises(AccessDeniedError):
+                self.app.get(
+                    url_for('api_03.view_class', view_class='place'))

@@ -1,49 +1,24 @@
+from pathlib import Path
+
 from flask import g, url_for
 
 from openatlas import app
 from openatlas.database.entity import Entity as DbEntity
 from openatlas.database.link import Link as DbLink
-from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
-class ContentTests(TestBaseCase):
+class AdminTests(TestBaseCase):
 
-    def test_orphans_and_newsletter(self) -> None:
-        with app.app_context():
-            self.app.post(
-                url_for('insert', class_='person'),
-                data={
-                    'name': 'Oliver Twist',
-                    self.precision_geonames: '',
-                    self.precision_wikidata: ''})
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                Entity.insert('file', 'One forsaken file entity')
-                Entity.insert('feature', 'One forsaken subunit')
-            rv = self.app.get(url_for('admin_orphans'))
-            assert b'Oliver Twist' in rv.data
-            assert b'One forsaken file entity' in rv.data
-            assert b'One forsaken subunit' in rv.data
-
-            rv = self.app.get(url_for('admin_newsletter'))
-            assert b'Newsletter' in rv.data
-
-    def test_logs(self) -> None:
-        with app.app_context():
-            rv = self.app.get(url_for('admin_log'))
-            assert b'Login' in rv.data
-
-            rv = self.app.get(
-                url_for('admin_log_delete', follow_redirects=True))
-            assert b'Login' not in rv.data
-
-    def test_links(self) -> None:
+    def test_admin(self) -> None:
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
+                person = insert_entity('Oliver Twist', 'person')
+                insert_entity('Forsaken file', 'file')
+                insert_entity('Forsaken subunit', 'feature')
                 id_ = DbEntity.insert({
                     'name': 'Invalid linked entity',
                     'openatlas_class_name': 'artifact',
@@ -54,16 +29,40 @@ class ContentTests(TestBaseCase):
                     'range_id': id_,
                     'description': '',
                     'type_id': None})
-                rv = self.app.get(url_for('admin_check_links'))
-                assert b'Invalid linked entity' in rv.data
+            rv = self.app.get(url_for('admin_orphans'))
+            assert b'Oliver Twist' in rv.data
+            assert b'Forsaken file' in rv.data
+            assert b'Forsaken subunit' in rv.data
 
-    def test_dates(self) -> None:
-        with app.app_context():
-            with app.test_request_context():
+            rv = self.app.get(url_for('admin_log'))
+            assert b'Login' in rv.data
+
+            rv = self.app.get(url_for('admin_check_dates'))
+            assert b'Congratulations, everything looks fine!' in rv.data
+
+            rv = self.app.get(url_for('admin_log_delete'))
+            assert b'Login' not in rv.data
+
+            rv = self.app.get(url_for('admin_check_links'))
+            assert b'Invalid linked entity' in rv.data
+
+            file_ = 'Test77.txt'
+            with open(Path(app.config['UPLOAD_DIR'] / file_), 'w') as _file:
+                pass
+
+            rv = self.app.get(
+                url_for('admin_file_delete', filename=file_),
+                follow_redirects=True)
+            assert b'Test77.txt was deleted' in rv.data
+
+            rv = self.app.get(
+                url_for('admin_file_delete', filename=file_),
+                follow_redirects=True)
+            assert b'An error occurred when trying to delete' in rv.data
+
+            with app.test_request_context():  # Create invalid dates
                 app.preprocess_request()  # type: ignore
-                # Create invalid dates for an actor and a relation link
-                person = Entity.insert('person', 'Person')
-                event = Entity.insert('activity', 'Event')
+                event = insert_entity('Event Horizon', 'acquisition')
                 person.update({
                     'attributes': {
                         'begin_from': '2018-01-31',
@@ -76,12 +75,9 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_check_dates'))
             assert b'<span class="tab-counter">' in rv.data
 
-    def test_duplicates(self) -> None:
-        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = Entity.insert('acquisition', 'Event Horizon')
-                source = Entity.insert('source', 'Tha source')
+                source = insert_entity('Tha source', 'source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_type = Type.get_hierarchy('Source')
@@ -103,17 +99,14 @@ class ContentTests(TestBaseCase):
                 follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
-    def test_similar(self) -> None:
-        with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                Entity.insert('person', 'I have the same name!')
-                Entity.insert('person', 'I have the same name!')
+                insert_entity('Oliver Twist', 'person')
             rv = self.app.post(
                 url_for('admin_check_similar'),
                 follow_redirects=True,
                 data={'classes': 'person', 'ratio': 100})
-            assert b'I have the same name!' in rv.data
+            assert b'Oliver Twist' in rv.data
 
             rv = self.app.post(
                 url_for('admin_check_similar'),
@@ -121,26 +114,11 @@ class ContentTests(TestBaseCase):
                 data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
 
-    def test_settings(self) -> None:
-        with app.app_context():
-            rv = self.app.get(url_for('admin_index'))
-            assert b'User' in rv.data
-
             rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
 
-            rv = self.app.post(
-                url_for('admin_settings', category='mail'),
-                follow_redirects=True,
-                data={
-                    'mail': True,
-                    'mail_transport_username': 'whatever',
-                    'mail_transport_host': 'localhost',
-                    'mail_transport_port': '23',
-                    'mail_from_email': 'max@example.com',
-                    'mail_from_name': 'Max Headroom',
-                    'mail_recipients_feedback': 'headroom@example.com'})
-            assert b'Max Headroom' in rv.data
+            rv = self.app.get(url_for('admin_index'))
+            assert b'User' in rv.data
 
             rv = self.app.get(url_for('admin_settings', category='general'))
             assert b'Log level' in rv.data

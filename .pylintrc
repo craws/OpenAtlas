@@ -1,6 +1,6 @@
 [MASTER]
 disable=C0111, broad-except, cyclic-import, duplicate-code
-good-names=i,j,k,ex,Run,_,e,js,bc,id,rv,ip  # default is i,j,k,ex,Run,_
+good-names=f,i,j,k,ex,Run,_,e,js,bc,id,rv,ip,to  # default is i,j,k,ex,Run,_
 ignore=openatlas.wsgi
 min-public-methods=0
 

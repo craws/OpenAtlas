@@ -26,7 +26,7 @@ def name_result(result: float) -> str:
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
-    return ''  # pragma: no cover
+    return ''
 
 
 def print_result(entity: Entity) -> str:
@@ -116,7 +116,7 @@ def sex_update(id_: int) -> Union[str, Response]:
             Transaction.begin()
             SexEstimation.save(entity, data, types)
             Transaction.commit()
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

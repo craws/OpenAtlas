@@ -10,11 +10,11 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.tab import Tab
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import versions
-from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (
     bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
@@ -64,8 +64,6 @@ def overview() -> str:
             f'<a href="{url_for("note_view", id_=note["id"])}">' +
             uc_first(_("view")) + '</a>'])
     for name, count in Entity.get_overview_counts().items():
-        if not count:
-            continue  # pragma: no cover
         url = url_for('index', view=g.class_view_mapping[name])
         if name == 'administrative_unit':
             url = f"{url_for('type_index')}#menu-tab-place"
@@ -74,8 +72,7 @@ def overview() -> str:
         elif name in ['feature', 'stratigraphic_unit', 'source_translation']:
             url = ''
         tables['overview'].rows.append([
-            link(g.classes[name].label, url) if url
-            else g.classes[name].label,
+            link(g.classes[name].label, url) if url else g.classes[name].label,
             format_number(count)])
     for entity in Entity.get_latest(10):
         tables['latest'].rows.append([
@@ -114,7 +111,7 @@ def index_feedback() -> Union[str, Response]:
         save = SubmitField(_('send'))
 
     form = FeedbackForm()
-    if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
+    if form.validate_on_submit() and g.settings['mail']:
         body = \
             f'{form.subject.data} from {current_user.username} ' \
             f'({current_user.id}) {current_user.email} at ' \
@@ -127,7 +124,7 @@ def index_feedback() -> Union[str, Response]:
                 g.settings['mail_recipients_feedback']):
             flash(_('info feedback thanks'), 'info')
         else:
-            flash(_('error mail send'), 'error')
+            flash(_('error mail send'), 'error')  # pragma: no cover
         return redirect(url_for('overview'))
     return render_template(
         'index/feedback.html',
@@ -158,7 +155,7 @@ def index_changelog() -> str:
 def index_unsubscribe(code: str) -> str:
     user = User.get_by_unsubscribe_code(code)
     content = _('unsubscribe link not valid')
-    if user:  # pragma: no cover
+    if user:
         user.settings['newsletter'] = ''
         user.unsubscribe_code = ''
         user.update()

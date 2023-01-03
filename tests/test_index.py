@@ -13,7 +13,6 @@ class IndexTests(TestBaseCase):
 
             assert b'not found' in self.app.get('/404').data
             assert b'0' in self.app.get('/').data
-            assert b'Thank you' in self.app.get(url_for('index_feedback')).data
             assert 'x00' in str(self.app.get('/static/favicon.ico').data)
 
             rv = self.app.get(url_for('index_changelog'))
@@ -22,9 +21,6 @@ class IndexTests(TestBaseCase):
 
             self.app.get(url_for('index_content', item='contact'))
             self.app.get(url_for('set_locale', language='en'))
-            rv = self.app.get(url_for('reset_password'))
-            assert b'Forgot your password?' not in rv.data
-
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
 
@@ -46,15 +42,6 @@ class IndexTests(TestBaseCase):
 
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
-
-            rv = self.app.get(url_for('reset_password'))
-            assert b'Forgot your password?' in rv.data
-
-            rv = self.app.get(url_for('reset_confirm', code='1234'))
-            assert b'404' in rv.data
-
-            rv = self.app.get(url_for('index_unsubscribe', code='1234'))
-            assert b'invalid' in rv.data
 
             rv = self.app.get('/')  # Test intro when not logged in
             assert b'Overview' in rv.data
