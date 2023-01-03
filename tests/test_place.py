@@ -172,8 +172,7 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
-            path = \
-                pathlib.Path(app.root_path) \
+            path = pathlib.Path(app.root_path) \
                 / 'static' / 'images' / 'layout' / 'logo.png'
             with open(path, 'rb') as img:
                 rv = self.app.post(

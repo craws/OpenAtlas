@@ -157,7 +157,7 @@ class BaseDisplay:
                 if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
-            if domain.class_.view not in ['source', 'file']:
+            elif domain.class_.view != 'source':
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
@@ -355,7 +355,7 @@ class PlaceBaseDisplay(BaseDisplay):
                                 place_id=entity.id,
                                 link_id=link_.id)))
                     else:
-                        data.append('')
+                        data.append('')  # pragma: no cover
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
@@ -469,8 +469,6 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['range_id']))])
         else:
             for item in entity.get_linked_entities(['P2', 'P89'], True, True):
-                if item.class_.name in ['location', 'reference_system']:
-                    continue
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]

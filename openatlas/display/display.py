@@ -1,15 +1,13 @@
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
-from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    delete_link, edit_link, format_entity_date, profile_image_table_link,
-    remove_link)
+    delete_link, edit_link, format_entity_date, remove_link)
 from openatlas.models.entity import Entity
 from openatlas.util.util import (
     button, get_base_table_data, get_file_path, is_authorized, link, uc_first)
@@ -262,26 +260,7 @@ class SourceDisplay(BaseDisplay):
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-            if domain.class_.view != 'file':
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
+        self.add_reference_tables_data()
         self.add_note_tab()
 
 
