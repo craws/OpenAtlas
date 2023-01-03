@@ -8,12 +8,12 @@ from wtforms import (
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.forms import base_manager, manager
 from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, uc_first
 
 

@@ -13,9 +13,9 @@ from wtforms import (
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.table import Table
 from openatlas.util.util import (
     button, description, display_form, display_info, format_date,
     is_authorized, link, manual, required_group, send_mail, uc_first)

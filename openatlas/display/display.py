@@ -6,11 +6,11 @@ from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
+from openatlas.display.table import Table
 from openatlas.display.util import (
     delete_link, edit_link, format_entity_date, profile_image_table_link,
     remove_link)
 from openatlas.models.entity import Entity
-from openatlas.util.table import Table
 from openatlas.util.util import (
     button, get_base_table_data, get_file_path, is_authorized, link, uc_first)
 

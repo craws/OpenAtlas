@@ -11,11 +11,11 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_path, uc_first
 
 
