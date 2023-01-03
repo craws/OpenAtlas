@@ -13,6 +13,7 @@ from wtforms import (
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -152,7 +153,7 @@ def user_view(id_: int) -> str:
             buttons.append(
                 button(_('edit'), url_for('user_update', id_=user.id)))
         if user.id != current_user.id and (
-                    user.group != 'admin' or current_user.group == 'admin'):
+                user.group != 'admin' or current_user.group == 'admin'):
             name = user.username.replace('"', '').replace("'", '')
             buttons.append(
                 button(
@@ -164,9 +165,12 @@ def user_view(id_: int) -> str:
         buttons.append(
             button(_('activity'), url_for('user_activity', user_id=user.id)))
     return render_template(
-        'content.html',
-        content=display_info(info) + description(user),
-        buttons=buttons,
+        'tabs.html',
+        tabs={
+            'info': Tab(
+                'info',
+                buttons=buttons,
+                content=display_info(info) + description(user))},
         title=user.username,
         crumbs=[
             [_('admin'), f"{url_for('admin_index')}#tab-user"],

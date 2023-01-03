@@ -24,13 +24,11 @@ from openatlas.util.util import (
 @app.route('/overview')
 def overview() -> str:
     if not current_user.is_authenticated:
-        info = render_template(
-            'index/index_guest.html',
-            intro=get_translation('intro'))
-        return render_template(
-            'tabs.html',
-            tabs={'info': Tab('info', info)},
-            crumbs=['overview'])
+        tabs = {
+            'info': Tab('info', render_template(
+                'index/index_guest.html',
+                intro=get_translation('intro')))}
+        return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
         'bookmarks': Tab(
