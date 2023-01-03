@@ -1,5 +1,7 @@
 from typing import Any, Optional, Union
 
+from flask import g
+
 from openatlas.api.resources.util import (
     link_parser_check,
     replace_empty_list_values_in_dict_with_none)
@@ -93,6 +95,10 @@ def get_geojson_dict(
             if 'when' in parser['show'] else None,
             'end_comment': entity.end_comment
             if 'when' in parser['show'] else None,
-            'types': [{'typeName': type_.name, 'typeId': type_.id}
-                      for type_ in entity.types]
+            'types': [{
+                'typeName': type_.name,
+                'typeId': type_.id,
+                'typeHierarchy': ' > '.join(
+                    map(str, [g.types[root].name for root in type_.root]))}
+                for type_ in entity.types]
             if 'types' in parser['show'] else None}})
