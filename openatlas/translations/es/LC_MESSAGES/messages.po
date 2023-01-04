@@ -528,7 +528,7 @@ msgstr "inverso"
 
 #: openatlas/forms/manager.py:54 openatlas/forms/manager.py:104
 msgid "actor"
-msgstr "acor"
+msgstr "actor"
 
 #: openatlas/forms/manager.py:241 openatlas/views/admin.py:120
 #: openatlas/views/entity_index.py:40 openatlas/views/imports.py:158
@@ -752,7 +752,7 @@ msgstr "muestra correo electrónico"
 
 #: openatlas/forms/setting.py:107
 msgid "tooltip show email"
-msgstr "tooltip muestra correo electrónico"
+msgstr "Si está marcado, su correo electrónico se puede mostrar a otros usuarios"
 
 #: openatlas/forms/setting.py:109 openatlas/forms/util.py:29
 #: openatlas/views/admin.py:132 openatlas/views/admin.py:727
@@ -776,7 +776,9 @@ msgstr "filas de la tabla"
 
 #: openatlas/forms/setting.py:120
 msgid "tooltip table rows"
-msgstr "tooltip en filas de la tabla"
+msgstr ""
+"La cantidad predeterminada de filas de la tabla que se muestra "
+"en las listas. Es posible que sea necesario reiniciar el navegador"
 
 #: openatlas/forms/setting.py:123
 msgid "show aliases in tables"
@@ -1004,7 +1006,7 @@ msgstr "Establezca un marcador/punto en la posición donde se encuentra la cosa 
 msgid "map_info_linestring"
 msgstr ""
 "Dibuje una línea conectada a las características espaciales de un objeto físico "
-"(por ejemplo. el curso de un río o camino)"
+"(por ejemplo: el curso de un río o camino)"
 
 #: openatlas/templates/map.html:42
 msgid "map_info_close"
@@ -1245,7 +1247,7 @@ msgstr "aquí"
 
 #: openatlas/templates/import/import_data.html:18
 msgid "example files"
-msgstr "aarchivos de ejemplo"
+msgstr "archivos de ejemplo"
 
 #: openatlas/templates/import/import_data.html:22
 msgid "error"
@@ -1434,7 +1436,7 @@ msgstr "opciones de red"
 
 #: openatlas/templates/model/network2.html:8 openatlas/views/model.py:289
 msgid "classic"
-msgstr "cla´sico"
+msgstr "clásico"
 
 #: openatlas/templates/sql/index.html:6
 msgid ""
@@ -1629,7 +1631,7 @@ msgstr "Felicidades, todo se ve bien!"
 
 #: openatlas/views/admin.py:243
 msgid "check links"
-msgstr "eliminar enlaces duplicados"
+msgstr "comprobar enlaces"
 
 #: openatlas/views/admin.py:280
 msgid "delete link duplicates"
@@ -1823,7 +1825,7 @@ msgstr "coordenadas inválidas"
 
 #: openatlas/views/imports.py:293
 msgid "error at import"
-msgstr "error en la importacion"
+msgstr "error en la importación"
 
 #: openatlas/views/index.py:42
 msgid "visibility"
@@ -1955,7 +1957,7 @@ msgstr "Se envió una nueva contraseña a %(email)s."
 #: openatlas/views/login.py:185
 #, python-format
 msgid "Failed to send password mail to %(email)s."
-msgstr "No se pudo enviar el correo de contraseña a"
+msgstr "No se pudo enviar el correo de contraseña a %(email)s."
 
 #: openatlas/views/model.py:24
 msgid "test"
@@ -2021,7 +2023,7 @@ msgstr "muestra la contraseña"
 #: openatlas/views/profile.py:40 openatlas/views/profile.py:41
 #: openatlas/views/user.py:60 openatlas/views/user.py:61
 msgid "error passwords must match"
-msgstr "Las contraseñas no coincidían"
+msgstr "Las contraseñas no coinciden"
 
 #: openatlas/views/profile.py:45
 msgid "error new password like old password"
