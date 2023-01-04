@@ -21,21 +21,21 @@ msgstr ""
 #: openatlas/display/base_display.py:94 openatlas/views/entity_index.py:59
 #: openatlas/views/model.py:91
 msgid "icon"
-msgstr ""
+msgstr "icono  "
 
 #: openatlas/display/base_display.py:121 openatlas/views/index.py:60
 #: openatlas/views/note.py:22
 msgid "public"
-msgstr ""
+msgstr "público"
 
 #: openatlas/display/base_display.py:122 openatlas/views/index.py:60
 msgid "private"
-msgstr ""
+msgstr "privado"
 
 #: openatlas/display/base_display.py:126 openatlas/views/index.py:65
 #: openatlas/views/model.py:85
 msgid "view"
-msgstr ""
+msgstr "vista"
 
 #: openatlas/display/base_display.py:133 openatlas/display/base_display.py:311
 #: openatlas/display/base_display.py:433 openatlas/display/display.py:208
@@ -53,33 +53,33 @@ msgstr ""
 #: openatlas/views/profile.py:76 openatlas/views/profile.py:79
 #: openatlas/views/user.py:153 openatlas/views/user.py:238
 msgid "edit"
-msgstr ""
+msgstr "edita"
 
 #: openatlas/display/base_display.py:138
 msgid "alias"
-msgstr ""
+msgstr "alias"
 
 #: openatlas/display/base_display.py:139 openatlas/display/base_display.py:179
 #: openatlas/display/display.py:137 openatlas/templates/util/dates.html:11
 msgid "begin"
-msgstr ""
+msgstr "inicio"
 
 #: openatlas/display/base_display.py:140 openatlas/display/base_display.py:184
 #: openatlas/display/display.py:142 openatlas/templates/util/dates.html:38
 msgid "end"
-msgstr ""
+msgstr "final"
 
 #: openatlas/display/base_display.py:144 openatlas/forms/display.py:39
 #: openatlas/templates/forms/tree_select.html:50
 #: openatlas/templates/type/index.html:24
 #: openatlas/templates/type/index.html:59
 msgid "type"
-msgstr ""
+msgstr "tipo"
 
 #: openatlas/display/base_display.py:189 openatlas/forms/manager.py:255
 #: openatlas/forms/manager.py:420
 msgid "residence"
-msgstr ""
+msgstr "residencia"
 
 #: openatlas/display/base_display.py:192
 msgid "appears first"
