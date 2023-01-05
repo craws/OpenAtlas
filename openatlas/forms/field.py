@@ -8,7 +8,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FloatField, HiddenField, StringField, TextAreaField, FileField, FieldList)
+    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
 from wtforms.widgets import HiddenInput, FileInput, Input, TextInput, HTMLString
 
 from openatlas.forms.util import get_table_content, value_type_expand_icon
@@ -16,7 +16,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, is_authorized
-from wtforms.validators import (Optional as OptionalValidator)
+
 
 class RemovableListInput(HiddenInput):
     def __call__(
