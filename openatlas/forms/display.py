@@ -5,12 +5,11 @@ from typing import Any, Optional, TYPE_CHECKING
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from wtforms import Field, IntegerField
+from wtforms import Field, IntegerField, StringField
 from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.forms.field import ValueTypeField
-from openatlas.forms.util import value_type_expand_icon
 from openatlas.util.util import manual, tooltip, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -95,6 +94,8 @@ def add_row(
         field.label.text += ' *'
     field_css = 'required' if field.flags.required else ''
     field_css += ' integer' if isinstance(field, IntegerField) else ''
+    field_css += f' {app.config["CSS"]["string_field"]}' if isinstance(field, StringField) else ''
+
     for validator in field.validators:
         field_css += ' email' if isinstance(validator, Email) else ''
     return render_template(

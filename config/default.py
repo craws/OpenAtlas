@@ -88,6 +88,7 @@ LOG_LEVELS = {
     7: 'debug'}
 
 CSS = {
+    'string_field': 'form-control form-control-sm',
     'button': {
         'primary': 'btn btn-outline-primary btn-sm',
         'secondary': 'btn btn-secondary btn-sm'}}

@@ -1,5 +1,5 @@
 <div class="d-flex">
-<input value="{{ value }}" id="{{ name }}-{{ id }}" name="{{ name }}-0" class="form-control form-control-sm" type="text"/>
+<input value="{{ value }}" id="{{ name }}-{{ id }}" name="{{ name }}-0" class="{{ config.CSS.string_field }}" type="text"/>
 {% if id == '0' %}
   <button onClick=addListElement('{{ name }}') type="button" id="add-{{ name }}-{{ id }}" class="add-{{ name }} {{ config.CSS.button.secondary }} ms-1">
   <icon class="fa fa-plus"></icon>

@@ -2,7 +2,7 @@
   <input
   id="{{ field.id }}-button"
   name="{{ field.id }}-button"
-  class="table-select {% if field.flags.required %}required{% endif %} form-control form-control-sm"
+  class="table-select {% if field.flags.required %}required{% endif %} {{ config.CSS.string_field }}"
   type="text"
   placeholder="{{ _('change')|uc_first }}"
   onfocus="this.blur()"

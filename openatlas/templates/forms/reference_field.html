@@ -1,13 +1,13 @@
 <div class="row g-1">
   <div class="col-6">
     <input autocomplete="off" value="{{ field.data['value'] or '' }}" id="reference_system_value_{{ field.reference_system_id }}" placeholder="{{ field.placeholder }}" name="reference_system_id_{{ field.reference_system_id }}"
-           type="text" class="{{ field.label.text }} form-control form-control-sm"/>
+           type="text" class="{{ field.label.text }} {{ config.CSS.string_field }}"/>
 
   </div>
   <div class="col-6">
   <input value="and" type="hidden"/>
     <select value="" id="reference_system_precision_{{ field.reference_system_id }}" name="reference_system_id_{{ field.reference_system_id }}"
-            class="form-control form-control-sm">
+            class="{{ config.CSS.string_field }}">
       <option value="" disabled selected>{{ _('precision') | uc_first  }}</option>
        {% for choice in field.choices %}
         <option {{ 'selected' if field.data['precision'] == choice[0] }} value="{{ choice[0] }}">{{ choice[1] }}</option>

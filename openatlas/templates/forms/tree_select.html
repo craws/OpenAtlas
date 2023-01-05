@@ -3,7 +3,7 @@
   id="{{ field.id }}-button"
   name="{{ field.id }}-button"
   type="text"
-  class="form-control form-control-sm table-select {% if field.flags.required %}required{% endif %}"
+  class="{{ config.CSS.string_field }} table-select {% if field.flags.required %}required{% endif %}"
   onfocus="this.blur()"
   onclick="$('#{{ field.id }}-modal').modal('show')"
   readonly="readonly"
@@ -41,7 +41,7 @@
       <div class="modal-body">
       <div class="d-flex">
         <input
-          class="tree-filter form-control"
+          class="tree-filter {{ config.CSS.string_field }}"
           id="{{ field.id }}-tree-search"
           placeholder="{{ _('type to search')|uc_first }}"
           type="text">

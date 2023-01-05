@@ -187,7 +187,7 @@ def form_to_datetime64(
 
 
 class GlobalSearchForm(FlaskForm):
-    term = StringField('', render_kw={"placeholder": _('search term'), 'class': 'form-control form-control-sm'})
+    term = StringField('', render_kw={"placeholder": _('search term'), "class": app.config['CSS']['string_field']})
 
 
 @app.context_processor
@@ -297,6 +297,7 @@ def format_name_and_aliases(entity: Entity, field_id: str) -> str:
             html += alias if i else f'<p>{alias}</p>'
         return html
     return link
+
 
 def value_type_expand_icon(type_: Type) -> str:
     return f'''<i onclick="switch_value_type({type_.id},this)" 
