@@ -39,6 +39,29 @@ class RemovableListField(HiddenField):
         return self.data
 
 
+class ValueTypeRoot(Input):
+    def __call__(
+            self,
+            field: ValueTypeField,
+            *args: Any,
+            **kwargs: Any) -> RemovableListInput:
+        type_ = g.types[field.type_id]
+        return HTMLString(f'{ value_type_expand_icon(type_)}')
+
+
+class ValueTypeRootField(FloatField):
+    def __init__(
+            self,
+            label: str,
+            type_id: int,
+            validators: Any = None,
+            **kwargs: Any) -> None:
+        super().__init__(label, validators, **kwargs)
+        self.type_id = type_id
+
+    widget = ValueTypeRoot()
+
+
 class ValueTypeInput(TextInput):
     def __call__(
             self,

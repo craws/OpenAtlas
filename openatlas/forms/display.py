@@ -49,10 +49,6 @@ def html_form(
                 label = uc_first(_('type'))
             if field.label.text == 'super':
                 label = uc_first(_('super'))
-            if type_.category == 'value' and 'is_type_form' not in form:
-                field.description = type_.description
-                html += add_row(field, label, value_type_expand_icon(type_))
-                continue
             if field.flags.required and field.label.text:
                 label += ' *'
             tooltip_ = ''

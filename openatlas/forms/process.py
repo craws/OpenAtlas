@@ -44,7 +44,8 @@ def process_standard_fields(manager: Any) -> None:
                     'SelectMultipleField',
                     'SubmitField',
                     'TableField',
-                    'TableMultiField']:
+                    'TableMultiField',
+                    'ValueTypeRootField']:
             continue
         if key == 'name':
             name = manager.form.data['name']

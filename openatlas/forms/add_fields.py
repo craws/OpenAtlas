@@ -8,7 +8,7 @@ from wtforms import IntegerField, StringField, TextAreaField
 from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
-from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField, ValueTypeField
+from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField, ValueTypeField, ValueTypeRootField
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 from openatlas.util.util import is_authorized, uc_first
@@ -245,7 +245,13 @@ def add_types(manager: Any) -> None:
             if form:
                 getattr(form, f'{type_.id}-dynamic').label.text = 'super'
             validators = [InputRequired()] if type_.required else []
-            if type_.multiple:
+            if type_.category == 'value':
+                setattr(
+                    manager.form_class,
+                    str(type_.id),
+                    ValueTypeRootField(str(type_.name), type_.id))
+                add_value_type_fields(manager.form_class, type_.subs)
+            elif type_.multiple:
                 setattr(
                     manager.form_class,
                     str(type_.id),
@@ -255,5 +261,3 @@ def add_types(manager: Any) -> None:
                     manager.form_class,
                     str(type_.id),
                     TreeField(str(type_.id), validators, form=form))
-            if type_.category == 'value':
-                add_value_type_fields(manager.form_class, type_.subs)
