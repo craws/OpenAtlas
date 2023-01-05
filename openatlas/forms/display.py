@@ -9,12 +9,12 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.field import ValueFloatField, ValueTypeField
+from openatlas.forms.field import ValueTypeField
 from openatlas.forms.util import value_type_expand_icon
 from openatlas.util.util import manual, tooltip, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
+    pass
 
 
 def html_form(
@@ -52,7 +52,6 @@ def html_form(
             if type_.category == 'value' and 'is_type_form' not in form:
                 field.description = type_.description
                 html += add_row(field, label, value_type_expand_icon(type_))
-                #html += add_value_type(form, type_)
                 continue
             if field.flags.required and field.label.text:
                 label += ' *'
@@ -109,38 +108,6 @@ def add_row(
         value=value,
         field_css=field_css,
         row_css=row_css)
-
-
-def add_value_type(
-        form: Any,
-        type_: Type,
-        root: Optional[Type] = None,
-        level: int = 0) -> str:
-    html = ''
-    root = root or type_
-    for sub_id in type_.subs:
-        sub = g.types[sub_id]
-        field = getattr(form, str(sub_id))
-        html += f"""
-        <div class="mt-2 table-row value-type-switch{type_.id}">
-          <div></div>
-          <div class="table-cell">
-            <div class="d-flex">
-              <div
-                  class="d-flex justify-content-between"
-                  style="width:16.15em;">
-                <div class="ms-{level} position-relative text-wrap">
-                  <div class="value-type-expander">{value_type_expand_icon(sub)}</div>
-                  {sub.name}
-                </div>
-                {field(class_='value-type')}
-              </div>
-              <span class="ms-1">{sub.description or ''}</span>
-            </div>
-            {add_value_type(form, sub, root, level + 1)}
-          </div>
-        </div>"""
-    return html
 
 
 def add_dates(form: Any) -> str:
