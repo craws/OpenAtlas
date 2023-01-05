@@ -1,7 +1,11 @@
 from openatlas.util.util import link
 
 versions = {
-    '7.10.0': ['TBA', {}],
+    '7.10.0': ['TBA', {
+        'feature': {
+            '1921': 'Additional UI translations - Spanish and Catalan'
+        }
+    }],
     '7.9.1': ['2023-01-02', {
         'fix': {
             '1919': 'Minor display issues'}}],
