@@ -4,7 +4,6 @@ import math
 import os
 import re
 import smtplib
-from collections import defaultdict
 from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
@@ -27,7 +26,6 @@ from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity
@@ -85,7 +83,7 @@ def is_authorized(context: str, group: Optional[str] = None) -> bool:
     if not group:  # In case it wasn't called from a template
         group = context
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False  # pragma: no cover - AnonymousUserMixin has no group
+        return False
     if current_user.group == 'admin' \
             or current_user.group == group \
             or (current_user.group == 'manager'
@@ -123,7 +121,7 @@ def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
 
 
 def get_backup_file_data() -> dict[str, Any]:
-    path = app.config['EXPORT_DIR'] / 'sql'
+    path = app.config['EXPORT_DIR']
     latest_file = None
     latest_file_date = None
     for file in [
@@ -183,16 +181,18 @@ def send_mail(
         subject: str,
         text: str,
         recipients: Union[str, list[str]],
-        log_body: bool = True) -> bool:  # pragma: no cover
+        log_body: bool = True) -> bool:
     """
         Send one mail to every recipient.
-        Set log_body to False for sensitive data, e.g. password mails
+        Set log_body to False for sensitive data, e.g. password mails.
     """
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not g.settings['mail'] or not recipients:
         return False
     from_ = f"{g.settings['mail_from_name']} <{g.settings['mail_from_email']}>"
-    try:
+    if app.config['IS_UNIT_TEST']:
+        return True  # To test mail functions w/o sending them
+    try:  # pragma: no cover
         with smtplib.SMTP(
                 g.settings['mail_transport_host'],
                 g.settings['mail_transport_port']) as smtp:
@@ -214,21 +214,21 @@ def send_mail(
                 f'Subject: {subject}'
             log_text += f' Content: {text}' if log_body else ''
             g.logger.log('info', 'mail', f'Mail send from {from_}', log_text)
-    except smtplib.SMTPAuthenticationError as e:
+    except smtplib.SMTPAuthenticationError as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error mail login for {g.settings['mail_transport_username']}", e)
         flash(_('error mail login'), 'error')
         return False
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log(
             'error',
             'mail',
             f"Error send mail for {g.settings['mail_transport_username']}", e)
         flash(_('error mail send'), 'error')
-        return False
-    return True
+        return False  # pragma: no cover
+    return True  # pragma: no cover
 
 
 @contextfilter
@@ -258,7 +258,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
                     "User OpenAtlas with default password is still active!")
     if warnings:
         return f'<p class="alert alert-danger">{"<br>".join(warnings)}<p>'
-    return ''  # pragma: no cover
+    return ''
 
 
 @app.template_filter()
@@ -280,7 +280,7 @@ def get_file_path(
     ext = g.file_stats[id_]['ext']
     if size:
         if ext in app.config['NONE_DISPLAY_EXT']:
-            ext = app.config['PROCESSED_EXT']  # pragma: no cover
+            ext = app.config['PROCESSED_EXT']
         path = app.config['RESIZED_IMAGES'] / size / f"{id_}{ext}"
         return path if os.path.exists(path) else None
     return app.config['UPLOAD_DIR'] / f"{id_}{ext}"
@@ -297,15 +297,10 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
-        return "0 B"  # pragma: no cover
+        return "0 B"
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
     i = int(math.floor(math.log(size_bytes, 1024)))
     return f"{int(size_bytes / math.pow(1024, i))} {size_name[i]}"
-
-
-def delete_link(name: str, url: str) -> str:
-    confirm = _('Delete %(name)s?', name=name.replace("'", ''))
-    return link(_('delete'), url=url, js=f"return confirm('{confirm}')")
 
 
 @app.template_filter()
@@ -380,30 +375,7 @@ def display_citation_example(code: str) -> str:
         return ''
     if text := get_translation('citation_example'):
         return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
-    return ''  # pragma: no cover
-
-
-def siblings_pager(entity: Entity, structure: Optional[dict[str, Any]]) -> str:
-    if not structure or len(structure['siblings']) < 2:
-        return ''
-    structure['siblings'].sort(key=lambda x: x.id)
-    prev_id = None
-    next_id = None
-    position = None
-    for counter, sibling in enumerate(structure['siblings']):
-        position = counter + 1
-        prev_id = sibling.id if sibling.id < entity.id else prev_id
-        if sibling.id > entity.id:
-            next_id = sibling.id
-            position = counter
-            break
-    parts = []
-    if prev_id:  # pragma: no cover
-        parts.append(button('<', url_for('view', id_=prev_id)))
-    if next_id:
-        parts.append(button('>', url_for('view', id_=next_id)))
-    parts.append(f"{position} {_('of')} {len(structure['siblings'])}")
-    return ' '.join(parts)
+    return ''
 
 
 @app.template_filter()
@@ -433,22 +405,6 @@ def display_info(data: dict[str, Union[str, list[str]]]) -> str:
     return render_template('util/info_data.html', data=data)
 
 
-def get_type_data(entity: Entity) -> dict[str, Any]:
-    if entity.location:
-        entity.types.update(entity.location.types)  # Add location types
-    data: dict[str, Any] = defaultdict(list)
-    for type_, value in sorted(entity.types.items(), key=lambda x: x[0].name):
-        if entity.standard_type and type_.id == entity.standard_type.id:
-            continue  # Standard type is already added
-        html = f"""
-            <span title="{" > ".join([g.types[i].name for i in type_.root])}">
-                {link(type_)}</span>"""
-        if type_.category == 'value':
-            html += f' {float(value):g} {type_.description}'
-        data[g.types[type_.root[0]].name].append(html)
-    return {key: data[key] for key in sorted(data.keys())}
-
-
 @app.template_filter()
 def description(entity: Union[Entity, Project, User]) -> str:
     from openatlas.models.entity import Entity
@@ -471,34 +427,6 @@ def description(entity: Union[Entity, Project, User]) -> str:
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
-
-
-def download_button(entity: Entity) -> str:
-    if entity.image_id:
-        if path := get_file_path(entity.image_id):
-            return button(
-                _('download'),
-                url_for('download_file', filename=path.name))
-    return ''  # pragma: no cover
-
-
-@app.template_filter()
-def display_profile_image(entity: Entity) -> str:
-    if not entity.image_id:
-        return ''
-    path = get_file_path(entity.image_id)
-    if not path:
-        return ''  # pragma: no cover
-    resized = None
-    size = app.config['IMAGE_SIZE']['thumbnail']
-    if g.settings['image_processing'] and check_processed_image(path.name):
-        if path_ := get_file_path(entity.image_id, size):
-            resized = url_for('display_file', filename=path_.name, size=size)
-    return render_template(
-        'util/profile_image.html',
-        entity=entity,
-        path=path,
-        resized=resized)
 
 
 @contextfilter

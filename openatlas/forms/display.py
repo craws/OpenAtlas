@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -11,9 +9,6 @@ from wtforms.validators import Email
 from openatlas import app
 from openatlas.forms.field import ValueTypeField
 from openatlas.util.util import manual, tooltip, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    pass
 
 
 def html_form(
@@ -44,7 +39,7 @@ def html_form(
         if field.type in ['TreeField', 'TreeMultiField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
-                continue  # pragma: no cover
+                continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
                 label = uc_first(_('type'))
@@ -53,7 +48,7 @@ def html_form(
             if field.flags.required and field.label.text:
                 label += ' *'
             tooltip_ = ''
-            if 'is_type_form' not in form:  # pragma: no cover
+            if 'is_type_form' not in form:
                 tooltip_ = type_.description or ''
                 if field.flags.required \
                         and current_user.group == 'contributor':

@@ -28,14 +28,14 @@ class NoteForm(FlaskForm):
 def note_view(id_: int) -> str:
     note = User.get_note_by_id(id_)
     if not note['public'] and note['user_id'] != current_user.id:
-        abort(403)  # pragma: no cover
+        abort(403)
     entity = Entity.get_by_id(note['entity_id'])
     buttons: list[str] = [manual('tools/notes')]
     if note['user_id'] == current_user.id:
         buttons += [
             button(_('edit'), url_for('note_update', id_=note['id'])),
             button(_('delete'), url_for('note_delete', id_=note['id']))]
-    elif is_authorized('manager'):  # pragma: no cover
+    elif is_authorized('manager'):
         buttons += [
             button(
                 _('set private'),
@@ -58,7 +58,7 @@ def note_view(id_: int) -> str:
 @required_group('contributor')
 def note_set_private(id_: int) -> Union[str, Response]:
     if not is_authorized('manager'):
-        abort(403)  # pragma: no cover
+        abort(403)
     note = User.get_note_by_id(id_)
     User.update_note(note['id'], note['text'], False)
     flash(_('note updated'), 'info')
@@ -89,7 +89,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
 def note_update(id_: int) -> Union[str, Response]:
     note = User.get_note_by_id(id_)
     if not note['user_id'] == current_user.id:
-        abort(403)  # pragma: no cover
+        abort(403)
     entity = Entity.get_by_id(note['entity_id'])
     form = NoteForm()
     if form.validate_on_submit():
@@ -114,7 +114,7 @@ def note_update(id_: int) -> Union[str, Response]:
 def note_delete(id_: int) -> Response:
     note = User.get_note_by_id(id_)
     if not note['user_id'] == current_user.id:
-        abort(403)  # pragma: no cover
+        abort(403)
     User.delete_note(note['id'])
     flash(_('note deleted'), 'info')
     return redirect(f"{url_for('view', id_=note['entity_id'])}#tab-note")

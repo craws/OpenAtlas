@@ -7,10 +7,10 @@ from wtforms import (
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.search import search
-from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 

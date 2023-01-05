@@ -89,7 +89,7 @@ def profile_index() -> str:
 def profile_settings(category: str) -> Union[str, Response]:
     if category not in ['profile', 'display'] \
             and not is_authorized('contributor'):
-        abort(403)  # pragma: no cover
+        abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
@@ -114,7 +114,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

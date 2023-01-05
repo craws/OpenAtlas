@@ -27,9 +27,9 @@ class Gis:
         for row in g.cursor.fetchall():
             if row['point']:
                 geometry = ast.literal_eval(row['point'])
-            elif row['linestring']:  # pragma: no cover
+            elif row['linestring']:
                 geometry = ast.literal_eval(row['linestring'])
-            else:  # pragma: no cover
+            else:
                 geometry = ast.literal_eval(row['polygon'])
             geometry['title'] = row['name'].replace('"', '\"') \
                 if row['name'] else ''

@@ -22,6 +22,7 @@ class TestBaseCase(unittest.TestCase):
         self.login()  # Login on default because needed almost everywhere
         with app.app_context():
             self.app.get('/')  # Needed to initialise g
+            self.alice_id = 2
             self.precision_geonames = \
                 'reference_system_precision_' + \
                 str(ReferenceSystem.get_by_name('GeoNames').id)

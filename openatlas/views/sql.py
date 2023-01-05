@@ -40,7 +40,7 @@ def sql_execute() -> str:
             response = f'<p>Rows affected: {g.cursor.rowcount}</p>'
             try:
                 response += f'<p>{g.cursor.fetchall()}</p>'
-            except Exception:  # pragma: no cover
+            except Exception:
                 pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')

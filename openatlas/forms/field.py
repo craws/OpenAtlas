@@ -8,14 +8,14 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, FileInput, Input, TextInput, HTMLString
+    Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
+from wtforms.widgets import FileInput, HiddenInput, TextInput
 
+from openatlas.display.table import Table
 from openatlas import app
 from openatlas.forms.util import get_table_content, value_type_expand_icon
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, is_authorized
 
 
@@ -180,7 +180,6 @@ class TableMultiField(HiddenField):
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
         self.filter_ids = filter_ids or []
-
     widget = TableMultiSelect()
 
 
@@ -241,7 +240,6 @@ class TableField(HiddenField):
         self.related_tables = related_tables or []
         self.add_dynamical = \
             (add_dynamic or []) if is_authorized('editor') else []
-
     widget = TableSelect()
 
 

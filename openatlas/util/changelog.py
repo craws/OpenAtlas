@@ -1,18 +1,30 @@
 from openatlas.util.util import link
 
 versions = {
-    '7.9.0': ['TBA', {
+    '7.10.0': ['TBA', {}],
+    '7.9.1': ['2023-01-02', {
+        'fix': {
+            '1919': 'Minor display issues'}}],
+    '7.9.0': ['2023-01-01', {
         'feature': {
             '1882': 'Log dynamically created entities',
             '1885': 'Inverse translations for OA properties',
+            '1871': 'Consolidate project file directories',
+            '1778': 'Manual: adding system class information',
             '1869': 'Manual: add feature list',
             '1820': 'API: use existing GeoJSON definitions for swagger',
+            '1884': 'Refactor',
             '1893': 'Code coverage for Windows'},
         'fix': {
             '1874': 'API: Outdated Swagger File',
             '1888': 'CSV data export missing data',
-            '1899': 'Map overlay not shown on feature level'}
-    }],
+            '1896':
+                "Map doesn't zoom in automatically if it is a polygon or "
+                "linestring",
+            '1899': 'Map overlay not shown on feature level',
+            '1912':
+                'API: search for typeID with subs logically connected with '
+                'AND'}}],
     '7.8.1': ['2022-12-08', {
         'fix': {
             '1911': 'Problem when adding members to groups'}}],
