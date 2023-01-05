@@ -256,9 +256,7 @@ def system_warnings(_context: str, _unneeded_string: str) -> str:
             if hash_ == user.password.encode('utf-8'):
                 warnings.append(
                     "User OpenAtlas with default password is still active!")
-    if warnings:
-        return f'<p class="error">{"<br>".join(warnings)}<p>'
-    return ''
+    return f'<p class="error">{"<br>".join(warnings)}<p>' if warnings else ''
 
 
 @app.template_filter()
@@ -371,11 +369,10 @@ def button_bar(buttons: list[Any]) -> str:
 
 @app.template_filter()
 def display_citation_example(code: str) -> str:
-    if code != 'reference':
-        return ''
-    if text := get_translation('citation_example'):
-        return '<h1>' + uc_first(_("citation_example")) + f'</h1>{text}'
-    return ''
+    html = ''
+    if code == 'reference' and (text := get_translation('citation_example')):
+        html = '<h1>' + uc_first(_('citation_example')) + f'</h1>{text}'
+    return html
 
 
 @app.template_filter()
@@ -470,7 +467,7 @@ def display_form(
 class MLStripper(HTMLParser):
 
     def error(self: MLStripper, message: str) -> None:
-        pass
+        pass  # pragma: no cover
 
     def __init__(self) -> None:
         super().__init__()

@@ -37,7 +37,7 @@ def ajax_add_type() -> str:
         Transaction.commit()
         g.logger.log_user(entity.id, 'insert')
         return str(entity.id)
-    except Exception as _e:
+    except Exception:
         Transaction.rollback()
         abort(400)
 

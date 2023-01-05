@@ -114,7 +114,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

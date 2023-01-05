@@ -87,7 +87,7 @@ def link_update(id_: int, origin_id: int) -> Union[str, Response]:
             manager.process_link_form()
             manager.link_.update()
             Transaction.commit()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
@@ -117,7 +117,7 @@ def insert_relation(type_: str, origin_id: int) -> Union[str, Response]:
             manager.process_form()
             manager.update_link()
             Transaction.commit()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

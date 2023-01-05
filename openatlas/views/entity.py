@@ -108,3 +108,17 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_('reference')}"])
+
+
+@app.route(
+    '/reference_system/remove_class/<int:system_id>/<class_name>',
+    methods=['POST', 'GET'])
+@required_group('manager')
+def reference_system_remove_class(system_id: int, class_name: str) -> Response:
+    try:
+        g.reference_systems[system_id].remove_class(class_name)
+        flash(_('info update'), 'info')
+    except Exception as e:
+        g.logger.log('error', 'database', 'remove form failed', e)
+        flash(_('error database'), 'error')
+    return redirect(url_for('view', id_=system_id))
