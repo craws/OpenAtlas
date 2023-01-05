@@ -22,6 +22,8 @@ def html_form(
         manual_page: Optional[str] = None) -> str:
     html = ''
     for field in form:
+        if field.id.startswith('insert_'):
+            continue  # These will be added in combination with other fields
         if isinstance(field, ValueTypeField):
             html += f'''
                 <div class="row">
