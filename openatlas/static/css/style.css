@@ -62,6 +62,7 @@ form ul, form ol, form li {
 form li svg.svg-inline--fa{
     font-size: 0.9rem!important;
 }
+
 /* utilities */
 .bg-gray{
    background-color: #e9ecef !important
@@ -91,4 +92,59 @@ form li svg.svg-inline--fa{
 }
 .value-type-switcher{
     transition:all ease-in 100ms;
+}
+
+/* drop-field */
+.drag-n-drop {
+    min-height: 120px;
+    width: 100%;
+    border: grey 2px dashed;
+    border-radius: 2px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+    white-space: normal;
+    padding:5px;
+    color: rgba(var(--bs-secondary-rgb),1) !important;
+}
+
+.drag-n-drop.highlight {
+    border: 2px #007bff dashed;
+    color:#007bff !important;
+}
+
+.drag-n-drop .drag-drop-item {
+    width: 150px;
+    margin: 5px;
+    height: 54px;
+    display: inline-block;
+}
+
+.drag-n-drop .drag-drop-item .card-body {
+    white-space: nowrap;
+    overflow: hidden;
+    color:black;
+    text-overflow: ellipsis;
+}
+
+.drag-n-drop .drag-drop-item .card-body .card-icon {
+    font-size: 1.4rem;
+    color: grey;
+    margin-right: 4px;
+}
+
+.drag-n-drop .instruction-text {
+    min-height: 100px;
+    display: grid;
+    place-content: center;
+}
+
+.drag-n-drop .drag-drop-item .card-body .close-icon {
+    position:absolute;
+    top:5px;
+    right:5px;
+    color:grey;
+    cursor: pointer;
+}
+.drag-n-drop .drag-drop-item .card-body .close-icon:hover {
+    color:black;
 }
