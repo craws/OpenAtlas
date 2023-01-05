@@ -11,6 +11,7 @@ from wtforms import (
     Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
 from wtforms.widgets import HiddenInput, FileInput, Input, TextInput, HTMLString
 
+from openatlas import app
 from openatlas.forms.util import get_table_content, value_type_expand_icon
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
@@ -80,7 +81,7 @@ class ValueTypeInput(TextInput):
                   <div class="width-full">
                     <label for="{field.id}">{type_.name}</label>
                     <div class="input-group">
-                      <input type="text" class="{{ config.CSS.string_field }}" name="{field.id}" id="{field.id}" 
+                      <input type="text" class="{ app.config['CSS']['string_field'] }" name="{field.id}" id="{field.id}" 
                              value="{field.data or ''}" />
                       {unit_text if type_.description else ''}
                     </div>

@@ -7,7 +7,6 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from wtforms import Field, IntegerField, StringField, FileField
 from wtforms.validators import Email
-from wtforms.widgets import FileInput
 
 from openatlas import app
 from openatlas.forms.field import ValueTypeField
