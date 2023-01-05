@@ -57,7 +57,8 @@ class ValueTypeInput(TextInput):
                   <div class="width-full">
                     <label for="{field.id}">{type_.name}</label>
                     <div class="input-group">
-                      <input type="text" class="form-control form-control-sm" name="{field.id}" id="{field.id}" />
+                      <input type="text" class="form-control form-control-sm" name="{field.id}" id="{field.id}" 
+                             value="{field.data or ''}" />
                       {unit_text if type_.description else ''}
                     </div>
                     </div>
