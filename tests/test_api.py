@@ -619,7 +619,7 @@ class Api(ApiTestCase):
                     download=True))]:
                 assert b'Shire' in rv.data
 
-            # --Test Error Handling--
+            # Test Error Handling
             with self.assertRaises(EntityDoesNotExistError):
                 self.app.get(url_for('api_03.entity', id_=233423424))
             with self.assertRaises(NotAPlaceError):
@@ -733,8 +733,9 @@ class Api(ApiTestCase):
                            '"values":["2000-1-1"],'
                            '"logicalOperator":"or"}]}'))
 
+            assert b'Endpoint not found' in self.app.get('/api/entity2').data
+
             self.app.get(url_for('logout'))
             app.config['ALLOWED_IPS'] = []
             with self.assertRaises(AccessDeniedError):
-                self.app.get(
-                    url_for('api_03.view_class', view_class='place'))
+                self.app.get(url_for('api_03.view_class', view_class='place'))

@@ -39,7 +39,7 @@ def page_not_found(e: Exception) -> tuple[Any, int]:
 
 @app.errorhandler(405)
 def method_not_allowed(_e: Exception) -> tuple[Any, int]:
-    raise MethodNotAllowedError
+    raise MethodNotAllowedError  # pragma: no cover
 
 
 @app.errorhandler(418)
