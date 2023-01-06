@@ -53,25 +53,24 @@ class PasswordForm(FlaskForm):
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index() -> str:
-    tabs = {'profile': Tab(
-        'profile',
-        content=display_info(get_form_settings(ProfileForm(), True)),
-        buttons=[manual('tools/profile')])}
-    if is_authorized('contributor'):
-        tabs['modules'] = Tab(
+    tabs = {
+        'profile': Tab(
+            'profile',
+            content=display_info(get_form_settings(ProfileForm(), True)),
+            buttons=[manual('tools/profile')]),
+        'modules': Tab(
             'modules',
             content=display_info(get_form_settings(ModulesForm(), True)),
-            buttons=[manual('tools/profile')])
-    tabs['display'] = Tab(
-        'display',
-        content=display_info(get_form_settings(DisplayForm(), True)),
-        buttons=[manual('tools/profile')])
+            buttons=[manual('tools/profile')]),
+        'display': Tab(
+            'display',
+            content=display_info(get_form_settings(DisplayForm(), True)),
+            buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
-        if is_authorized('contributor'):
-            tabs['modules'].buttons.append(
+        tabs['modules'].buttons.append(
                 button(
                     _('edit'),
                     url_for('profile_settings', category='modules')))
@@ -87,9 +86,6 @@ def profile_index() -> str:
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
 @login_required
 def profile_settings(category: str) -> Union[str, Response]:
-    if category not in ['profile', 'display'] \
-            and not is_authorized('contributor'):
-        abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
