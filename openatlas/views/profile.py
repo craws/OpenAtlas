@@ -6,7 +6,6 @@ from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, SubmitField
@@ -18,7 +17,7 @@ from openatlas.display.tab import Tab
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.util.util import (
-    button, display_form, display_info, is_authorized, manual, uc_first)
+    button, display_form, display_info, manual, uc_first)
 
 
 class PasswordForm(FlaskForm):
