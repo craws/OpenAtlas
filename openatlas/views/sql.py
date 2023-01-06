@@ -38,10 +38,8 @@ def sql_execute() -> str:
         try:
             g.cursor.execute(form.statement.data)
             response = f'<p>Rows affected: {g.cursor.rowcount}</p>'
-            try:
+            if g.cursor.pgresult_ptr is not None:
                 response += f'<p>{g.cursor.fetchall()}</p>'
-            except Exception:
-                pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')
             g.logger.log(
