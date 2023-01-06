@@ -42,10 +42,7 @@ def sql_execute() -> str:
                 response += f'<p>{g.cursor.fetchall()}</p>'
             Transaction.commit()
             flash(_('SQL executed'), 'info')
-            g.logger.log(
-                'info',
-                'database',
-                'SQL executed', form.statement.data)
+            g.logger.log('info', 'database', 'SQL query', form.statement.data)
         except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
