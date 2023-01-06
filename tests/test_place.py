@@ -90,7 +90,6 @@ class PlaceTest(TestBaseCase):
                     "description": "",
                     "shapeType": "shape"}}]"""
             data[place_type.id] = place_type.subs
-            data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=source.id),
                 data=data,
