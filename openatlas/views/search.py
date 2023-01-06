@@ -18,7 +18,7 @@ class SearchForm(FlaskForm):
     term = StringField(
         _('search'),
         [InputRequired()],
-        render_kw={'placeholder': _('search term'), 'autofocus': True})
+        render_kw={'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
     classes = SelectMultipleField(

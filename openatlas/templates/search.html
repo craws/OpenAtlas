@@ -4,7 +4,7 @@
   <div class="col-2">
     <form method="post">
       {{ form.csrf_token }}
-      {{ form.term }}<br><br>
+      {{ form.term(placeholder=_('search term')|uc_first) }}<br><br>
       {{ form.own }} {{ form.own.label }}<br>
       {{ form.desc }} {{ form.desc.label }}<br>
 

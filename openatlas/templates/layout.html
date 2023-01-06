@@ -84,7 +84,7 @@
               action="{{ url_for('search_index') }}"
               style="display:inline-flex">
             {{ search_form.csrf_token }}
-            {{ search_form.term }}
+            {{ search_form.term(placeholder=_('search term')|uc_first) }}
             <button type="submit" class="btn btn-link search-button">
               <i class="fas fa-search"></i>
             </button>

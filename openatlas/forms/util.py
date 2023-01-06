@@ -184,7 +184,7 @@ def form_to_datetime64(
 
 
 class GlobalSearchForm(FlaskForm):
-    term = StringField('', render_kw={"placeholder": _('search term')})
+    term = StringField('')
 
 
 @app.context_processor
