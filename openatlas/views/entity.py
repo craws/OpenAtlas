@@ -121,7 +121,7 @@ def reference_system_remove_class(system_id: int, class_name: str) -> Response:
     try:
         g.reference_systems[system_id].remove_class(class_name)
         flash(_('info update'), 'info')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.logger.log('error', 'database', 'remove class failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('view', id_=system_id))

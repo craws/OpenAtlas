@@ -177,6 +177,7 @@ class PlaceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 file = Entity.get_by_class('file')[0]
                 link_id = Link.insert(file, 'P67', place)[0]
+
             rv = self.app.get(
                 url_for(
                     'overlay_insert',
@@ -298,6 +299,15 @@ class PlaceTest(TestBaseCase):
             self.app.get(url_for('insert', class_='place', origin_id=feat_id))
             self.app.get(url_for('update', id_=feat_id))
             self.app.post(url_for('update', id_=feat_id), data=data)
+
+            rv = self.app.get(
+                url_for(
+                    'insert',
+                    class_='stratigraphic_unit',
+                    origin_id=feat_id),
+                data=data)
+            assert b'Insert and add human remains' in rv.data
+
             data['name'] = "I'm a stratigraphic unit"
             data['place'] = feat_id
             rv = self.app.post(

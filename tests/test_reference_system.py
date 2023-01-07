@@ -25,6 +25,19 @@ class ReferenceSystemTest(TestBaseCase):
                     'classes': ['place']})
             wikipedia_id = rv.location.split('/')[-1]
 
+            rv = self.app.post(
+                url_for('insert', class_='reference_system'),
+                data={
+                    'name': 'Another system to test forms with more than 3',
+                    'website_url': '',
+                    'resolver_url': '',
+                    'classes': ['place']},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+
+            rv = self.app.get(url_for('insert', class_='place'))
+            assert b'reference-system-switch' in rv.data
+
             rv = self.app.get(
                 url_for(
                     'index',
