@@ -52,7 +52,7 @@ def get_buttons(view: str) -> list[str]:
 def get_table(view: str) -> Table:
     table = Table(g.table_headers[view])
     if view == 'file':
-        table.order=[[0, 'desc']]
+        table.order = [[0, 'desc']]
         table.header = ['date'] + table.header
         if g.settings['image_processing'] \
                 and current_user.settings['table_show_icons']:

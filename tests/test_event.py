@@ -4,8 +4,6 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -66,10 +64,6 @@ class EventTest(TestBaseCase):
             assert b'Location' not in rv.data
 
             event_name2 = 'Second event'
-            wikidata = \
-                f"reference_system_id_" \
-                f"{ReferenceSystem.get_by_name('Wikidata').id}"
-            precision = Type.get_hierarchy('External reference match').subs[0]
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
@@ -81,8 +75,8 @@ class EventTest(TestBaseCase):
                     'begin_month_from': '10',
                     'begin_day_from': '8',
                     'end_year_from': '1951',
-                    wikidata: 'Q123',
-                    self.precision_wikidata: precision})
+                    self.wikidata: 'Q123',
+                    self.precision_wikidata: self.precision_type.subs[0]})
             event_id = rv.location.split('/')[-1]
 
             rv = self.app.get(url_for('view', id_=event_id))
