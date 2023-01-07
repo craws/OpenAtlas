@@ -523,34 +523,35 @@ def link(
         external: bool = False) -> str:
     from openatlas.models.entity import Entity
     from openatlas.models.user import User
+    html = ''
     if isinstance(object_, (str, LazyString)):
         js = f'onclick="{js}"' if js else ''
         label = uc_first(str(object_)) if uc_first_ else object_
         class_ = f'class="{class_}"' if class_ else ''
         ext = 'target="_blank" rel="noopener noreferrer"' if external else ''
-        return f'<a href="{url}" {class_} {js} {ext}>{label}</a>'
-    if isinstance(object_, Entity):
-        return link(
+        html = f'<a href="{url}" {class_} {js} {ext}>{label}</a>'
+    elif isinstance(object_, Entity):
+        html = link(
             object_.name,
             url_for('view', id_=object_.id),
             uc_first_=False)
-    if isinstance(object_, CidocClass):
-        return link(
+    elif isinstance(object_, CidocClass):
+        html = link(
             object_.code,
             url_for('cidoc_class_view', code=object_.code))
-    if isinstance(object_, CidocProperty):
-        return link(object_.code, url_for('property_view', code=object_.code))
-    if isinstance(object_, Project):
-        return link(
+    elif isinstance(object_, CidocProperty):
+        html = link(object_.code, url_for('property_view', code=object_.code))
+    elif isinstance(object_, Project):
+        html = link(
             object_.name,
             url_for('import_project_view', id_=object_.id))
-    if isinstance(object_, User):
-        return link(
+    elif isinstance(object_, User):
+        html = link(
             object_.username,
             url_for('user_view', id_=object_.id),
             class_='' if object_.active else 'inactive',
             uc_first_=False)
-    return ''
+    return html
 
 
 @app.template_filter()

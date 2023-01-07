@@ -20,7 +20,6 @@ _('likely female')
 _('indifferent')
 _('likely male')
 _('male')
-_('corresponds to')
 
 
 def name_result(result: float) -> str:
@@ -31,13 +30,12 @@ def name_result(result: float) -> str:
 
 
 def print_result(entity: Entity) -> str:
-    calculation = SexEstimation.calculate(entity)
-    if calculation is None:
-        return ''
-    return \
-        'Ferembach et al. 1979: ' \
-        f'<span class="anthro-result">{calculation}</span>' \
-        f' - {_("corresponds to")} "{name_result(calculation)}"'
+    html = ''
+    if result := SexEstimation.calculate(entity):
+        html = \
+            f'Ferembach et al. 1979: <strong>{result}</strong> ' + \
+            _('corresponds to') + f' <strong>{name_result(result)}</strong>'
+    return html
 
 
 @app.route('/anthropology/index/<int:id_>')
@@ -123,7 +121,6 @@ def sex_update(id_: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('sex', id_=entity.id))
 
-    # Fill in data
     for dict_ in types:
         getattr(form, g.types[dict_['id']].name).data = dict_['description']
     return render_template(
