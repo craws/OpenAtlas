@@ -10,6 +10,7 @@ from wtforms import (
     TextAreaField, widgets)
 from wtforms.validators import InputRequired, URL
 
+from openatlas.display.util import uc_first
 from openatlas.forms.add_fields import (
     add_date_fields, add_reference_systems, add_types)
 from openatlas.forms.field import RemovableListField, TableField, TreeField
@@ -25,7 +26,6 @@ from openatlas.models.link import Link
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
 
 
 class BaseManager:

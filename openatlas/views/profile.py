@@ -14,10 +14,10 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
+from openatlas.display.util import (
+    button, display_form, display_info, manual, uc_first)
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.util.util import (
-    button, display_form, display_info, manual, uc_first)
 
 
 class PasswordForm(FlaskForm):

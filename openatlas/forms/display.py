@@ -7,9 +7,9 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
+from openatlas.display.util import manual, tooltip, uc_first
 from openatlas.forms.field import ValueFloatField
 from openatlas.models.type import Type
-from openatlas.util.util import manual, tooltip, uc_first
 
 
 def html_form(

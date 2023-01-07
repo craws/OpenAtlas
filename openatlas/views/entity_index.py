@@ -9,13 +9,13 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display.table import Table
+from openatlas.display.util import (
+    button, format_date, get_base_table_data, get_file_path, is_authorized,
+    link, manual, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.util.image_processing import check_processed_image
-from openatlas.util.util import (
-    button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group)
 
 
 @app.route('/index/<view>')

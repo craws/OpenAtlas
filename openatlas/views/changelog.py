@@ -2,7 +2,7 @@ from flask import render_template
 from flask_babel import lazy_gettext as _
 
 from openatlas import app
-from openatlas.util.util import link
+from openatlas.display.util import link
 
 
 @app.route('/changelog')

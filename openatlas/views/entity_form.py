@@ -10,6 +10,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import is_authorized, link, required_group
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
@@ -18,7 +19,6 @@ from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.type import Type
 from openatlas.util.image_processing import resize_image
-from openatlas.util.util import is_authorized, link, required_group
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])

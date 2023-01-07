@@ -7,7 +7,7 @@ from flask import abort, g
 from openatlas.database.anthropology import Anthropology
 from openatlas.database.date import Date
 from openatlas.database.link import Link as Db
-from openatlas.util.util import (
+from openatlas.display.util import (
     datetime64_to_timestamp, format_date_part, timestamp_to_datetime64)
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -238,7 +238,7 @@ class Link:
     @staticmethod
     def get_invalid_cidoc_links() -> list[dict[str, str]]:
         from openatlas.models.entity import Entity
-        from openatlas.util.util import link
+        from openatlas.display.util import link
         invalid_linking = []
         for row in Db.get_cidoc_links():
             property_ = g.properties[row['property_code']]

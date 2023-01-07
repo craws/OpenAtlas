@@ -12,7 +12,7 @@ from openatlas.forms.base_manager import (
     ActorBaseManager, ArtifactBaseManager, BaseManager, EventBaseManager,
     HierarchyBaseManager)
 from openatlas.forms.field import (
-    TableField, TableMultiField, TreeField, DragNDropField)
+    DragNDropField, TableField, TableMultiField, TreeField)
 from openatlas.forms.validation import file
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link

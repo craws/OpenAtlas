@@ -4,7 +4,7 @@ from flask import json, render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
-from openatlas.util.util import uc_first
+from openatlas.display.util import uc_first
 
 
 class Table:
@@ -30,7 +30,7 @@ class Table:
             'targets': [
                 i for i, name in enumerate(self.header)
                 if name in ['begin', 'end', 'count', 'size']]})
-        data_table = {
+        data = {
             'data': self.rows,
             'stateSave': 'true',
             'columns':
@@ -42,11 +42,11 @@ class Table:
             'pageLength': current_user.settings['table_rows'],
             'autoWidth': 'false'}
         if self.order:
-            data_table['order'] = self.order
+            data['order'] = self.order
         if self.defs:
-            data_table['columnDefs'] = self.defs
+            data['columnDefs'] = self.defs
         return render_template(
             'util/table.html',
             table=self,
             name=name,
-            data=json.dumps(data_table))
+            data=json.dumps(data))

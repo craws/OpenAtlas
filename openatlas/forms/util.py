@@ -16,7 +16,7 @@ from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.util import get_base_table_data, get_file_path, uc_first
+from openatlas.display.util import get_base_table_data, get_file_path, uc_first
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:

@@ -7,7 +7,7 @@ from flask import g, json
 
 from openatlas.database.gis import Gis as Db
 from openatlas.models.type import Type
-from openatlas.util.util import sanitize
+from openatlas.display.util import sanitize
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity

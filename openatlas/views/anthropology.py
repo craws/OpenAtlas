@@ -9,10 +9,10 @@ from wtforms import SelectField, SubmitField
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import (
+    button, display_form, is_authorized, manual, required_group, uc_first)
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
-from openatlas.util.util import (
-    button, display_form, is_authorized, manual, required_group, uc_first)
 
 
 def name_result(result: float) -> str:

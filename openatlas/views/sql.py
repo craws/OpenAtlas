@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.util.util import get_backup_file_data, manual, required_group
+from openatlas.display.util import get_backup_file_data, manual, required_group
 
 
 class SqlForm(FlaskForm):

@@ -15,7 +15,7 @@ from openatlas.display.table import Table
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.util import get_base_table_data, is_authorized
+from openatlas.display.util import get_base_table_data, is_authorized
 
 
 class RemovableListInput(TextInput):

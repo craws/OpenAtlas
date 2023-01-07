@@ -8,9 +8,9 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display import display
+from openatlas.display.util import display_form, required_group, uc_first
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import display_form, required_group, uc_first
 from openatlas.views.link import AddReferenceForm
 
 

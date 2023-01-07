@@ -11,9 +11,9 @@ from wtforms import SubmitField
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.models.export import sql_export
-from openatlas.util.util import (
+from openatlas.display.util import (
     convert_size, is_authorized, link, required_group, uc_first)
+from openatlas.models.export import sql_export
 
 
 class ExportSqlForm(FlaskForm):

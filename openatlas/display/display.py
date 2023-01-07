@@ -7,10 +7,9 @@ from openatlas.display.base_display import (
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
 from openatlas.display.util import (
-    delete_link, edit_link, format_entity_date, remove_link)
+    button, delete_link, edit_link, format_entity_date, get_base_table_data,
+    get_file_path, is_authorized, link, remove_link, uc_first)
 from openatlas.models.entity import Entity
-from openatlas.util.util import (
-    button, get_base_table_data, get_file_path, is_authorized, link, uc_first)
 
 
 class AcquisitionDisplay(EventsDisplay):

@@ -33,7 +33,7 @@ from openatlas.models.type import Type
 from openatlas.models.user import User
 from openatlas.util.image_processing import (
     create_resized_images, delete_orphaned_resized_images)
-from openatlas.util.util import (
+from openatlas.display.util import (
     button, convert_size, display_form, display_info, format_date,
     get_file_path, is_authorized, link, manual, required_group, sanitize,
     send_mail, uc_first)

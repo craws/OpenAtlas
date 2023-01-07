@@ -12,11 +12,11 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
+from openatlas.display.util import (
+    bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.util import (
-    bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 
 
 @app.route('/')
