@@ -10,6 +10,7 @@ from openatlas.display.util import (
     button, delete_link, edit_link, format_entity_date, get_base_table_data,
     get_file_path, is_authorized, link, remove_link, uc_first)
 from openatlas.models.entity import Entity
+from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -155,16 +156,18 @@ class PlaceDisplay(PlaceBaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
-        for link_ in \
-                self.entity.location.get_links(['P74', 'OA8', 'OA9'], True):
-            actor = Entity.get_by_id(link_.domain.id)
-            self.tabs['actor'].table.rows.append([
-                link(actor),
-                g.properties[link_.property.code].name,
-                actor.class_.name,
-                actor.first,
-                actor.last,
-                actor.description])
+        if self.entity.location:
+            for link_ in self.entity.location.get_links(
+                    ['P74', 'OA8', 'OA9'],
+                    True):
+                actor = Entity.get_by_id(link_.domain.id)
+                self.tabs['actor'].table.rows.append([
+                    link(actor),
+                    g.properties[link_.property.code].name,
+                    actor.class_.name,
+                    actor.first,
+                    actor.last,
+                    actor.description])
         actor_ids = []
         for event in self.events:
             for actor in \
@@ -186,6 +189,8 @@ class ProductionDisplay(EventsDisplay):
 
 
 class ReferenceSystemDisplay(BaseDisplay):
+
+    entity: ReferenceSystem
 
     def add_data(self) -> None:
         super().add_data()

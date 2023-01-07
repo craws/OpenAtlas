@@ -26,11 +26,11 @@ class BaseDisplay:
 
     entity: Union[Entity, ReferenceSystem, Type]
     tabs: dict[str, Tab]
-    events: Optional[list[Entity]]
+    events: list[Entity]
     event_links: Optional[list[Link]]  # Needed for actor and info data
     linked_places: list[Entity]  # Related places for map
-    gis_data: dict[str, Any] = None
-    structure = None
+    gis_data: dict[str, Any]
+    structure: dict[str, list[Entity]]
     overlays = None
     crumbs: list[Any]
     buttons: list[str]
@@ -295,7 +295,7 @@ class EventsDisplay(BaseDisplay):
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.range.name, link_, entity, 'actor')])
-        entity.linked_places = [
+        self.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
@@ -343,11 +343,11 @@ class PlaceBaseDisplay(BaseDisplay):
                     content = ''
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                         overlays = Overlay.get_by_object(entity)
-                        if domain.id in overlays:
-                            content = edit_link(
+                        if domain.id in overlays and (html_link := edit_link(
                                 url_for(
                                     'overlay_update',
-                                    id_=overlays[domain.id].id))
+                                    id_=overlays[domain.id].id))):
+                            content += html_link
                         else:
                             content = link(
                                 _('link'),
@@ -419,6 +419,8 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 
 class TypeBaseDisplay(BaseDisplay):
+
+    entity: Type
 
     def add_data(self) -> None:
         super().add_data()
