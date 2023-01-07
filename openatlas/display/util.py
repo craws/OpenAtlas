@@ -22,11 +22,11 @@ from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 
 from openatlas import app
+from openatlas.display.image_processing import check_processed_image
 from openatlas.models.cidoc_class import CidocClass
 from openatlas.models.cidoc_property import CidocProperty
 from openatlas.models.content import get_translation
 from openatlas.models.imports import Project
-from openatlas.util.image_processing import check_processed_image
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.entity import Entity

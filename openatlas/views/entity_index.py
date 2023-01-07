@@ -8,6 +8,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.image_processing import check_processed_image
 from openatlas.display.table import Table
 from openatlas.display.util import (
     button, format_date, get_base_table_data, get_file_path, is_authorized,
@@ -15,7 +16,6 @@ from openatlas.display.util import (
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.image_processing import check_processed_image
 
 
 @app.route('/index/<view>')
