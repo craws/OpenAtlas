@@ -42,6 +42,8 @@ class BaseDisplay:
         self.events = []
         self.event_links = []
         self.linked_places = []
+        self.structure = {}
+        self.gis_data = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()

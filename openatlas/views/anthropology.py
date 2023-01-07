@@ -14,19 +14,20 @@ from openatlas.display.util import (
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
 
+# Needed for translations
+_('female')
+_('likely female')
+_('indifferent')
+_('likely male')
+_('male')
+_('corresponds to')
+
 
 def name_result(result: float) -> str:
-    # Needed for translations
-    _('female')
-    _('likely female')
-    _('indifferent')
-    _('likely male')
-    _('male')
-    _('corresponds to')
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
-    return ''
+    return ''  # pragma: no cover
 
 
 def print_result(entity: Entity) -> str:
@@ -116,7 +117,7 @@ def sex_update(id_: int) -> Union[str, Response]:
             Transaction.begin()
             SexEstimation.save(entity, data, types)
             Transaction.commit()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
