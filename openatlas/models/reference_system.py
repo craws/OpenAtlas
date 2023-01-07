@@ -44,9 +44,6 @@ class ReferenceSystem(Entity):
         return systems
 
     def remove_class(self, class_name: str) -> None:
-        for link_ in self.get_links('P67'):
-            if link_.range.class_.name == class_name:
-                return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 
     def update_system(self, data: dict[str, Any]) -> None:

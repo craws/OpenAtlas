@@ -16,13 +16,13 @@ class ReferenceSystemTest(TestBaseCase):
             rv = self.app.get(url_for('insert', class_='reference_system'))
             assert b'Resolver URL' in rv.data
 
-            data: dict[Any, Any] = {
-                'name': 'Wikipedia',
-                'website_url': 'https://wikipedia.org',
-                'resolver_url': 'https://wikipedia.org',
-                'classes': ['place']}
             rv = self.app.post(
-                url_for('insert', class_='reference_system'), data=data)
+                url_for('insert', class_='reference_system'),
+                data={
+                    'name': 'Wikipedia',
+                    'website_url': 'https://wikipedia.org',
+                    'resolver_url': 'https://wikipedia.org',
+                    'classes': ['place']})
             wikipedia_id = rv.location.split('/')[-1]
 
             rv = self.app.get(
@@ -53,7 +53,7 @@ class ReferenceSystemTest(TestBaseCase):
                 url_for('update', id_=g.reference_system_geonames.id))
             assert b'Website URL' in rv.data
 
-            data = {
+            data: dict[Any, Any] = {
                 'name': 'GeoNames',
                 self.precision_type.id: self.precision_type.subs[0],
                 'website_url': 'https://www.geonames2.org/',
@@ -110,6 +110,14 @@ class ReferenceSystemTest(TestBaseCase):
                     self.precision_geonames: '',
                     self.precision_wikidata: ''})
             assert b'required' in rv.data
+
+            rv = self.app.get(
+                url_for(
+                    'reference_system_remove_class',
+                    system_id=g.reference_system_wikidata.id,
+                    class_name='person'),
+                follow_redirects=True)
+            assert b'403 - Forbidden' in rv.data
 
             rv = self.app.post(
                 url_for('insert', class_='person'),

@@ -115,10 +115,13 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
     methods=['POST', 'GET'])
 @required_group('manager')
 def reference_system_remove_class(system_id: int, class_name: str) -> Response:
+    for link_ in g.reference_systems[system_id].get_links('P67'):
+        if link_.range.class_.name == class_name:
+            abort(403)  # Abort because there are linked entities
     try:
         g.reference_systems[system_id].remove_class(class_name)
         flash(_('info update'), 'info')
     except Exception as e:
-        g.logger.log('error', 'database', 'remove form failed', e)
+        g.logger.log('error', 'database', 'remove class failed', e)
         flash(_('error database'), 'error')
     return redirect(url_for('view', id_=system_id))
