@@ -256,6 +256,11 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
+@app.context_processor
+def handle_context():
+    return dict(os=os)
+
+
 @app.template_filter()
 def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
