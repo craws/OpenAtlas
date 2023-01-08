@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-08 21:50+0100\n"
+"POT-Creation-Date: 2023-01-08 22:00+0100\n"
 "PO-Revision-Date: 2023-01-05 13:58+0100\n"
 "Last-Translator: Enric Rodellas <enricrodellas@gmail.com>\n"
 "Language: ca\n"
@@ -228,7 +228,7 @@ msgid "person"
 msgstr "persona"
 
 #: openatlas/display/display.py:148 openatlas/display/display.py:245
-#: openatlas/forms/manager.py:541
+#: openatlas/forms/manager.py:542
 msgid "artifact"
 msgstr "artefacte"
 
@@ -236,15 +236,15 @@ msgstr "artefacte"
 msgid "produced"
 msgstr "produït"
 
-#: openatlas/display/display.py:197 openatlas/forms/manager.py:469
+#: openatlas/display/display.py:197 openatlas/forms/manager.py:470
 msgid "website URL"
 msgstr "URL del lloc web"
 
-#: openatlas/display/display.py:201 openatlas/forms/manager.py:471
+#: openatlas/display/display.py:201 openatlas/forms/manager.py:472
 msgid "resolver URL"
 msgstr "URL de resolució"
 
-#: openatlas/display/display.py:205 openatlas/forms/manager.py:473
+#: openatlas/display/display.py:205 openatlas/forms/manager.py:474
 msgid "example ID"
 msgstr "ID d'exemple"
 
@@ -454,7 +454,7 @@ msgid "description"
 msgstr "descripció"
 
 #: openatlas/display/util.py:636 openatlas/forms/base_manager.py:72
-#: openatlas/forms/manager.py:518 openatlas/views/admin.py:224
+#: openatlas/forms/manager.py:519 openatlas/views/admin.py:224
 #: openatlas/views/admin.py:693
 msgid "content"
 msgstr "contingut"
@@ -522,7 +522,7 @@ msgstr "insertar"
 msgid "insert and continue"
 msgstr "insertar i continuar"
 
-#: openatlas/forms/base_manager.py:362 openatlas/forms/manager.py:476
+#: openatlas/forms/base_manager.py:362 openatlas/forms/manager.py:477
 #: openatlas/templates/model/index.html:9
 #: openatlas/templates/model/index.html:11
 #: openatlas/templates/model/network.html:34
@@ -564,7 +564,7 @@ msgstr "lloc donat"
 msgid "given artifact"
 msgstr "artefacte donat"
 
-#: openatlas/forms/manager.py:51 openatlas/forms/manager.py:561
+#: openatlas/forms/manager.py:51 openatlas/forms/manager.py:562
 msgid "inverse"
 msgstr "invers"
 
@@ -609,15 +609,20 @@ msgstr "nascut a"
 msgid "died in"
 msgstr "mort a"
 
-#: openatlas/forms/manager.py:497
-msgid "Link artifacts as the information carrier of the source"
-msgstr "Enllaçar artefactes com portadors d'informació de la font"
-
-#: openatlas/forms/manager.py:541 openatlas/forms/manager.py:546
+#: openatlas/forms/manager.py:443 openatlas/forms/manager.py:542
+#: openatlas/forms/manager.py:547
 msgid "insert and add"
 msgstr ""
 
-#: openatlas/forms/manager.py:546
+#: openatlas/forms/manager.py:443
+msgid "feature"
+msgstr ""
+
+#: openatlas/forms/manager.py:498
+msgid "Link artifacts as the information carrier of the source"
+msgstr "Enllaçar artefactes com portadors d'informació de la font"
+
+#: openatlas/forms/manager.py:547
 msgid "human remains"
 msgstr ""
 

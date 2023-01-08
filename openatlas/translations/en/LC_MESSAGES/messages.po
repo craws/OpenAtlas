@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-08 21:50+0100\n"
-"PO-Revision-Date: 2023-01-08 21:52+0100\n"
+"POT-Creation-Date: 2023-01-08 22:00+0100\n"
+"PO-Revision-Date: 2023-01-08 22:01+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -227,7 +227,7 @@ msgid "person"
 msgstr "person"
 
 #: openatlas/display/display.py:148 openatlas/display/display.py:245
-#: openatlas/forms/manager.py:541
+#: openatlas/forms/manager.py:542
 msgid "artifact"
 msgstr "artifact"
 
@@ -235,15 +235,15 @@ msgstr "artifact"
 msgid "produced"
 msgstr "produced"
 
-#: openatlas/display/display.py:197 openatlas/forms/manager.py:469
+#: openatlas/display/display.py:197 openatlas/forms/manager.py:470
 msgid "website URL"
 msgstr "website URL"
 
-#: openatlas/display/display.py:201 openatlas/forms/manager.py:471
+#: openatlas/display/display.py:201 openatlas/forms/manager.py:472
 msgid "resolver URL"
 msgstr "resolver URL"
 
-#: openatlas/display/display.py:205 openatlas/forms/manager.py:473
+#: openatlas/display/display.py:205 openatlas/forms/manager.py:474
 msgid "example ID"
 msgstr "example ID"
 
@@ -452,7 +452,7 @@ msgid "description"
 msgstr "description"
 
 #: openatlas/display/util.py:636 openatlas/forms/base_manager.py:72
-#: openatlas/forms/manager.py:518 openatlas/views/admin.py:224
+#: openatlas/forms/manager.py:519 openatlas/views/admin.py:224
 #: openatlas/views/admin.py:693
 msgid "content"
 msgstr "content"
@@ -520,7 +520,7 @@ msgstr "insert"
 msgid "insert and continue"
 msgstr "insert and continue"
 
-#: openatlas/forms/base_manager.py:362 openatlas/forms/manager.py:476
+#: openatlas/forms/base_manager.py:362 openatlas/forms/manager.py:477
 #: openatlas/templates/model/index.html:9 openatlas/templates/model/index.html:11
 #: openatlas/templates/model/network.html:34
 #: openatlas/templates/model/network2.html:51 openatlas/templates/search.html:27
@@ -561,7 +561,7 @@ msgstr "given place"
 msgid "given artifact"
 msgstr "given artifact"
 
-#: openatlas/forms/manager.py:51 openatlas/forms/manager.py:561
+#: openatlas/forms/manager.py:51 openatlas/forms/manager.py:562
 msgid "inverse"
 msgstr "inverse"
 
@@ -606,15 +606,20 @@ msgstr "born in"
 msgid "died in"
 msgstr "died in"
 
-#: openatlas/forms/manager.py:497
-msgid "Link artifacts as the information carrier of the source"
-msgstr "Link artifacts as the information carrier of the source"
-
-#: openatlas/forms/manager.py:541 openatlas/forms/manager.py:546
+#: openatlas/forms/manager.py:443 openatlas/forms/manager.py:542
+#: openatlas/forms/manager.py:547
 msgid "insert and add"
 msgstr "insert and add"
 
-#: openatlas/forms/manager.py:546
+#: openatlas/forms/manager.py:443
+msgid "feature"
+msgstr "feature"
+
+#: openatlas/forms/manager.py:498
+msgid "Link artifacts as the information carrier of the source"
+msgstr "Link artifacts as the information carrier of the source"
+
+#: openatlas/forms/manager.py:547
 msgid "human remains"
 msgstr "human remains"
 
