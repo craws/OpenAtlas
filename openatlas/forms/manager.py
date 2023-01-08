@@ -538,12 +538,12 @@ class StratigraphicUnitManager(BaseManager):
                 self.form_class,
                 'insert_continue_sub',
                 SubmitField(
-                    f"{uc_first(_('insert and add'))} {_('artifact')}"))
+                    uc_first(_('insert and add') + ' ' + _('artifact'))))
             setattr(
                 self.form_class,
                 'insert_continue_human_remains',
                 SubmitField(
-                    f"{uc_first(_('insert and add'))} {_('human remains')}"))
+                    uc_first(_('insert and add') + ' ' + _('human remains'))))
 
 
 class TypeManager(BaseManager):
