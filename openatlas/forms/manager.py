@@ -439,7 +439,8 @@ class PlaceManager(BaseManager):
             setattr(
                 self.form_class,
                 'insert_continue_sub',
-                SubmitField(f"{uc_first(_('insert and add'))} {_('feature')}"))
+                SubmitField(
+                    uc_first(_('insert and add')) + ' ' + _('feature')))
 
 
 class ProductionManager(EventBaseManager):
