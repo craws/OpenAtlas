@@ -39,8 +39,8 @@
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
-  {% if os.path.exists(config.ROOT_PATH|string + '/static/js/messages_' + session.language + '.js') %}
-    <script src="{{'/static/js/messages_' + session.language + '.js'}}"></script>
+  {% if g.js_message_file %}
+    <script src="/{{ g.js_message_file }}"></script>
   {% endif %}
   <title>
     {{ g.settings.site_name }}

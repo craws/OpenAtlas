@@ -256,11 +256,6 @@ def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     return button(label, id_=f'bookmark{entity_id}', onclick=onclick)
 
 
-@app.context_processor
-def handle_context():
-    return dict(os=os)
-
-
 @app.template_filter()
 def display_menu(entity: Optional[Entity], origin: Optional[Entity]) -> str:
     view_name = ''
@@ -321,11 +316,6 @@ def sanitize(string: str, mode: Optional[str] = None) -> str:
         stripper.feed(string)
         return stripper.get_data().strip()
     return re.sub('[^A-Za-z0-9]+', '', string)  # Filter ASCII letters/numbers
-
-
-@app.template_filter()
-def test_file(file_name: str) -> Optional[str]:
-    return file_name if (Path(app.root_path) / file_name).is_file() else None
 
 
 def format_name_and_aliases(entity: Entity, show_links: bool) -> str:
