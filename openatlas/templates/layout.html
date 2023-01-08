@@ -39,9 +39,7 @@
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
-  {% if g.js_message_file %}
-    <script src="/{{ g.js_message_file }}"></script>
-  {% endif %}
+  {{ session.language|get_js_messages|safe }}
   <title>
     {{ g.settings.site_name }}
     {% if title %}

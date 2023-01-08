@@ -71,10 +71,6 @@ def before_request() -> None:
     g.class_view_mapping = OpenatlasClass.get_class_view_mapping()
     g.table_headers = OpenatlasClass.get_table_headers()
     g.file_stats = get_file_stats()
-    js_message_file = \
-        Path('static') / 'js' / f'messages_{session["language"]}.js'
-    g.js_message_file = js_message_file \
-        if (Path(app.root_path) / js_message_file).is_file else None
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = \

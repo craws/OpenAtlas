@@ -29,7 +29,6 @@ def html_form(
             if field.id == 'begin_year_from':
                 html += add_dates(form)
             continue
-
         if field.type in ['TreeField', 'TreeMultiField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
@@ -80,6 +79,8 @@ def html_form(
                 html += add_reference_systems(form)
                 reference_systems_added = True
             continue
+        if field.type in ['TableField', 'TableMultiField']:
+            field.label.text = _(field.label.text.lower())
         html += add_row(field, form_id=form_id)
     return html
 
