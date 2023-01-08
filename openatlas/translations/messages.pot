@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-08 17:03+0100\n"
+"POT-Creation-Date: 2023-01-08 21:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,7 +68,7 @@ msgstr ""
 msgid "end"
 msgstr ""
 
-#: openatlas/display/base_display.py:144 openatlas/forms/display.py:39
+#: openatlas/display/base_display.py:144 openatlas/forms/display.py:38
 #: openatlas/templates/forms/tree_select.html:50
 #: openatlas/templates/type/index.html:24
 #: openatlas/templates/type/index.html:59
@@ -119,12 +119,12 @@ msgid "overlay"
 msgstr ""
 
 #: openatlas/display/base_display.py:355 openatlas/display/tab.py:248
-#: openatlas/display/util.py:566 openatlas/templates/forms/form_table.html:5
+#: openatlas/display/util.py:569 openatlas/templates/forms/form_table.html:5
 #: openatlas/views/link.py:63 openatlas/views/reference.py:34
 msgid "link"
 msgstr ""
 
-#: openatlas/display/base_display.py:429 openatlas/forms/display.py:41
+#: openatlas/display/base_display.py:429 openatlas/forms/display.py:40
 #: openatlas/forms/manager.py:181 openatlas/forms/manager.py:278
 #: openatlas/templates/model/cidoc_class_view.html:13
 #: openatlas/templates/model/property_view.html:13
@@ -227,6 +227,7 @@ msgid "person"
 msgstr ""
 
 #: openatlas/display/display.py:148 openatlas/display/display.py:245
+#: openatlas/forms/manager.py:541
 msgid "artifact"
 msgstr ""
 
@@ -334,7 +335,7 @@ msgstr ""
 msgid "next"
 msgstr ""
 
-#: openatlas/display/table.py:12 openatlas/forms/display.py:205
+#: openatlas/display/table.py:12 openatlas/forms/display.py:206
 #: openatlas/templates/layout.html:34 openatlas/templates/type/index.html:107
 #: openatlas/templates/type/index.html:113
 #: openatlas/templates/util/reference_system_switch.html:6
@@ -424,24 +425,24 @@ msgstr ""
 msgid "bookmark"
 msgstr ""
 
-#: openatlas/display/util.py:434
+#: openatlas/display/util.py:437
 msgid "error mail login"
 msgstr ""
 
-#: openatlas/display/util.py:441 openatlas/views/index.py:124
+#: openatlas/display/util.py:444 openatlas/views/index.py:124
 msgid "error mail send"
 msgstr ""
 
-#: openatlas/display/util.py:587
+#: openatlas/display/util.py:590
 msgid "citation_example"
 msgstr ""
 
-#: openatlas/display/util.py:627 openatlas/views/anthropology.py:53
+#: openatlas/display/util.py:630 openatlas/views/anthropology.py:53
 #: openatlas/views/anthropology.py:81 openatlas/views/anthropology.py:134
 msgid "anthropological analyses"
 msgstr ""
 
-#: openatlas/display/util.py:631 openatlas/forms/add_fields.py:250
+#: openatlas/display/util.py:634 openatlas/forms/add_fields.py:250
 #: openatlas/forms/base_manager.py:72 openatlas/forms/field.py:112
 #: openatlas/templates/model/cidoc_class_view.html:8
 #: openatlas/templates/model/property_view.html:8
@@ -451,7 +452,7 @@ msgstr ""
 msgid "description"
 msgstr ""
 
-#: openatlas/display/util.py:633 openatlas/forms/base_manager.py:72
+#: openatlas/display/util.py:636 openatlas/forms/base_manager.py:72
 #: openatlas/forms/manager.py:518 openatlas/views/admin.py:224
 #: openatlas/views/admin.py:693
 msgid "content"
@@ -536,11 +537,11 @@ msgstr ""
 msgid "tooltip hierarchy forms"
 msgstr ""
 
-#: openatlas/forms/display.py:52
+#: openatlas/forms/display.py:51
 msgid "tooltip_required_type"
 msgstr ""
 
-#: openatlas/forms/display.py:204 openatlas/templates/layout.html:35
+#: openatlas/forms/display.py:205 openatlas/templates/layout.html:35
 msgid "hide"
 msgstr ""
 
@@ -607,6 +608,14 @@ msgstr ""
 
 #: openatlas/forms/manager.py:497
 msgid "Link artifacts as the information carrier of the source"
+msgstr ""
+
+#: openatlas/forms/manager.py:541 openatlas/forms/manager.py:546
+msgid "insert and add"
+msgstr ""
+
+#: openatlas/forms/manager.py:546
+msgid "human remains"
 msgstr ""
 
 #: openatlas/forms/setting.py:15
@@ -926,18 +935,18 @@ msgstr ""
 msgid "show less"
 msgstr ""
 
-#: openatlas/templates/layout.html:87 openatlas/templates/search.html:7
+#: openatlas/templates/layout.html:84 openatlas/templates/search.html:7
 msgid "search term"
 msgstr ""
 
-#: openatlas/templates/index/index.html:24 openatlas/templates/layout.html:118
+#: openatlas/templates/index/index.html:24 openatlas/templates/layout.html:115
 #: openatlas/views/profile.py:81 openatlas/views/profile.py:82
 #: openatlas/views/profile.py:121 openatlas/views/profile.py:123
 #: openatlas/views/profile.py:141 openatlas/views/profile.py:143
 msgid "profile"
 msgstr ""
 
-#: openatlas/templates/layout.html:121 openatlas/views/admin.py:188
+#: openatlas/templates/layout.html:118 openatlas/views/admin.py:188
 #: openatlas/views/admin.py:189 openatlas/views/admin.py:226
 #: openatlas/views/admin.py:245 openatlas/views/admin.py:247
 #: openatlas/views/admin.py:310 openatlas/views/admin.py:312
@@ -958,19 +967,19 @@ msgstr ""
 msgid "admin"
 msgstr ""
 
-#: openatlas/templates/layout.html:125 openatlas/templates/layout.html:142
+#: openatlas/templates/layout.html:122 openatlas/templates/layout.html:139
 msgid "contact"
 msgstr ""
 
-#: openatlas/templates/layout.html:130 openatlas/templates/layout.html:154
+#: openatlas/templates/layout.html:127 openatlas/templates/layout.html:151
 msgid "legal_notice"
 msgstr ""
 
-#: openatlas/templates/layout.html:133
+#: openatlas/templates/layout.html:130
 msgid "logout"
 msgstr ""
 
-#: openatlas/templates/layout.html:161 openatlas/views/login.py:37
+#: openatlas/templates/layout.html:158 openatlas/views/login.py:37
 #: openatlas/views/login.py:99 openatlas/views/login.py:101
 #: openatlas/views/login.py:149
 msgid "login"
@@ -980,11 +989,11 @@ msgstr ""
 #: openatlas/templates/forms/table_select.html:56
 #: openatlas/templates/forms/tree_multi_select.html:50
 #: openatlas/templates/forms/tree_select.html:62
-#: openatlas/templates/layout.html:180
+#: openatlas/templates/layout.html:177
 msgid "close"
 msgstr ""
 
-#: openatlas/templates/layout.html:198
+#: openatlas/templates/layout.html:195
 msgid "warning no js"
 msgstr ""
 
