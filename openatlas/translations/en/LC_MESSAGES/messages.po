@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2023-01-08 22:00+0100\n"
-"PO-Revision-Date: 2023-01-08 22:01+0100\n"
+"POT-Creation-Date: 2023-01-08 22:05+0100\n"
+"PO-Revision-Date: 2023-01-08 22:06+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -569,6 +569,15 @@ msgstr "inverse"
 msgid "actor"
 msgstr "actor"
 
+#: openatlas/forms/manager.py:231 openatlas/forms/manager.py:443
+#: openatlas/forms/manager.py:542 openatlas/forms/manager.py:547
+msgid "insert and add"
+msgstr "insert and add"
+
+#: openatlas/forms/manager.py:232
+msgid "stratigraphic unit"
+msgstr "stratigraphic unit"
+
 #: openatlas/forms/manager.py:241 openatlas/views/admin.py:123
 #: openatlas/views/entity_index.py:39 openatlas/views/imports.py:156
 msgid "file"
@@ -605,11 +614,6 @@ msgstr "born in"
 #: openatlas/forms/manager.py:427
 msgid "died in"
 msgstr "died in"
-
-#: openatlas/forms/manager.py:443 openatlas/forms/manager.py:542
-#: openatlas/forms/manager.py:547
-msgid "insert and add"
-msgstr "insert and add"
 
 #: openatlas/forms/manager.py:443
 msgid "feature"

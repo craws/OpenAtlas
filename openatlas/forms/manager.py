@@ -228,8 +228,8 @@ class FeatureManager(BaseManager):
                 self.form_class,
                 'insert_continue_sub',
                 SubmitField(
-                    f"{uc_first(_('insert and add'))} "
-                    f"{_('stratigraphic unit')}"))
+                    uc_first(_('insert and add')) + ' '
+                    + _('stratigraphic unit')))
 
 
 class FileManager(BaseManager):
