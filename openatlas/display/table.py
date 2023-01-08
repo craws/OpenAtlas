@@ -6,6 +6,13 @@ from flask_login import current_user
 
 from openatlas.display.util import uc_first
 
+# Needed for translations
+_('previous')
+_('next')
+_('show')
+_('entries')
+_('showing %(first)s to %(last)s of %(all)s entries', first=1, last=25, all=38)
+
 
 class Table:
 
