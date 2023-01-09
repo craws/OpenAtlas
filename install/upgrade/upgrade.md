@@ -24,6 +24,9 @@ Install python3-requests for new feature API: fetch data from ARCHE (#1848):
 
     # apt install python3-requests
 
+### 7.9.x to 7.9.2
+A code base update (e.g. with git pull) and a webserver restart is sufficient.
+
 ### 7.9.0 to 7.9.1
 A code base update (e.g. with git pull) and a webserver restart is sufficient.
 

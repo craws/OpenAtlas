@@ -57,9 +57,8 @@ def get_geometries_thanados(
                 item['coordinates'] = check_geometries(item)
                 geometries.append(item)
             geom['geometries'] = [{'geom': item} for item in geometries]
-            return geom
-        geom['coordinates'] = check_geometries(geom)
-        return geom
+        else:
+            geom['coordinates'] = check_geometries(geom)
     return geom
 
 

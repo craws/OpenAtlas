@@ -61,7 +61,8 @@ def ext_references(links: list[Link]) -> str:
         system = g.reference_systems[link_.domain.id]
         html += link(
             f'{system.resolver_url}{link_.description}',
-            link_.description,
+            f'{system.resolver_url}{link_.description}',
+            uc_first_=False,
             external=True) if system.resolver_url else link_.description
         html += \
             f' ({ g.types[link_.type.id].name } ' + _('at') + \
