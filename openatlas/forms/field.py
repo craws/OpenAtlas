@@ -26,7 +26,7 @@ class RemovableListInput(HiddenInput):
             *args: Any,
             **kwargs: Any) -> RemovableListInput:
         [name, index] = field.id.split('-')
-        return super().__call__(field, **kwargs) + render_template(
+        return render_template(
             'forms/removable_list_field.html',
             value=field.data,
             name=name,
@@ -35,9 +35,6 @@ class RemovableListInput(HiddenInput):
 
 class RemovableListField(HiddenField):
     widget = RemovableListInput()
-
-    def _value(self) -> str:
-        return self.data
 
 
 class ValueTypeRoot(Input):
