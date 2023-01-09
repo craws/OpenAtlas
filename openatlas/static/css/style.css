@@ -164,3 +164,21 @@ table.table-no-style tr td{
 img.schema_image {
     width: 500px;
 }
+
+/* js tree */
+.jstree li > a > .jstree-icon {
+    display: none;
+}
+
+.jstree li > a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* modals */
+.modal-body {
+    overflow: auto;
+    max-height: calc(100vh - 200px);
+    width: 100%;
+}
