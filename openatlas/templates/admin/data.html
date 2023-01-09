@@ -20,7 +20,7 @@
     {% if 'admin'|is_authorized %}
       {{ _('execute SQL')|button(url_for('sql_index'))|safe }}
     {% endif %}
-    {% if config.ARCHE_ID %}
+    {% if config.ARCHE['id'] %}
       {{ 'ARCHE'|button(url_for('arche_index'))|safe }}
     {% endif %}
   </div>

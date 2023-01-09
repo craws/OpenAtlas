@@ -76,7 +76,7 @@ class ReferenceSystem(Entity):
         return choices
 
     @staticmethod
-    def insert_system(data: dict[str, str]) -> Entity:
+    def insert_system(data: dict[str, str]) -> ReferenceSystem:
         entity = Entity.insert(
             'reference_system',
             data['name'],
