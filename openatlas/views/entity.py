@@ -8,9 +8,9 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.display import display
+from openatlas.display.util import display_form, required_group, uc_first
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import display_form, required_group, uc_first
 from openatlas.views.link import AddReferenceForm
 
 
@@ -108,3 +108,20 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
             [_(entity.class_.view), url_for('index', view=entity.class_.view)],
             entity,
             f"{_('link')} {_('reference')}"])
+
+
+@app.route(
+    '/reference_system/remove_class/<int:system_id>/<class_name>',
+    methods=['POST', 'GET'])
+@required_group('manager')
+def reference_system_remove_class(system_id: int, class_name: str) -> Response:
+    for link_ in g.reference_systems[system_id].get_links('P67'):
+        if link_.range.class_.name == class_name:
+            abort(403)  # Abort because there are linked entities
+    try:
+        g.reference_systems[system_id].remove_class(class_name)
+        flash(_('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        g.logger.log('error', 'database', 'remove class failed', e)
+        flash(_('error database'), 'error')
+    return redirect(url_for('view', id_=system_id))

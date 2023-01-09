@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/static/node_modules/leaflet.fullscreen/Control.FullScreen.css">
 
 <script>
-  const geoNamesModule =     {{ 'true' if geonames_module else 'false' }};
+  const geoNamesModule =     {{ 'true' if class_name == 'place' and g.reference_system_geonames.classes else 'false' }};
   const geoNamesUsername =  '{{ g.settings.geonames_username }}';
   const gisPointAll =        {{ gis_data.gisPointAll|safe }};
   const gisPointSupers =     {{ gis_data.gisPointSupers|safe }};

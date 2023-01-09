@@ -125,12 +125,12 @@ class AdminTests(TestBaseCase):
 
             rv = self.app.post(
                 url_for('admin_content', item='citation_example'),
-                data={'en': 'citation as example', 'de': ''},
+                data={'en': 'cool citation'},
                 follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
             rv = self.app.get(url_for('insert', class_='edition'))
-            assert b'citation as example' in rv.data
+            assert b'cool citation' in rv.data
 
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data

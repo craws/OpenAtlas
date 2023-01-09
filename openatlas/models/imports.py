@@ -52,7 +52,7 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.util.util import sanitize
+        from openatlas.display.util import sanitize
         Db.update_project(
             project.id,
             project.name,

@@ -6,7 +6,6 @@ from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
-from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, SubmitField
@@ -15,10 +14,10 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
+from openatlas.display.util import (
+    button, display_form, display_info, manual, uc_first)
 from openatlas.forms.setting import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.util import get_form_settings, set_form_settings
-from openatlas.util.util import (
-    button, display_form, display_info, is_authorized, manual, uc_first)
 
 
 class PasswordForm(FlaskForm):
@@ -53,25 +52,24 @@ class PasswordForm(FlaskForm):
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index() -> str:
-    tabs = {'profile': Tab(
-        'profile',
-        content=display_info(get_form_settings(ProfileForm(), True)),
-        buttons=[manual('tools/profile')])}
-    if is_authorized('contributor'):
-        tabs['modules'] = Tab(
+    tabs = {
+        'profile': Tab(
+            'profile',
+            content=display_info(get_form_settings(ProfileForm(), True)),
+            buttons=[manual('tools/profile')]),
+        'modules': Tab(
             'modules',
             content=display_info(get_form_settings(ModulesForm(), True)),
-            buttons=[manual('tools/profile')])
-    tabs['display'] = Tab(
-        'display',
-        content=display_info(get_form_settings(DisplayForm(), True)),
-        buttons=[manual('tools/profile')])
+            buttons=[manual('tools/profile')]),
+        'display': Tab(
+            'display',
+            content=display_info(get_form_settings(DisplayForm(), True)),
+            buttons=[manual('tools/profile')])}
     if not app.config['DEMO_MODE']:
         tabs['profile'].buttons += [
             button(_('edit'), url_for('profile_settings', category='profile')),
             button(_('change password'), url_for('profile_password'))]
-        if is_authorized('contributor'):
-            tabs['modules'].buttons.append(
+        tabs['modules'].buttons.append(
                 button(
                     _('edit'),
                     url_for('profile_settings', category='modules')))
@@ -87,9 +85,6 @@ def profile_index() -> str:
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
 @login_required
 def profile_settings(category: str) -> Union[str, Response]:
-    if category not in ['profile', 'display'] \
-            and not is_authorized('contributor'):
-        abort(403)
     form = getattr(
         importlib.import_module('openatlas.forms.setting'),
         f"{uc_first(category)}Form")()
@@ -114,7 +109,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             Transaction.commit()
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

@@ -7,7 +7,6 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from tests.base import TestBaseCase
 
@@ -31,16 +30,12 @@ class PlaceTest(TestBaseCase):
                     'https://openatlas.eu')
                 place_type = Type.get_hierarchy('Place')
                 source = Entity.insert('source', 'Necronomicon')
-            geonames = \
-                f"reference_system_id_" \
-                f"{ReferenceSystem.get_by_name('GeoNames').id}"
-            precision = Type.get_hierarchy('External reference match').subs[0]
             data = {
                 'name': 'Asgard',
                 'alias-0': 'Valhöll',
                 unit_type.id: str([unit_sub1.id, unit_sub2.id]),
-                geonames: '123456',
-                self.precision_geonames: precision,
+                self.geonames: '123456',
+                self.precision_geonames: self.precision_type.subs[0],
                 self.precision_wikidata: ''}
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=reference.id),
@@ -48,13 +43,11 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Asgard' in rv.data and b'An entry has been' in rv.data
 
-            rv = self.app.get(url_for('view', id_=precision))
+            rv = self.app.get(url_for('view', id_=self.precision_type.subs[0]))
             assert b'Asgard' in rv.data
 
             rv = self.app.get(
-                url_for(
-                    'view',
-                    id_=ReferenceSystem.get_by_name('GeoNames').id))
+                url_for('view', id_=g.reference_system_geonames.id))
             assert b'Asgard' in rv.data
 
             data['gis_points'] = """[{
@@ -90,7 +83,6 @@ class PlaceTest(TestBaseCase):
                     "description": "",
                     "shapeType": "shape"}}]"""
             data[place_type.id] = place_type.subs
-            data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('insert', class_='place', origin_id=source.id),
                 data=data,
@@ -172,8 +164,7 @@ class PlaceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
-            path = \
-                pathlib.Path(app.root_path) \
+            path = pathlib.Path(app.root_path) \
                 / 'static' / 'images' / 'layout' / 'logo.png'
             with open(path, 'rb') as img:
                 rv = self.app.post(
@@ -186,6 +177,7 @@ class PlaceTest(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 file = Entity.get_by_class('file')[0]
                 link_id = Link.insert(file, 'P67', place)[0]
+
             rv = self.app.get(
                 url_for(
                     'overlay_insert',
@@ -289,7 +281,7 @@ class PlaceTest(TestBaseCase):
             data = {
                 'name': "Try continue",
                 'continue_': 'sub',
-                self.precision_geonames: precision,
+                self.precision_geonames: self.precision_type.subs[0],
                 self.precision_wikidata: ''}
             rv = self.app.post(
                 url_for('insert', class_='place'),
@@ -307,6 +299,15 @@ class PlaceTest(TestBaseCase):
             self.app.get(url_for('insert', class_='place', origin_id=feat_id))
             self.app.get(url_for('update', id_=feat_id))
             self.app.post(url_for('update', id_=feat_id), data=data)
+
+            rv = self.app.get(
+                url_for(
+                    'insert',
+                    class_='stratigraphic_unit',
+                    origin_id=feat_id),
+                data=data)
+            assert b'Insert and add human remains' in rv.data
+
             data['name'] = "I'm a stratigraphic unit"
             data['place'] = feat_id
             rv = self.app.post(
@@ -332,7 +333,7 @@ class PlaceTest(TestBaseCase):
                 'name': 'You never find me',
                 'artifact_super': strati_id,
                 Type.get_hierarchy('Dimensions').subs[0]: 50,
-                self.precision_geonames: precision,
+                self.precision_geonames: self.precision_type.subs[0],
                 self.precision_wikidata: ''}
             rv = self.app.post(
                 url_for('insert', class_='artifact', origin_id=strati_id),
@@ -358,7 +359,7 @@ class PlaceTest(TestBaseCase):
                 'actor': actor.id,
                 'human_remains_super': strati_id,
                 human_remains_type.id: str([human_remains_type_sub.id]),
-                self.precision_geonames: precision,
+                self.precision_geonames: self.precision_type.subs[0],
                 self.precision_wikidata: ''}
             rv = self.app.post(
                 url_for('insert', class_='human_remains', origin_id=strati_id),

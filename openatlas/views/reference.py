@@ -7,9 +7,9 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.util import display_form, required_group, uc_first
 from openatlas.forms.form import get_add_reference_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import display_form, required_group, uc_first
 
 
 @app.route('/reference/add/<int:id_>/<view>', methods=['POST', 'GET'])

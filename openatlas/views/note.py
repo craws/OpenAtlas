@@ -11,11 +11,11 @@ from wtforms import BooleanField, SubmitField, TextAreaField
 
 from openatlas import app
 from openatlas.display.tab import Tab
-from openatlas.models.entity import Entity
-from openatlas.models.user import User
-from openatlas.util.util import (
+from openatlas.display.util import (
     button, display_form, is_authorized, link, manual, required_group,
     uc_first)
+from openatlas.models.entity import Entity
+from openatlas.models.user import User
 
 
 class NoteForm(FlaskForm):

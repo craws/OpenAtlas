@@ -11,9 +11,9 @@ from openatlas import app
 from openatlas.database.date import Date
 from openatlas.database.entity import Entity as Db
 from openatlas.models.link import Link
-from openatlas.util.util import (
-    datetime64_to_timestamp, format_date_part, get_base_table_data, sanitize,
-    timestamp_to_datetime64)
+from openatlas.display.util import datetime64_to_timestamp, format_date_part, \
+    get_base_table_data, \
+    sanitize, timestamp_to_datetime64
 
 if TYPE_CHECKING:  # pragma: no cover
     from openatlas.models.type import Type

@@ -15,8 +15,7 @@ def current_date_for_filename() -> str:
 
 
 def sql_export(postfix: Optional[str] = '') -> bool:
-    file = \
-        app.config['EXPORT_DIR'] \
+    file = app.config['EXPORT_DIR'] \
         / f'{current_date_for_filename()}_dump{postfix}.sql'
     pg_dump = "pg_dump" if os.name == 'posix' \
         else f'"{shutil.which("pg_dump.exe")}"'
@@ -41,7 +40,7 @@ def sql_export(postfix: Optional[str] = '') -> bool:
                 ['7z', 'a', f'{file}.7z', file],
                 stdout=null).wait()
         file.unlink()
-    except Exception:
+    except Exception:  # pragma: no cover
         return False
 
     return True

@@ -5,10 +5,10 @@ from shutil import copyfile
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.display.image_processing import safe_resize_image
 from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.image_processing import safe_resize_image
 from tests.base import TestBaseCase, insert_entity
 
 

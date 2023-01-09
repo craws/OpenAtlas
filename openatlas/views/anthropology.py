@@ -9,34 +9,33 @@ from wtforms import SelectField, SubmitField
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import (
+    button, display_form, is_authorized, manual, required_group, uc_first)
 from openatlas.models.anthropology import SexEstimation, get_types
 from openatlas.models.entity import Entity
-from openatlas.util.util import (
-    button, display_form, is_authorized, manual, required_group, uc_first)
+
+# Needed for translations
+_('female')
+_('likely female')
+_('indifferent')
+_('likely male')
+_('male')
 
 
 def name_result(result: float) -> str:
-    # Needed for translations
-    _('female')
-    _('likely female')
-    _('indifferent')
-    _('likely male')
-    _('male')
-    _('corresponds to')
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
-    return ''
+    return ''  # pragma: no cover
 
 
 def print_result(entity: Entity) -> str:
-    calculation = SexEstimation.calculate(entity)
-    if calculation is None:
-        return ''
-    return \
-        'Ferembach et al. 1979: ' \
-        f'<span class="anthro-result">{calculation}</span>' \
-        f' - {_("corresponds to")} "{name_result(calculation)}"'
+    html = ''
+    if result := SexEstimation.calculate(entity):
+        html = \
+            f'Ferembach et al. 1979: <strong>{result}</strong> ' + \
+            _('corresponds to') + f' <strong>{name_result(result)}</strong>'
+    return html
 
 
 @app.route('/anthropology/index/<int:id_>')
@@ -116,13 +115,12 @@ def sex_update(id_: int) -> Union[str, Response]:
             Transaction.begin()
             SexEstimation.save(entity, data, types)
             Transaction.commit()
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('sex', id_=entity.id))
 
-    # Fill in data
     for dict_ in types:
         getattr(form, g.types[dict_['id']].name).data = dict_['description']
     return render_template(

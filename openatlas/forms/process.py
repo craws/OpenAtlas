@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.util import sanitize
+from openatlas.display.util import sanitize
 
 
 def process_standard_fields(manager: Any) -> None:
