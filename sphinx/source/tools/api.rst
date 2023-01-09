@@ -254,10 +254,10 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.
 
 
 :doc:`Version 0.3 Stable<api_version0_3>`
-----------------------------------
+-----------------------------------------
 
 :doc:`Version 1.0 Unstable<api_version1_0>`
-----------------------------------
+-------------------------------------------
 
 :doc:`Version 0.2<api_version0_2>`
 ----------------------------------
@@ -266,7 +266,7 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.
 ----------------------------------
 
 Parameter definition
---------------
+--------------------
 
 .. list-table::
    :widths: 20 15 45 20
@@ -325,8 +325,7 @@ Parameter definition
         * n3
         * turtle
         * nt
-        * xml
-        (subunits endpoint can only handle xml)
+        * xml (subunits endpoint can only handle xml)
    * - geometry
      - string
      - Select a preferred geometry
@@ -474,7 +473,7 @@ An error message is provided by its own error handler
 
 
 Authentication guide
-----------------------
+--------------------
 No authentication is needed to use the OpenAtlas API.
 
 

@@ -89,7 +89,8 @@ pagination
    * - /api/entities/1.0/linked-to-type-including-subtypes/{id}
      - limit, column, sort, search, first, last, show, relation-type, type-id,
        count, download, format, export, page
-     - Retrieve a list of entities, based on their OpenAtlas type ID including all connected subtypes(2)(3)
+     - Retrieve a list of entities, based on their OpenAtlas type ID including
+       all connected subtypes(2)(3)
 
 (1) All codes available in OpenAtlas can be found under
 `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_

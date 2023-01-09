@@ -10,4 +10,5 @@ Tools
    map
    network
    api
+
    anthropological_analyses

@@ -127,7 +127,6 @@ information see this <a class="reference external" href="https://www.botify.com/
 </ul>
 <p>Using the above-mentioned <strong>https://demo.openatlas.eu/api/1/entity/5117</strong>
 yields the following result:</p>
-<p>..code-block:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
   <span class="s2">&quot;@context&quot;</span><span class="p">:</span> <span class="s2">&quot;https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.1.jsonld&quot;</span><span class="p">,</span>
   <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;FeatureCollection&quot;</span><span class="p">,</span>
@@ -313,7 +312,7 @@ yields the following result:</p>
 <a class="reference external" href="https://en.wikipedia.org/wiki/Software_versioning#Sequence-based_identifiers">sequenced based versioning</a>
 and reflects the significance: <strong>major.minor.fix</strong> e.g. <strong>3.11.1</strong>. Only the
 <strong>major</strong> number is used for the URL path. <strong>Minor</strong> and <strong>fix</strong> are used for
-documentation reasons only with the exeption of versions 0.1, 0.2 and 0.3.
+documentation reasons only with the exception of versions 0.1, 0.2 and 0.3.
 A <strong>stable</strong> version of the API will be available at all times. In addition,
 <strong>previous</strong> versions will still be usable but tagged as <strong>deprecated</strong>. A
 warning will be posted in the
@@ -334,279 +333,261 @@ instance. The requested information is provided in Linked Places format
 (<a class="reference external" href="https://github.com/LinkedPasts/linked-places-format">LPF</a>). Alternatively,
 GeoJSON or RDFs, derived from the LPF data, can be accessed.</p>
 </section>
-<section id="version-1-0">
-<h2>Version 1.0<a class="headerlink" href="#version-1-0" title="Permalink to this headline"></a></h2>
-<section id="entity-endpoint">
-<h3>Entity endpoint<a class="headerlink" href="#entity-endpoint" title="Permalink to this headline"></a></h3>
-<p><strong>Single entities</strong></p>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/entity/{id}</p></td>
-<td><p>show, download,export,format</p></td>
-<td><p>Retrieves all information about a single entity</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Query</strong> - Combine several or all entity endpoints in one query</p>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/entities/query/</p></td>
-<td><p><strong>ids</strong>, <strong>cidoc-classes</strong>, <strong>menu-item</strong>, <strong>classes</strong>,
-<strong>linked-to-entity</strong>, <strong>linked-to-type</strong>,
-<strong>linked-to-type-including-subtypes</strong>, limit, column, sort, search,
-first, last, show, relation-type, type-id, count, download, format,
-export, page</p></td>
-<td><p>Retrieves a list with entity ID, CIDOC CRM code, system class, or menu
-item. Combine up to four of the aforementioned endpoints in a single
-query; each request has to be a new parameter; Possible parameters are:
-entities={id}, classes={cidoc-class-code}, codes={view-name},
-system_classes={system-class}(2)</p></td>
-</tr>
-</tbody>
-</table>
-<p><strong>Multiple entities</strong> - Results in list form include related entities and
-pagination</p>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/entities/cidoc-class/{cidoc-class}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieve a list of entities, based on their CIDOC CRM class code(1)(2),
-e.g. “E18” or “E22” (see <a class="reference internal" href="../model/cidoc_crm.html"><span class="doc">CIDOC CRM</span></a>)</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/entities/menu-item/{menu-item}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieves a list of entities based on their OpenAtlas menu items
-(available menu items are: source, event, actor, place, artifact,
-reference, source_translation, file, and type)</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/entities/class/{class}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieves a list of entities, based on their OpenAtlas class name
-(available system classes are: acquisition’, ‘activity’,
-‘actor_appellation’,’administrative_unit’, ‘appellation’, ‘artifact’,
-‘bibliography’, ‘edition’, ‘external_reference’, ‘feature’,’file’,
-‘find’, ‘group’, ‘human_remains’, ‘move’, ‘object_location’, ‘person’,
-‘place’, ‘reference_system’, ‘source’, ‘stratigraphic_unit’,
-‘source_translation’, ‘type’)(1)(2).</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/entities/last-entered/{n} (n represents a number between 1
-and 100)</p></td>
-<td><p>show, relation-type, download, format, export</p></td>
-<td><p>Retrieves the last entered ebtities. n represents the amount of entities
-retrieved (up to 100). The pagination information is always <strong>null</strong></p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/entities/linked-to-entity/{id}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieves a list of entities linked to the stated entity (2)</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/entities/linked-to-type/{id}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieves a list of entities based on their OpenAtlas type ID (2)(3).
-For an endpoint that lists all available  types, see “type endpoints”</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/entities/1.0/linked-to-type-including-subtypes/{id}</p></td>
-<td><p>limit, column, sort, search, first, last, show, relation-type, type-id,
-count, download, format, export, page</p></td>
-<td><p>Retrieve a list of entities, based on their OpenAtlas type ID including all connected subtypes(2)(3)</p></td>
-</tr>
-</tbody>
-</table>
-<p>(1) All codes available in OpenAtlas can be found under
-<a class="reference external" href="https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints">OpenAtlas and CIDOC CRM class mapping</a>
-(2) The result can be filtered, sorted, and manipulated through different
-parameters. By default 20 entities in alphabetical order are shown.
-(3) Available IDs can be obtained by using the type-tree or node-overview
-endpoint.
-Required parameters are shown as <strong>bold</strong>.</p>
+<section id="version-0-3-stable">
+<h2><a class="reference internal" href="api_version0_3.html"><span class="doc">Version 0.3 Stable</span></a><a class="headerlink" href="#version-0-3-stable" title="Permalink to this headline"></a></h2>
 </section>
-<section id="type-endpoints">
-<h3>Type endpoints<a class="headerlink" href="#type-endpoints" title="Permalink to this headline"></a></h3>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/types/hierarchy/</p></td>
-<td><p>download</p></td>
-<td><p>Retrives a list of all OpenAtlas types, sorted by custom, place,
-standard, and value; replaces the older /api/node_overview endpoint</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/types/hierarchy/standard/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all standard types</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/types/hierarchy/value/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all value types</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/types/hierarchy/custom/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all custom types</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/types/hierarchy/place/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all place types</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/types/hierarchy/reference-system/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all reference system types</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/types/hierarchy/system-types/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all system types</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/types/list/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all OpenAtlas types, including their information</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="administrative-endpoints">
-<h3>Administrative endpoints<a class="headerlink" href="#administrative-endpoints" title="Permalink to this headline"></a></h3>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/export-database/{format}</p></td>
-<td><p>none</p></td>
-<td><p>Downloads all information in an OpenAtlas instance as CSV, XML or JSON</p></td>
-</tr>
-<tr class="row-odd"><td><p>api/1.0/openatlas-classes/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a list of all available classes, their CIDOC CRM mapping,
-their view, which icon can be used, if aliases and reference systems are
-allowed, which standard type it has, and how many entities are linked</p></td>
-</tr>
-<tr class="row-even"><td><p>/api/1.0/content/</p></td>
-<td><p>download, lang</p></td>
-<td><p>Retrieves a detailed list of information on available frontend content
-in an OpenAtlas instance - intro, legal, notice, contact, and size of
-processed images</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/system-class-count/</p></td>
-<td><p>download</p></td>
-<td><p>Retrieves a detailed list of the number of entities connected to a
-system class</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="special-entities-and-output-formats">
-<h3>Special entities and output formats<a class="headerlink" href="#special-entities-and-output-formats" title="Permalink to this headline"></a></h3>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/subunits/{id}</p></td>
-<td><p>download, format, count</p></td>
-<td><p>Displays all subunits of a place in a special format as used by the
-<a class="reference external" href="https://thanados.net">THANADOS</a> project. This cann only be used for
-<strong>Places</strong>. As format only XML can be chosen</p></td>
-</tr>
-<tr class="row-odd"><td><p>/api/1.0/geometric-entities/</p></td>
-<td><p>count, download, geometry</p></td>
-<td><p>Retrieves a <strong>GeoJSON</strong> of all chosen geometries in an OpenAtlas
-instance</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-<section id="image-endpoints">
-<h3>Image endpoints<a class="headerlink" href="#image-endpoints" title="Permalink to this headline"></a></h3>
-<table class="colwidths-given docutils align-default">
-<colgroup>
-<col style="width: 25%" />
-<col style="width: 25%" />
-<col style="width: 50%" />
-</colgroup>
-<thead>
-<tr class="row-odd"><th class="head"><p>API endpoint</p></th>
-<th class="head"><p>Possible parameters</p></th>
-<th class="head"><p>Description</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>/api/1.0/display/{id}</p></td>
-<td><p>download, image-size</p></td>
-<td><p>Retrieves the respective image if it has a license</p></td>
-</tr>
-</tbody>
-</table>
-</section>
-</section>
-<section id="version-0-3">
-<h2><a class="reference internal" href="api_version0_3.html"><span class="doc">Version 0.3</span></a><a class="headerlink" href="#version-0-3" title="Permalink to this headline"></a></h2>
+<section id="version-1-0-unstable">
+<h2><a class="reference internal" href="api_version1_0.html"><span class="doc">Version 1.0 Unstable</span></a><a class="headerlink" href="#version-1-0-unstable" title="Permalink to this headline"></a></h2>
 </section>
 <section id="version-0-2">
 <h2><a class="reference internal" href="api_version0_2.html"><span class="doc">Version 0.2</span></a><a class="headerlink" href="#version-0-2" title="Permalink to this headline"></a></h2>
 </section>
 <section id="version-0-1">
 <h2><a class="reference internal" href="api_version0_1.html"><span class="doc">Version 0.1</span></a><a class="headerlink" href="#version-0-1" title="Permalink to this headline"></a></h2>
+</section>
+<section id="parameter-definition">
+<h2>Parameter definition<a class="headerlink" href="#parameter-definition" title="Permalink to this headline"></a></h2>
+<table class="colwidths-given docutils align-default">
+<colgroup>
+<col style="width: 20%" />
+<col style="width: 15%" />
+<col style="width: 45%" />
+<col style="width: 20%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Parameter</p></th>
+<th class="head"><p>Format</p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Values</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>cidoc_class/cidoc_classes/cidoc-class/cidoc-classes</p></td>
+<td><p>string</p></td>
+<td><p>CIDOC CRM class code (e.g. E21)</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>column</p></td>
+<td><p>string</p></td>
+<td><p>Results will be sorted by the given column</p></td>
+<td><ul class="simple">
+<li><p>ID</p></li>
+<li><p>classCode</p></li>
+<li><p>name</p></li>
+<li><p>description</p></li>
+<li><p>created</p></li>
+<li><p>modified</p></li>
+<li><p>systemClass</p></li>
+<li><p>beginFrom</p></li>
+<li><p>beginTo</p></li>
+<li><p>endFrom</p></li>
+<li><p>endTo</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>count</p></td>
+<td><p>boolean</p></td>
+<td><p>Returns the total count of results as integer</p></td>
+<td><p>True/False</p></td>
+</tr>
+<tr class="row-odd"><td><p>download</p></td>
+<td><p>boolean</p></td>
+<td><p>Triggers file download of the requested data in a file</p></td>
+<td><p>True/False</p></td>
+</tr>
+<tr class="row-even"><td><p>entities</p></td>
+<td><p>integer</p></td>
+<td><p>Specific entity ID</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>export</p></td>
+<td><p>string</p></td>
+<td><p>Results will be downloaded in the given format</p></td>
+<td><ul class="simple">
+<li><p>csv</p></li>
+<li><p>csvNetwork</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>first</p></td>
+<td><p>integer</p></td>
+<td><p>List of results starting with given ID</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>format</p></td>
+<td><p>string</p></td>
+<td><p>Select a preferred output format</p></td>
+<td><ul class="simple">
+<li><p>lp</p></li>
+<li><p>geojson</p></li>
+<li><p>geojson-v2</p></li>
+<li><p>pretty-xml</p></li>
+<li><p>n3</p></li>
+<li><p>turtle</p></li>
+<li><p>nt</p></li>
+<li><p>xml (subunits endpoint can only handle xml)</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>geometry</p></td>
+<td><p>string</p></td>
+<td><p>Select a preferred geometry</p></td>
+<td><ul class="simple">
+<li><p>gisAll</p></li>
+<li><p>gisPointAll</p></li>
+<li><p>gisPointSupers</p></li>
+<li><p>gisPointSubs</p></li>
+<li><p>gisPointSibling</p></li>
+<li><p>gisLineAll</p></li>
+<li><p>gisPolygonAll</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>id</p></td>
+<td><p>integer</p></td>
+<td><p>Specific entity ID in OpenAtlas instance</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>image-size/image_size</p></td>
+<td><p>string</p></td>
+<td><p>Select the size category for the displayed image (can be modified in production.py)</p></td>
+<td><ul class="simple">
+<li><p>thumbnail</p></li>
+<li><p>table</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>lang</p></td>
+<td><p>string</p></td>
+<td><p>Select an output language</p></td>
+<td><ul class="simple">
+<li><p>en</p></li>
+<li><p>de</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>last</p></td>
+<td><p>integer</p></td>
+<td><p>JSON list of results start with entity after given ID</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>latest</p></td>
+<td><p>integer</p></td>
+<td><p>Number of last database entries to be returned; only numbers between 1 and 100 are valid</p></td>
+<td><p>1 - 100</p></td>
+</tr>
+<tr class="row-even"><td><p>limit</p></td>
+<td><p>integer</p></td>
+<td><p>Number of entities returned per page</p></td>
+<td><ul class="simple">
+<li><p>0 corresponds to “no limit set”</p></li>
+<li><p>Default is set to 20 entities</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>none</p></td>
+<td></td>
+<td><p>No parameters are required</p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p>page</p></td>
+<td><p>integer</p></td>
+<td><p>Jump to chosen page</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>relation_type/relation-type</p></td>
+<td><p>string</p></td>
+<td><p>Select which relations are shown</p></td>
+<td><p>E.g. P53</p></td>
+</tr>
+<tr class="row-even"><td><p>search</p></td>
+<td><p>string</p></td>
+<td><p>Search request with AND/OR logic</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>show</p></td>
+<td><p>string</p></td>
+<td><p>Select a key to be shown. If using “not”, no other keys will be displayed.</p></td>
+<td><ul class="simple">
+<li><p>description</p></li>
+<li><p>depictions</p></li>
+<li><p>geometry</p></li>
+<li><p>links</p></li>
+<li><p>names</p></li>
+<li><p>not</p></li>
+<li><p>relations</p></li>
+<li><p>types</p></li>
+<li><p>when</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>sort</p></td>
+<td><p>string</p></td>
+<td><p>Results will be sorted asc/desc (default column is name)</p></td>
+<td><ul class="simple">
+<li><p>asc</p></li>
+<li><p>desc</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-odd"><td><p>system_class/system_classes/system-class/system-classes</p></td>
+<td><p>string</p></td>
+<td><p>Needs to be one of the OpenAtlas system classes</p></td>
+<td><ul class="simple">
+<li><p>all</p></li>
+<li><p>administrative_unit</p></li>
+<li><p>type</p></li>
+<li><p>acquisition</p></li>
+<li><p>activity</p></li>
+<li><p>actor_actor_relation</p></li>
+<li><p>actor_function</p></li>
+<li><p>appellation</p></li>
+<li><p>artifact</p></li>
+<li><p>bibliography</p></li>
+<li><p>edition</p></li>
+<li><p>external_reference</p></li>
+<li><p>feature</p></li>
+<li><p>file</p></li>
+<li><p>group</p></li>
+<li><p>human_remains</p></li>
+<li><p>involvement</p></li>
+<li><p>move</p></li>
+<li><p>object_location</p></li>
+<li><p>person</p></li>
+<li><p>place</p></li>
+<li><p>production</p></li>
+<li><p>reference_system</p></li>
+<li><p>source</p></li>
+<li><p>source_translation</p></li>
+<li><p>stratigraphic_unit</p></li>
+</ul>
+</td>
+</tr>
+<tr class="row-even"><td><p>type_id/type-id</p></td>
+<td><p>integer</p></td>
+<td><p>Output will be filtered by chosen type ID and only entities with this type ID will be displayed; the relation is in logical OR</p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p>view_class/view_classes/view-class/view-classes</p></td>
+<td><p>string</p></td>
+<td><p>Needs to be one of the OpenAtlas menu items</p></td>
+<td><ul class="simple">
+<li><p>actor</p></li>
+<li><p>all</p></li>
+<li><p>artifact</p></li>
+<li><p>event</p></li>
+<li><p>file</p></li>
+<li><p>object</p></li>
+<li><p>place</p></li>
+<li><p>reference</p></li>
+<li><p>source</p></li>
+<li><p>source_translation</p></li>
+<li><p>type</p></li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </section>
 <section id="error-handling">
 <h2>Error handling<a class="headerlink" href="#error-handling" title="Permalink to this headline"></a></h2>
@@ -617,13 +598,12 @@ not possible. Codes in the 5xx range indicate a server error.
 If any issues occur when using the OpenAtlas API, a case-specific error message
 is provided in JSON format, describing the error in more detail.</p>
 <p>Example:</p>
-<p>..code-block:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>{
-    “title”: “entity does not exist”,
-     “message”: “Requested entity does not exist. Try another ID”
-     “timestamp”: “Tue, 19 Jul 2022 13:59:13 GMT”,
-     “status”: 404
- }
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="s2">&quot;entity does not exist&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Requested entity does not exist. Try another ID&quot;</span>
+     <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="s2">&quot;Tue, 19 Jul 2022 13:59:13 GMT&quot;</span><span class="p">,</span>
+     <span class="s2">&quot;status&quot;</span><span class="p">:</span> <span class="mi">404</span>
+ <span class="p">}</span>
 </pre></div>
 </div>
 <p>If an invalid endpoint parameter value e.g. ?sort=kfs instead of ?sort=desc is
@@ -632,8 +612,8 @@ entered, Flask catches this via its own
 An error message is provided by its own error handler
 <a class="reference external" href="https://flask-restful.readthedocs.io/en/latest/reqparse.html#error-handling">error handler</a></p>
 </section>
-<section id="authentification-guide">
-<h2>Authentification guide<a class="headerlink" href="#authentification-guide" title="Permalink to this headline"></a></h2>
+<section id="authentication-guide">
+<h2>Authentication guide<a class="headerlink" href="#authentication-guide" title="Permalink to this headline"></a></h2>
 <p>No authentication is needed to use the OpenAtlas API.</p>
 </section>
 </section>
