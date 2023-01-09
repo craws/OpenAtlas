@@ -2,13 +2,13 @@ from typing import Any
 
 import rdflib
 import requests
+from flask import g
 from requests import Response
 
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.imports import is_float
 from openatlas.database.gis import Gis as Db
-from openatlas.models.reference_system import ReferenceSystem
 
 
 def fetch_arche_data() -> dict[int, Any]:
@@ -52,7 +52,10 @@ def get_linked_image(data: list[dict[str, Any]]) -> str:
 
 def import_arche_data() -> list[Entity]:
     entities = []
-    arche_ref = ReferenceSystem.get_by_name('ARCHE')
+    # Fix after merge
+    # arche_ref = ReferenceSystem.get_by_name('ARCHE')
+    arche_ref = [system for system in g.reference_systems.values()
+                 if system.name == 'ARCHE'][0]
     for entries in fetch_arche_data().values():
         for metadata in entries.values():
             name = metadata['name']

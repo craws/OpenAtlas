@@ -4,11 +4,11 @@ from werkzeug.utils import redirect
 from openatlas import app
 from openatlas.api.arche.function import fetch_arche_data, import_arche_data
 from openatlas.database.connect import Transaction
+from openatlas.display.tab import Tab
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    required_group, is_authorized, display_info, button)
 from openatlas.models.imports import Import
-from openatlas.util.tab import Tab
-from openatlas.util.table import Table
-from openatlas.util.util import required_group, display_info, button, \
-    is_authorized
 from flask_babel import lazy_gettext as _
 
 
