@@ -330,11 +330,11 @@ msgstr "texto"
 
 #: openatlas/display/table.py:10
 msgid "previous"
-msgstr ""
+msgstr "anterior"
 
 #: openatlas/display/table.py:11
 msgid "next"
-msgstr ""
+msgstr "siguiente"
 
 #: openatlas/display/table.py:12 openatlas/forms/display.py:206
 #: openatlas/templates/layout.html:34 openatlas/templates/type/index.html:107
@@ -345,12 +345,12 @@ msgstr "muestra"
 
 #: openatlas/display/table.py:13
 msgid "entries"
-msgstr ""
+msgstr "ítems"
 
 #: openatlas/display/table.py:14
 #, python-format
 msgid "showing %(first)s to %(last)s of %(all)s entries"
-msgstr ""
+msgstr "mostrando del %(primero)s a %(último)s de %(todas)s ítems""
 
 #: openatlas/display/util.py:49
 #, python-format
@@ -380,11 +380,11 @@ msgstr "no hay vista previa disponible"
 
 #: openatlas/display/util.py:167
 msgid "unset"
-msgstr "sin valor"
+msgstr "Deseleccionar"
 
 #: openatlas/display/util.py:173 openatlas/views/admin.py:613
 msgid "set"
-msgstr "set"
+msgstr "Seleccionar"
 
 #: openatlas/display/util.py:191 openatlas/views/admin.py:522
 #: openatlas/views/export.py:69
@@ -543,10 +543,11 @@ msgid "tooltip_required_type"
 msgstr ""
 "Este campo de tipo es obligatorio, pero no tiene permiso para crear "
 "tipos. Si esto lo coloca en una posición difícil, debe discutirlo con "
+"el gestor del proyecto"
 
 #: openatlas/forms/display.py:205 openatlas/templates/layout.html:35
 msgid "hide"
-msgstr "oculta"
+msgstr "ocultar"
 
 #: openatlas/forms/form.py:42 openatlas/views/link.py:22
 msgid "page"
@@ -575,11 +576,11 @@ msgstr "actor"
 #: openatlas/forms/manager.py:231 openatlas/forms/manager.py:443
 #: openatlas/forms/manager.py:542 openatlas/forms/manager.py:547
 msgid "insert and add"
-msgstr ""
+msgstr "inserta y añade"
 
 #: openatlas/forms/manager.py:232
 msgid "stratigraphic unit"
-msgstr ""
+msgstr "unidad estratigráfica"
 
 #: openatlas/forms/manager.py:241 openatlas/views/admin.py:123
 #: openatlas/views/entity_index.py:39 openatlas/views/imports.py:156
@@ -600,7 +601,7 @@ msgstr "Si está marcada, se pueden usar múltiples opciones para una entidad."
 
 #: openatlas/forms/manager.py:305 openatlas/templates/type/index.html:81
 msgid "multiple"
-msgstr "multiple"
+msgstr "múltiple"
 
 #: openatlas/forms/manager.py:373 openatlas/templates/search.html:12
 msgid "from"
@@ -620,7 +621,7 @@ msgstr "murió en"
 
 #: openatlas/forms/manager.py:443
 msgid "feature"
-msgstr ""
+msgstr "característica"
 
 #: openatlas/forms/manager.py:498
 msgid "Link artifacts as the information carrier of the source"
@@ -628,7 +629,7 @@ msgstr "Enlazar artefactos como portadores de información de la fuente"
 
 #: openatlas/forms/manager.py:547
 msgid "human remains"
-msgstr ""
+msgstr "restos humanos"
 
 #: openatlas/forms/setting.py:15
 msgid "map overlay"
@@ -664,7 +665,7 @@ msgstr "longitud mínima de la contraseña"
 
 #: openatlas/forms/setting.py:35
 msgid "reset confirm hours"
-msgstr "restablecer confirmar horas"
+msgstr "restablecer horario de confirmación"
 
 #: openatlas/forms/setting.py:36
 msgid "failed login tries"
@@ -1891,9 +1892,7 @@ msgstr "Muchas gracias por sus comentarios"
 
 #: openatlas/views/index.py:145
 msgid "unsubscribe link not valid"
-msgstr ""
-"Lo sentimos, pero este enlace parece inválido, también puedes darte de "
-"baja del "
+msgstr "Este enlace no es válido."
 
 #: openatlas/views/index.py:151
 msgid ""
@@ -1930,8 +1929,8 @@ msgstr "enviar"
 #: openatlas/views/login.py:58
 msgid "error login attempts exceeded"
 msgstr ""
-"Demasiados intentos de inicio de sesión. Puede volver a intentarlo en "
-"unos minutos."
+"Demasiados intentos de inicio de sesión. "
+"Puede volver a intentarlo en unos minutos."
 
 #: openatlas/views/login.py:81
 msgid "error inactive"
@@ -1954,28 +1953,28 @@ msgstr "Solicitud de restablecimiento de contraseña para %(site_name)s"
 #, python-format
 msgid "We received a password reset request for %(username)s"
 msgstr ""
-"Recibimos una solicitud de restablecimiento de contraseña para "
-"%(username)s"
+"Recibimos una solicitud de restablecimiento "
+"de contraseña para %(username)s"
 
 #: openatlas/views/login.py:132
 #, python-format
 msgid "A password reset confirmation mail was send to %(email)s."
 msgstr ""
-"Se envió un correo de confirmación de restablecimiento de contraseña a "
-"%(email)s."
+"Se envió un correo de confirmación de "
+"restablecimiento de contraseña a %(email)s."
 
 #: openatlas/views/login.py:137
 #, python-format
 msgid "Failed to send password reset confirmation mail to %(email)s."
 msgstr ""
-"No se pudo enviar el correo de confirmación de restablecimiento de "
-"contraseña a %(email)s. "
+"No se pudo enviar el correo de confirmación de "
+"restablecimiento de contraseña a %(email)s."
 
 #: openatlas/views/login.py:145
 msgid "error non existing email"
 msgstr ""
-"Lo sentimos, pero esta dirección de correo electrónico es desconocida "
-"para nosotros."
+"Lo sentimos, pero esta dirección de correo electrónico "
+"es desconocida para nosotros."
 
 #: openatlas/views/login.py:157
 msgid "invalid password reset confirmation code"
