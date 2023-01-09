@@ -301,11 +301,11 @@ function selectFromTableMulti(name) {
   $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
     function () {
       if ($(this).is(':checked')) {
-        checkedNames += $(this).val();
+        checkedNames.push($(this).val());
         ids.push($(this).attr('id'));
       }
     });
-  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black me-1"> ${x}</span>`));
+  $('#' + name + '-selection').html(checkedNames.map(x => `<span class="badge bg-gray text-black  mt-1 me-1"> ${x}</span>`));
   $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 
