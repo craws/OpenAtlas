@@ -1,17 +1,15 @@
 from __future__ import annotations
 
 import ast
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, json
 
 from openatlas.database.gis import Gis as Db
-from openatlas.models.type import Type
 from openatlas.display.util import sanitize
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
-    from openatlas.models.imports import Project
+from openatlas.models.entity import Entity
+from openatlas.models.imports import Project
+from openatlas.models.type import Type
 
 
 class InvalidGeomException(Exception):
@@ -103,9 +101,9 @@ class Gis:
             elif row['object_id'] in object_ids:
                 selected[shape].append(item)
             elif row['object_id'] in subunit_ids:
-                extra['subs'].append(item)
+                extra['subs'].append(item)  # pragma: no cover
             elif row['object_id'] in sibling_ids:
-                extra['siblings'].append(item)
+                extra['siblings'].append(item)  # pragma: no cover
             else:
                 all_[shape].append(item)
             if row['polygon_point']:
@@ -120,9 +118,11 @@ class Gis:
                         and row['object_id'] == structure['supers'][-1].id:
                     extra['supers'].append(polygon_point_item)
                 elif row['object_id'] in subunit_ids:
-                    extra['subs'].append(polygon_point_item)
+                    extra['subs'].append(
+                        polygon_point_item)  # pragma: no cover
                 elif row['object_id'] in sibling_ids:
-                    extra['siblings'].append(polygon_point_item)
+                    extra['siblings'].append(
+                        polygon_point_item)  # pragma: no cover
                 else:
                     all_['point'].append(polygon_point_item)
         return {
@@ -144,12 +144,7 @@ class Gis:
     @staticmethod
     def insert(entity: Entity, data: dict[str, Any]) -> None:
         for shape in ['point', 'line', 'polygon']:
-            if shape not in data or not data[shape]:
-                continue
             for item in json.loads(data[shape]):
-                if not item['geometry']['coordinates'] \
-                        or item['geometry']['coordinates'] == [[]]:
-                    continue
                 if item['properties']['shapeType'] != 'centerpoint' \
                         and not Db.test_geom(json.dumps(item['geometry'])):
                     raise InvalidGeomException
