@@ -1,18 +1,16 @@
 <div style="float:left;">
   {{ info|display_info|safe }}
   {% if disk_space_info %}
-    <div id="disk-size"></div>
-    <p>
+    <p class="mb-1">
       {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
       {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
     </p>
-    <script>
-      $(function() {
-        $("#disk-size").progressbar({
-            value: {{ disk_space_info.percent }}
-        });
-      });
-    </script>
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" style="width: {{ disk_space_info.percent }}%"
+           aria-valuenow="{{ disk_space_info.percent }}" aria-valuemin="0"
+           aria-valuemax="100">{{ disk_space_info.percent }}%
+      </div>
+    </div>
   {% endif %}
 </div>
 {% if 'manager'|is_authorized %}
