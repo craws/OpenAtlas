@@ -80,18 +80,30 @@ form li svg.svg-inline--fa{
     width:100%;
 }
 
-.rotate-90 {
-
-}
-
-.value-type-field[data-show=""]{
-    display: none!important;
-}
-.value-type-switcher[data-show="true"]{
+.value-type-switcher[show]{
     rotate:90deg;
 }
 .value-type-switcher{
     transition:all ease-in 100ms;
+}
+
+td.fit-width{
+    width:1px;
+    max-width: initial!important;
+
+}
+table.table-no-style tr td{
+    border-bottom-width: 0!important;;
+}
+.more {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
+}
+.more-link {
+    display: block;
 }
 
 /* drop-field */
@@ -147,4 +159,8 @@ form li svg.svg-inline--fa{
 }
 .drag-n-drop .drag-drop-item .card-body .close-icon:hover {
     color:black;
+}
+/* model */
+img.schema_image {
+    width: 500px;
 }

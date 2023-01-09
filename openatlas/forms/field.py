@@ -72,14 +72,13 @@ class ValueTypeInput(TextInput):
         type_ = g.types[field.type_id]
         unit_text = f'''<div class="input-group-text d-inline-block text-truncate"
                     title="{type_.description}" style="max-width:80px;font-size:0.8rem">{type_.description}</div>'''
-        sub_of = ' '.join([f'sub-of-{i}' for i in type_.root])
         padding = len(type_.root)
         return HTMLString(f'''
-        <div class=" mb-2 value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-flex align-items-end" data-show="">
+        <div class="d-flex align-items-end" >
                 <div class="text-end d-flex justify-content-end align-items-end pe-2" style="width:{padding}rem">
                 { value_type_expand_icon(type_) if type_.subs else ''}</div>
                   <div class="width-full">
-                    <label for="{field.id}">{type_.name}</label>
+                    <label class="mb-1" for="{field.id}">{type_.name}</label>
                     <div class="input-group">
                       <input type="text" class="{ app.config['CSS']['string_field'] }" name="{field.id}" id="{field.id}" 
                              value="{field.data or ''}" />
@@ -97,6 +96,10 @@ class ValueTypeField(FloatField):
             validators: Any = None,
             **kwargs: Any) -> None:
         super().__init__(label, validators, **kwargs)
+        type_ = g.types[type_id]
+        sub_of = ' '.join([f'sub-of-{i}' for i in type_.root])
+        self.selectors = f'value-type-field {sub_of} direct-sub-of-{type_.root[-1]} d-none'
+        self.field_data = f'data-show'
         self.type_id = type_id
 
     widget = ValueTypeInput()

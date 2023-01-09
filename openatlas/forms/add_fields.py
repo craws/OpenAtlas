@@ -9,7 +9,7 @@ from wtforms.validators import (
     InputRequired, NoneOf, NumberRange, Optional as OptionalValidator)
 
 from openatlas.display.util import is_authorized, uc_first
-from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField
+from openatlas.forms.field import TreeField, TreeMultiField, ReferenceField, ValueTypeRootField, ValueTypeField
 from openatlas.models.openatlas_class import OpenatlasClass
 from openatlas.models.type import Type
 

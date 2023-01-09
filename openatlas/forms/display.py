@@ -21,13 +21,7 @@ def html_form(
         if field.id.startswith('insert_'):
             continue  # These will be added in combination with other fields
         if isinstance(field, ValueTypeField):
-            html += f'''
-                <div class="row">
-                  <div  class="col-sm-auto mr-1 text-sm-end" style="min-width: 160px"></div>
-                  <div class = col>
-                    {field()}
-                  </div>
-                </div>'''
+            html += add_row(field, '', field, row_css=field.selectors)
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
@@ -52,7 +46,7 @@ def html_form(
                 tooltip_ = type_.description or ''
                 tooltip_ += "&#013;" + str(_('tooltip_required_type')) \
                     if field.flags.required \
-                            and current_user.group == 'contributor' else ''
+                       and current_user.group == 'contributor' else ''
             html += add_row(field, label + tooltip(tooltip_))
             continue
 
@@ -103,6 +97,73 @@ def add_row(
         value=value,
         field_css=field_css,
         row_css=row_css)
+
+
+def add_reference_systems(form: Any) -> str:
+    html = ''
+    switch_class = ''
+    errors = False
+    fields = []
+    for field in form:
+        if field.id.startswith('reference_system_id_'):
+            fields.append(field)
+            if field.errors:
+                errors = True
+    if len(fields) > 3 and not errors:
+        switch_class = 'reference-system-switch'
+        html = render_template('util/reference_system_switch.html')
+    for field in fields:
+        precision_field = getattr(form, field.id.replace('id_', 'precision_'))
+        class_ = field.label.text \
+            if field.label.text in ['GeoNames', 'Wikidata'] else ''
+        html += add_row(
+            field,
+            field.label,
+            f'{field(class_=class_)} {precision_field.label} '
+            f'{precision_field}',
+            row_css=f'external-reference {switch_class}')
+    return html
+
+
+def add_value_type(
+        form: Any,
+        type_: Type,
+        root: Optional[Type] = None,
+        level: int = 0) -> str:
+    html = ''
+    root = root or type_
+    for sub_id in type_.subs:
+        sub = g.types[sub_id]
+        field = getattr(form, str(sub_id))
+        html += f"""
+        <div class="mt-2 table-row value-type-switch{type_.id}">
+          <div></div>
+          <div class="table-cell">
+            <div class="d-flex">
+              <div
+                  class="d-flex justify-content-between"
+                  style="width:16.15em;">
+                <div class="ms-{level} position-relative text-wrap">
+                  <div class="value-type-expander">{button_icon(sub)}</div>
+                  {sub.name}
+                </div>
+                {field(class_='value-type')}
+              </div>
+              <span class="ms-1">{sub.description or ''}</span>
+            </div>
+            {add_value_type(form, sub, root, level + 1)}
+          </div>
+        </div>"""
+    return html
+
+
+def button_icon(type_: Type) -> str:
+    if not type_.subs:
+        return ''
+    onclick = f'switch_value_type({type_.id})' if len(type_.subs) != 0 else ''
+    return \
+        f'<span id="value-type-switcher-{type_.id}" class="btn btn-xsm" ' \
+        f'onclick="{onclick}"><i class="fa fa-chevron-right"></i></span>'
 
 
 def add_dates(form: Any) -> str:

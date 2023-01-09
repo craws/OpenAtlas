@@ -1,24 +1,28 @@
-<div class="row mb-2">
-  <label class="col-sm-1 mr-1 col-form-label text-sm-end py-0" style="min-width: 160px">
-    {% if label is string %}
-      {{ label|safe }}
-    {% else %}
-      {{ field.label|safe }}
-    {% endif %}
-    {{ field.description|tooltip|safe }}
-  </label>
-  <div class="col align-self-center">
-   {% if value %}
-      {{ value|safe }}
-    {% else %}
-      {{ field(class_=field_css + ' mb-2')|safe }}
-    {% endif %}
-    {% if field.errors %}
-      <span class="error">
+<tr class="table-row {{ row_css }}">
+  <td class="fit-width pt-3 text-end">
+    <label>
+      {% if label is string %}
+        {{ label|safe }}
+      {% else %}
+        {{ field.label|safe }}
+      {% endif %}
+      {{ field.description|tooltip|safe }}
+    </label>
+  </td>
+  <td>
+    <div>
+      {% if value %}
+        {{ value|safe }}
+      {% else %}
+        {{ field(class_=field_css + ' mb-2')|safe }}
+      {% endif %}
+      {% if field.errors %}
+        <span class="error">
         {% for error in field.errors %}
           {{ error|uc_first }}
         {% endfor %}
       </span>
-    {% endif %}
-  </div>
-</div>
+      {% endif %}
+    </div>
+  </td>
+</tr>

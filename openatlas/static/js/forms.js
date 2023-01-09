@@ -1,20 +1,19 @@
 const variables = {}
 /* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
-function switch_value_type(id,el) {
-    console.log(el.dataset.show,id,el)
-    if(el.dataset.show){
-        el.dataset.show = ''
-        $(`.value-type-field.sub-of-${id}, .value-type-field.sub-of-${id} .value-type-switcher`).each(function() {
-            console.log('hallo')
-        this.dataset.show='';
+function switch_value_type(id, el) {
+    if (el.hasAttribute('show')) {
+        el.removeAttribute('show');
+        $(`.value-type-field.sub-of-${id}`).each(function () {
+            this.classList.add('d-none');
         });
-    }
-    else{
-         $(`.value-type-field.direct-sub-of-${id}`).each(function() {
-            console.log('hallo')
-        this.dataset.show='true';
+        $(`.value-type-field.sub-of-${id} .value-type-switcher`).each(function () {
+            this.removeAttribute('show');
         });
-         el.dataset.show = 'true'
+    } else {
+        $(`.value-type-field.direct-sub-of-${id}`).each(function () {
+            this.classList.remove('d-none');
+        });
+        el.setAttribute('show', '');
     }
 }
 

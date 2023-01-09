@@ -636,7 +636,7 @@ def description(entity: Union[Entity, Project, User]) -> str:
         label = _('content')
     return f"""
         {html}
-        <h2>{uc_first(label)}</h2>
+        <p><strong>{uc_first(label)}</strong></h2>
         <div class="description more">
             {'<br>'.join(entity.description.splitlines())}
         </div>"""
@@ -676,8 +676,8 @@ def display_form(
     multipart = 'enctype="multipart/form-data"' if 'file' in form else ''
     return \
         f'<form method="post" {form_id} {multipart}>' \
-        f'<div class="data-table container">{html_form(form, form_id, manual_page)}' \
-        f'</div></form>'
+        f'<table class="table table-no-style container">{html_form(form, form_id, manual_page)}' \
+        f'</table></form>'
 
 
 class MLStripper(HTMLParser):
