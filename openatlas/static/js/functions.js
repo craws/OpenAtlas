@@ -435,3 +435,9 @@ function removeListField(id){
         const el = document.getElementById(id);
         el.parentElement?.closest('li')?.remove();
 }
+
+function addGeneratePasswordButton(){
+       $("#show_passwords").after(function() {
+        return`<span class="${css.button.primary} ms-1" id="generate-password">${generatePassword}</span>`;
+      });
+}
