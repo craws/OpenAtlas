@@ -14,7 +14,7 @@ from openatlas.display.image_processing import check_processed_image
 class DisplayImage(Resource):
 
     @staticmethod
-    def get(filename: str) -> Response:  # pragma: no cover
+    def get(filename: str) -> Response:
         entity = get_entity_by_id(int(Pathlib_path(filename).stem))
         license_ = get_license(entity)
         if not license_:
@@ -24,9 +24,9 @@ class DisplayImage(Resource):
             return send_file(
                 f"{app.config['UPLOAD_DIR']}/{filename}",
                 as_attachment=True)
-        if parser['image_size'] and check_processed_image(filename):
+        directory = app.config['UPLOAD_DIR']
+        if parser['image_size'] \
+                and check_processed_image(filename):  # pragma: no cover
             size = app.config['IMAGE_SIZE'][parser['image_size']]
-            return send_from_directory(
-                f"{app.config['RESIZED_IMAGES']}/{size}",
-                filename)
-        return send_from_directory(app.config['UPLOAD_DIR'], filename)
+            directory = f"{app.config['RESIZED_IMAGES']}/{size}"
+        return send_from_directory(directory, filename)
