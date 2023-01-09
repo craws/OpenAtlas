@@ -215,10 +215,10 @@ class ActorDisplay(BaseDisplay):
                 _('moved')
                 if link_.property.code == 'P25' else link(link_.type),
                 link_.first or (
-                    f'<span class="inactive">{event.first}</span>'
+                    f'<span class="text-muted">{event.first}</span>'
                     if event.first else ''),
                 link_.last or (
-                    f'<span class="inactive">{event.last}</span>'
+                    f'<span class="text-muted">{event.last}</span>'
                     if event.last else ''),
                 link_.description,
                 '' if link_.property.code == 'P25' else
@@ -288,9 +288,9 @@ class EventsDisplay(BaseDisplay):
                 link(link_.range),
                 link_.range.class_.label,
                 link_.type.name if link_.type else '',
-                link_.first or f'<span class="inactive">{entity.first}</span>'
+                link_.first or f'<span class="text-muted">{entity.first}</span>'
                 if entity.first else '',
-                link_.last or f'<span class="inactive">{entity.last}</span>'
+                link_.last or f'<span class="text-muted">{entity.last}</span>'
                 if entity.last else '',
                 g.properties[link_.property.code].name_inverse,
                 link_.description,

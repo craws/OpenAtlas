@@ -78,7 +78,7 @@ def login() -> Union[str, Response]:
                     'notice',
                     'auth',
                     f'Inactive login try {user.username}')
-                flash(_('error inactive'), 'error')
+                flash(_('error text-muted'), 'error')
             else:
                 g.logger.log(
                     'notice',
