@@ -106,7 +106,11 @@ def import_arche_data() -> list[Entity]:
                             f'[{metadata["longitude"]},'
                             f'{metadata["latitude"]}]}}'})
 
-            file = Entity.insert('file', name, metadata['description'])
+            file = Entity.insert(
+                'file',
+                name,
+                f"Created by {metadata['creator']}"
+                if metadata['creator'] else '')
             file_response = requests.get(metadata['image_link_thumbnail'])
             filename = f"{file.id}.{name.rsplit('.', 1)[1].lower()}"
             open(str(app.config['UPLOAD_DIR'] / filename), "wb") \
@@ -133,10 +137,9 @@ def get_arche_reference_system() -> ReferenceSystem:
     return system
 
 
-###############################################################################
-# Script from                                                                 #
-# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html  #
-###############################################################################
+# Script from
+# https://acdh-oeaw.github.io/arche-docs/aux/rdf_compacting_and_framing.html
+
 
 def n_triples_to_json(req: Response) -> dict[str, Any]:
     context = get_arche_context()
