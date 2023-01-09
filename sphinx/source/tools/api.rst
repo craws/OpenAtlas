@@ -265,6 +265,187 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.
 :doc:`Version 0.1<api_version0_1>`
 ----------------------------------
 
+Parameter definition
+--------------
+
+.. list-table::
+   :widths: 20 15 45 20
+   :header-rows: 1
+
+   * - Parameter
+     - Format
+     - Description
+     - Values
+   * - cidoc_class/cidoc_classes/cidoc-class/cidoc-classes
+     - string
+     - CIDOC CRM class code (e.g. E21)
+     -
+   * - column
+     - string
+     - Results will be sorted by the given column
+     - * ID
+       * classCode
+       * name
+       * description
+       * created
+       * modified
+       * systemClass
+       * beginFrom
+       * beginTo
+       * endFrom
+       * endTo
+   * - count
+     - boolean
+     - Returns the total count of results as integer
+     - True/False
+   * - download
+     - boolean
+     - Triggers file download of the requested data in a file
+     - True/False
+   * - entities
+     - integer
+     - Specific entity ID
+     -
+   * - export
+     - string
+     - Results will be downloaded in the given format
+     - * csv
+       * csvNetwork
+   * - first
+     - integer
+     - List of results starting with given ID
+     -
+   * - format
+     - string
+     - Select a preferred output format
+     -  * lp
+        * geojson
+        * geojson-v2
+        * pretty-xml
+        * n3
+        * turtle
+        * nt
+        * xml
+        (subunits endpoint can only handle xml)
+   * - geometry
+     - string
+     - Select a preferred geometry
+     -  * gisAll
+        * gisPointAll
+        * gisPointSupers
+        * gisPointSubs
+        * gisPointSibling
+        * gisLineAll
+        * gisPolygonAll
+   * - id
+     - integer
+     - Specific entity ID in OpenAtlas instance
+     -
+   * - image-size/image_size
+     - string
+     - Select the size category for the displayed image (can be modified in production.py)
+     - * thumbnail
+       * table
+   * - lang
+     - string
+     - Select an output language
+     - * en
+       * de
+   * - last
+     - integer
+     - JSON list of results start with entity after given ID
+     -
+   * - latest
+     - integer
+     - Number of last database entries to be returned; only numbers between 1 and 100 are valid
+     - 1 - 100
+   * - limit
+     - integer
+     - Number of entities returned per page
+     - * 0 corresponds to "no limit set"
+       * Default is set to 20 entities
+   * - none
+     -
+     - No parameters are required
+     -
+   * - page
+     - integer
+     - Jump to chosen page
+     -
+   * - relation_type/relation-type
+     - string
+     - Select which relations are shown
+     - E.g. P53
+   * - search
+     - string
+     - Search request with AND/OR logic
+     -
+   * - show
+     - string
+     - Select a key to be shown. If using "not", no other keys will be displayed.
+     -  * description
+        * depictions
+        * geometry
+        * links
+        * names
+        * not
+        * relations
+        * types
+        * when
+   * - sort
+     - string
+     - Results will be sorted asc/desc (default column is name)
+     -  * asc
+        * desc
+   * - system_class/system_classes/system-class/system-classes
+     - string
+     - Needs to be one of the OpenAtlas system classes
+     -  * all
+        * administrative_unit
+        * type
+        * acquisition
+        * activity
+        * actor_actor_relation
+        * actor_function
+        * appellation
+        * artifact
+        * bibliography
+        * edition
+        * external_reference
+        * feature
+        * file
+        * group
+        * human_remains
+        * involvement
+        * move
+        * object_location
+        * person
+        * place
+        * production
+        * reference_system
+        * source
+        * source_translation
+        * stratigraphic_unit
+   * - type_id/type-id
+     - integer
+     - Output will be filtered by chosen type ID and only entities with this type ID will be displayed; the relation is in logical OR
+     -
+   * - view_class/view_classes/view-class/view-classes
+     - string
+     - Needs to be one of the OpenAtlas menu items
+     -  * actor
+        * all
+        * artifact
+        * event
+        * file
+        * object
+        * place
+        * reference
+        * source
+        * source_translation
+        * type
+
+
 Error handling
 --------------
 OpenAtlas uses conventional HTTP response codes to indicate the success or
