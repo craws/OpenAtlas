@@ -20,7 +20,8 @@ def fetch_arche_data() -> dict[int, Any]:
     for id_ in app.config['ARCHE']['collection_ids']:
         req = requests.get(
             f"{app.config['ARCHE']['base_url']}/api/{id_}/metadata",
-            headers={'Accept': 'application/n-triples'})
+            headers={'Accept': 'application/n-triples'},
+            proxies={'http': 'http://fifi.arz.oeaw.ac.at:8080'})
         try:
             collections[id_] = get_metadata(n_triples_to_json(req))
         except:
