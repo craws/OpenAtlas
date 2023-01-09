@@ -470,13 +470,13 @@ is provided in JSON format, describing the error in more detail.
 
 Example:
 
-..code-block::
+.. code-block::
 
   {
-      “title”: “entity does not exist”,
-       “message”: “Requested entity does not exist. Try another ID”
-       “timestamp”: “Tue, 19 Jul 2022 13:59:13 GMT”,
-       “status”: 404
+      "title": "entity does not exist",
+       "message": "Requested entity does not exist. Try another ID"
+       "timestamp": "Tue, 19 Jul 2022 13:59:13 GMT",
+       "status": 404
    }
 
 If an invalid endpoint parameter value e.g. ?sort=kfs instead of ?sort=desc is
