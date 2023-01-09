@@ -83,7 +83,7 @@ Entity endpoint
    * - /api/3.0/cidoc_class/{cidoc_class}
      - limit, column, sort, search, first, last, show, relation_type, type_id,
        count, download, format, export, page
-     - Retrieves a JSON list of entities based on their CDOC CRM class(1)(2)
+     - Retrieves a JSON list of entities based on their CIDOC CRM class(1)(2)
 
 (1) All codes available in OpenAtlas can be found under
 `OpenAtlas and CIDOC CRM class mapping <https://redmine.openatlas.eu/projects/uni/wiki/OpenAtlas_and_CIDOC_CRM_class_mapping?parent=Endpoints>`_

@@ -27,24 +27,24 @@ Version 0.1
      - limit, column, sort, filter, string, first, last, show, count, download
      - Retrieves a list of geojson representations which share a specified
        class code
-   * - api/0.1/latest/{limit}
+   * - /api/0.1/latest/{limit}
      - download
      - Retrieves a list of geojson representations which were edited last
    * - /api/0.1/node_entities/{id}
      - count, download
      - Retrieves a list of entities linked to that node
-   * - api/0.1//node_entities_all/{id}
+   * - /api/0.1/node_entities_all/{id}
      - count, download
      - Retrieves a list of entities linked to that node and subnode
-   * - api/0.1//stratographic_node/{id}
+   * - /api/0.1/stratographic_node/{id}
      - count, download
      - Retrieves a list of entities linked to that place as stratigraphy,
        feature, find etc.
-   * - api/0.1/stratographic_node_all/{id}
+   * - /api/0.1/stratographic_node_all/{id}
      - count, download
      - Retrieves a list of all entities and sub entities linked to that place
        as stratigraphy, feature, find etc.
-   * - api/0.1/content
+   * - /api/0.1/content
      - download, lang
      - Retrieves a detailed list of information on available content
        in an OpenAtlas instance - intro, legal notice, contact, and size of
