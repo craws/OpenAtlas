@@ -1,6 +1,9 @@
 from openatlas.util.util import link
 
 versions = {
+    '7.9.2': ['2023-01-09', {
+        'fix': {
+            '1926': 'Broken external reference system links'}}],
     '7.9.1': ['2023-01-02', {
         'fix': {
             '1919': 'Minor display issues'}}],
