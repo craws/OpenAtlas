@@ -56,7 +56,7 @@ class Item:
         self.sub_property_of: List[str] = []
 
 
-def import_cidoc() -> None:  # pragma: no cover
+def import_cidoc() -> None:
 
     start = time.time()
     classes = {}

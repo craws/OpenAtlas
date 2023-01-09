@@ -174,10 +174,20 @@
             
   <div class="section" id="features">
 <h1>Features<a class="headerlink" href="#features" title="Permalink to this headline">¶</a></h1>
+<p>OpenAtlas is developed for easy acquisition, editing, and management of
+research data from the humanities as well as related research fields. Special
+emphasis is placed on making data entry as easy and convenient as possible for
+researchers while maintaining high standards in the development of the
+software. The features listed below contribute significantly to this effort.</p>
 <div class="section" id="model">
 <h2>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h2>
+<p>The data model specifies the structure in which the information is stored
+within the database. The use of an ontology, for example, allows the data to be
+combined more easily with information from other projects and is consistent
+with the <a class="reference external" href="https://www.go-fair.org/fair-principles/">FAIR principles</a>.</p>
 <p>The OpenAtlas <a class="reference internal" href="model/index.html"><span class="doc">Model</span></a> is based on the international standard of
-<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a></p>
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a>, an ontology widely used within the
+field of humanities.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="entity/type.html"><span class="doc">Types</span></a> can be used to adapt for specific research topics</p></li>
 <li><p><a class="reference internal" href="entity/reference_system.html"><span class="doc">Reference Systems</span></a> for
@@ -192,21 +202,30 @@ with detailed mapping</p></li>
 </div>
 <div class="section" id="user-interface">
 <h2>User interface<a class="headerlink" href="#user-interface" title="Permalink to this headline">¶</a></h2>
+<p>The user interface allows for easy and quick entry of information into the
+database, while the data is mapped in the background according to the
+specifications of the data model (see above).
+Due to the use of <a class="reference internal" href="entity/type.html"><span class="doc">types</span></a>, this can be designed
+particularly flexibly and can thus be adapted to the requirements of each
+project.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="tools/map.html"><span class="doc">Interactive map</span></a> to enter places with a known location</p></li>
 <li><p><a class="reference internal" href="entity/file.html"><span class="doc">File upload</span></a></p></li>
-<li><p><a class="reference internal" href="tools/search.html"><span class="doc">Search</span></a> and <a class="reference internal" href="ui/table.html"><span class="doc">Table</span></a> filter functions for quick
+<li><p><a class="reference internal" href="tools/search.html"><span class="doc">Search</span></a> and <a class="reference internal" href="ui/table.html"><span class="doc">table</span></a> filter functions for quick
 navigation</p></li>
 <li><p><a class="reference internal" href="tools/network.html"><span class="doc">Network visualization</span></a></p></li>
 <li><p><a class="reference internal" href="tools/notes.html"><span class="doc">Notes</span></a> and bookmarks</p></li>
-<li><p><a class="reference internal" href="index.html"><span class="doc">User manual</span></a> (English) with <a class="reference internal" href="examples/index.html"><span class="doc">Examples</span></a> and context
-specific links in the application</p></li>
+<li><p><a class="reference internal" href="index.html"><span class="doc">User manual</span></a> (English) with <a class="reference internal" href="examples/index.html"><span class="doc">examples</span></a>
+and context specific links in the application</p></li>
 <li><p>User interface internationalization (currently English and German)
 using <a class="reference external" href="https://www.gnu.org/software/gettext/">gettext</a></p></li>
 </ul>
+<img alt="_images/ui.png" src="_images/ui.png" />
 </div>
 <div class="section" id="data-exchange">
 <h2>Data exchange<a class="headerlink" href="#data-exchange" title="Permalink to this headline">¶</a></h2>
+<p>OpenAtlas offers various possibilities to exchange data with other systems or
+to import data into the database system.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="tools/api.html"><span class="doc">API</span></a> for easier exchange with other information system</p></li>
 <li><p><a class="reference internal" href="admin/export.html"><span class="doc">Export</span></a> functions for multiple formats</p></li>
@@ -215,6 +234,10 @@ using <a class="reference external" href="https://www.gnu.org/software/gettext/"
 </div>
 <div class="section" id="user-management">
 <h2>User management<a class="headerlink" href="#user-management" title="Permalink to this headline">¶</a></h2>
+<p>The User Management Features allows the activation of users for the own
+OpenAtlas instance. These can also be divided into different user groups with
+different permissions. In addition, the user interface can be adapted to the
+user’s own preferences via settings.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="admin/user.html"><span class="doc">User</span></a> and groups can be used to grant different access levels</p></li>
 <li><p><a class="reference internal" href="tools/profile.html"><span class="doc">Profile</span></a> settings to adapt for personal workflows</p></li>
@@ -224,6 +247,10 @@ using <a class="reference external" href="https://www.gnu.org/software/gettext/"
 </div>
 <div class="section" id="anthropological-analyses">
 <h2>Anthropological Analyses<a class="headerlink" href="#anthropological-analyses" title="Permalink to this headline">¶</a></h2>
+<p>In order to also allow interdisciplinary work with anthropological data,
+anthropological methods, such as age and sex determination, will be available
+in OpenAtlas in the future. The implementation of the age determination
+according to Ferembach et al. is the first step in this direction.</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="tools/anthropological_analyses.html"><span class="doc">Sex estimation</span></a> based on the method
 given by Ferembach et al. 1979</p></li>

@@ -39,10 +39,7 @@
   </script>
   <script src="/static/js/functions.js"></script>
   <script src="/static/js/forms.js"></script>
-  {% set js_translation_file = '/static/js/messages_' + session.language + '.js' %}
-  {% if js_translation_file|test_file %}
-    <script src="{{ js_translation_file }}"></script>
-  {% endif %}
+  {{ session.language|get_js_messages|safe }}
   <title>
     {{ g.settings.site_name }}
     {% if title %}
@@ -84,7 +81,7 @@
               action="{{ url_for('search_index') }}"
               style="display:inline-flex">
             {{ search_form.csrf_token }}
-            {{ search_form.term }}
+            {{ search_form.term(placeholder=_('search term')|uc_first) }}
             <button type="submit" class="btn btn-link search-button">
               <i class="fas fa-search"></i>
             </button>

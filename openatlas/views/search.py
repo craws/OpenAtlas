@@ -7,18 +7,18 @@ from wtforms import (
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
+from openatlas.display.table import Table
+from openatlas.display.util import link, required_group
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.search import search
-from openatlas.util.table import Table
-from openatlas.util.util import link, required_group
 
 
 class SearchForm(FlaskForm):
     term = StringField(
         _('search'),
         [InputRequired()],
-        render_kw={'placeholder': _('search term'), 'autofocus': True})
+        render_kw={'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
     classes = SelectMultipleField(

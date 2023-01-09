@@ -28,21 +28,23 @@ class CidocProperty:
     def name(self) -> str:
         from openatlas import get_locale
         locale_session = get_locale()
+        name = getattr(self, '_name')
         if locale_session in self.i18n:
-            return self.i18n[locale_session]
-        if g.settings['default_language'] in self.i18n:
-            return self.i18n[g.settings['default_language']]
-        return getattr(self, '_name')  # pragma: no cover
+            name = self.i18n[locale_session]
+        elif g.settings['default_language'] in self.i18n:
+            name = self.i18n[g.settings['default_language']]
+        return name
 
     @property
     def name_inverse(self) -> str:
         from openatlas import get_locale
         locale_session = get_locale()
+        name = getattr(self, '_name_inverse')
         if locale_session in self.i18n_inverse:
-            return self.i18n_inverse[locale_session]
-        if g.settings['default_language'] in self.i18n_inverse:
-            return self.i18n_inverse[g.settings['default_language']]
-        return getattr(self, '_name_inverse')  # pragma: no cover
+            name = self.i18n_inverse[locale_session]
+        elif g.settings['default_language'] in self.i18n_inverse:
+            name = self.i18n_inverse[g.settings['default_language']]
+        return name
 
     def find_object(self, attr: str, class_id: int) -> bool:
         valid_domain_id = getattr(self, attr)

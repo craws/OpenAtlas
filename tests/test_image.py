@@ -5,10 +5,10 @@ from shutil import copyfile
 from flask import g, url_for
 
 from openatlas import app
+from openatlas.display.image_processing import safe_resize_image
+from openatlas.display.util import profile_image
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.image_processing import safe_resize_image
-from openatlas.util.util import display_profile_image
 from tests.base import TestBaseCase, insert_entity
 
 
@@ -73,7 +73,7 @@ class ImageTest(TestBaseCase):
                 dst_py = pathlib.Path(app.config['UPLOAD_DIR'] / file_name_py)
                 copyfile(src_py, dst_py)
                 safe_resize_image(file2.id, '.png', size="???")
-                display_profile_image(file_pathless)
+                profile_image(file_pathless)
 
             # Resizing images (don't change order!)
             rv = self.app.get(url_for('view', id_=file.id))

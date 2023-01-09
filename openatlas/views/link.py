@@ -10,11 +10,11 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import display_form, required_group, uc_first
 from openatlas.forms.field import TableField
 from openatlas.forms.form import get_manager, get_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import display_form, required_group, uc_first
 
 
 class AddReferenceForm(FlaskForm):

@@ -4,9 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.reference_system import ReferenceSystem
-from openatlas.models.type import Type
-from tests.base import TestBaseCase
+from tests.base import TestBaseCase, insert_entity
 
 
 class EventTest(TestBaseCase):
@@ -27,7 +25,7 @@ class EventTest(TestBaseCase):
                 actor = Entity.insert('person', actor_name)
                 file = Entity.insert('file', 'X-Files')
                 source = Entity.insert('source', 'Necronomicon')
-                carrier = Entity.insert('artifact', 'Artifact')
+                artifact = insert_entity('artifact', 'artifact')
                 reference = Entity.insert(
                     'external_reference',
                     'https://openatlas.eu')
@@ -66,10 +64,6 @@ class EventTest(TestBaseCase):
             assert b'Location' not in rv.data
 
             event_name2 = 'Second event'
-            wikidata = \
-                f"reference_system_id_" \
-                f"{ReferenceSystem.get_by_name('Wikidata').id}"
-            precision = Type.get_hierarchy('External reference match').subs[0]
             rv = self.app.post(
                 url_for('insert', class_='acquisition'),
                 data={
@@ -81,9 +75,10 @@ class EventTest(TestBaseCase):
                     'begin_month_from': '10',
                     'begin_day_from': '8',
                     'end_year_from': '1951',
-                    wikidata: 'Q123',
-                    self.precision_wikidata: precision})
+                    self.wikidata: 'Q123',
+                    self.precision_wikidata: self.precision_type.subs[0]})
             event_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('view', id_=event_id))
             assert b'Event Horizon' in rv.data
 
@@ -93,14 +88,17 @@ class EventTest(TestBaseCase):
                     'name': 'Keep it moving',
                     'place_to': residence_id,
                     'place_from': residence_id,
-                    'artifact': carrier.id,
+                    'artifact': artifact.id,
                     'person': actor.id,
                     self.precision_wikidata: ''})
             move_id = rv.location.split('/')[-1]
+
             rv = self.app.get(url_for('view', id_=move_id))
             assert b'Keep it moving' in rv.data
-            rv = self.app.get(url_for('view', id_=carrier.id))
+
+            rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'Keep it moving' in rv.data
+
             rv = self.app.get(url_for('update', id_=move_id))
             assert b'Keep it moving' in rv.data
 
@@ -108,13 +106,13 @@ class EventTest(TestBaseCase):
                 url_for('insert', class_='production'),
                 data={
                     'name': 'A very productive event',
-                    'artifact': carrier.id,
+                    'artifact': artifact.id,
                     self.precision_wikidata: ''})
             production_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('view', id_=production_id))
             assert b'Artifact' in rv.data
 
-            rv = self.app.get(url_for('view', id_=carrier.id))
+            rv = self.app.get(url_for('view', id_=artifact.id))
             assert b'A very productive event' in rv.data
 
             rv = self.app.get(url_for('update', id_=production_id))

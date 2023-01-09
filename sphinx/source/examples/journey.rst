@@ -40,7 +40,8 @@ The following steps will create a move event:
 
 * Click on the **Event** tab in the menu then use the **+ Move** button
 * Fill out the form, for more information see the :doc:`move event tutorial<move_event>`.
-* **Please note**: do not link a person in this form if the journey was taken willingly.
+* **Please note**: do not link a person in this form if the journey was taken
+  willingly.
   Link here only people who have not traveled of their own free will - think,
   for example, of a prisoner transport or the translation of relics. To see
   how to link (voluntary) travelers correctly, see below.
@@ -68,4 +69,5 @@ move event.
     * the form of participation can be determined
     * in addition, dates and a free text description are possible
 
-* via **+person** or **+group** new actors can be created and then linked to the move event
+* via **+person** or **+group** new actors can be created and then linked to
+  the move event

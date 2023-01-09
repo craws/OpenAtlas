@@ -15,7 +15,7 @@ pg_dump.
 * Existing files are shown in a list and can be downloaded or deleted
   (only admins can delete)
 * If the directory isn't writable, a warning will be shown
-* SQL dumps are saved in the **export/sql** folder
+* SQL dumps are saved in the **files/export** folder
 * File names begin with date and time e.g. 2018-08-23_1533_dump.sql.
 
 
@@ -68,4 +68,3 @@ When the **Export XML** button is clicked, the download of an
 
 The file name starts with the current date and time, for example
 2022-10-04_1610-export.xml. This process can take some time.
-

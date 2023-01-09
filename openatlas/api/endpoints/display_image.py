@@ -8,10 +8,11 @@ from openatlas.api.resources.error import AccessDeniedError
 from openatlas.api.resources.parser import image
 from openatlas.api.resources.util import get_license
 from openatlas.api.resources.model_mapper import get_entity_by_id
-from openatlas.util.image_processing import check_processed_image
+from openatlas.display.image_processing import check_processed_image
 
 
 class DisplayImage(Resource):
+
     @staticmethod
     def get(filename: str) -> Response:  # pragma: no cover
         entity = get_entity_by_id(int(Pathlib_path(filename).stem))

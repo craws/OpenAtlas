@@ -11,11 +11,6 @@ body {
     color: #000000;
 }
 
-span.anthro-result {
-    font-weight: bold;
-    margin-left: 1em;
-}
-
 img.schema_image {
     width: 500px;
 }

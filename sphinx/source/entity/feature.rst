@@ -6,7 +6,7 @@ Feature
 CIDOC documentation: :cidoc_entity:`E18 Physical Thing<e18-physical-thing>`
 
 Features are subunit of a :doc:`place` and used in archaeological data
-  recording. E.g. graves or buildings of a site would be considered Features.
+recording. E.g. graves or buildings of a site would be considered Features.
 
 Form fields
 -----------

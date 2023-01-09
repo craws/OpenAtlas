@@ -10,7 +10,7 @@ from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.util import required_group, uc_first
+from openatlas.display.util import required_group, uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])
@@ -37,7 +37,7 @@ def ajax_add_type() -> str:
         Transaction.commit()
         g.logger.log_user(entity.id, 'insert')
         return str(entity.id)
-    except Exception as _e:  # pragma: no cover
+    except Exception:
         Transaction.rollback()
         abort(400)
 
@@ -67,7 +67,7 @@ def ajax_create_entity() -> str:
             entity.link('P2', g.types[int(request.form['standardType'])])
         g.logger.log_user(entity.id, 'insert')
         return str(entity.id)
-    except Exception as _e:  # pragma: no cover
+    except Exception as _e:
         g.logger.log('error', 'ajax', _e)
         abort(400)
 
@@ -79,6 +79,6 @@ def ajax_get_entity_table(content_domain: str) -> str:
         filter_ids = json.loads(request.form['filterIds']) or []
         table, _selection = get_table_content(content_domain, None, filter_ids)
         return table.display(content_domain)
-    except Exception as _e:  # pragma: no cover
+    except Exception as _e:
         g.logger.log('error', 'ajax', _e)
         abort(400)

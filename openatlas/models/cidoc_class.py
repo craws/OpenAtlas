@@ -26,11 +26,12 @@ class CidocClass:
 
     def get_i18n(self) -> str:
         from openatlas import get_locale
+        name = getattr(self, '_name')
         if get_locale() in self.i18n:
-            return self.i18n[get_locale()]
-        if g.settings['default_language'] in self.i18n:
-            return self.i18n[g.settings['default_language']]
-        return getattr(self, '_name')  # pragma: no cover
+            name = self.i18n[get_locale()]
+        elif g.settings['default_language'] in self.i18n:
+            name = self.i18n[g.settings['default_language']]
+        return name
 
     @staticmethod
     def get_all() -> dict[str, CidocClass]:
