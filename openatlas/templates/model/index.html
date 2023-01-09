@@ -1,53 +1,58 @@
 {% extends "layout.html" %}
 {% block content %}
-{{ buttons|button_bar|safe }}
-<div class="container-fluid">
-  <div class="row">
-    <div class="col">
-      <p>
-        {{ _('browse')|uc_first }}:
-        <a href="{{ url_for('cidoc_class_index') }}">CIDOC {{ _('classes')|uc_first }}</a>,
-        <a href="{{ url_for('property_index') }}">CIDOC {{ _('properties')|uc_first }}</a>,
-        <a href="{{ url_for('openatlas_class_index') }}">OpenAtlas {{ _('classes')|uc_first }}</a>
-      </p>
-      <p style="font-weight: bold;">
-        {{ _('check for valid links')|uc_first }} (CIDOC CRM 7.1.1)
-      </p>
-      {{ form|display_form()|safe }}
-      {% if result %}
-        <p style="margin-top:1em;">
-          {{ _('result for')|uc_first }}
-          {{ result.domain|link|safe }} >
-          {{ result.property|link|safe }} >
-          {{ result.range|link|safe }}
+  {{ buttons|button_bar|safe }}
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-auto">
+        <p>
+          {{ _('browse')|uc_first }}:
+          <a href="{{ url_for('cidoc_class_index') }}">CIDOC {{ _('classes')|uc_first }}</a>,
+          <a href="{{ url_for('property_index') }}">CIDOC {{ _('properties')|uc_first }}</a>,
+          <a href="{{ url_for('openatlas_class_index') }}">OpenAtlas {{ _('classes')|uc_first }}</a>
         </p>
-        {% if result.domain_valid and result.range_valid %}
-          <p>{{ _('valid link')|uc_first }}<br>
-        {% elif not result.domain_valid %}
-          <p>
-            <span class="error">{{ _('wrong domain')|uc_first }}</span>
-            {{ result.domain|link|safe }} {{ _('for') }}
-            {{ result.property|link|safe }}
+        <p style="font-weight: bold;">
+          {{ _('check for valid links')|uc_first }} (CIDOC CRM 7.1.1)
+        </p>
+        {{ form|display_form()|safe }}
+        {% if result %}
+          <p style="margin-top:1em;">
+            {{ _('result for')|uc_first }}
+            {{ result.domain|link|safe }} >
+            {{ result.property|link|safe }} >
+            {{ result.range|link|safe }}
           </p>
-        {% elif not result.range_valid %}
-          <p>
-            <span class="error">{{ _('wrong range')|uc_first }}</span>
-            {{ result.range|link|safe }} {{ _('for') }}
-            {{ result.property|link|safe }}
-          </p>
+          {% if result.domain_valid and result.range_valid %}
+            <p>{{ _('valid link')|uc_first }}<br>
+              {% elif not result.domain_valid %}
+            <p>
+              <span class="error">{{ _('wrong domain')|uc_first }}</span>
+              {{ result.domain|link|safe }} {{ _('for') }}
+              {{ result.property|link|safe }}
+            </p>
+          {% elif not result.range_valid %}
+            <p>
+              <span class="error">{{ _('wrong range')|uc_first }}</span>
+              {{ result.range|link|safe }} {{ _('for') }}
+              {{ result.property|link|safe }}
+            </p>
+          {% endif %}
         {% endif %}
-      {% endif %}
-    </div>
-    <div class="col">
-      <a href="/static/images/model/openatlas_schema.png">
-        <img class="schema_image" src="/static/images/model/openatlas_schema.png" alt="Schema" class="img-fluid">
-      </a>
-    </div>
-    <div class="col">
-      <a href="/static/images/model/openatlas_schema2.png">
-        <img class="schema_image" src="/static/images/model/openatlas_schema2.png" alt="Schema" class="img-fluid">
-      </a>
+      </div>
+      <div class="col">
+        <div class="row g-5">
+
+          <div class="col">
+            <a href="/static/images/model/openatlas_schema.png">
+              <img class="schema_image" src="/static/images/model/openatlas_schema.png" alt="Schema" class="img-fluid">
+            </a>
+          </div>
+          <div class="col">
+            <a href="/static/images/model/openatlas_schema2.png">
+              <img class="schema_image" src="/static/images/model/openatlas_schema2.png" alt="Schema" class="img-fluid">
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 {% endblock %}

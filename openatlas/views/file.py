@@ -6,9 +6,9 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.util import required_group
 from openatlas.forms.form import get_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import required_group
 
 
 @app.route('/download/<path:filename>')

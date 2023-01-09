@@ -12,12 +12,12 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.tab import Tab
 from openatlas.display.table import Table
+from openatlas.display.util import (
+    get_entities_linked_to_type_recursive, link, manual, required_group,
+    sanitize)
 from openatlas.forms.form import get_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import (
-    get_entities_linked_to_type_recursive, link, manual, required_group,
-    sanitize)
 
 
 def walk_tree(types: list[int]) -> list[dict[str, Any]]:

@@ -77,11 +77,11 @@ def check_if_folder_exist(folder: str, path: str) -> bool:
     return True if folder_to_check.is_dir() else create_folder(folder_to_check)
 
 
-def create_folder(folder: Path) -> bool:
+def create_folder(folder: Path) -> bool:  # pragma: no cover
     try:
         folder.mkdir()
         return True
-    except OSError as e:  # pragma: no cover
+    except OSError as e:
         g.logger.log('info', 'image processing', 'failed to create folder', e)
         return False
 

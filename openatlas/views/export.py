@@ -11,9 +11,9 @@ from wtforms import SubmitField
 
 from openatlas import app
 from openatlas.display.table import Table
-from openatlas.models.export import sql_export
-from openatlas.util.util import (
+from openatlas.display.util import (
     convert_size, is_authorized, link, required_group, uc_first)
+from openatlas.models.export import sql_export
 
 
 class ExportSqlForm(FlaskForm):
@@ -39,7 +39,7 @@ def export_sql() -> Union[str, Response]:
         if sql_export():
             g.logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
-        else:
+        else:  # pragma: no cover
             g.logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))

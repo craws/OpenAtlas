@@ -3,7 +3,6 @@ from __future__ import annotations
 from typing import Any, Optional
 
 from flask import g
-from werkzeug.exceptions import abort
 
 from openatlas.database.reference_system import ReferenceSystem as Db
 from openatlas.models.entity import Entity
@@ -31,23 +30,20 @@ class ReferenceSystem(Entity):
 
     @staticmethod
     def get_all() -> dict[int, ReferenceSystem]:
-        systems = {row['id']: ReferenceSystem(row) for row in Db.get_all()}
-        for class_ in g.classes.values():
-            for system_id in class_.reference_systems:
-                systems[system_id].classes.append(class_.name)
+        systems = {}
+        for row in Db.get_all():
+            system = ReferenceSystem(row)
+            for class_ in g.classes.values():
+                if system.id in class_.reference_systems:
+                    system.classes.append(class_.name)
+            systems[system.id] = system
+            if system.name == 'GeoNames':
+                g.reference_system_geonames = system
+            elif system.name == 'Wikidata':
+                g.reference_system_wikidata = system
         return systems
 
-    @staticmethod
-    def get_by_name(name: str) -> ReferenceSystem:
-        for system in g.reference_systems.values():
-            if system.name == name:
-                return system
-        abort(404)
-
     def remove_class(self, class_name: str) -> None:
-        for link_ in self.get_links('P67'):
-            if link_.range.class_.name == class_name:
-                return  # Abort if there are linked entities
         Db.remove_class(self.id, class_name)
 
     def update_system(self, data: dict[str, Any]) -> None:

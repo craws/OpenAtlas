@@ -8,7 +8,7 @@ from openatlas.api.resources.util import (
     replace_empty_list_values_in_dict_with_none, to_camel_case)
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import get_file_path
+from openatlas.display.util import get_file_path
 
 
 def get_linked_places_entity(

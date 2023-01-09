@@ -14,7 +14,7 @@ from openatlas.forms.field import TableMultiField, TreeField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.util import get_base_table_data, uc_first
+from openatlas.display.util import get_base_table_data, uc_first
 
 
 def get_manager(

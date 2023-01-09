@@ -25,7 +25,9 @@ class IndexTests(TestBaseCase):
             assert b'first' in rv.data
 
             self.app.get(url_for('set_locale', language='de'))
-            assert b'Quelle' in self.app.get('/').data
+            rv = self.app.get('/')
+            assert b'Quelle' in rv.data
+            assert b'messages_de.js' in rv.data
 
             self.app.get(url_for('set_locale', language='en'))
             assert b'Source' in self.app.get('/').data

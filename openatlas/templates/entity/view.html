@@ -8,9 +8,11 @@
       </div>
     {% endif %}
     <h1>{{ entity.name }}</h1>
-    <div>
+    <div class="row g-0">
+      <div class="col-12 col-sm-auto me-sm-2">
       {{ profile_image|safe }}
-      <div style="float:left;">
+      </div>
+      <div class="col" style="float:left;">
         {{ info_data|display_info|safe }}
       </div>
     </div>

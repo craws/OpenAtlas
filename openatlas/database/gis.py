@@ -33,9 +33,8 @@ class Gis:
                 geometry = ast.literal_eval(row['polygon'])
             geometry['title'] = row['name'].replace('"', '\"') \
                 if row['name'] else ''
-            geometry['description'] = \
-                row['description'].replace('"', '\"') \
-                    if row['description'] else ''
+            geometry['description'] = row['description'].replace('"', '\"') \
+                if row['description'] else ''
             geometry['shapeType'] = row['type'].replace('"', '\"') \
                 if row['type'] else ''
             geometries.append(geometry)

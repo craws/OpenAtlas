@@ -10,16 +10,15 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.image_processing import resize_image
+from openatlas.display.util import is_authorized, link, required_group
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.image_processing import resize_image
-from openatlas.util.util import is_authorized, link, required_group
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
@@ -42,9 +41,9 @@ def insert(
     return render_template(
         'entity/insert.html',
         form=manager.form,
+        class_name=class_,
         view_name=g.classes[class_].view,
         gis_data=place_info['gis_data'],
-        geonames_module=check_geonames_module(class_),
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
@@ -82,9 +81,9 @@ def update(id_: int) -> Union[str, Response]:
         'entity/update.html',
         form=manager.form,
         entity=entity,
+        class_name=entity.name,
         gis_data=place_info['gis_data'],
         overlays=place_info['overlays'],
-        geonames_module=check_geonames_module(entity.class_.name),
         title=entity.name,
         crumbs=add_crumbs(entity.class_.name, entity, place_info['structure']))
 
@@ -120,11 +119,6 @@ def add_crumbs(
                 [i for i in structure['siblings'] if i.class_.name == class_]):
             siblings = f" ({count} {_('exists')})" if count else ''
     return crumbs + [f'+ {g.classes[class_].label}{siblings}']
-
-
-def check_geonames_module(class_: str) -> bool:
-    return class_ == 'place' \
-           and bool(ReferenceSystem.get_by_name('GeoNames').classes)
 
 
 def check_insert_access(class_: str) -> None:

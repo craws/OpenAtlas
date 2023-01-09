@@ -2,7 +2,7 @@
 {% block content %}
   {% if modifier %}
     <p class="error">
-      {{ _('error modified by %(username)s', username=modifier|safe) }}
+      {{ _('error modified by %(username)s', username=modifier)|safe }}
     </p>
     <p>
       {{ _('reload')|button(url_for('update', id_=entity.id))|safe }}

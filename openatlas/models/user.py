@@ -10,7 +10,7 @@ from flask_login import UserMixin, current_user
 
 from openatlas.database.user import User as Db
 from openatlas.models.entity import Entity
-from openatlas.util.util import sanitize
+from openatlas.display.util import sanitize
 
 
 class User(UserMixin):

@@ -10,9 +10,9 @@ from openatlas.api.resources.util import (
     filter_link_list_by_property_codes, get_geometric_collection,
     get_license, get_reference_systems, remove_duplicate_entities,
     replace_empty_list_values_in_dict_with_none)
+from openatlas.display.util import get_file_path
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
-from openatlas.util.util import get_file_path
 
 
 def get_subunit(data: dict[str, Any]) -> dict[str, Any]:

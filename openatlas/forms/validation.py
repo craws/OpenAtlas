@@ -9,7 +9,7 @@ from openatlas.forms.field import TreeField
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.util import uc_first
+from openatlas.display.util import uc_first
 
 
 def file(_form: FlaskForm, field: MultipleFileField) -> None:

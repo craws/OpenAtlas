@@ -1,6 +1,5 @@
-<div class="mb-2 row">
-
-  <label class="col-sm-1 mr-1 col-form-label text-sm-end" style="min-width: 160px">
+<div class="row mb-2">
+  <label class="col-sm-1 mr-1 col-form-label text-sm-end py-0" style="min-width: 160px">
     {% if label is string %}
       {{ label|safe }}
     {% else %}
@@ -12,7 +11,7 @@
    {% if value %}
       {{ value|safe }}
     {% else %}
-      {{ field(class_=field_css)|safe }}
+      {{ field(class_=field_css + ' mb-2')|safe }}
     {% endif %}
     {% if field.errors %}
       <span class="error">

@@ -35,23 +35,29 @@ INSERT INTO model.entity (cidoc_class_code, openatlas_class_name, name, descript
   ('E7', 'activity', 'Exchange of the one ring', NULL);
 
 
-INSERT INTO model.gis (entity_id, name, description, type, geom_point)
+INSERT INTO model.gis (entity_id, name, description, type, geom_point, geom_polygon, geom_linestring)
 VALUES
   ((SELECT id from model.entity WHERE name='Location of Mordor'),
   'Mordor',
   'Nicer place',
   'centerpoint',
-  public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [18.370696110389183, 28.20857123273274], "type": "Point"}'),4326)),
+  NULL,
+  NULL,
+  '0102000020E610000002000000890CC36E40FA3C4086C57C1702814440E3CB71BFA4F83C40A0D4D2DD13814440'),
   ((SELECT id from model.entity WHERE name='Location of Mordor'),
   'Mordor',
   'best place',
   'centerpoint',
-  public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [8.370696110389183, 22.20857123273274], "type": "Point"}'),4326)),
+  NULL,
+  '0103000020E61000000100000005000000A13E6C6B5FF03C40527185FEB7834440E6FAEBBEE0F03C40270C23F97E8344404AE254EC24F13C406043D2B1A5834440A253097DA1F03C40A5422755CF834440A13E6C6B5FF03C40527185FEB7834440',
+  NULL),
   ((SELECT id from model.entity WHERE name='Location of Shire'),
   'Shire',
   'Nice place',
   'centerpoint',
-  public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [16.370696110389183, 48.20857123273274], "type": "Point"}'),4326));
+  public.ST_SetSRID(public.ST_GeomFromGeoJSON('{"coordinates": [16.370696110389183, 48.20857123273274], "type": "Point"}'),4326),
+  NULL,
+  NULL);
 
 
 INSERT INTO model.link (property_code, range_id, domain_id)

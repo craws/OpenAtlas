@@ -9,14 +9,14 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
     Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
-from wtforms.widgets import FileInput, HiddenInput, TextInput
+from wtforms.widgets import FileInput, HiddenInput, TextInput, Input, HTMLString
 
 from openatlas.display.table import Table
 from openatlas import app
 from openatlas.forms.util import get_table_content, value_type_expand_icon
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.util import get_base_table_data, is_authorized
+from openatlas.display.util import get_base_table_data, is_authorized
 
 
 class RemovableListInput(HiddenInput):
