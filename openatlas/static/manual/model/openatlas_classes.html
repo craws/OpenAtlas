@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>UI Elements &mdash; OpenAtlas 7.9.0 documentation</title>
+  <title>OpenAtlas classes &mdash; OpenAtlas 7.9.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
 
     
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Form" href="form.html" />
-    <link rel="prev" title="API" href="../admin/api.html" /> 
+    <link rel="next" title="OpenAtlas shortcuts" href="openatlas_shortcuts.html" />
+    <link rel="prev" title="CIDOC CRM" href="cidoc_crm.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -95,13 +95,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../entity/index.html">Entity</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">UI Elements</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="form.html">Form</a></li>
-<li class="toctree-l2"><a class="reference internal" href="table.html">Table</a></li>
-<li class="toctree-l2"><a class="reference internal" href="menu.html">Menu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ui/index.html">UI Elements</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Model</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="cidoc_crm.html">CIDOC CRM</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">OpenAtlas classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="openatlas_shortcuts.html">OpenAtlas shortcuts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="references.html">References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="link_checker.html">Link checker</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../model/index.html">Model</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">FAQ</a></li>
@@ -153,7 +155,9 @@
     
       <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
         
-      <li>UI Elements</li>
+          <li><a href="index.html">Model</a> &raquo;</li>
+        
+      <li>OpenAtlas classes</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -170,16 +174,39 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="ui-elements">
-<h1>UI Elements<a class="headerlink" href="#ui-elements" title="Permalink to this headline">¶</a></h1>
-<p>Here we describe elements involved in the user interface (UI)</p>
+  <div class="section" id="openatlas-classes">
+<h1>OpenAtlas classes<a class="headerlink" href="#openatlas-classes" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="form.html">Form</a></li>
-<li class="toctree-l1"><a class="reference internal" href="table.html">Table</a></li>
-<li class="toctree-l1"><a class="reference internal" href="menu.html">Menu</a></li>
-</ul>
 </div>
+<p>These special classes are used within the software to further refine
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a> classes for the user interface.</p>
+<p>All OpenAtlas classes can be mapped directly to the corresponding CIDOC CRM
+classes. For all available classes and properties of CIDOC CRM (version 7.1.1)
+<a class="reference external" href="https://cidoc-crm.org/Version/version-7.1.1">see here</a>.</p>
+<p>Example:
+The CIDOC class <a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1.1">E18 - Physical Thing</a>
+“comprises all persistent physical items with a relatively stable form,
+human-made or natural” (for more information see
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/e18-physical-thing/version-7.1.1">CIDOC CRM</a> documentation).
+In OpenAtlas E18 is used to represent <a class="reference internal" href="../entity/place.html"><span class="doc">place</span></a>,
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">stratigraphic unit</span></a>, and
+<a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a>, which are all physical things according to
+<a class="reference external" href="https://www.cidoc-crm.org/">CIDOC CRM</a>.
+To differentiate between those different entities, the corresponding OpenAtlas
+classes were created. While <a class="reference internal" href="../entity/place.html"><span class="doc">place</span></a>,
+<a class="reference internal" href="../entity/stratigraphic_unit.html"><span class="doc">stratigraphic unit</span></a>, and
+<a class="reference internal" href="../entity/feature.html"><span class="doc">feature</span></a> are all considered E18 and mapped to this
+CIDOC CRM class in the background of the application, the user interface
+displays the OpenAtlas class name for user’s convenience and to avoid
+confusion.</p>
+<p>The same is true for bibliography, edition, external reference and file,
+which are all considered to be <a class="reference external" href="https://www.cidoc-crm.org/Entity/E31-Document/version-7.1.1">E31 - Documents</a> in
+CIDOC CRM or the OpenAtlas classes source and source translation which
+correspond to the CIDOC class
+<a class="reference external" href="https://www.cidoc-crm.org/Entity/E33-Linguistic-Object/version-7.1.1">E33 - Linguistic object</a>.</p>
+<p>An overview of all OpenAtlas classes used and how they correspond to CIDOC CRM
+classes can be found
+<a class="reference external" href="https://demo.openatlas.eu/overview/model/openatlas_class_index">here</a>.</p>
 </div>
 
 
@@ -188,8 +215,8 @@
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="form.html" class="btn btn-neutral float-right" title="Form" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="../admin/api.html" class="btn btn-neutral float-left" title="API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="openatlas_shortcuts.html" class="btn btn-neutral float-right" title="OpenAtlas shortcuts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="cidoc_crm.html" class="btn btn-neutral float-left" title="CIDOC CRM" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
   <hr/>
