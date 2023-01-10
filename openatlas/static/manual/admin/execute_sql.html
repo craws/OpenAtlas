@@ -5,7 +5,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Execute SQL &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -25,6 +26,9 @@
   
 
   
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
@@ -181,21 +185,21 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="execute-sql">
+  <section id="execute-sql">
 <h1>Execute SQL<a class="headerlink" href="#execute-sql" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Admins can execute SQL direct to the database.</p>
 <p><strong>Warning</strong>: direct database manipulation can result in data loss and an unusable application!</p>
-<div class="section" id="preparation">
+<section id="preparation">
 <h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Backup the database (<a class="reference internal" href="export.html"><span class="doc">Export</span></a>) and download it in case you lose data or crash the application</p></li>
 <li><p>Create a local database with the backup and test the SQL on this local version first</p></li>
 <li><p>If there is no recent backup (maximal one day old), the SQL function is not available</p></li>
 </ul>
-</div>
-<div class="section" id="keep-in-mind">
+</section>
+<section id="keep-in-mind">
 <h2>Keep in mind<a class="headerlink" href="#keep-in-mind" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>It’s a simple but very powerful feature. Unlike the rest of the application there are no safeguards to prevent e.g. total data loss and/or making the application unusable.</p></li>
@@ -204,8 +208,8 @@
 <li><p>Don’t refresh the page (e.g pressing F5) because this will execute the statement again.</p></li>
 <li><p>You can use multiple statements (every statement has to be terminated with “;”) but only the result of the last one will be displayed.</p></li>
 </ul>
-</div>
-<div class="section" id="result">
+</section>
+<section id="result">
 <h2>Result<a class="headerlink" href="#result" title="Permalink to this headline">¶</a></h2>
 <p>After clicking on <strong>Execute</strong> the result of the last query is shown below depending on the statement:</p>
 <ul class="simple">
@@ -213,8 +217,8 @@
 <li><p><strong>INSERT, UPDATE, DELETE</strong> - the affected row count</p></li>
 <li><p><strong>Error</strong> - there is nothing to worry about because the transaction executes the statement(s) only if there is no error.</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
