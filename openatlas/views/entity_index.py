@@ -8,14 +8,14 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.image_processing import check_processed_image
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    button, format_date, get_base_table_data, get_file_path, is_authorized,
+    link, manual, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.image_processing import check_processed_image
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, format_date, get_base_table_data, get_file_path, is_authorized,
-    link, manual, required_group)
 
 
 @app.route('/index/<view>')
@@ -50,14 +50,13 @@ def get_buttons(view: str) -> list[str]:
 
 
 def get_table(view: str) -> Table:
-    header = g.table_headers[view]
+    table = Table(g.table_headers[view])
     if view == 'file':
-        header = ['date'] + header
+        table.order = [[0, 'desc']]
+        table.header = ['date'] + table.header
         if g.settings['image_processing'] \
                 and current_user.settings['table_show_icons']:
-            header.insert(1, _('icon'))
-    table = Table(header, order=[[0, 'desc']])
-    if view == 'file':
+            table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
             data = [
                 format_date(entity.created),

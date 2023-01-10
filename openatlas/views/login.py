@@ -14,8 +14,8 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.display.util import display_form, send_mail, uc_first
 from openatlas.models.user import User
-from openatlas.util.util import display_form, send_mail, uc_first
 
 login_manager = LoginManager()
 login_manager.init_app(app)

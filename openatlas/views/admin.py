@@ -17,7 +17,14 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.image_processing import (
+    create_resized_images, delete_orphaned_resized_images)
 from openatlas.display.tab import Tab
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    button, convert_size, display_form, display_info, format_date,
+    get_file_path, is_authorized, link, manual, required_group, sanitize,
+    send_mail, uc_first)
 from openatlas.forms.setting import (
     ApiForm, ContentForm, FilesForm, GeneralForm, LogForm, MailForm, MapForm,
     ModulesForm, SimilarForm, TestMailForm)
@@ -30,13 +37,6 @@ from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.settings import Settings
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.image_processing import (
-    create_resized_images, delete_orphaned_resized_images)
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, convert_size, display_form, display_info, format_date,
-    get_file_path, is_authorized, link, manual, required_group, sanitize,
-    send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"], strict_slashes=False)
@@ -70,7 +70,10 @@ def admin_index(
                 'entities'],
             defs=[{'className': 'dt-body-right', 'targets': 7}]),
         'content': Table(['name'] + list(app.config['LANGUAGES']))}
+    newsletter = False
     for user in User.get_all():
+        if user.settings['newsletter']:
+            newsletter = True
         user_entities = ''
         if count := User.get_created_entities_count(user.id):
             user_entities = \
@@ -129,8 +132,10 @@ def admin_index(
             buttons=[
                 manual('admin/user'),
                 button(_('activity'), url_for('user_activity')),
-                button(_('newsletter'), url_for('admin_newsletter'))
-                if is_authorized('manager') and g.settings['mail'] else '',
+                button(_('newsletter'), url_for('admin_newsletter')) if (
+                    is_authorized('manager') and
+                    g.settings['mail'] and
+                    newsletter) else '',
                 button(_('user'), url_for('user_insert'))
                 if is_authorized('manager') else ''])}
     if is_authorized('admin'):

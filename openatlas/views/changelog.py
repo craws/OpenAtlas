@@ -1,7 +1,31 @@
-from openatlas.util.util import link
+from flask import render_template
+from flask_babel import lazy_gettext as _
+
+from openatlas import app
+from openatlas.display.util import link
+
+
+@app.route('/changelog')
+def index_changelog() -> str:
+    return render_template(
+        'index/changelog.html',
+        title=_('changelog'),
+        crumbs=[_('changelog')],
+        versions=versions)
+
 
 versions = {
-    '7.10.0': ['TBA', {}],
+    '7.10.0': ['TBA', {
+        'feature': {
+            '1921': 'Additional UI translations - Spanish and Catalan'
+        }
+    }],
+    '7.9.2': ['2023-01-09', {
+        'fix': {
+            '1926': 'Broken external reference system links'}}],
+    '7.9.1': ['2023-01-02', {
+        'fix': {
+            '1919': 'Minor display issues'}}],
     '7.9.0': ['2023-01-01', {
         'feature': {
             '1882': 'Log dynamically created entities',

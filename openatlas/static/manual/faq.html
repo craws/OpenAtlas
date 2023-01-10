@@ -5,7 +5,8 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8" />
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>FAQ &mdash; OpenAtlas 7.9.0 documentation</title>
@@ -25,6 +26,9 @@
   
 
   
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -166,13 +170,14 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="faq">
+  <section id="faq">
 <h1>FAQ<a class="headerlink" href="#faq" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
 <p>Here you can find answers to some frequently asked questions.</p>
 <p><strong>Why is it not possible to add custom types with a free text entry field
 the same way it is possible with numbers for value types?</strong></p>
+<p>Tag: design decision</p>
 <p>A free text entry field would lead to lots of unstructured data.
 Unstructured data can not be processed automatically and would result in it
 not being presented nor searchable in the OpenAtlas system as well as in a
@@ -191,6 +196,7 @@ create new types, click <a class="reference internal" href="examples/types.html"
 project’s specific needs, so please don’t hesitate to reach out to us if you
 have any additional questions on this topic.</p>
 <p><strong>How can I enter professions into the OpenAtlas system?</strong></p>
+<p>Tag: model</p>
 <p>A profession is not entered via a type as a lot of other information you
 will put into the database. You can enter a person’s profession by linking
 them to a group.
@@ -200,7 +206,20 @@ enter our lead developer Alex into the database: create a group named
 can also pick the role he has in that group from a list of types. For a more
 detailed tutorial on how to enter professions, have a look
 <a class="reference internal" href="examples/profession.html"><span class="doc">here</span></a>.</p>
-</div>
+<p><strong>Why can’t longer texts be formatted?</strong></p>
+<p>Tag: design decision</p>
+<p>For formatting longer texts, e.g. entity descriptions, only linebreaks can
+be used. The main reason for not implementing formatting systems like HTML or
+Markdown for e.g. bold font, underline, lists and similar is that data may
+be used by other systems via the <a class="reference internal" href="tools/api.html"><span class="doc">API</span></a>, and these systems are not
+necessarily able to handle these formats.</p>
+<p>Another reason is that these formats might change over time. All in all it is
+more important for us that acquired data is as interoperable, as long as
+possible.</p>
+<p>Of course the situation is different for e.g. presentation sites for OpenAtlas
+data. There it would be possible to e.g. add manual formatted texts where
+needed.</p>
+</section>
 
 
            </div>

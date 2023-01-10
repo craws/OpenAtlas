@@ -10,10 +10,10 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.util import (
+    button, display_form, is_authorized, manual, required_group, uc_first)
 from openatlas.models.tools import SexEstimation, get_types
 from openatlas.models.entity import Entity
-from openatlas.util.util import (
-    button, display_form, is_authorized, manual, required_group, uc_first)
 
 
 def name_result(result: float) -> str:
@@ -27,7 +27,7 @@ def name_result(result: float) -> str:
     for label, value in SexEstimation.result.items():
         if result < value:
             return _(label)
-    return ''
+    return ''  # pragma: no cover
 
 
 def print_sex_result(entity: Entity) -> str:
@@ -88,6 +88,59 @@ def sex(id_: int) -> Union[str, Response]:
             _('sex estimation')])
 
 
+@app.route('/anthropology/sex/update/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def sex_update(id_: int) -> Union[str, Response]:
+
+    class Form(FlaskForm):
+        pass
+
+    entity = Entity.get_by_id(id_, types=True)
+    choices = [(option, option) for option in SexEstimation.options]
+    for feature, values in SexEstimation.features.items():
+        description = ''
+        if values['female'] or values['male']:
+            description = f"Female: {values['female']}, male: {values['male']}"
+        setattr(
+           Form,
+           feature,
+           SelectField(
+               f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
+               choices=choices,
+               default='Not preserved',
+               description=description))
+    setattr(Form, 'save', SubmitField(_('save')))
+    form = Form()
+    types = get_types(entity.id)
+    if form.validate_on_submit():
+        data = form.data
+        data.pop('save', None)
+        data.pop('csrf_token', None)
+        try:
+            Transaction.begin()
+            SexEstimation.save(entity, data, types)
+            Transaction.commit()
+        except Exception as e:  # pragma: no cover
+            Transaction.rollback()
+            g.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(url_for('sex', id_=entity.id))
+
+    for dict_ in types:
+        getattr(form, g.types[dict_['id']].name).data = dict_['description']
+    return render_template(
+        'content.html',
+        content=display_form(
+            form,
+            manual_page='tools/anthropological_analyses'),
+        entity=entity,
+        crumbs=[
+            entity,
+            [_('tools'), url_for('tools_index', id_=entity.id)],
+            [_('sex estimation'), url_for('sex', id_=entity.id)],
+            _('edit')])
+
+
 @app.route('/tools/carbon/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def carbon_update(id_: int) -> Union[str, Response]:
@@ -121,60 +174,4 @@ def carbon_update(id_: int) -> Union[str, Response]:
             entity,
             [_('tools'), url_for('tools_index', id_=entity.id)],
             [_('radiocarbon dating'), url_for('carbon_update', id_=entity.id)],
-            _('edit')])
-
-
-@app.route('/tools/sex/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def sex_update(id_: int) -> Union[str, Response]:
-
-    class Form(FlaskForm):
-        pass
-
-    entity = Entity.get_by_id(id_, types=True)
-    choices = [(option, option) for option in SexEstimation.options]
-    for feature, values in SexEstimation.features.items():
-        description = ''
-        if values['female'] or values['male']:
-            description = f"Female: {values['female']}, male: {values['male']}"
-        setattr(
-           Form,
-           feature,
-           SelectField(
-               f"{uc_first(feature.replace('_', ' '))} ({values['category']})",
-               choices=choices,
-               default='Not preserved',
-               description=description))
-    setattr(Form, 'save', SubmitField(_('save')))
-    form = Form()
-    types = get_types(entity.id)
-    if form.validate_on_submit():
-        data = form.data
-        data.pop('save', None)
-        data.pop('csrf_token', None)
-        try:
-            Transaction.begin()
-            SexEstimation.save(entity, data, types)
-            Transaction.commit()
-        except Exception as e:
-            Transaction.rollback()
-            g.logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for('sex', id_=entity.id))
-
-    # Fill in data
-    for dict_ in types:
-        getattr(form, g.types[dict_['id']].name).data = dict_['description']
-    return render_template(
-        'content.html',
-        content=display_form(
-            form,
-            manual_page='tools/anthropological_analyses'),
-        entity=entity,
-        manual_page='tools/anthropological_analyses',
-        form=form,
-        crumbs=[
-            entity,
-            [_('tools'), url_for('tools_index', id_=entity.id)],
-            [_('sex estimation'), url_for('sex', id_=entity.id)],
             _('edit')])

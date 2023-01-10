@@ -11,26 +11,23 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.display.tab import Tab
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 from openatlas.models.content import get_translation
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
-from openatlas.util.changelog import versions
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    bookmark_toggle, format_date, link, required_group, send_mail, uc_first)
 
 
 @app.route('/')
 @app.route('/overview')
 def overview() -> str:
     if not current_user.is_authenticated:
-        info = render_template(
-            'index/index_guest.html',
-            intro=get_translation('intro'))
-        return render_template(
-            'tabs.html',
-            tabs={'info': Tab('info', info)},
-            crumbs=['overview'])
+        tabs = {
+            'info': Tab('info', render_template(
+                'index/index_guest.html',
+                intro=get_translation('intro')))}
+        return render_template('tabs.html', tabs=tabs, crumbs=['overview'])
     tabs = {
         'info': Tab('info'),
         'bookmarks': Tab(
@@ -140,15 +137,6 @@ def index_content(item: str) -> str:
         content=get_translation(item),
         title=_(_(item)),
         crumbs=[_(item)])
-
-
-@app.route('/changelog')
-def index_changelog() -> str:
-    return render_template(
-        'index/changelog.html',
-        title=_('changelog'),
-        crumbs=[_('changelog')],
-        versions=versions)
 
 
 @app.route('/unsubscribe/<code>')

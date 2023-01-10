@@ -20,14 +20,13 @@ class Network:
         entities: set[int] = set()
         nodes = []
         for row in Db.get_entities(classes):
-            if row['id'] in mapping or row['id'] in entities:
-                continue  # Locations are mapped to objects
-            nodes.append({
-                'id': row['id'],
-                'label' if dimensions else
-                'name': Network.truncate(row['name'].replace("'", "")),
-                'color': colors[row['openatlas_class_name']]})
-            entities.add(row['id'])
+            if row['id'] not in mapping and row['id'] not in entities:
+                nodes.append({
+                    'id': row['id'],
+                    'label' if dimensions else
+                    'name': Network.truncate(row['name'].replace("'", "")),
+                    'color': colors[row['openatlas_class_name']]})
+                entities.add(row['id'])
         linked_entity_ids = set()
         edges = []
         edge_entity_ids = set()

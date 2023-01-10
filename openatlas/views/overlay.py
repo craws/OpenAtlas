@@ -10,9 +10,9 @@ from wtforms import FloatField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.util import button, required_group, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
-from openatlas.util.util import button, required_group, uc_first
 
 
 class OverlayForm(FlaskForm):

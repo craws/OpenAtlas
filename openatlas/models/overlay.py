@@ -2,12 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from flask_login import current_user
-
-from openatlas import app
 from openatlas.database.overlay import Overlay as Db
 from openatlas.models.entity import Entity
-from openatlas.util.util import get_file_path
+from openatlas.display.util import get_file_path
 
 
 class Overlay:
@@ -50,10 +47,6 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> dict[int, Overlay]:
-        if not app.config['IS_UNIT_TEST'] \
-                and not current_user.settings['module_map_overlay']:
-            return {}
-
         ids = [object_.id] + \
             [e.id for e in object_.get_linked_entities_recursive('P46', True)]
         return {row['image_id']: Overlay(row) for row in Db.get_by_object(ids)}

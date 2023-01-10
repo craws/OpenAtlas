@@ -4,9 +4,9 @@ from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
+from openatlas.display.table import Table
+from openatlas.display.util import button, is_authorized, uc_first
 from openatlas.models.entity import Entity
-from openatlas.util.table import Table
-from openatlas.util.util import button, is_authorized, uc_first
 
 # Needed for translations of tab titles
 _('member of')

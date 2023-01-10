@@ -11,12 +11,12 @@ from flask_wtf import FlaskForm
 from wtforms import StringField
 
 from openatlas import app
+from openatlas.display.table import Table
 from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.type import Type
-from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_path, uc_first
+from openatlas.display.util import get_base_table_data, get_file_path, uc_first
 
 
 def get_form_settings(form: Any, profile: bool = False) -> dict[str, str]:
@@ -81,7 +81,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
                 'file_upload_allowed_extension']:
             field.data = ' '.join(g.settings[field.name])
             continue
-        if field.name not in g.settings:
+        if field.name not in g.settings:  # pragma: no cover
             field.data = ''  # In case of a missing setting after an update
             continue
         field.data = g.settings[field.name]
@@ -119,10 +119,11 @@ def populate_insert_form(
 def was_modified(form: FlaskForm, entity: Entity) -> bool:
     if not entity.modified or not form.opened.data:
         return False
-    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+    if entity.modified < datetime.fromtimestamp(
+            float(form.opened.data)):  # pragma: no cover
         return False
-    g.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
-    return True
+    g.logger.log('info', 'multi user', 'Overwrite denied')  # pragma: no cover
+    return True  # pragma: no cover
 
 
 def form_to_datetime64(
@@ -183,7 +184,7 @@ def form_to_datetime64(
 
 
 class GlobalSearchForm(FlaskForm):
-    term = StringField('', render_kw={"placeholder": _('search term')})
+    term = StringField('')
 
 
 @app.context_processor

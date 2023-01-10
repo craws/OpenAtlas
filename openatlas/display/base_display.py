@@ -8,9 +8,10 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.display.tab import Tab
 from openatlas.display.util import (
-    delete_link, edit_link, ext_references, format_entity_date, get_appearance,
-    get_system_data, profile_image, profile_image_table_link, remove_link,
-    siblings_pager)
+    bookmark_toggle, button, delete_link, edit_link, ext_references,
+    format_date, format_entity_date, get_appearance, get_base_table_data,
+    get_system_data, is_authorized, link, manual, profile_image,
+    profile_image_table_link, remove_link, siblings_pager, uc_first)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -18,9 +19,6 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
 from openatlas.models.user import User
-from openatlas.util.util import (
-    bookmark_toggle, button, format_date, get_base_table_data, is_authorized,
-    link, manual, uc_first)
 from openatlas.views.entity_index import file_preview
 
 
@@ -28,11 +26,11 @@ class BaseDisplay:
 
     entity: Union[Entity, ReferenceSystem, Type]
     tabs: dict[str, Tab]
-    events: Optional[list[Entity]]
+    events: list[Entity]
     event_links: Optional[list[Link]]  # Needed for actor and info data
     linked_places: list[Entity]  # Related places for map
-    gis_data: dict[str, Any] = None
-    structure = None
+    gis_data: dict[str, Any]
+    structure: dict[str, list[Entity]]
     overlays = None
     crumbs: list[Any]
     buttons: list[str]
@@ -44,6 +42,8 @@ class BaseDisplay:
         self.events = []
         self.event_links = []
         self.linked_places = []
+        self.structure = {}
+        self.gis_data = {}
         self.problematic_type = self.entity.check_too_many_single_type_links()
         self.entity.image_id = entity.get_profile_image_id()
         self.add_tabs()
@@ -157,7 +157,7 @@ class BaseDisplay:
                 if not entity.image_id \
                         and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     entity.image_id = domain.id
-            if domain.class_.view not in ['source', 'file']:
+            elif domain.class_.view != 'source':
                 data.append(link_.description)
                 data.append(edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)))
@@ -297,7 +297,7 @@ class EventsDisplay(BaseDisplay):
                 edit_link(
                     url_for('link_update', id_=link_.id, origin_id=entity.id)),
                 remove_link(link_.range.name, link_, entity, 'actor')])
-        entity.linked_places = [
+        self.linked_places = [
             location.get_linked_entity_safe('P53', True) for location
             in entity.get_linked_entities(['P7', 'P26', 'P27'])]
 
@@ -342,20 +342,23 @@ class PlaceBaseDisplay(BaseDisplay):
                 if entity.class_.view == 'place' \
                         and is_authorized('editor') \
                         and current_user.settings['module_map_overlay']:
-                    overlays = Overlay.get_by_object(entity)
+                    content = ''
                     if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                        if domain.id in overlays:
-                            data.append(edit_link(url_for(
-                                'overlay_update',
-                                id_=overlays[domain.id].id)))
+                        overlays = Overlay.get_by_object(entity)
+                        if domain.id in overlays and (html_link := edit_link(
+                                url_for(
+                                    'overlay_update',
+                                    id_=overlays[domain.id].id))):
+                            content += html_link
                         else:
-                            data.append(link(_('link'), url_for(
-                                'overlay_insert',
-                                image_id=domain.id,
-                                place_id=entity.id,
-                                link_id=link_.id)))
-                    else:
-                        data.append('')
+                            content = link(
+                                _('link'),
+                                url_for(
+                                    'overlay_insert',
+                                    image_id=domain.id,
+                                    place_id=entity.id,
+                                    link_id=link_.id))
+                    data.append(content)
             if domain.class_.view not in ['source', 'file']:
                 data.append(link_.description)
                 data.append(edit_link(
@@ -419,6 +422,8 @@ class ReferenceBaseDisplay(BaseDisplay):
 
 class TypeBaseDisplay(BaseDisplay):
 
+    entity: Type
+
     def add_data(self) -> None:
         super().add_data()
         self.data[_('super')] = link(g.types[self.entity.root[-1]])
@@ -469,8 +474,6 @@ class TypeBaseDisplay(BaseDisplay):
                     link(Entity.get_by_id(row['range_id']))])
         else:
             for item in entity.get_linked_entities(['P2', 'P89'], True, True):
-                if item.class_.name in ['location', 'reference_system']:
-                    continue
                 if item.class_.name == 'object_location':
                     item = item.get_linked_entity_safe('P53', inverse=True)
                 data = [link(item)]

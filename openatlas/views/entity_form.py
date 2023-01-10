@@ -3,22 +3,22 @@ from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect, secure_filename
 from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.database.connect import Transaction
+from openatlas.display.image_processing import resize_image
+from openatlas.display.util import is_authorized, link, required_group
 from openatlas.forms.base_manager import BaseManager
 from openatlas.forms.form import get_manager
 from openatlas.forms.util import populate_insert_form, was_modified
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
-from openatlas.models.reference_system import ReferenceSystem
 from openatlas.models.type import Type
-from openatlas.util.image_processing import resize_image
-from openatlas.util.util import is_authorized, link, required_group
 
 
 @app.route('/insert/<class_>', methods=['POST', 'GET'])
@@ -35,13 +35,15 @@ def insert(
             return redirect(insert_files(manager))
         return redirect(save(manager))
     populate_insert_form(manager.form, class_, origin)
-    place_info = get_place_info_for_insert(g.classes[class_].view, origin)
+    place_info = {'structure': None, 'gis_data': None, 'overlays': None}
+    if g.classes[class_].view in ['artifact', 'place']:
+        place_info = get_place_info_for_insert(origin)
     return render_template(
         'entity/insert.html',
         form=manager.form,
+        class_name=class_,
         view_name=g.classes[class_].view,
         gis_data=place_info['gis_data'],
-        geonames_module=check_geonames_module(class_),
         writable=os.access(app.config['UPLOAD_DIR'], os.W_OK),
         overlays=place_info['overlays'],
         title=_(g.classes[class_].view),
@@ -79,9 +81,9 @@ def update(id_: int) -> Union[str, Response]:
         'entity/update.html',
         form=manager.form,
         entity=entity,
+        class_name=entity.name,
         gis_data=place_info['gis_data'],
         overlays=place_info['overlays'],
-        geonames_module=check_geonames_module(entity.class_.name),
         title=entity.name,
         crumbs=add_crumbs(entity.class_.name, entity, place_info['structure']))
 
@@ -119,11 +121,6 @@ def add_crumbs(
     return crumbs + [f'+ {g.classes[class_].label}{siblings}']
 
 
-def check_geonames_module(class_: str) -> bool:
-    return class_ == 'place' \
-           and bool(ReferenceSystem.get_by_name('GeoNames').classes)
-
-
 def check_insert_access(class_: str) -> None:
     if class_ not in g.classes \
             or not g.classes[class_].view \
@@ -139,32 +136,34 @@ def check_update_access(entity: Entity) -> None:
         abort(403)
 
 
-def get_place_info_for_insert(
-        class_view: str,
-        origin: Optional[Entity]) -> dict[str, Any]:
-    if class_view not in ['artifact', 'place']:
-        return {'structure': None, 'gis_data': None, 'overlays': None}
+def get_place_info_for_insert(origin: Optional[Entity]) -> dict[str, Any]:
     structure = origin.get_structure_for_insert() if origin else None
+    overlay = None
+    if current_user.settings['module_map_overlay'] \
+            and origin \
+            and origin.class_.view == 'place':
+        overlay = Overlay.get_by_object(origin)
     return {
         'structure': structure,
         'gis_data': Gis.get_all([origin] if origin else None, structure),
-        'overlays': Overlay.get_by_object(origin)
-        if origin and origin.class_.view == 'place' else None}
+        'overlays': overlay}
 
 
 def get_place_info_for_update(entity: Entity) -> dict[str, Any]:
-    if entity.class_.view not in ['artifact', 'place']:
-        return {
-            'structure': None,
-            'gis_data': None,
-            'overlays': None,
-            'location': None}
-    structure = entity.get_structure()
-    return {
-        'structure': structure,
-        'gis_data': Gis.get_all([entity], structure),
-        'overlays': Overlay.get_by_object(entity),
-        'location': entity.get_linked_entity_safe('P53', types=True)}
+    data: dict[str, Any] = {
+        'structure': None,
+        'gis_data': None,
+        'overlays': None,
+        'location': None}
+    if entity.class_.view in ['artifact', 'place']:
+        structure = entity.get_structure()
+        data = {
+            'structure': structure,
+            'gis_data': Gis.get_all([entity], structure),
+            'overlays': Overlay.get_by_object(entity)
+            if current_user.settings['module_map_overlay'] else None,
+            'location': entity.get_linked_entity_safe('P53', types=True)}
+    return data
 
 
 def insert_files(manager: BaseManager) -> Union[str, Response]:

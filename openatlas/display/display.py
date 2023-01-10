@@ -1,18 +1,16 @@
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 
-from openatlas import app
 from openatlas.display.base_display import (
     ActorDisplay, BaseDisplay, EventsDisplay, PlaceBaseDisplay,
     ReferenceBaseDisplay, TypeBaseDisplay)
 from openatlas.display.tab import Tab
+from openatlas.display.table import Table
 from openatlas.display.util import (
-    delete_link, edit_link, format_entity_date, profile_image_table_link,
-    remove_link)
+    button, delete_link, edit_link, format_entity_date, get_base_table_data,
+    get_file_path, is_authorized, link, remove_link, uc_first)
 from openatlas.models.entity import Entity
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, get_base_table_data, get_file_path, is_authorized, link, uc_first)
+from openatlas.models.reference_system import ReferenceSystem
 
 
 class AcquisitionDisplay(EventsDisplay):
@@ -158,16 +156,18 @@ class PlaceDisplay(PlaceBaseDisplay):
 
     def add_tabs(self) -> None:
         super().add_tabs()
-        for link_ in \
-                self.entity.location.get_links(['P74', 'OA8', 'OA9'], True):
-            actor = Entity.get_by_id(link_.domain.id)
-            self.tabs['actor'].table.rows.append([
-                link(actor),
-                g.properties[link_.property.code].name,
-                actor.class_.name,
-                actor.first,
-                actor.last,
-                actor.description])
+        if self.entity.location:
+            for link_ in self.entity.location.get_links(
+                    ['P74', 'OA8', 'OA9'],
+                    True):
+                actor = Entity.get_by_id(link_.domain.id)
+                self.tabs['actor'].table.rows.append([
+                    link(actor),
+                    g.properties[link_.property.code].name,
+                    actor.class_.name,
+                    actor.first,
+                    actor.last,
+                    actor.description])
         actor_ids = []
         for event in self.events:
             for actor in \
@@ -189,6 +189,8 @@ class ProductionDisplay(EventsDisplay):
 
 
 class ReferenceSystemDisplay(BaseDisplay):
+
+    entity: ReferenceSystem
 
     def add_data(self) -> None:
         super().add_data()
@@ -262,26 +264,7 @@ class SourceDisplay(BaseDisplay):
             data.append(
                 remove_link(range_.name, link_, entity, range_.class_.view))
             self.tabs[range_.class_.view].table.rows.append(data)
-        for link_ in entity.get_links('P67', inverse=True):
-            domain = link_.domain
-            data = get_base_table_data(domain)
-            if domain.class_.view == 'file':
-                extension = data[3]
-                data.append(
-                    profile_image_table_link(entity, domain, extension))
-                if not entity.image_id \
-                        and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    entity.image_id = domain.id
-            if domain.class_.view != 'file':
-                data.append(link_.description)
-                data.append(edit_link(
-                    url_for('link_update', id_=link_.id, origin_id=entity.id)))
-                if domain.class_.view == 'reference_system':
-                    entity.reference_systems.append(link_)
-                    continue
-            data.append(
-                remove_link(domain.name, link_, entity, domain.class_.view))
-            self.tabs[domain.class_.view].table.rows.append(data)
+        self.add_reference_tables_data()
         self.add_note_tab()
 
 

@@ -40,19 +40,19 @@ def check_dates(entity: Entity, data: dict[str, Any]) -> bool:
             and not entity.end_from \
             and not entity.end_to:
         return bool(data['include_dateless'])
-    begin_ok = False
-    end_ok = False
     dates = [
         entity.begin_from,
         entity.begin_to,
         entity.end_from,
         entity.end_to]
+    begin_ok = False
     if not data['from_date']:
         begin_ok = True
     else:
         for date in dates:
             if date and date >= data['from_date']:
                 begin_ok = True
+    end_ok = False
     if not data['to_date']:
         end_ok = True
     else:
