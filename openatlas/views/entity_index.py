@@ -1,4 +1,3 @@
-import datetime
 from typing import Optional, Union
 
 from flask import flash, g, render_template, url_for
@@ -9,14 +8,14 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.display.image_processing import check_processed_image
+from openatlas.display.table import Table
+from openatlas.display.util import (
+    button, format_date, get_base_table_data, get_file_path, is_authorized,
+    link, manual, required_group)
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.image_processing import check_processed_image
-from openatlas.util.table import Table
-from openatlas.util.util import (
-    button, external_url, format_date, get_base_table_data, get_file_path,
-    is_authorized, link, manual, required_group)
 
 
 @app.route('/index/<view>')
@@ -24,7 +23,7 @@ from openatlas.util.util import (
 @required_group('readonly')
 def index(view: str, delete_id: Optional[int] = None) -> Union[str, Response]:
     if delete_id:  # Delete before showing index to prevent additional redirect
-        if current_user.group == 'contributor':  # pragma: no cover
+        if current_user.group == 'contributor':
             info = g.logger.get_log_info(delete_id)
             if not info['creator'] or info['creator'].id != current_user.id:
                 abort(403)
@@ -51,22 +50,16 @@ def get_buttons(view: str) -> list[str]:
 
 
 def get_table(view: str) -> Table:
-    header = g.table_headers[view]
+    table = Table(g.table_headers[view])
     if view == 'file':
-        header = ['date'] + header
+        table.order = [[0, 'desc']]
+        table.header = ['date'] + table.header
         if g.settings['image_processing'] \
                 and current_user.settings['table_show_icons']:
-            header.insert(1, _('icon'))
-    table = Table(header)
-    if view == 'file':
+            table.header.insert(1, _('icon'))
         for entity in Entity.get_by_class('file', types=True):
-            date = 'N/A'
-            if entity.id in g.file_stats:
-                date = format_date(
-                    datetime.datetime.utcfromtimestamp(
-                        g.file_stats[entity.id]['date']))
             data = [
-                date,
+                format_date(entity.created),
                 link(entity),
                 link(entity.standard_type),
                 g.file_stats[entity.id]['size']
@@ -83,8 +76,8 @@ def get_table(view: str) -> Table:
             table.rows.append([
                 link(system),
                 system.count or '',
-                external_url(system.website_url),
-                external_url(system.resolver_url),
+                link(system.website_url, system.website_url, external=True),
+                link(system.resolver_url, system.resolver_url, external=True),
                 system.placeholder,
                 link(g.types[system.precision_default_id])
                 if system.precision_default_id else '',
@@ -116,7 +109,7 @@ def delete_entity(id_: int) -> Optional[str]:
     url = None
     entity = Entity.get_by_id(id_)
     if not is_authorized(entity.class_.write_access):
-        abort(403)  # pragma: no cover
+        abort(403)
     if isinstance(entity, ReferenceSystem):
         if entity.system:
             abort(403)
@@ -139,7 +132,7 @@ def delete_entity(id_: int) -> Optional[str]:
     elif entity.class_.name == 'file':
         try:
             delete_files(id_)
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             g.logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
             return url_for('view', id_=id_)

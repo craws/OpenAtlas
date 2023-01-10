@@ -7,7 +7,7 @@ from werkzeug.exceptions import abort
 from openatlas.forms.util import form_to_datetime64
 from openatlas.models.entity import Entity
 from openatlas.models.reference_system import ReferenceSystem
-from openatlas.util.util import sanitize
+from openatlas.display.util import sanitize
 
 
 def process_standard_fields(manager: Any) -> None:
@@ -67,6 +67,9 @@ def process_standard_fields(manager: Any) -> None:
         elif key == 'alias':
             manager.data['aliases'] = value
         elif field_type in ['TreeField', 'TreeMultiField']:
+            if manager.class_.name in \
+                    ['actor_function', 'actor_relation', 'involvement']:
+                continue
             if g.types[int(getattr(manager.form, key).id)].class_.name \
                     == 'administrative_unit':
                 if 'administrative_units' not in manager.data:

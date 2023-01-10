@@ -10,9 +10,9 @@ from wtforms import FloatField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.display.util import button, required_group, uc_first
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
-from openatlas.util.util import button, required_group, uc_first
 
 
 class OverlayForm(FlaskForm):
@@ -77,9 +77,10 @@ def overlay_update(id_: int) -> Union[str, Response]:
         flash(_('info update'), 'info')
         return redirect(
             f"{url_for('view', id_=overlay.place_id)}#tab-file")
-    bounding = ast.literal_eval(overlay.bounding_box)
-    if len(bounding) == 2:  # pragma no cover
-        bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
+    bounding = [[0, 0], [0, 0], [0, 0]]  # For data entered before 6.4.0
+    bounding_values = ast.literal_eval(overlay.bounding_box)
+    if len(bounding_values) == 3:
+        bounding = bounding_values
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
     form.top_right_easting.data = bounding[1][1]

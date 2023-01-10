@@ -5,6 +5,7 @@ Model
    :maxdepth: 1
 
    cidoc_crm
+   openatlas_classes
    openatlas_shortcuts
    references
    link_checker

@@ -6,7 +6,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.database.connect import Transaction
-from openatlas.util.util import get_backup_file_data, manual, required_group
+from openatlas.display.util import get_backup_file_data, manual, required_group
 
 
 class SqlForm(FlaskForm):
@@ -38,16 +38,11 @@ def sql_execute() -> str:
         try:
             g.cursor.execute(form.statement.data)
             response = f'<p>Rows affected: {g.cursor.rowcount}</p>'
-            try:
+            if g.cursor.pgresult_ptr is not None:
                 response += f'<p>{g.cursor.fetchall()}</p>'
-            except Exception:  # pragma: no cover
-                pass  # Assuming no SELECT statement so returning rowcount
             Transaction.commit()
             flash(_('SQL executed'), 'info')
-            g.logger.log(
-                'info',
-                'database',
-                'SQL executed', form.statement.data)
+            g.logger.log('info', 'database', 'SQL query', form.statement.data)
         except Exception as e:
             Transaction.rollback()
             g.logger.log('error', 'database', 'transaction failed', e)

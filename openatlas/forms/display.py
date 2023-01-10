@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Any, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -9,11 +7,9 @@ from wtforms import Field, IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
+from openatlas.display.util import manual, tooltip, uc_first
 from openatlas.forms.field import ValueFloatField
-from openatlas.util.util import manual, tooltip, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.type import Type
+from openatlas.models.type import Type
 
 
 def html_form(
@@ -33,11 +29,10 @@ def html_form(
             if field.id == 'begin_year_from':
                 html += add_dates(form)
             continue
-
         if field.type in ['TreeField', 'TreeMultiField']:
             type_ = g.types[int(field.type_id)]
             if not type_.subs:
-                continue  # pragma: no cover
+                continue
             label = type_.name
             if type_.category == 'standard' and type_.name != 'License':
                 label = uc_first(_('type'))
@@ -51,11 +46,11 @@ def html_form(
             if field.flags.required and field.label.text:
                 label += ' *'
             tooltip_ = ''
-            if 'is_type_form' not in form:  # pragma: no cover
+            if 'is_type_form' not in form:
                 tooltip_ = type_.description or ''
-                if field.flags.required \
-                        and current_user.group == 'contributor':
-                    tooltip_ += "&#013;" + str(_('tooltip_required_type'))
+                tooltip_ += "&#013;" + str(_('tooltip_required_type')) \
+                    if field.flags.required \
+                            and current_user.group == 'contributor' else ''
             html += add_row(field, label + tooltip(tooltip_))
             continue
 
@@ -84,6 +79,8 @@ def html_form(
                 html += add_reference_systems(form)
                 reference_systems_added = True
             continue
+        if field.type in ['TableField', 'TableMultiField']:
+            field.label.text = _(field.label.text.lower())
         html += add_row(field, form_id=form_id)
     return html
 
@@ -119,8 +116,8 @@ def add_reference_systems(form: Any) -> str:
         if field.id.startswith('reference_system_id_'):
             fields.append(field)
             if field.errors:
-                errors = True  # pragma: no cover
-    if len(fields) > 3 and not errors:  # pragma: no cover
+                errors = True
+    if len(fields) > 3 and not errors:
         switch_class = 'reference-system-switch'
         html = render_template('util/reference_system_switch.html')
     for field in fields:

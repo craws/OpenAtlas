@@ -175,7 +175,11 @@ class TypeTest(TestBaseCase):
                     Entity.get_by_id(Type.get_hierarchy('Sex').subs[1]))
 
             rv = self.app.get(url_for('update', id_=frodo.id))
-            assert b'422' in rv.data  # Check invalid multiple type links
+            assert b'422' in rv.data  # Invalid multiple type links
+
+            rv = self.app.post(
+                url_for('type_move_entities', id_=dimension_type.subs[0]))
+            assert b'403' in rv.data  # Can't move value types
 
             rv = self.app.get(
                 url_for('show_multiple_linked_entities', id_=sex_type.id))
@@ -221,6 +225,5 @@ class TypeTest(TestBaseCase):
 
             rv = self.app.post(
                 url_for('type_delete_recursive', id_=actor_type.id),
-                data={'confirm_delete': True},
-                follow_redirects=True)
+                data={'confirm_delete': True})
             assert b'403 - Forbidden' in rv.data

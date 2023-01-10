@@ -1,16 +1,12 @@
-from __future__ import annotations
-
-from typing import Optional, TYPE_CHECKING
+from typing import Optional
 
 from flask import g, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
-from openatlas.util.table import Table
-from openatlas.util.util import button, is_authorized, uc_first
-
-if TYPE_CHECKING:  # pragma: no cover
-    from openatlas.models.entity import Entity
+from openatlas.display.table import Table
+from openatlas.display.util import button, is_authorized, uc_first
+from openatlas.models.entity import Entity
 
 # Needed for translations of tab titles
 _('member of')

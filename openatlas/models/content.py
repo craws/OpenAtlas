@@ -24,12 +24,9 @@ def get_content() -> dict[str, dict[str, str]]:
 
 
 def get_translation(name: str, lang: Optional[str] = None) -> str:
-    items = get_content()
-    if name not in items:  # pragma: no cover
-        return ''
-    translations = items[name]
+    translations = get_content()[name]
     if lang and lang in translations and translations[lang]:
-        return translations[lang]  # pragma: no cover, can be used by API
+        return translations[lang]
     if translations[session['language']]:
         return translations[session['language']]
     return translations[g.settings['default_language']]

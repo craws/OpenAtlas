@@ -100,19 +100,9 @@ Test Apache configuration and restart
     # apache2ctl configtest
     # service apache2 restart
 
-### File Upload and Export
+Make the **files** directory writable for the Apache user, e.g.:
 
-Make these directories writable for the Apache user:
-
-    openatlas/uploads
-    openatlas/export/sql
-    openatlas/processed_images/resized
-
-e.g.
-
-    # chown www-data openatlas/uploads
-    # chown www-data openatlas/export/sql
-    # chown www-data openatlas/processed_images/resized
+    # chown -R www-data files
 
 ### Finishing
 

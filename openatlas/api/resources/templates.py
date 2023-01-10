@@ -8,6 +8,7 @@ from flask_restful.fields import Integer, List, Nested, String
 def geojson_template() -> dict[str, Any]:
     types = {
         'typeName': fields.String,
+        'typeHierarchy': fields.String,
         'typeId': fields.Integer}
 
     properties = {

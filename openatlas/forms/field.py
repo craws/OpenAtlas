@@ -8,14 +8,14 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (
-    Field, FloatField, HiddenField, StringField, TextAreaField, FileField)
-from wtforms.widgets import HiddenInput, TextInput, FileInput
+    Field, FileField, FloatField, HiddenField, StringField, TextAreaField)
+from wtforms.widgets import FileInput, HiddenInput, TextInput
 
+from openatlas.display.table import Table
 from openatlas.forms.util import get_table_content
 from openatlas.models.entity import Entity
 from openatlas.models.type import Type
-from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, is_authorized
+from openatlas.display.util import get_base_table_data, is_authorized
 
 
 class RemovableListInput(TextInput):

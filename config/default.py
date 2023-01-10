@@ -3,14 +3,12 @@ from pathlib import Path
 
 from config.database_versions import DATABASE_VERSIONS
 
-root_path = Path(__file__).parent.parent / 'openatlas'
-
-VERSION = '7.9.0'
+VERSION = '7.10.0'
 DATABASE_VERSION = DATABASE_VERSIONS[0]
 DEMO_MODE = False  # If activated some options are disabled, login is prefilled
 IS_UNIT_TEST = False
 
-LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
+LANGUAGES = {'ca': 'Català', 'de': 'Deutsch', 'en': 'English', 'es': 'Español'}
 DEBUG = False
 
 DATABASE_NAME = 'openatlas'
@@ -28,12 +26,13 @@ DISPLAY_FILE_EXTENSIONS = \
 # Paths are implemented operating system independent using pathlib.
 # To override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
-TMP_DIR = Path('/tmp')  # used e.g. for processing import and export files
-EXPORT_DIR = Path(root_path) / 'export'
-UPLOAD_DIR = Path(root_path) / 'uploads'
+FILES_PATH = Path(__file__).parent.parent / 'files'
+EXPORT_DIR = Path(FILES_PATH) / 'export'
+UPLOAD_DIR = Path(FILES_PATH) / 'uploads'
+TMP_DIR = Path('/tmp')  # used e.g. for processing imports and export files
 
 # Image processing
-PROCESSED_IMAGE_DIR = Path(root_path) / 'processed_images'
+PROCESSED_IMAGE_DIR = Path(FILES_PATH) / 'processed_images'
 RESIZED_IMAGES = Path(PROCESSED_IMAGE_DIR) / 'resized'
 IMAGE_SIZE = {
     'thumbnail': '200',
@@ -45,7 +44,7 @@ PROCESSED_EXT = '.jpeg'
 # For system checks
 WRITABLE_DIRS = [
     UPLOAD_DIR,
-    EXPORT_DIR / 'sql',
+    EXPORT_DIR,
     RESIZED_IMAGES]
 
 # Security

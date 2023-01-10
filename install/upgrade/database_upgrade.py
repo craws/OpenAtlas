@@ -105,7 +105,7 @@ def check_database_version_supported() -> None:
 
 
 def backup_database() -> None:
-    path = EXPORT_DIR / 'sql'
+    path = EXPORT_DIR
     if not os.access(path, os.W_OK):
         finish(
             f'Directory for database backup not writeable ({path}). Aborting!')

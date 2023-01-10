@@ -14,8 +14,8 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.display.util import display_form, send_mail, uc_first
 from openatlas.models.user import User
-from openatlas.util.util import display_form, send_mail, uc_first
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -106,7 +106,7 @@ def reset_password() -> Union[str, Response]:
     if current_user.is_authenticated:  # Prevent password reset if logged in
         return redirect(url_for('overview'))
     form = PasswordResetForm()
-    if form.validate_on_submit() and g.settings['mail']:  # pragma: no cover
+    if form.validate_on_submit() and g.settings['mail']:
         if user := User.get_by_email(form.email.data):
             code = User.generate_password()
             user.password_reset_code = code
@@ -132,7 +132,7 @@ def reset_password() -> Union[str, Response]:
                     _('A password reset confirmation mail was send '
                       'to %(email)s.', email=email),
                     'info')
-            else:
+            else:  # pragma: no cover
                 flash(
                     _('Failed to send password reset confirmation mail '
                       'to %(email)s.', email=email),
@@ -150,7 +150,7 @@ def reset_password() -> Union[str, Response]:
 
 
 @app.route('/reset_confirm/<code>')
-def reset_confirm(code: str) -> Response:  # pragma: no cover
+def reset_confirm(code: str) -> Response:
     user = User.get_by_reset_code(code)
     if not user or not user.username or not user.email:
         g.logger.log('info', 'auth', 'unknown reset code')
@@ -180,7 +180,7 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
         flash(
             _('A new password was sent to %(email)s.', email=user.email),
             'info')
-    else:
+    else:  # pragma: no cover
         flash(
             _('Failed to send password mail to %(email)s.', email=user.email),
             'error')
