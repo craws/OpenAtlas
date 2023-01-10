@@ -76,6 +76,26 @@ class Api(ApiTestCase):
                         height = entity
                     if entity.name == 'Change of Property':
                         change_of_property = entity
+                    if entity.name == 'Picture with a License':
+                        file_ = entity
+                    if entity.name == 'File without license':
+                        file_without_licences = entity
+
+            # ---Display Image Endpoint---
+            with self.assertRaises(FileNotFoundError):
+                self.app.get(url_for(
+                    'api_03.display',
+                    filename=f'{file_.id}.jpg',
+                    download=True))
+            with self.assertRaises(AccessDeniedError):
+                self.app.get(url_for(
+                    'api_03.display',
+                    filename=f'{file_without_licences.id}.jpg'))
+            rv = self.app.get(url_for(
+                'api_03.display',
+                filename=f'{file_.id}.jpg',
+                image_size='thumbnail'))
+            assert b'URL was not found on the server' in rv.data
 
             # ---Content Endpoints---
             rv = self.app.get(url_for('api_03.class_mapping')).get_json()

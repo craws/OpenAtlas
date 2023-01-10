@@ -118,11 +118,11 @@ def get_csv_geom_entry(entity: Entity) -> dict[str, None]:
 
 
 def get_csv_geometry(entity: Entity) -> dict[str, Any]:
-    if entity.cidoc_class.code != 'E53':
-        return {'type': None, 'coordinates': None}  # pragma: no cover
-    if geoms := Gis.get_by_id(entity.id):
-        return {key: [geom[key] for geom in geoms] for key in geoms[0]}
-    return {'type': None, 'coordinates': None}
+    dict_ = {'type': None, 'coordinates': None}
+    if (geoms := Gis.get_by_id(entity.id)) \
+            and entity.cidoc_class.code == 'E53':
+        dict_ = {key: [geom[key] for geom in geoms] for key in geoms[0]}
+    return dict_
 
 
 def export_csv_for_network_analysis(
