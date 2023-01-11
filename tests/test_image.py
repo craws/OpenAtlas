@@ -117,6 +117,13 @@ class ImageTest(TestBaseCase):
             rv = self.app.get(url_for('view', id_=file.id))
             assert b'Test_File' in rv.data
 
+            # API display image
+            rv = self.app.get(url_for(
+                'api_03.display',
+                filename=file_name,
+                image_size='thumbnail'))
+            assert b'\xff' in rv.data
+
             # Exception
             app.config['IMAGE_SIZE']['tmp'] = '<'
             rv = self.app.get(url_for('view', id_=file.id))
