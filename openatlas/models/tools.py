@@ -1,6 +1,6 @@
 from typing import Any, Union
 
-from flask import g
+from flask import g, json
 
 from openatlas.database.tools import Tools as Db
 from openatlas.models.entity import Entity
@@ -11,6 +11,9 @@ from openatlas.models.type import Type
 def get_types(id_: int) -> list[dict[str, Any]]:
     return Db.get_types(id_)
 
+def update_carbon(entity: Entity, data: dict[str,Any]):
+    # Entity.insert('string', 'carbon_string', json.dumps(data))
+    pass
 
 class SexEstimation:
 

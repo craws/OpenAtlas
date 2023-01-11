@@ -12,7 +12,7 @@ from openatlas import app
 from openatlas.database.connect import Transaction
 from openatlas.display.util import (
     button, display_form, is_authorized, manual, required_group, uc_first)
-from openatlas.models.tools import SexEstimation, get_types
+from openatlas.models.tools import SexEstimation, get_types, update_carbon
 from openatlas.models.entity import Entity
 
 
@@ -166,6 +166,16 @@ def carbon_update(id_: int) -> Union[str, Response]:
 
     entity = Entity.get_by_id(id_)
     form = Form()
+    if form.validate_on_submit():
+        update_carbon(
+            entity,
+            data={
+                'labId': form.lab_id.data,
+                'specId': form.spec_id.data,
+                'radiocarbonYear': form.radiocarbon_year.data,
+                'range': form.range.data,
+                'timeScale': 'BP'})
+
     return render_template(
         'content.html',
         entity=entity,
