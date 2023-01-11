@@ -15,6 +15,7 @@ development specific documentation in our Redmine
    overview
    features
    entity/index
+   technical/index
    tools/index
    admin/index
    ui/index

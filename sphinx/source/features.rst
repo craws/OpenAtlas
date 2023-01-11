@@ -63,7 +63,7 @@ Data exchange
 OpenAtlas offers various possibilities to exchange data with other systems or
 to import data into the database system.
 
-* :doc:`/tools/api` for easier exchange with other information system
+* :doc:`/technical/api` for easier exchange with other information system
 * :doc:`/admin/export` functions for multiple formats
 * :doc:`/admin/import` of CSV files
 
