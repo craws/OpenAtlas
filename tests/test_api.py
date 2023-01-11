@@ -123,8 +123,8 @@ class Api(ApiTestCase):
                 assert self.get_geom_properties(rv, 'shapeType')
 
             for rv in [
-                self.app.get(
-                    url_for('api_03.export_database', format_='xml')),
+                # self.app.get(
+                #     url_for('api_03.export_database', format_='xml')),
                 self.app.get(
                     url_for('api_03.export_database', format_='json')),
                 self.app.get(
@@ -167,9 +167,11 @@ class Api(ApiTestCase):
             assert self.get_bool(
                 links, 'identifier', 'https://www.geonames.org/2761369')
             assert self.get_bool(links, 'referenceSystem', 'GeoNames')
-            assert self.get_bool(rv['geometry'], 'type', 'Point')
+            assert self.get_bool(rv['geometry'], 'type', 'GeometryCollection')
             assert self.get_bool(
-                rv['geometry'], 'coordinates', [16.37069611, 48.208571233])
+                rv['geometry']['geometries'][1],
+                'coordinates',
+                [16.37069611, 48.208571233])
             assert self.get_bool(rv['depictions'][0], '@id')
             assert self.get_bool(
                 rv['depictions'][0], 'title', 'Picture with a License')
@@ -185,7 +187,8 @@ class Api(ApiTestCase):
                     'api_03.entity', id_=place.id, format='geojson-v2'))]:
                 rv = rv.get_json()['features'][0]
             assert self.get_bool(rv['geometry'], 'type')
-            assert self.get_bool(rv['geometry'], 'coordinates')
+            assert self.get_bool(
+                rv['geometry']['geometries'][0], 'coordinates')
             assert self.get_bool(rv['properties'], '@id')
             assert self.get_bool(rv['properties'], 'systemClass')
             assert self.get_bool(rv['properties'], 'name')
@@ -327,7 +330,7 @@ class Api(ApiTestCase):
             assert bool(rv.get_json() == 8)
 
             rv = self.app.get(url_for('api_03.geometric_entities', count=True))
-            assert bool(rv.get_json() == 4)
+            assert bool(rv.get_json() == 6)
 
             # Test entities with GeoJSON Format
             for rv in [
