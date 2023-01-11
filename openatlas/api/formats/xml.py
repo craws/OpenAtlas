@@ -18,7 +18,7 @@ def subunit_xml(result: dict[str, Any]) -> bytes:
 
 
 def export_database_xml(tables: dict[str, Any], filename: str) -> Response:
-    return Response(  # pragma: no cover
+    return Response(
         dicttoxml(tables, root=False, attr_type=False),
         mimetype='application/xml',
         headers={

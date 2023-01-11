@@ -123,8 +123,8 @@ class Api(ApiTestCase):
                 assert self.get_geom_properties(rv, 'shapeType')
 
             for rv in [
-                # self.app.get(
-                #     url_for('api_03.export_database', format_='xml')),
+                self.app.get(
+                    url_for('api_03.export_database', format_='xml')),
                 self.app.get(
                     url_for('api_03.export_database', format_='json')),
                 self.app.get(

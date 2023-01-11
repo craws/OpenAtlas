@@ -52,7 +52,7 @@ class ExportDatabase(Resource):
         if format_ == 'csv':
             return export_database_csv(tables, filename)
         if format_ == 'xml':
-            return export_database_xml(tables, filename)  # pragma: no cover
+            return export_database_xml(tables, filename)
         return Response(
             json.dumps({key: str(value) for key, value in tables.items()}),
             mimetype='application/json',
