@@ -15,11 +15,13 @@ development specific documentation in our Redmine
    overview
    features
    entity/index
+   admin/index
+
+   model/index
    technical/index
    tools/index
-   admin/index
    ui/index
-   model/index
+
    examples/index
    troubleshooting/index
    faq

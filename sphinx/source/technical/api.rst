@@ -255,11 +255,10 @@ GeoJSON or RDFs, derived from the LPF data, can be accessed.
 .. toctree::
    :maxdepth: 1
 
-   api_version0_3
-   api_version1_0
+   Version 0.3 (current) <api_version0_3>
    api_version0_2
    api_version0_1
-
+   Version 1.0 (in development) <api_version1_0>
 
 Parameter definition
 --------------------
