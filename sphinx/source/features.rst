@@ -47,8 +47,13 @@ project.
 * :doc:`/tools/notes` and bookmarks
 * :doc:`User manual </index>` (English) with :doc:`examples </examples/index>`
   and context specific links in the application
-* User interface internationalization (currently English and German)
-  using `gettext <https://www.gnu.org/software/gettext/>`_
+* User interface internationalization using
+  `gettext <https://www.gnu.org/software/gettext/>`_, currently implemented:
+
+   * Catalan
+   * English
+   * German
+   * Spanish
 
 .. image:: /ui.png
 
